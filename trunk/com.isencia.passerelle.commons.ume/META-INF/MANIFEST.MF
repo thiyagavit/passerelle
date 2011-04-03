@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Unified Messaging Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.commons.ume
-Bundle-Version: 5.1.0.qualifier
+Bundle-Version: 7.0.0
 Bundle-Vendor: iSencia
 Import-Package: com.isencia.util;version="7.0.0",
  org.slf4j;version="1.6.0"
