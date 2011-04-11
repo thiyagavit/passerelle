@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.isencia.passerelle.engine.actorGroups">
+      <actorgroup
+            id="com.isencia.passerelle.actor.actorgroup.general"
+            name="General">
+      </actorgroup>
+      <actorgroup
+            id="com.isencia.passerelle.actor.actorgroup.flow"
+            name="Flow Control">
+      </actorgroup>
+      <actorgroup
+            id="com.isencia.passerelle.actor.actorgroup.filter"
+            name="Filters">
+      </actorgroup>
+   </extension>
+
+   <extension
+         point="com.isencia.passerelle.engine.actors">
+      <actor
+            class="com.isencia.passerelle.actor.general.Const"
+            group="com.isencia.passerelle.actor.actorgroup.general"
+            id="be.isencia.passerelle.actor.general.const"
+            name="Const">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.general.Console"
+            group="com.isencia.passerelle.actor.actorgroup.general"
+            id="com.isencia.passerelle.actor.console"
+            name="Console">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.general.Counter"
+            group="com.isencia.passerelle.actor.actorgroup.general"
+            id="com.isencia.passerelle.actor.counter"
+            name="Counter">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.filter.HeaderFilter"
+            group="com.isencia.passerelle.actor.actorgroup.filter"
+            id="com.isencia.passerelle.actor.HeaderFilter"
+            name="HeaderFilter">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.filter.RegExpFilter"
+            group="com.isencia.passerelle.actor.actorgroup.filter"
+            id="com.isencia.passerelle.actor.RegExpFilter"
+            name="RegExpFilter">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.flow.Synchronizer"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.Synchronizer"
+            name="Synchronizer">
+      </actor>
+   </extension>
+</plugin>
