@@ -43,4 +43,5 @@ Export-Package: com.isencia.passerelle.actor.control;version="7.0.0",
  com.isencia.passerelle.actor.mail;version="7.0.0",
  com.isencia.passerelle.actor.net;version="7.0.0",
  com.isencia.passerelle.actor.sequence;version="7.0.0"
+DynamicImport-Package: *
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
