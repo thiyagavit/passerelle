@@ -31,7 +31,7 @@
             name="HeaderFilter">
       </actor>
       <actor
-            class="com.isencia.passerelle.actor.filter.RegExpFilter"
+            class="com.isencia.passerelle.actor.filter.RegexpFilter"
             group="com.isencia.passerelle.actor.actorgroup.filter"
             id="com.isencia.passerelle.actor.RegExpFilter"
             name="RegExpFilter">

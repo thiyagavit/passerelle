@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Conf
-Bundle-SymbolicName: com.isencia.passerelle.actor.conf.tmep;singleton:=true
+Bundle-SymbolicName: com.isencia.passerelle.actor.conf;singleton:=true
 Bundle-Version: 6.0.1.qualifier
 Bundle-Vendor: ISENCIA
 Fragment-Host: com.isencia.passerelle.actor;bundle-version="6.0.1"
