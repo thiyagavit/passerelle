@@ -18,11 +18,11 @@ package com.isencia.passerelle.util.ptolemy;
 
 import javax.swing.filechooser.FileFilter;
 
-import com.isencia.passerelle.util.ExtensionFileFilter;
-
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+
+import com.isencia.passerelle.util.ExtensionFileFilter;
 
 /**
  * An extension on the std FileParameter, that allows to define
@@ -41,7 +41,7 @@ import ptolemy.kernel.util.NamedObj;
  * @author erwin
  *
  */
-public class FileParameter extends ptolemy.data.expr.FileParameter {
+public class ResourceParameter extends ptolemy.data.expr.FileParameter {
 	
 	/**
 	 * 
@@ -50,15 +50,13 @@ public class FileParameter extends ptolemy.data.expr.FileParameter {
 	
 	private ExtensionFileFilter fileFilter = null;
 
-	private String[] filterExtensions;
-
 	/**
 	 * @param container
 	 * @param name
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public FileParameter(NamedObj container, String name) throws IllegalActionException, NameDuplicationException {
+	public ResourceParameter(NamedObj container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
 	}
 	
@@ -72,9 +70,8 @@ public class FileParameter extends ptolemy.data.expr.FileParameter {
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public FileParameter(NamedObj container, String name, String filterName, String... filterExtensions) throws IllegalActionException, NameDuplicationException {
+	public ResourceParameter(NamedObj container, String name, String filterName, String... filterExtensions) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
-		this.filterExtensions = filterExtensions;
 		if(filterExtensions!=null && filterExtensions.length>0) {
 			fileFilter = new ExtensionFileFilter(filterExtensions);
 			fileFilter.setDescription(filterName);
@@ -89,7 +86,18 @@ public class FileParameter extends ptolemy.data.expr.FileParameter {
 		return fileFilter;
 	}
 
-	public String[] getFilterExtensions() {
-		return filterExtensions;
+	private int resourceType = 0;
+
+	/**
+	 * Will 
+	 * @return
+	 */
+	public int getResourceType() {
+		return resourceType;
 	}
+
+	public void setResourceType(int resourceType) {
+		this.resourceType = resourceType;
+	}
+	
 }
