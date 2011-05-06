@@ -18,6 +18,7 @@ package com.isencia.passerelle.actor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1027,6 +1028,49 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	 */
 	final public Parameter[] getConfigurableParameters() {
 		return (Parameter[]) configurableParameters.toArray(new Parameter[0]);
+	}
+	
+	/**
+	 * Method attempts to find a Configurable parameter by class type.
+	 * This encapsulates finding a parameter by name rather than pushing that
+	 * find (current just a loop) to outside classes to implement.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	final public Collection<Parameter> getConfigurableParameter(final Class<? extends Parameter> type) {
+		if (configurableParameters==null)     return null;
+		if (configurableParameters.isEmpty()) return null;
+		
+		final Parameter[] params  = getConfigurableParameters();
+		final Collection<Parameter> ret = new HashSet<Parameter>(params.length);
+		for (int i = 0; i < params.length; i++) {
+			if (type.isAssignableFrom(params[i].getClass())) {
+				ret.add(params[i]);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Method attempts to find a Configurable parameter by name.
+	 * This encapsulates finding a parameter by name rather than pushing that
+	 * find (current just a loop) to outside classes to implement.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	final public Parameter getConfigurableParameter(final String name) {
+		if (name==null)                       return null;
+		if (configurableParameters==null)     return null;
+		if (configurableParameters.isEmpty()) return null;
+		final Parameter[] params = getConfigurableParameters();
+		for (int i = 0; i < params.length; i++) {
+			if (name.equals(params[i].getName())) {
+				return params[i];
+			}
+		}
+		return null;
 	}
 
 	/**
