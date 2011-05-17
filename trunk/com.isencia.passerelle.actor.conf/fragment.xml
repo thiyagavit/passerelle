@@ -148,7 +148,7 @@
             name="Filters">
       </actorgroup>
    </extension>
-
+<!--
 	<extension
          point="org.eclipse.help.toc">
       <toc
@@ -160,9 +160,5 @@
           point="org.eclipse.help.index">
        <index file="index.xml"></index>
     </extension>
-    <extension
-          point="org.eclipse.help.contexts">
-       <index file="test.xml"></index>
-    </extension>
-
+    -->
 </fragment>
