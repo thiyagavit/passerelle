@@ -40,6 +40,7 @@ public class PaletteItemFactory implements Serializable {
 	public static final String DEFAULT_FAVORITES_NAME = "Favorites";
 	private static PreferenceStore store;
 	private CreationFactory selectedItem;
+
 	public CreationFactory getSelectedItem() {
 		return selectedItem;
 	}
@@ -81,6 +82,11 @@ public class PaletteItemFactory implements Serializable {
 		return actorBundleMap.get(className);
 	}
 
+	public void addPaletteGroup(String label) {
+		PaletteGroup paletteGroup = new PaletteGroup(label,label);
+		paletteGroups.add(paletteGroup);
+		groups.put(label, paletteGroup);
+	}
 	public List<PaletteGroup> getPaletteGroups() {
 		return paletteGroups;
 	}
@@ -201,8 +207,10 @@ public class PaletteItemFactory implements Serializable {
 				CombinedTemplateCreationEntry entry = (CombinedTemplateCreationEntry) child;
 				ClassTypeFactory entryType = (ClassTypeFactory) entry
 						.getTemplate();
-				if ((((Class)entryType.getObjectType()).getName().equals(type) && entryType.getNewObject().equals(name))
-						|| (entryType.getNewObject() instanceof Flow && ((Flow)entryType.getNewObject()).getName().equals(name))) {
+				if ((((Class) entryType.getObjectType()).getName().equals(type) && entryType
+						.getNewObject().equals(name))
+						|| (entryType.getNewObject() instanceof Flow && ((Flow) entryType
+								.getNewObject()).getName().equals(name))) {
 					return true;
 				}
 			}
@@ -428,10 +436,16 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public void addSubModel(Flow flow) {
-
-		SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(
-				flow, userLibrary, flow.getName(), flow.getName());
-		paletteItemMap.put(flow.getName(), item);
+		if (!paletteItemMap.containsKey(flow.getName())) {
+			SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(
+					flow, userLibrary, flow.getName(), flow.getName());
+			paletteItemMap.put(flow.getName(), item);
+		} else {
+			PaletteItemDefinition item = paletteItemMap.get(flow.getName());
+			if (item instanceof SubModelPaletteItemDefinition) {
+				((SubModelPaletteItemDefinition) item).setFlow(flow);
+			}
+		}
 		MoMLParser.putActorClass(flow.getName(), flow);
 	}
 
