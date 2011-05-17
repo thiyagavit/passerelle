@@ -117,10 +117,9 @@ public class PaletteBuilder {
 		for (Object e : containertLis) {
 
 			if (e instanceof PaletteDrawer) {
-				PaletteEntry paletteEntry = getFavoriteGroup(((PaletteDrawer) e)
-						.getLabel());
-				if (paletteEntry instanceof PaletteContainer) {
-					PaletteContainer favoritesContainer = (PaletteContainer) paletteEntry;
+				PaletteContainer favoritesContainer = (PaletteDrawer) e;
+				if (!favoritesContainer.getLabel().equals(PaletteItemFactory.get().getPaletteGroup(
+						ACTORGROUP_UTILITIES).getName())) {
 					containers.append(favoritesContainer.getLabel());
 					containers.append(",");
 					StringBuffer entries = new StringBuffer();
@@ -141,11 +140,12 @@ public class PaletteBuilder {
 
 							}
 						}
-
 					}
+					addFavoriteGroup(favoritesContainer.getLabel(), favoritesContainer);
 					factory.getStore().putValue(favoritesContainer.getLabel(),
 							entries.toString());
 				}
+
 			}
 		}
 		factory.getStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,

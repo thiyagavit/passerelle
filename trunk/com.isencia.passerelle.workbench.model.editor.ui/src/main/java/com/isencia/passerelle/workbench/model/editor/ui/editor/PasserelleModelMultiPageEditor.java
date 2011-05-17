@@ -124,6 +124,11 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	protected boolean editorSaving = false;
 	private RefreshCommand RefreshCommand;
 	protected OutlinePage outlinePage;
+	protected ActorTreeViewerPage actorTreeViewPage;
+
+	public ActorTreeViewerPage getActorTreeViewPage() {
+		return actorTreeViewPage;
+	}
 
 	public IPasserelleEditor getSelectedPage() {
 		IEditorPart ed = getEditor(getActivePage());
@@ -149,9 +154,9 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			return outlinePage;
 		}
 		if (type == ActorPalettePage.class) {
-			ActorTreeViewerPage page = new ActorTreeViewerPage(editor
+			actorTreeViewPage = new ActorTreeViewerPage(editor
 					.getActionRegistry());
-			return page;
+			return actorTreeViewPage;
 		}
 
 		return super.getAdapter(type);

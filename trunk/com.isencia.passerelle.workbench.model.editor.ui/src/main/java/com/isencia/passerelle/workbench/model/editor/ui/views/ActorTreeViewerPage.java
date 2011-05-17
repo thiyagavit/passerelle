@@ -24,6 +24,8 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -71,6 +73,20 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 	 */
 	protected void initPage() {
 		createContextMenus();
+		getTreeViewer().getTree().addTreeListener(new TreeListener() {
+			
+			@Override
+			public void treeExpanded(TreeEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void treeCollapsed(TreeEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		getTreeViewer().getTree().addMouseTrackListener(
 				new MouseTrackAdapter() {
 
