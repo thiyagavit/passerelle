@@ -115,26 +115,27 @@ public class PasserelleNewModelWizardPage extends WizardPage {
 			}
 		}
 
-		fileText.setText(generateUniqueFileName(container));
+			fileText.setText(generateUniqueFileName(container));
 	}
 
 	private String generateUniqueFileName(IContainer container) {
 
 		StringBuffer buffer = new StringBuffer("new_model");
-		addIndex(container, buffer, 1,buffer.toString());
+		if (container != null)
+			addIndex(container, buffer, 1, buffer.toString());
 		buffer.append(".moml");
 		return buffer.toString();
 	}
 
-	private void addIndex(IContainer container, StringBuffer buffer,
-			int index,String name) {
+	private void addIndex(IContainer container, StringBuffer buffer, int index,
+			String name) {
 		IFile file = container.getFile(new Path(buffer.toString() + ".moml"));
 		if (file.exists()) {
 			buffer.setLength(name.length());
 			buffer.append("(");
 			buffer.append(index++);
 			buffer.append(")");
-			addIndex(container, buffer, index,name);
+			addIndex(container, buffer, index, name);
 		}
 	}
 
