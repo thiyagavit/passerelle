@@ -148,7 +148,6 @@
             name="Filters">
       </actorgroup>
    </extension>
-<!--
 	<extension
          point="org.eclipse.help.toc">
       <toc
@@ -160,5 +159,11 @@
           point="org.eclipse.help.index">
        <index file="index.xml"></index>
     </extension>
-    -->
+	 <extension
+         point="org.eclipse.help.contexts">
+    	<contexts
+            file="context.xml"
+            plugin="com.isencia.passerelle.actor.conf">
+   	 </contexts>
+	</extension>
 </fragment>

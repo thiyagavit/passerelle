@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contexts>
+   <context id="com_isencia_passerelle_actor_general_Console" >
+      <description>
+      <b>Console</b>
+      Ouput is shown in console
+      </description>
+      <topic label="details" href="html/com.isencia.passerelle.actor.general.Console.html"/>
+   </context>
+   <context id="com_isencia_passerelle_actor_net_SocketClientSender_Msg End" >
+      <description>Message end</description>
+   </context>
+   <context id="com_isencia_passerelle_actor_net_SocketClientSender_port" >
+      <description>Port of client sender</description>
+   </context>
+   <context id="com_isencia_passerelle_actor_net_SocketClientSender_remote host" >
+      <description>Remote host of sender</description>
+   </context>
+</contexts>
