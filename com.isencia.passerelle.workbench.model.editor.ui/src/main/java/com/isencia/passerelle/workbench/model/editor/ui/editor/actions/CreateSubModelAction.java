@@ -3,6 +3,7 @@ package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.gef.ui.actions.SelectionAction;
@@ -135,6 +136,7 @@ public class CreateSubModelAction extends SelectionAction {
 		PaletteItemFactory factory = PaletteItemFactory.get();
 		Flow flow = FlowManager.readMoml(new FileReader(file));
 		factory.addSubModel(flow);
+
 		return entityAsClass;
 	}
 

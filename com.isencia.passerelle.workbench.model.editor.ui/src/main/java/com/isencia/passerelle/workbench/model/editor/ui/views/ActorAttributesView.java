@@ -36,6 +36,7 @@ import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
@@ -170,37 +171,37 @@ public class ActorAttributesView extends ViewPart implements
 		createColumns(viewer);
 		viewer.setUseHashlookup(true);
 		viewer.setColumnProperties(new String[] { "Property", "Value" });
-		
+
 		createActions();
 		createPopupMenu();
 
 		getSite().getWorkbenchWindow().getSelectionService()
 				.addSelectionListener(this);
-//		viewer.getTable().addMouseListener(new MouseListener() {
-//			
-//			@Override
-//			public void mouseUp(MouseEvent arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//			
-//			@Override
-//			public void mouseDown(MouseEvent arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//			
-//			@Override
-//			public void mouseDoubleClick(MouseEvent arg0) {
-//				try {
-//					showHelpSelectedParameter();
-//				} catch (IllegalActionException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//			}
-//		});
+		viewer.getTable().addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseDown(MouseEvent arg0) {
+			
+			}
+
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+				try {
+					showHelpSelectedParameter();
+				} catch (IllegalActionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+
+			}
+		});
 		viewer.getTable().addKeyListener(new KeyListener() {
 
 			@Override
@@ -292,11 +293,11 @@ public class ActorAttributesView extends ViewPart implements
 		return actor.getName();
 	}
 
-	public String getActorClass() {
+	public Class getActorClass() {
 		if (actor == null) {
 			return null;
 		}
-		return actor.getClass().getName();
+		return actor.getClass();
 	}
 
 	public void setActorName(final String name) {
@@ -326,19 +327,19 @@ public class ActorAttributesView extends ViewPart implements
 		final ISelection sel = viewer.getSelection();
 		if (sel != null && sel instanceof StructuredSelection) {
 			final StructuredSelection s = (StructuredSelection) sel;
-			String actorClass = getActorClass();
+			String actorClass = getActorClass().getName();
 			final Object o = s.getFirstElement();
 			if (o instanceof String)
 				return;
 			if (o instanceof Attribute) {
 				Attribute attr = (Attribute) o;
 				if (actorClass != null) {
-					String href = "/"
-							+ PaletteItemFactory.get().getBuildId(actorClass)
-							+ "/html/" + getActorClass() + ".html#"
-							+ attr.getName();
+					String helpBundle = Constants.HELP_BUNDLE_ID;
+					String actorName = getActorClass().getName().replace(".", "_");
+					String contextId = helpBundle
+							+ "." + actorName + "_" + attr.getName();
 
-					WorkbenchHelpSystem.getInstance().displayHelpResource(href);
+					WorkbenchHelp.displayHelp(contextId);
 				}
 			}
 

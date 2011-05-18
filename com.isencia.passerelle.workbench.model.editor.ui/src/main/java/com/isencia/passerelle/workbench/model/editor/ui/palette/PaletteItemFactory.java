@@ -1,8 +1,11 @@
 package com.isencia.passerelle.workbench.model.editor.ui.palette;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +40,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 public class PaletteItemFactory implements Serializable {
 
 	public static final String FAVORITE_GROUPS = "FavoriteGroups";
+	public static final String SUBMODELS = "Submodels";
 	public static final String DEFAULT_FAVORITES_NAME = "Favorites";
 	private static PreferenceStore store;
 	private CreationFactory selectedItem;
@@ -83,10 +87,11 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public void addPaletteGroup(String label) {
-		PaletteGroup paletteGroup = new PaletteGroup(label,label);
+		PaletteGroup paletteGroup = new PaletteGroup(label, label);
 		paletteGroups.add(paletteGroup);
 		groups.put(label, paletteGroup);
 	}
+
 	public List<PaletteGroup> getPaletteGroups() {
 		return paletteGroups;
 	}
@@ -365,22 +370,8 @@ public class PaletteItemFactory implements Serializable {
 		}
 		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toOSString();
-		File metaData = new File(workspacePath + File.separator + ".metadata");
-		if (metaData.isDirectory()) {
-			File[] files = metaData.listFiles();
-			for (File file : files) {
-				try {
-					FileReader in = new FileReader(file);
-					Flow flow = FlowManager.readMoml(in);
-					if (flow.isClassDefinition()) {
-						if (file.getName().endsWith(".moml")) {
-							addSubModel(flow);
-						}
-
-					}
-				} catch (Exception e1) {
-				}
-			}
+		for (Flow flow : getSubModels().values()) {
+			addSubModel(flow);
 		}
 
 		// Find all Actors and add them to the corresponding container
@@ -435,6 +426,61 @@ public class PaletteItemFactory implements Serializable {
 
 	}
 
+	public void registerSubModel(Flow flow) {
+		if (modelList == null) {
+			modelList = getSubModels();
+		}
+		String model = flow.getName();
+		if (!modelList.containsKey(model)) {
+			modelList.put(model, flow);
+
+			StringBuffer modelString = new StringBuffer(getStore().getString(
+					SUBMODELS));
+			modelString.append(model);
+			modelString.append(",");
+			getStore().putValue(SUBMODELS, modelString.toString());
+			try {
+				getStore().save();
+			} catch (IOException e1) {
+
+			}
+
+		}
+
+	}
+
+	private Map<String, Flow> modelList;
+
+	public Map<String, Flow> getSubModels() {
+
+		if (modelList == null) {
+			String models = getStore().getString(PaletteItemFactory.SUBMODELS);
+			modelList = new HashMap<String, Flow>();
+			for (String model : models.split(",")) {
+
+				InputStreamReader reader = new InputStreamReader(
+						createEmptySubModel(model));
+				try {
+					Flow flow = FlowManager.readMoml(reader);
+					MoMLParser.putActorClass(model, flow);
+					modelList.put(model, flow);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+		return modelList;
+	}
+
+	private InputStream createEmptySubModel(String subModel) {
+		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
+				+ "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
+				+ "<class name=\"" + subModel
+				+ "\" extends=\"ptolemy.actor.TypedCompositeActor\"> </class>";
+		return new ByteArrayInputStream(contents.getBytes());
+	}
+
 	public void addSubModel(Flow flow) {
 		if (!paletteItemMap.containsKey(flow.getName())) {
 			SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(
@@ -447,6 +493,7 @@ public class PaletteItemFactory implements Serializable {
 			}
 		}
 		MoMLParser.putActorClass(flow.getName(), flow);
+		registerSubModel(flow);
 	}
 
 	private static Class<?> loadClass(

@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -525,23 +527,35 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		InputStream is = null;
 		try {
 			is = new FileInputStream(filePath);
+			PaletteItemFactory factory = PaletteItemFactory.get();
+
+			Map<String,Flow> modelList = factory.getSubModels();
+
 			final String workspacePath = ResourcesPlugin.getWorkspace()
 					.getRoot().getLocation().toOSString();
-			File folder = new File(workspacePath + File.separator + ".metadata");
+			File metaData = new File(workspacePath + File.separator
+					+ ".metadata");
 
-			for (File file : folder.listFiles()) {
-				try {
-					if (file.getName().endsWith(".moml")){
-						FileReader in = new FileReader(file);
-						Flow flow = FlowManager.readMoml(in);
-						if (flow.isClassDefinition()) {
-							MoMLParser.putActorClass(file.getName().substring(0,file.getName().length()-5), flow);
+			if (metaData.isDirectory()) {
+				File[] files = metaData.listFiles();
+				for (File file : files) {
+					try {
+						String momlName = file.getName().substring(0,
+								file.getName().length() - 5);
+						if (file.getName().endsWith(".moml")
+								&& modelList.keySet().contains(momlName)) {
+
+							FileReader in = new FileReader(file);
+							Flow flow = FlowManager.readMoml(in);
+							if (flow.isClassDefinition()) {
+								MoMLParser.putActorClass(momlName, flow);
+							}
+
 						}
-					}
-					
-				} catch (Exception e1) {
-				}
 
+					} catch (Exception e1) {
+					}
+				}
 			}
 
 			MoMLParser moMLParser = new MoMLParser();
@@ -569,6 +583,14 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 
 		}
 
+	}
+
+	private InputStream createEmptySubModel(String subModel) {
+		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
+				+ "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
+				+ "<class name=\"" + subModel
+				+ "\" extends=\"ptolemy.actor.TypedCompositeActor\"> </class>";
+		return new ByteArrayInputStream(contents.getBytes());
 	}
 
 	private boolean isClass(String name) {
