@@ -18,7 +18,7 @@ import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
-public class DeleteConnectionCommand extends Command {
+public class DeleteConnectionCommand extends Command implements IRefreshConnections{
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DeleteConnectionCommand.class);

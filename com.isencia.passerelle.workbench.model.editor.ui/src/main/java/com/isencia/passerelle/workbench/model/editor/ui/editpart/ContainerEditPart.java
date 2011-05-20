@@ -6,6 +6,8 @@ import java.util.Enumeration;
 import java.util.List;
 
 import ptolemy.actor.CompositeActor;
+import ptolemy.actor.IOPort;
+import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.moml.Vertex;
@@ -63,47 +65,21 @@ abstract public class ContainerEditPart extends AbstractBaseEditPart {
 		CompositeActor modelDiagram = getModelDiagram(actor);
 
 		ArrayList children = new ArrayList();
-		List entities = modelDiagram.entityList();
 		
-		if (entities != null){
-//			if (entities.isEmpty()){
-//				if (getModel() instanceof Flow){
-//					try {
-//					((Flow)getModel()).initialize();
-//					} catch (IllegalActionException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					entities = modelDiagram.entityList();
-//				}
-//			}
+		List entities = modelDiagram.entityList();
+		if (entities != null)
 			children.addAll(entities);
-		}
+
 		if (modelDiagram.getContainer() == null
 				&& modelDiagram.getDirector() != null)
 			children.add(modelDiagram.getDirector());
 
-		Enumeration attributes = modelDiagram.getAttributes();
-		while (attributes.hasMoreElements()) {
+		
+		children.addAll(modelDiagram.attributeList(TextAttribute.class));
+		children.addAll(modelDiagram.attributeList(IOPort.class));
+		children.addAll(modelDiagram.inputPortList());
+		children.addAll(modelDiagram.outputPortList());
 
-			Object nextElement = attributes.nextElement();
-			if (nextElement instanceof TextAttribute)
-				children.add(nextElement);
-			if (nextElement instanceof CompositeActor)
-				children.add(nextElement);
-		}
-		Enumeration enitites = modelDiagram.getEntities();
-		while (attributes.hasMoreElements()) {
-
-			Object nextElement = attributes.nextElement();
-			children.add(nextElement);
-		}
-		Enumeration ports = modelDiagram.getPorts();
-		while (ports.hasMoreElements()) {
-
-			Object nextElement = ports.nextElement();
-			children.add(nextElement);
-		}
 		Enumeration relations = modelDiagram.getRelations();
 		while (relations.hasMoreElements()) {
 

@@ -58,8 +58,6 @@ public class DiagramEditPart extends ContainerEditPart implements
 	 * Installs EditPolicies specific to this.
 	 */
 	protected void createEditPolicies() {
-		super.createEditPolicies();
-
 		installEditPolicy(EditPolicy.NODE_ROLE, null);
 		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, null);
 		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, null);

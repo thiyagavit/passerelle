@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteSubmodelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;

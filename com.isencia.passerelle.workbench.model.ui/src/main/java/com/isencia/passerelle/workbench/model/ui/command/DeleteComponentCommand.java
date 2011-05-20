@@ -25,7 +25,7 @@ import com.isencia.passerelle.workbench.model.ui.ComponentUtility;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
-public class DeleteComponentCommand extends Command {
+public class DeleteComponentCommand extends Command implements IRefreshConnections{
 	private IPasserelleMultiPageEditor multiPageEditor;
 
 	public void setMultiPageEditor(IPasserelleMultiPageEditor multiPageEditor) {

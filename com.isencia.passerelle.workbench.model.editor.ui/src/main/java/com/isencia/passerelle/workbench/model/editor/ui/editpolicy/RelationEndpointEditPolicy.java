@@ -1,7 +1,5 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpolicy;
 
-import java.io.ObjectInputStream.GetField;
-
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.gef.GraphicalEditPart;
 

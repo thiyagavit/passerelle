@@ -368,8 +368,7 @@ public class PaletteItemFactory implements Serializable {
 		} catch (Exception e) {
 
 		}
-		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation().toOSString();
+
 		for (Flow flow : getSubModels().values()) {
 			addSubModel(flow);
 		}

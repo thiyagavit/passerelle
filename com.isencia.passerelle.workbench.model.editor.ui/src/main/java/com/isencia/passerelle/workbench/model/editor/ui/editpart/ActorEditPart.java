@@ -55,7 +55,7 @@ import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionC
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class ActorEditPart extends AbstractNodeEditPart {
+public class ActorEditPart extends AbstractNodeEditPart implements ActorNodeEditPart{
 
 	private final static Logger logger = LoggerFactory
 			.getLogger(ActorEditPart.class);
@@ -81,39 +81,13 @@ public class ActorEditPart extends AbstractNodeEditPart {
 		return logger;
 	}
 
-	@Override
-	public void changeExecuted(ChangeRequest changerequest) {
-		super.changeExecuted(changerequest);
 
-		Object source = changerequest.getSource();
-		if (changerequest instanceof ModelChangeRequest) {
-			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-
-			if (EntityPropertySource.class.equals(type)) {
-				if (source == this.getModel()) {
-					// Execute the dummy command force a dirty state
-					getViewer().getEditDomain().getCommandStack().execute(
-							new ChangeActorPropertyCommand());
-				}
-			} else if ((DeleteConnectionCommand.class.equals(type)
-					|| DeleteVertexConnectionCommand.class.equals(type)
-					|| DeleteComponentCommand.class.equals(type) || CreateConnectionCommand.class
-					.equals(type))) {
-				try {
-					refreshSourceConnections();
-					refreshTargetConnections();
-				} catch (Exception e) {
-
-				}
-			}
-		}
-	}
 
 	protected void createEditPolicies() {
 		if (getParent() instanceof DiagramEditPart) {
 			installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE,
 					new ActorEditPolicy(((DiagramEditPart) getParent())
-							.getMultiPageEditorPart()));
+							.getMultiPageEditorPart(), this));
 		}
 		installEditPolicy(EditPolicy.COMPONENT_ROLE,
 				new ComponentNodeDeletePolicy());

@@ -18,7 +18,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteSubmodelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
 
 /**
@@ -56,12 +56,12 @@ public class ActorTreeMenuProvider extends ContextMenuProvider {
 		// IAction action = getActionRegistry().getAction(
 		// ActionFactory.DELETE.getId());
 		// if (action != null && action.isEnabled())
-//		TreeViewer tree = (TreeViewer) getViewer();
-//		TreeSelection treeSelection = (TreeSelection) tree.getSelection();
+		TreeViewer tree = (TreeViewer) getViewer();
+		TreeSelection treeSelection = (TreeSelection) tree.getSelection();
 //		Object element = treeSelection.getFirstElement();
 //		if (element instanceof SubModelPaletteItemDefinition) {
 //			menu.appendToGroup(GEFActionConstants.GROUP_EDIT,
-//					new DeleteSubmodelAction((SubModelPaletteItemDefinition)element));
+//					new EditSubmodelAction((SubModelPaletteItemDefinition)element));
 //		}
 
 	}

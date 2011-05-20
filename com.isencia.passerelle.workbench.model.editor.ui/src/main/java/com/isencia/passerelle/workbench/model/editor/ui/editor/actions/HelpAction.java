@@ -56,12 +56,6 @@ public class HelpAction extends SelectionAction {
 	@Override
 	public void run() {
 		List selection = getSelectedObjects();
-		// String langPrefix = "";
-		// if (Locale.getDefault().getLanguage() != null
-		// && !Locale.getDefault().getLanguage().equals(Locale.ENGLISH)) {
-		// langPrefix = Locale.getDefault().getLanguage() + "/";
-		// }
-		WorkbenchHelp.displayHelp("com.isencia.passerelle.actor.conf.Context");
 		for (Object o : selection) {
 			if (o instanceof OutlineEditPart) {
 				OutlineEditPart out = (OutlineEditPart) o;
