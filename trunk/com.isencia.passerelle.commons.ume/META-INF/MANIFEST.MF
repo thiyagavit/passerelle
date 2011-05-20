@@ -6,7 +6,7 @@ Bundle-Version: 7.0.0
 Bundle-Vendor: iSencia
 Import-Package: com.isencia.util;version="7.0.0",
  org.apache.commons.net.ftp,
- org.slf4j;version="1.6.0"
+  org.slf4j;version="1.5.0"
 Require-Bundle: mail
 Export-Package: com.isencia.message;version="7.0.0",
  com.isencia.message.db;version="7.0.0",
