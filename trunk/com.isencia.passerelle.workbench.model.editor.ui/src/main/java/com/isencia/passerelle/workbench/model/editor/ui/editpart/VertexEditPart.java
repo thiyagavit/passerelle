@@ -48,7 +48,7 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
  * 
  * @author Dirk Jacobs
  */
-public class VertexEditPart extends AbstractNodeEditPart implements ActorNodeEditPart{
+public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEditPart{
 	public static Map<Vertex, Map<NamedObj, VertexLink>> vertexRelationMap = new HashMap<Vertex, Map<NamedObj, VertexLink>>();
 	public static Set<Vertex> vertexRelationSources = new HashSet<Vertex>();
 	public static Set<Vertex> vertexRelationTargets = new HashSet<Vertex>();

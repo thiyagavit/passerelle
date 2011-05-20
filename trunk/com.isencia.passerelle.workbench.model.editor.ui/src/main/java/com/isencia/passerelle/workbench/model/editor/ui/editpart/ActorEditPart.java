@@ -55,7 +55,8 @@ import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionC
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class ActorEditPart extends AbstractNodeEditPart implements ActorNodeEditPart{
+public class ActorEditPart extends AbstractNodeEditPart implements
+		IActorNodeEditPart {
 
 	private final static Logger logger = LoggerFactory
 			.getLogger(ActorEditPart.class);
@@ -80,8 +81,6 @@ public class ActorEditPart extends AbstractNodeEditPart implements ActorNodeEdit
 	public Logger getLogger() {
 		return logger;
 	}
-
-
 
 	protected void createEditPolicies() {
 		if (getParent() instanceof DiagramEditPart) {
@@ -198,7 +197,10 @@ public class ActorEditPart extends AbstractNodeEditPart implements ActorNodeEdit
 	 * @return Model of this as an Actor.
 	 */
 	public Actor getActor() {
-		return (Actor) getModel();
+		Object model = getModel();
+		if (model instanceof Actor)
+			return (Actor) model;
+		return null;
 	}
 
 	public void setSelected(int i) {

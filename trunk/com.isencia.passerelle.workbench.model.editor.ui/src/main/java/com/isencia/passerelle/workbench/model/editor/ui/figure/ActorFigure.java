@@ -78,12 +78,12 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 					sourceConnectionAnchors.size());
 			if (maxAnchorCount > 0) {
 				int height = maxAnchorCount
-						* ANCHOR_HEIGTH
-						+ (maxAnchorCount > 1 ? ((maxAnchorCount - 1) * ANCHOR_SPACING)
-								: 0) + (2 * ANCHOR_MARGIN);
-				if (height < MIN_HEIGHT)
-					height = MIN_HEIGHT;
-				return new Dimension(DEFAULT_WIDTH, height);
+						* getAnchorHeight()
+						+ (maxAnchorCount > 1 ? ((maxAnchorCount - 1) * getAnchorSpacing())
+								: 0) + (2 * getAnchorMargin());
+				if (height < getMinHeight())
+					height = getMinHeight();
+				return new Dimension(getDefaultWidth(), height);
 			} else
 				return super.getMinimumSize();
 		}
@@ -94,7 +94,7 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 		public Ports() {
 			ToolbarLayout layout = new ToolbarLayout();
 			layout.setVertical(true);
-			layout.setSpacing(ANCHOR_SPACING);
+			layout.setSpacing(getAnchorSpacing());
 			setLayoutManager(layout);
 			setOpaque(false);
 			setBorder(new PortsBorder());
@@ -105,7 +105,7 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 
 		@Override
 		public Insets getInsets(IFigure ifigure) {
-			return new Insets(ANCHOR_MARGIN, 0, 0, 0);
+			return new Insets(getAnchorMargin(), 0, 0, 0);
 		}
 
 		@Override
@@ -141,7 +141,7 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 		// TODO update Anchor with correct attributes
 		FixedConnectionAnchor anchor = new FixedConnectionAnchor(inputPortFigure);
 		
-		anchor.offsetV = ANCHOR_HEIGTH / 2;
+		anchor.offsetV = getAnchorHeight() / 2;
 		getTargetConnectionAnchors().add(anchor);
 		connectionAnchors.put(portName, anchor);
 		return inputPortFigure;
@@ -188,12 +188,14 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 			outputPortMap.put(portName, outputPortFigure);
 		}
 		FixedConnectionAnchor anchor = new FixedConnectionAnchor(outputPortFigure);
-		anchor.offsetV = ANCHOR_HEIGTH / 2;
-		anchor.offsetH = ANCHOR_WIDTH - 1;
+		anchor.offsetV = getAnchorHeight() / 2;
+		anchor.offsetH = getAnchorWidth() - 1;
 		getSourceConnectionAnchors().add(anchor);
 		connectionAnchors.put(portName, anchor);
 		return outputPortFigure;
 	}
+
+
 
 	public PortFigure getInputPort(String name) {
 		return inputPortMap.get(name);
@@ -202,4 +204,6 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 	public PortFigure getOutputPort(String name) {
 		return outputPortMap.get(name);
 	}
+
+
 }

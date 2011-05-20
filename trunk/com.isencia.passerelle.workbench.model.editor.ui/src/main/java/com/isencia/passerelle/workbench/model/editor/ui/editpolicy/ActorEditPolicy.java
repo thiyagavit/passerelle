@@ -23,7 +23,7 @@ import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorNodeEditPart;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.IActorNodeEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.RelationEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.VertexEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.VertexLinkEditPart;
@@ -57,10 +57,10 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 		return CreateConnectionCommand;
 	}
 
-	private ActorNodeEditPart node;
+	private IActorNodeEditPart node;
 
 	public ActorEditPolicy(PasserelleModelMultiPageEditor editor,
-			ActorNodeEditPart node) {
+			IActorNodeEditPart node) {
 		super();
 		this.editor = editor;
 		this.node = node;
@@ -78,7 +78,7 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 	 * (org.eclipse.gef.requests.CreateConnectionRequest)
 	 */
 	protected Command getConnectionCreateCommand(CreateConnectionRequest request) {
-		ActorNodeEditPart editPart = getActorEditPart();
+		IActorNodeEditPart editPart = getActorEditPart();
 		if (getLogger().isDebugEnabled())
 			getLogger().trace(
 					"getConnectionCreateCommand for editPart : " + editPart);
@@ -88,7 +88,7 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 		} else {
 			ConnectionAnchor anchor = editPart
 					.getSourceConnectionAnchor(request);
-			port = (ComponentPort) ((ActorNodeEditPart) editPart)
+			port = (ComponentPort) ((IActorNodeEditPart) editPart)
 					.getSourcePort(anchor);
 		}
 		if (port != null) {
@@ -109,7 +109,7 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 	 */
 	protected Command getConnectionCompleteCommand(
 			CreateConnectionRequest request) {
-		ActorNodeEditPart editPart = getActorEditPart();
+		IActorNodeEditPart editPart = getActorEditPart();
 		if (getLogger().isDebugEnabled())
 			getLogger().debug(
 					"getConnectionCompleteCommand for editPart : " + editPart);
@@ -119,7 +119,7 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 		} else {
 			ConnectionAnchor anchor = editPart
 					.getTargetConnectionAnchor(request);
-			port = (ComponentPort) ((ActorNodeEditPart) editPart)
+			port = (ComponentPort) ((IActorNodeEditPart) editPart)
 					.getTargetPort(anchor);
 		}
 
@@ -136,8 +136,8 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 		return (Actor) getHost().getModel();
 	}
 
-	protected ActorNodeEditPart getActorEditPart() {
-		return (ActorNodeEditPart) getHost();
+	protected IActorNodeEditPart getActorEditPart() {
+		return (IActorNodeEditPart) getHost();
 	}
 
 	protected Command getReconnectTargetCommand(ReconnectRequest request) {
@@ -194,8 +194,8 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
 		ReConnectCommand cmd = createReconnectCommand(request,false);
 
 		EditPart target = request.getTarget();
-		if (target instanceof ActorNodeEditPart) {
-			ActorNodeEditPart actorEditPart = (ActorNodeEditPart) target;
+		if (target instanceof IActorNodeEditPart) {
+			IActorNodeEditPart actorEditPart = (IActorNodeEditPart) target;
 			ConnectionAnchor anchor = actorEditPart
 					.getSourceConnectionAnchor(request);
 			Port port = actorEditPart.getSourcePort(anchor);

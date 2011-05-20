@@ -95,19 +95,20 @@ public class ActorAttributesView extends ViewPart implements
 				// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
 				// addedListener = true;
 			}
-
-			final List<Parameter> parameterList = new ArrayList<Parameter>(7);
-			Iterator<Parameter> parameterIterator = actor.attributeList(
-					Parameter.class).iterator();
-			while (parameterIterator.hasNext()) {
-				Parameter parameter = (Parameter) parameterIterator.next();
-				if (PasserelleConfigurer.isVisible(actor, parameter)) {
-					parameterList.add(parameter);
+			if (actor != null) {
+				final List<Parameter> parameterList = new ArrayList<Parameter>(
+						7);
+				Iterator<Parameter> parameterIterator = actor.attributeList(
+						Parameter.class).iterator();
+				while (parameterIterator.hasNext()) {
+					Parameter parameter = (Parameter) parameterIterator.next();
+					if (PasserelleConfigurer.isVisible(actor, parameter)) {
+						parameterList.add(parameter);
+					}
 				}
+
+				createTableModel(parameterList);
 			}
-
-			createTableModel(parameterList);
-
 			return true;
 		}
 
