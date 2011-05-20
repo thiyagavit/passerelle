@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.PositionConstants;
@@ -59,21 +58,17 @@ import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.gef.ui.parts.SelectionSynchronizer;
 import org.eclipse.gef.ui.rulers.RulerComposite;
-import org.eclipse.help.internal.base.HelpBasePlugin;
-import org.eclipse.help.internal.base.IHelpBaseConstants;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.internal.Platform;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -85,6 +80,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.part.FileEditorInput;
@@ -97,7 +93,10 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.util.NamedObj;
 
+import com.isencia.passerelle.workbench.model.editor.ui.Constants;
+import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.FileTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.PasserelleTemplateTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CloseEditorAction;
@@ -174,6 +173,28 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		updateActions(getSelectionActions());
+//		if (EclipseUtils.getActivePage().getActivePart().equals(part)) {
+//			try {
+//
+//				if (selection instanceof StructuredSelection) {
+//					StructuredSelection structure = (StructuredSelection) selection;
+//					Object o = structure.getFirstElement();
+//					if (o instanceof AbstractBaseEditPart) {
+//						NamedObj actor = (NamedObj) ((AbstractBaseEditPart) o)
+//								.getModel();
+//						String actorName = actor.getClassName().replace(".",
+//								"_");
+//						PlatformUI.getWorkbench().getHelpSystem().setHelp(
+//								getGraphicalViewer().getControl(),
+//								Constants.HELP_BUNDLE_ID + "." + actorName);
+//						PlatformUI.getWorkbench().getHelpSystem()
+//								.displayDynamicHelp();
+//					}
+//				}
+//			} catch (Exception e) {
+//
+//			}
+//		}
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {
@@ -529,7 +550,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		HelpAction helpAction = new HelpAction(this, getParent());
 		registry.registerAction(helpAction);
 		getSelectionActions().add(helpAction.getId());
-		DynamicHelpAction dynamicHelpAction = new DynamicHelpAction(this, getParent());
+		DynamicHelpAction dynamicHelpAction = new DynamicHelpAction(this,
+				getParent());
 		registry.registerAction(dynamicHelpAction);
 		getSelectionActions().add(dynamicHelpAction.getId());
 
@@ -592,13 +614,15 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 			Map map = paletteViewer.getVisualPartMap();
 			Set<DrawerEditPart> drawers = new HashSet<DrawerEditPart>();
 			for (Object o : contents.getChildren()) {
-				if (o instanceof DrawerEditPart && !((DrawerEditPart)o).getDrawer().getLabel().equals("Utilities")) {
-						drawers.add((DrawerEditPart) o);
+				if (o instanceof DrawerEditPart
+						&& !((DrawerEditPart) o).getDrawer().getLabel().equals(
+								"Utilities")) {
+					drawers.add((DrawerEditPart) o);
 				}
 			}
 			for (DrawerEditPart drawer : drawers) {
-					drawer.getDrawerFigure().addMouseMotionListener(
-							new PaletteMouseListener(drawer));
+				drawer.getDrawerFigure().addMouseMotionListener(
+						new PaletteMouseListener(drawer));
 
 			}
 			DropTarget dt = new DropTarget(paletteViewer.getControl(),

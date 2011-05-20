@@ -22,6 +22,7 @@ import org.eclipse.swt.accessibility.AccessibleEvent;
 
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedIORelation;
+import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
@@ -47,7 +48,7 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
  * 
  * @author Dirk Jacobs
  */
-public class VertexEditPart extends AbstractNodeEditPart {
+public class VertexEditPart extends AbstractNodeEditPart implements ActorNodeEditPart{
 	public static Map<Vertex, Map<NamedObj, VertexLink>> vertexRelationMap = new HashMap<Vertex, Map<NamedObj, VertexLink>>();
 	public static Set<Vertex> vertexRelationSources = new HashSet<Vertex>();
 	public static Set<Vertex> vertexRelationTargets = new HashSet<Vertex>();
@@ -201,7 +202,7 @@ public class VertexEditPart extends AbstractNodeEditPart {
 		if (getParent() instanceof DiagramEditPart)
 			installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE,
 					new ActorEditPolicy(((DiagramEditPart) getParent())
-							.getMultiPageEditorPart()));
+							.getMultiPageEditorPart(), this));
 		installEditPolicy(EditPolicy.COMPONENT_ROLE,
 				new ComponentNodeDeletePolicy());
 	}
@@ -247,31 +248,15 @@ public class VertexEditPart extends AbstractNodeEditPart {
 	}
 
 	@Override
-	public void changeExecuted(ChangeRequest changerequest) {
-		super.changeExecuted(changerequest);
+	public Port getSourcePort(ConnectionAnchor anchor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		Object source = changerequest.getSource();
-		if (changerequest instanceof ModelChangeRequest) {
-			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-
-			if (EntityPropertySource.class.equals(type)) {
-				if (source == this.getModel()) {
-					// Execute the dummy command force a dirty state
-					getViewer().getEditDomain().getCommandStack().execute(
-							new ChangeActorPropertyCommand());
-				}
-			} else if ((DeleteConnectionCommand.class.equals(type)
-					|| DeleteVertexConnectionCommand.class.equals(type)
-					|| DeleteComponentCommand.class.equals(type) || CreateConnectionCommand.class
-					.equals(type))) {
-				try {
-					refreshSourceConnections();
-					refreshTargetConnections();
-				} catch (Exception e) {
-
-				}
-			}
-		}
+	@Override
+	public Port getTargetPort(ConnectionAnchor anchor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -20,7 +20,7 @@ import ptolemy.moml.Vertex;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class DeleteVertexConnectionCommand extends Command {
+public class DeleteVertexConnectionCommand extends Command implements IRefreshConnections{
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DeleteVertexConnectionCommand.class);

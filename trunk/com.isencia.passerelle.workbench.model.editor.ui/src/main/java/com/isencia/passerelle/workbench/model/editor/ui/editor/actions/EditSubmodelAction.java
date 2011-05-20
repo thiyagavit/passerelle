@@ -1,19 +1,22 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
+import org.eclipse.core.internal.resources.File;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.PartInitException;
 
-import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
-public class DeleteSubmodelAction extends Action {
-	private final String icon = "icons/delete.gif";
+public class EditSubmodelAction extends Action {
+	private final String icon = "icons/edit.gif";
 	private SubModelPaletteItemDefinition definition;
 
-	public DeleteSubmodelAction(SubModelPaletteItemDefinition definition) {
+	public EditSubmodelAction(SubModelPaletteItemDefinition definition) {
 		super();
-		setId("DeleteSubModel");
-		setText("Delete Submodel");
+		setId("EditSubModel");
+		setText("Edit Submodel");
 		this.definition = definition;
 		Activator.getImageDescriptor(icon);
 		setHoverImageDescriptor(Activator.getImageDescriptor(icon));
@@ -24,14 +27,20 @@ public class DeleteSubmodelAction extends Action {
 
 	protected boolean checkEnabled() {
 
-		return true;
+		return definition.getPath() != null && definition.getWorkSpace() != null;
 	}
 
 	@Override
 	public void run() {
 		if (definition != null) {
-			Flow flowToDelete = definition.getFlow();
-			System.out.println(flowToDelete.getName());
+			try {
+
+				EclipseUtils.openEditor(new SubModelFile(new Path(definition.getPath()),definition.getWorkSpace()));
+			} catch (PartInitException e) {
+
+			}
+
+
 		}
 	}
 

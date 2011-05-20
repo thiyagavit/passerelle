@@ -34,6 +34,9 @@ import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropert
 import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
 import com.isencia.passerelle.workbench.model.ui.command.CreateConnectionCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
+import com.isencia.passerelle.workbench.model.ui.command.DeleteConnectionCommand;
+import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionCommand;
+import com.isencia.passerelle.workbench.model.ui.command.IRefreshConnections;
 import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
@@ -45,7 +48,6 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 abstract public class AbstractBaseEditPart extends
 		org.eclipse.gef.editparts.AbstractGraphicalEditPart implements
 		ChangeListener {
-
 
 	protected Set<Image> images = new HashSet<Image>();
 
@@ -171,7 +173,16 @@ abstract public class AbstractBaseEditPart extends
 		Object source = changerequest.getSource();
 		if (changerequest instanceof ModelChangeRequest) {
 			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-
+			if (IPropertySource.class.isAssignableFrom(type)) {
+				onChangePropertyResource(source);
+				return;
+			}
+			if (SetConstraintCommand.class.equals(type)) {
+				if (source == this.getModel() && source instanceof NamedObj) {
+					refresh();
+				}
+				return;
+			}
 			if (ActorGeneralSection.class.equals(type)) {
 				if (source == this.getModel() && source instanceof NamedObj) {
 					String name = getName(source);
@@ -186,28 +197,29 @@ abstract public class AbstractBaseEditPart extends
 						getFigure().repaint();
 					}
 				}
-			} else if (SetConstraintCommand.class.equals(type)) {
-				if (source == this.getModel() && source instanceof NamedObj) {
-					refresh();
-				}
+				return;
 			}
-			if (EntityPropertySource.class.equals(type)
-					|| CommentPropertySource.class.equals(type)) {
-				if (source == this.getModel()) {
-					// Execute the dummy command force a dirty state
-					getViewer().getEditDomain().getCommandStack().execute(
-							new ChangeActorPropertyCommand());
-				}
-			} else if (DeleteComponentCommand.class.equals(type)
-					|| CreateConnectionCommand.class.equals(type)) {
-
-				try {
-					refreshSourceConnections();
-					refreshTargetConnections();
-				} catch (Exception e) {
-
-				}
+			if (IRefreshConnections.class.isAssignableFrom(type)) {
+				refreshConnections(type,source);
+				return;
 			}
+		}
+	}
+
+	protected void refreshConnections(Class type,Object source) {
+		try {
+			refreshSourceConnections();
+			refreshTargetConnections();
+		} catch (Exception e) {
+
+		}
+	}
+
+	protected void onChangePropertyResource(Object source) {
+		if (source == this.getModel()) {
+			// Execute the dummy command force a dirty state
+			getViewer().getEditDomain().getCommandStack().execute(
+					new ChangeActorPropertyCommand());
 		}
 	}
 

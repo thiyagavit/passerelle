@@ -15,7 +15,7 @@ import ptolemy.moml.Vertex;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
-public class CreateConnectionCommand extends Command {
+public class CreateConnectionCommand extends Command implements IRefreshConnections{
 
 	private IPasserelleMultiPageEditor editor;
 

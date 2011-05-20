@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteSubmodelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
 

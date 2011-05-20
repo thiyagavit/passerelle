@@ -18,18 +18,21 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.WorkbenchHelp;
-import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
@@ -41,7 +44,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMu
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.DirectorEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
@@ -105,6 +107,7 @@ public class ActorAttributesView extends ViewPart implements
 			}
 
 			createTableModel(parameterList);
+
 			return true;
 		}
 
@@ -163,7 +166,7 @@ public class ActorAttributesView extends ViewPart implements
 	public void createPartControl(Composite parent) {
 
 		this.viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.BORDER);
+				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -177,31 +180,7 @@ public class ActorAttributesView extends ViewPart implements
 
 		getSite().getWorkbenchWindow().getSelectionService()
 				.addSelectionListener(this);
-		viewer.getTable().addMouseListener(new MouseListener() {
 
-			@Override
-			public void mouseUp(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseDown(MouseEvent arg0) {
-			
-			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent arg0) {
-				try {
-					showHelpSelectedParameter();
-				} catch (IllegalActionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-
-			}
-		});
 		viewer.getTable().addKeyListener(new KeyListener() {
 
 			@Override
@@ -210,6 +189,9 @@ public class ActorAttributesView extends ViewPart implements
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.F1) {
+					// showHelpSelectedParameter();
+				}
 				if (e.character == SWT.DEL) {
 					try {
 						deleteSelectedParameter();
@@ -223,6 +205,7 @@ public class ActorAttributesView extends ViewPart implements
 		try {
 			this.part = EclipseUtils.getActivePage().getActiveEditor();
 			updateSelection(EclipseUtils.getActivePage().getSelection());
+
 		} catch (Throwable ignored) {
 			// There might not be a selection or page.
 		}
@@ -232,12 +215,20 @@ public class ActorAttributesView extends ViewPart implements
 
 		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT,
 				0);
+		// name.getColumn().addListener(SWT.SELECTED, new Listener() {
+		//
+		// @Override
+		// public void handleEvent(Event event) {
+		// showHelpSelectedParameter();
+		// }
+		// });
 		name.getColumn().setText("Property");
 		name.getColumn().setWidth(200);
 		name.setLabelProvider(new PropertyLabelProvider());
 
 		final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT,
 				1);
+
 		value.getColumn().setText("Value");
 		value.getColumn().setWidth(700);
 		value.setLabelProvider(new VariableLabelProvider(this));
@@ -322,29 +313,30 @@ public class ActorAttributesView extends ViewPart implements
 		}
 	}
 
-	public void showHelpSelectedParameter() throws IllegalActionException {
-
-		final ISelection sel = viewer.getSelection();
-		if (sel != null && sel instanceof StructuredSelection) {
-			final StructuredSelection s = (StructuredSelection) sel;
-			String actorClass = getActorClass().getName();
-			final Object o = s.getFirstElement();
-			if (o instanceof String)
-				return;
-			if (o instanceof Attribute) {
-				Attribute attr = (Attribute) o;
-				if (actorClass != null) {
-					String helpBundle = Constants.HELP_BUNDLE_ID;
-					String actorName = getActorClass().getName().replace(".", "_");
-					String contextId = helpBundle
-							+ "." + actorName + "_" + attr.getName();
-
-					WorkbenchHelp.displayHelp(contextId);
-				}
-			}
-
-		}
-	}
+	// public void showHelpSelectedParameter() {
+	// final ISelection sel = viewer.getSelection();
+	//
+	// if (sel != null && sel instanceof StructuredSelection) {
+	// final StructuredSelection s = (StructuredSelection) sel;
+	// String actorClass = getActorClass().getName();
+	// final Object o = s.getFirstElement();
+	// if (o instanceof String)
+	// return;
+	// if (o instanceof Attribute) {
+	// Attribute attr = (Attribute) o;
+	// if (actorClass != null) {
+	// String helpBundle = Constants.HELP_BUNDLE_ID;
+	// String actorName = getActorClass().getName().replace(".",
+	// "_");
+	// String contextId = helpBundle + "." + actorName + "_"
+	// + attr.getName();
+	// PlatformUI.getWorkbench().getHelpSystem();
+	// WorkbenchHelp.displayHelp(contextId);
+	// }
+	// }
+	//
+	// }
+	// }
 
 	public void setAttributeValue(Object element, Object value)
 			throws IllegalActionException {

@@ -7,8 +7,6 @@ import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.CompositeEntity;
 
 import com.isencia.passerelle.workbench.model.ui.VertexLink;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteConnectionCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionCommand;
 
 public class VertexRelationDeletePolicy extends

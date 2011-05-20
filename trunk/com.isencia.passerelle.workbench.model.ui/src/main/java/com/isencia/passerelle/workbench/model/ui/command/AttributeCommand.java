@@ -55,6 +55,8 @@ public class AttributeCommand extends Command {
 					if (value!=null) {
 						if (value instanceof Boolean) {
 							attribute.setToken(new BooleanToken(((Boolean)value).booleanValue()));
+						} else if (value instanceof Number) {
+							attribute.setExpression(((Number)value).toString());
 						} else if (value instanceof String) {
 							attribute.setExpression((String)value);
 						} else {

@@ -27,41 +27,23 @@ import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class CommentEditPart extends AbstractNodeEditPart {
 
-	@Override
-	public void changeExecuted(ChangeRequest changerequest) {
 
-		getLogger().debug("Change Executed");
-		Object source = changerequest.getSource();
-		if (changerequest instanceof ModelChangeRequest) {
-			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-
-			if (CommentPropertySource.class.equals(type)) {
-				if (source == this.getModel() && source instanceof NamedObj) {
-					String name = getName(source);
-					if ((getComponentFigure() instanceof INameable)
-							&& name != null
-							&& !name.equals(((INameable) getComponentFigure())
-									.getName())) {
-						// Execute the dummy command force a dirty state
-						getViewer().getEditDomain().getCommandStack().execute(
-								new ChangeActorPropertyCommand());
-						((CommentFigure) getFigure()).setName(name);
-						getFigure().repaint();
-						refresh();
-					}
-				}
-			} else if (SetConstraintCommand.class.equals(type)) {
-				if (source == this.getModel() && source instanceof NamedObj) {
-					refresh();
-				}
-			}
-			if (DeleteComponentCommand.class.equals(type)) {
-				refreshSourceConnections();
-				refreshTargetConnections();
+	protected void onChangePropertyResource(Object source) {
+		if (source == this.getModel() && source instanceof NamedObj) {
+			String name = getName(source);
+			if ((getComponentFigure() instanceof INameable)
+					&& name != null
+					&& !name.equals(((INameable) getComponentFigure())
+							.getName())) {
+				// Execute the dummy command force a dirty state
+				getViewer().getEditDomain().getCommandStack().execute(
+						new ChangeActorPropertyCommand());
+				((CommentFigure) getFigure()).setName(name);
+				getFigure().repaint();
+				refresh();
 			}
 		}
 	}
-
 	protected void createEditPolicies() {
 
 		installEditPolicy(EditPolicy.COMPONENT_ROLE,

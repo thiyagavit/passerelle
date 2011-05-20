@@ -17,7 +17,6 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.AccessibleAnchorProvider;
-import org.eclipse.gef.AccessibleEditPart;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
@@ -25,8 +24,6 @@ import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.requests.DropRequest;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,31 +38,26 @@ import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.ChangeRequest;
-import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
-import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
+import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ActorEditPolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
-import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.CompositeActorEditPolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompositeActorFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.CreateConnectionCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteConnectionCommand;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils.ConnectionType;
 
 public class CompositeActorEditPart extends ContainerEditPart implements
-		NodeEditPart {
+		ActorNodeEditPart {
 	private PasserelleModelMultiPageEditor multiPageEditorPart;
 
 	public PasserelleModelMultiPageEditor getMultiPageEditorPart() {
@@ -121,8 +113,6 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 						.getEditor(index + 1));
 			}
 
-
-
 		} catch (Exception e) {
 		}
 	}
@@ -147,19 +137,8 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 		super.changeExecuted(changerequest);
 
 		Object source = changerequest.getSource();
-
 		if (changerequest instanceof ModelChangeRequest) {
 			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-			String childType = ((ModelChangeRequest) changerequest)
-					.getChildType();
-
-			if (getModel() != source
-					&& (DeleteConnectionCommand.class.equals(type)
-							|| DeleteComponentCommand.class.equals(type) || CreateConnectionCommand.class
-							.equals(type))) {
-				refreshSourceConnections();
-				refreshTargetConnections();
-			}
 			NamedObj child = ((ModelChangeRequest) changerequest).getChild();
 			NamedObj container = ((ModelChangeRequest) changerequest)
 					.getContainer();
@@ -167,7 +146,6 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 		} else {
 			if (source instanceof TypedIOPort
 					&& getModel().equals(((TypedIOPort) source).getContainer())) {
-				Class<?> commandClazz = null;
 				if (changerequest.getDescription().equals("undo-delete")) {
 					updateFigure(CreateComponentCommand.class,
 							(NamedObj) source, (NamedObj) getModel());
@@ -220,8 +198,8 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 				EditPolicy.COMPONENT_ROLE,
 				new ComponentNodeDeletePolicy(
 						(PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
-		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE,
-				new CompositeActorEditPolicy(multiPageEditorPart));
+		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(
+				multiPageEditorPart, this));
 	}
 
 	/**
