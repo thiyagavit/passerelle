@@ -117,6 +117,26 @@ public abstract class AbstractNodeFigure extends AbstractBaseFigure {
 	public HashMap getConnectionAnchors() {
 		return connectionAnchors;
 	}
+	protected int getDefaultWidth() {
+		return DEFAULT_WIDTH;
+	}
 
-	
+	protected int getMinHeight() {
+		return MIN_HEIGHT;
+	}
+
+	protected int getAnchorHeight() {
+		return ANCHOR_HEIGTH;
+	}
+
+	protected int getAnchorMargin() {
+		return ANCHOR_MARGIN;
+	}
+
+	protected int getAnchorSpacing() {
+		return ANCHOR_SPACING;
+	}
+	protected int getAnchorWidth() {
+		return ANCHOR_WIDTH;
+	}
 }

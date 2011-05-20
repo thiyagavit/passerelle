@@ -52,7 +52,6 @@ public class CompoundInputFigure extends CompoundIOFigure {
 			graphics.pushState();
 			graphics.setForegroundColor(ColorConstants.white);
 			graphics.setBackgroundColor(ColorConstants.white);
-			// graphics.fillGradient(getBounds(), true);
 			graphics.popState();
 
 			graphics.setForegroundColor(ColorConstants.black);
@@ -94,7 +93,6 @@ public class CompoundInputFigure extends CompoundIOFigure {
 
 	protected IFigure generateBody(Image image, Clickable[] clickables) {
 		Body body = new Body();
-		body.setBorder(new LineBorder());
 		for (Clickable clickable : clickables)
 			body.initClickable(clickable);
 		return (body);

@@ -94,7 +94,6 @@ public class CompoundOutputFigure extends CompoundIOFigure {
 
 	protected IFigure generateBody(Image image, Clickable[] clickables) {
 		Body body = new Body();
-		body.setBorder(new LineBorder());
 		for (Clickable clickable : clickables)
 			body.initClickable(clickable);
 		return (body);

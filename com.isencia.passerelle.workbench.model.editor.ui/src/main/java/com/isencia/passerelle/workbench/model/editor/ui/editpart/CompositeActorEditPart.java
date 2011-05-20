@@ -57,7 +57,7 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils.ConnectionType;
 
 public class CompositeActorEditPart extends ContainerEditPart implements
-		ActorNodeEditPart {
+		IActorNodeEditPart {
 	private PasserelleModelMultiPageEditor multiPageEditorPart;
 
 	public PasserelleModelMultiPageEditor getMultiPageEditorPart() {

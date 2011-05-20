@@ -19,7 +19,8 @@ public class DirectorFigure extends AbstractBaseFigure {
 	
 
 	public final static int DIRECTOR_WIDTH = 120;
-	public final static Dimension DIRECTOR_SIZE = new Dimension(DIRECTOR_WIDTH,DEFAULT_HEIGHT);
+	public final static int DIRECTOR_HEIGHT = 60;
+	public final static Dimension DIRECTOR_SIZE = new Dimension(DIRECTOR_WIDTH,DIRECTOR_HEIGHT);
 	public final static Color DIRECTOR_BACKGROUND_COLOR = new Color(null,204,0,0);
 
     private Body body = null;

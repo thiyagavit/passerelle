@@ -12,9 +12,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
 
 public class AbstractBaseFigure extends Figure implements INameable {
 	public final static int DEFAULT_WIDTH = 60;
-	public final static int DEFAULT_HEIGHT = 60;
 	public final static int MIN_HEIGHT = 60;
-	public static Dimension DEFAULT_SIZE   = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	
 	public final static Color DEFAULT_BACKGROUND_COLOR = ColorConstants.lightGray;
 
