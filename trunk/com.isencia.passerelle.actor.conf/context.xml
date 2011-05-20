@@ -7,6 +7,9 @@
       </description>
       <topic label="details" href="html/com.isencia.passerelle.actor.general.Console.html"/>
    </context>
+   <context id="name" >
+      <description>Actor name</description>
+   </context>
    <context id="com_isencia_passerelle_actor_net_SocketClientSender_Msg End" >
       <description>Message end</description>
    </context>
