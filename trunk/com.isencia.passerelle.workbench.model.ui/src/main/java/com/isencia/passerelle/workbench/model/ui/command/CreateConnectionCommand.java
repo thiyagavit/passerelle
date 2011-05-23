@@ -1,5 +1,6 @@
 package com.isencia.passerelle.workbench.model.ui.command;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class CreateConnectionCommand extends Command implements IRefreshConnections{
@@ -73,7 +75,6 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
 					container, "connection") {
 				@Override
 				protected void _execute() throws Exception {
-					getLogger().debug("Create new connection");
 					try {
 
 						if (source instanceof ComponentPort
@@ -99,7 +100,9 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
 							((TypedIORelation)((Vertex) source).getContainer()).link((TypedIORelation)((Vertex) target).getContainer());
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						logger.error("Unable to create connection",e);
+
+						EclipseUtils.logError(e, "Unable to create connection", IStatus.ERROR);
 					}
 				}
 			});
@@ -148,7 +151,6 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
 					container, "connection") {
 				@Override
 				protected void _execute() throws Exception {
-					getLogger().debug("Remove connection");
 					connection.setContainer(null);
 				}
 			});

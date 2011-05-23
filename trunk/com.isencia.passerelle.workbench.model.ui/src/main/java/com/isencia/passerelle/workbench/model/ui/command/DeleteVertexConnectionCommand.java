@@ -3,6 +3,7 @@ package com.isencia.passerelle.workbench.model.ui.command;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -67,12 +69,16 @@ public class DeleteVertexConnectionCommand extends Command implements IRefreshCo
 			@SuppressWarnings("unchecked")
 			@Override
 			protected void _execute() throws Exception {
-
-				if (getPort() != null)
-					unlinkRelation(connection, getPort());
-				else
-					unlinkRelation(connection, getVertex());
-				getLogger().debug("Connection deleted");
+				try{
+					if (getPort() != null)
+						unlinkRelation(connection, getPort());
+					else
+						unlinkRelation(connection, getVertex());
+				}catch(IllegalActionException e){
+					logger.error("Unable to delete targetConnection",e);
+					
+					EclipseUtils.logError(e, "Unable to delete connection", IStatus.ERROR);
+				}
 			}
 		});
 
