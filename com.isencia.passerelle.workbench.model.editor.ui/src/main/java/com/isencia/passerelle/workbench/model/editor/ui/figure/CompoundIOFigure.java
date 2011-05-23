@@ -8,6 +8,12 @@ import org.eclipse.swt.graphics.Image;
 
 public abstract class CompoundIOFigure extends ActorFigure {
 	@Override
+	protected int getAnchorMargin() {
+		// TODO Auto-generated method stub
+		return super.getAnchorMargin()/3;
+	}
+
+	@Override
 	protected IFigure generateBody(Image image, Clickable[] clickables) {
 		// TODO Auto-generated method stub
 		return null;

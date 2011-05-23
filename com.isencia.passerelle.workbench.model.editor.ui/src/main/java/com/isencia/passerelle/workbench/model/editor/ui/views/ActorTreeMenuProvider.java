@@ -58,11 +58,11 @@ public class ActorTreeMenuProvider extends ContextMenuProvider {
 		// if (action != null && action.isEnabled())
 		TreeViewer tree = (TreeViewer) getViewer();
 		TreeSelection treeSelection = (TreeSelection) tree.getSelection();
-//		Object element = treeSelection.getFirstElement();
-//		if (element instanceof SubModelPaletteItemDefinition) {
-//			menu.appendToGroup(GEFActionConstants.GROUP_EDIT,
-//					new EditSubmodelAction((SubModelPaletteItemDefinition)element));
-//		}
+		Object element = treeSelection.getFirstElement();
+		if (element instanceof SubModelPaletteItemDefinition) {
+			menu.appendToGroup(GEFActionConstants.GROUP_EDIT,
+					new EditSubmodelAction((SubModelPaletteItemDefinition)element));
+		}
 
 	}
 

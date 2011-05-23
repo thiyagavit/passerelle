@@ -190,7 +190,7 @@ public class PaletteItemFactory implements Serializable {
 		if (def instanceof SubModelPaletteItemDefinition) {
 			return new CombinedTemplateCreationEntry(def.getName(), def
 					.getName(), new ClassTypeFactory(def.getClazz(),
-					((SubModelPaletteItemDefinition) def).getFlow()), def
+					(SubModelPaletteItemDefinition) def), def
 					.getIcon(), //$NON-NLS-1$
 					def.getIcon()//$NON-NLS-1$
 			);
@@ -214,7 +214,7 @@ public class PaletteItemFactory implements Serializable {
 						.getTemplate();
 				if ((((Class) entryType.getObjectType()).getName().equals(type) && entryType
 						.getNewObject().equals(name))
-						|| (entryType.getNewObject() instanceof Flow && ((Flow) entryType
+						|| (entryType.getNewObject() instanceof SubModelPaletteItemDefinition && ((SubModelPaletteItemDefinition) entryType
 								.getNewObject()).getName().equals(name))) {
 					return true;
 				}
@@ -450,6 +450,11 @@ public class PaletteItemFactory implements Serializable {
 
 	private Map<String, Flow> modelList;
 
+	public void addSubModel(String name, Flow model) {
+		if (modelList != null)
+			modelList.put(name, model);
+	}
+
 	public Map<String, Flow> getSubModels() {
 
 		if (modelList == null) {
@@ -462,12 +467,38 @@ public class PaletteItemFactory implements Serializable {
 				try {
 					Flow flow = FlowManager.readMoml(reader);
 					MoMLParser.putActorClass(model, flow);
-					modelList.put(model, flow);
-				} catch (Exception e) {
+					} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 			}
+			final String workspacePath = ResourcesPlugin.getWorkspace()
+					.getRoot().getLocation().toOSString();
+			File metaData = new File(workspacePath + File.separator
+					+ ".metadata");
+
+			if (metaData.isDirectory()) {
+				File[] files = metaData.listFiles();
+				for (File file : files) {
+					try {
+						String momlName = file.getName().substring(0,
+								file.getName().length() - 5);
+						if (file.getName().endsWith(".moml")) {
+
+							FileReader in = new FileReader(file);
+							Flow flow = FlowManager.readMoml(in);
+							if (flow.isClassDefinition()) {
+								MoMLParser.putActorClass(momlName, flow);
+								modelList.put(flow.getName(), flow);
+							}
+
+						}
+
+					} catch (Exception e1) {
+					}
+				}
+			}
+
 		}
 		return modelList;
 	}

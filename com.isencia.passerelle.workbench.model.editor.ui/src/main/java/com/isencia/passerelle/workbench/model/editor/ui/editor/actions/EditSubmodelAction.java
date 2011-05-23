@@ -1,6 +1,5 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
-import org.eclipse.core.internal.resources.File;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PartInitException;

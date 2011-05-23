@@ -27,6 +27,7 @@ import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
 
@@ -224,9 +225,9 @@ public class DiagramXYLayoutEditPolicy extends
 
 			create.setParent(editor.getSelectedContainer());
 			
-			if (request.getNewObject() instanceof Flow){
-				create.setFlow((Flow)request.getNewObject());
-				create.setName(((Flow)request.getNewObject()).getName());
+			if (request.getNewObject() instanceof SubModelPaletteItemDefinition){
+				create.setFlow(((SubModelPaletteItemDefinition)request.getNewObject()).getFlow());
+				create.setName(((SubModelPaletteItemDefinition)request.getNewObject()).getName());
 			}else{
 				create.setName((String) request.getNewObject());
 			}
