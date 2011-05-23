@@ -3,6 +3,7 @@ package com.isencia.passerelle.workbench.model.ui.command;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -114,6 +115,7 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 
 						} else if (clazz.equals(Flow.class)) {
 							if (flow != null) {
+								
 								child = (NamedObj) flow.instantiate(parentModel, componentName);
 								((CompositeActor) child).setClassName(flow
 										.getName());

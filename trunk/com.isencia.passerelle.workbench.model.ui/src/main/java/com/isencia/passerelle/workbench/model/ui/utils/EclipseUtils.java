@@ -16,6 +16,7 @@ package com.isencia.passerelle.workbench.model.ui.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +65,13 @@ public class EclipseUtils {
 	 */
 	public static String getFilePath(IEditorInput fileInput) {
 		if (fileInput instanceof IURIEditorInput) {
-			String path = ((IURIEditorInput)fileInput).getURI().toString();
+			URI uri = ((IURIEditorInput)fileInput).getURI();
+			String path = null;
+			if (uri != null)
+				path = uri.toString();
+			else if (fileInput instanceof FileEditorInput){
+				path = ((FileEditorInput)fileInput).getFile().getFullPath().toString();
+			}
 			if (path.startsWith("file:")) path = path.substring(5);
 			if (path.startsWith("/") && isWindowsOS()) path = path.substring(1);
 			return path;
