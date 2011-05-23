@@ -16,8 +16,16 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.AncestorListener;
+import org.eclipse.draw2d.CoordinateListener;
 import org.eclipse.draw2d.FigureCanvas;
+import org.eclipse.draw2d.FigureListener;
+import org.eclipse.draw2d.FocusEvent;
+import org.eclipse.draw2d.FocusListener;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
@@ -34,6 +42,7 @@ import org.eclipse.gef.dnd.TemplateTransferDragSourceListener;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.internal.ui.palette.editparts.DrawerEditPart;
+import org.eclipse.gef.internal.ui.palette.editparts.DrawerFigure;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.AlignmentAction;
@@ -173,28 +182,28 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		updateActions(getSelectionActions());
-//		if (EclipseUtils.getActivePage().getActivePart().equals(part)) {
-//			try {
-//
-//				if (selection instanceof StructuredSelection) {
-//					StructuredSelection structure = (StructuredSelection) selection;
-//					Object o = structure.getFirstElement();
-//					if (o instanceof AbstractBaseEditPart) {
-//						NamedObj actor = (NamedObj) ((AbstractBaseEditPart) o)
-//								.getModel();
-//						String actorName = actor.getClassName().replace(".",
-//								"_");
-//						PlatformUI.getWorkbench().getHelpSystem().setHelp(
-//								getGraphicalViewer().getControl(),
-//								Constants.HELP_BUNDLE_ID + "." + actorName);
-//						PlatformUI.getWorkbench().getHelpSystem()
-//								.displayDynamicHelp();
-//					}
-//				}
-//			} catch (Exception e) {
-//
-//			}
-//		}
+		// if (EclipseUtils.getActivePage().getActivePart().equals(part)) {
+		// try {
+		//
+		// if (selection instanceof StructuredSelection) {
+		// StructuredSelection structure = (StructuredSelection) selection;
+		// Object o = structure.getFirstElement();
+		// if (o instanceof AbstractBaseEditPart) {
+		// NamedObj actor = (NamedObj) ((AbstractBaseEditPart) o)
+		// .getModel();
+		// String actorName = actor.getClassName().replace(".",
+		// "_");
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(
+		// getGraphicalViewer().getControl(),
+		// Constants.HELP_BUNDLE_ID + "." + actorName);
+		// PlatformUI.getWorkbench().getHelpSystem()
+		// .displayDynamicHelp();
+		// }
+		// }
+		// } catch (Exception e) {
+		//
+		// }
+		// }
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {
@@ -621,8 +630,10 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 				}
 			}
 			for (DrawerEditPart drawer : drawers) {
-				drawer.getDrawerFigure().addMouseMotionListener(
-						new PaletteMouseListener(drawer));
+				DrawerFigure drawerFigure = drawer.getDrawerFigure();
+
+				drawerFigure.addMouseMotionListener(new PaletteMouseListener(
+						drawer,paletteViewer));
 
 			}
 			DropTarget dt = new DropTarget(paletteViewer.getControl(),

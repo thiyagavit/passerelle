@@ -25,7 +25,7 @@ public class TreeViewCreationFactory implements CreationFactory {
 		// TODO Auto-generated method stub
 		PaletteItemDefinition selected2 = (PaletteItemDefinition)selected;
 		if (selected2 instanceof SubModelPaletteItemDefinition){
-			return ((SubModelPaletteItemDefinition)selected2).getFlow();
+			return (SubModelPaletteItemDefinition)selected2;
 		}
 		return selected2.getName();
 	}

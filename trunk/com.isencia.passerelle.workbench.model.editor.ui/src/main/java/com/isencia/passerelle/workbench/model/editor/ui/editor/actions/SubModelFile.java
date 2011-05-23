@@ -8,6 +8,7 @@ public class SubModelFile extends File {
 
 	public SubModelFile(IPath path, Workspace container) {
 		super(path, container);
+		
 		// TODO Auto-generated constructor stub
 	}
 

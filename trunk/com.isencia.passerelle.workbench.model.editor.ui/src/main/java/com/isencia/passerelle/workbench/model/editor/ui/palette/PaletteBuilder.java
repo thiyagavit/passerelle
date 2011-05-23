@@ -1,15 +1,11 @@
 package com.isencia.passerelle.workbench.model.editor.ui.palette;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
 import org.eclipse.gef.palette.ConnectionCreationToolEntry;
 import org.eclipse.gef.palette.MarqueeToolEntry;
@@ -26,11 +22,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ptolemy.actor.CompositeActor;
-
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 
 public class PaletteBuilder {
@@ -118,8 +110,9 @@ public class PaletteBuilder {
 
 			if (e instanceof PaletteDrawer) {
 				PaletteContainer favoritesContainer = (PaletteDrawer) e;
-				if (!favoritesContainer.getLabel().equals(PaletteItemFactory.get().getPaletteGroup(
-						ACTORGROUP_UTILITIES).getName())) {
+				if (!favoritesContainer.getLabel().equals(
+						PaletteItemFactory.get().getPaletteGroup(
+								ACTORGROUP_UTILITIES).getName())) {
 					containers.append(favoritesContainer.getLabel());
 					containers.append(",");
 					StringBuffer entries = new StringBuffer();
@@ -129,9 +122,9 @@ public class PaletteBuilder {
 							ClassTypeFactory entryType = (ClassTypeFactory) entry
 									.getTemplate();
 							Object objectType = entryType.getObjectType();
-							if (((Class) objectType).equals(Flow.class)) {
+							if (entryType.getNewObject() instanceof SubModelPaletteItemDefinition) {
 								entries
-										.append(((Flow) entryType
+										.append(((SubModelPaletteItemDefinition) entryType
 												.getNewObject()).getName());
 								entries.append(",");
 							} else {
@@ -141,7 +134,8 @@ public class PaletteBuilder {
 							}
 						}
 					}
-					addFavoriteGroup(favoritesContainer.getLabel(), favoritesContainer);
+					addFavoriteGroup(favoritesContainer.getLabel(),
+							favoritesContainer);
 					factory.getStore().putValue(favoritesContainer.getLabel(),
 							entries.toString());
 				}

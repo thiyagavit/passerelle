@@ -90,6 +90,7 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.SubModelFile;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlinePartFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
@@ -310,12 +311,15 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 				StringWriter writer = new StringWriter();
 				diagram.exportMoML(writer);
 				IFile file = EclipseUtils.getIFile(getEditorInput());
-				if (file != null) {
+				if (file != null && !(file instanceof SubModelFile)) {
 					file.setContents(new ByteArrayInputStream(writer.toString()
 							.getBytes()), true, false, monitor);
 				} else {
 					final File fileIO = EclipseUtils.getFile(getEditorInput());
 					FileUtils.write(fileIO, writer.toString());
+					if (file instanceof SubModelFile && diagram.isClassDefinition()){
+						PaletteItemFactory.get().addSubModel((Flow)diagram);
+					}
 				}
 			}
 		});
@@ -531,32 +535,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 
 			Map<String,Flow> modelList = factory.getSubModels();
 
-			final String workspacePath = ResourcesPlugin.getWorkspace()
-					.getRoot().getLocation().toOSString();
-			File metaData = new File(workspacePath + File.separator
-					+ ".metadata");
-
-			if (metaData.isDirectory()) {
-				File[] files = metaData.listFiles();
-				for (File file : files) {
-					try {
-						String momlName = file.getName().substring(0,
-								file.getName().length() - 5);
-						if (file.getName().endsWith(".moml")
-								&& modelList.keySet().contains(momlName)) {
-
-							FileReader in = new FileReader(file);
-							Flow flow = FlowManager.readMoml(in);
-							if (flow.isClassDefinition()) {
-								MoMLParser.putActorClass(momlName, flow);
-							}
-
-						}
-
-					} catch (Exception e1) {
-					}
-				}
-			}
 
 			MoMLParser moMLParser = new MoMLParser();
 			FlowManager flowManager = new FlowManager();
