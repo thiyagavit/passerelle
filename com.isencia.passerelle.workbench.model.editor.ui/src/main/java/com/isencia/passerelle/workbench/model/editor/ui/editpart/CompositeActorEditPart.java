@@ -20,7 +20,6 @@ import org.eclipse.gef.AccessibleAnchorProvider;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
-import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.requests.DropRequest;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -41,6 +40,7 @@ import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelEditor;
@@ -84,37 +84,39 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 	}
 
 	private void initPage(TypedCompositeActor actor) {
-		PasserelleModelMultiPageEditor multiPageEditor = (PasserelleModelMultiPageEditor) searchPasserelleModelSampleEditor(getParent());
-		CompositeActor mainFlow = multiPageEditor.getModel();
-		try {
-			mainFlow.initialize();
-		} catch (Exception e1) {
-		}
-		try {
-			if (multiPageEditor != null) {
-
-				TypedCompositeActor model = (TypedCompositeActor) getModel();
-
-				PasserelleModelEditor editor = new PasserelleModelEditor(
-						multiPageEditor, model, multiPageEditor.getEditor()
-								.getDiagram());
-				int index = multiPageEditor.getPageIndex(model);
-				if (index == -1) {
-
-					index = multiPageEditor.addPage(model, editor,
-							multiPageEditor.getEditorInput());
-					multiPageEditor.setText(index, WorkbenchUtility
-							.getPath(model));
-					multiPageEditor.setActiveEditor(editor);
-					index = index - 1;
-
-				}
-				multiPageEditor.setActiveEditor(multiPageEditor
-						.getEditor(index + 1));
+//		if (! (actor instanceof Flow && multiPageEditorPart.getSelectedContainer().getClassName().equals(actor.getClassName()))) {
+			PasserelleModelMultiPageEditor multiPageEditor = (PasserelleModelMultiPageEditor) searchPasserelleModelSampleEditor(getParent());
+			CompositeActor mainFlow = multiPageEditor.getModel();
+			try {
+				mainFlow.initialize();
+			} catch (Exception e1) {
 			}
+			try {
+				if (multiPageEditor != null) {
 
-		} catch (Exception e) {
-		}
+					TypedCompositeActor model = (TypedCompositeActor) getModel();
+
+					PasserelleModelEditor editor = new PasserelleModelEditor(
+							multiPageEditor, model, multiPageEditor.getEditor()
+									.getDiagram());
+					int index = multiPageEditor.getPageIndex(model);
+					if (index == -1) {
+
+						index = multiPageEditor.addPage(model, editor,
+								multiPageEditor.getEditorInput());
+						multiPageEditor.setText(index, WorkbenchUtility
+								.getPath(model));
+						multiPageEditor.setActiveEditor(editor);
+						index = index - 1;
+
+					}
+					multiPageEditor.setActiveEditor(multiPageEditor
+							.getEditor(index + 1));
+				}
+
+			} catch (Exception e) {
+			}
+//		}
 	}
 
 	public MultiPageEditorPart searchPasserelleModelSampleEditor(EditPart child) {

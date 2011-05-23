@@ -69,7 +69,6 @@ public class DeleteConnectionCommand extends Command implements IRefreshConnecti
 				} else {
 					connection.setContainer(null);
 				}
-				getLogger().debug("Connection deleted");
 			}
 		});
 

@@ -17,14 +17,14 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 public class SetConstraintCommand extends org.eclipse.gef.commands.Command {
 	private static final String Command_Label_Location = "change location command";
 	private static final Logger logger = LoggerFactory
-			.getLogger(SetConstraintCommand.class);	
+			.getLogger(SetConstraintCommand.class);
 
 	private double[] newPos;
 
 	private double[] oldPos;
 
 	private NamedObj model;
-	
+
 	public Logger getLogger() {
 		return logger;
 	}
@@ -32,26 +32,24 @@ public class SetConstraintCommand extends org.eclipse.gef.commands.Command {
 	public void execute() {
 		doExecute();
 	}
-	
+
 	@Override
 	public boolean canExecute() {
 		oldPos = ModelUtils.getLocation(model);
 		return newPos != null && !newPos.equals(oldPos);
 	}
 
-
 	public void doExecute() {
-		if( model==null)
+		if (model == null)
 			return;
-		
+
 		// Perform Change in a ChangeRequest so that all Listeners are notified
-		model.requestChange(new ModelChangeRequest(this.getClass(), model, "setLocation"){
+		model.requestChange(new ModelChangeRequest(this.getClass(), model,
+				"setLocation") {
 			@Override
 			protected void _execute() throws Exception {
 				oldPos = ModelUtils.getLocation(model).clone();
 				ModelUtils.setLocation(model, newPos);
-				if( getLogger().isDebugEnabled() )
-					getLogger().debug("Location changed from "+oldPos==null?"":oldPos.toString()+" to "+newPos.toString());
 			}
 		});
 	}
@@ -61,17 +59,16 @@ public class SetConstraintCommand extends org.eclipse.gef.commands.Command {
 	}
 
 	public void redo() {
-		if( canExecute())
+		if (canExecute())
 			doExecute();
 	}
 
 	public void undo() {
-		model.requestChange(new ModelChangeRequest(this.getClass(), model, "refresh"){
+		model.requestChange(new ModelChangeRequest(this.getClass(), model,
+				"refresh") {
 			@Override
 			protected void _execute() throws Exception {
 				ModelUtils.setLocation(model, oldPos);
-				if( getLogger().isDebugEnabled() )
-					getLogger().debug("Location changed from "+oldPos==null?"":oldPos.toString()+" to "+newPos.toString());
 			}
 		});
 	}

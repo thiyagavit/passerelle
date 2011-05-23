@@ -27,6 +27,7 @@ public class PasserellePerspective implements IPerspectiveFactory {
         viewFolder.addView(IPageLayout.ID_PROP_SHEET);
         viewFolder.addView("com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView");
         viewFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+        viewFolder.addView("org.eclipse.pde.runtime.LogView");
         
         // Ensure that the run menu is visible
         layout.addActionSet(IDebugUIConstants.LAUNCH_ACTION_SET);

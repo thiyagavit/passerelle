@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.ui.ComponentUtility;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -167,7 +169,8 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 
 
 				} catch (Exception e) {
-					getLogger().error("Unable to create component", e);
+					logger.error("Unable to create component",e);
+					EclipseUtils.logError(e, "Unable to create component", IStatus.ERROR);
 				}
 
 			}
@@ -181,7 +184,6 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 				"create") {
 			@Override
 			protected void _execute() throws Exception {
-				getLogger().debug("Redo create component");
 				editor.selectPage((CompositeActor) parent);
 				if (child instanceof NamedObj) {
 					ComponentUtility.setContainer(child, parent);

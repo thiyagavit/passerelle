@@ -1,10 +1,12 @@
 package com.isencia.passerelle.workbench.model.ui.command;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 import ptolemy.data.BooleanToken;
@@ -60,7 +62,8 @@ public class AttributeCommand extends Command {
 						} else if (value instanceof String) {
 							attribute.setExpression((String)value);
 						} else {
-							throw new Exception("Unrecognised value sent to Variable "+attribute.getName());
+							logger.error("Unrecognised value sent to Variable "+attribute.getName());
+							EclipseUtils.logError(null,"Unrecognised value sent to Variable "+attribute.getName(), IStatus.ERROR);
 						}
 					} else {
 						if (attribute.isStringMode()) {
@@ -71,7 +74,8 @@ public class AttributeCommand extends Command {
 			});
 			
 		} catch (Exception ne) {
-			logger.error("Cannot set variable value "+value, ne);
+			logger.error("Cannot set variable value "+value,ne);
+			EclipseUtils.logError(ne,"Cannot set variable value "+value, IStatus.ERROR);
 		} finally {
 			if (!viewer.getControl().isDisposed()) {
 				viewer.cancelEditing();

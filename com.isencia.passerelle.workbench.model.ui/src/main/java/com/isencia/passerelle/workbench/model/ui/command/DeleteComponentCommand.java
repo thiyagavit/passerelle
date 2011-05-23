@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import ptolemy.moml.Vertex;
 
 import com.isencia.passerelle.workbench.model.ui.ComponentUtility;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class DeleteComponentCommand extends Command implements IRefreshConnections{
@@ -114,17 +116,7 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
 	}
 
 	private void restoreConnections(NamedObj child) {
-		// Iterator<?> targetIterator = targetConnections.iterator();
-		// Iterator<?> sourceIterator = sourceConnections.iterator();
-		//
-		// while (targetIterator.hasNext()) {
-		// restoreRelation(child, (List) targetIterator.next(),
-		// (List) sourceIterator.next());
-		//
-		// }
-		//
-		// sourceConnections.clear();
-		// targetConnections.clear();
+
 		for (Command cmd : delecteConnectionCommands) {
 			cmd.undo();
 		}
@@ -140,7 +132,8 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
 				connection.execute();
 			}
 		} catch (Exception e) {
-			getLogger().error("Unable to delete targetConnection", e);
+			logger.error( "Unable to delete targetConnection",e);
+			EclipseUtils.logError(e, "Unable to delete targetConnection", IStatus.ERROR);
 		}
 	}
 
@@ -188,8 +181,9 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
 						restoreConnections(child);
 					}
 				} catch (Exception e) {
-					getLogger()
-							.error("Unable to undo deletion of component", e);
+					logger.error( "Unable to undo deletion of component",e);
+
+					EclipseUtils.logError(e, "Unable to undo deletion of component", IStatus.ERROR);
 				}
 
 			}
