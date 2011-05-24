@@ -63,6 +63,7 @@ public abstract class ActorFigure extends AbstractNodeFigure {
 
 			outputPorts = new Ports();
 			add(outputPorts, BorderLayout.RIGHT);
+			
 		}
 
 		@Override

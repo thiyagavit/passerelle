@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.part.ViewPart;
@@ -58,6 +59,16 @@ import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
  */
 public class ActorAttributesView extends ViewPart implements
 		ISelectionListener, CommandStackEventListener {
+
+	@Override
+	public void setSite(IWorkbenchPartSite site) {
+		// TODO Auto-generated method stub
+		super.setSite(site);
+	}
+
+	public void setActor(NamedObj actor) {
+		this.actor = actor;
+	}
 
 	private static Logger logger = LoggerFactory
 			.getLogger(ActorAttributesView.class);
@@ -120,32 +131,35 @@ public class ActorAttributesView extends ViewPart implements
 
 		if (parameterList != null)
 			Collections.sort(parameterList, new NamedObjComparator());
+		try {
+			viewer.setContentProvider(new IStructuredContentProvider() {
+				@Override
+				public void dispose() {
 
-		viewer.setContentProvider(new IStructuredContentProvider() {
-			@Override
-			public void dispose() {
+				}
 
-			}
+				@Override
+				public void inputChanged(Viewer viewer, Object oldInput,
+						Object newInput) {
+				}
 
-			@Override
-			public void inputChanged(Viewer viewer, Object oldInput,
-					Object newInput) {
-			}
+				@Override
+				public Object[] getElements(Object inputElement) {
+					if (parameterList == null || parameterList.isEmpty())
+						return new Parameter[] {};
+					final List<Object> ret = new ArrayList<Object>(
+							parameterList.size() + 1);
+					ret.add(actor.getName());
+					ret.addAll(parameterList);
+					return ret.toArray(new Object[ret.size()]);
+				}
+			});
 
-			@Override
-			public Object[] getElements(Object inputElement) {
-				if (parameterList == null || parameterList.isEmpty())
-					return new Parameter[] {};
-				final List<Object> ret = new ArrayList<Object>(parameterList
-						.size() + 1);
-				ret.add(actor.getName());
-				ret.addAll(parameterList);
-				return ret.toArray(new Object[ret.size()]);
-			}
-		});
+			viewer.setInput(new Object());
+			viewer.refresh();
+		} catch (Exception e) {
 
-		viewer.setInput(new Object());
-		viewer.refresh();
+		}
 	}
 
 	public void clear() {
@@ -179,9 +193,9 @@ public class ActorAttributesView extends ViewPart implements
 
 		createActions();
 		createPopupMenu();
-
-		getSite().getWorkbenchWindow().getSelectionService()
-				.addSelectionListener(this);
+		if (getSite() != null)
+			getSite().getWorkbenchWindow().getSelectionService()
+					.addSelectionListener(this);
 
 		viewer.getTable().addKeyListener(new KeyListener() {
 
@@ -217,13 +231,7 @@ public class ActorAttributesView extends ViewPart implements
 
 		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT,
 				0);
-		// name.getColumn().addListener(SWT.SELECTED, new Listener() {
-		//
-		// @Override
-		// public void handleEvent(Event event) {
-		// showHelpSelectedParameter();
-		// }
-		// });
+
 		name.getColumn().setText("Property");
 		name.getColumn().setWidth(200);
 		name.setLabelProvider(new PropertyLabelProvider());
@@ -314,31 +322,6 @@ public class ActorAttributesView extends ViewPart implements
 			}
 		}
 	}
-
-	// public void showHelpSelectedParameter() {
-	// final ISelection sel = viewer.getSelection();
-	//
-	// if (sel != null && sel instanceof StructuredSelection) {
-	// final StructuredSelection s = (StructuredSelection) sel;
-	// String actorClass = getActorClass().getName();
-	// final Object o = s.getFirstElement();
-	// if (o instanceof String)
-	// return;
-	// if (o instanceof Attribute) {
-	// Attribute attr = (Attribute) o;
-	// if (actorClass != null) {
-	// String helpBundle = Constants.HELP_BUNDLE_ID;
-	// String actorName = getActorClass().getName().replace(".",
-	// "_");
-	// String contextId = helpBundle + "." + actorName + "_"
-	// + attr.getName();
-	// PlatformUI.getWorkbench().getHelpSystem();
-	// WorkbenchHelp.displayHelp(contextId);
-	// }
-	// }
-	//
-	// }
-	// }
 
 	public void setAttributeValue(Object element, Object value)
 			throws IllegalActionException {

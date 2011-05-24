@@ -10,18 +10,22 @@ import java.util.Vector;
 import org.eclipse.draw2d.Clickable;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.ImageFigure;
+import org.eclipse.draw2d.MarginBorder;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.AccessibleAnchorProvider;
-import org.eclipse.gef.AccessibleEditPart;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.requests.DropRequest;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.accessibility.AccessibleControlEvent;
-import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewSite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +36,6 @@ import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
-import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
@@ -44,15 +47,10 @@ import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNode
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.PortFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.RectangularActorFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
-import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
-import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
-import com.isencia.passerelle.workbench.model.ui.command.CreateConnectionCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteConnectionCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionCommand;
-import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
+import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
+import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class ActorEditPart extends AbstractNodeEditPart implements
@@ -99,13 +97,62 @@ public class ActorEditPart extends AbstractNodeEditPart implements
 	 */
 	protected IFigure createFigure() {
 		Actor actorModel = getActor();
+		ImageFigure drillDownImageFigure = new ImageFigure(
+				createImage(IMAGE_DESCRIPTOR_ACTOR));
+		drillDownImageFigure.setAlignment(PositionConstants.SOUTH);
+		drillDownImageFigure.setBorder(new MarginBorder(0, 0, 5, 0));
+
+		// Implement drilldown in composite
+//		Clickable button = new Clickable(drillDownImageFigure);
+//		button.addMouseListener(new MouseListener() {
+//
+//			@Override
+//			public void mouseDoubleClicked(MouseEvent e) {
+//				try {
+//					IViewSite site = null;
+//					for (IViewPart part : EclipseUtils.getActivePage()
+//							.getViews()) {
+//						if (part instanceof ActorAttributesView) {
+//							site = (IViewSite) part.getSite();
+//							break;
+//						}
+//
+//					}
+//					if (site != null) {
+//						ActorDialog dialog = new ActorDialog(site,
+//								(NamedObj) getModel());
+//						dialog.open();
+//					}
+//
+//				} catch (Exception e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//
+//			}
+//
+//			@Override
+//			public void mousePressed(MouseEvent arg0) {
+//				// Not action when mouse pressed
+//
+//			}
+//
+//			@Override
+//			public void mouseReleased(MouseEvent arg0) {
+//				// Not action when mouse released
+//
+//			}
+//		});
+
 		ImageDescriptor imageDescriptor = PaletteItemFactory.get().getIcon(
 				actorModel.getClass());
 		if (imageDescriptor == null) {
 			imageDescriptor = IMAGE_DESCRIPTOR_ACTOR;
 		}
 		ActorFigure actorFigure = getActorFigure(actorModel.getDisplayName(),
-				createImage(imageDescriptor), new Clickable[] {});
+				createImage(imageDescriptor), new Clickable[] {  });
+//		ActorFigure actorFigure = getActorFigure(actorModel.getDisplayName(),
+//				createImage(imageDescriptor), new Clickable[] { button });
 		// Add TargetConnectionAnchors
 		List<TypedIOPort> inputPortList = actorModel.inputPortList();
 		if (inputPortList != null) {
