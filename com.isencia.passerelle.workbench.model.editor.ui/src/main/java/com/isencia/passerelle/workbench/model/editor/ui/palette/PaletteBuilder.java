@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class PaletteBuilder {
 
@@ -71,7 +72,7 @@ public class PaletteBuilder {
 			PaletteContainer createPaletteContainer = createFavoriteContainer(favoriteGroup);
 			favoritesContainers.put(favoriteGroup, createPaletteContainer);
 			categories.add(createPaletteContainer);
-			String favorites = factory.getStore().getString(favoriteGroup);
+			String favorites = ModelUtils.getStore().getString(favoriteGroup);
 			if (favorites != null && !favorites.isEmpty()) {
 				String[] names = favorites.split(",");
 				for (String name : names) {
@@ -136,16 +137,16 @@ public class PaletteBuilder {
 					}
 					addFavoriteGroup(favoritesContainer.getLabel(),
 							favoritesContainer);
-					factory.getStore().putValue(favoritesContainer.getLabel(),
+					ModelUtils.getStore().putValue(favoritesContainer.getLabel(),
 							entries.toString());
 				}
 
 			}
 		}
-		factory.getStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,
+		ModelUtils.getStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,
 				containers.toString());
 		try {
-			factory.getStore().save();
+			ModelUtils.getStore().save();
 		} catch (IOException ex) {
 		}
 
