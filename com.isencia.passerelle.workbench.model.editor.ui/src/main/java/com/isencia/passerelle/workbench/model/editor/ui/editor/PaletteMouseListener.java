@@ -49,6 +49,7 @@ public class PaletteMouseListener implements MouseMotionListener {
 						(PaletteContainer) PaletteBuilder
 								.getFavoriteGroup(drawerFigure.getDrawer()
 										.getLabel()));
+				
 
 			} else {
 				paletteItemFactory.addFavorite(type.getName(),
@@ -56,6 +57,7 @@ public class PaletteMouseListener implements MouseMotionListener {
 								.getFavoriteGroup(drawerFigure.getDrawer()
 										.getLabel()));
 			}
+			PaletteBuilder.synchFavorites(paletteViewer);
 			paletteItemFactory.setSelectedItem(null);
 		}
 	}

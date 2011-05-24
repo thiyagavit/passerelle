@@ -618,30 +618,13 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	private void customizePalette(EditDomain editDomain) {
 		if (editDomain != null) {
 			PaletteViewer paletteViewer = editDomain.getPaletteViewer();
-			Control control = paletteViewer.getControl();
-			EditPart contents = paletteViewer.getContents();
-			Map map = paletteViewer.getVisualPartMap();
-			Set<DrawerEditPart> drawers = new HashSet<DrawerEditPart>();
-			for (Object o : contents.getChildren()) {
-				if (o instanceof DrawerEditPart
-						&& !((DrawerEditPart) o).getDrawer().getLabel().equals(
-								"Utilities")) {
-					drawers.add((DrawerEditPart) o);
-				}
-			}
-			for (DrawerEditPart drawer : drawers) {
-				DrawerFigure drawerFigure = drawer.getDrawerFigure();
-
-				drawerFigure.addMouseMotionListener(new PaletteMouseListener(
-						drawer,paletteViewer));
-
-			}
+			WorkbenchUtility.addMouseListenerToPaletteViewer(paletteViewer);
 			DropTarget dt = new DropTarget(paletteViewer.getControl(),
 					DND.DROP_MOVE);
 
 			dt.setTransfer(new Transfer[] { TemplateTransfer.getInstance() });
 			dt.addDropListener(new DropFavouriteListener(paletteViewer));
-			paletteViewer.setCustomizer(new PasserellePaletteCustomizer());
+			paletteViewer.setCustomizer(new PasserellePaletteCustomizer(paletteViewer));
 
 			ContextMenuProvider provider = new PasserellePaletteContextMenuProvider(
 					paletteViewer, parent);
@@ -649,6 +632,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		}
 	}
+
+
 
 	private void createFigureMenu(final FigureCanvas fc) {
 

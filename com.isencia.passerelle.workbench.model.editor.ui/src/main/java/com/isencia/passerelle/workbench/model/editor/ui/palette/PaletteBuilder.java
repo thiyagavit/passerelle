@@ -17,6 +17,7 @@ import org.eclipse.gef.palette.PaletteStack;
 import org.eclipse.gef.palette.PanningSelectionToolEntry;
 import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gef.tools.MarqueeSelectionTool;
+import org.eclipse.gef.ui.palette.PaletteViewer;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.part.EditorPart;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class PaletteBuilder {
@@ -102,9 +104,7 @@ public class PaletteBuilder {
 		return createPaletteContainer;
 	}
 
-	public static void synchFavorites() {
-		PaletteItemFactory factory = PaletteItemFactory.get();
-
+	public static void synchFavorites(PaletteViewer paletteViewer) {
 		StringBuffer containers = new StringBuffer();
 		List containertLis = paletteRoot.getChildren();
 		for (Object e : containertLis) {
@@ -145,6 +145,7 @@ public class PaletteBuilder {
 		}
 		ModelUtils.getStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,
 				containers.toString());
+		WorkbenchUtility.addMouseListenerToPaletteViewer(paletteViewer);
 		try {
 			ModelUtils.getStore().save();
 		} catch (IOException ex) {

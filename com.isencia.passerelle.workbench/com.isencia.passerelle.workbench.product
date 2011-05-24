@@ -42,7 +42,6 @@
       <plugin id="com.isencia.passerelle.commons"/>
       <plugin id="com.isencia.passerelle.commons.ume"/>
       <plugin id="com.isencia.passerelle.engine"/>
-      <plugin id="com.isencia.passerelle.ume"/>
       <plugin id="com.isencia.passerelle.workbench"/>
       <plugin id="com.isencia.passerelle.workbench.logging.development" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
@@ -236,11 +235,11 @@
       <plugin id="org.quartz"/>
       <plugin id="org.sat4j.core"/>
       <plugin id="org.sat4j.pb"/>
+      <plugin id="org.slf4j"/>
+      <plugin id="org.slf4j.impl" fragment="true"/>
       <plugin id="ptolemy.core"/>
       <plugin id="ptolemy.domains.and.actors"/>
       <plugin id="ptolemy.gui"/>
-      <plugin id="slf4j.api"/>
-      <plugin id="slf4j.log4j12" fragment="true"/>
    </plugins>
 
 

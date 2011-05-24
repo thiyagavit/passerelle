@@ -219,7 +219,7 @@ public class PaletteItemFactory implements Serializable {
 
 			CombinedTemplateCreationEntry createPaletteEntryFromPaletteDefinition = createPaletteEntryFromPaletteDefinition(paletteItem);
 			container.add(createPaletteEntryFromPaletteDefinition);
-			PaletteBuilder.synchFavorites();
+			
 			return true;
 		}
 

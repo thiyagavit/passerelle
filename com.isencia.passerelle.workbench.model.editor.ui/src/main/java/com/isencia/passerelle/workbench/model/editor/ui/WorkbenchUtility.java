@@ -1,10 +1,16 @@
 package com.isencia.passerelle.workbench.model.editor.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.internal.ui.palette.editparts.DrawerEditPart;
+import org.eclipse.gef.internal.ui.palette.editparts.DrawerFigure;
+import org.eclipse.gef.ui.palette.PaletteViewer;
+import org.eclipse.swt.widgets.Control;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.ComponentEntity;
@@ -14,9 +20,28 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
+import com.isencia.passerelle.workbench.model.editor.ui.editor.PaletteMouseListener;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.DiagramEditPart;
 
 public abstract class WorkbenchUtility {
+	public static void addMouseListenerToPaletteViewer(PaletteViewer paletteViewer) {
+		Control control = paletteViewer.getControl();
+		EditPart contents = paletteViewer.getContents();
+		Set<DrawerEditPart> drawers = new HashSet<DrawerEditPart>();
+		for (Object o : contents.getChildren()) {
+			if (o instanceof DrawerEditPart
+					&& !((DrawerEditPart) o).getDrawer().getLabel().equals(
+							"Utilities")) {
+				drawers.add((DrawerEditPart) o);
+			}
+		}
+		for (DrawerEditPart drawer : drawers) {
+			DrawerFigure drawerFigure = drawer.getDrawerFigure();
+			drawerFigure.addMouseMotionListener(new PaletteMouseListener(
+					drawer,paletteViewer));
+
+		}
+	}
 	public static CompositeEntity getParentActor(Object o) {
 		if (o instanceof DiagramEditPart
 				&& ((DiagramEditPart) o).getCompositeActor() != null) {
