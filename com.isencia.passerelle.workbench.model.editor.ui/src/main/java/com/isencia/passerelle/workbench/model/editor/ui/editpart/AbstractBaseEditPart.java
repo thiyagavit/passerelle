@@ -31,6 +31,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserellRootEdit
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CommentPropertySource;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
+import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
 import com.isencia.passerelle.workbench.model.ui.command.CreateConnectionCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
@@ -173,7 +174,7 @@ abstract public class AbstractBaseEditPart extends
 		Object source = changerequest.getSource();
 		if (changerequest instanceof ModelChangeRequest) {
 			Class<?> type = ((ModelChangeRequest) changerequest).getType();
-			if (IPropertySource.class.isAssignableFrom(type)) {
+			if (IPropertySource.class.isAssignableFrom(type) || AttributeCommand.class.isAssignableFrom(type)) {
 				onChangePropertyResource(source);
 				return;
 			}

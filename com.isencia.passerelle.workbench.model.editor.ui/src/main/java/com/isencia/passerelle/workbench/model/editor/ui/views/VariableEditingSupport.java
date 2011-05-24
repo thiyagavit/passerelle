@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Variable;
+import ptolemy.data.type.BaseType;
 import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.StringAttribute;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CellEditorAttribute;
@@ -42,7 +44,7 @@ public class VariableEditingSupport extends EditingSupport {
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 
-		final PropertyDescriptor desc;
+		PropertyDescriptor desc = null;
 		String contextId = null;
 		if (element instanceof CellEditorAttribute) {
 			return ((CellEditorAttribute) element).createCellEditor(getViewer()
@@ -52,10 +54,13 @@ public class VariableEditingSupport extends EditingSupport {
 			desc = new TextPropertyDescriptor(VariableEditingSupport.class
 					.getName()
 					+ ".nameText", "Name");
-		} else {
+		} else if (element instanceof Variable) {
 			contextId = showHelpSelectedParameter((Variable) element);
 			desc = EntityPropertySource
 					.getPropertyDescriptor((Variable) element);
+		} else if (element instanceof StringAttribute) {
+			desc = EntityPropertySource.getPropertyDescriptor(
+					(StringAttribute) element, BaseType.STRING);
 		}
 
 		CellEditor createPropertyEditor = desc
@@ -82,7 +87,8 @@ public class VariableEditingSupport extends EditingSupport {
 
 		if (element instanceof String)
 			return actorAttributesView.getActorName();
-
+		if (element instanceof StringAttribute)
+			return ((StringAttribute)element).getExpression();
 		final Variable param = (Variable) element;
 		try {
 			if (!param.isStringMode() && param.getToken() != null

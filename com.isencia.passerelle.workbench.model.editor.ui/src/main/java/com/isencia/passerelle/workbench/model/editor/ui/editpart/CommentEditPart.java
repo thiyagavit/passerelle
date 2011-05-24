@@ -27,9 +27,8 @@ import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class CommentEditPart extends AbstractNodeEditPart {
 
-
 	protected void onChangePropertyResource(Object source) {
-		if (source == this.getModel() && source instanceof NamedObj) {
+		if (source instanceof TextAttribute || source instanceof StringAttribute) {
 			String name = getName(source);
 			if ((getComponentFigure() instanceof INameable)
 					&& name != null
@@ -43,7 +42,11 @@ public class CommentEditPart extends AbstractNodeEditPart {
 				refresh();
 			}
 		}
+		if (source instanceof StringAttribute) {
+
+		}
 	}
+
 	protected void createEditPolicies() {
 
 		installEditPolicy(EditPolicy.COMPONENT_ROLE,
@@ -87,9 +90,14 @@ public class CommentEditPart extends AbstractNodeEditPart {
 	}
 
 	protected String getName(Object source) {
-		Attribute attribute = ((TextAttribute) source).getAttribute("text");
-		if (attribute instanceof StringAttribute)
-			return ((StringAttribute) attribute).getExpression();
+		if (source instanceof StringAttribute) {
+			return ((StringAttribute) source).getExpression();
+		}
+		if (source instanceof TextAttribute) {
+			Attribute attribute = ((TextAttribute) source).getAttribute("text");
+			if (attribute instanceof StringAttribute)
+				return ((StringAttribute) attribute).getExpression();
+		}
 		return "";
 	}
 

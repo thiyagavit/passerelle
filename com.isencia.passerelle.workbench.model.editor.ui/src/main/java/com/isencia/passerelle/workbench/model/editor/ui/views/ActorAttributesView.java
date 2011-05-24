@@ -18,32 +18,27 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.data.expr.Parameter;
-import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
+import ptolemy.kernel.util.StringAttribute;
 
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
-import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.CommentEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.DirectorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
@@ -96,38 +91,48 @@ public class ActorAttributesView extends ViewPart implements
 			return false;
 
 		final Object sel = ((StructuredSelection) selection).getFirstElement();
+		if (sel instanceof AbstractBaseEditPart) {
+			final List<Attribute> parameterList = new ArrayList<Attribute>();
+			this.actor = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
 
-		if (sel instanceof ActorEditPart || sel instanceof DirectorEditPart) {
-			this.actor = sel instanceof ActorEditPart ? (NamedObj) ((ActorEditPart) sel)
-					.getActor()
-					: (NamedObj) ((DirectorEditPart) sel).getDirectorModel();
+			if (sel instanceof ActorEditPart || sel instanceof DirectorEditPart
+					|| sel instanceof CommentEditPart) {
 
-			if (!addedListener
-					&& part instanceof PasserelleModelMultiPageEditor) {
-				// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
-				// addedListener = true;
-			}
-			if (actor != null) {
-				final List<Parameter> parameterList = new ArrayList<Parameter>(
-						7);
-				Iterator<Parameter> parameterIterator = actor.attributeList(
-						Parameter.class).iterator();
-				while (parameterIterator.hasNext()) {
-					Parameter parameter = (Parameter) parameterIterator.next();
-					if (PasserelleConfigurer.isVisible(actor, parameter)) {
-						parameterList.add(parameter);
+				if (!addedListener
+						&& part instanceof PasserelleModelMultiPageEditor) {
+					// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
+					// addedListener = true;
+				}
+				if (actor != null) {
+
+					Class filter = null;
+					if (sel instanceof CommentEditPart) {
+						filter = StringAttribute.class;
+					} else {
+						filter = Parameter.class;
+					}
+					Iterator parameterIterator = actor.attributeList(filter)
+							.iterator();
+					while (parameterIterator.hasNext()) {
+						Attribute parameter = (Attribute) parameterIterator
+								.next();
+
+						if (!(parameter instanceof Parameter)
+								|| (PasserelleConfigurer.isVisible(actor,
+										(Parameter) parameter))) {
+							parameterList.add(parameter);
+						}
 					}
 				}
 
-				createTableModel(parameterList);
 			}
+			createTableModel(parameterList);
 			return true;
 		}
-
 		return false;
 	}
 
-	private void createTableModel(final List<Parameter> parameterList) {
+	private void createTableModel(final List<Attribute> parameterList) {
 
 		if (parameterList != null)
 			Collections.sort(parameterList, new NamedObjComparator());
@@ -145,7 +150,7 @@ public class ActorAttributesView extends ViewPart implements
 
 				@Override
 				public Object[] getElements(Object inputElement) {
-					if (parameterList == null || parameterList.isEmpty())
+					if (parameterList == null)
 						return new Parameter[] {};
 					final List<Object> ret = new ArrayList<Object>(
 							parameterList.size() + 1);
