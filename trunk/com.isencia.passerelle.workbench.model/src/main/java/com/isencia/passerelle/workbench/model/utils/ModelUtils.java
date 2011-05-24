@@ -1,5 +1,11 @@
 package com.isencia.passerelle.workbench.model.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -14,6 +20,7 @@ import org.apache.commons.digester.substitution.VariableSubstitutor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,19 +42,96 @@ import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.model.util.MoMLParser;
+
 public class ModelUtils {
+	public static final String SUBMODELS = "Submodels";
 
 	public static Logger logger = LoggerFactory.getLogger(ModelUtils.class);
+	private static PreferenceStore store;
+
+	public static PreferenceStore getStore() {
+		if (store == null) {
+			store = new PreferenceStore();
+			final String workspacePath = ResourcesPlugin.getWorkspace()
+					.getRoot().getLocation().toOSString();
+			store
+					.setFilename(workspacePath
+							+ "/.metadata/favorites.properties");
+			try {
+				store.load();
+			} catch (IOException e) {
+				return store;
+			}
+		}
+		return store;
+	}
+
+	public static HashMap<String, Flow> readSubModels() {
+		String models = getStore().getString(SUBMODELS);
+		HashMap<String, Flow> modelList = new HashMap<String, Flow>();
+		for (String model : models.split(",")) {
+
+			InputStreamReader reader = new InputStreamReader(
+					createEmptySubModel(model));
+			try {
+				Flow flow = FlowManager.readMoml(reader);
+				MoMLParser.putActorClass(model, flow);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot()
+				.getLocation().toOSString();
+		File metaData = new File(workspacePath + File.separator + ".metadata");
+
+		if (metaData.isDirectory()) {
+			File[] files = metaData.listFiles();
+			for (File file : files) {
+				try {
+					String momlName = file.getName().substring(0,
+							file.getName().length() - 5);
+					if (file.getName().endsWith(".moml")) {
+
+						FileReader in = new FileReader(file);
+						Flow flow = FlowManager.readMoml(in);
+						if (flow.isClassDefinition()) {
+							MoMLParser.putActorClass(momlName, flow);
+							modelList.put(flow.getName(), flow);
+						}
+
+					}
+
+				} catch (Exception e1) {
+				}
+			}
+		}
+		return modelList;
+	}
+
+	private static InputStream createEmptySubModel(String subModel) {
+		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
+				+ "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
+				+ "<class name=\"" + subModel
+				+ "\" extends=\"ptolemy.actor.TypedCompositeActor\"> </class>";
+		return new ByteArrayInputStream(contents.getBytes());
+	}
 
 	public static enum ConnectionType {
 		SOURCE, TARGET
 	};
-	public static boolean isClassDefinition(Object model){
-		if (model instanceof CompositeActor){
-			return ((CompositeActor)model).isClassDefinition();
+
+	public static boolean isClassDefinition(Object model) {
+		if (model instanceof CompositeActor) {
+			return ((CompositeActor) model).isClassDefinition();
 		}
 		return false;
 	}
+
 	public static final boolean isPort(String type) {
 		return ModelConstants.INPUT_IOPORT.equals(type)
 				|| ModelConstants.OUTPUT_IOPORT.equals(type);
@@ -227,7 +311,6 @@ public class ModelUtils {
 		}
 		return false;
 	}
-
 
 	public static String findUniqueActorName(CompositeEntity parentModel,
 			String name) {

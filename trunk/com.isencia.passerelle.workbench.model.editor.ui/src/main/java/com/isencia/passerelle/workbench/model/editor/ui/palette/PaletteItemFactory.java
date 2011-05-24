@@ -36,13 +36,13 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class PaletteItemFactory implements Serializable {
 
 	public static final String FAVORITE_GROUPS = "FavoriteGroups";
-	public static final String SUBMODELS = "Submodels";
 	public static final String DEFAULT_FAVORITES_NAME = "Favorites";
-	private static PreferenceStore store;
+
 	private CreationFactory selectedItem;
 
 	public CreationFactory getSelectedItem() {
@@ -54,29 +54,14 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public String[] getFavoriteGroupNames() {
-		String groups = getStore().getString(FAVORITE_GROUPS);
+		String groups = ModelUtils.getStore().getString(FAVORITE_GROUPS);
 		if (groups == null || groups.isEmpty()) {
 			return new String[] { DEFAULT_FAVORITES_NAME };
 		}
 		return groups.split(",");
 	}
 
-	public PreferenceStore getStore() {
-		if (store == null) {
-			store = new PreferenceStore();
-			final String workspacePath = ResourcesPlugin.getWorkspace()
-					.getRoot().getLocation().toOSString();
-			store
-					.setFilename(workspacePath
-							+ "/.metadata/favorites.properties");
-			try {
-				store.load();
-			} catch (IOException e) {
-				return store;
-			}
-		}
-		return store;
-	}
+
 
 	List<PaletteGroup> paletteGroups;
 	private static PaletteItemFactory factory;
@@ -101,7 +86,7 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public String[] getFavorites() {
-		PreferenceStore store = getStore();
+		PreferenceStore store = ModelUtils.getStore();
 		if (store == null) {
 			return new String[0];
 		}
@@ -190,8 +175,7 @@ public class PaletteItemFactory implements Serializable {
 		if (def instanceof SubModelPaletteItemDefinition) {
 			return new CombinedTemplateCreationEntry(def.getName(), def
 					.getName(), new ClassTypeFactory(def.getClazz(),
-					(SubModelPaletteItemDefinition) def), def
-					.getIcon(), //$NON-NLS-1$
+					(SubModelPaletteItemDefinition) def), def.getIcon(), //$NON-NLS-1$
 					def.getIcon()//$NON-NLS-1$
 			);
 		} else {
@@ -224,7 +208,7 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public void removeFavorite(String name) {
-		getStore().putValue(name, "");
+		ModelUtils.getStore().putValue(name, "");
 	}
 
 	public boolean addFavorite(String name, PaletteContainer container) {
@@ -433,13 +417,13 @@ public class PaletteItemFactory implements Serializable {
 		if (!modelList.containsKey(model)) {
 			modelList.put(model, flow);
 
-			StringBuffer modelString = new StringBuffer(getStore().getString(
-					SUBMODELS));
+			StringBuffer modelString = new StringBuffer(ModelUtils.getStore().getString(
+					ModelUtils.SUBMODELS));
 			modelString.append(model);
 			modelString.append(",");
-			getStore().putValue(SUBMODELS, modelString.toString());
+			ModelUtils.getStore().putValue(ModelUtils.SUBMODELS, modelString.toString());
 			try {
-				getStore().save();
+				ModelUtils.getStore().save();
 			} catch (IOException e1) {
 
 			}
@@ -458,58 +442,14 @@ public class PaletteItemFactory implements Serializable {
 	public Map<String, Flow> getSubModels() {
 
 		if (modelList == null) {
-			String models = getStore().getString(PaletteItemFactory.SUBMODELS);
-			modelList = new HashMap<String, Flow>();
-			for (String model : models.split(",")) {
-
-				InputStreamReader reader = new InputStreamReader(
-						createEmptySubModel(model));
-				try {
-					Flow flow = FlowManager.readMoml(reader);
-					MoMLParser.putActorClass(model, flow);
-					} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-			final String workspacePath = ResourcesPlugin.getWorkspace()
-					.getRoot().getLocation().toOSString();
-			File metaData = new File(workspacePath + File.separator
-					+ ".metadata");
-
-			if (metaData.isDirectory()) {
-				File[] files = metaData.listFiles();
-				for (File file : files) {
-					try {
-						String momlName = file.getName().substring(0,
-								file.getName().length() - 5);
-						if (file.getName().endsWith(".moml")) {
-
-							FileReader in = new FileReader(file);
-							Flow flow = FlowManager.readMoml(in);
-							if (flow.isClassDefinition()) {
-								MoMLParser.putActorClass(momlName, flow);
-								modelList.put(flow.getName(), flow);
-							}
-
-						}
-
-					} catch (Exception e1) {
-					}
-				}
-			}
+			return modelList = ModelUtils.readSubModels();
 
 		}
 		return modelList;
 	}
 
-	private InputStream createEmptySubModel(String subModel) {
-		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
-				+ "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
-				+ "<class name=\"" + subModel
-				+ "\" extends=\"ptolemy.actor.TypedCompositeActor\"> </class>";
-		return new ByteArrayInputStream(contents.getBytes());
-	}
+
+
 
 	public void addSubModel(Flow flow) {
 		if (!paletteItemMap.containsKey(flow.getName())) {

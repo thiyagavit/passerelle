@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
@@ -19,6 +20,8 @@ import ptolemy.moml.MoMLParser;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorCollector;
+import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -99,9 +102,9 @@ public class ModelRunner implements IApplication {
 					MoMLParser.purgeModelRecord(modelPath);
 				    MoMLParser.purgeAllModelRecords();
 					
-					// NOTE must use argument below 
-					final MoMLParser moMLParser = new MoMLParser();
-					compositeActor = (CompositeActor) moMLParser.parse(null, reader);
+					ModelUtils.readSubModels();
+
+					compositeActor = FlowManager.readMoml(reader);
 					compositeActor.setPersistent(false);
 					
 					// The workspace is named after the RCP project. This enables actors
