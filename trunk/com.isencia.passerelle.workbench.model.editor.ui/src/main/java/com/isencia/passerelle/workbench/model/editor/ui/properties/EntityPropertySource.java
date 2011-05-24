@@ -108,14 +108,7 @@ public class EntityPropertySource implements IPropertySource {
 		for (Parameter parameter : parameterList) {
 			addPropertyDescriptor(descriptors, parameter);
 		}
-		// shouldn't be editable
-		// descriptors.add(new
-		// PropertyDescriptor(Integer.toString(attr.getFeatureID()),
-		// attr.getName()));
 
-		// descriptors.add(new
-		// CheckboxPropertyDescriptor(Integer.toString(attr.getFeatureID()),
-		// attr.getName()));
 		return (IPropertyDescriptor[]) descriptors
 				.toArray(new IPropertyDescriptor[] {});
 	}
