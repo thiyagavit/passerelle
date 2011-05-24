@@ -71,11 +71,12 @@ public class ActorAttributesView extends ViewPart implements
 
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-
-		this.part = part;
-		if (updateSelection(selection))
-			return;
-		clear();
+		if (part instanceof PasserelleModelMultiPageEditor) {
+			this.part = part;
+			if (updateSelection(selection))
+				return;
+			clear();
+		}
 	}
 
 	protected boolean updateSelection(final ISelection selection) {
