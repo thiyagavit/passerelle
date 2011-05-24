@@ -6,19 +6,22 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
-import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Variable;
+import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.StringAttribute;
+import ptolemy.vergil.kernel.attributes.TextAttribute;
+
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
+import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class AttributeCommand extends Command {
 
 	private static Logger logger = LoggerFactory
 			.getLogger(AttributeCommand.class);
 
-	private final Variable attribute;
+	private final Attribute attribute;
 	private final Object newValue;
 	private final Object previousValue;
 	private final ColumnViewer viewer;
@@ -26,16 +29,22 @@ public class AttributeCommand extends Command {
 	public AttributeCommand(final ColumnViewer viewer, Object element,
 			Object newValue) throws IllegalActionException {
 
-		super("Set value " + ((Variable) element).getDisplayName() + " to "
-				+ getVisibleValue(newValue));
+		super("Set value "
+				+ (element instanceof Variable ? (((Variable) element)
+						.getDisplayName()
+						+ " to " + getVisibleValue(newValue)) : ""));
 		this.viewer = viewer;
-		this.attribute = (Variable) element;
+		this.attribute = (Attribute) element;
 		this.newValue = newValue;
-		this.previousValue = (!attribute.isStringMode()
-				&& attribute.getToken() != null && attribute.getToken() instanceof BooleanToken) ? new Boolean(
-				((BooleanToken) attribute.getToken()).booleanValue())
-				: attribute.getExpression();
-
+		if (attribute instanceof StringAttribute){
+			this.previousValue = ((StringAttribute) attribute).getExpression();
+		}else {
+			Variable var = (Variable)attribute;
+			this.previousValue = (!var.isStringMode()
+					&& var.getToken() != null && var.getToken() instanceof BooleanToken) ? new Boolean(
+					((BooleanToken) var.getToken()).booleanValue())
+					: var.getExpression();
+		}
 	}
 
 	private static Object getVisibleValue(Object newValue) {
@@ -62,22 +71,29 @@ public class AttributeCommand extends Command {
 				protected void _execute() throws Exception {
 					if (value != null) {
 						try {
-							if (value instanceof Boolean) {
-								attribute.setToken(new BooleanToken(
-										((Boolean) value).booleanValue()));
-							} else if (value instanceof Number) {
-								attribute.setExpression(((Number) value)
-										.toString());
-							} else if (value instanceof String) {
-								attribute.setExpression((String) value);
-							} else {
-								logger
-										.error("Unrecognised value sent to Variable "
-												+ attribute.getName());
-								EclipseUtils.logError(null,
-										"Unrecognised value sent to Variable "
-												+ attribute.getName(),
-										IStatus.ERROR);
+							if (attribute instanceof StringAttribute) {
+								((StringAttribute) attribute)
+										.setExpression((String) value);
+							}
+							if (attribute instanceof Variable) {
+								Variable var = (Variable) attribute;
+								if (value instanceof Boolean) {
+									var.setToken(new BooleanToken(
+											((Boolean) value).booleanValue()));
+								} else if (value instanceof Number) {
+									var.setExpression(((Number) value)
+											.toString());
+								} else if (value instanceof String) {
+									var.setExpression((String) value);
+								} else {
+									logger
+											.error("Unrecognised value sent to Variable "
+													+ attribute.getName());
+									EclipseUtils.logError(null,
+											"Unrecognised value sent to Variable "
+													+ attribute.getName(),
+											IStatus.ERROR);
+								}
 							}
 						} catch (Exception e) {
 							EclipseUtils.logError(e,
@@ -87,8 +103,14 @@ public class AttributeCommand extends Command {
 
 						}
 					} else {
-						if (attribute.isStringMode()) {
-							attribute.setExpression(null);
+						if (attribute instanceof StringAttribute) {
+							((StringAttribute) attribute)
+							.setExpression(null);
+						}
+						if (attribute instanceof Variable) {
+							if (((Variable)attribute).isStringMode()) {
+								((Variable)attribute).setExpression(null);
+							}
 						}
 					}
 				}

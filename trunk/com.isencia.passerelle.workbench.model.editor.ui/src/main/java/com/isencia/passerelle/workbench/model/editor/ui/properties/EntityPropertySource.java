@@ -288,7 +288,7 @@ public class EntityPropertySource implements IPropertySource {
 	 * @param type
 	 * @return
 	 */
-	protected static PropertyDescriptor getPropertyDescriptor(final Attribute parameter, final Type type) {
+	public static PropertyDescriptor getPropertyDescriptor(final Attribute parameter, final Type type) {
 		
 		
 		if (parameter instanceof ColorAttribute) {
