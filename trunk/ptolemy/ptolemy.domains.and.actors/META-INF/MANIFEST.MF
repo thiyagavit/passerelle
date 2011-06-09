@@ -5,18 +5,17 @@ Bundle-SymbolicName: ptolemy.domains.and.actors
 Bundle-Version: 7.0.1
 Bundle-Activator: ptolemy.domains.activator.Activator
 Bundle-Vendor: isencia
-Eclipse-LazyStart: false
 Import-Package: com.microstar.xml,
  org.osgi.framework;version="1.3.0"
-Export-Package: ptolemy.actor.lib.comm,
- ptolemy.actor.lib.conversions,
+Export-Package: ptolemy.actor.lib.comm;version="7.0.1",
+ ptolemy.actor.lib.conversions;version="7.0.1",
  ptolemy.actor.lib.hoc;version="7.0.1",
- ptolemy.actor.lib.io,
- ptolemy.actor.lib.logic,
- ptolemy.actor.lib.net,
- ptolemy.actor.lib.string,
- ptolemy.actor.lib.tutorial,
- ptolemy.actor.lib.xslt,
+ ptolemy.actor.lib.io;version="7.0.1",
+ ptolemy.actor.lib.logic;version="7.0.1",
+ ptolemy.actor.lib.net;version="7.0.1",
+ ptolemy.actor.lib.string;version="7.0.1",
+ ptolemy.actor.lib.tutorial;version="7.0.1",
+ ptolemy.actor.lib.xslt;version="7.0.1",
  ptolemy.domains.ct.kernel;version="7.0.1",
  ptolemy.domains.ct.kernel.solver;version="7.0.1",
  ptolemy.domains.ct.lib;version="7.0.1",
