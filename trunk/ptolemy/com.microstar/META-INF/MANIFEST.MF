@@ -6,4 +6,4 @@ Bundle-Version: 1.2.0
 Bundle-Vendor: isencia
 Eclipse-LazyStart: false
 Import-Package: org.osgi.framework;version="1.3.0"
-Export-Package: com.microstar.xml
+Export-Package: com.microstar.xml;version="1.2.0"
