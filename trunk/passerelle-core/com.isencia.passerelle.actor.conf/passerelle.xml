@@ -3,11 +3,9 @@
 
 <toc label="Passerelle" topic="html/passerelle.html">
 	<topic label="General Actors"  href="html/general.html"> 
-		<topic label="Console" href="html/com.isencia.passerelle.actor.general.Console.html">
-			<topic label="attributes" href="html/com.isencia.passerelle.actor.general.Console_attributes.html"/> 	
+		<topic label="Console" href="html/com.isencia.passerelle.actor.general.Console.html">	
 		</topic> 
 		<topic label="Const" href="html/com.isencia.passerelle.actor.general.Const.html">
-			<topic label="attributes" href="html/com.isencia.passerelle.actor.general.Const_attributes.html"/> 
 		</topic> 
 	</topic>
 </toc>
