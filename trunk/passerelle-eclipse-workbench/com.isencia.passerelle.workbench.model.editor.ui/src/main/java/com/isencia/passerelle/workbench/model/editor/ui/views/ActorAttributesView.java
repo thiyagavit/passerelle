@@ -19,31 +19,38 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
+import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.CommentEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.DirectorEditPart;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
+import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
  * Optional replacement for PropertiesView which renders the actor properties
@@ -61,8 +68,10 @@ public class ActorAttributesView extends ViewPart implements
 		super.setSite(site);
 	}
 
+	private NamedObj dialogActor;
+
 	public void setActor(NamedObj actor) {
-		this.actor = actor;
+		this.dialogActor = actor;
 	}
 
 	private static Logger logger = LoggerFactory
@@ -93,35 +102,33 @@ public class ActorAttributesView extends ViewPart implements
 		final Object sel = ((StructuredSelection) selection).getFirstElement();
 		if (sel instanceof AbstractBaseEditPart) {
 			final List<Attribute> parameterList = new ArrayList<Attribute>();
-			this.actor = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
+			if (this.dialogActor == null)
+				this.actor = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
+			else
+				this.actor = this.dialogActor;
 
-			if (sel instanceof ActorEditPart || sel instanceof DirectorEditPart
-					|| sel instanceof CommentEditPart) {
+			if (this.actor instanceof NamedObj) {
 
 				if (!addedListener
 						&& part instanceof PasserelleModelMultiPageEditor) {
 					// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
 					// addedListener = true;
 				}
-				if (actor != null) {
+				Class filter = null;
+				if (this.actor instanceof TextAttribute) {
+					filter = StringAttribute.class;
+				} else {
+					filter = Parameter.class;
+				}
+				Iterator parameterIterator = actor.attributeList(filter)
+						.iterator();
+				while (parameterIterator.hasNext()) {
+					Attribute parameter = (Attribute) parameterIterator.next();
 
-					Class filter = null;
-					if (sel instanceof CommentEditPart) {
-						filter = StringAttribute.class;
-					} else {
-						filter = Parameter.class;
-					}
-					Iterator parameterIterator = actor.attributeList(filter)
-							.iterator();
-					while (parameterIterator.hasNext()) {
-						Attribute parameter = (Attribute) parameterIterator
-								.next();
-
-						if (!(parameter instanceof Parameter)
-								|| (PasserelleConfigurer.isVisible(actor,
-										(Parameter) parameter))) {
-							parameterList.add(parameter);
-						}
+					if (!(parameter instanceof Parameter)
+							|| (PasserelleConfigurer.isVisible(actor,
+									(Parameter) parameter))) {
+						parameterList.add(parameter);
 					}
 				}
 
@@ -154,7 +161,17 @@ public class ActorAttributesView extends ViewPart implements
 						return new Parameter[] {};
 					final List<Object> ret = new ArrayList<Object>(
 							parameterList.size() + 1);
-					ret.add(actor.getName());
+					ret
+							.add(new GeneralAttribute(
+									GeneralAttribute.ATTRIBUTE_TYPE.TYPE,
+									PaletteItemFactory.get().getType(
+											actor.getClass())));
+					ret.add(new GeneralAttribute(
+							GeneralAttribute.ATTRIBUTE_TYPE.CLASS,actor.getClass().getName()));
+					ret.add(new GeneralAttribute(
+							GeneralAttribute.ATTRIBUTE_TYPE.NAME,
+							PaletteItemFactory.get().getType(
+									actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
 				}
@@ -187,7 +204,34 @@ public class ActorAttributesView extends ViewPart implements
 	public void createPartControl(Composite parent) {
 
 		this.viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER) {
+
+			@Override
+			protected void doShowItem(Item item) {
+				// TODO Auto-generated method stub
+				super.doShowItem(item);
+			}
+
+			@Override
+			protected void doSelect(int[] indices) {
+				// TODO Auto-generated method stub
+				super.doSelect(indices);
+
+			}
+
+			public String showHelpSelectedParameter(Variable param) {
+
+				Attribute attr = (Attribute) param;
+				if (param.getContainer() != null) {
+					String helpBundle = Constants.HELP_BUNDLE_ID;
+					String actorName = param.getContainer().getClass()
+							.getName().replace(".", "_");
+					return helpBundle + "." + actorName + "_" + attr.getName();
+				}
+				return "";
+			}
+
+		};
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -211,7 +255,11 @@ public class ActorAttributesView extends ViewPart implements
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.F1) {
-					// showHelpSelectedParameter();
+					try {
+						showHelpSelectedParameter();
+					} catch (IllegalActionException e1) {
+
+					}
 				}
 				if (e.character == SWT.DEL) {
 					try {
@@ -232,7 +280,7 @@ public class ActorAttributesView extends ViewPart implements
 		}
 	}
 
-	private void createColumns(TableViewer viewer) {
+	private void createColumns(final TableViewer viewer) {
 
 		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT,
 				0);
@@ -240,7 +288,6 @@ public class ActorAttributesView extends ViewPart implements
 		name.getColumn().setText("Property");
 		name.getColumn().setWidth(200);
 		name.setLabelProvider(new PropertyLabelProvider());
-
 		final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT,
 				1);
 
@@ -262,13 +309,22 @@ public class ActorAttributesView extends ViewPart implements
 	 */
 	private void createPopupMenu() {
 		MenuManager menuMan = new MenuManager();
+
 		menuMan.add(new Action("Delete Attribute", Activator
 				.getImageDescriptor("icons/delete_attribute.gif")) {
 			public void run() {
 				(new DeleteAttributeHandler()).run(null);
 			}
 		});
-
+		menuMan.add(new Action("Help", Activator
+				.getImageDescriptor("icons/help.gif")) {
+			public void run() {
+				try {
+					showHelpSelectedParameter();
+				} catch (IllegalActionException e) {
+				}
+			}
+		});
 		viewer.getControl().setMenu(
 				menuMan.createContextMenu(viewer.getControl()));
 	}
@@ -325,6 +381,20 @@ public class ActorAttributesView extends ViewPart implements
 			if (o instanceof Attribute) {
 				setAttributeValue(o, null);
 			}
+		}
+	}
+
+	public void showHelpSelectedParameter() throws IllegalActionException {
+
+		final ISelection sel = viewer.getSelection();
+		if (sel != null && sel instanceof StructuredSelection) {
+			final StructuredSelection s = (StructuredSelection) sel;
+			final Object o = s.getFirstElement();
+			String contextId = HelpUtils.getContextId(o);
+			if (contextId != null) {
+				WorkbenchHelp.displayHelp(contextId);
+			}
+
 		}
 	}
 

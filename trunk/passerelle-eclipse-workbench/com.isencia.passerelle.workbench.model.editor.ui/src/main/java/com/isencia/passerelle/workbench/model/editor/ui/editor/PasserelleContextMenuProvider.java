@@ -9,6 +9,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.actions.ActionFactory;
 
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 
 public class PasserelleContextMenuProvider extends
 		org.eclipse.gef.ContextMenuProvider {
@@ -42,6 +43,9 @@ public class PasserelleContextMenuProvider extends
 		manager.add(new Separator(GEFActionConstants.GROUP_HELP));
 
 		IAction action;
+		action = getActionRegistry().getAction(ViewAttributesAction.ID);
+		if (action != null )
+			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
 		action = getActionRegistry().getAction(OpenFileAction.ID1);
 		if (action != null )
 			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);

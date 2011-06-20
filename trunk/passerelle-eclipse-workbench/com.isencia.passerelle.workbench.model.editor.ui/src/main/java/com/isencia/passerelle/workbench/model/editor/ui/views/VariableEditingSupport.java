@@ -22,6 +22,7 @@ import ptolemy.kernel.util.StringAttribute;
 import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CellEditorAttribute;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
+import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
  * Editing support for parameter column.
@@ -41,40 +42,55 @@ public class VariableEditingSupport extends EditingSupport {
 		this.actorAttributesView = part;
 	}
 
+	// private Object previousSelection;
+
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 
 		PropertyDescriptor desc = null;
-		String contextId = null;
+
 		if (element instanceof CellEditorAttribute) {
 			return ((CellEditorAttribute) element).createCellEditor(getViewer()
 					.getControl());
-		} else if (element instanceof String) {
-			contextId = Constants.HELP_BUNDLE_ID + ".name";
-			desc = new TextPropertyDescriptor(VariableEditingSupport.class
-					.getName()
-					+ ".nameText", "Name");
+		} else if (element instanceof GeneralAttribute) {
+
+			if (((GeneralAttribute) element).getType().equals(
+					GeneralAttribute.ATTRIBUTE_TYPE.NAME)) {
+				desc = new TextPropertyDescriptor(VariableEditingSupport.class
+						.getName()
+						+ ".nameText", "Name");
+			}
+
 		} else if (element instanceof Variable) {
-			contextId = showHelpSelectedParameter((Variable) element);
 			desc = EntityPropertySource
 					.getPropertyDescriptor((Variable) element);
 		} else if (element instanceof StringAttribute) {
 			desc = EntityPropertySource.getPropertyDescriptor(
 					(StringAttribute) element, BaseType.STRING);
 		}
+		if (desc != null) {
+			CellEditor createPropertyEditor = desc
+					.createPropertyEditor((Composite) getViewer().getControl());
+			// if (!element.equals(previousSelection)) {
 
-		CellEditor createPropertyEditor = desc
-				.createPropertyEditor((Composite) getViewer().getControl());
-		if (contextId != null) {
-			try {
-				PlatformUI.getWorkbench().getHelpSystem().setHelp(
-						createPropertyEditor.getControl(), contextId);
-				PlatformUI.getWorkbench().getHelpSystem().displayDynamicHelp();
-			} catch (Exception e) {
+			String contextId = HelpUtils.getContextId(element);
+			if (contextId != null) {
+				try {
+					PlatformUI.getWorkbench().getHelpSystem().setHelp(
+							createPropertyEditor.getControl(), contextId);
+					PlatformUI.getWorkbench().getHelpSystem()
+							.displayDynamicHelp();
+				} catch (Exception e) {
 
+				}
+				// WorkbenchHelp.displayHelp(contextId);
+				// previousSelection = element;
+				// }
 			}
+			return createPropertyEditor;
 		}
-		return createPropertyEditor;
+		return null;
+		
 	}
 
 	@Override
@@ -85,10 +101,10 @@ public class VariableEditingSupport extends EditingSupport {
 	@Override
 	protected Object getValue(Object element) {
 
-		if (element instanceof String)
-			return actorAttributesView.getActorName();
+		if (element instanceof GeneralAttribute)
+			return ((GeneralAttribute) element).getValue();
 		if (element instanceof StringAttribute)
-			return ((StringAttribute)element).getExpression();
+			return ((StringAttribute) element).getExpression();
 		final Variable param = (Variable) element;
 		try {
 			if (!param.isStringMode() && param.getToken() != null
@@ -117,7 +133,7 @@ public class VariableEditingSupport extends EditingSupport {
 	protected void setValue(Object element, Object value) {
 
 		try {
-			if (element instanceof String) {
+			if (element instanceof GeneralAttribute) {
 				// Also uses a Command so that is undoable
 				actorAttributesView.setActorName((String) value);
 

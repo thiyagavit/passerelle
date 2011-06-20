@@ -41,26 +41,7 @@
          	</propertyTab>	
          </propertyTabs>
    </extension>
-   <extension
-         point="org.eclipse.ui.views.properties.tabbed.propertySections">
-         <propertySections  contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor">
-         	<propertySection 
-         		class="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorParameterSection"
-         		id="com.isencia.passerelle.workbench.model.editor.ui.properties.section.parameters"
-         		tab="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.parameters" >
-         		<input type="org.eclipse.gef.editparts.AbstractGraphicalEditPart" />
-         	</propertySection>
-          <propertySection
-                class="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection"
-                id="com.isencia.passerelle.workbench.model.editor.ui.properties.section.general"
-                tab="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general">
-             <input
-                   type="org.eclipse.gef.editparts.AbstractGraphicalEditPart">
-             </input>
-          </propertySection>	
-         </propertySections>
-   </extension>
-   <extension
+    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="com.isencia.passerelle.workbench.model.editor.ui.PreferenceInitializer">
