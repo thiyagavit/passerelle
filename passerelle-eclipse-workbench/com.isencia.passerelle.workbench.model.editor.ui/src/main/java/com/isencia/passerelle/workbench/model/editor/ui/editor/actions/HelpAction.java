@@ -57,34 +57,34 @@ public class HelpAction extends SelectionAction {
 	public void run() {
 		List selection = getSelectedObjects();
 		for (Object o : selection) {
-			if (o instanceof OutlineEditPart) {
-				OutlineEditPart out = (OutlineEditPart) o;
+			// if (o instanceof OutlineEditPart) {
+			// OutlineEditPart out = (OutlineEditPart) o;
+			//
+			// Object model = out.getModel();
+			// if (model instanceof Attribute) {
+			// Attribute attr = (Attribute) model;
+			// NamedObj container = attr.getContainer();
+			// String actorName = container.getClass().getName();
+			//
+			// String href = "/"
+			// + PaletteItemFactory.get().getBuildId(actorName)
+			// + "/html/" + actorName + "_" + attr.getName()
+			// + ".html";
+			// WorkbenchHelpSystem.getInstance().displayHelpResource(href);
+			//
+			// } else {
+			// String actorName = model.getClass().getName();
+			//
+			// WorkbenchHelpSystem.getInstance().displayHelpResource(
+			// "/"
+			// + PaletteItemFactory.get().getBuildId(
+			// actorName) + "/html/" + actorName
+			// + ".html");
+			//
+			// }
+			// break;
 
-				Object model = out.getModel();
-				if (model instanceof Attribute) {
-					Attribute attr = (Attribute) model;
-					NamedObj container = attr.getContainer();
-					String actorName = container.getClass().getName();
-
-					String href = "/"
-							+ PaletteItemFactory.get().getBuildId(actorName)
-							+ "/html/" + actorName + "_" + attr.getName()
-							+ ".html";
-					WorkbenchHelpSystem.getInstance().displayHelpResource(href);
-
-				} else {
-					String actorName = model.getClass().getName();
-
-					WorkbenchHelpSystem.getInstance().displayHelpResource(
-							"/"
-									+ PaletteItemFactory.get().getBuildId(
-											actorName) + "/html/" + actorName
-									+ ".html");
-
-				}
-				break;
-
-			} else if (o instanceof ActorEditPart) {
+			if (o instanceof ActorEditPart) {
 				String actorName = ((ActorEditPart) o).getEntity().getClass()
 						.getName();
 				String string = "/"
