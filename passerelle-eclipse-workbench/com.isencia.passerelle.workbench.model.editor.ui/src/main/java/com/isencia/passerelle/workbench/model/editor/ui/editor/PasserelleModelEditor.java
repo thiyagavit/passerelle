@@ -2,10 +2,8 @@ package com.isencia.passerelle.workbench.model.editor.ui.editor;
 
 import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -16,16 +14,8 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.draw2d.AncestorListener;
-import org.eclipse.draw2d.CoordinateListener;
 import org.eclipse.draw2d.FigureCanvas;
-import org.eclipse.draw2d.FigureListener;
-import org.eclipse.draw2d.FocusEvent;
-import org.eclipse.draw2d.FocusListener;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
@@ -41,8 +31,6 @@ import org.eclipse.gef.dnd.TemplateTransfer;
 import org.eclipse.gef.dnd.TemplateTransferDragSourceListener;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
-import org.eclipse.gef.internal.ui.palette.editparts.DrawerEditPart;
-import org.eclipse.gef.internal.ui.palette.editparts.DrawerFigure;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.AlignmentAction;
@@ -72,7 +60,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
@@ -89,9 +76,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
@@ -102,9 +87,7 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.ComponentEntity;
-import ptolemy.kernel.util.NamedObj;
 
-import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.FileTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.PasserelleTemplateTransferDropTargetListener;
@@ -118,6 +101,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.HelpActio
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.PasteNodeAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.EditPartFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
@@ -414,13 +398,13 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	protected KeyHandler getCommonKeyHandler() {
 		if (sharedKeyHandler == null) {
 			sharedKeyHandler = new KeyHandler();
-			sharedKeyHandler.put(KeyStroke.getPressed(SWT.F2, 0),
-					getActionRegistry().getAction(
-							ActionFactory.DYNAMIC_HELP.getId()));
-			sharedKeyHandler
-					.put(KeyStroke.getPressed(SWT.DEL, 127, 0),
-							getActionRegistry().getAction(
-									ActionFactory.DELETE.getId()));
+//			sharedKeyHandler.put(KeyStroke.getPressed(SWT.F2, 0),
+//					getActionRegistry().getAction(
+//							ActionFactory.DYNAMIC_HELP.getId()));
+//			sharedKeyHandler
+//					.put(KeyStroke.getPressed(SWT.DEL, 127, 0),
+//							getActionRegistry().getAction(
+//									ActionFactory.DELETE.getId()));
 			sharedKeyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, 0),
 					getActionRegistry().getAction(GEFActionConstants.ZOOM_IN));
 			sharedKeyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT,
@@ -540,6 +524,9 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 				getParent());
 		registry.registerAction(subModelAction);
 		getSelectionActions().add(subModelAction.getId());
+		ViewAttributesAction viewAttributes = new ViewAttributesAction(this);
+		registry.registerAction(viewAttributes);
+		getSelectionActions().add(viewAttributes.getId());
 
 		final IToolBarManager man = getEditorSite().getActionBars()
 				.getToolBarManager();
@@ -587,6 +574,7 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		rulerComp = new RulerComposite(parent, SWT.NONE);
 		super.createGraphicalViewer(rulerComp);
 
+
 		ScrollingGraphicalViewer graphicalViewer = (ScrollingGraphicalViewer) getGraphicalViewer();
 		rulerComp.setGraphicalViewer(graphicalViewer);
 
@@ -599,6 +587,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		keyHandler.put(KeyStroke.getPressed(SWT.F2, 0), getActionRegistry()
 				.getAction(ActionFactory.DYNAMIC_HELP.getId()));
+		keyHandler.put(KeyStroke.getPressed(SWT.ALT, 0), getActionRegistry()
+				.getAction(ViewAttributesAction.ID));
 		graphicalViewerKeyHandler.setParent(keyHandler);
 		graphicalViewer.setKeyHandler(graphicalViewerKeyHandler);
 

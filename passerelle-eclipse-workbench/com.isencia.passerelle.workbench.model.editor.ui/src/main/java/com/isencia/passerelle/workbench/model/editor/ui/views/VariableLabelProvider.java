@@ -33,8 +33,8 @@ public class VariableLabelProvider extends ColumnLabelProvider {
 	 */
 	public String getText(Object element) {
 
-		if (element instanceof String) {
-			return actorAttributesView.getActorName();
+		if (element instanceof GeneralAttribute) {
+			return ((GeneralAttribute)element).getValue();
 		}
 		if (element instanceof CellEditorAttribute) {
 			final String text = ((CellEditorAttribute) element)

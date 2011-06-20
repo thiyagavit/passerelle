@@ -21,28 +21,20 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMu
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
-public class DeleteAttributeHandler extends AbstractHandler implements IViewActionDelegate, ISelectionListener {
+public class DeleteAttributeHandler extends AbstractAttributeHandler {
 
-	private static Logger logger = LoggerFactory.getLogger(AbstractHandler.class);
-	private IViewPart view;
-	
-	@Override
-	public void run(IAction action) {
-        doAction();		
-	}
+	private static Logger logger = LoggerFactory
+			.getLogger(AbstractHandler.class);
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-        doAction();		
-		return Boolean.TRUE;
-	}
+	protected void doAction() {
 
-	private void doAction() {
-		
-		final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor)EclipseUtils.getActivePage().getActiveEditor();
-		if (ed==null) return;
-		
-		final ActorAttributesView attView = (ActorAttributesView)EclipseUtils.getActivePage().getActivePart();
+		final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) EclipseUtils
+				.getActivePage().getActiveEditor();
+		if (ed == null)
+			return;
+
+		final ActorAttributesView attView = (ActorAttributesView) EclipseUtils
+				.getActivePage().getActivePart();
 		try {
 			attView.deleteSelectedParameter();
 		} catch (IllegalActionException e) {
@@ -50,43 +42,4 @@ public class DeleteAttributeHandler extends AbstractHandler implements IViewActi
 		}
 	}
 
-
-	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		selectionChanged(selection);
-	}
-	
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		selectionChanged(selection);
-	}
-
-	private void selectionChanged(ISelection selection) {
-		if (selection instanceof StructuredSelection) {
-			this.isEnabled = ((StructuredSelection)selection).getFirstElement() instanceof Attribute;
-			fireHandlerChanged(new HandlerEvent(this, true, false));
-		}
-	}
-
-	@Override
-	public void init(IViewPart view) {
-		this.view = view;
-		view.getViewSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
-	}
-	
-	public void dispose() {
-		super.dispose();
-		view.getViewSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
-	}
-
-
-	private boolean isEnabled = false;
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-	
-	public void setEnabled(Object sel) {
-		this.isEnabled = sel instanceof Attribute;
-		fireHandlerChanged(new HandlerEvent(this, true, false));
-	}
 }
