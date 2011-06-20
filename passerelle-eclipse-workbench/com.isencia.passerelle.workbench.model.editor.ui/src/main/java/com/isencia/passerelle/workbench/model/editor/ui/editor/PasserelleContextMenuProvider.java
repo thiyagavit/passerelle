@@ -43,6 +43,9 @@ public class PasserelleContextMenuProvider extends
 		manager.add(new Separator(GEFActionConstants.GROUP_HELP));
 
 		IAction action;
+//		action = getActionRegistry().getAction(ActionFactory.RENAME.getId());
+//		if (action != null )
+//			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
 		action = getActionRegistry().getAction(ViewAttributesAction.ID);
 		if (action != null )
 			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);

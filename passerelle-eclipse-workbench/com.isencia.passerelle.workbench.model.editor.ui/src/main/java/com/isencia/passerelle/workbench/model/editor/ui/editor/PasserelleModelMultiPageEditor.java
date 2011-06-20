@@ -255,13 +255,16 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 					return false;
 				}
 			};
-			addPage(1, textEditor, getEditorInput());
-			setPageText(1, "XML");
+			if (!getModel().isClassDefinition()) {
+				addPage(1, textEditor, getEditorInput());
+				setPageText(1, "XML");
+			}
 			// setPageImage(1,
 			// Activator.getImageDescriptor("icons/xml.png").createImage());
 
 		} catch (PartInitException e) {
-			EclipseUtils.logError(e,"Cannot open passerelle editor "+ getEditorInput().getName(),IStatus.ERROR); 
+			EclipseUtils.logError(e, "Cannot open passerelle editor "
+					+ getEditorInput().getName(), IStatus.ERROR);
 
 			logger.error("Cannot open passerelle editor "
 					+ getEditorInput().getName(), e);
@@ -547,7 +550,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			FlowManager flowManager = new FlowManager();
 			FileReader reader = new FileReader(new File(filePath));
 			Flow compositeActor = flowManager.readMoml(reader);
-			
+
 			this.parseError = false;
 			ModelUtils.setCompositeProjectName(compositeActor, filePath);
 
@@ -555,9 +558,11 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 
 		} catch (Exception e) {
 			this.parseError = true;
-			logger.error("Error during reading/parsing of model file",e);
+			logger.error("Error during reading/parsing of model file", e);
 
-			EclipseUtils.logError(e,"Error during reading/parsing of model file",IStatus.ERROR); 
+			EclipseUtils
+					.logError(e, "Error during reading/parsing of model file",
+							IStatus.ERROR);
 		} finally {
 			if (is != null) {
 				try {
@@ -570,8 +575,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		}
 
 	}
-
-
 
 	private InputStream createEmptySubModel(String subModel) {
 		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
@@ -592,7 +595,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			return true;
 		}
 	}
-
 
 	class ResourceTracker implements IResourceChangeListener,
 			IResourceDeltaVisitor {
