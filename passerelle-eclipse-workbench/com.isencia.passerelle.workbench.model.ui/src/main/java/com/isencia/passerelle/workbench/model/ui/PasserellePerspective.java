@@ -24,7 +24,7 @@ public class PasserellePerspective implements IPerspectiveFactory {
         
         IFolderLayout viewFolder = layout.createFolder("view-folder",IPageLayout.BOTTOM,0.6f,editorArea);
         // This view is specific to passerelle and is simpler and nicer to use than standard properties view.
-        viewFolder.addView(IPageLayout.ID_PROP_SHEET);
+//        viewFolder.addView(IPageLayout.ID_PROP_SHEET);
         viewFolder.addView("com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView");
         viewFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         viewFolder.addView("org.eclipse.pde.runtime.LogView");
