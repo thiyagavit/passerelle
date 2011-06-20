@@ -100,6 +100,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.Execution
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.HelpAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.PasteNodeAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RenameAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
@@ -398,13 +399,13 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	protected KeyHandler getCommonKeyHandler() {
 		if (sharedKeyHandler == null) {
 			sharedKeyHandler = new KeyHandler();
-//			sharedKeyHandler.put(KeyStroke.getPressed(SWT.F2, 0),
-//					getActionRegistry().getAction(
-//							ActionFactory.DYNAMIC_HELP.getId()));
-//			sharedKeyHandler
-//					.put(KeyStroke.getPressed(SWT.DEL, 127, 0),
-//							getActionRegistry().getAction(
-//									ActionFactory.DELETE.getId()));
+			// sharedKeyHandler.put(KeyStroke.getPressed(SWT.F2, 0),
+			// getActionRegistry().getAction(
+			// ActionFactory.DYNAMIC_HELP.getId()));
+			// sharedKeyHandler
+			// .put(KeyStroke.getPressed(SWT.DEL, 127, 0),
+			// getActionRegistry().getAction(
+			// ActionFactory.DELETE.getId()));
 			sharedKeyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, 0),
 					getActionRegistry().getAction(GEFActionConstants.ZOOM_IN));
 			sharedKeyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT,
@@ -523,7 +524,11 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		CreateSubModelAction subModelAction = new CreateSubModelAction(this,
 				getParent());
 		registry.registerAction(subModelAction);
-		getSelectionActions().add(subModelAction.getId());
+		
+//		RenameAction renameAction = new RenameAction(this);
+//		registry.registerAction(renameAction);
+//		getSelectionActions().add(renameAction.getId());
+		
 		ViewAttributesAction viewAttributes = new ViewAttributesAction(this);
 		registry.registerAction(viewAttributes);
 		getSelectionActions().add(viewAttributes.getId());
@@ -574,7 +579,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		rulerComp = new RulerComposite(parent, SWT.NONE);
 		super.createGraphicalViewer(rulerComp);
 
-
 		ScrollingGraphicalViewer graphicalViewer = (ScrollingGraphicalViewer) getGraphicalViewer();
 		rulerComp.setGraphicalViewer(graphicalViewer);
 
@@ -614,7 +618,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 			dt.setTransfer(new Transfer[] { TemplateTransfer.getInstance() });
 			dt.addDropListener(new DropFavouriteListener(paletteViewer));
-			paletteViewer.setCustomizer(new PasserellePaletteCustomizer(paletteViewer));
+			paletteViewer.setCustomizer(new PasserellePaletteCustomizer(
+					paletteViewer));
 
 			ContextMenuProvider provider = new PasserellePaletteContextMenuProvider(
 					paletteViewer, parent);
@@ -622,8 +627,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		}
 	}
-
-
 
 	private void createFigureMenu(final FigureCanvas fc) {
 
