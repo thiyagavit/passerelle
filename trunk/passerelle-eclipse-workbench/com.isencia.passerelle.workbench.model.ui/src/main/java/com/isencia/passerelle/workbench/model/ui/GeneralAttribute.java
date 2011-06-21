@@ -1,4 +1,4 @@
-package com.isencia.passerelle.workbench.model.editor.ui.views;
+package com.isencia.passerelle.workbench.model.ui;
 
 public class GeneralAttribute {
 	public GeneralAttribute(ATTRIBUTE_TYPE type, String value) {

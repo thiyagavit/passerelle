@@ -525,9 +525,9 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 				getParent());
 		registry.registerAction(subModelAction);
 		
-//		RenameAction renameAction = new RenameAction(this);
-//		registry.registerAction(renameAction);
-//		getSelectionActions().add(renameAction.getId());
+		RenameAction renameAction = new RenameAction(this);
+		registry.registerAction(renameAction);
+		getSelectionActions().add(renameAction.getId());
 		
 		ViewAttributesAction viewAttributes = new ViewAttributesAction(this);
 		registry.registerAction(viewAttributes);
@@ -593,6 +593,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 				.getAction(ActionFactory.DYNAMIC_HELP.getId()));
 		keyHandler.put(KeyStroke.getPressed(SWT.ALT, 0), getActionRegistry()
 				.getAction(ViewAttributesAction.ID));
+		keyHandler.put(KeyStroke.getPressed(SWT.F3, 0), getActionRegistry()
+				.getAction(ActionFactory.RENAME.getId()));
 		graphicalViewerKeyHandler.setParent(keyHandler);
 		graphicalViewer.setKeyHandler(graphicalViewerKeyHandler);
 

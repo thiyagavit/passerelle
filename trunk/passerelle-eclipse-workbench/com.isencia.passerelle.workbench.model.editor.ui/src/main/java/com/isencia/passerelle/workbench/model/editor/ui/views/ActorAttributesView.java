@@ -9,6 +9,7 @@ import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -19,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -42,14 +44,14 @@ import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.CommentEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.DirectorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
-import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
+import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
+import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
+import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
@@ -167,11 +169,11 @@ public class ActorAttributesView extends ViewPart implements
 									PaletteItemFactory.get().getType(
 											actor.getClass())));
 					ret.add(new GeneralAttribute(
-							GeneralAttribute.ATTRIBUTE_TYPE.CLASS,actor.getClass().getName()));
+							GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor
+									.getClass().getName()));
 					ret.add(new GeneralAttribute(
 							GeneralAttribute.ATTRIBUTE_TYPE.NAME,
-							PaletteItemFactory.get().getType(
-									actor.getName())));
+							PaletteItemFactory.get().getType(actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
 				}
@@ -362,12 +364,20 @@ public class ActorAttributesView extends ViewPart implements
 		return actor.getClass();
 	}
 
-	public void setActorName(final String name) {
-		try {
-			ActorGeneralSection.setName(actor, name);
-		} catch (Exception ne) {
-			logger.error("Cannot set name as " + name, ne);
+	public void setActorName(final GeneralAttribute element, String name) {
+		if (ModelUtils.isNameLegal(name)) {
+			element.setValue(name);
+			final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
+			final RenameCommand cmd = new RenameCommand(viewer,actor,element);
+			ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
+			ed.refreshActions();
+		} else {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(),
+					"Invalid Name", "The name '" + name
+							+ "' is not allowed.\n\n"
+							+ "Names should not contain '.'");
 		}
+
 	}
 
 	public void deleteSelectedParameter() throws IllegalActionException {

@@ -2,6 +2,8 @@ package com.isencia.passerelle.workbench.model.editor.ui.views;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
+import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
+
 import ptolemy.kernel.util.Attribute;
 
 public class PropertyLabelProvider extends ColumnLabelProvider {

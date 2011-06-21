@@ -50,8 +50,7 @@ public class RenameAction extends SelectionAction {
 		reqData.put("newName", name);
 		renameReq.setExtendedData(reqData);
 
-		RenameCommand renameCommand = new RenameCommand();
-		renameCommand.setModel(model);
+		RenameCommand renameCommand = new RenameCommand(model,name);
 		return renameCommand;
 	}
 
@@ -61,7 +60,7 @@ public class RenameAction extends SelectionAction {
 		WizardDialog dialog = new WizardDialog(getWorkbenchPart().getSite()
 				.getShell(), wizard);
 		dialog.create();
-		dialog.getShell().setSize(400, 180);
+		dialog.getShell().setSize(400, 240);
 		dialog.setTitle("Rename wizard");
 		dialog.setMessage("Rename");
 		if (dialog.open() == WizardDialog.OK) {
