@@ -22,6 +22,7 @@ import ptolemy.kernel.util.StringAttribute;
 import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CellEditorAttribute;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
+import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
@@ -71,8 +72,6 @@ public class VariableEditingSupport extends EditingSupport {
 		if (desc != null) {
 			CellEditor createPropertyEditor = desc
 					.createPropertyEditor((Composite) getViewer().getControl());
-			// if (!element.equals(previousSelection)) {
-
 			String contextId = HelpUtils.getContextId(element);
 			if (contextId != null) {
 				try {
@@ -83,18 +82,20 @@ public class VariableEditingSupport extends EditingSupport {
 				} catch (Exception e) {
 
 				}
-				// WorkbenchHelp.displayHelp(contextId);
-				// previousSelection = element;
-				// }
 			}
 			return createPropertyEditor;
 		}
 		return null;
-		
+
 	}
 
 	@Override
 	protected boolean canEdit(Object element) {
+		if (element instanceof GeneralAttribute)
+
+			return ((GeneralAttribute) element).getType().equals(
+					GeneralAttribute.ATTRIBUTE_TYPE.NAME);
+
 		return true;
 	}
 
@@ -134,9 +135,7 @@ public class VariableEditingSupport extends EditingSupport {
 
 		try {
 			if (element instanceof GeneralAttribute) {
-				// Also uses a Command so that is undoable
-				actorAttributesView.setActorName((String) value);
-
+				actorAttributesView.setActorName((GeneralAttribute)element,(String)value);
 			} else {
 				actorAttributesView.setAttributeValue(element, value);
 			}

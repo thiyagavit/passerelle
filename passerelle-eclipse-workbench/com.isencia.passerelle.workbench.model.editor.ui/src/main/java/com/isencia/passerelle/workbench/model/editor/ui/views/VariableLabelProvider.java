@@ -16,6 +16,7 @@ import com.isencia.passerelle.util.ptolemy.IAvailableChoices;
 import com.isencia.passerelle.util.ptolemy.StringChoiceParameter;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CellEditorAttribute;
+import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.util.ListUtils;
 
 public class VariableLabelProvider extends ColumnLabelProvider {

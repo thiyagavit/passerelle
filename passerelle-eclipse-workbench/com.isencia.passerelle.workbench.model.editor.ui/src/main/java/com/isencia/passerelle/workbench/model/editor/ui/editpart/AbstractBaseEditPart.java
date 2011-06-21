@@ -6,7 +6,6 @@ import java.util.Set;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -27,17 +26,12 @@ import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.INameable;
 import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserellRootEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorGeneralSection;
-import com.isencia.passerelle.workbench.model.editor.ui.properties.CommentPropertySource;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
+import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
-import com.isencia.passerelle.workbench.model.ui.command.CreateConnectionCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteConnectionCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteVertexConnectionCommand;
 import com.isencia.passerelle.workbench.model.ui.command.IRefreshConnections;
+import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
@@ -184,16 +178,13 @@ abstract public class AbstractBaseEditPart extends
 				}
 				return;
 			}
-			if (ActorGeneralSection.class.equals(type)) {
+			if (RenameCommand.class.equals(type)) {
 				if (source == this.getModel() && source instanceof NamedObj) {
 					String name = getName(source);
 					if ((getComponentFigure() instanceof INameable)
 							&& name != null
 							&& !name.equals(((INameable) getComponentFigure())
 									.getName())) {
-						// Execute the dummy command force a dirty state
-						getViewer().getEditDomain().getCommandStack().execute(
-								new ChangeActorPropertyCommand());
 						((INameable) getComponentFigure()).setName(name);
 						getFigure().repaint();
 					}
@@ -204,7 +195,9 @@ abstract public class AbstractBaseEditPart extends
 				refreshConnections(type,source);
 				return;
 			}
+
 		}
+
 	}
 
 	protected void refreshConnections(Class type,Object source) {
