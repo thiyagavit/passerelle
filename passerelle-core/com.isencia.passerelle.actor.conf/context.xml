@@ -3,20 +3,23 @@
    <context id="com_isencia_passerelle_actor_general_Console" >
       <description>
       <b>Console</b>
-      Ouput is shown in console
+      Class : com.isencia.passerelle.actor.general.Console
+      Description : Dump a message on the console
+      Parameters:
+      - Name : name
+      - Chop output at #chars : Chop length
       </description>
       <topic label="details" href="html/com.isencia.passerelle.actor.general.Console.html"/>
    </context>
    <context id="name" >
       <description>Actor name</description>
    </context>
-   <context id="com_isencia_passerelle_actor_net_SocketClientSender_Msg End" >
-      <description>Message end</description>
-   </context>
-   <context id="com_isencia_passerelle_actor_net_SocketClientSender_port" >
-      <description>Port of client sender</description>
-   </context>
-   <context id="com_isencia_passerelle_actor_net_SocketClientSender_remote host" >
-      <description>Remote host of sender</description>
+   <context id="com_isencia_passerelle_actor_general_Console_Chop output at #chars" >
+      <description>
+      Name : Chop output at #chars
+      Description : Chop length
+      Value type : Number
+      Example: 80
+      Default : 80</description>
    </context>
 </contexts>
