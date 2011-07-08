@@ -43,7 +43,6 @@
       <plugin id="com.isencia.passerelle.commons.ume"/>
       <plugin id="com.isencia.passerelle.engine"/>
       <plugin id="com.isencia.passerelle.workbench"/>
-      <plugin id="com.isencia.passerelle.workbench.logging.development" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
