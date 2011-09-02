@@ -5,9 +5,9 @@ Bundle-SymbolicName: com.isencia.passerelle.commons.ume
 Bundle-Version: 7.0.0
 Bundle-Vendor: iSencia
 Import-Package: com.isencia.util;version="7.0.0",
- org.apache.commons.net.ftp,
-  org.slf4j;version="1.5.0"
-Require-Bundle: mail
+ org.slf4j;version="1.5.0"
+Require-Bundle: mail,
+ org.apache.commons.net;bundle-version="1.4.1"
 Export-Package: com.isencia.message;version="7.0.0",
  com.isencia.message.db;version="7.0.0",
  com.isencia.message.extractor;version="7.0.0",
