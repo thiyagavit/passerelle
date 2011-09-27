@@ -44,6 +44,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -66,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.gui.PtolemyEffigy;
+import ptolemy.gui.CloseListener;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.ChangeRequest;
@@ -83,6 +85,7 @@ import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory.ParameterEd
 import com.isencia.passerelle.actor.gui.PasserelleQuery.QueryLabelProvider;
 import com.isencia.passerelle.actor.gui.PasserelleQuery.RenameRequest;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
+import com.isencia.passerelle.actor.gui.graph.EditPreferencesDialog;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
@@ -99,6 +102,8 @@ import com.isencia.passerelle.hmi.trace.TraceVisualizer;
 import com.isencia.passerelle.hmi.util.VersionPrinter;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.util.EnvironmentUtils;
+import diva.graph.GraphEvent;
+import diva.graph.GraphModel;
 
 /**
  * @todo Class Comment
@@ -110,7 +115,9 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
 	public static final String HMI_DEF_PREFS_FILE_PROPNAME = "hmi.default.preferences.file";
 	private static String HMI_DEF_PREFS_FILE;
-
+    public static final String HMI_DEF_PREFS_PATH_PROPNAME = "hmi.default.preferences.path";
+    public static final String HMI_DEF_PREFS_FILE_DEFAULT = "hmi_filter_def.xml";
+    
 	private IPasserelleEditorPaneFactory editorPaneFactory;
 
 	private JMenuBar menuBar;
@@ -146,10 +153,13 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	@Override
 	public void init() {
 		super.init();
-		
-		String defPrefsFileName = System.getProperty(HMI_DEF_PREFS_FILE_PROPNAME,"hmi_filter_def.xml");
-		if(defPrefsFileName!=null && defPrefsFileName.length()>0)
-			HMI_DEF_PREFS_FILE = EnvironmentUtils.getApplicationRootFolder()+"/"+ IPropertyNames.APP_CFG_DEFAULT+"/"+defPrefsFileName;
+        String defPrefsFileName = System.getProperty(HMI_DEF_PREFS_FILE_PROPNAME,HMI_DEF_PREFS_FILE_DEFAULT);
+        String defPrefsFilePath = System.getProperty(HMI_DEF_PREFS_PATH_PROPNAME);
+        if(defPrefsFilePath != null && defPrefsFilePath.length() > 0 ){
+              HMI_DEF_PREFS_FILE = defPrefsFilePath + "/" + defPrefsFileName;
+        }else {
+              HMI_DEF_PREFS_FILE = EnvironmentUtils.getApplicationRootFolder()+"/"+ IPropertyNames.APP_CFG_DEFAULT+"/"+defPrefsFileName;
+        }
 		
 		hmiDef = HMIDefinition.parseHMIDefFile(HMI_DEF_PREFS_FILE);
 	}
@@ -371,6 +381,9 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 //			new EditionActions().addActions(graphPanel);
 
 			selectTab(getModelURL(), tabbedPane);
+			// StateMachine stuff
+			 StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, tab.getName(), graphPanel);
+			 StateMachine.getInstance().compile();
 
 		} catch (final Throwable t) {
 			logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
@@ -477,9 +490,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 				panel.add(globalPanel);
 
 				// StateMachine stuff
-				// StateMachine.getInstance().registerActionForState(
-				// StateMachine.MODEL_OPEN, name, component);
-				// StateMachine.getInstance().compile();
+				 StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, name, component);
+				 StateMachine.getInstance().compile();
 				return true;
 			}
 			return false;
@@ -689,7 +701,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 		if (modelNameLabel != null) {
 			parameterScrollPane.getParent().remove(modelNameLabel);
 		}
-		getParameterScrollPane().validate();
+		parameterScrollPane.getParent().validate();
 		// getConfigPanel().validate();
 	}
 
@@ -702,7 +714,11 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 			if (element instanceof JComponent) {
 				// do not remove IPasserelleQuery since a reference is kept by
 				// the actor
-				if (!(element instanceof IPasserelleQuery)) {
+				if (element instanceof IPasserelleQuery) {
+					if(element instanceof CloseListener) {
+						((CloseListener)element).windowClosed(null, null);
+					}
+				} else {
 					clearPanel((JComponent) element);
 					// System.out.println("REMOVE " + element.getClass());
 					((JComponent) element).removeAll();
@@ -773,6 +789,29 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 			saveAndApplySettings();
 		}
 	}
+	
+	private class GraphPreferencesOpener implements ActionListener {
+		public void actionPerformed(final ActionEvent e) {
+			EditPreferencesDialog dialog = new EditPreferencesDialog(getDialogHookComponent(), getPtolemyConfiguration());
+
+			try {
+				int tabCount = modelGraphTabPanel.getTabCount();
+				for(int i=0; i<tabCount; ++i) {
+					Tab tab = modelGraphTabPanel.getTabAt(i);
+//				}
+//				for(Tab tab : graphTabsMap.values()) {
+					if(tab.getContentComponent() instanceof ModelGraphPanel) {
+						ModelGraphPanel _gp = (ModelGraphPanel)tab.getContentComponent();
+						GraphModel graphModel = _gp.getJGraph().getGraphPane().getGraphController().getGraphModel();
+				        graphModel.dispatchGraphEvent(new GraphEvent(this, GraphEvent.STRUCTURE_CHANGED, graphModel.getRoot()));
+					}
+				}
+			} catch (Exception ex) {
+				logger.error("Error applying preference changes to open model", ex);
+			}
+		}
+	}
+
 
 	private void saveAndApplySettings() {
 		final String def = ModelBundle.generateDef(hmiDef);
@@ -847,6 +886,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	public void addPrefsMenu(final JMenuBar menuBar) {
 		final JMenu prefsMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_PREFS));
 		prefsMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_PREFS + HMIMessages.KEY).charAt(0));
+		
 		final JMenuItem layoutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_LAYOUT), HMIMessages.getString(
 				HMIMessages.MENU_LAYOUT + HMIMessages.KEY).charAt(0));
 		layoutMenuItem.addActionListener(new ColumnCountDialogOpener());
@@ -857,14 +897,21 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 		prefsMenu.add(actorOrderMenuItem);
 		final JMenuItem paramFilterMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_PARAM_VISIBILITY), HMIMessages.getString(
 				HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
-		// the Ctrl+P accelerator is now used for Printing...
-		// paramFilterMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
-		// InputEvent.CTRL_MASK));
 		paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
 		prefsMenu.add(paramFilterMenuItem);
+		
+		prefsMenu.add(new JSeparator());
+		
+		final JMenuItem graphPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_GRAPH_PREFERENCES), HMIMessages.getString(
+				HMIMessages.MENU_GRAPH_PREFERENCES + HMIMessages.KEY).charAt(0));
+		graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
+		prefsMenu.add(graphPrefsMenuItem);
+
 		menuBar.add(prefsMenu);
 
-		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, prefsMenu);
+		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, layoutMenuItem);
+		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, actorOrderMenuItem);
+		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, paramFilterMenuItem);
 	}
 	public void addHelpMenu(final JMenuBar menuBar) {
 		final JMenu helpMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_HELP));
