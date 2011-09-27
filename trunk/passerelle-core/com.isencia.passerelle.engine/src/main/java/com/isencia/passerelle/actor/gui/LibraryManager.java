@@ -219,7 +219,7 @@ public class LibraryManager {
 	 * @return the names of the user library and its sublibraries
 	 */
 	public String[] getUserLibraryNames() {
-		if(userLibraryMap==null) 
+		if(userLibraryMap==null || userLibraryMap.isEmpty()) 
 			refreshUserLibraryMap(configuration);
 		if(userLibraryMap==null) {
 			//means the refresh failed

@@ -364,8 +364,21 @@ public class Director extends ProcessDirector {
 			try {
             	if(logger.isDebugEnabled())
             		logger.debug("Stopping scheduler "+scheduler.getSchedulerName());
-            	
-				scheduler.shutdown();
+            	// as the scheduler is typically a centralized instance,
+            	// used across multiple models, we can not do any shutdown or so here!
+            	// but as an illustration, here are two options if it would ever be needed :
+//				scheduler.shutdown();
+//				or, a bit less drastic :
+//				for (String group : scheduler.getJobGroupNames()) {
+//                    for (String jobName : scheduler.getJobNames(group)) {
+//                        try {
+//                            scheduler.interrupt(jobName, group);
+//                            scheduler.deleteJob(jobName, group);
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//                }
 			} catch (SchedulerException e) {
 				logger.error("Error shutting down the scheduler",e);
 			}

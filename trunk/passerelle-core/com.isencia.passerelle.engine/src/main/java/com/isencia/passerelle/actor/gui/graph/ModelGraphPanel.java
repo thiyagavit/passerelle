@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -30,6 +31,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -48,6 +54,7 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -56,9 +63,6 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditListener;
-import javax.swing.text.DefaultEditorKit.CopyAction;
-import javax.swing.text.DefaultEditorKit.CutAction;
-import javax.swing.text.DefaultEditorKit.PasteAction;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -67,16 +71,6 @@ import javax.swing.undo.UndoableEditSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.actor.gui.LibraryManager;
-import com.isencia.passerelle.actor.gui.graph.EditorGraphController.ViewFactory;
-import com.isencia.passerelle.actor.gui.graph.userlib.AddUserLibraryFolderMenuItemFactory;
-import com.isencia.passerelle.actor.gui.graph.userlib.DeleteFromLibraryMenuItemFactory;
-import com.isencia.passerelle.actor.gui.graph.userlib.ImportClassInLibraryMenuItemFactory;
-import com.isencia.passerelle.actor.gui.graph.userlib.RenameLibraryMenuItemFactory;
-import com.isencia.passerelle.core.ControlPort;
-import com.isencia.passerelle.core.ErrorPort;
-import com.isencia.passerelle.model.util.MoMLParser;
-import com.isencia.passerelle.util.EnvironmentUtils;
 
 import ptolemy.actor.IOPort;
 import ptolemy.actor.gui.Configuration;
@@ -115,11 +109,21 @@ import ptolemy.util.CancelException;
 import ptolemy.util.MessageHandler;
 import ptolemy.vergil.actor.ActorGraphModel;
 import ptolemy.vergil.basic.AbstractBasicGraphModel;
-import ptolemy.vergil.basic.GetDocumentationAction;
 import ptolemy.vergil.tree.EntityTreeModel;
 import ptolemy.vergil.tree.PTree;
 import ptolemy.vergil.tree.PTreeMenuCreator;
 import ptolemy.vergil.tree.VisibleTreeModel;
+import com.isencia.passerelle.actor.gui.GetDocumentationAction;
+import com.isencia.passerelle.actor.gui.LibraryManager;
+import com.isencia.passerelle.actor.gui.graph.EditorGraphController.ViewFactory;
+import com.isencia.passerelle.actor.gui.graph.userlib.AddUserLibraryFolderMenuItemFactory;
+import com.isencia.passerelle.actor.gui.graph.userlib.DeleteFromLibraryMenuItemFactory;
+import com.isencia.passerelle.actor.gui.graph.userlib.ImportClassInLibraryMenuItemFactory;
+import com.isencia.passerelle.actor.gui.graph.userlib.RenameLibraryMenuItemFactory;
+import com.isencia.passerelle.core.ControlPort;
+import com.isencia.passerelle.core.ErrorPort;
+import com.isencia.passerelle.model.util.MoMLParser;
+import com.isencia.passerelle.util.EnvironmentUtils;
 import diva.canvas.CanvasComponent;
 import diva.canvas.CanvasUtilities;
 import diva.canvas.Figure;
@@ -162,7 +166,7 @@ import diva.util.java2d.ShapeUtilities;
  * the menu per model. But we're keeping the toolbar.
  * 
  * The resulting panel will be embedded in a IDE view component. In Netbeans,
- * this is our own be.isencia.passerelle.ide.graphedit.ModelGraphTopComponent.
+ * this is our own com.isencia.passerelle.ide.graphedit.ModelGraphTopComponent.
  * 
  * This panel is constructed by our customized ActorGraphTableau. In order to
  * use this, one needs to define the correct tableau factory in the
@@ -170,7 +174,7 @@ import diva.util.java2d.ShapeUtilities;
  * <code>
  * &lt;property name="factory2" class="ptolemy.actor.gui.PtolemyTableauFactory"/><br>
  * &lt;property name="Graph Editor"
- *           class="be.isencia.passerelle.actor.gui.graph.ActorGraphTableau$Factory"/><br>
+ *           class="com.isencia.passerelle.actor.gui.graph.ActorGraphTableau$Factory"/><br>
  * ...
  * </code>
  * 
@@ -270,9 +274,6 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 
 		// Code copied from ptolemy.gui.Top
 		setLayout(new BorderLayout());
-		// Make this the default context for modal messages.
-		GraphicalMessageHandler.setContext(this);
-		MessageHandler.setMessageHandler(new GraphicalMessageHandler());
 
 		// Code copied from ptolemy.vergil.basic.BasicGraphFrame
 		model.addChangeListener(this);
@@ -280,6 +281,18 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 		initGUI();
 	}
 
+	public void setEnabled(boolean b) {
+		_jgraph.getGraphPane().getForegroundEventLayer().setEnabled(b);
+		_jgraph.getGraphPane().getForegroundLayer().setEnabled(b);
+		_jgraph.getGraphPane().getBackgroundEventLayer().setEnabled(b);
+		Component[] toolbarButtons = _toolbar.getComponents();
+		for (Component toolbarButton : toolbarButtons) {
+			toolbarButton.setEnabled(b);
+		}
+		_dropTarget.setActive(b);
+
+	}
+	
 	/**
 	 * This method contains the largest part of the constructor of
 	 * ptolemy.vergil.basic.BasicGraphFrame, where all UI components are
@@ -296,6 +309,9 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 		pane.getForegroundLayer().setPickHalo(2);
 
 		_jgraph = new JGraph(pane);
+		// Make this the default context for modal messages.
+		GraphicalMessageHandler.setContext(getDialogHookComponent());
+		MessageHandler.setMessageHandler(new GraphicalMessageHandler());
 
 		_dropTarget = new EditorDropTarget(_jgraph, this);
 
@@ -310,6 +326,20 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			}
 		};
 
+		PanMouseListener pmListener = new PanMouseListener();
+		_jgraph.addMouseListener(pmListener);
+		_jgraph.addMouseMotionListener(pmListener);
+		_jgraph.addMouseWheelListener(new MouseWheelListener() {
+			
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int dir=e.getWheelRotation();
+				if(dir>0)
+					zoom(1.1);
+				else
+					zoom(0.9);
+			}
+		});
+		
 		_jgraph.registerKeyboardAction(deletionListener, "Delete", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		_jgraph.registerKeyboardAction(deletionListener, "BackSpace", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -513,6 +543,13 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 
 		GraphPane pane = new GraphPane(controller, graphModel);
 		return pane;
+	}
+
+	public Frame getDialogHookComponent() {
+		if(_jgraph==null) return null;
+		
+		final JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, _jgraph);
+		return parentFrame;
 	}
 
 	public void setAnimationDelay(long msDelay) {
@@ -818,8 +855,11 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			// The pasted version will have the names generated by the
 			// uniqueName() method of the container, to ensure that they
 			// do not collide with objects already in the container.
+			String pastedSegment = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+			// stupid method to slightly move the pasted elements, compared to their "originals"
+			pastedSegment = translateFiguresInSegment(pastedSegment,20,20);
 			moml.append("<group name=\"auto\">\n");
-			moml.append((String) transferable.getTransferData(DataFlavor.stringFlavor));
+			moml.append(pastedSegment);
 			moml.append("</group>\n");
 
 			MoMLChangeRequest change = new MoMLChangeRequest(this, container, moml.toString());
@@ -828,6 +868,51 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 		} catch (Exception ex) {
 			MessageHandler.error("Paste failed", ex);
 		}
+	}
+
+	private String translateFiguresInSegment(String momlSegment, int... increments) {
+		String movedSegment = momlSegment;
+		int i=0;
+		while(i>=0) {
+			i = movedSegment.indexOf("_location", i);
+			if(i>=0) {
+				int jRoundBrace = movedSegment.indexOf("{", i);
+				int jSquareBracket = movedSegment.indexOf("[", i);
+				if(jRoundBrace<0 && jSquareBracket<0) {
+					break;
+				}
+				if(jRoundBrace<0)
+					i = jSquareBracket;
+				else if(jSquareBracket<0)
+					i = jRoundBrace;
+				else
+					i = Math.min(jRoundBrace, jSquareBracket);
+				jRoundBrace = movedSegment.indexOf("}",i);
+				jSquareBracket = movedSegment.indexOf("]",i);
+				if(jRoundBrace<0 && jSquareBracket<0) {
+					break;
+				}
+				int j = 0;
+				if(jRoundBrace<0)
+					j = jSquareBracket;
+				else if(jSquareBracket<0)
+					j = jRoundBrace;
+				else
+					j = Math.min(jRoundBrace, jSquareBracket);
+				String locationSegment = movedSegment.substring(i+1,j);
+				String[] locationCoordinates = locationSegment.split(",");
+				int[] newCoordinates = new int[locationCoordinates.length];
+				for (int c=0;c<locationCoordinates.length;++c) {
+					String locationCoordinate = locationCoordinates[c].trim();
+					newCoordinates[c] = Math.round(Float.parseFloat(locationCoordinate))+increments[c];
+				}
+				movedSegment=movedSegment.substring(0,i+1) 
+						+ newCoordinates[0] + "," + newCoordinates[1]
+						+ movedSegment.substring(j);
+				i=j;
+			}
+		}
+		return movedSegment;
 	}
 
 	public void postUndoableEdit(String editMsg) {
@@ -1516,6 +1601,11 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			}
 		}
 
+		@Override
+		public Frame getFrame() {
+			return ModelGraphPanel.this.getDialogHookComponent();
+		}
+
 		/**
 		 * Show the documentation for a NamedObj. This does the same thing as
 		 * the actionPerformed but without the action handler
@@ -1550,6 +1640,41 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 		}
 
 	}
+    // This listener is attached to this panner and is responsible for
+    // panning the target in response to a mouse click on the panner.
+    private class PanMouseListener extends MouseAdapter implements
+            MouseMotionListener {
+    	private int startX;
+    	private int startY;
+    	
+        public void mousePressed(MouseEvent evt) {
+            startX=evt.getX();
+            startY=evt.getY();
+        }
+
+        public void mouseMoved(MouseEvent evt) {
+        }
+
+        public void mouseDragged(MouseEvent evt) {
+            if ((_jgraph != null)
+//                    && ((evt.getModifiers() & InputEvent.BUTTON1_MASK) != 0)
+                    && ((evt.getModifiers() & InputEvent.BUTTON2_MASK) != 0)
+                    ) {
+                setPosition(evt.getX(), evt.getY());
+                startX=evt.getX();startY=evt.getY();
+            }
+        }
+        
+        public void setPosition(int x, int y) {
+        	AffineTransform newTransform = _jgraph.getCanvasPane().getTransformContext().getTransform();
+        	Point2D newCenter = new Point2D.Double(x, y);
+        	newTransform.translate( x-startX,y-startY);
+
+    		_jgraph.getCanvasPane().setTransform(newTransform);
+
+        }
+    }
+
 
 	public class UndoableEdit extends AbstractUndoableEdit {
 

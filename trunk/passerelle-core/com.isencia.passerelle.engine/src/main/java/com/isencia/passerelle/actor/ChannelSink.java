@@ -37,7 +37,6 @@ import ptolemy.kernel.util.NameDuplicationException;
  * processing.  ChannelSink provides a fully functional doFire() implementation that uses the ISenderChannel to send out any messages received on the actor's
  * input.
  * 
- * @version $Id
  * @author Erwin De Ley
  */
 public abstract class ChannelSink extends Sink {
@@ -98,10 +97,6 @@ public abstract class ChannelSink extends Sink {
         }
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
     protected void doInitialize() throws InitializationException {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo());
@@ -140,10 +135,6 @@ public abstract class ChannelSink extends Sink {
         }
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPreFire()
-	 */
     protected boolean doPreFire() throws ProcessingException {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo());
@@ -180,10 +171,6 @@ public abstract class ChannelSink extends Sink {
         return res;
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doWrapUp()
-	 */
     protected void doWrapUp() throws TerminationException {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo());

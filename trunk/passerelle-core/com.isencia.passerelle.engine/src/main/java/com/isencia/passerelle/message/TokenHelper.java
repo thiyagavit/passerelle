@@ -450,7 +450,7 @@ public class TokenHelper {
      * </ul>
      * 
      * The string-to-boolean conversion will look for following (case-insensitive) patterns 
-     * (based on using be.isencia.util.StringConvertor.stringToBoolean()):
+     * (based on using com.isencia.util.StringConvertor.stringToBoolean()):
      * <ul>
      * <li> yes/no
      * <li> on/off

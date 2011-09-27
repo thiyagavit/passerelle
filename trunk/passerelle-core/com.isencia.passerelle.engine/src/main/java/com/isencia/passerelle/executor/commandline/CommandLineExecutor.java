@@ -64,7 +64,7 @@ public class CommandLineExecutor {
         					+ " -Dlog4j.configuration=file:" + passerelleHome + "/"+IPropertyNames.APP_CFG_DEFAULT+"/log4j.properties";
 
         EnvCommandline commandline = new EnvCommandline(execStr);
-        commandline.createArgument().setValue("be.isencia.passerelle.executor.AsyncModelExecutor");
+        commandline.createArgument().setValue("com.isencia.passerelle.executor.AsyncModelExecutor");
         commandline.createArgument().setValue(modelName);
         commandline.addArguments(parameterOverrides);
         

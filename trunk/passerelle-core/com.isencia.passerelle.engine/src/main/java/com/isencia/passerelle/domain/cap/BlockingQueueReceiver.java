@@ -16,10 +16,8 @@
 package com.isencia.passerelle.domain.cap;
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.IOPort;
 import ptolemy.actor.QueueReceiver;
 import ptolemy.actor.process.BoundaryDetector;
@@ -27,8 +25,8 @@ import ptolemy.actor.process.ProcessReceiver;
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.Workspace;
-
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageHelper;
@@ -297,6 +295,14 @@ public class BlockingQueueReceiver extends QueueReceiver
             	return;
             } else if (buffer!=null) {
 				try {
+					if(getContainer() instanceof Port) {
+						Port _p = (Port) getContainer();
+						try {
+							token = _p.convertTokenForMe(token);
+						} catch (Exception e) {
+							throw new RuntimeException("Failed to convert token "+token, e);
+						}
+					}
 					ManagedMessage msg = MessageHelper.getMessageFromToken(token);
 //				int i = getMyIndex();
 					MessageInputContext ctxt = new MessageInputContext(0, getContainer().getName(), msg);

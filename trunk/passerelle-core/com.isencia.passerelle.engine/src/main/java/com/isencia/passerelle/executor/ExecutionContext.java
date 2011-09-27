@@ -31,7 +31,7 @@ import ptolemy.data.expr.Parameter;
  * @author erwin
  */
 public class ExecutionContext {
-	public final static String EXECUTION_CTXT_ATTR="be.isencia.passerelle.execution.ctxt";
+	public final static String EXECUTION_CTXT_ATTR="com.isencia.passerelle.execution.ctxt";
 
 	private Map attributes = new HashMap();
 	

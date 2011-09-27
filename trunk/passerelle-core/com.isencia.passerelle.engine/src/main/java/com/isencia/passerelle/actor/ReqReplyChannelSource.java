@@ -17,6 +17,16 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ptolemy.actor.gui.style.CheckBoxStyle;
+import ptolemy.data.BooleanToken;
+import ptolemy.data.Token;
+import ptolemy.data.expr.Parameter;
+import ptolemy.data.type.BaseType;
+import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.message.ChannelException;
 import com.isencia.message.IReceiverChannel;
 import com.isencia.message.NoMoreMessagesException;
@@ -35,16 +45,6 @@ import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
 import com.isencia.passerelle.message.xml.XmlMessageHelper;
-
-import ptolemy.actor.gui.style.CheckBoxStyle;
-import ptolemy.data.BooleanToken;
-import ptolemy.data.Token;
-import ptolemy.data.expr.Parameter;
-import ptolemy.data.type.BaseType;
-import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 
 /**
  * Base class for all Passerelle Sources that use a  IReceiverChannel. Sub-classes must implement createChannel(), returning a completely
@@ -227,10 +227,6 @@ public abstract class ReqReplyChannelSource extends Source {
 			logger.trace(getInfo()+" - exit ");
 		}
 	}
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPreFire()
-	 */
 	protected boolean doPreFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -270,10 +266,6 @@ public abstract class ReqReplyChannelSource extends Source {
 
 		return res;
 	}
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPostFire()
-	 */
 	protected boolean doPostFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -296,10 +288,6 @@ public abstract class ReqReplyChannelSource extends Source {
 		return res;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doWrapUp()
-	 */
 	protected void doWrapUp() throws TerminationException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());

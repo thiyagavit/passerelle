@@ -61,9 +61,6 @@ public class TextToMessageConverter extends ManagedMessageConverter {
 		return messageContainer;
 	}
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.message.interceptor.ManagedMessageConverter#cloneConverter(be.isencia.passerelle.message.interceptor.IMessageCreator)
-	 */
 	public ManagedMessageConverter cloneConverter(IMessageCreator msgCreator) {
 		return new TextToMessageConverter(msgCreator);
 	}

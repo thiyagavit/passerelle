@@ -26,5 +26,20 @@ package com.isencia.passerelle.core;
  * @author erwin
  */
 public enum PortMode {
-	PULL,PUSH;
+  
+	PULL(true),PUSH(false);
+	
+  private boolean blocking;
+
+  private PortMode(boolean blocking) {
+    this.blocking = blocking;
+  }
+  
+  public boolean isBlocking() {
+    return blocking;
+  }
+  
+  public boolean equals(PortMode other) {
+    return this.blocking==other.blocking;
+  }
 }

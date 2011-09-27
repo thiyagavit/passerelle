@@ -31,25 +31,28 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.ExecutionListener;
-import ptolemy.actor.Manager;
 import ptolemy.actor.Manager.State;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.IllegalActionException;
-
+import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.domain.ProcessThread;
+import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.engine.activator.Activator;
 import com.isencia.passerelle.ext.ErrorCollector;
+import com.isencia.passerelle.ext.ExecutionControlStrategy;
+import com.isencia.passerelle.ext.impl.SuspendResumeExecutionControlStrategy;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.model.util.RESTFacade;
+
+
 
 /**
  * A FlowManager offers services to work with flows:
@@ -88,12 +91,12 @@ public class FlowManager {
 			executionError(null, e);
 		}
 
-		public void executionError(Manager manager, final Throwable throwable) {
+		public void executionError(ptolemy.actor.Manager manager, final Throwable throwable) {
 			this.throwable = throwable;
 			logger.error("Error during model execution", throwable);
 		}
 
-		public void executionFinished(final Manager manager) {
+		public void executionFinished(final ptolemy.actor.Manager manager) {
 			FlowManager.this.executionFinished(flow);
 		}
 
@@ -111,7 +114,8 @@ public class FlowManager {
 			}
 		}
 
-		public void managerStateChanged(Manager manager) {
+		public void managerStateChanged(ptolemy.actor.Manager manager) {
+			//System.out.println("manager state changed to "+manager.getState());
 		}
 
 		public void otherExceptionOccured() throws Throwable {
@@ -139,6 +143,7 @@ public class FlowManager {
 
 	// Maintains a mapping between locally executing flows and their managers
 	private final Map<FlowHandle, Manager> flowExecutions = new HashMap<FlowHandle, Manager>();
+	private final Map<FlowHandle, ExecutionListener> flowExecutionListeners = new HashMap<FlowHandle, ExecutionListener>();
 
 	// Maintains a list of remotly executing flows
 	private final List<Flow> remoteFlowExecutionsList = new ArrayList<Flow>();
@@ -491,9 +496,7 @@ public class FlowManager {
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
 		}
-		if (flowExecutions.get(handle) != null) {
-			throw new FlowAlreadyExecutingException("", flow, null);
-		}
+		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);
 		}
@@ -508,11 +511,12 @@ public class FlowManager {
 			dir.addErrorCollector(executionListener);
 			manager.addExecutionListener(executionListener);
 			manager.execute();
-			executionFinished(flow);
 		} catch (IllegalActionException e) {
 			throw new FlowAlreadyExecutingException("", flow, e);
 		} catch (Exception e) {
 			throw new PasserelleException("Error executing flow", flow, e);
+		} finally {
+			executionFinished(flow);
 		}
 
 		try {
@@ -541,6 +545,9 @@ public class FlowManager {
 	 * Parameter values should be passed as String values. For numerical
 	 * parameter types, the conversion to the right numerical type will be done
 	 * internally.
+	 * <br/>
+	 * Any exceptions raised during the model execution will not be delivered to
+	 * an ExecutionListener, but will be thrown from here, wrapped in a PasserelleException
 	 * 
 	 * @param flow
 	 * @param props
@@ -554,9 +561,7 @@ public class FlowManager {
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
 		}
-		if (flowExecutions.get(handle) != null) {
-			throw new FlowAlreadyExecutingException("", flow, null);
-		}
+		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);
 		}
@@ -565,13 +570,61 @@ public class FlowManager {
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
 			manager.execute();
-			executionFinished(flow);
 		} catch (IllegalActionException e) {
 			throw new FlowAlreadyExecutingException("", flow, e);
 		} catch (Exception e) {
 			throw new PasserelleException("Error executing flow", flow, e);
+		} finally {
+			executionFinished(flow);
 		}
 	}
+
+	/**
+	 * Executes the given flow and blocks till the execution finishes. <br>
+	 * REMARK: Not all flows will stop automatically. For such flows, this
+	 * execution method will block forever, unless the flow execution is stopped
+	 * explicitly, by invoking FlowManager.stop() for the given flow. <br>
+	 * The flow's actors' parameter values can be configured with the given
+	 * properties. Parameter/property names are of the format
+	 * "actor_name.param_name", where the actor name itself can be nested. E.g.
+	 * in the case of using composite actors in a model... <br>
+	 * Parameter values should be passed as String values. For numerical
+	 * parameter types, the conversion to the right numerical type will be done
+	 * internally.
+	 * <br/>
+	 * A listener can be passed, which in this blocking execution mainly serves
+	 * to be notified of any errors during the execution.
+	 * 
+	 * @param flow
+	 * @param props
+	 * @param listener
+	 * @throws FlowAlreadyExecutingException
+	 *             if the flow is already executing.
+	 * @throws PasserelleException
+	 *             any possible exceptions during the flow execution.
+	 */
+	public void executeBlockingLocally(Flow flow, Map<String, String> props, ExecutionListener listener) throws FlowAlreadyExecutingException, PasserelleException {
+		FlowHandle handle = flow.getHandle();
+		if(handle==null) {
+			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
+		}
+		checkFlowAlreadyExecuting(flow);
+		if (props != null) {
+			applyParameterSettings(flow, props);
+		}
+		try {
+			Manager manager = new Manager(flow.workspace(), flow.getName());
+			flow.setManager(manager);
+			flowExecutions.put(handle, manager);
+			manager.addExecutionListener(listener);
+			manager.run();
+		} catch (Exception e) {
+			throw new PasserelleException("Error executing flow", flow, e);
+		} finally {
+			executionFinished(flow);
+		}
+	}
+
 
 	/**
 	 * Executes the given flow and returns immediately, without waiting for the
@@ -593,15 +646,16 @@ public class FlowManager {
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
 		}
-		if (flowExecutions.get(handle) != null) {
-			throw new FlowAlreadyExecutingException("", flow, null);
-		}
+		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);
 		}
 		try {
-			Manager manager = new Manager(flow.workspace(), flow.getName());
-			manager.addExecutionListener(this.new ModelExecutionListener(flow));
+			ModelExecutionListener listener = this.new ModelExecutionListener(flow);
+			flowExecutionListeners.put(handle, listener);
+			final Manager manager = new Manager(flow.workspace(), flow.getName());
+			manager.addExecutionListener(listener);
+			
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
 			manager.startRun();
@@ -617,15 +671,15 @@ public class FlowManager {
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
 		}
-		if (flowExecutions.get(handle) != null) {
-			throw new FlowAlreadyExecutingException("", flow, null);
-		}
+		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);
 		}
 		try {
+			ModelExecutionListener listener = this.new ModelExecutionListener(flow);
+			flowExecutionListeners.put(handle, listener);
 			final Manager manager = new Manager(flow.workspace(), flow.getName());
-			manager.addExecutionListener(this.new ModelExecutionListener(flow));
+			manager.addExecutionListener(listener);
 			manager.addExecutionListener(executionListener);
 
 			flow.setManager(manager);
@@ -635,6 +689,24 @@ public class FlowManager {
 			throw new FlowAlreadyExecutingException("", flow, e);
 		}
 
+	}
+
+	/**
+	 * @param flow
+	 * @param handle
+	 * @throws FlowAlreadyExecutingException
+	 */
+	protected void checkFlowAlreadyExecuting(final Flow flow) throws FlowAlreadyExecutingException {
+		Manager mgr = flowExecutions.get(flow.getHandle());
+		if (mgr != null) {
+			if(Manager.IDLE.equals(mgr.getState())) {
+				// probably means the execution-finished event did not arrive,
+				// so do the corresponding cleanup here
+				executionFinished(flow);
+			} else {
+				throw new FlowAlreadyExecutingException("", flow, null);
+			}
+		}
 	}
 
 	/**
@@ -695,6 +767,7 @@ public class FlowManager {
 	 * @param flow
 	 */
 	private synchronized void executionFinished(final Flow flow) {
+		flowExecutionListeners.remove(flow.getHandle());
 		if (flow.getHandle().isRemote()) {
 			remoteFlowExecutionsList.remove(flow);
 		} else {
@@ -756,8 +829,31 @@ public class FlowManager {
 	 * @throws PasserelleException
 	 * @throws IllegalArgumentException
 	 * @throws IllegalStateException
+	 * 
+	 * @deprecated this version may block forever for models that do not stop correctly.
+	 * Use stopExecution(Flow flow, long timeout) instead.
 	 */
 	public synchronized Flow stopExecution(Flow flow) throws IllegalStateException, IllegalArgumentException, PasserelleException, Exception {
+		return stopExecution(flow, -1);
+	}
+
+	/**
+	 * Stop the execution of the given flow and wait at most the given time in ms
+	 * for the full stop.
+	 * 
+	 * If the model has not stopped completely within the given time, a PasserelleException is thrown.
+	 * 
+	 * @param flow
+	 * @param timeOut_ms
+	 * @return
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 * @throws PasserelleException
+	 * @throws Exception
+	 */
+	public synchronized Flow stopExecution(Flow flow, long timeOut_ms) throws IllegalStateException, IllegalArgumentException, PasserelleException, Exception {
+		logger.info("Stopping {}",flow.getName());
+		
 		FlowHandle handle = flow.getHandle();
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
@@ -781,28 +877,99 @@ public class FlowManager {
 			}
 			mgr.stop();
 			// wait for stop completion
-			while (mgr.getState().equals(Manager.ITERATING)) {
+			long elapsedTime = 0;
+			boolean timeOut = false;
+			while (!mgr.getState().equals(Manager.IDLE) && !timeOut) {
 				try {
-					System.out.println(getLocalExecutionState(flow));
+//					System.out.println(getLocalExecutionState(flow));
 					Thread.sleep(100);
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					elapsedTime += 100;
+					timeOut = timeOut_ms>0 && (timeOut_ms < elapsedTime);
+				} catch (final InterruptedException e) {}
 			}
-
-			while (mgr.getState().equals(Manager.WRAPPING_UP)) {
-				try {
-					System.out.println(getLocalExecutionState(flow));
-					Thread.sleep(100);
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			logger.info("{} stopped to state {}",flow.getName(),mgr.getState());
+			try {
+				Collection<ProcessThread> remainingThreads = ((Director)flow.getDirector()).getThreads();
+				if(!remainingThreads.isEmpty()) {
+					logger.warn("Failed to do a clean stop of {}", flow.getName());
+					for (ProcessThread thread : remainingThreads) {
+						logger.warn("{} - pending thread {}", flow.getName(), thread.toString());
+					}
 				}
+			} catch (Exception e) {
+				// ignore
 			}
 			executionFinished(flow);
 			return flow;
 		}
 	}
 
+	public synchronized Flow pauseExecution(Flow flow) throws IllegalStateException, IllegalArgumentException, PasserelleException, Exception {
+		FlowHandle handle = flow.getHandle();
+		if(handle==null) {
+			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
+		}
+		if (handle.isRemote()) {
+			throw new IllegalArgumentException("Suspend not yet supported for remote execution");
+		} else {
+			Manager mgr = flowExecutions.get(handle);
+			if (mgr == null) {
+				throw new FlowNotExecutingException("Flow is not executing", flow, null);
+			} else {
+				mgr.pause();
+				
+//				try {
+//					ExecutionControlStrategy execCtrlStrategy = ((Director)flow.getDirector()).getExecutionControlStrategy();
+//					if(execCtrlStrategy instanceof SuspendResumeExecutionControlStrategy) {
+//						((SuspendResumeExecutionControlStrategy) execCtrlStrategy).suspend();
+//					}
+//				} catch (ClassCastException e) {
+//					logger.error("Received suspend event, but model not configured correctly", e);
+//				}
+			}
+			return flow;
+		}
+	}
+	
+	/**
+	 * Resuming a model execution may be a slow operation, as each paused actor
+	 * is sequentially resumed, before all actor threads are allowed to start iterating again.
+	 * <br/>
+	 * Some of the actors may take some time for their "resume", e.g. when waiting for external events.
+	 * In the meantime, the whole FlowManager instance is locked!
+	 * 
+	 * TODO : check if it is not better after all to do the actor resume within their actor threads!?
+	 * 
+	 * @param flow
+	 * @return
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 * @throws PasserelleException
+	 * @throws Exception
+	 */
+	public synchronized Flow resumeExecution(Flow flow) throws IllegalStateException, IllegalArgumentException, PasserelleException, Exception {
+		FlowHandle handle = flow.getHandle();
+		if(handle==null) {
+			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
+		}
+		if (handle.isRemote()) {
+			throw new IllegalArgumentException("Flow is not managed locally");
+		} else {
+			Manager mgr = flowExecutions.get(handle);
+			if (mgr == null) {
+				throw new FlowNotExecutingException("Flow is not executing", flow, null);
+			}
+			mgr.resume();
+
+			try {
+				ExecutionControlStrategy execCtrlStrategy = ((Director)flow.getDirector()).getExecutionControlStrategy();
+				if(execCtrlStrategy instanceof SuspendResumeExecutionControlStrategy) {
+					((SuspendResumeExecutionControlStrategy) execCtrlStrategy).resume();
+				}
+			} catch (ClassCastException e) {
+				logger.error("Received resume event, but model not configured correctly", e);
+			}
+			return flow;
+		}
+	}
 }

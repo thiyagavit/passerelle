@@ -63,7 +63,7 @@ public class DefaultTypeConverterProvider implements TypeConverterProvider {
 	 *
 	 */
 	private void loadConverters() {
-		IHierarchicProperty converterProps = PropertyContainerFactory.instance().get("be.isencia.passerelle.message.type.properties");
+		IHierarchicProperty converterProps = PropertyContainerFactory.instance().get("com.isencia.passerelle.message.type.properties");
 		if(converterProps!=null) {
 			String[] converterNames = converterProps.getPropertyValueList("type-converters.type-converter");
 			for (final String converterName : converterNames) {

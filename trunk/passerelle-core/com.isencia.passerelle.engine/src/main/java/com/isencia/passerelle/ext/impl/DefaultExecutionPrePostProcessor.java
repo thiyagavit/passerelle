@@ -34,9 +34,6 @@ public class DefaultExecutionPrePostProcessor implements
 
 	private Logger logger = LoggerFactory.getLogger(DefaultExecutionPrePostProcessor.class);
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.ext.ExecutionPrePostProcessor#postProcess()
-	 */
 	public void postProcess() {
 		if(logger.isTraceEnabled())
 			logger.trace("postProcess() - entry");
@@ -45,9 +42,6 @@ public class DefaultExecutionPrePostProcessor implements
 			logger.trace("postProcess() - exit");
 	}
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.ext.ExecutionPrePostProcessor#preProcess()
-	 */
 	public void preProcess() {
 		if(logger.isTraceEnabled())
 			logger.trace("preProcess() - entry");

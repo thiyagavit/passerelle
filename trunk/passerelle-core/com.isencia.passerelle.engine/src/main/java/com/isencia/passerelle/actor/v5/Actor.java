@@ -46,10 +46,11 @@ import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
+
+import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.message.MessageOutputContext;
 
@@ -164,12 +165,12 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 	}	
 
 	public boolean registerMessageProvider(Object provider) {
-		logger.debug("Registered msgprovider {}",provider);
+		getLogger().debug("Registered msgprovider {}",provider);
 		return msgProviders.add(provider);
 	}
 
 	public boolean unregisterMessageProvider(Object provider) {
-		logger.debug("Unregistered msgprovider {}",provider);
+		getLogger().debug("Unregistered msgprovider {}",provider);
 		return msgProviders.remove(provider);
 	}
 
@@ -191,8 +192,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 	
 	@SuppressWarnings("unchecked")
 	protected void doInitialize() throws InitializationException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doInitialize() - entry");
+		if (getLogger().isTraceEnabled())
+			getLogger().trace(getInfo() + " doInitialize() - entry");
 
 		blockingInputHandlers.clear();
 		blockingInputFinishRequests.clear();
@@ -221,8 +222,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 			}
 		}
 
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doInitialize() - exit ");
+		if (getLogger().isTraceEnabled())
+			getLogger().trace(getInfo() + " doInitialize() - exit ");
 	}
 
 	/**
@@ -240,8 +241,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 	}
 
 	protected void doFire() throws ProcessingException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doFire() - entry");
+		if (getLogger().isTraceEnabled())
+			getLogger().trace(getInfo() + " doFire() - entry");
 
 		ProcessRequest req = new ProcessRequest();
 		req.setIterationCount(iterationCount++);
@@ -265,11 +266,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 					}
 					if (msg == null) {
 						blockingInputFinishRequests.set(i, Boolean.TRUE);
-						if (logger.isDebugEnabled())
-							logger.debug(getInfo() + " doFire() - found exhausted port " + handler.getName());
+						if (getLogger().isDebugEnabled())
+							getLogger().debug(getInfo() + " doFire() - found exhausted port " + handler.getName());
 					} else {
-						if (logger.isDebugEnabled())
-							logger.debug(getInfo() + " doFire() - msg " + msg.getID() + " received on port " + handler.getName());
+						if (getLogger().isDebugEnabled())
+							getLogger().debug(getInfo() + " doFire() - msg " + msg.getID() + " received on port " + handler.getName());
 					}
 				}
 				req.addInputMessage(i, handler.getName(), msg);
@@ -278,7 +279,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 				try {
 					int bufferTime = ((IntToken)bufferTimeParameter.getToken()).intValue();
 					if(bufferTime>0) {
-						logger.debug("{} doFire() - sleeping for buffer time {}",getInfo(),bufferTime);
+						getLogger().debug("{} doFire() - sleeping for buffer time {}",getInfo(),bufferTime);
 						Thread.sleep(bufferTime);
 					}
 				} catch (Exception e) {
@@ -300,13 +301,13 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 			ActorContext ctxt = new ActorContext();
 			if (mustValidateIteration()) {
 				try {
-					if (logger.isTraceEnabled())
-						logger.trace("doFire() - validating iteration for request " + req);
+					if (getLogger().isTraceEnabled())
+						getLogger().trace("doFire() - validating iteration for request " + req);
 					validateIteration(ctxt, req);
 					if (getAuditLogger().isDebugEnabled())
 						getAuditLogger().debug("ITERATION VALIDATED");
-					if (logger.isTraceEnabled())
-						logger.trace("doFire() - validation done");
+					if (getLogger().isTraceEnabled())
+						getLogger().trace("doFire() - validation done");
 				} catch (ValidationException e) {
 					try {
 						getErrorControlStrategy().handleIterationValidationException(this, e);
@@ -319,17 +320,15 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
 			// now let the actor do it's real work
 			ProcessResponse response = new ProcessResponse(req);
-			if (logger.isTraceEnabled())
-				logger.trace("doFire() - processing request " + req);
+			if (getLogger().isTraceEnabled())
+				getLogger().trace("doFire() - processing request " + req);
 			process(ctxt, req, response);
-			if (logger.isTraceEnabled())
-				logger.trace("doFire() - obtained response " + response);
+			if (getLogger().isTraceEnabled())
+				getLogger().trace("doFire() - obtained response " + response);
 
 			// Mark the contexts as processed.
-			// This is especially important for the pushed inputs,
-			// that are often offered multiple times for processing.
-			// But some actors need to be able to distinguish whether
-			// a pushed input is offered for the 1st time, or repeatedly.
+			// Not sure if this is still relevant for v5 actors,
+			// as even PUSHed messages are assumed to be handled once, in the iteration when they are offered to process().
 			Iterator<MessageInputContext> allInputContexts = req.getAllInputContexts();
 			while (allInputContexts.hasNext()) {
 				MessageInputContext msgInputCtxt = allInputContexts.next();
@@ -359,8 +358,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 			}
 		}
 
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doFire() - exit ");
+		if (getLogger().isTraceEnabled())
+			getLogger().trace(getInfo() + " doFire() - exit ");
 	}
 
 	/**
@@ -374,7 +373,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 	 * @throws ProcessingException 
 	 */
 	protected void addPushedMessages(ProcessRequest req) throws ProcessingException {
-		logger.debug("addPushedMessages() - entry");
+		getLogger().debug("addPushedMessages() - entry");
 		try {
 			if(!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
 				// if we did not get the lock, something is getting overcharged,
@@ -392,7 +391,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 			throw new ProcessingException("Msg Queue lock interrupted...", this, null);
 		} finally {
 			try {msgQLock.unlock();} catch (Exception e) {}
-			logger.debug("addPushedMessages() - exit");
+			getLogger().debug("addPushedMessages() - exit");
 		}
 	}
 

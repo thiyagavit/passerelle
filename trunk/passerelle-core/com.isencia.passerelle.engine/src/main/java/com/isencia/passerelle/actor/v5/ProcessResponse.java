@@ -17,10 +17,10 @@ package com.isencia.passerelle.actor.v5;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageOutputContext;
 
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.message.ManagedMessage;
 
 /**
  * In the new Passerelle Actor API, the ProcessResponse is a generic container

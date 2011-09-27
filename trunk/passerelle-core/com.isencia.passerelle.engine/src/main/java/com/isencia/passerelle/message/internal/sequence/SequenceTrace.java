@@ -46,9 +46,6 @@ public class SequenceTrace implements Traceable {
 		this.sequenceID = sequenceID;
 	}
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.sequence.Traceable#isHandled()
-	 */
 	public synchronized boolean isHandled() {
 		if(Boolean.TRUE.equals(handled))
 			return true;

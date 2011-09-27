@@ -103,10 +103,6 @@ public abstract class Filter extends Actor {
                 "<line x1=\"0\" y1=\"13\" x2=\"5\" y2=\"10\" " + "style=\"stroke-width:1.0;stroke:red\"/>\n" + "</svg>\n");
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled())
 			logger.trace(getInfo());
@@ -152,10 +148,6 @@ public abstract class Filter extends Actor {
 		return super.doPreFire();
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doFire()
-	 */
 	public void doFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
