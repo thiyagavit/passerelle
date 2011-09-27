@@ -15,16 +15,10 @@
 package com.isencia.passerelle.actor.gui.graph;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import com.isencia.passerelle.actor.gui.EditParametersDialog;
 
 import ptolemy.actor.gui.Configuration;
-import ptolemy.actor.gui.PtolemyPreferences;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
-import ptolemy.util.CancelException;
-import ptolemy.util.MessageHandler;
 import ptolemy.vergil.toolbox.FigureAction;
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
@@ -55,13 +49,11 @@ public class EditPreferencesAction extends FigureAction {
         super.actionPerformed(e);
         NamedObj target = getTarget();
         if (target instanceof CompositeEntity) {
-            new EditPreferencesDialog(getFrame(), _configuration, (CompositeEntity) target);
+            new EditPreferencesDialog(getFrame(), _configuration);
         }
 
         GraphModel graphModel = graphController.getGraphModel();
-        graphModel.dispatchGraphEvent(new GraphEvent(this,
-                        GraphEvent.STRUCTURE_CHANGED, graphModel.getRoot()));
-
+        graphModel.dispatchGraphEvent(new GraphEvent(this, GraphEvent.STRUCTURE_CHANGED, graphModel.getRoot()));
     }
 }
 

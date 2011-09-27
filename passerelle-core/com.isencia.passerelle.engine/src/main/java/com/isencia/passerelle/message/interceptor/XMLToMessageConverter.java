@@ -63,9 +63,6 @@ public class XMLToMessageConverter extends ManagedMessageConverter {
 			
 		return managedMsg;
 	}
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.message.interceptor.ManagedMessageConverter#cloneConverter(be.isencia.passerelle.message.interceptor.IMessageCreator)
-	 */
 	public ManagedMessageConverter cloneConverter(IMessageCreator msgCreator) {
 		return new XMLToMessageConverter(msgCreator);
 	}

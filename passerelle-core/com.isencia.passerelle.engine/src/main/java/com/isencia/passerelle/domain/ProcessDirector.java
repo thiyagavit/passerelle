@@ -82,6 +82,10 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
 	// flag to allow
 	private boolean enforcedErrorCtrlStrategy;
 	
+	// annoyingly need to maintaina copy here of the activeThreads in the Ptolemy ProcessDirector baseclass,
+	// as it is not reachable from subclasses....
+	private Collection<ProcessThread> myThreads = new HashSet<ProcessThread>();
+	
 	/**
 	 * 
 	 */
@@ -106,6 +110,33 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
 		super(container, name);
 	}
 	
+	
+	@Override
+	public synchronized void addThread(Thread thread) {
+		super.addThread(thread);
+		if(thread instanceof ProcessThread) {
+			myThreads.add((ProcessThread) thread);
+		}
+	}
+
+	@Override
+	public void preinitialize() throws IllegalActionException {
+		super.preinitialize();
+		myThreads.clear();
+	}
+
+	@Override
+	public synchronized void removeThread(Thread thread) {
+		super.removeThread(thread);
+		if(thread instanceof ProcessThread) {
+			myThreads.remove((ProcessThread) thread);
+		}
+	}
+	
+	public Collection<ProcessThread> getThreads() {
+		return myThreads;
+	}
+
 	/**
 	 * @return all configurable parameters
 	 */
@@ -202,12 +233,23 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
 		execCtrlStrategy.iterationFinished(actor, itPerm);
 	}
 	
-	public boolean pauseActor(Actor actor) {
-		return execCtrlStrategy.pause(actor);
+	/**
+	 * just an alias for stopFire()...
+	 */
+	public void pauseAllActors() {
+		stopFire();
 	}
     
-	public boolean resumeActor(Actor actor) {
-		return execCtrlStrategy.resume(actor);
+	public void resumeAllActors() {
+        Iterator<ProcessThread> threads = myThreads.iterator();
+
+        while (threads.hasNext()) {
+        	ProcessThread thread = threads.next();
+
+        	if(thread.getActor() instanceof com.isencia.passerelle.actor.Actor) {
+        		((com.isencia.passerelle.actor.Actor)thread.getActor()).resumeFire();
+        	}
+        }
 	}
     
     public void setExecutionControlStrategy(ExecutionControlStrategy execCtrlStrategy) {

@@ -107,10 +107,6 @@ public abstract class ChannelSource extends Source {
 		return receiverChannel;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -161,10 +157,6 @@ public abstract class ChannelSource extends Source {
 		}
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPreFire()
-	 */
 	protected boolean doPreFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -204,10 +196,7 @@ public abstract class ChannelSource extends Source {
 
 		return res;
 	}
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPostFire()
-	 */
+
 	protected boolean doPostFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -230,10 +219,6 @@ public abstract class ChannelSource extends Source {
 		return res;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doWrapUp()
-	 */
 	protected void doWrapUp() throws TerminationException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());

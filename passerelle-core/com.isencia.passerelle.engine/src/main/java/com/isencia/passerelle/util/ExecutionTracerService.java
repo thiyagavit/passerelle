@@ -31,7 +31,7 @@ import com.isencia.passerelle.ext.impl.DefaultExecutionTracer;
  * application should decide for itself what ExecutionTracer implementation
  * should be used/registered.
  * 
- * In many cases, the be.isencia.passerelle.ext.impl.DefaultExecutionTracer is a
+ * In many cases, the com.isencia.passerelle.ext.impl.DefaultExecutionTracer is a
  * good option.
  * 
  * @author erwin

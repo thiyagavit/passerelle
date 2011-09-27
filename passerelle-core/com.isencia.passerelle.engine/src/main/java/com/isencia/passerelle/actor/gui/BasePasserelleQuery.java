@@ -90,11 +90,6 @@ public class BasePasserelleQuery implements IPasserelleQuery, IPasserelleCompone
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see be.isencia.passerelle.actor.gui.PasserelleComponentCloseListener#onClose(java.lang.String)
-	 */
 	public void onClose(String button) {
 		fillParameters();
 	}

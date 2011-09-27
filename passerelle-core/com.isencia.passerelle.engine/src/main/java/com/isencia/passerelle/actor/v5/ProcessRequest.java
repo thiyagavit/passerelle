@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageInputContext;
 
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.message.ManagedMessage;
 
 /**
  * ProcessRequest is a generic container for request data delivered to an actor.

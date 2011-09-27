@@ -65,9 +65,6 @@ public class EventQueueSteppingExecutionControlStrategy extends Attribute implem
 	}
 	
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.ext.ExecutionControlStrategy#requestNextIteration(ptolemy.actor.Actor)
-	 */
 	public synchronized IterationPermission requestNextIteration(Actor actor) {
 		if(logger.isTraceEnabled())
 			logger.trace("requestNextIteration() - entry - actor "+((NamedObj)actor).getName());

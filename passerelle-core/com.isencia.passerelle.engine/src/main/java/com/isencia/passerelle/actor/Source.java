@@ -17,13 +17,13 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.message.ManagedMessage;
 
 /**
  * 
@@ -91,10 +91,6 @@ public abstract class Source extends Actor {
 	}
 
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doFire()
-	 */
     protected void doFire() throws ProcessingException {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo()+" doFire() - entry");
@@ -152,10 +148,6 @@ public abstract class Source extends Actor {
         return noMoreMessages;
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException{
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());

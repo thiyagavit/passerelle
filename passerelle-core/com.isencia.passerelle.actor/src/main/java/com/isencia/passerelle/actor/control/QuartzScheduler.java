@@ -199,6 +199,9 @@ public class QuartzScheduler extends Actor {
   // flag to track if this actor is using
   // its own private scheduler instance or a shared one
   private boolean itsMyScheduler = false;
+	private JobDetail jobDetail;
+	private JobListener jobListener;
+	private SchedulerActorManager schedulerActorManager;
 
   // ~ Constructors
   // ···········································································································································
@@ -322,11 +325,13 @@ public class QuartzScheduler extends Actor {
       throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, message, e);
     }
 
+	    if(message!=null) {
     try {
       sendOutputMsg(output, message);
     } catch (IllegalArgumentException e) {
       throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, message, e);
     }
+	    }
 
     if (logger.isTraceEnabled()) {
       logger.trace(getInfo() + " - exit ");
@@ -369,24 +374,27 @@ public class QuartzScheduler extends Actor {
         }
       }
       try {
-        scheduler.addSchedulerListener(new SchedulerActorManager());
+                schedulerActorManager = new SchedulerActorManager();
+				scheduler.addSchedulerListener(schedulerActorManager);
       } catch (SchedulerException e) {
+    			if(itsMyScheduler) {
         try {
           scheduler.shutdown();
         } catch (SchedulerException e1) {
           // ignore
         }
+    			}
         throw new InitializationException(PasserelleException.Severity.FATAL, getInfo() + " - Error registering with the scheduler", this, e);
       }
     }
     try {
       myTrigger = createTrigger();
-      JobDetail jD = new JobDetail(someUniqueName + "_Job", getName(), NoOpJob.class);
+	        jobDetail = new JobDetail(someUniqueName+"_Job", getName(),NoOpJob.class);
 
-      JobListener jL = new SchedulerActorJob(someUniqueName + "_JobListener");
-      scheduler.addJobListener(jL);
-      jD.addJobListener(jL.getName());
-      scheduler.scheduleJob(jD, myTrigger);
+	        jobListener = new SchedulerActorJob(someUniqueName + "_JobListener");
+			scheduler.addJobListener(jobListener);
+	        jobDetail.addJobListener(jobListener.getName());
+            scheduler.scheduleJob(jobDetail, myTrigger);
     } catch (Exception e) {
       throw new InitializationException(PasserelleException.Severity.FATAL, getInfo() + " - Error configuring the scheduler", this, e);
     }
@@ -403,9 +411,23 @@ public class QuartzScheduler extends Actor {
     try {
       if (scheduler != null) {
         try {
+					boolean removed = scheduler.removeJobListener(jobListener.getName());
+					removed = scheduler.removeSchedulerListener(schedulerActorManager);
+					removed = scheduler.interrupt(jobDetail.getName(), jobDetail.getGroup());
+					removed = scheduler.deleteJob(jobDetail.getName(), jobDetail.getGroup());
           if (itsMyScheduler) {
             // i'm responsible for the scheduler cleanup
-            scheduler.shutdown(true);
+//						scheduler.shutdown(true);
+//						for (String group : scheduler.getJobGroupNames()) {
+//		                    for (String jobName : scheduler.getJobNames(group)) {
+//		                        try {
+//		                            scheduler.interrupt(jobName, group);
+//		                            scheduler.deleteJob(jobName, group);
+//		                        } catch (Exception e) {
+//
+//		                        }
+//		                    }
+//		                }
           }
           // to get initialize() working correctly if the actor is
           // used in consecutive model runs in Vergil
@@ -426,6 +448,10 @@ public class QuartzScheduler extends Actor {
   protected void doStopFire() {
     queue.trigger();
   }
+
+	protected void doStop() {
+		queue.trigger();
+	}
 
   protected String getExtendedInfo() {
     return "";

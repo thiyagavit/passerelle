@@ -33,6 +33,7 @@ import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.InternalErrorException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
@@ -317,5 +318,96 @@ public class Flow extends TypedCompositeActor {
 		}
 		return results;
 	}
+
+    /** Return a name that is guaranteed to not be the name of
+     *  any contained attribute, port, class, entity, or relation.
+     *  In this implementation, the argument
+     *  is stripped of any numeric suffix, and then a numeric suffix
+     *  is appended and incremented until a name is found that does not
+     *  conflict with a contained attribute, port, class, entity, or relation.
+     *  If this composite entity or any composite entity that it contains
+     *  defers its MoML definition (i.e., it is an instance of a class or
+     *  a subclass), then the prefix gets appended with "_<i>n</i>_",
+     *  where <i>n</i> is the depth of this deferral. That is, if the object
+     *  deferred to also defers, then <i>n</i> is incremented.
+     *  @param prefix A prefix for the name.
+     *  @return A unique name.
+     */
+	@Override
+    public String uniqueName(String prefix) {
+        if (prefix == null) {
+            prefix = "null";
+        }
+
+        prefix =_stripNumericSuffix(prefix);
+
+        String candidate = prefix;
+
+        // NOTE: The list returned by getPrototypeList() has
+        // length equal to the number of containers of this object
+        // that return non-null to getParent(). That number is
+        // assured to be at least one greater than the corresponding
+        // number for any of the parents returned by getParent().
+        // Hence, we can use that number to minimize the likelyhood
+        // of inadvertent capture.
+        try {
+            int depth = getPrototypeList().size();
+
+            if (depth > 0) {
+                prefix = prefix + "_" + depth + "_";
+            }
+        } catch (IllegalActionException e) {
+            // Derivation invariant is not satisified.
+            throw new InternalErrorException(e);
+        }
+
+        int uniqueNameIndex = 2;
+
+        while ((getAttribute(candidate) != null)
+                || (getPort(candidate) != null)
+                || (getEntity(candidate) != null)
+                || (getRelation(candidate) != null)) {
+            candidate = prefix + "_" + uniqueNameIndex++;
+        }
+
+        return candidate;
+    }
+    /** Return a string that is identical to the specified string
+     *  except any trailing digits are removed which were preceded by a '_'.
+     *  @param string The string to strip of its numeric suffix.
+     *  @return A string with no numeric suffix.
+     */
+    protected static String _stripNumericSuffix(String string) {
+        int length = string.length();
+        char[] chars = string.toCharArray();
+
+        boolean numericSuffixFound=false;
+        
+        for (int i = length - 1; i >= 0; i--) {
+            char current = chars[i];
+
+            if (Character.isDigit(current)) {
+                length--;
+            } else {
+                if (current == '_') {
+                	if(length<string.length()) {
+                		numericSuffixFound=true;
+                		length--;
+                	}
+                }
+                // Found a non-numeric, so we are done.
+                break;
+            }
+        }
+
+        if (numericSuffixFound) {
+            // Some stripping occurred.
+            char[] result = new char[length];
+            System.arraycopy(chars, 0, result, 0, length);
+            return new String(result);
+        } else {
+            return string;
+        }
+    }
 
 }

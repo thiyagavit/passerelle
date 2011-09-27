@@ -16,17 +16,17 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ptolemy.data.Token;
+import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
-
-import ptolemy.data.Token;
-import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 
 /**
  * @version 1.1
@@ -96,10 +96,6 @@ public abstract class Transformer extends Actor {
                 "</svg>\n");
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled())
 			logger.trace(getInfo());
@@ -134,9 +130,6 @@ public abstract class Transformer extends Actor {
 		return super.doPreFire();
 	}
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doFire()
-	 */
 	protected void doFire() throws ProcessingException {
 		if (logger.isTraceEnabled())
 			logger.trace(getInfo());
@@ -173,9 +166,6 @@ public abstract class Transformer extends Actor {
 	 */
 	protected abstract void doFire(ManagedMessage message) throws ProcessingException;
 
-	/* (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#getAuditTrailMessage(be.isencia.passerelle.message.ManagedMessage, be.isencia.passerelle.core.Port)
-	 */
 	protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {
 		return " sent converted message";
 	}

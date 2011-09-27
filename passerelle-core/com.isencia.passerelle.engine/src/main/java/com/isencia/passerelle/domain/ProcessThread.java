@@ -83,6 +83,12 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 				new FiringEvent(_director, actor, FiringEvent.AFTER_ITERATE), };
 	}
 
+	public String toString() {
+		if(getActor()!=null)
+			return getActor().getFullName();
+		else
+			return super.toString();
+	}
 	/**
 	 * Overriding the ptolemy ProcessThread.run() to add events
 	 */
@@ -105,7 +111,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 
 				// check for synchronization/stepping/... of this actor's
 				// iterations
-				ExecutionControlStrategy.IterationPermission itrPerm = _director.requestNextIteration(getActor());
+//				ExecutionControlStrategy.IterationPermission itrPerm = _director.requestNextIteration(getActor());
 				try {
 					// NOTE: Possible race condition... actor.stop()
 					// might be called before we get to this.
@@ -156,7 +162,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 						}
 					}
 				} finally {
-					_director.iterationFinished(getActor(), itrPerm);
+//					_director.iterationFinished(getActor(), itrPerm);
 				}
 			}
 			if (logger.isInfoEnabled()) {
@@ -167,6 +173,12 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 			logger.error(getActor().getFullName() + " - Error in ProcessThread", t);
 			t.printStackTrace();
 		} finally {
+			// Let the director know that this thread stopped.
+			// This is synchronized to prevent a race condition
+			// where the director might conclude before the
+			// call to wrapup() below.
+			synchronized (_director) {
+				_director.removeThread(this);
 
 			try {
 				// NOTE: Deadlock risk here if wrapup is done inside
@@ -183,11 +195,6 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 			} catch (IllegalActionException e) {
 				thrownWhenWrapup = e;
 			} finally {
-				// Let the director know that this thread stopped.
-				// This must occur after the call to wrapup above.
-				synchronized (_director) {
-					_director.removeThread(this);
-				}
 				_debug("-- Thread stopped.");
 
 				boolean rethrow = false;
@@ -224,13 +231,14 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 		}
 		LoggerManager.clearContext(ctxt);
 	}
+	}
 
 	/**
 	 * @return
 	 * @throws IllegalActionException
 	 */
 	private boolean doActorIterationWithoutEvents() throws IllegalActionException {
-		boolean iterate = false;
+		boolean iterate = true;
 		boolean preFireOK = getActor().prefire();
 		if (preFireOK) {
 			getActor().fire();
@@ -244,7 +252,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
 	 * @throws IllegalActionException
 	 */
 	private boolean doActorIterationWithEvents() throws IllegalActionException {
-		boolean iterate = false;
+		boolean iterate = true;
 		_director.notifyFiringEventListeners(firingEventCache[0]);
 		_director.notifyFiringEventListeners(firingEventCache[1]);
 		boolean preFireOK = getActor().prefire();

@@ -32,7 +32,7 @@ import ptolemy.util.MessageHandler;
 public class EnvironmentUtils {
 	
 	private static final String DEFAULT_PASSERELLE_USERLIBRARY_PATH = "/UserLibrary.xml";
-	private final static String PASSERELLE_USERLIB_PATH_ENV_VARIABLE = "be.isencia.passerelle.user.library";
+	private final static String PASSERELLE_USERLIB_PATH_ENV_VARIABLE = "com.isencia.passerelle.user.library";
 	
 	// where the user's actor classes etc are maintained
 	private static File userFolder;

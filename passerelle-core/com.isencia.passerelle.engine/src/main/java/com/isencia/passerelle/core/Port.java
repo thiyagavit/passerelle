@@ -774,7 +774,7 @@ public class Port extends TypedIOPort {
 	 * @return
 	 * @throws IllegalActionException
 	 */
-	private Token convertTokenForMe(Token token) throws IllegalActionException {
+	public Token convertTokenForMe(Token token) throws IllegalActionException {
 		Token converted = token;
 		if ((getContainer() instanceof Actor) && (PasserelleType.PASSERELLE_MSG_TYPE.equals(getType()))) {
 			// Need to check/convert for ManagedMessage

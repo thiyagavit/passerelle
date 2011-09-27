@@ -16,12 +16,6 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.core.PortHandler;
-import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageHelper;
 
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
@@ -32,6 +26,12 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.core.PortHandler;
+import com.isencia.passerelle.message.ManagedMessage;
+import com.isencia.passerelle.message.MessageHelper;
 
 /**
  * Base class for all Passerelle sinks:
@@ -121,10 +121,6 @@ public abstract class Sink extends Actor {
 			logger.trace(getInfo()+" - exit ");
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled())
 			logger.trace(getInfo());

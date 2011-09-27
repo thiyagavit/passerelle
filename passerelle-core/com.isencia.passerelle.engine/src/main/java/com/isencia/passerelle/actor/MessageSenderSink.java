@@ -19,6 +19,10 @@ import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.message.IMessageSender;
 import com.isencia.message.ISenderChannel;
 import com.isencia.message.interceptor.IMessageInterceptorChain;
@@ -26,10 +30,6 @@ import com.isencia.message.interceptor.MessageInterceptorChain;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
-
-import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 
 
 /**
@@ -77,10 +77,6 @@ public abstract class MessageSenderSink extends Sink {
             logger.trace(getInfo()+" - exit ");
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
     protected void doInitialize() throws InitializationException {
         if (logger.isTraceEnabled())
             logger.trace(getInfo());
@@ -120,10 +116,6 @@ public abstract class MessageSenderSink extends Sink {
             logger.trace(getInfo()+" - exit ");
     }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doWrapUp()
-	 */
     protected void doWrapUp() throws TerminationException {
         if (logger.isTraceEnabled())
             logger.trace(getInfo());

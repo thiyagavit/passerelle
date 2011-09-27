@@ -211,15 +211,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	private PortHandler requestFinishHandler;
 	
 	/**
-	 * CONTROL input port, used to request an actor to pause its processing,
-	 * until a resume request arrives on the requestResumePort.
-	 */
-	public ControlPort requestPausePort = null;
-	private PortHandler requestPauseHandler;
-	public ControlPort requestResumePort = null;
-	private PortHandler requestResumeHandler;
-
-	/**
 	 * CONTROL output port, used by an actor to indicate that a TECHNICAL error
 	 * occurred during its processing. FUNCTIONAL errors should be handled by
 	 * extra output ports, specific to the functional domain of each actor. The
@@ -312,8 +303,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		super(container, name);
 
 		requestFinishPort = PortFactory.getInstance().createInputControlPort(this, "requestFinish");
-		requestPausePort = PortFactory.getInstance().createInputControlPort(this, "pause");
-		requestResumePort = PortFactory.getInstance().createInputControlPort(this, "resume");
 		
 		errorPort = PortFactory.getInstance().createOutputErrorPort(this);
 
@@ -437,7 +426,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		}
 
 		super.initialize();
-		
+		paused=false;
 		finishRequested = false;
 		mockMode = false;
 		try {
@@ -466,42 +455,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 			// Start handling the port
 			requestFinishHandler.start();
 		}
-		if (requestPausePort.getWidth() > 0) {
-			// If at least 1 channel is connected to the port
-			// Install handler on input port
-			requestPauseHandler = new PortHandler(requestPausePort, new PortListenerAdapter() {
-				public void tokenReceived() {
-					if (logger.isTraceEnabled()) {
-						logger.trace(getInfo() + " - requestPauseHandler.tokenReceived()");
-					}
-					requestPauseHandler.getToken();
-					pause();
-					if (logger.isTraceEnabled()) {
-						logger.trace(getInfo() + " - requestPauseHandler.tokenReceived()");
-					}
-				}
-			});
-			// Start handling the port
-			requestPauseHandler.start();
-		}
-		if (requestResumePort.getWidth() > 0) {
-			// If at least 1 channel is connected to the port
-			// Install handler on input port
-			requestResumeHandler = new PortHandler(requestResumePort, new PortListenerAdapter() {
-				public void tokenReceived() {
-					if (logger.isTraceEnabled()) {
-						logger.trace(getInfo() + " - requestResumeHandler.tokenReceived()");
-					}
-					requestResumeHandler.getToken();
-					resume();
-					if (logger.isTraceEnabled()) {
-						logger.trace(getInfo() + " - requestResumeHandler.tokenReceived()");
-					}
-				}
-			});
-			// Start handling the port
-			requestResumeHandler.start();
-		}
+		
 		try {
 			doInitialize();
 		} catch (InitializationException e) {
@@ -590,24 +544,50 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	}
 
 	/**
+	 * A slight variation on the stopFire() semantics, provided in Ptolemy.
+	 * A stopFire() is used to interrupt asap an ongoing fire()
+	 * - that may be blocked, waiting for some event or so - but does not
+	 * assume that a resume of the fire() will be explicitly invoked.
+	 * <p>
+	 * Even though the doc of the stopFire() mentions that it assumes that an
+	 * actor should be able to continue where it left, when a next fire() is called
+	 * after a stopFire(), it is not clear how this can be represented/implemented.
+	 * E.g. a problem is that in principle, each fire() iteration risks needing
+	 * new input messages on the input port(s)...
+	 * </p>
+	 * <p>
+	 * A Passerelle actor thus supports a more "traditional" pair of pauseFire/resumeFire
+	 * methods, accompanied by 2 overridable doPauseFire()/doResumeFire() methods.
+	 * </p>
+	 * <p>
+	 * When a running model is paused/resumed, the actors will first receive a "notification"
+	 * invocation of the pauseFire/resumeFire methods, before the actual "pause" or "resume"
+	 * of the model iterations is done. In this way, an actor can react in a consistent way,
+	 * independently of the "normal" fire() iteration semantics.
+	 * </p>
+	 * <p>
+	 * E.g. a long-running external operation may be interrupted/paused in doPauseFire()
+	 * and the actor may store status info if needed. During the doResumeFire(), the original
+	 * operation may be continued till completion, before a next actor fire() iteration is done.
+	 * </p>
 	 * 
-	 * @return
+	 * @return true if the actor was not yet paused, and is paused now.
 	 */
-	final public synchronized boolean pause() {
+	final public synchronized boolean pauseFire() {
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " pause() - entry");
+			logger.trace(getInfo() + " pauseFire() - entry");
 		}
 		boolean wasNotPaused = !paused;
 		try {
 			paused = true;
 			if(wasNotPaused)
-				doPause();
-			return ((ProcessDirector)getDirector()).pauseActor(this);
+				doPauseFire();
+			return wasNotPaused;
 		} catch (ClassCastException e) {
 			return wasNotPaused;
 		} finally {
 			if (logger.isTraceEnabled()) {
-				logger.trace(getInfo() + " pause() - exit");
+				logger.trace(getInfo() + " pauseFire() - exit");
 			}
 		}
 	}
@@ -615,25 +595,43 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	/**
 	 * Overridable template method, for when an actor implementation needs
 	 * some special action to be done when an actor is being paused from an active state.
+	 * <p>
+	 * By default it calls doStopFire().
+	 * </p>
 	 */
-	protected void doPause() {
+	protected void doPauseFire() {
+		doStopFire();
 	}
 	
-	final public synchronized boolean resume() {
+	/**
+	 * A "notification" method, allowing an actor to first resume any pending operation that
+	 * was interrupted/paused with pauseFire(), before the "normal" actor fire() iterations
+	 * are resumed.
+	 * <p>
+	 * Remark that all paused actors will receive a resumeFire() notification call sequentially,
+	 * in 1 thread, and that the "normal" model iterations will only start after all actors have
+	 * finished their resumeFire() actions. The order of the invocations on the different actors
+	 * is not determined.
+	 * </p>
+	 * 
+	 * @return true if the actor was paused before, and is no longer paused after this method
+	 * has finished.
+	 */
+	final public synchronized boolean resumeFire() {
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " resume() - entry");
+			logger.trace(getInfo() + " resumeFire() - entry");
 		}
 		boolean wasPaused = paused;
 		try {
-			paused = false;
 			if(wasPaused)
-				doResume();
-			return ((ProcessDirector)getDirector()).resumeActor(this);
+				doResumeFire();
+			paused = false;
+			return wasPaused;
 		} catch (ClassCastException e) {
 			return wasPaused;
 		} finally {
 			if (logger.isTraceEnabled()) {
-				logger.trace(getInfo() + " resume() - exit");
+				logger.trace(getInfo() + " resumeFire() - exit");
 			}
 		}
 	}
@@ -641,8 +639,11 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	/**
 	 * Overridable template method, for when an actor implementation needs
 	 * some special action to be done when an actor is resuming from a paused state.
+	 * <p>
+	 * By default it does nothing.
+	 * </p>
 	 */
-	protected void doResume() {
+	protected void doResumeFire() {
 	}
 	
 	/**
@@ -943,10 +944,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " stopfire() - entry()");
 		}
-//		if (!isFinishRequested()) {
-//			requestFinish();
-//		}
-		doStopFire();
+		pauseFire();
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " stopfire() - exit ");
 		}
@@ -988,10 +986,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     }
 
 	/**
-	 * Method to request this actor to finish its processing. It invokes also
-	 * the std Ptolemy method stopFire(). This method must be overridden by
-	 * actors with blocking fire loop, in such a way that the block is relieved
-	 * asap.
+	 * Method to request this actor to finish its processing. 
 	 */
 	final public void requestFinish() {
 		if (logger.isTraceEnabled()) {
@@ -999,7 +994,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		}
 		finishRequested = true;
 
-		stopFire();
+		//stopFire();
 		logger.info(getInfo() + " FINISH REQUESTED !!");
 
 		if (logger.isTraceEnabled()) {
@@ -1137,6 +1132,15 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	public ManagedMessage createMessage() {
 		return MessageFactory.getInstance().createMessage(getStandardMessageHeaders());
 	}
+
+	 public ManagedMessage createMessageFromCauses(ManagedMessage... causes) {
+	    ManagedMessage result = MessageFactory.getInstance().createMessage(getStandardMessageHeaders());
+	    for (ManagedMessage causeMsg : causes) {
+        result.addCauseID(causeMsg.getID());
+      }
+	    return result;
+	  }
+
 
 	/**
 	 * Default implementation just creates a standard message using the

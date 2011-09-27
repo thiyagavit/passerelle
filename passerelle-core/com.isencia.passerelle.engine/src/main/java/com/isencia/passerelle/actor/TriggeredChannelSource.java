@@ -16,6 +16,15 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ptolemy.actor.gui.style.CheckBoxStyle;
+import ptolemy.data.BooleanToken;
+import ptolemy.data.expr.Parameter;
+import ptolemy.data.type.BaseType;
+import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.message.ChannelException;
 import com.isencia.message.IReceiverChannel;
 import com.isencia.message.NoMoreMessagesException;
@@ -26,15 +35,6 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.interceptor.TextToMessageConverter;
 import com.isencia.passerelle.message.xml.XmlMessageHelper;
-
-import ptolemy.actor.gui.style.CheckBoxStyle;
-import ptolemy.data.BooleanToken;
-import ptolemy.data.expr.Parameter;
-import ptolemy.data.type.BaseType;
-import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 
 
 /**
@@ -132,10 +132,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
 			logger.trace(getInfo()+" - exit ");
 	}
 	
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doInitialize()
-	 */
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -185,10 +181,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
 			logger.trace(getInfo()+" - exit ");
 		}
 	}
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPreFire()
-	 */
 	protected boolean doPreFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -238,10 +230,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
 		return res;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doPostFire()
-	 */
 	protected boolean doPostFire() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());
@@ -265,10 +253,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
 	}
 
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Actor#doWrapUp()
-	 */
     protected void doWrapUp() throws TerminationException {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo());
@@ -329,10 +313,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
     
 
 
-	/*
-	 *  (non-Javadoc)
-	 * @see be.isencia.passerelle.actor.Source#getMessage()
-	 */
 	protected ManagedMessage getMessage() throws ProcessingException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo());

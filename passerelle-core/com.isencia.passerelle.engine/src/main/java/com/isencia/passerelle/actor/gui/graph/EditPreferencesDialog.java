@@ -15,16 +15,9 @@
 package com.isencia.passerelle.actor.gui.graph;
 
 import java.awt.Frame;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 import ptolemy.actor.gui.Configuration;
 import ptolemy.gui.ComponentDialog;
-import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.Entity;
-import ptolemy.kernel.Port;
-import ptolemy.moml.MoMLChangeRequest;
 
 /**
  This class is a modal dialog box for showing/hiding all port names of the
@@ -40,9 +33,8 @@ public class EditPreferencesDialog extends ComponentDialog {
      *   generating the dialog, or null if none.
      *  @param target The object being renamed.
      */
-    public EditPreferencesDialog(Frame owner, Configuration configuration, CompositeEntity target) {
-        super(owner, "Edit preferences",
-                new EditPreferencesConfigurer(configuration, target), _buttons);
+    public EditPreferencesDialog(Frame owner, Configuration configuration) {
+        super(owner, "Edit preferences", new EditPreferencesConfigurer(configuration), _buttons);
     }
 
 	/** If the window is closed with anything but Cancel, apply the changes.

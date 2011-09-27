@@ -44,13 +44,6 @@ import javax.swing.filechooser.FileFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
-import com.isencia.passerelle.model.util.MoMLParser;
-import com.isencia.passerelle.util.ptolemy.DateTimeParameter;
-import com.isencia.passerelle.util.ptolemy.ParameterGroup;
-import com.isencia.util.swing.calendar.DateTimeSelector;
-import com.isencia.util.swing.components.FinderAccessory;
 
 import ptolemy.actor.gui.ColorAttribute;
 import ptolemy.actor.gui.EditorFactory;
@@ -74,6 +67,13 @@ import ptolemy.kernel.util.Settable;
 import ptolemy.moml.ErrorHandler;
 import ptolemy.moml.MoMLChangeRequest;
 import ptolemy.util.MessageHandler;
+import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
+import com.isencia.passerelle.model.util.MoMLParser;
+import com.isencia.passerelle.util.ptolemy.DateTimeParameter;
+import com.isencia.passerelle.util.ptolemy.ParameterGroup;
+import com.isencia.util.swing.calendar.DateTimeSelector;
+import com.isencia.util.swing.components.FinderAccessory;
 
 // ////////////////////////////////////////////////////////////////////////
 // // PasserelleQuery
@@ -186,6 +186,19 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 //			applyNameChange();
 		}
 		super.changed(name);
+	}
+
+	/**
+	 * block updates to prevent feedback loops in the HMI
+	 * remark that this means that open cfg panels will not
+	 * adjust automatically when a parameter value changes
+	 * in an "unsollicited" way, i.e. by some external effect
+	 * unrelated to the cfg panel in question.
+	 */
+	@Override
+	public void valueChanged(Settable attribute) {
+//		super.valueChanged(attribute);
+//		System.out.println("value changed for "+attribute.getFullName());
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -406,11 +419,6 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see be.isencia.passerelle.actor.gui.IPasserelleQuery#setStringValue(java.lang.String, java.lang.String)
-	 */
 	public void setStringValue(String name, String value) {
 		this.set(name, value);
 	}
@@ -634,7 +642,7 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 			_entryBox = new JTextField(defaultName, getTextWidth());
 			_entryBox.setBackground(background);
 			_entryBox.setForeground(foreground);
-			JButton button = new JButton("Browse");
+			button = new JButton("Browse");
 			button.addActionListener(this);
 			add(_entryBox);
 			add(button);
@@ -656,6 +664,13 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 			_entryBox.addFocusListener(new QueryFocusListener(name));
 
 			_name = name;
+		}
+
+		@Override
+		public void setEnabled(boolean enabled) {
+			super.setEnabled(enabled);
+			_entryBox.setEnabled(enabled);
+			button.setEnabled(enabled);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -722,6 +737,8 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 
 		private File _startingDirectory;
 		private FileFilter _fileFilter;
+
+		private JButton button;
 	}
 
 	/**
@@ -777,11 +794,6 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see be.isencia.passerelle.actor.gui.IPasserelleQuery#hasAutoSync()
-	 */
 	public boolean hasAutoSync() {
 		return true;
 	}
