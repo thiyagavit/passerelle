@@ -11,13 +11,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.kernel.util.Attribute;
-import com.isencia.passerelle.ext.ExecutionControlStrategy;
-import com.isencia.passerelle.ext.impl.SuspendResumeExecutionControlStrategy;
+
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
-import com.isencia.passerelle.hmi.state.StateMachine;
-import com.isencia.passerelle.hmi.util.DynamicStepExecutionControlStrategy;
 
 @SuppressWarnings("serial")
 public class ModelResumer extends AbstractAction {
@@ -37,29 +33,7 @@ public class ModelResumer extends AbstractAction {
       getLogger().trace("Model Resume action - entry"); //$NON-NLS-1$
     }
 
-    try {
-      final ExecutionControlStrategy execCtrlStr = getHMI().getDirector().getExecutionControlStrategy();
-      try {
-        ((SuspendResumeExecutionControlStrategy) execCtrlStr).resume();
-      } catch (final ClassCastException ex) {
-        ((DynamicStepExecutionControlStrategy) execCtrlStr).resume();
-        // there's a small time window here where there's a risk that a
-        // suspend action
-        // is triggered immediately after the resume, where it will
-        // still see the Stepping exec ctrl strategy,
-        // but that should never happen in reality...
-        final Attribute tmp = getHMI().getDirector().getAttribute(HMIBase.EXECUTION_CONTROL_ATTR_NAME);
-        if (tmp != null) {
-          // remove the previous execution controller
-          tmp.setContainer(null);
-        }
-        new SuspendResumeExecutionControlStrategy(getHMI().getDirector(), HMIBase.EXECUTION_CONTROL_ATTR_NAME);
-      }
-    } catch (final Exception ex) {
-      getLogger().error("Received resume event, but model not configured correctly", ex);
-    }
-
-    StateMachine.getInstance().transitionTo(StateMachine.MODEL_EXECUTING);
+		 getHMI().resumeModel();
 
     if (getLogger().isTraceEnabled()) {
       getLogger().trace("Model Resume action - exit"); //$NON-NLS-1$

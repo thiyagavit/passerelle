@@ -155,7 +155,7 @@ public class TracePanel extends JPanel {
   }
 
   private JTextField createFilterTextField() {
-    final JTextField result = new JTextField(6);
+		final JTextField result = new JTextField(16);
     result.setAction(createFilterAction());
     return result;
   }
@@ -403,6 +403,33 @@ public class TracePanel extends JPanel {
       myTraceTableModel.removeRow(0);
     }
   }
+
+	/**
+	 * 
+	 * get the value contains in a cell
+	 * 
+	 * @param row
+	 *            the row number of the cell
+	 * @param column
+	 *            the column number of the cell
+	 * @return the value contains at the cell(row,column)
+	 * @throws ArrayOfBoundsException
+	 *             raise an ArrayOfBoundsException if row or column does not exist.
+	 */
+
+	public String getValueAt(final int row, final int column) {
+		return (String) myTraceTableModel.getValueAt(row, column);
+	}
+
+	/**
+	 * the row number in the table
+	 * 
+	 * @return the row number in the table
+	 */
+
+	public int getRowNumber() {
+		return myTraceTableModel.getRowCount();
+	}
 
   private static class FixedLengthDocument extends PlainDocument {
     private final int maxLength;

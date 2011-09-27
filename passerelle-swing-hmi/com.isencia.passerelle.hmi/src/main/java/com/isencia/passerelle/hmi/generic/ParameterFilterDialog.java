@@ -225,17 +225,16 @@ public class ParameterFilterDialog extends JDialog {
 		}
 		cfgPanel.setSpecial(true);
 		cfgPanel.add(builder.getPanel());
-		
+		Model filterCfgModel = getModelParameterFilterConfig().getModel(model.getDisplayName());
+	    boolean filterCfgKnown = filterCfgModel!=null;
 		for (int i=0; i< parameters.size(); i++, paramCount++) {
 			Settable p = parameters.get(i);
 		    String stdName = p.getName();
 		    String alias=null;
-		    boolean filterCfgKnown = getModelParameterFilterConfig().getModel(model.getName())!=null;
 		    boolean checked = true;
 		    if(filterCfgKnown) {
 		        try {
-		            alias = getModelParameterFilterConfig().getModel(model.getName()).getFieldMapping().getValueForKey(
-		            			ModelUtils.getFullNameButWithoutModelName(model,p));
+		            alias = filterCfgModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(model,p));
 		            checked = (alias!=null);
 		            alias = stdName.equals(alias) ? null : alias;
 		        } catch (Exception e) {

@@ -32,6 +32,7 @@ public class HMIMessages {
     public final static String MENU_EXIT = "hmi.menu.exit"; //$NON-NLS-1$
     public final static String MENU_FILE = "hmi.menu.file"; //$NON-NLS-1$
     public final static String MENU_GRAPH = "hmi.menu.graph"; //$NON-NLS-1$
+    public final static String MENU_GRAPH_PREFERENCES = "hmi.menu.graph.prefs"; //$NON-NLS-1$
     public final static String MENU_INTERACTIVE_ERRORHANDLING = "hmi.menu.interactive_errorhandling"; //$NON-NLS-1$
     public final static String MENU_LAYOUT = "hmi.menu.layout"; //$NON-NLS-1$
     public final static String MENU_MONITORING = "hmi.menu.monitoring"; //$NON-NLS-1$

@@ -31,10 +31,6 @@ public class ActorListModel extends AbstractListModel {
     this.model = model;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see javax.swing.ListModel#getSize()
-   */
   public int getSize() {
     return actors.size();
   }

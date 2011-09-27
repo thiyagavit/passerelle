@@ -59,6 +59,7 @@ import ptolemy.actor.Manager;
 import ptolemy.actor.gui.Configuration;
 import ptolemy.actor.gui.ModelDirectory;
 import ptolemy.actor.gui.PtolemyEffigy;
+import ptolemy.actor.gui.PtolemyPreferences;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.Entity;
@@ -68,6 +69,7 @@ import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.util.MessageHandler;
+import ptolemy.util.StringUtilities;
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
@@ -118,6 +120,9 @@ public abstract class HMIBase implements ChangeListener {
 	public static final String HMI_MODEL_URL_PROPNAME = "hmi.modelURL";
 	public static final String HMI_RECENTMODELS_FILE_PROPNAME = "hmi.recentModels.file";
 	public static final String HMI_RECENTMODELS_LIMIT_PROPNAME = "hmi.recentModels.limit";
+	public static final String HMI_RECENTMODELS_PATH_PROPNAME = "hmi.recentModels.path";
+    public static final String HMI_RECENTMODELS_FILE_DEFAULT = "hmi_userdef.xml";
+	public static final String HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME = "hmi.diagnosis.data.base.dir";
 
 	private final static Logger logger = LoggerFactory.getLogger(HMIBase.class);
 
@@ -166,9 +171,6 @@ public abstract class HMIBase implements ChangeListener {
 	// current implementation uses XMLStreamer files
 	private ModelBundle hmiModelsDef;
 
-	// this contains the instance of the Passerelle/Ptolemy execution manager
-	// while a model is running
-	private Manager manager;
 	private FlowManager flowManager = new FlowManager();
 
 	private Action modelCreatorAction;
@@ -215,6 +217,10 @@ public abstract class HMIBase implements ChangeListener {
 	}
 	
 	public void init() {
+		// this stuff is used to maintain user prefs like "show parameters" and "show port names"
+		StringUtilities.PREFERENCES_DIRECTORY=".passerelle";
+		PtolemyPreferences.PREFERENCES_FILE_NAME="PasserelleHmiPreferences.xml";
+		
 		// this ensures that from the 1st loaded model,
 		// the user gets pop-ups for any missing actor classes in the HMI installation,
 		// and can still choose to see whatever can be rendered of the model
@@ -237,9 +243,13 @@ public abstract class HMIBase implements ChangeListener {
 			logger.info("HMI did not find config file");
 		}
 		MODELS_URL_STRING = System.getProperty(HMI_MODEL_URL_PROPNAME);
-		String recentModelsProp = System.getProperty(HMI_RECENTMODELS_FILE_PROPNAME);
-		if(recentModelsProp!=null && recentModelsProp.length()>0)
+		String recentModelsProp = System.getProperty(HMI_RECENTMODELS_FILE_PROPNAME,HMI_RECENTMODELS_FILE_DEFAULT);
+        String recentModelsPath = System.getProperty(HMI_RECENTMODELS_PATH_PROPNAME);
+        if (recentModelsPath != null && recentModelsPath.length() > 0) {
+              HMI_RECENTMODELS_FILE_STRING = recentModelsPath + "/" + recentModelsProp;
+        } else {
 			HMI_RECENTMODELS_FILE_STRING = EnvironmentUtils.getUserFolder() + "/"+ recentModelsProp;
+        }
 
 		
 		String recentModelsLimitStr = System.getProperty(HMI_RECENTMODELS_LIMIT_PROPNAME,"10");
@@ -293,9 +303,9 @@ public abstract class HMIBase implements ChangeListener {
 			System.out.println("readconfiguration file " + configurationFile);
 			logger.debug("readconfiguration file " + configurationFile);
 			config = readConfiguration(configurationFile);
+			PtolemyPreferences.setDefaultPreferences(config);
 		} catch (final Exception e) {
-			e.printStackTrace();
-			logger.error("readconfiguration failed " + e.toString());
+			logger.error("readconfiguration failed ",e);
 		}
 
 		traceComponent = createTraceComponent();
@@ -672,7 +682,6 @@ public abstract class HMIBase implements ChangeListener {
 		if (showThing(HMIMessages.MENU_EXIT, menuItemsToShow, menuItemsToHide)) {
 			final JMenuItem exitMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_EXIT), HMIMessages.getString(
 					HMIMessages.MENU_EXIT + HMIMessages.KEY).charAt(0));
-//			exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 			exitMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					checkExitApplication();
@@ -1084,9 +1093,6 @@ public abstract class HMIBase implements ChangeListener {
 
 	public void launchModel(final Flow model, final ModelExecutor executor, final boolean blocking, final boolean updateState) {
 		try {
-			manager = new Manager(model.workspace(), model.getName());
-			model.setManager(manager);
-
 			final Director director = (Director) model.getDirector();
 			if (interactiveErrorControl) {
 				director.setErrorControlStrategy(new AskTheUserErrorControlStrategy(this, executor), true);
@@ -1107,20 +1113,22 @@ public abstract class HMIBase implements ChangeListener {
 				executor.createExecutionControlStrategy(director, HMIBase.EXECUTION_CONTROL_ATTR_NAME);
 			}
 
-			setModelConfigurationBeforeExecution(model);
+			director.removeAllErrorCollectors();
+			final ModelExecutionListener executionListener = createExecutionListener();
+			director.addErrorCollector(executionListener);
+
 			animationEventListener = setModelAnimation(model, animateModelExecution, animationEventListener);
 
 			if (blocking) {
-				manager.execute();
+				flowManager.executeBlockingLocally(model, null, executionListener);
 			} else {
-				manager.startRun();
+				flowManager.execute(model, null, executionListener);
 			}
 
 			if (updateState && executor != null) {
 				StateMachine.getInstance().transitionTo(executor.getSuccessState());
 			}
 		} catch (final Throwable t) {
-			t.printStackTrace();
 			logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
 			PopupUtil.showError(getDialogHookComponent(), "error.execution.error", t.getMessage());
 			StateMachine.getInstance().transitionTo(executor.getErrorState());
@@ -1137,7 +1145,6 @@ public abstract class HMIBase implements ChangeListener {
 					flowManager.execute(currentModel, null);
 					StateMachine.getInstance().transitionTo(executor.getSuccessState());
 				} catch (Throwable t) {
-					t.printStackTrace();
 					logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
 					PopupUtil.showError(getDialogHookComponent(), "error.execution.error", t.getMessage());
 					StateMachine.getInstance().transitionTo(executor.getErrorState());
@@ -1225,22 +1232,6 @@ public abstract class HMIBase implements ChangeListener {
 		return uiWidget;
 	}
 
-	/**
-	 * DBA : suspend execution Need to be validating
-	 */
-	public void resumeModel() {
-		try {
-			if (manager != null) {
-				manager.resume();
-			}
-			StateMachine.getInstance().transitionTo(StateMachine.MODEL_EXECUTING);
-		} catch (final Throwable t) {
-			t.printStackTrace();
-			logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
-			PopupUtil.showError(getDialogHookComponent(), HMIMessages.ERROR_GENERIC, t.getMessage());
-		}
-	}
-
 	public void saveModelAs(final Flow model, final URL destinationURL) throws IOException, IllegalActionException, NameDuplicationException {
 		
 		if(checkFlowLoadingError(model)) {
@@ -1310,9 +1301,11 @@ public abstract class HMIBase implements ChangeListener {
 			}
 			currentModel = model;
 			hmiFields.clear();
-			showModelForm(modelKey);
 			if (loadGraphPanel) {
 				showModelGraph(modelKey);
+				// the above also indirectly will show the cfg forms
+			} else {
+				showModelForm(modelKey);
 			}
 			if (currentModel != null) {
 				currentModel.addChangeListener(this);
@@ -1351,22 +1344,6 @@ public abstract class HMIBase implements ChangeListener {
 			currentListener = null;
 		}
 		return currentListener;
-	}
-
-	/**
-	 * Override this method in HMI subclasses if you want to add extra
-	 * configurations to the model. <br>
-	 * By default, this sets a ModelExecutionListener that will show a pop-up
-	 * when a model has finished its execution (possible with error info).
-	 * 
-	 * @param model
-	 */
-	protected void setModelConfigurationBeforeExecution(final Flow model) {
-		final Director director = (Director) model.getDirector();
-		director.removeAllErrorCollectors();
-		final ModelExecutionListener executionListener = createExecutionListener();
-		director.addErrorCollector(executionListener);
-		model.getManager().addExecutionListener(executionListener);
 	}
 
 	public void setModelURL(final URL modelURL) {
@@ -1422,86 +1399,42 @@ public abstract class HMIBase implements ChangeListener {
 	}
 
 	public void stopModel() {
-		boolean stopRemotely = false;
-		if (getCurrentModel() instanceof Flow) {
-			Flow currentModel = (Flow) getCurrentModel();
-			if (currentModel.getHandle().isRemote()) {
-				stopRemotely = true;
-				try {
-					flowManager.stopExecution(currentModel);
-				} catch (Throwable t) {
-					t.printStackTrace();
-					logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
-					PopupUtil.showError(getDialogHookComponent(), HMIMessages.ERROR_GENERIC, t.getMessage());
-				}  finally {
-					StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
-				}
-			}
-		}
-		if (!stopRemotely) {
-			try {
-				if (manager != null) {
-					manager.stop();
-					// desactivate toolbar while stopping manager.stop() since
-					// is not a blocking method
-
+		Flow currentModel = getCurrentModel();
 					if(StateMachine.MODEL_DEBUGGING.equals(StateMachine.getInstance().getCurrentState())) {
 						// in stepping mode, we first must go to plain execution mode,
 						// to allow the manager.stop() to reach all actors!
-						((DynamicStepExecutionControlStrategy) getDirector()
-								.getExecutionControlStrategy()).resume();
+			((DynamicStepExecutionControlStrategy) getDirector().getExecutionControlStrategy()).resume();
 					}
-					StateMachine.getInstance().transitionTo(StateMachine.READY);
-					while (manager.getState().equals(Manager.ITERATING)) {
 						try {
-							logger.debug(manager.getState().toString());
-							Thread.sleep(100);
-						} catch (final InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+			// wait at most 10s for the complete model stop
+			flowManager.stopExecution(currentModel, 10000);
+		} catch (Throwable t) {
+			logger.error("Error stopping execution of model "+currentModel.getDisplayName(), t);
+			PopupUtil.showError(getDialogHookComponent(), "Error stopping execution of model "+currentModel.getDisplayName(), t.getMessage());
+		}  finally {
+			StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
 						}
 					}
 
-					while (manager.getState().equals(Manager.WRAPPING_UP)) {
+	public void suspendModel() {
 						try {
-							logger.debug(manager.getState().toString());
-							Thread.sleep(100);
-						} catch (final InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
+			flowManager.pauseExecution(getCurrentModel());
+			StateMachine.getInstance().transitionTo(StateMachine.MODEL_EXECUTING_SUSPENDED);
 			} catch (final Throwable t) {
 				t.printStackTrace();
-				logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
-				PopupUtil.showError(getDialogHookComponent(), HMIMessages.ERROR_GENERIC, t.getMessage());
-			} finally {
-				StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
-			}
+			logger.error("Error suspending execution of model "+currentModel.getDisplayName(), t);
+			PopupUtil.showError(getDialogHookComponent(), "Error suspending execution of model "+currentModel.getDisplayName(), t.getMessage());
 		}
 	}
 
-	/**
-	 * DBA : suspend execution Need to be validating
-	 */
-	public void suspendModel() {
+	public void resumeModel() {
 		try {
-			if (getCurrentModel() instanceof Flow) {
-				Flow currentModel = (Flow) getCurrentModel();
-				if (currentModel.getHandle().isRemote()) {
-					PopupUtil.showInfo(getDialogHookComponent(), "Suspend not yet supported for remote execution");
-					return;
-				}
-			} 
-			if (manager != null) {
-				manager.pause();
-				StateMachine.getInstance().transitionTo(StateMachine.MODEL_EXECUTING_SUSPENDED);
-			}
+			flowManager.resumeExecution(getCurrentModel());
+			StateMachine.getInstance().transitionTo(StateMachine.MODEL_EXECUTING);
 		} catch (final Throwable t) {
 			t.printStackTrace();
-			logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
-			PopupUtil.showError(getDialogHookComponent(), HMIMessages.ERROR_GENERIC, t.getMessage());
+			logger.error("Error resuming execution of model "+currentModel.getDisplayName(), t);
+			PopupUtil.showError(getDialogHookComponent(), "Error resuming execution of model "+currentModel.getDisplayName(), t.getMessage());
 		}
 	}
 
