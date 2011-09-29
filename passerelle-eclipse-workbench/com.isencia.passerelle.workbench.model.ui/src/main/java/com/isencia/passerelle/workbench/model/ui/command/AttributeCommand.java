@@ -113,6 +113,7 @@ public class AttributeCommand extends Command {
 							}
 						}
 					}
+					attribute.propagateValue();
 				}
 			});
 
