@@ -838,8 +838,9 @@ public abstract class HMIBase implements ChangeListener {
 				final JMenuItem templateMenuItem = new JMenuItem((i)+". "+HMIMessages.getString(modelKey));
 				templateMenuItem.setToolTipText(hmiModelsDef.getModel(modelKey).getMomlPath().toString());
 				if(i<10) {
-					templateMenuItem.setMnemonic(Integer.toString(i++).charAt(0));
+					templateMenuItem.setMnemonic(Integer.toString(i).charAt(0));
 				}
+				i++;
 				templateMenuItem.addActionListener(new TemplateModelOpener(modelKey));
 				modelsSubMenu.add(templateMenuItem);
 			} catch (Exception e) {
