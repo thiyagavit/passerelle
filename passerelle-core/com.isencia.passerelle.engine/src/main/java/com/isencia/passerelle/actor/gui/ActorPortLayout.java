@@ -190,9 +190,10 @@ public class ActorPortLayout extends AbstractGlobalLayout {
 			}
 			boolean portIsConnected = port.getWidth() > 0;
 			if(port instanceof ControlPort) {
-				if(!portIsConnected && !isExpertMode)
+				if(!portIsConnected && !isExpertMode) {
 					portFigure.setVisible(false);
-				continue;
+				  continue;
+				}
 			}
 
 			// If the actor contains a variable named "_showRate",
