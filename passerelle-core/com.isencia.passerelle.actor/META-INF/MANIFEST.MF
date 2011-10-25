@@ -20,15 +20,17 @@ Import-Package: org.apache.commons.collections.map,
  ptolemy.gui,
  ptolemy.kernel,
  ptolemy.kernel.util,
- ptolemy.moml
+ ptolemy.moml,
+  org.quartz,
+  org.quartz.helpers,
+  org.quartz.jobs
 Require-Bundle: com.isencia.passerelle.commons;bundle-version="7.0.0",
  com.isencia.passerelle.commons.ume;bundle-version="7.0.0",
  com.isencia.passerelle.engine;bundle-version="7.0.0",
  mail;bundle-version="1.4.0",
  org.apache.commons.beanutils;bundle-version="1.6.0",
  org.apache.xerces;bundle-version="2.9.0",
- org.apache.xml.serializer;bundle-version="2.7.1",
- org.quartz;bundle-version="1.6.0"
+ org.apache.xml.serializer;bundle-version="2.7.1"
 Export-Package: com.isencia.passerelle.actor.control,
  com.isencia.passerelle.actor.convert,
  com.isencia.passerelle.actor.db,
