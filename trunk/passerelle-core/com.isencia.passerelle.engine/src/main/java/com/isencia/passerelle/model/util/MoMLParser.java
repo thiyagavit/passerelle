@@ -3968,7 +3968,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     private NamedObj _createInstance(Class newClass, Object[] arguments)
             throws Exception {
 
-    	if(TypedCompositeActor.class.equals(newClass) && arguments.length==1) {
+    	if((TypedCompositeActor.class.equals(newClass) || Flow.class.equals(newClass)) && arguments.length==1) {
     		if(arguments[0]==_workspace) {
 	    		// is the toplevel, and we want it to be a Flow
 	    		return new Flow(_workspace, _base);
