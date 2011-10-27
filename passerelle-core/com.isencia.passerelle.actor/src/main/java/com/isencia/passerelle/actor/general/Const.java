@@ -35,6 +35,11 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 public class Const extends TriggeredSource {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6555818249656144384L;
+	
   private static Logger logger = LoggerFactory.getLogger(Const.class);
   private boolean messageSent = false;
 

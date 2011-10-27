@@ -25,6 +25,11 @@ import ptolemy.kernel.util.NameDuplicationException;
 public class ErrorConsole extends Console {
 
   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6530337774933942033L;
+
+	/**
    * @param container
    * @param name
    * @throws ptolemy.kernel.util.NameDuplicationException

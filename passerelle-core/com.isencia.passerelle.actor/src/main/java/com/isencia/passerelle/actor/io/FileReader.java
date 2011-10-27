@@ -50,6 +50,11 @@ import com.isencia.util.StringConvertor;
  */
 public class FileReader extends TriggeredChannelSource {
 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
   private static class InputType {
 
     public final static InputType TEXT_LINES = new InputType("text-lines", "text/plain", new TextLineMessageExtractor(), new TextToMessageConverter(null)),

@@ -257,7 +257,7 @@ public class TableReader extends Actor {
         }
         ManagedMessage message = MessageFactory.getInstance().createMessageInSequence(sequenceID, new Long(i++), nextMessage != null);
         message.setBodyContent(channelMsg, "Map");
-        response.addOutputMessage(0, output, message);
+        response.addOutputMessage(output, message);
         channelMsg = nextMessage;
       }
     } catch (ChannelException e) {

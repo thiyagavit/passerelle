@@ -36,6 +36,11 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * @version 1.0
  */
 public class TracerConsole extends Sink {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5950430024278609950L;
+
   private static Logger logger = LoggerFactory.getLogger(TracerConsole.class);
 
   public Parameter chopLengthParam;
