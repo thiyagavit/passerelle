@@ -24,6 +24,33 @@
             name="Counter">
       </actor>
       <actor
+            class="com.isencia.passerelle.actor.general.DevNullActor"
+            group="com.isencia.passerelle.actor.actorgroup.general"
+            id="com.isencia.passerelle.actor.devnullactor"
+            name="DevNull">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.error.ErrorCatcher"
+            group="com.isencia.passerelle.actor.actorgroup.error"
+            icon="icons/error.gif"
+            id="com.isencia.passerelle.actor.errorcatcher"
+            name="ErrorCatcher">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.error.ErrorObserver"
+            group="com.isencia.passerelle.actor.actorgroup.error"
+            icon="icons/error.gif"
+            id="com.isencia.passerelle.actor.errorobserver"
+            name="ErrorObserver">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.error.ErrorGenerator"
+            group="com.isencia.passerelle.actor.actorgroup.error"
+            icon="icons/error.gif"
+            id="com.isencia.passerelle.actor.errorgenerator"
+            name="ErrorGenerator">
+      </actor>
+      <actor
             class="com.isencia.passerelle.actor.filter.HeaderFilter"
             group="com.isencia.passerelle.actor.actorgroup.filter"
             color="0,50,50"
@@ -146,6 +173,11 @@
       		parent="com.isencia.passerelle.actor.actorgroup.passerelle"
             id="com.isencia.passerelle.actor.actorgroup.filter"
             name="Filters">
+      </actorgroup>
+      <actorgroup
+      		parent="com.isencia.passerelle.actor.actorgroup.passerelle"
+            id="com.isencia.passerelle.actor.actorgroup.error"
+            name="Error">
       </actorgroup>
    </extension>
 	<extension
