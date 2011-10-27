@@ -24,21 +24,14 @@ import com.isencia.passerelle.core.Port;
  */
 public class MessageOutputContext {
 
-	private int index;
 	private Port port;
 	private ManagedMessage message;
 	
-	public MessageOutputContext(int index, Port port, ManagedMessage message) {
-		super();
-		this.index = index;
+	public MessageOutputContext(Port port, ManagedMessage message) {
 		this.port = port;
 		this.message = message;
 	}
 	
-	public int getIndex() {
-		return index;
-	}
-
 	public Port getPort() {
 		return port;
 	}

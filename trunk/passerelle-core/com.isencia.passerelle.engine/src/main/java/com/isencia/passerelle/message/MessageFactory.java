@@ -165,6 +165,12 @@ public class MessageFactory {
 		return newMsg;
 	}
 	
+	/**
+	 * Create copied message, with copied headers and body without any change in values.
+	 * @param msg
+	 * @return
+	 * @throws MessageException
+	 */
 	public synchronized ManagedMessage copyMessage(ManagedMessage msg) throws MessageException {
 		if(msg !=null && msg instanceof MessageContainer) {
 			MessageContainer newMsg = ((MessageContainer)msg).copy();
@@ -173,6 +179,25 @@ public class MessageFactory {
 			throw new IllegalArgumentException();
 		}
 	}
+
+	/**
+	 * Create a new message, with new message ID but with copied values for other headers and for body.
+	 * Indicate that this new message was caused by the original msg.
+	 * 
+	 * @param msg
+	 * @return
+	 * @throws MessageException
+	 */
+  public synchronized ManagedMessage createCausedCopyMessage(ManagedMessage msg) throws MessageException {
+    if(msg !=null && msg instanceof MessageContainer) {
+      MessageContainer newMsg = ((MessageContainer)msg).copy();
+      setStdHeaders(newMsg);
+      newMsg.addCauseID(msg.getID());
+      return newMsg;
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
 
 	public synchronized ManagedMessage createMessageCopyInSequence(ManagedMessage msg, Long seqID, Long seqPos, boolean isSeqEnd) throws MessageException {
 		MessageContainer newMsg = (MessageContainer) copyMessage(msg);
