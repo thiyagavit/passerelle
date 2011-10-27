@@ -47,16 +47,16 @@ public class ProcessResponse {
 		this.request=request;
 	}
 
-	public void addOutputMessage(int outputIndex, Port outputPort, ManagedMessage outputMsg) {
-		outputs.add(new MessageOutputContext(outputIndex, outputPort, outputMsg));
+	public void addOutputMessage(Port outputPort, ManagedMessage outputMsg) {
+		outputs.add(new MessageOutputContext(outputPort, outputMsg));
 	}
 
 	public void addOutputContext(MessageOutputContext msgCtxt) {
 		outputs.add(msgCtxt);
 	}
 
-	public void addOutputMessageInSequence(int outputIndex, Port outputPort, ManagedMessage outputMsg) {
-		outputsInSequence.add(new MessageOutputContext(outputIndex, outputPort, outputMsg));
+	public void addOutputMessageInSequence(Port outputPort, ManagedMessage outputMsg) {
+		outputsInSequence.add(new MessageOutputContext(outputPort, outputMsg));
 	}
 
 	public void addOutputContextInSequence(MessageOutputContext msgCtxt) {

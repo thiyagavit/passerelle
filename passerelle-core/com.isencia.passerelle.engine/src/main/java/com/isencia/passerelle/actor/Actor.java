@@ -1245,14 +1245,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       port.broadcast(token);
         if(logger.isDebugEnabled())
           logger.debug(getInfo()+" sendOutputMsg() - Message "+message.getID()+
-              " sent on port "+port.getName());
+              " sent on port "+port.getDisplayName());
         
         String auditDetail = null;
         try {
           auditDetail = getAuditTrailMessage(message, port);
         } catch (Exception e) {
           // simple hack to log a default msg anyway
-          auditDetail = "sent message on port "+port.getFullName();
+          auditDetail = getInfo()+" sent message "+message.getID()+" on port "+port.getDisplayName();
         }
       if(auditDetail!=null && getAuditLogger().isInfoEnabled()) {
         getAuditLogger().info(auditDetail);
@@ -1272,7 +1272,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	 * @return
 	 */
 	protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception{
-		return getInfo()+" sent message on port "+port.getFullName();
+		return getInfo()+" sent message "+message.getID()+" on port "+port.getDisplayName();
 	}
 	
 	/**

@@ -143,6 +143,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 		super(container, name);
 
 		bufferTimeParameter = new Parameter(this,"Buffer time (ms)", new IntToken(0));
+		registerExpertParameter(bufferTimeParameter);
 	}
 
 	@Override
