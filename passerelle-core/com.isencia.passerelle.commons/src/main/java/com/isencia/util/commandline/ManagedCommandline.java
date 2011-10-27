@@ -12,59 +12,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-/*
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Ant", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Group.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
 package com.isencia.util.commandline;
 
 import java.io.BufferedReader;
@@ -73,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,12 +41,13 @@ import org.slf4j.LoggerFactory;
  */
 public class ManagedCommandline extends EnvCommandline {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ManagedCommandline.class);
+  private static final Logger logger = LoggerFactory.getLogger(ManagedCommandline.class);
 
   private Process currentProcess;
 
   private StreamGobbler stdOutGobbler;
   private StreamGobbler stdErrGobbler;
+  private boolean streamLogsToLogging;
 
   /**
    * Constructor which takes a command line string and attempts to parse it into
@@ -210,7 +159,7 @@ public class ManagedCommandline extends EnvCommandline {
     try {
       currentProcess.waitFor();
     } catch (InterruptedException e) {
-      LOG.error("Thread was interrupted while executing command \"" + this.toString() + "\".", e);
+      logger.error("Thread was interrupted while executing command \"" + this.toString() + "\".", e);
     }
 
     // make sure last outputs are also captured, even if no new-line was at the
@@ -263,7 +212,7 @@ public class ManagedCommandline extends EnvCommandline {
         try {
           read();
         } catch (IOException e) {
-          LOG.error("Error reading from stream by Gobbler " + getName(), e);
+          logger.error("Error reading from stream by Gobbler " + getName(), e);
         }
       }
     }
@@ -273,8 +222,12 @@ public class ManagedCommandline extends EnvCommandline {
       BufferedReader lineByLineReader = new BufferedReader(inputStreamReader);
       String line = null;
       while ((line = lineByLineReader.readLine()) != null) {
-        streamDataAsStringBuilder.append(line + LINE_SEPARATOR);
-        streamDataAsList.add(line);
+        if (streamLogsToLogging) {
+          logger.debug(getName() + "> " + line);
+        } else {
+          streamDataAsStringBuilder.append(line + LINE_SEPARATOR);
+          streamDataAsList.add(line);
+        }
       }
     }
 
@@ -291,14 +244,18 @@ public class ManagedCommandline extends EnvCommandline {
       // if there is no data present, but the string can still
       // read.
       while (((length = inputStreamReader.read(chars, 0, 80)) != -1)) {
-        if (LOG.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
           // Note that ready might be false here since
           // we already read the data.
-          LOG.debug("_read(): Gobbler '" + getName() + "' Ready: " + inputStreamReader.ready() + " Value: '" + String.valueOf(chars, 0, length) + "'");
+          logger.debug("_read(): Gobbler '" + getName() + "' Ready: " + inputStreamReader.ready() + " Value: '" + String.valueOf(chars, 0, length) + "'");
         }
 
-        streamDataAsStringBuilder.append(chars, 0, length);
-        streamDataAsList.add(new String(chars));
+        if (streamLogsToLogging) {
+          logger.debug(getName() + "> " + new String(chars));
+        } else {
+          streamDataAsStringBuilder.append(chars, 0, length);
+          streamDataAsList.add(new String(chars));
+        }
       }
     }
 
@@ -314,6 +271,20 @@ public class ManagedCommandline extends EnvCommandline {
     // StringBuffer to maintain data from configured input stream.
     private StringBuilder streamDataAsStringBuilder;
     private List<String> streamDataAsList;
+  }
+
+  public boolean isStreamLogsToLogging() {
+    return streamLogsToLogging;
+  }
+
+  public void setStreamLogsToLogging(boolean streamLogsToLogging) {
+    this.streamLogsToLogging = streamLogsToLogging;
+  }
+
+  public void setEnv(Map<String, String> env) {
+    for (String key : env.keySet()) {
+      setVariable(key, env.get(key));
+    }
   }
 
 }
