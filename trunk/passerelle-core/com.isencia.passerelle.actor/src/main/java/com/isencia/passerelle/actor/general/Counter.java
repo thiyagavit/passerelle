@@ -42,6 +42,11 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 public class Counter extends Transformer {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3712075950718358876L;
+
   private static Logger logger = LoggerFactory.getLogger(Counter.class);
 
   public Parameter startValueParam;

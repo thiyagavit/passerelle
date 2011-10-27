@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
@@ -36,11 +37,16 @@ import com.isencia.passerelle.message.MessageException;
  * @version 1.0
  */
 public class Console extends Sink {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
   private static Logger logger = LoggerFactory.getLogger(Console.class);
 
   public Parameter chopLengthParam;
   private int chopLength = 80;
-
+  
   /**
    * @param container The container.
    * @param name The name of this actor.

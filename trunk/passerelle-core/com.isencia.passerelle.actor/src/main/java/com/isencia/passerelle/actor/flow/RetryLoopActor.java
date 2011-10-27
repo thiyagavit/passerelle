@@ -114,9 +114,9 @@ public class RetryLoopActor extends Actor {
       int maxCounterValue = ((IntToken) retryCountParameter.getToken()).intValue();
 
       if (counter < maxCounterValue) {
-        response.addOutputMessage(0, retryOutput, msg);
+        response.addOutputMessage(retryOutput, msg);
       } else {
-        response.addOutputMessage(0, noRetryOutput, msg);
+        response.addOutputMessage(noRetryOutput, msg);
       }
     } catch (IllegalActionException e) {
       throw new ProcessingException("Error getting max counter value", msg, e);
