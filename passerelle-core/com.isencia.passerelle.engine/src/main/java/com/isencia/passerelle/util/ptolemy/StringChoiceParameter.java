@@ -29,10 +29,12 @@ public class StringChoiceParameter extends StringParameter {
 								final int          type) throws IllegalActionException, NameDuplicationException {
 		this(container, name, new IAvailableChoices() {
 			
+			@Override
 			public String[] getChoices() {
 				return choices.toArray(new String[choices.size()]);
 			}
 
+			@Override
 			public Map<String,String> getVisibleChoices() {
 				return null;
 			}

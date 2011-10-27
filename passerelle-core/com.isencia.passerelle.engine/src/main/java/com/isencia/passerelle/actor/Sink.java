@@ -45,7 +45,7 @@ public abstract class Sink extends Actor {
 	/**
 	 * Holds the last received message
 	 */
-	private ManagedMessage message = null;
+	protected ManagedMessage message = null;
 	
 	public Port input = null;
 	private PortHandler inputHandler = null;
