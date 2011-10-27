@@ -213,7 +213,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
      *  @param workspace The workspace into which to place entities.
      */
     public MoMLParser(Workspace workspace) {
-        super();
+        super(workspace);
 
         if (workspace == null) {
             // NOTE: Workspace has no name, to ensure that full names
@@ -1512,6 +1512,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
      *  @see #purgeModelRecord(URL)
      */
     public static void purgeAllModelRecords() {
+    	if (_imports!=null) _imports.clear();
         _imports = null;
     }
 
@@ -3968,7 +3969,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     private NamedObj _createInstance(Class newClass, Object[] arguments)
             throws Exception {
 
-    	if((TypedCompositeActor.class.equals(newClass) || Flow.class.equals(newClass)) && arguments.length==1) {
+    	if(TypedCompositeActor.class.isAssignableFrom(newClass) && arguments.length==1) {
     		if(arguments[0]==_workspace) {
 	    		// is the toplevel, and we want it to be a Flow
 	    		return new Flow(_workspace, _base);
@@ -3995,8 +3996,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
             }
 
             if (match) {
-                NamedObj newEntity = (NamedObj) constructor
-                        .newInstance(arguments);
+                NamedObj newEntity = (NamedObj) constructor.newInstance(arguments);
 
                 // Mark the contents of the new entity as being derived objects.
                 _markContentsDerived(newEntity, 0);
@@ -4947,7 +4947,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                                 + "the class definition.");
             }
 
-            ((IOPort) _current).setInput(newValue);
+            currentIOPort.setInput(newValue);
 
             // Propagate.
             Iterator derivedObjects = _current.getDerivedList().iterator();

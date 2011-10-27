@@ -31,6 +31,11 @@ import ptolemy.kernel.util.NamedObj;
 public class PasserelleEditorFactory extends EditorFactory {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1552894915611896868L;
+
+	/**
      * @param container
      * @param name
      * @throws IllegalActionException

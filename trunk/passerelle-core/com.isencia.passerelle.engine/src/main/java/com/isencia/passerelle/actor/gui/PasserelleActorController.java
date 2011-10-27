@@ -170,7 +170,7 @@ public class PasserelleActorController extends IconController {
      * 
      * We only allow this uncontrolled port configuration for plain Ptolemy actors.
      * 
-     * @author erwin.de.ley@isencia.be
+     * @author erwin
      */
     private static class PortDialogFactory implements MenuItemFactory {
 

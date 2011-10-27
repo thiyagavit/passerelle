@@ -34,16 +34,23 @@ import com.isencia.passerelle.message.MessageHelper;
  */
 public abstract class Transformer extends Actor {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -956542172812952106L;
+
 	private final static Logger logger = LoggerFactory.getLogger(Transformer.class);
 	
 	/**
 	 * Holds the last received message
 	 */
-	private ManagedMessage message = null;
+	protected ManagedMessage message = null;
 	
 	/** The input port.  This base class imposes no type constraints except
 	 *  that the type of the input cannot be greater than the type of the
 	 *  output.
+	 *  
+	 *  NOTE Ports must be public for composites to work.
 	 */
 	public Port input;
 	private PortHandler inputHandler = null;
