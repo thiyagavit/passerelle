@@ -416,7 +416,7 @@ public class ActorAttributesView extends ViewPart implements
 				value);
 		ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
 		ed.refreshActions();
-
+		ed.getEditor().refresh();
 	}
 
 }
