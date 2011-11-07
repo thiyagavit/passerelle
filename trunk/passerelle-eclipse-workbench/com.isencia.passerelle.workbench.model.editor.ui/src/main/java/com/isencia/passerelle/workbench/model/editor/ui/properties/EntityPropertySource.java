@@ -191,6 +191,7 @@ public class EntityPropertySource implements IPropertySource {
 					}
 					attribute.setExpression(v);
 				}
+				figure.repaint();
 
 			}
 
