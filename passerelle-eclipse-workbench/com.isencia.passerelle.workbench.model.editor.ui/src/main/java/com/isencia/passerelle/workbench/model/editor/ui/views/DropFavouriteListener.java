@@ -53,7 +53,7 @@ public class DropFavouriteListener extends DropTargetAdapter {
 		// TODO Auto-generated method stub
 		CreationFactory fact = getFactory(TemplateTransfer.getInstance()
 				.getTemplate());
-		if (fact != null) {
+		if (fact != null && fact instanceof TreeViewCreationFactory) {
 			config = fact;
 		}
 	}
