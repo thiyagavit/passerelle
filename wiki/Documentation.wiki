@@ -1,0 +1,13 @@
+#summary Passerelle documentation
+#labels Phase-Implementation,Phase-Deploy
+
+= Developer guides =
+
+PasserelleActorDevelopmentGuide : This guide presents an overview of the technological basis for the Passerelle actor model.
+Then it describes the actor lifecycle, actor development APIs and types of actors.For each major actor type, a complete example is developed.
+Finally, some advanced topics are discussed.
+
+
+= User guides =
+
+= Links & References =
