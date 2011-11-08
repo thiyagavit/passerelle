@@ -65,6 +65,10 @@ public class FlowHandle {
 		this.authorativeResourceLocation = authorativeResourceLocation;
 	}
 	
+	void setName(String name) {
+		this.name = name;
+	}
+
 	/**
 	 * 
 	 * @param id
