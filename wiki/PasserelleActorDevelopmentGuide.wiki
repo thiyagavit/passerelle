@@ -26,7 +26,7 @@ Basic principles of collections and generics should be known. Some experience wi
 === Document conventions ===
 The Passerelle engine is to a large extent a wrapper around the underlying Ptolemy II framework (see below). 
 Many Passerelle concepts are directly inherited from Ptolemy. 
-But wherever something is discussed in this guide that is a Passerelle-specific extension or adaptation, it will be indicated by \[Passerelle specific\].
+But wherever something is discussed in this guide that is a Passerelle-specific extension or adaptation, it will be indicated by _Passerelle specific_.
 
 ----
 
@@ -35,17 +35,17 @@ But wherever something is discussed in this guide that is a Passerelle-specific 
 It should be possible to develop fully working Passerelle actors, without bothering about the underlying technologies and vision. But it would be a pitty to not be aware of the interesting stuff mentioned below. Especially as the persons we should thank for creating these great ideas and technologies, have also made the effort to create some great documentation to support these! What's more, even ignoring any directly applicable use, the ideas behind these technologies (and the concrete execution of them) will enrich anyone's thinking on software-related problems and solutions.
 
 So here we go :
-# *Patterns of software architecture & design*, as documented in some reference works like :
-** "Pattern-oriented software architecture" aka POSA, Volume 1, by F. Buschmann et al.
-** "Design Patterns" aka GOF, by E. Gamma et al.
-** "Enterprise Integration Patterns" aka EIP, by G. Hohpe et al.
-# *OSGi, the advanced and proven framework for modular Java solutions*, as documented in e.g. :
-** "OSGI Service Platform - Core Specification", which can be obtained from "http://www.osgi.org"
-** "OSGi and Equinox", by J. McAffer et al.
-** Many authors writing blogs with OSGi introductions, some of them referenced from "http://www.osgi.org/Links/BasicEducation"
-# *Ptolemy II*, "an open-source software framework supporting experimentation with actor-oriented design", created at U.C. Berkeley
+  # *Patterns of software architecture & design*, as documented in some reference works like :
+    * "Pattern-oriented software architecture" aka POSA, Volume 1, by F. Buschmann et al.
+    * "Design Patterns" aka GOF, by E. Gamma et al.
+    * "Enterprise Integration Patterns" aka EIP, by G. Hohpe et al.
+  # *OSGi, the advanced and proven framework for modular Java solutions*, as documented in e.g. :
+    * "OSGI Service Platform - Core Specification", which can be obtained from "http://www.osgi.org"
+    * "OSGi and Equinox", by J. McAffer et al.
+    * Many authors writing blogs with OSGi introductions, some of them referenced from "http://www.osgi.org/Links/BasicEducation"
+  # *Ptolemy II*, "an open-source software framework supporting experimentation with actor-oriented design", created at U.C. Berkeley
 by the "CHESS" research group of a.o. Professor E.A. Lee. Ptolemy comes with a couple of extensive guides, of which the following one is the perfect introduction :
-** Volume 1 : Introduction to Ptolemy II, by Chr. Brooks et al.
+    * Volume 1 : Introduction to Ptolemy II, by Chr. Brooks et al.
 
 ----
 
@@ -58,21 +58,20 @@ TBD
 === Pipe-and-filter / Asynchronous processing / messages&events ===
 
 Passerelle is a direct implementation of an architectural pattern called "Pipes and Filters" (see POSA - Volume 1, pg 53) :
-{quote}
-"Provides a structure for systems that process a stream of data. Each processing step is encapsulated in a filter component. 
-Data is passed through pipes between adjacent filters. Recombining filters allows you to build families of related systems."
-{quote}
+ "Provides a structure for systems that process a stream of data. Each  processing step is encapsulated in a filter component. 
+ Data is passed through pipes between adjacent filters. Recombining filters allows you to build families of related systems."
+
 
 The "Pipes and Filters" architecture fits well with dataflow systems where streams of data must be processed and/or transformed through a sequence of several processing stages.
 When each stage or processing step gets a single well-defined responsibility, these can be implemented with low coupling and they become easy to reuse and to recombine in different scenarios or end-to-end process definitions. Filters also typically implement a common API, which ensures uniform development, and easy recombination.
 Filters are easy to test since they have a clearly defined responsibility, they must be completely decoupled from each other and they have a uniform API.
 So it is easy to also create uniform and reusable test tools.
 
-{note:title=Filter????}
-The term "filter" is used in two different meanings. The "filter" in the architectural pattern is a generic processing component,
+*Filter????*
+ The term "filter" is used in two different meanings. The "filter" in the architectural pattern is a generic processing component,
 without any a-priori assumption about its concrete functionality. In many other contexts (also in the library of Passerelle actors),
 "filters" denote components with a "filtering function", i.e. excluding subsets of data or messages from further processing.
-{note}
+
 
 Furthermore, such an architecture fits well with tools to define and configure executable processes in a graphical way.
 When this is done, we often speak of "graphical models", typically representing the underlying solution with directed graphs.
@@ -80,10 +79,10 @@ When these models can be used as direct input to execute the corresponding proce
 
 This in turn enables a clear split in roles for the delivery of software solutions, their operational usage and maintenance.
 For example:
-* Functional experts/analysts can assemble solutions by picking, configuring and interconnecting filters from a library.
-* Application administrators can execute and monitor the processes, where the graphical view offers them visibility on what the processes actually do.
-* Application developers are responsible for implementing filters with clearly defined responsibilities.
-* Testers are mainly occupied with defining test data inputs and expected resulting outputs, and can take advantage of uniform test tools.
+  * Functional experts/analysts can assemble solutions by picking, configuring and interconnecting filters from a library.
+  * Application administrators can execute and monitor the processes, where the graphical view offers them visibility on what the processes actually do.
+  * Application developers are responsible for implementing filters with clearly defined responsibilities.
+  * Testers are mainly occupied with defining test data inputs and expected resulting outputs, and can take advantage of uniform test tools.
 
 In Passerelle, the models are executable. The filters are implemented as actors. Each actor is in control of its own operations. 
 I.e. it decides when to read input data, how to process it and when to send output. This fits with the "Scenario IV" of POSA.
@@ -111,7 +110,7 @@ In Ptolemy and Passerelle, hierarchic models are a native concept and can be ful
 The sub-processes (or "composite" actors) are represented and treated to a large extent in the same way as "simple" atomic actors, both internally and graphically.
 
 === Passerelle and OSGi === 
-\[Passerelle specific\]
+_Passerelle specific_
 
 Since Passerelle v4.x, the complete set of Passerelle tools has been converted to embrace OSGi as the core application framework.
 Both the Passerelle tool itself, and extensions like new actor libraries etc., are now developed as a collection of OSGi bundles.
@@ -127,13 +126,13 @@ But it also means that some core concepts of OSGi must be known to successfully 
 Passerelle offers several ways to launch a process model, e.g. using a shell script, from inside a graphical editor in a desktop application or via the web-based Passerelle Manager.
 
 In each case, the actual execution process is the same, and goes through the following steps :
-# Read the model from its definition, maintained in an XML file (typically with extension '.moml')
-# Parse the file and construct all actors in it (including those contained in referred sub-models)
-# Build all interconnections
-# Trigger the actual execution via the so-called model _Director_. From here on, the Director controls the following steps.
-# Start all required threads
-# Initialize all actors
-# Start the actor iterations
+  # Read the model from its definition, maintained in an XML file (typically with extension '.moml')
+  # Parse the file and construct all actors in it (including those contained in referred sub-models)
+  # Build all interconnections
+  # Trigger the actual execution via the so-called model _Director_. From here on, the Director controls the following steps.
+  # Start all required threads
+  # Initialize all actors
+  # Start the actor iterations
 
 During their iterations, the actors wait until one or more messages (depending on the concrete needs for each type of actor) arrive on their input ports. When an actor has received sufficient data, it can process it and send out results, typically via one or more output ports. Then it will perform a next iteration, waiting again for the next messages to arrive etc.
 
@@ -167,30 +166,30 @@ Actors normally interact via sending messages to each other via an asynchronous 
 An actor can be configured by defining one or more actor attributes. Passerelle inherits a rich set of configuration features from Ptolemy, including dynamic updates, an expression language etc.
 
 So an actor can be considered as a composition of 3 main types of elements :
-* one core actor object, representing the unit of functionality
-* a set of input and output ports that provide the communication paths to/from the actor functionality
-* a set of attributes that provide configuration elements for the actor
+  * one core actor object, representing the unit of functionality
+  * a set of input and output ports that provide the communication paths to/from the actor functionality
+  * a set of attributes that provide configuration elements for the actor
 
 Inside a Passerelle model, each of these core elements is identified by a unique name. Furthermore, the naming reflects the hierarchic composition of a model.
 For example, in a model named "HelloWorld", with a source actor named "Constant", and connected to a sink actor, named "Console", there are a.o. following named elements :
-* HelloWorld.Constant : the source actor
-* HelloWorld.Constant.value : the parameter of the source actor where we can configure the source data. E.g. a StringParameter with value "hello world".
-* HelloWorld.Constant.output : the output port of the source actor
-* HelloWorld.Console : the sink actor
-* HelloWorld.Console.input : the input port of the sink actor
+  * HelloWorld.Constant : the source actor
+  * HelloWorld.Constant.value : the parameter of the source actor where we can configure the source data. E.g. a StringParameter with value "hello world".
+  * HelloWorld.Constant.output : the output port of the source actor
+  * HelloWorld.Console : the sink actor
+  * HelloWorld.Console.input : the input port of the sink actor
 
 The "named" nature of model elements is a core aspect of Ptolemy and thus of Passerelle. In fact "ptolemy.kernel.util.NamedObj" is the base class of almost all Ptolemy/Passerelle classes. A second aspect, inherited from Ptolemy, is the native support fot hierarchical structures. Passerelle elements can be contained in parent elements and can act as containers themselves as well. For example, actors can be contained in composite actors which can be contained in further composite actors etc. Actors contain ports and attributes. Ports are contained in their respective actors, but can contain attributes themselves. Etc.
 
 Among these types of hierarchical model elements, actors are special as they can perform work during a model execution. To achieve this, actors must execute a predefined lifecycle, expressed via an API defined by "ptolemy.actor.Executable". As a consequence, an actor has following main phases in its lifecycle :
-# Construction : this is where the actor is constructed as a Java object, after which it is linked into the containing model.\\
+  # Construction : this is where the actor is constructed as a Java object, after which it is linked into the containing model.\\
   After construction the actor is in an "idle" state, unable to perform any work yet.\\
-# Ready but idle : When a model has been parsed, all actors are constructed and linked as defined. I.e. the model is "live" in memory.\\
+  # Ready but idle : When a model has been parsed, all actors are constructed and linked as defined. I.e. the model is "live" in memory.\\
   But until the model is started for execution, nothing is happening yet in any actor.
-# Execution initialization : at the start of a model execution, all actors get the opportunity to perform some initialization logic, \\
+  # Execution initialization : at the start of a model execution, all actors get the opportunity to perform some initialization logic, \\
   via an invocation of their _initialize()_ method. This is where required resources should be configured and/or acquired etc.
-# Firing iterations : this is the main "active" time of an actor, where it repeatedly iterates between waiting for inputs, performing its processing logic and sending results on its output(s). Each iteration consists of three parts : _prefire(), fire(), postfire()_. 
-# Execution wrapping up : By returning a boolean _false_ from its postfire(), an actor indicates that it has finished its work as part of the executing model. The execution engine will then stop iterating that actor, and will invoke its _wrapup()_, where any post-execution cleanup can be done, resources can be released etc.
-# Ready but idle again : an actor should be capable of being "re-executed", starting again from a clean initial state. A parsed model may remain present in the application's memory space, and it may be used for several consecutive executions. So an actor must return to a clean state before a next execution, by a combination of logic contained in _wrapup()_ and _initialize()_.
+  # Firing iterations : this is the main "active" time of an actor, where it repeatedly iterates between waiting for inputs, performing its processing logic and sending results on its output(s). Each iteration consists of three parts : _prefire(), fire(), postfire()_. 
+  # Execution wrapping up : By returning a boolean _false_ from its postfire(), an actor indicates that it has finished its work as part of the executing model. The execution engine will then stop iterating that actor, and will invoke its _wrapup()_, where any post-execution cleanup can be done, resources can be released etc.
+  # Ready but idle again : an actor should be capable of being "re-executed", starting again from a clean initial state. A parsed model may remain present in the application's memory space, and it may be used for several consecutive executions. So an actor must return to a clean state before a next execution, by a combination of logic contained in _wrapup()_ and _initialize()_.
 
 === Fast iterations versus slow/blocking iterations ; role of stopFire() ===
 
@@ -207,8 +206,7 @@ When models containing such slow/blocking actors must be stopped or suspended, t
 
 As a first example of an actor implementation, we will present a simple transformer of text messages.
 The actor will have one input port, one output port and a parameter to define the transformed text.
-
-{code:java}
+{{{
 /* Copyright 2011 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -295,7 +293,7 @@ public class HelloPasserelle extends Actor {
     }
   }
 }
-{code}
+}}}
 
 Such an actor can be used in a small variation on the classic "Hello World", adapted to Passerelle :
 
@@ -317,8 +315,8 @@ First check the libraries of existing ones.
 Actors communicate across relations/channels between their ports, by sending messages. In Ptolemy each message is wrapped in an instance of a (subtype of) ptolemy.data.Token. Passerelle standardizes on a Token containing an instance of com.isencia.passerelle.message.ManagedMessage.
 
 A ManagedMessage contains :
-- system headers : managed by Passerelle. They serve to add meta-data to a message like a message ID, grouping keys, correlation IDs etc.
-- a body consisting of body headers and content : for usage by the actors
+  * system headers : managed by Passerelle. They serve to add meta-data to a message like a message ID, grouping keys, correlation IDs etc.
+  * a body consisting of body headers and content : for usage by the actors
 
 Headers are simple String-based key/value pairs. 
 Actors can use the body headers to tag messages with meta-data that may be used later in sequences for easy filtering, routing etc.
@@ -327,8 +325,7 @@ The message body is implemented based on javax.mail.internet.MimeBodyPart, with 
 In general, the body is used to store and transport Java objects between actors. 
 
 For simple scenarios, these could just be Strings. This has the advantage that it is easy to build a large collection of reusable actors, performing all kinds of operations on Strings. For such cases, the message content can be set with ManagedMessage.setBodyContentPlainText(). This was the case in the HelloPasserelle example above. 
-
-{code:java}
+{{{
 ...
       // Create a new outgoing msg, "caused by" the received input msg
       ManagedMessage outputMsg = createMessageFromCauses(receivedMsg);
@@ -336,11 +333,11 @@ For simple scenarios, these could just be Strings. This has the advantage that i
       // Set the outgoing msg to be sent on the output port
       response.addOutputMessage(output, outputMsg)
 ...
-{code}
+}}}
 
 An actor receiving such a message can also easily obtain the String content as follows (also from HelloPasserelle) :
 
-{code:java}
+{{{
 ...
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
@@ -355,12 +352,12 @@ An actor receiving such a message can also easily obtain the String content as f
     }
   }
 ...
-{code}
+}}}
 
 
 But in most real-life scenarios, ManagedMessages contain instances of a custom domain model. For such scenarios, also specific actor libraries must then be developed that are aware of the domain model.
 
-{code:java}
+{{{
 ...
       Foo someObject = ....;
       ...
@@ -369,11 +366,11 @@ But in most real-life scenarios, ManagedMessages contain instances of a custom d
       outputMsg.setBodyContent(someObject,  ManagedMessage.objectContentType);
       ...
 ...
-{code}
+}}}
 
 An actor receiving such a message can obtain the contents as follows, casting to the expected object class :
 
-{code:java}
+{{{
 ...
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
@@ -388,7 +385,7 @@ An actor receiving such a message can obtain the contents as follows, casting to
     }
   }
 ...
-{code}
+}}}
 
 In the examples above, the method Actor.createMessageFromCauses(ManagedMessage... msgs) creates a new message instance, with a reference to the IDs of the msgs passed as arguments. These are maintained as "causes IDs". It is good practice to indicate all related input messages as "causes" for outgoing messages, to support (future) causality analyses and other advanced analysis services on Passerelle messages.
 
@@ -425,38 +422,38 @@ But in general, the choice on how to aggregate simple functionalities into bigge
 
 ==== Delegate implementation of the logic ====
 For all cases except the really trivial ones, an actor should be considered as just an integration component between the "control" layer and the "service" layer. 
-* The control layer is provided by the Passerelle engine and the collection of active models.
-* The service layer is where the functionality is really implemented, without any dependency on Ptolemy/Passerelle types etc.
+  * The control layer is provided by the Passerelle engine and the collection of active models.
+  * The service layer is where the functionality is really implemented, without any dependency on Ptolemy/Passerelle types etc.
 
 The responsibility of an actor is then limited to :
-* collecting sufficient info from its inputs and passing it into the right service
-* collecting results from the service and sending them out on the right output ports
-* collecting service errors and reporting them via the dedicated approach foreseen in Passerelle \[Passerelle specific\]
+  * collecting sufficient info from its inputs and passing it into the right service
+  * collecting results from the service and sending them out on the right output ports
+  * collecting service errors and reporting them via the dedicated approach foreseen in Passerelle _Passerelle specific_
 
 As a consequence the actor development becomes straightforward, once the service layer is defined.
 
 ==== Actor port types ====
-\[Passerelle specific\]
+_Passerelle specific_
 
 Passerelle offers specialized types of ports in two different ways :
-* Data ports versus Control ports and Error ports
-** Data ports are the "plain" kind of ports that can be defined by actor developers as input and output ports.
-** Control ports are created automatically on each Passerelle actor :
-*** requestFinish input : can be used to force an actor to finish its iterations and to wrap up, by sending an arbitrary message on this port.
-*** hasFired output : generates a simple trigger message with arbitrary content, each time the actor has performed one firing iteration
-*** hasFinished output : generates a simple trigger mesasge with arbitrary content, when the actor has finished its wrapup
-** Error output port is created automatically on each Passerelle actor.
-*** Errors in an actor's processing are sent via this port as PasserelleException objects with full context information. By connecting this port to dedicated error handling errors, models can be enriched with integrated error handling.
-* Blocking versus non-blocking input ports 
-** Blocking input ports should be used to define input channels for mandatory messages. Each actor firing iteration requires one message from each blocking input port. These ports correspond to PortMode.PULL, which is the default.
-** Non-blocking ports should be used for optional messages. Actor firing iterations do not block/wait for incoming messages on such ports.\\
+  * Data ports versus Control ports and Error ports
+    * Data ports are the "plain" kind of ports that can be defined by actor developers as input and output ports.
+    * Control ports are created automatically on each Passerelle actor :
+      * requestFinish input : can be used to force an actor to finish its iterations and to wrap up, by sending an arbitrary message on this port.
+      * hasFired output : generates a simple trigger message with arbitrary content, each time the actor has performed one firing iteration
+      * hasFinished output : generates a simple trigger message with arbitrary content, when the actor has finished its wrapup
+    * Error output port is created automatically on each Passerelle actor.
+      * Errors in an actor's processing are sent via this port as PasserelleException objects with full context information. By connecting this port to dedicated error handling errors, models can be enriched with integrated error handling.
+  * Blocking versus non-blocking input ports 
+    * Blocking input ports should be used to define input channels for mandatory messages. Each actor firing iteration requires one message from each blocking input port. These ports correspond to PortMode.PULL, which is the default.
+    * Non-blocking ports should be used for optional messages. Actor firing iterations do not block/wait for incoming messages on such ports.
 These ports use PortMode.PUSH, corresponding to the fact that messages arriving on non-blocking ports are pushed to a buffer, from where they can be retrieved during a next firing iteration.
 
 Blocking input ports are the default in the Ptolemy "Process Networks" domain, which is the basis of Passerelle's runtime. In fact, blocking ports are the _only_ option available there.
 
 Non-blocking ports are implemented in Passerelle, as an extension on Ptolemy, in two different ways :
-* Legacy approach : a Passerelle actor creates an extra thread per input channel of each non-blocking port. These threads wrap the blocking message retrieval and then push the received messages to an internal buffer. This is implemented via PortHandlers.
-* New approach since Actor v5 API (see below) : Passerelle overrides the default internal design of Ptolemy and implements a direct feed from each channel to the internal buffer, without requiring extra threads.
+  * Legacy approach : a Passerelle actor creates an extra thread per input channel of each non-blocking port. These threads wrap the blocking message retrieval and then push the received messages to an internal buffer. This is implemented via PortHandlers.
+  * New approach since Actor v5 API (see below) : Passerelle overrides the default internal design of Ptolemy and implements a direct feed from each channel to the internal buffer, without requiring extra threads.
 
 ==== Consequences of asynchronous model execution ====
 
@@ -478,14 +475,13 @@ The HelloPasserelle actor above has already illustrated the basic elements of an
 
 ==== API concepts ====
 The actor development is centered around the Actor.process() method, with three parameters :
-* ActorContext : this is currently just a place holder. In the future this will be the access point to obtain state information about the actor.
-* ProcessRequest : contains all received messages since the previous iteration, mapped to the input port on which they were received.
-* ProcessResponse : where the actor should assign outgoing messages to the corresponding output ports.
+  * ActorContext : this is currently just a place holder. In the future this will be the access point to obtain state information about the actor.
+  * ProcessRequest : contains all received messages since the previous iteration, mapped to the input port on which they were received.
+  * ProcessResponse : where the actor should assign outgoing messages to the corresponding output ports.
 
 When an actor needs to perform some specific initialization logic, for example allocating some resource for its processing needs,
 this can be done by overriding Actor.doInitialize(), similarly as described in the previous section. Typically this also requires custom cleanup logic, which can then be implemented in an overridden Actor.doWrapup(). One must take care to not forget the call to super.doInitialize() and super.doWrapup() in such cases!
-
-{code:java}
+{{{
 	@Override
 	protected void doInitialize() throws InitializationException {
 		super.doInitialize();
@@ -506,7 +502,7 @@ this can be done by overriding Actor.doInitialize(), similarly as described in t
 		  super.doWrapUp();
 		}
 	}
-{code}
+}}}
 
 ==== MessageBuffer and the modified threading model ====
 In native Ptolemy, in the domain used for Passerelle, all input ports are blocking. Even worse, each input channel (i.e. each incoming link into an input port) is working in this way. The reason is that each channel has its own blocking queue at the receiver side, that must be read individually by the containing actor.
@@ -528,8 +524,8 @@ This is required by Ptolemy's internally used cloning mechanisms. These are trig
 This is an easy and safe way to construct ports of the right type and that get correctly initialized.
 
 When designing actors, one must decide about what must be made configurable, as opposed to being dynamic (i.e. based on the incoming data) :
-* configurable items : these can be defined/changed before each model execution, for example using a Passerelle GUI. During the model execution they will normally remain stable.
-* dynamic items : these are derived from data in the received messages. So they can change with each actor firing iteration.
+  * configurable items : these can be defined/changed before each model execution, for example using a Passerelle GUI. During the model execution they will normally remain stable.
+  * dynamic items : these are derived from data in the received messages. So they can change with each actor firing iteration.
 
 Parameters should be created to represent the configurable items. Ptolemy supports extreme dynamism, also for run-time changes in parameter values.
 But this dramatically reduces the transparency & understandability of a model execution, so this is strongly dissuaded for Passerelle.
@@ -543,11 +539,11 @@ Stated differently, multiple ports allow to easily differentiate the incoming an
 Typically, an actor will first read the received messages, then perform some processing on the contained information, and finally send results via one or more output ports.
 
 Reading messages can be done in two ways :
-* Get the last obtained message on a specific port.
-* Iterate over all received messages
+  * Get the last obtained message on a specific port.
+  * Iterate over all received messages
 
 The first approach can work both based on the port's name or using the port instance itself as a key :
-{code:java}
+{{{
   public Port input1;
   public Port input2;
   ...
@@ -564,10 +560,10 @@ The first approach can work both based on the port's name or using the port inst
     ManagedMessage receivedMsg2 = request.getMessage("inputPort2");
 	...
   }
-{code}
+}}}
 
 For the second approach, a classic iteration loop can be done as in :
-{code:java}
+{{{
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
 	Iterator<MessageInputContext> inputContexts = request.getAllInputContexts();
@@ -578,24 +574,23 @@ For the second approach, a classic iteration loop can be done as in :
 		...
 	}
   }
-{code}
+}}}
 
 For simple actors, with only PULL/blocking input ports, the first approach is the most straightforward.
-In more dynamic or complex cases (e.g. with PUSH ports), where it count of received messages is not predictable, the second approach is preferable
-as it guarantees that all received messages are retrieved for processing.
+In more dynamic or complex cases (e.g. with PUSH ports), where it count of received messages is not predictable, the second approach is preferable as it guarantees that all received messages are retrieved for processing.
 
 Once the actor has results available, they are normally sent via one or more output ports.
 It is good practice to create new ManagedMessage instances in each actor that is sending outputs,
 and to correlate the outgoing message(s) to the received ones that have "caused" the obtained results.
 Passerelle's Actor base classes provide some utility methods to get this done.
-{code:java}
+{{{
       ManagedMessage outputMsg1 = createMessageFromCauses(receivedMsg1,receivedMsg2);
       ManagedMessage outputMsg2 = createMessageFromCauses(receivedMsg1,receivedMsg2);
 	  // set the contents of the outgoing messages
 	  ...
       response.addOutputMessage(output1, outputMsg1);
       response.addOutputMessage(output2, outputMsg2);
-{code}
+}}}
 
 ==== Some examples ====
 
@@ -609,7 +604,7 @@ This is especially the case if they must be applied in many different sequences 
 
 The HelloPasserelle actor above is an example of a very simple transformer. In this section, we will introduce a transformer that adds or removes a body header, and leaves the message body untouched.
 
-{code:java}
+{{{
 /* Copyright 2011 - iSencia Belgium N
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -680,10 +675,10 @@ public class AddRemoveMessageHeader extends Actor {
     modeParameter.setExpression(MODE_ADD);
   }
   //...
-{code}
+}}}
 The actor now has three parameters. A header name and value can be specified as text values. The Add/Remove options are set as choices on the Mode parameter.
 Passerelle actors can validate their initialization state during the startup of a model, before the actor iterations are allowed to begin.
-{code:java}
+{{{
   //...
   /**
    * An illustration of validating the parameter settings.
@@ -705,14 +700,16 @@ Passerelle actors can validate their initialization state during the startup of 
       throw new ValidationException("Undefined header name", this, null);
     }
   }
-{code}
+}}}
+
 Once the actor iterations have started, the process() method will be invoked when a message has been received on the input port.
 As the input port is a blocking/PULL one, each received message will cause a separate (sequential) process() invocation.
 It is good practice to create new message instances for outgoing messages, and not send out (modified) received messages just like that.
 In fact, to prevent any risk for concurrency issues, received messages should be considered immutable.
+
 Below, the actor first makes a copy of the received message and indicates that it is caused by the received message.
 The configured header modification is then applied on the copy, and this one will be sent out.
-{code:java}
+{{{
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage receivedMsg = request.getMessage(input);
@@ -740,7 +737,7 @@ The configured header modification is then applied on the copy, and this one wil
     }
   }
 }
-{code}
+}}}
 
 The actor's parameters can be configured via an automatically generated panel, e.g. in the Swing HMI :
 
@@ -748,7 +745,7 @@ The actor's parameters can be configured via an automatically generated panel, e
 
 Running this model will result in a final message being sent to the TracerConsole with the added header.
 From the logs we can see that indeed a header _MyHeader_ was added in the _Body_ :
-{code:xml}
+{{{
 <Message>
   <Header name="__PSRL_CAUSES_IDS" value="2" />
   <Header name="__PSRL_SRC_REF" value=".HelloWithTransformer.Constant" />
@@ -763,7 +760,7 @@ From the logs we can see that indeed a header _MyHeader_ was added in the _Body_
     </Part>
   </Body>
 </Message>
-{code}
+}}}
 
 ===== Filter actors =====
 A _Filter_ actor is an implementation of EIP's _Message Filter_ pattern. An EIP _Message Filter_ typically evaluates incoming messages according to some boolean condition. If the condition evaluates to _true_, the message is sent along in the sequence, and if it's _false_ the message is dropped.
@@ -773,8 +770,7 @@ Whereas in the plain world-of-EIP a pure Message Filter is a useful concept, thi
 As we can imagine many different filter implementations, all sharing a common basic structure, we will start by defining a base class for filter actors. The base class will have one input port and two output ports (match,noMatch) and an abstract method to implement a boolean condition on each received message. To improve the model's clarity and the searchability of execution traces, we will allow to rename the output port names to clearly identify the meaning of the condition. For example, a filter that checks for the presence of a VOIP service on a telecommunications line could get output ports _voip_ and _noVoip_. Another actor checking for the presence of a header "MyHeader" could have output ports _hasMyHeader_ and _noMyHeader_ etc.
 
 We start with an abstract Filter actor with one input port, two output ports and parameters to set the names of the output ports.
-
-{code:java}
+{{{
 public abstract class Filter extends Actor {
   public Port input;
   public Port outputMatch;
@@ -802,12 +798,11 @@ public abstract class Filter extends Actor {
     outputNoMatchPortNameParameter.setExpression(outputNoMatch.getName());
   }
   //...
-{code}
+}}}
 
 Ptolemy (and thus Passerelle) provides a callback mechanism on actors to be notified about any change in parameter values.
 The method is called _attributeChanged()_. It can be used here to adapt a port's visible name when a model designer has changed the corresponding parameter.
-
-{code:java}
+{{{
   /**
    * Each time an actor attribute is changed, the actor is notified about this via this callback,
    * containing the changed attribute.
@@ -836,19 +831,18 @@ The method is called _attributeChanged()_. It can be used here to adapt a port's
       super.attributeChanged(attribute);
     }
   };
-{code}
+}}}
 
 We use the fact that each model element in Ptolemy/Passerelle is a specialization of _ptolemy.kernel.util.NamedObj_. A NamedObj has a fully-qualified hierarchical name, uniquely identifying each element in a hierarchic model (as already described previously). For a Port this name can not easily be changed as relations/channels between actors explicitly refer to the Port name in the model definition (e.g. as visible in the MOML file). But what can be changed at will is the so-called _displayName_. This is the name that is effectively shown in the UIs, and used in execution logs to trace message flows. By default it is the same as the "normal" name, but it can be explicitly set to something different as shown in this example.
 
-{note}
-In Ptolemy's Vergil tool, it is possible to rename all ports via a context-menu that can be opened with a right-mouse-button-click on a port.
-However this action is not supported in other editors like the eclipse workbench or the web-based editor.
-In Passerelle, it is generally preferable to explicitly model all configuration elements via parameters as shown in this abstract Filter.
-{note}
+ In Ptolemy's Vergil tool, it is possible to rename all ports via a context-menu that can be opened with a right-mouse-button-click on a port.
+ However this action is not supported in other editors like the eclipse workbench or the web-based editor.
+ In Passerelle, it is generally preferable to explicitly model all configuration elements via parameters as shown in this abstract Filter.
+
 
 Finally, the actual skeleton for the filter condition can be implemented as below. The actor's _process()_ method passes the received message to an abstract boolean method _isMatchingFilter()_ and based on the result forwards the message via the _outputMatch_ or _outputNoMatch_ output ports.
 
-{code:java}
+{{{
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage inputMsg = request.getMessage(input);
@@ -874,11 +868,11 @@ Finally, the actual skeleton for the filter condition can be implemented as belo
    */
   protected abstract boolean isMatchingFilter(ManagedMessage msg) throws Exception;
 }
-{code}
+}}}
 
 A simple example of a Filter implementation is given below. It checks for the presence of a header field with name as defined in the filter's parameter.
 
-{code:java}
+{{{
 public class HeaderFilter extends Filter {
 
   public StringParameter headerNameParameter;
@@ -903,7 +897,7 @@ public class HeaderFilter extends Filter {
     return msg.getBodyHeader(headerNameParameter.getExpression()) != null;
   }
 }
-{code}
+}}}
 
 This actor can be used in an extension of the model with the _AddRemoveMessageHeader_ above, to check if "MyHeader" was correctly added.
 When the filter matches, the message can be routed to the TracerConsole as before.
@@ -930,9 +924,9 @@ Since Passerelle v5.5, the Passerelle Manager has been extended with a web-based
 And with Passerelle v7.x, a functioning eclipse RCP Passerelle workbench has been added.
 Both these tools now fully exploit OSGi and eclipse plugin features to develop and use Passerelle actors.
 Furthermore these OSGi/eclipse-based tools have become the prefered ones to develop and execute actors and models, which has an impact on the approach to develop actors :
-* actors must be developed in eclipse plugins
-* the actors must be exposed via specific Passerelle extension points
-* the editor's actor palette is constructed based on the actors registered via the extension points
+  * actors must be developed in eclipse plugins
+  * the actors must be exposed via specific Passerelle extension points
+  * the editor's actor palette is constructed based on the actors registered via the extension points
 
 This section will explain the development approach using eclipse's PDE as development tool.
 
@@ -971,4 +965,3 @@ TODO
 -- reusing v5.Actor.getLogger()
 -- overriding using v5.Actor.getLogger()
 - ...?
-
