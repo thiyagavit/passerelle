@@ -2,11 +2,10 @@
 #labels Phase-Implementation,Phase-Requirements
 
 = Introduction =
+ The goal of this page is to work on a guide that must ultimately be delivered as document/PDF/...
+ So it's not appropriate to structure this as many Wiki pages with cross-links etc.
+ It's better to build one complete page.
 
-{note}The goal of this page is to work on a guide that must ultimately be delivered as document/PDF/...
-So it's not appropriate to structure this as many Wiki pages with cross-links etc.
-It's better to build one complete page.
-{note}
 
 
 = Development guide for Passerelle Actors =
@@ -41,7 +40,7 @@ So here we go :
     * "Enterprise Integration Patterns" aka EIP, by G. Hohpe et al.
   # *OSGi, the advanced and proven framework for modular Java solutions*, as documented in e.g. :
     * "OSGI Service Platform - Core Specification", which can be obtained from "http://www.osgi.org"
-    * "OSGi and Equinox", by J. McAffer et al.
+    * "OSGi and Equinox", by J. Mc Affer et al.
     * Many authors writing blogs with OSGi introductions, some of them referenced from "http://www.osgi.org/Links/BasicEducation"
   # *Ptolemy II*, "an open-source software framework supporting experimentation with actor-oriented design", created at U.C. Berkeley
 by the "CHESS" research group of a.o. Professor E.A. Lee. Ptolemy comes with a couple of extensive guides, of which the following one is the perfect introduction :
@@ -68,9 +67,7 @@ Filters are easy to test since they have a clearly defined responsibility, they 
 So it is easy to also create uniform and reusable test tools.
 
 *Filter????*
- The term "filter" is used in two different meanings. The "filter" in the architectural pattern is a generic processing component,
-without any a-priori assumption about its concrete functionality. In many other contexts (also in the library of Passerelle actors),
-"filters" denote components with a "filtering function", i.e. excluding subsets of data or messages from further processing.
+ The term "filter" is used in two different meanings. The "filter" in the architectural pattern is a generic processing component, without any a-priori assumption about its concrete functionality. In many other contexts (also in the library of Passerelle actors), "filters" denote components with a "filtering function", i.e. excluding subsets of data or messages from further processing.
 
 
 Furthermore, such an architecture fits well with tools to define and configure executable processes in a graphical way.
