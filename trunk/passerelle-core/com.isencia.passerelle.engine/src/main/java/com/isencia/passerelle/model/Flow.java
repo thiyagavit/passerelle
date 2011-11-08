@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.model;
 
 import java.lang.reflect.Constructor;
@@ -38,43 +38,50 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
 /**
- * A Flow represents an assembly of interconnected Passerelle actors,
- * with a single Director.
- * <br>
+ * A Flow represents an assembly of interconnected Passerelle actors, with a
+ * single Director. <br>
  * Flows can contain sub-flows. Sub-flows do not have own Directors.
- *
+ * 
  * @author erwin
- *
+ * 
  */
 public class Flow extends TypedCompositeActor {
-	
+	@Override
+	public void setName(String name) throws IllegalActionException,
+			NameDuplicationException {
+		super.setName(name);
+		if (handle != null) {
+			handle.setName(name);
+		}
+
+	}
+
 	/**
-	 * For a top-level Flow instance, this field contains the authorative resource location
-	 * from which this Flow instance was constructed.
+	 * For a top-level Flow instance, this field contains the authorative
+	 * resource location from which this Flow instance was constructed.
 	 * 
-	 * This is typically either a local moml file
-	 * (with an URL with the file:// schema)
-	 * or a moml managed on a Passerelle Manager server instance
-	 * (with an URL corresponding to a REST resource id, with the http:// schema) 
+	 * This is typically either a local moml file (with an URL with the file://
+	 * schema) or a moml managed on a Passerelle Manager server instance (with
+	 * an URL corresponding to a REST resource id, with the http:// schema)
 	 */
 	private URL authorativeResourceLocation;
-	
+
 	private FlowHandle handle;
 
 	private ExecutionListener executionListener;
-	
+
 	/**
 	 * property used to flag whether the Flow was loaded/parsed without issues.
 	 * if there were issues, this may impact the supported actions on the flow,
 	 * as it is probably incomplete/crippled then...
 	 */
 	private boolean loadedFaultless = true;
-	
+
 	public void reportLoadingError(Throwable t) {
-		if(t!=null)
+		if (t != null)
 			loadedFaultless = false;
 	}
-	
+
 	public boolean isLoadedFaultless() {
 		return loadedFaultless;
 	}
@@ -89,31 +96,33 @@ public class Flow extends TypedCompositeActor {
 
 	/**
 	 * Create a top-level flow with the given name.
-	 *
+	 * 
 	 * @param name
-	 * @param authorativeResourceLocation only filled in when flow is
-	 * parsed from a file resource, either from a local moml
-	 * or a moml obtained from a passerelle manager.
+	 * @param authorativeResourceLocation
+	 *            only filled in when flow is parsed from a file resource,
+	 *            either from a local moml or a moml obtained from a passerelle
+	 *            manager.
 	 * 
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
-	 *
+	 * 
 	 */
-	public Flow(String name, URL authorativeResourceLocation) throws IllegalActionException, NameDuplicationException {
+	public Flow(String name, URL authorativeResourceLocation)
+			throws IllegalActionException, NameDuplicationException {
 		super(new Workspace(name));
 		setName(name);
 		this.authorativeResourceLocation = authorativeResourceLocation;
 		handle = new FlowHandle(0L, name, authorativeResourceLocation);
 	}
 
-
 	/**
 	 * Create a top-level flow in the given workspace.
 	 * 
 	 * @param workspace
-	 * @param authorativeResourceLocation only filled in when flow is
-	 * parsed from a file resource, either from a local moml
-	 * or a moml obtained from a passerelle manager.
+	 * @param authorativeResourceLocation
+	 *            only filled in when flow is parsed from a file resource,
+	 *            either from a local moml or a moml obtained from a passerelle
+	 *            manager.
 	 */
 	public Flow(Workspace workspace, URL authorativeResourceLocation) {
 		super(workspace);
@@ -121,21 +130,21 @@ public class Flow extends TypedCompositeActor {
 		handle = new FlowHandle(0L, null, authorativeResourceLocation);
 	}
 
-	
 	/**
 	 * 
-	 * @return the authorative resource location
-	 * from which this Flow instance was constructed.
-	 * <p>
-	 * This is typically either :
-	 * <ul>
-	 * <li>null, for a newly constructed flow instance that has
-	 * not been parsed from a moml resource/file
-	 * <li>a local moml file (with an URL with the file:// schema)
-	 * <li>or a moml managed on a Passerelle Manager server instance<br/>
-	 * (with an URL corresponding to a REST resource id, <br/>with the http:// schema) 
-	 * </ul>
-	 * </p>
+	 * @return the authorative resource location from which this Flow instance
+	 *         was constructed.
+	 *         <p>
+	 *         This is typically either :
+	 *         <ul>
+	 *         <li>null, for a newly constructed flow instance that has not been
+	 *         parsed from a moml resource/file
+	 *         <li>a local moml file (with an URL with the file:// schema)
+	 *         <li>or a moml managed on a Passerelle Manager server instance<br/>
+	 *         (with an URL corresponding to a REST resource id, <br/>
+	 *         with the http:// schema)
+	 *         </ul>
+	 *         </p>
 	 */
 	public URL getAuthorativeResourceLocation() {
 		return authorativeResourceLocation;
@@ -149,41 +158,42 @@ public class Flow extends TypedCompositeActor {
 		this.handle = handle;
 		setAuthorativeResourceLocation(handle.getAuthorativeResourceLocation());
 	}
-	
+
 	/**
 	 * only for use by flowmanager
-	 * @param authorativeResourceLocation the authorativeResourceLocation to set
+	 * 
+	 * @param authorativeResourceLocation
+	 *            the authorativeResourceLocation to set
 	 */
 	void setAuthorativeResourceLocation(URL authorativeResourceLocation) {
 		this.authorativeResourceLocation = authorativeResourceLocation;
 	}
 
-
 	/**
-	 *
+	 * 
 	 * Create a sub-flow with the given name, in the given parent flow.
-	 *
+	 * 
 	 * @param parent
 	 * @param name
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public Flow(Flow parent, String name)
-			throws IllegalActionException, NameDuplicationException {
+	public Flow(Flow parent, String name) throws IllegalActionException,
+			NameDuplicationException {
 		super(parent, name);
 	}
 
 	/**
-	 * Builds a default connection between actor a1 and actor a2,
-	 * i.e. connecting a1's output port with default name "output"
-	 * with a2's input port with default name "input".
-	 *
+	 * Builds a default connection between actor a1 and actor a2, i.e.
+	 * connecting a1's output port with default name "output" with a2's input
+	 * port with default name "input".
+	 * 
 	 * @param a1
 	 * @param a2
 	 */
 	public void connect(Actor a1, Actor a2) {
-		IOPort a1Output = (IOPort) ((ComponentEntity)a1).getPort("output");
-		IOPort a2Input = (IOPort) ((ComponentEntity)a2).getPort("input");
+		IOPort a1Output = (IOPort) ((ComponentEntity) a1).getPort("output");
+		IOPort a2Input = (IOPort) ((ComponentEntity) a2).getPort("input");
 		try {
 			super.connect(a1Output, a2Input);
 		} catch (Exception e) {
@@ -193,9 +203,8 @@ public class Flow extends TypedCompositeActor {
 	}
 
 	/**
-	 * Builds a connection from the given output port
-	 * to the given input port.
-	 *
+	 * Builds a connection from the given output port to the given input port.
+	 * 
 	 * @param output
 	 * @param input
 	 */
@@ -207,9 +216,10 @@ public class Flow extends TypedCompositeActor {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Removes any existing connections between actors a1 and a2.
-	 *
+	 * 
 	 * @param a1
 	 * @param a2
 	 */
@@ -228,9 +238,10 @@ public class Flow extends TypedCompositeActor {
 			}
 		}
 	}
+
 	/**
 	 * Removes any existing connections between the ports output and input.
-	 *
+	 * 
 	 * @param output
 	 * @param input
 	 */
@@ -238,16 +249,16 @@ public class Flow extends TypedCompositeActor {
 	public void disconnect(final IOPort output, final IOPort input) {
 		final List<Relation> relations = output.linkedRelationList();
 		for (final Relation relation : relations) {
-			if(input.isLinked(relation)) {
+			if (input.isLinked(relation)) {
 				input.unlink(relation);
 				output.unlink(relation);
 			}
-			if(!relation.linkedPorts().hasMoreElements()) {
+			if (!relation.linkedPorts().hasMoreElements()) {
 				// the relation was only between the given ports
 				// so now it doesn't connect anything anymore
 				// and we'll just remove it altogether
 				try {
-					((ComponentRelation)relation).setContainer(null);
+					((ComponentRelation) relation).setContainer(null);
 				} catch (final Exception e) {
 					// ignore
 				}
@@ -256,24 +267,27 @@ public class Flow extends TypedCompositeActor {
 	}
 
 	/**
-	 * Tries to create a new actor instance in this flow, with the given class and name.
-	 *
+	 * Tries to create a new actor instance in this flow, with the given class
+	 * and name.
+	 * 
 	 * @param actorClass
 	 * @param actorName
 	 * @return
 	 * @throws NameDuplicationException
 	 * @throws Exception
 	 */
-	public Actor addActor(Class<? extends Actor> actorClass, String actorName) throws NameDuplicationException, Exception {
+	public Actor addActor(Class<? extends Actor> actorClass, String actorName)
+			throws NameDuplicationException, Exception {
 		Object[] constructorArgs = new Object[] { this, actorName };
-		Actor result=null;
-		for (Constructor<Actor> constructor : (Constructor<Actor>[])actorClass.getConstructors()) {
+		Actor result = null;
+		for (Constructor<Actor> constructor : (Constructor<Actor>[]) actorClass
+				.getConstructors()) {
 			Class<?>[] paramTypes = constructor.getParameterTypes();
 			if (paramTypes.length == constructorArgs.length) {
 				boolean itsTheGoodOne = true;
 				for (int i = 0; i < paramTypes.length; i++) {
-					if(!paramTypes[i].isInstance(constructorArgs[i])) {
-						itsTheGoodOne=false;
+					if (!paramTypes[i].isInstance(constructorArgs[i])) {
+						itsTheGoodOne = false;
 						break;
 					}
 				}
@@ -313,101 +327,107 @@ public class Flow extends TypedCompositeActor {
 			// add actor's own parameters
 			results.addAll(actor.attributeList(Parameter.class));
 			// if it's a composite, add the ones of the contained actors
-			if(actor instanceof CompositeActor)
-				results.addAll(getAllParameters((CompositeActor)actor));
+			if (actor instanceof CompositeActor)
+				results.addAll(getAllParameters((CompositeActor) actor));
 		}
 		return results;
 	}
 
-    /** Return a name that is guaranteed to not be the name of
-     *  any contained attribute, port, class, entity, or relation.
-     *  In this implementation, the argument
-     *  is stripped of any numeric suffix, and then a numeric suffix
-     *  is appended and incremented until a name is found that does not
-     *  conflict with a contained attribute, port, class, entity, or relation.
-     *  If this composite entity or any composite entity that it contains
-     *  defers its MoML definition (i.e., it is an instance of a class or
-     *  a subclass), then the prefix gets appended with "_<i>n</i>_",
-     *  where <i>n</i> is the depth of this deferral. That is, if the object
-     *  deferred to also defers, then <i>n</i> is incremented.
-     *  @param prefix A prefix for the name.
-     *  @return A unique name.
-     */
+	/**
+	 * Return a name that is guaranteed to not be the name of any contained
+	 * attribute, port, class, entity, or relation. In this implementation, the
+	 * argument is stripped of any numeric suffix, and then a numeric suffix is
+	 * appended and incremented until a name is found that does not conflict
+	 * with a contained attribute, port, class, entity, or relation. If this
+	 * composite entity or any composite entity that it contains defers its MoML
+	 * definition (i.e., it is an instance of a class or a subclass), then the
+	 * prefix gets appended with "_<i>n</i>_", where <i>n</i> is the depth of
+	 * this deferral. That is, if the object deferred to also defers, then
+	 * <i>n</i> is incremented.
+	 * 
+	 * @param prefix
+	 *            A prefix for the name.
+	 * @return A unique name.
+	 */
 	@Override
-    public String uniqueName(String prefix) {
-        if (prefix == null) {
-            prefix = "null";
-        }
+	public String uniqueName(String prefix) {
+		if (prefix == null) {
+			prefix = "null";
+		}
 
-        prefix =_stripNumericSuffix(prefix);
+		prefix = _stripNumericSuffix(prefix);
 
-        String candidate = prefix;
+		String candidate = prefix;
 
-        // NOTE: The list returned by getPrototypeList() has
-        // length equal to the number of containers of this object
-        // that return non-null to getParent(). That number is
-        // assured to be at least one greater than the corresponding
-        // number for any of the parents returned by getParent().
-        // Hence, we can use that number to minimize the likelyhood
-        // of inadvertent capture.
-        try {
-            int depth = getPrototypeList().size();
+		// NOTE: The list returned by getPrototypeList() has
+		// length equal to the number of containers of this object
+		// that return non-null to getParent(). That number is
+		// assured to be at least one greater than the corresponding
+		// number for any of the parents returned by getParent().
+		// Hence, we can use that number to minimize the likelyhood
+		// of inadvertent capture.
+		try {
+			int depth = getPrototypeList().size();
 
-            if (depth > 0) {
-                prefix = prefix + "_" + depth + "_";
-            }
-        } catch (IllegalActionException e) {
-            // Derivation invariant is not satisified.
-            throw new InternalErrorException(e);
-        }
+			if (depth > 0) {
+				prefix = prefix + "_" + depth + "_";
+			}
+		} catch (IllegalActionException e) {
+			// Derivation invariant is not satisified.
+			throw new InternalErrorException(e);
+		}
 
-        int uniqueNameIndex = 2;
+		int uniqueNameIndex = 2;
 
-        while ((getAttribute(candidate) != null)
-                || (getPort(candidate) != null)
-                || (getEntity(candidate) != null)
-                || (getRelation(candidate) != null)) {
-            candidate = prefix + "_" + uniqueNameIndex++;
-        }
+		while ((getAttribute(candidate) != null)
+				|| (getPort(candidate) != null)
+				|| (getEntity(candidate) != null)
+				|| (getRelation(candidate) != null)) {
+			candidate = prefix + "_" + uniqueNameIndex++;
+		}
 
-        return candidate;
-    }
-    /** Return a string that is identical to the specified string
-     *  except any trailing digits are removed which were preceded by a '_'.
-     *  @param string The string to strip of its numeric suffix.
-     *  @return A string with no numeric suffix.
-     */
-    protected static String _stripNumericSuffix(String string) {
-        int length = string.length();
-        char[] chars = string.toCharArray();
+		return candidate;
+	}
 
-        boolean numericSuffixFound=false;
-        
-        for (int i = length - 1; i >= 0; i--) {
-            char current = chars[i];
+	/**
+	 * Return a string that is identical to the specified string except any
+	 * trailing digits are removed which were preceded by a '_'.
+	 * 
+	 * @param string
+	 *            The string to strip of its numeric suffix.
+	 * @return A string with no numeric suffix.
+	 */
+	protected static String _stripNumericSuffix(String string) {
+		int length = string.length();
+		char[] chars = string.toCharArray();
 
-            if (Character.isDigit(current)) {
-                length--;
-            } else {
-                if (current == '_') {
-                	if(length<string.length()) {
-                		numericSuffixFound=true;
-                		length--;
-                	}
-                }
-                // Found a non-numeric, so we are done.
-                break;
-            }
-        }
+		boolean numericSuffixFound = false;
 
-        if (numericSuffixFound) {
-            // Some stripping occurred.
-            char[] result = new char[length];
-            System.arraycopy(chars, 0, result, 0, length);
-            return new String(result);
-        } else {
-            return string;
-        }
-    }
+		for (int i = length - 1; i >= 0; i--) {
+			char current = chars[i];
+
+			if (Character.isDigit(current)) {
+				length--;
+			} else {
+				if (current == '_') {
+					if (length < string.length()) {
+						numericSuffixFound = true;
+						length--;
+					}
+				}
+				// Found a non-numeric, so we are done.
+				break;
+			}
+		}
+
+		if (numericSuffixFound) {
+			// Some stripping occurred.
+			char[] result = new char[length];
+			System.arraycopy(chars, 0, result, 0, length);
+			return new String(result);
+		} else {
+			return string;
+		}
+	}
 
 }
