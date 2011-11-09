@@ -117,6 +117,8 @@ import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		implements IPasserelleMultiPageEditor, IResourceChangeListener {
 
+	public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor";
+
 	private static Logger logger = LoggerFactory
 			.getLogger(PasserelleModelMultiPageEditor.class);
 
@@ -946,4 +948,8 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		editor.setActorSelected(actorName, isSelected);
 	}
 
+	@Override
+	public void setPasserelleEditorActive() {
+		setActivePage(0);
+	}
 }
