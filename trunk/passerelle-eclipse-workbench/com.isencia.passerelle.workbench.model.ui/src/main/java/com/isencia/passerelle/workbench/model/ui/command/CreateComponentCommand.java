@@ -101,21 +101,13 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 										clazz,
 										name, name);
 						componentName = ModelUtils.getLegalName(componentName);
-						Class constructorClazz = CompositeEntity.class;
-						if (TypedIOPort.class.isAssignableFrom(clazz)) {
-							constructorClazz = ComponentEntity.class;
-							
-						} else if (TextAttribute.class.isAssignableFrom(clazz)) {
-							constructorClazz = NamedObj.class;
-							
-						} else if (Vertex.class.isAssignableFrom(clazz)) {
+					
+						if (Vertex.class.isAssignableFrom(clazz)) {
 							
 							TypedIORelation rel = new TypedIORelation(parentModel, componentName);
 							child = new Vertex(rel, "Vertex");
 
-						} 
-						
-						if (Flow.class.isAssignableFrom(clazz)) {
+						} else	if (Flow.class.isAssignableFrom(clazz)) {
 							if (flow != null) {
 								
 								child = (NamedObj) flow.instantiate(parentModel, componentName);
@@ -125,6 +117,14 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 							}
 
 						} else {
+							Class constructorClazz = CompositeEntity.class;
+							if (TypedIOPort.class.isAssignableFrom(clazz)) {
+								constructorClazz = ComponentEntity.class;
+								
+							} else if (TextAttribute.class.isAssignableFrom(clazz)) {
+								constructorClazz = NamedObj.class;
+								
+							}
 							Constructor constructor = clazz.getConstructor(constructorClazz, String.class);
 
 							child = (NamedObj) constructor.newInstance(parentModel, componentName);
