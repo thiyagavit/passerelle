@@ -4,7 +4,6 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.ToolbarLayout;
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 
 import com.isencia.passerelle.workbench.model.editor.ui.INameable;
@@ -48,10 +47,11 @@ public class AbstractBaseFigure extends Figure implements INameable {
 		layout.setSpacing(2);
 		setLayoutManager(layout);
 		if (withLabel) {
-			nameLabel.setText(name);
+			nameLabel.setText(getNotTooLongName(name));
 			nameLabel.setOpaque(true);
 			add(nameLabel);
 		}
+		setToolTip(new Label(name));
 		this.type = type;
 		if (type != null && PaletteItemFactory.getInstance().getType(type) != null){
 			setToolTip(new Label(PaletteItemFactory.getInstance().getType(type)));
@@ -59,7 +59,16 @@ public class AbstractBaseFigure extends Figure implements INameable {
 		setOpaque(false);
 
 	}
-
+	private String getNotTooLongName(String name) {
+		// TODO Add system property, for now always return full name
+		if (true) return name;
+		
+		
+		if (name.length()>16) {
+			return name.substring(0,3)+"..."+name.substring(name.length()-10);
+		}
+		return name;
+	}
 	public String getName() {
 		return this.nameLabel.getText();
 	}
