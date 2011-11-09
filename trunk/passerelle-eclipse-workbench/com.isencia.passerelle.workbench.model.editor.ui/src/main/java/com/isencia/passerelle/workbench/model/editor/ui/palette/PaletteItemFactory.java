@@ -93,7 +93,7 @@ public class PaletteItemFactory implements Serializable {
 		return store.preferenceNames();
 	}
 
-	public static PaletteItemFactory get() {
+	public static PaletteItemFactory getInstance() {
 		if (factory == null) {
 			factory = new PaletteItemFactory();
 		}
@@ -212,7 +212,7 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public boolean addFavorite(String name, PaletteContainer container) {
-		PaletteItemDefinition paletteItem = PaletteItemFactory.get()
+		PaletteItemDefinition paletteItem = PaletteItemFactory.getInstance()
 				.getPaletteItem(name);
 		if (paletteItem != null
 				&& !containsFavorite(container, name, paletteItem.getName())) {

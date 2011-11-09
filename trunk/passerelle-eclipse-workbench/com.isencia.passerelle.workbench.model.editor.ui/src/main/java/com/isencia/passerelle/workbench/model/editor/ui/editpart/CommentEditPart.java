@@ -64,7 +64,7 @@ public class CommentEditPart extends AbstractNodeEditPart {
 		if (attribute instanceof StringAttribute) {
 			name = ((StringAttribute) attribute).getExpression();
 		}
-		ImageDescriptor imageDescriptor = PaletteItemFactory.get().getIcon(
+		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
 				TextAttribute.class);
 		return new CommentFigure(name, createImage(imageDescriptor));
 	}

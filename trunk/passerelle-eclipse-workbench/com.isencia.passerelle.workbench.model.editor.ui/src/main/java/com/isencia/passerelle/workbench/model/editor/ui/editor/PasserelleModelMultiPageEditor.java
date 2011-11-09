@@ -327,7 +327,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 						FileUtils.write(fileIO, writer.toString());
 						if (file instanceof SubModelFile
 								&& diagram.isClassDefinition()) {
-							PaletteItemFactory.get()
+							PaletteItemFactory.getInstance()
 									.addSubModel((Flow) diagram);
 						}
 					}
@@ -543,7 +543,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		InputStream is = null;
 		try {
 			is = new FileInputStream(filePath);
-			PaletteItemFactory factory = PaletteItemFactory.get();
+			PaletteItemFactory factory = PaletteItemFactory.getInstance();
 
 			Map<String, Flow> modelList = factory.getSubModels();
 

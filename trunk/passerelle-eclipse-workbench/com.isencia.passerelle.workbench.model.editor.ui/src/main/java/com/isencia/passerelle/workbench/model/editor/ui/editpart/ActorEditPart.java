@@ -144,7 +144,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements
 //			}
 //		});
 
-		ImageDescriptor imageDescriptor = PaletteItemFactory.get().getIcon(
+		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
 				actorModel.getClass());
 		if (imageDescriptor == null) {
 			imageDescriptor = IMAGE_DESCRIPTOR_ACTOR;

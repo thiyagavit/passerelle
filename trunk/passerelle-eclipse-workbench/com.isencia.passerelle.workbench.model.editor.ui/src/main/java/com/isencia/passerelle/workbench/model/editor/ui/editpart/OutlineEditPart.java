@@ -160,7 +160,7 @@ public class OutlineEditPart extends
 		} else if (model instanceof TypedAtomicActor) {
 			setWidgetImage(ActorEditPart.IMAGE_DESCRIPTOR_ACTOR, model);
 		} else if (model instanceof CompositeActor) {
-			setWidgetImage(PaletteItemFactory.get().getIcon(model.getClass()),
+			setWidgetImage(PaletteItemFactory.getInstance().getIcon(model.getClass()),
 					model);
 		}
 		// Set Text

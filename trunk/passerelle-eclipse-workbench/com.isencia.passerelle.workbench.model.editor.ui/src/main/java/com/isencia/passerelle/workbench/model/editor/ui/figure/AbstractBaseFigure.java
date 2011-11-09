@@ -26,7 +26,7 @@ public class AbstractBaseFigure extends Figure implements INameable {
 		return DEFAULT_BACKGROUND_COLOR;
 	}
 	public Color getColor() {
-		Color color = PaletteItemFactory.get().getColor(type);
+		Color color = PaletteItemFactory.getInstance().getColor(type);
 		if (color != null){
 			return color;
 		}
@@ -53,8 +53,8 @@ public class AbstractBaseFigure extends Figure implements INameable {
 			add(nameLabel);
 		}
 		this.type = type;
-		if (type != null && PaletteItemFactory.get().getType(type) != null){
-			setToolTip(new Label(PaletteItemFactory.get().getType(type)));
+		if (type != null && PaletteItemFactory.getInstance().getType(type) != null){
+			setToolTip(new Label(PaletteItemFactory.getInstance().getType(type)));
 		}
 		setOpaque(false);
 
