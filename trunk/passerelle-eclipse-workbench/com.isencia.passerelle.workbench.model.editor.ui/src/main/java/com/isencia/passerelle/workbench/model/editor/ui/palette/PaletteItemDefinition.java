@@ -7,6 +7,11 @@ import org.eclipse.swt.graphics.Color;
 
 public class PaletteItemDefinition implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1589063207120521216L;
+
 	public PaletteItemDefinition(ImageDescriptor icon, PaletteGroup group,
 			String id, String name, String color, Class clazz) {
 		this(icon, group, id, name, clazz);
