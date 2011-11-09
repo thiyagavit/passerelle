@@ -2,7 +2,6 @@ package com.isencia.passerelle.workbench.model.editor.ui.figure;
 
 import org.eclipse.draw2d.Clickable;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
@@ -28,8 +27,8 @@ public abstract class CompoundIOFigure extends ActorFigure {
 
 
 
-	public final static int DEFAULT_WIDTH = 28;
-	public final static int MIN_HEIGHT = 15;
+	public final static int DEFAULT_WIDTH = 32;
+	public final static int MIN_HEIGHT = 32;
 
 	public CompoundIOFigure(String name, Class type) {
 		super(name, type, null, new Clickable[] {});
