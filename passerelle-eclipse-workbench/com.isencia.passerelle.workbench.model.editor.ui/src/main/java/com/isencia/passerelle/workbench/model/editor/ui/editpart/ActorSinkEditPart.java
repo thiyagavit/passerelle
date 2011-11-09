@@ -12,8 +12,7 @@ public class ActorSinkEditPart extends ActorEditPart {
 	@Override
 	protected IFigure createFigure() {
 		ActorFigure createFigure = (ActorFigure) super.createFigure();
-		if (createFigure.getColor().equals(createFigure.getDefaultColor()))
-			createFigure.setBackgroundColor(ACTOR_BACKGROUND_COLOR);
+		createFigure.setBackgroundColor(ACTOR_BACKGROUND_COLOR);
 		return createFigure;
 	}
 
