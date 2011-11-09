@@ -5,7 +5,7 @@ import org.eclipse.ui.IEditorPart;
 public class CreateEmptySubModelAction extends CreateSubModelAction {
 
 	public CreateEmptySubModelAction(IEditorPart part) {
-		super(part,null);
+		super(part);
 	}
 
 }
