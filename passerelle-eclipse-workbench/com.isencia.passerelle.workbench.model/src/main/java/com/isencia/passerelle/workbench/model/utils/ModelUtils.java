@@ -2,10 +2,9 @@ package com.isencia.passerelle.workbench.model.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -19,7 +18,9 @@ import org.apache.commons.digester.substitution.MultiVariableExpander;
 import org.apache.commons.digester.substitution.VariableSubstitutor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
+import ptolemy.actor.TypedCompositeActor;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.CompositeEntity;
@@ -40,26 +42,20 @@ import ptolemy.kernel.util.Location;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
+import ptolemy.kernel.util.Workspace;
 import ptolemy.moml.Vertex;
-
-import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.model.util.MoMLParser;
+import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 public class ModelUtils {
-	public static final String SUBMODELS = "Submodels";
 
 	public static Logger logger = LoggerFactory.getLogger(ModelUtils.class);
 	private static PreferenceStore store;
 
-	public static PreferenceStore getStore() {
+	public static PreferenceStore getFavouritesStore() throws Exception {
 		if (store == null) {
 			store = new PreferenceStore();
-			final String workspacePath = ResourcesPlugin.getWorkspace()
-					.getRoot().getLocation().toOSString();
-			store
-					.setFilename(workspacePath
-							+ "/.metadata/favorites.properties");
+			final IProject pass = getPasserelleProject();
+			store.setFilename(pass.getLocation().toOSString()+"/favorites.properties");
 			try {
 				store.load();
 			} catch (IOException e) {
@@ -69,58 +65,7 @@ public class ModelUtils {
 		return store;
 	}
 
-	public static HashMap<String, Flow> readSubModels() {
-		String models = getStore().getString(SUBMODELS);
-		HashMap<String, Flow> modelList = new HashMap<String, Flow>();
-		for (String model : models.split(",")) {
-
-			InputStreamReader reader = new InputStreamReader(
-					createEmptySubModel(model));
-			try {
-				Flow flow = FlowManager.readMoml(reader);
-				MoMLParser.putActorClass(model, flow);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation().toOSString();
-		File metaData = new File(workspacePath + File.separator + ".metadata");
-
-		if (metaData.isDirectory()) {
-			File[] files = metaData.listFiles();
-			for (File file : files) {
-				try {
-					String momlName = file.getName().substring(0,
-							file.getName().length() - 5);
-					if (file.getName().endsWith(".moml")) {
-
-						FileReader in = new FileReader(file);
-						Flow flow = FlowManager.readMoml(in);
-						if (flow.isClassDefinition()) {
-							MoMLParser.putActorClass(momlName, flow);
-							modelList.put(flow.getName(), flow);
-						}
-
-					}
-
-				} catch (Exception e1) {
-				}
-			}
-		}
-		return modelList;
-	}
-
-	private static InputStream createEmptySubModel(String subModel) {
-		String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
-				+ "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
-				+ "<class name=\"" + subModel
-				+ "\" extends=\"ptolemy.actor.TypedCompositeActor\"> </class>";
-		return new ByteArrayInputStream(contents.getBytes());
-	}
-
+	
 	public static enum ConnectionType {
 		SOURCE, TARGET
 	};
@@ -133,8 +78,7 @@ public class ModelUtils {
 	}
 
 	public static final boolean isPort(String type) {
-		return ModelConstants.INPUT_IOPORT.equals(type)
-				|| ModelConstants.OUTPUT_IOPORT.equals(type);
+		return ModelConstants.INPUT_IOPORT.equals(type) || ModelConstants.OUTPUT_IOPORT.equals(type);
 	}
 
 	public static final boolean isOutputPort(String type) {
@@ -145,8 +89,7 @@ public class ModelUtils {
 		return ModelConstants.INPUT_IOPORT.equals(type);
 	}
 
-	public static Set<Relation> getConnectedRelations(Nameable model,
-			ConnectionType connectionType) {
+	public static Set<Relation> getConnectedRelations(Nameable model, ConnectionType connectionType) {
 
 		return getConnectedRelations(model, connectionType, false);
 
@@ -185,12 +128,10 @@ public class ModelUtils {
 		return ports;
 	}
 
-	public static Set<Relation> getConnectedRelations(Nameable model,
-			ConnectionType connectionType, boolean fullList) {
+	public static Set<Relation> getConnectedRelations(Nameable model, ConnectionType connectionType, boolean fullList) {
+		
 		Set<Relation> connections = new HashSet<Relation>();
-		if (model.getContainer() == null
-				|| !(model.getContainer() instanceof CompositeEntity))
-			return Collections.EMPTY_SET;
+		if (model.getContainer() == null || !(model.getContainer() instanceof CompositeEntity)) return Collections.EMPTY_SET;
 		CompositeEntity composite = (CompositeEntity) model.getContainer();
 		List<Relation> relationList = new ArrayList<Relation>();
 		relationList.addAll(composite.relationList());
@@ -403,16 +344,19 @@ public class ModelUtils {
 	}
 
 	public static String findUniqueName(CompositeEntity parentModel,
-			Class clazz, String startName, String actorName) {
+			                            Class clazz, 
+			                            String startName, 
+			                            String actorName) {
 
-		if (clazz.getSimpleName().equals("Vertex")) {
-			return generateUniqueVertexName(clazz.getSimpleName(), parentModel,
-					0, clazz);
-		} else if (clazz.getSimpleName().equals("TextAttribute")) {
-			return generateUniqueTextAttributeName(clazz.getSimpleName(),
-					parentModel, 0, clazz);
-		} else if (clazz.getSimpleName().equals("TypedIOPort")) {
+		if (Vertex.class.isAssignableFrom(clazz)) {
+			return generateUniqueVertexName(clazz.getSimpleName(), parentModel, 0, clazz);
+		
+		} else if (TextAttribute.class.isAssignableFrom(clazz)) {
+			return generateUniqueTextAttributeName(clazz.getSimpleName(), parentModel, 0, clazz);
+		
+		} else if (TypedIOPort.class.isAssignableFrom(clazz)) {
 			return generateUniquePortName(startName, parentModel, 0);
+		
 		} else {
 			return findUniqueActorName(parentModel,
 					actorName != null ? actorName : clazz.getSimpleName());
@@ -426,8 +370,7 @@ public class ModelUtils {
 	 * @param actorName
 	 * @return
 	 */
-	public static ComponentEntity findEntityByName(CompositeActor toplevel,
-			String actorName) {
+	public static ComponentEntity findEntityByName(CompositeActor toplevel, String actorName) {
 
 		ComponentEntity entity = toplevel.getEntity(actorName);
 		if (entity != null)
@@ -453,39 +396,20 @@ public class ModelUtils {
 		}
 	}
 
-	/**
-	 * This names the parent actor workspace name after the eclipse project
-	 * being used and this is used by actors to determine which eclipse project
-	 * they are executing in.
-	 * 
-	 * @param compositeActor
-	 * @param modelPath
-	 * @throws IllegalActionException
-	 * @throws NameDuplicationException
-	 */
-	public static void setCompositeProjectName(
-			final CompositeActor compositeActor, final String modelPath)
-			throws IllegalActionException, NameDuplicationException {
-
-		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation().toOSString();
+	public static IFile getProjectFile(final String modelPath) {
+		
+		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 
 		// We must tell the composite actor the containing project name
 		String relPath = modelPath.substring(workspacePath.length());
-		IFile projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot()
-				.findMember(relPath);
+		IFile projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
 		if (projFile == null) {
 			relPath = modelPath.substring(workspacePath.length() + 2);
-			projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot()
-					.findMember(relPath);
+			projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
 
 		}
-		if (projFile != null) {
-			compositeActor.workspace().setName(projFile.getProject().getName());
-		} else {
-			compositeActor.workspace().setName("default");
-		}
-		compositeActor.setSource(modelPath);
+		
+		return projFile;
 	}
 
 	/**
@@ -494,8 +418,9 @@ public class ModelUtils {
 	 * 
 	 * @param actor
 	 * @return
+	 * @throws Exception 
 	 */
-	public static IProject getProject(final NamedObj actor) {
+	public static IProject getProject(final NamedObj actor) throws Exception {
 
 		// Get top level actor, which knows the project we have.
 		CompositeActor comp = (CompositeActor) actor.getContainer();
@@ -503,8 +428,12 @@ public class ModelUtils {
 			comp = (CompositeActor) comp.getContainer();
 		}
 
-		return (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(
-				comp.workspace().getName());
+		final IProject project =  (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(comp.workspace().getName());
+		
+		if (project != null) return project;
+		
+		// If this .moml is in .passerelle we return that project
+		return ModelUtils.getPasserelleProject();
 	}
 
 	/**
@@ -512,10 +441,11 @@ public class ModelUtils {
 	 * 
 	 * @param filePath
 	 * @param dataExportTransformer
+	 * @throws Exception 
 	 */
-	public static String substitute(final String sub, final NamedObj actor) {
+	public static String substitute(final String sub, final NamedObj actor) throws Exception {
 
-		final Map<String, String> variables = new HashMap<String, String>(3);
+		final Map<String, Object> variables = new HashMap<String, Object>(3);
 		variables.put("project_name", getProject(actor).getName());
 		variables.put("actor_name", actor.getName());
 
@@ -525,5 +455,95 @@ public class ModelUtils {
 		VariableSubstitutor substitutor = new VariableSubstitutor(expander);
 
 		return substitutor.substitute(sub);
+	}
+	
+	/**
+	 * We will initialize file contents with a sample text.
+	 */
+
+	public static InputStream getEmptyWorkflowStream(final String fileName) {
+		String contents =
+			"<?xml version=\"1.0\" standalone=\"no\"?> \r\n" + 
+			"<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n" +
+            "<entity name=\"" +  fileName.substring(0, fileName.length() - 5) + 
+            "\" class=\"ptolemy.actor.TypedCompositeActor\"> \r\n" +
+            "   <property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\" /> \r\n" +
+            "   <property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\""+System.getProperty("passerelle.workbench.version")+"\" /> \r\n" +
+            "   <property name=\"Director\" class=\"com.isencia.passerelle.domain.cap.Director\" > \r\n" +
+        	"      <property name=\"_location\" class=\"ptolemy.kernel.util.Location\" value=\"{20, 20}\" /> \r\n" +
+            "   </property> \r\n" +
+        	"</entity>";
+		return new ByteArrayInputStream(contents.getBytes());
+	}
+	
+	public static InputStream getEmptyCompositeStream(final String filePath) throws UnsupportedEncodingException {
+		
+		final File   source = new File(filePath);
+		String       name   = source.getName();
+		if (name.toLowerCase().endsWith(".moml")) name = name.substring(0,name.length()-5);
+		
+		final StringBuilder contents = new StringBuilder();
+		contents.append("<?xml version=\"1.0\" standalone=\"no\"?> \r\n");
+		contents.append("<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\">\r\n");
+
+		contents.append("<class name=\""+name+"\" extends=\""+TypedCompositeActor.class.getName()+"\" >\r\n");
+		contents.append("<property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\"></property>\r\n");
+		contents.append("<property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\""+System.getProperty("passerelle.workbench.version")+"\"></property>\r\n");
+		contents.append("<property name=\"_controllerFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory\"></property>\r\n");
+		contents.append("<property name=\"_editorFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleEditorFactory\"></property>\r\n");
+		contents.append("<property name=\"_editorPaneFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory\"></property>\r\n");
+		contents.append("</class>\r\n");
+
+		return new ByteArrayInputStream(contents.toString().getBytes("UTF-8"));
+	}
+
+	
+	public static IProject getPasserelleProject() throws Exception {
+		
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IProject    project = root.getProject(".passerelle");
+		if (!project.exists()) {
+			project.create(new NullProgressMonitor());
+			try {
+			    project.setHidden(true);
+			} catch (Exception ignored) {
+				// It is not hidden for the test decks
+			}
+		}
+		if (!project.isOpen()) {
+		    project.open(new NullProgressMonitor());
+		}
+		return project;
+	}
+
+	/**
+	 * 
+	 * @param modelPath
+	 * @return
+	 */
+	public static Workspace getWorkspace(final String modelPath) {
+		
+		IFile projFile = ModelUtils.getProjectFile(modelPath);
+		if (projFile!=null) {
+		    logger.info("Running project file "+projFile);
+		    return new Workspace(projFile.getProject().getName());
+		}
+		
+		final String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
+
+		// We must tell the composite actor the containing project name
+		String relPath = modelPath.substring(workspacePath.length());
+		projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
+		if (projFile!=null) {
+		    logger.info("Running project file "+projFile);
+	        return new Workspace(projFile.getProject().getName());
+		}
+		
+		if (relPath.startsWith("/")) relPath = relPath.substring(1);
+		final String projectName = relPath.substring(0, relPath.indexOf("/"));
+
+	    logger.info("Using project "+projectName);
+	    return new Workspace(projectName);
+	    
 	}
 }
