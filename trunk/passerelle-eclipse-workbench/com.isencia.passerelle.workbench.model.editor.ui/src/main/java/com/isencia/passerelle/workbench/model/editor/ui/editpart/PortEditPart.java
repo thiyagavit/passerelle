@@ -7,13 +7,9 @@ import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.AccessibleEditPart;
 import org.eclipse.gef.ConnectionEditPart;
-import org.eclipse.swt.accessibility.AccessibleControlEvent;
-import org.eclipse.swt.accessibility.AccessibleEvent;
 
 import ptolemy.actor.IOPort;
-import ptolemy.actor.IORelation;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
@@ -42,9 +38,9 @@ public class PortEditPart extends ActorEditPart {
 	@Override
 	protected IFigure createFigure() {
 		if (isInput)
-			return new CompoundInputFigure(((IOPort) getModel()).getName(),IOPort.class);
+			return new CompoundInputFigure(((IOPort) getModel()).getName(),getModel().getClass());
 		else
-			return new CompoundOutputFigure(((IOPort) getModel()).getName(),IOPort.class);
+			return new CompoundOutputFigure(((IOPort) getModel()).getName(),getModel().getClass());
 	}
 
 	public CompoundIOFigure getComponentFigure() {
@@ -123,16 +119,12 @@ public class PortEditPart extends ActorEditPart {
 		return null;
 	}
 
-	public ConnectionAnchor getSourceConnectionAnchor(
-			ConnectionEditPart connEditPart) {
-		return getComponentFigure().getConnectionAnchor(
-				CompoundInputFigure.INPUT_PORT_NAME);
+	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connEditPart) {
+		return getComponentFigure().getConnectionAnchor(CompoundInputFigure.INPUT_PORT_NAME);
 	}
 
-	public ConnectionAnchor getTargetConnectionAnchor(
-			ConnectionEditPart connEditPart) {
-		return getComponentFigure().getConnectionAnchor(
-				CompoundOutputFigure.OUTPUT_PORT_NAME);
+	public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connEditPart) {
+		return getComponentFigure().getConnectionAnchor(CompoundOutputFigure.OUTPUT_PORT_NAME);
 		
 	}
 
