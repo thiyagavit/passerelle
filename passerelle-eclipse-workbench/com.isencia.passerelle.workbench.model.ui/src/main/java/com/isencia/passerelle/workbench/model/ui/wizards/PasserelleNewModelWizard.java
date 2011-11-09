@@ -15,6 +15,8 @@ import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+
 /**
  * This is a sample new wizard. Its role is to create a new file 
  * resource in the provided container. If the container resource
@@ -99,7 +101,7 @@ public class PasserelleNewModelWizard extends Wizard implements INewWizard {
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
 		try {
-			InputStream stream = openContentStream(fileName);
+			InputStream stream = ModelUtils.getEmptyWorkflowStream(fileName);
 			if (file.exists()) {
 				throwCoreException("File \"" + fileName + "\" already exists in container");
 			} else {
@@ -123,26 +125,7 @@ public class PasserelleNewModelWizard extends Wizard implements INewWizard {
 		monitor.worked(1);
 	}
 	
-	/**
-	 * We will initialize file contents with a sample text.
-	 */
-
-	private InputStream openContentStream(String fileName) {
-		String contents =
-			"<?xml version=\"1.0\" standalone=\"no\"?> \r\n" + 
-			"<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n" +
-            "<entity name=\"" + 
-            fileName.substring(0, fileName.length() - 5) + 
-            "\" class=\"ptolemy.actor.TypedCompositeActor\"> \r\n" +
-            "   <property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\" /> \r\n" +
-            "   <property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\""+System.getProperty("passerelle.workbench.version")+"\" /> \r\n" +
-            "   <property name=\"Director\" class=\"com.isencia.passerelle.domain.cap.Director\" > \r\n" +
-        	"      <property name=\"_location\" class=\"ptolemy.kernel.util.Location\" value=\"{20, 20}\" /> \r\n" +
-            "   </property> \r\n" +
-        	"</entity>";
-		return new ByteArrayInputStream(contents.getBytes());
-	}
-
+	
 	private void throwCoreException(String message) throws CoreException {
 		IStatus status =
 			new Status(IStatus.ERROR, "com.isencia.passerelle.workbench.model.editor.ui", IStatus.OK, message, null);
