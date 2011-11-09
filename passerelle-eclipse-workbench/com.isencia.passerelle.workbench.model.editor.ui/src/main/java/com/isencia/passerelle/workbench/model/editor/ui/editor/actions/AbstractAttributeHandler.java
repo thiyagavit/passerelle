@@ -15,11 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.IllegalActionException;
-
-import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
-import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
-import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
 public abstract class AbstractAttributeHandler extends AbstractHandler implements IViewActionDelegate, ISelectionListener {
 
