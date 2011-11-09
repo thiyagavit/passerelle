@@ -7,16 +7,18 @@ import org.eclipse.gef.palette.PaletteContainer;
 import org.eclipse.gef.palette.PaletteEntry;
 import org.eclipse.gef.ui.palette.customize.DefaultEntryPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PasserelleEntryPage extends DefaultEntryPage {
 
+	private static Logger logger = LoggerFactory.getLogger(PasserelleEntryPage.class);
+	
 	@Override
 	public void createControl(Composite parent, PaletteEntry entry) {
 		// TODO Auto-generated method stub
@@ -24,16 +26,19 @@ public class PasserelleEntryPage extends DefaultEntryPage {
 		Composite panel = (Composite) getControl();
 		Control[] tablist = new Control[1];
 		createLabel(panel, SWT.NONE, "Group");
-		tablist[0] = createGroupText(panel, entry);
+		try {
+			tablist[0] = createGroupText(panel, entry);
+		} catch (Exception e) {
+			logger.error("Cannot create group text", e);
+		}
 
 		panel.setTabList(tablist);
 	}
 
-	protected Combo createGroupText(Composite panel, PaletteEntry entry) {
+	protected Combo createGroupText(Composite panel, PaletteEntry entry) throws Exception {
 		PaletteContainer container = entry.getParent();
 		Combo group = new Combo(panel, SWT.SINGLE);
-		String[] favoriteGroupNames = PaletteItemFactory.getInstance()
-				.getFavoriteGroupNames();
+		String[] favoriteGroupNames = PaletteItemFactory.getInstance().getFavoriteGroupNames();
 		group.setItems(favoriteGroupNames);
 		String label = getEntry().getParent().getLabel();
 		List groups = Arrays.asList(favoriteGroupNames);
