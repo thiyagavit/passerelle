@@ -7,8 +7,12 @@ import javax.management.MBeanServerConnection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchManager;
@@ -18,12 +22,15 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.launch.ModelRunner;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
@@ -40,7 +47,7 @@ import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
  *
  */
 @SuppressWarnings("restriction")
-public class RunAction extends ExecutionAction implements IEditorActionDelegate {
+public class RunAction extends ExecutionAction implements IEditorActionDelegate, ModelChangeListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(RunAction.class);
 	
@@ -49,6 +56,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
 		setId(getClass().getName());
 		setText("Run the workflow from start to end until finished.");
 		setImageDescriptor(Activator.getImageDescriptor("/icons/run_workflow.gif"));
+   		ExecutionAction.addModelChangeListener(this);
 	}
 
 	@Override
@@ -58,10 +66,24 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
 	
 	@Override
 	public void run(IAction action) {
+		try {
+			final IFile   config  = getModelRunner();
+			run(config);
+		} catch (Exception e) {
+			logger.error("Cannot read configuration", e);
+		}
+	}
+	
+	public void run(IFile config) {
 	    
 		try {
-			final IFile config = getModelRunner();
-			EclipseUtils.getPage().saveAllEditors(true);
+
+            // We will ensure console view is selected
+            final IWorkbenchPage page = EclipseUtils.getPage();
+            page.showView("org.eclipse.ui.console.ConsoleView");
+
+			final boolean didSave = EclipseUtils.getPage().saveAllEditors(true);
+			if (!didSave) return;
 			
 			final IEditorPart editor = EclipseUtils.getPage().getActiveEditor();
 			if (editor!=null)  EclipseUtils.getPage().activate(editor);
@@ -70,7 +92,24 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
 			final IResource sel = getSelectedResource();
 			if (sel instanceof IFile)  EclipseUtils.openEditor((IFile)sel);
 			
+			// Select any editor which is PasserelleModelMultiPageEditor.ID
+			if (sel==null && editor==null) {
+				final IEditorReference[] refs = EclipseUtils.getPage().getEditorReferences();
+				for (int i = 0; i < refs.length; i++) {
+					if (refs[i].getId().equals(PasserelleModelMultiPageEditor.ID)) {
+						 EclipseUtils.getPage().activate(refs[i].getEditor(true));
+						 break;
+					}
+				}
+			}
+			
+			// Save the current workspace.
+			saveWorkSpace();
+			
+            fireRunListeners();
+            
             if (System.getProperty("eclipse.debug.session")!=null) {
+            	
 				final Job job = new Job("Run workflow debug mode") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
@@ -86,70 +125,39 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
 				job.setUser(false);
 				job.setPriority(Job.LONG);
 				job.schedule();
-				
-				refreshToolbars();
+				updateActionsAvailable(200);
 				
 			} else { // Normally the case in real application
 				// TODO Find way of sending port, addSystemProperty not working
 				WorkflowLaunchConfiguration configuration = new WorkflowLaunchConfiguration(config);
 				configuration.addSystemProperty("com.isencia.jmx.service.port");
 				DebugUITools.launch(configuration, ILaunchManager.RUN_MODE);
-				createModelListener();
+				
 			}
-			
-			
+            
+ 			 			
 		} catch (Exception e) {
 			logger.error("Cannot read configuration", e);
-			refreshToolbars();
+			updateActionsAvailable(500);
 		}
 
 	}
+
+	@Override
+	public void executionStarted(ModelChangeEvent evt) {
+		updateActionsAvailable(100);
+	}
+
+	@Override
+	public void executionTerminated(ModelChangeEvent evt) {
+		updateActionsAvailable(500);
+	}
 	
-	private void createModelListener() {
+	private void saveWorkSpace() throws CoreException {
 		
-		// Polling is horrible...
-		final Job job = new Job("Running workflow") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					logger.debug("Running run buttons update task");
-					int waited = 0;
-					// BODGE Sleep while starting and then refresh when service up.
-					while(DebugUITools.getCurrentProcess()==null) {
-						Thread.sleep(100);
-						waited+=100;
-						if (waited>=10000) break;
-					}
-					logger.debug("process "+DebugUITools.getCurrentProcess());
-					logger.debug("process "+DebugUITools.getCurrentProcess().getLabel());
-
-
-				} catch (Exception ignored) {
-					// try to wait, if not then die.
-				}
-				try {
-					logger.debug("Adding polling");
-					MBeanServerConnection client = RemoteManagerAgent.getServerConnection(10000);
-					while(client.isRegistered(RemoteManagerAgent.REMOTE_MANAGER)) {
-						refreshToolbars();
-						Thread.sleep(1000);
-						monitor.worked(1);
-					}
-					refreshToolbars();
-				} catch (Exception e) {
-					logger.error("Cannot add polling to be notified when run finished.", e);
-				}
-				monitor.done();
-				return Status.OK_STATUS;
-			}
-		};
+		IWorkspace ws = ResourcesPlugin.getWorkspace();
+		ws.save(true, new NullProgressMonitor());
 		
-		// This makes the job show in the status but does not 
-		// pop up a dialog.
-		job.setUser(false);
-		job.setPriority(Job.SHORT);
-		job.schedule(500);
-
 	}
 	
 	public boolean isEnabled() {
@@ -175,13 +183,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
         Bundle bundle = Activator.getDefault().getBundle();
 
         // look for the image (this will check both the plugin and fragment folders
-        URL fullPathString = null;
-        if ("true".equals(System.getProperty("edna","true"))){	
-        	fullPathString = BundleUtility.find(bundle, "ModelRunnerEdna.txt");
-        } else{
-        	fullPathString = BundleUtility.find(bundle, "ModelRunner.txt");
-        	
-        }
+        URL fullPathString = BundleUtility.find(bundle, "ModelRunner.txt");
         final IResource sel= getSelectedResource();
         final IFile   file = sel.getProject().getFile("WorkflowConfiguration.launch");
         if (file.exists()) return file;
@@ -210,5 +212,4 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate 
 		// TODO Auto-generated method stub
 
 	}
-
 }
