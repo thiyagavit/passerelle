@@ -164,10 +164,10 @@ public class ActorAttributesView extends ViewPart implements
 					                        ? (Director)((Actor)actor).getDirector()
 					                        : null;
 					if (actor instanceof Actor && director!=null && director.isExpertMode()) {
-						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
+						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.get().getType(actor.getClass())));
 						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
 					}
-					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.getInstance().getType(actor.getName())));
+					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.get().getType(actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
 				}
