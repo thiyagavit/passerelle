@@ -69,21 +69,29 @@ public class PaletteBuilder {
 		} catch (Exception e) {
 			logger.error("Error creating Palette Categories", e);
 		}
+		try {
+
 		String[] favoriteGroups = factory.getFavoriteGroupNames();
 		for (String favoriteGroup : favoriteGroups) {
-			PaletteContainer createPaletteContainer = createFavoriteContainer(favoriteGroup);
-			favoritesContainers.put(favoriteGroup, createPaletteContainer);
-			categories.add(createPaletteContainer);
-			String favorites = ModelUtils.getStore().getString(favoriteGroup);
-			if (favorites != null && !favorites.isEmpty()) {
-				String[] names = favorites.split(",");
-				for (String name : names) {
-					factory.addFavorite(name,
-							(PaletteContainer) createPaletteContainer);
+				PaletteContainer createPaletteContainer = createFavoriteContainer(favoriteGroup);
+				favoritesContainers.put(favoriteGroup, createPaletteContainer);
+				categories.add(createPaletteContainer);
+				String favorites;
+				try {
+					favorites = ModelUtils.getFavouritesStore().getString(favoriteGroup);
+					if (favorites != null && !favorites.isEmpty()) {
+						String[] names = favorites.split(",");
+						for (String name : names) {
+							factory.addFavorite(name,
+									(PaletteContainer) createPaletteContainer);
+						}
+					}
+				} catch (Exception e) {
 				}
-			}
-		}
 
+			}
+		} catch (Exception e) {
+		}
 		return categories;
 	}
 
@@ -105,6 +113,7 @@ public class PaletteBuilder {
 	}
 
 	public static void synchFavorites(PaletteViewer paletteViewer) {
+		try{
 		StringBuffer containers = new StringBuffer();
 		List containertLis = paletteRoot.getChildren();
 		for (Object e : containertLis) {
@@ -137,18 +146,18 @@ public class PaletteBuilder {
 					}
 					addFavoriteGroup(favoritesContainer.getLabel(),
 							favoritesContainer);
-					ModelUtils.getStore().putValue(favoritesContainer.getLabel(),
+					ModelUtils.getFavouritesStore().putValue(favoritesContainer.getLabel(),
 							entries.toString());
 				}
 
 			}
 		}
-		ModelUtils.getStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,
+		ModelUtils.getFavouritesStore().putValue(PaletteItemFactory.FAVORITE_GROUPS,
 				containers.toString());
 		WorkbenchUtility.addMouseListenerToPaletteViewer(paletteViewer);
-		try {
-			ModelUtils.getStore().save();
-		} catch (IOException ex) {
+
+			ModelUtils.getFavouritesStore().save();
+		} catch (Exception ex) {
 		}
 
 	}

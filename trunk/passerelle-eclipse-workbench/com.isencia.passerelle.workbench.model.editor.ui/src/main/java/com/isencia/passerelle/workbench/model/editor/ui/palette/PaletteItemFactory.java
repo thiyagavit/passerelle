@@ -1,11 +1,5 @@
 package com.isencia.passerelle.workbench.model.editor.ui.palette;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
@@ -33,10 +26,9 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
 public class PaletteItemFactory implements Serializable {
 
@@ -53,15 +45,14 @@ public class PaletteItemFactory implements Serializable {
 		this.selectedItem = selectedItem;
 	}
 
-	public String[] getFavoriteGroupNames() {
-		String groups = ModelUtils.getStore().getString(FAVORITE_GROUPS);
+	public String[] getFavoriteGroupNames() throws Exception {
+		String groups = ModelUtils.getFavouritesStore().getString(
+				FAVORITE_GROUPS);
 		if (groups == null || groups.isEmpty()) {
 			return new String[] { DEFAULT_FAVORITES_NAME };
 		}
 		return groups.split(",");
 	}
-
-
 
 	List<PaletteGroup> paletteGroups;
 	private static PaletteItemFactory factory;
@@ -86,11 +77,17 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public String[] getFavorites() {
-		PreferenceStore store = ModelUtils.getStore();
-		if (store == null) {
-			return new String[0];
+		PreferenceStore store;
+		try {
+			store = ModelUtils.getFavouritesStore();
+
+			if (store == null) {
+				return new String[0];
+			}
+			return store.preferenceNames();
+		} catch (Exception e) {
+			return null;
 		}
-		return store.preferenceNames();
 	}
 
 	public static PaletteItemFactory getInstance() {
@@ -102,7 +99,11 @@ public class PaletteItemFactory implements Serializable {
 
 	private PaletteItemFactory() {
 		super();
-		init();
+		try {
+			init();
+		} catch (Exception e) {
+
+		}
 	}
 
 	private Map<String, PaletteGroup> groups;
@@ -208,7 +209,11 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 	public void removeFavorite(String name) {
-		ModelUtils.getStore().putValue(name, "");
+		try {
+			ModelUtils.getFavouritesStore().putValue(name, "");
+		} catch (Exception e) {
+
+		}
 	}
 
 	public boolean addFavorite(String name, PaletteContainer container) {
@@ -219,7 +224,7 @@ public class PaletteItemFactory implements Serializable {
 
 			CombinedTemplateCreationEntry createPaletteEntryFromPaletteDefinition = createPaletteEntryFromPaletteDefinition(paletteItem);
 			container.add(createPaletteEntryFromPaletteDefinition);
-			
+
 			return true;
 		}
 
@@ -271,190 +276,128 @@ public class PaletteItemFactory implements Serializable {
 		return userLibrary;
 	}
 
-	private void init() {
+	public static final String COMPOSITE_ID = "com.isencia.passerelle.workbench.model.editor.ui.palette.composites";
+	public static final String COMPOSITE_LABEL = "Composites";
+	private PaletteGroup composites;
+
+	public PaletteGroup getComposites() {
+		return composites;
+	}
+
+	private void init() throws Exception {
+
 		paletteGroups = new ArrayList<PaletteGroup>();
-		userLibrary = new PaletteGroup(USER_LIBRARY, USER_LIBRARY);
-		paletteGroups.add(userLibrary);
+
+		composites = new PaletteGroup(COMPOSITE_ID, COMPOSITE_LABEL);
+		composites
+				.setIcon(Activator.getImageDescriptor("icons/Composites.png"));
+
+		paletteGroups.add(composites);
 		groups = new HashMap<String, PaletteGroup>();
 		paletteItemMap = new HashMap<String, PaletteItemDefinition>();
 		ImageDescriptor icon = null;
 
-		try {
-			IConfigurationElement[] config = Platform.getExtensionRegistry()
-					.getConfigurationElementsFor(
-							"com.isencia.passerelle.engine.actorGroups");
-			if (config != null) {
-				for (IConfigurationElement configurationElement : config) {
-					String nameAttribute = configurationElement
-							.getAttribute("name");
-					String idAttribute = configurationElement
-							.getAttribute("id");
-					String iconAttribute = configurationElement
-							.getAttribute("icon");
-					String priorityAttribute = configurationElement
-							.getAttribute("priority");
-					String expandedAttribute = configurationElement
-							.getAttribute("open");
-
-					PaletteGroup e = new PaletteGroup(idAttribute,
-							nameAttribute);
-					if (priorityAttribute != null) {
-						try {
-							e.setPriority(Integer.parseInt(priorityAttribute));
-						} catch (Exception e2) {
-
-						}
-					}
-					if (expandedAttribute != null) {
-						try {
-							e.setExpanded(new Boolean(expandedAttribute));
-						} catch (Exception e2) {
-
-						}
-					}
-					final String bundleId = configurationElement
-							.getDeclaringExtension().getContributor().getName();
-					Bundle bundle = Platform.getBundle(bundleId);
-					icon = Activator.getImageDescriptor("icons/ide.gif");
-					if (iconAttribute != null && !iconAttribute.isEmpty()) {
-						try {
-							icon = Activator.getImageDescriptor(bundleId,
-									iconAttribute);
-
-						} catch (Exception e2) {
-
-						}
-					}
-					e.setIcon(icon);
-					groups.put(e.getId(), e);
-
-				}
-			}
+		IConfigurationElement[] config = Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(
+						"com.isencia.passerelle.engine.actorGroups");
+		if (config != null) {
 			for (IConfigurationElement configurationElement : config) {
-				String parentAttribute = configurationElement
-						.getAttribute("parent");
+
+				String nameAttribute = configurationElement
+						.getAttribute("name");
 				String idAttribute = configurationElement.getAttribute("id");
-				PaletteGroup currentGroup = groups.get(idAttribute);
-				PaletteGroup parentGroup = null;
-				if (parentAttribute != null) {
-					parentGroup = groups.get(parentAttribute);
+				String iconAttribute = configurationElement
+						.getAttribute("icon");
+				String priorityAttribute = configurationElement
+						.getAttribute("priority");
+				String expandedAttribute = configurationElement
+						.getAttribute("open");
+
+				PaletteGroup e = new PaletteGroup(idAttribute, nameAttribute);
+				if (priorityAttribute != null) {
+					e.setPriority(Integer.parseInt(priorityAttribute));
 				}
-				if (parentGroup != null) {
-					parentGroup.addPaletteGroup(currentGroup);
-					currentGroup.setParent(parentGroup);
-				} else {
-					paletteGroups.add(currentGroup);
+				if (expandedAttribute != null) {
+					e.setExpanded(new Boolean(expandedAttribute));
 				}
+				final String bundleId = configurationElement
+						.getDeclaringExtension().getContributor().getName();
+
+				icon = Activator.getImageDescriptor("icons/ide.gif");
+				if (iconAttribute != null && !iconAttribute.isEmpty()) {
+					icon = Activator
+							.getImageDescriptor(bundleId, iconAttribute);
+				}
+				e.setIcon(icon);
+				groups.put(e.getId(), e);
 
 			}
-			java.util.Collections.sort(paletteGroups);
-
-		} catch (Exception e) {
-
 		}
 
-		for (Flow flow : getSubModels().values()) {
+		for (IConfigurationElement configurationElement : config) {
+			String parentAttribute = configurationElement
+					.getAttribute("parent");
+			String idAttribute = configurationElement.getAttribute("id");
+			PaletteGroup currentGroup = groups.get(idAttribute);
+			PaletteGroup parentGroup = null;
+			if (parentAttribute != null) {
+				parentGroup = groups.get(parentAttribute);
+			}
+			if (parentGroup != null) {
+				parentGroup.addPaletteGroup(currentGroup);
+				currentGroup.setParent(parentGroup);
+			} else {
+				paletteGroups.add(currentGroup);
+			}
+
+		}
+		java.util.Collections.sort(paletteGroups);
+
+		for (String id : SubModelUtils.getSubModels().keySet()) {
+			final Flow flow = SubModelUtils.getSubModels().get(id);
 			addSubModel(flow);
 		}
 
-		// Find all Actors and add them to the corresponding container
-		try {
-			IConfigurationElement[] config = Platform.getExtensionRegistry()
-					.getConfigurationElementsFor(
-							"com.isencia.passerelle.engine.actors");
-			if (config != null) {
-				for (IConfigurationElement configurationElement : config) {
-					String nameAttribute = configurationElement
-							.getAttribute("name");
-					String colorAttribute = configurationElement
-							.getAttribute("color");
-					String idAttribute = configurationElement
-							.getAttribute("id");
+		config = Platform.getExtensionRegistry().getConfigurationElementsFor(
+				"com.isencia.passerelle.engine.actors");
+		if (config != null) {
+			for (IConfigurationElement ele : config) {
 
-					String groupAttribute = configurationElement
-							.getAttribute("group");
-					PaletteGroup group = groups.get(groupAttribute);
-					String iconAttribute = configurationElement
-							.getAttribute("icon");
+				String nameAttribute = ele.getAttribute("name");
+				String colorAttribute = ele.getAttribute("color");
+				String idAttribute = ele.getAttribute("id");
 
-					final String bundleId = configurationElement
-							.getDeclaringExtension().getContributor().getName();
+				String groupAttribute = ele.getAttribute("group");
+				PaletteGroup group = groups.get(groupAttribute);
+				String iconAttribute = ele.getAttribute("icon");
 
-					Bundle bundle = Platform.getBundle(bundleId);
-					icon = Activator.getImageDescriptor("icons/ide.gif");
-					if (iconAttribute != null && !iconAttribute.isEmpty()) {
-						try {
-							icon = Activator.getImageDescriptor(bundleId,
-									iconAttribute);
+				final String bundleId = ele.getDeclaringExtension()
+						.getContributor().getName();
 
-						} catch (Exception e) {
+				icon = Activator.getImageDescriptor("icons/ide.gif");
+				if (iconAttribute != null && !iconAttribute.isEmpty()) {
+					icon = Activator
+							.getImageDescriptor(bundleId, iconAttribute);
+				}
 
-						}
-					}
+				final Class<?> clazz = loadClass(ele, bundleId);
 
-					final Class<?> clazz = loadClass(configurationElement,
-							bundleId);
-
-					if (clazz != null && group != null) {
-						actorBundleMap.put(clazz.getName(), bundleId);
-						PaletteItemDefinition item = new PaletteItemDefinition(
-								icon, group, idAttribute, nameAttribute,
-								colorAttribute, clazz);
-						paletteItemMap.put(item.getClazz().getName(), item);
-					}
+				if (clazz != null && group != null) {
+					actorBundleMap.put(clazz.getName(), bundleId);
+					PaletteItemDefinition item = new PaletteItemDefinition(
+							icon, group, idAttribute, nameAttribute,
+							colorAttribute, clazz);
+					paletteItemMap.put(item.getClazz().getName(), item);
 				}
 			}
-		} catch (Exception e) {
 		}
-
 	}
 
-	public void registerSubModel(Flow flow) {
-		if (modelList == null) {
-			modelList = getSubModels();
-		}
-		String model = flow.getName();
-		if (!modelList.containsKey(model)) {
-			modelList.put(model, flow);
+	public void addSubModel(Flow flow) throws Exception {
 
-			StringBuffer modelString = new StringBuffer(ModelUtils.getStore().getString(
-					ModelUtils.SUBMODELS));
-			modelString.append(model);
-			modelString.append(",");
-			ModelUtils.getStore().putValue(ModelUtils.SUBMODELS, modelString.toString());
-			try {
-				ModelUtils.getStore().save();
-			} catch (IOException e1) {
-
-			}
-
-		}
-
-	}
-
-	private Map<String, Flow> modelList;
-
-	public void addSubModel(String name, Flow model) {
-		if (modelList != null)
-			modelList.put(name, model);
-	}
-
-	public Map<String, Flow> getSubModels() {
-
-		if (modelList == null) {
-			return modelList = ModelUtils.readSubModels();
-
-		}
-		return modelList;
-	}
-
-
-
-
-	public void addSubModel(Flow flow) {
 		if (!paletteItemMap.containsKey(flow.getName())) {
 			SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(
-					flow, userLibrary, flow.getName(), flow.getName());
+					flow, composites, flow.getName(), flow.getName());
 			paletteItemMap.put(flow.getName(), item);
 		} else {
 			PaletteItemDefinition item = paletteItemMap.get(flow.getName());
@@ -462,8 +405,14 @@ public class PaletteItemFactory implements Serializable {
 				((SubModelPaletteItemDefinition) item).setFlow(flow);
 			}
 		}
-		MoMLParser.putActorClass(flow.getName(), flow);
-		registerSubModel(flow);
+	}
+
+	public PaletteItemDefinition removeSubModel(String name) throws Exception {
+		PaletteItemDefinition def = paletteItemMap.remove(name);
+		final PaletteGroup grp = def.getGroup();
+		if (grp != null)
+			grp.removePaletteItem(def);
+		return def;
 	}
 
 	private static Class<?> loadClass(

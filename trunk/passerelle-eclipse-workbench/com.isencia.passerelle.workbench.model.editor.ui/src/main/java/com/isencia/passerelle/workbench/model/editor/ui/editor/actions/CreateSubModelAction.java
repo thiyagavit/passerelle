@@ -33,12 +33,33 @@ public class CreateSubModelAction extends SelectionAction {
 	private PasserelleModelMultiPageEditor parent;
 	private final String icon = "icons/flow.png";
 	public static String CREATE_SUBMODEL = "createSubModel";
-
-	public CreateSubModelAction(IEditorPart part,
-			PasserelleModelMultiPageEditor parent) {
+	/**
+	 * Creates an empty model
+	 * @param part
+	 */
+	public CreateSubModelAction() {
+		this(null,null);
+		setId(ActionFactory.NEW.getId());
+	}
+	/**
+	 * Creates an empty model
+	 * @param part
+	 */
+	public CreateSubModelAction(final IEditorPart part) {
+		this(part,null);
+		setId(ActionFactory.NEW.getId());
+	}
+	/**
+	 * Creates the model from the contents of the part
+	 * @param part
+	 * @param parent
+	 */
+	public CreateSubModelAction(final IEditorPart part, 
+			                    final PasserelleModelMultiPageEditor parent) {
 		super(part);
 		this.parent = parent;
 		setLazyEnablementCalculation(true);
+		if (parent!=null) setId(ActionFactory.EXPORT.getId());
 	}
 
 	@Override
@@ -59,9 +80,9 @@ public class CreateSubModelAction extends SelectionAction {
 	@Override
 	public void run() {
 		try {
-			
+
 			exportEntityToClassFile(parent.getSelectedContainer());
-//			parent.getActorTreeViewPage().getTreeViewer().refresh();
+			// parent.getActorTreeViewPage().getTreeViewer().refresh();
 		} catch (Exception e) {
 		}
 	}

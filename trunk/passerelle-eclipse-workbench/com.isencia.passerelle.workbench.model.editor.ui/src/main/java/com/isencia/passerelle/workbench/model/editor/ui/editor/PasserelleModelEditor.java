@@ -853,6 +853,26 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		return root.getZoomManager();
 	}
 
+	public void setActorSelected(final String actorName,
+			final boolean isSelected) {
+
+		final ComponentEntity sel = ModelUtils.findEntityByName(getContainer(),
+				actorName);
+		GraphicalViewer gv = getGraphicalViewer();
+		final Map<?, ?> reg = gv.getEditPartRegistry();
+		final AbstractGraphicalEditPart part = (AbstractGraphicalEditPart) reg
+				.get(sel);
+		if (part != null) {
+			if (isSelected) {
+				part.setSelected(EditPart.SELECTED_PRIMARY);
+				part.getFigure().setBorder(
+						new LineBorder(Display.getCurrent().getSystemColor(
+								SWT.COLOR_RED), 1));
+			} else {
+				part.getFigure().setBorder(null);
+			}
+		}
+	}
 	@Override
 	public IFigure getWorkflowFigure() {
 		return getEditor().getContents();
