@@ -1,14 +1,9 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.internal.ui.palette.editparts.DrawerEditPart;
 import org.eclipse.gef.palette.PaletteContainer;
-import org.eclipse.gef.palette.PaletteDrawer;
 import org.eclipse.gef.palette.PaletteEntry;
 import org.eclipse.gef.ui.palette.PaletteCustomizer;
 import org.eclipse.gef.ui.palette.PaletteMessages;
@@ -17,10 +12,15 @@ import org.eclipse.gef.ui.palette.customize.PaletteDrawerFactory;
 import org.eclipse.gef.ui.palette.customize.PaletteSeparatorFactory;
 import org.eclipse.gef.ui.palette.customize.PaletteStackFactory;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class PasserellePaletteCustomizer extends PaletteCustomizer {
+	
+	private static Logger logger = LoggerFactory.getLogger(PasserellePaletteCustomizer.class);
+	
 	public PasserellePaletteCustomizer(PaletteViewer paletteViewer) {
 		super();
 		this.paletteViewer = paletteViewer;
@@ -58,7 +58,11 @@ public class PasserellePaletteCustomizer extends PaletteCustomizer {
 
 	@Override
 	public void save() {
-		PaletteBuilder.synchFavorites(paletteViewer);
+		try {
+			PaletteBuilder.synchFavorites(paletteViewer);
+		} catch (Exception e) {
+			logger.error("Cannot sync favourites!", e);
+		}
 	}
 
 }
