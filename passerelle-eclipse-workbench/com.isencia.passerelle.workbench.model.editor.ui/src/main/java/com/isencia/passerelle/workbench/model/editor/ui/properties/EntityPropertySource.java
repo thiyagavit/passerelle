@@ -178,11 +178,11 @@ public class EntityPropertySource implements IPropertySource {
 						parameter.setExpression(v);
 
 					}
-					if (entity.getClass().getSimpleName()
-							.equals("Synchronizer")
-							&& parameter.getName().equals("Extra nr of ports")) {
-						changeNumberOfPortsOnFigure(value, parameter, oldValue);
-					}
+//					if (entity.getClass().getSimpleName()
+//							.equals("Synchronizer")
+//							&& parameter.getName().equals("Extra nr of ports")) {
+//						changeNumberOfPortsOnFigure(value, parameter, oldValue);
+//					}
 				} else if (attr instanceof StringAttribute) {
 					StringAttribute attribute = (StringAttribute) attr;
 					String v = null;
@@ -191,7 +191,6 @@ public class EntityPropertySource implements IPropertySource {
 					}
 					attribute.setExpression(v);
 				}
-				figure.repaint();
 
 			}
 
