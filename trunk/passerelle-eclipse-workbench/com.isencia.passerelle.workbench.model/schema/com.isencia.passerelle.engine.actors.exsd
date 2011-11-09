@@ -21,9 +21,9 @@ Such contributed actor extensions can typically be used in 2 contexts :
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
+         <sequence minOccurs="1" maxOccurs="unbounded">
             <element ref="actor"/>
-         </choice>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -100,7 +100,7 @@ Such contributed actor extensions can typically be used in 2 contexts :
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="com.isencia.passerelle.engine.api.actorGroups/actorgroup/@id"/>
+                  <meta.attribute kind="identifier" basedOn="com.isencia.passerelle.engine.actorGroups/actorgroup/@id"/>
                </appinfo>
             </annotation>
          </attribute>
