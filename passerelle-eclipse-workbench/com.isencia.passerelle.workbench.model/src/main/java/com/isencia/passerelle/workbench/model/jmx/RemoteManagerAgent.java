@@ -1,6 +1,8 @@
 package com.isencia.passerelle.workbench.model.jmx;
 
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.workbench.model.activator.Activator;
+import com.isencia.passerelle.workbench.model.launch.ModelRunner;
 
 import ptolemy.actor.Manager;
 
@@ -48,12 +51,20 @@ public class RemoteManagerAgent {
 		this.remoteManager = new RemoteManager(manager);
 		final int port     = Integer.parseInt(System.getProperty("com.isencia.jmx.service.port"));
 		
-		String hostName = System.getProperty("org.dawb.workbench.jmx.host.name");
-		if (hostName==null) hostName = "localhost";
+		String hostName = getHostName();
 
 		this.serverUrl     = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+hostName+":"+port+"/workflow");
+		logger.debug("Workflow URI: "+serverUrl.getURLPath());
 	}
 	
+	private static final String getHostName() throws UnknownHostException {
+		String hostName = System.getProperty("org.dawb.workbench.jmx.host.name");
+		if (hostName==null) hostName = InetAddress.getLocalHost().getHostName();
+		if (hostName==null) hostName = InetAddress.getLocalHost().getHostAddress();
+		if (hostName==null) hostName = "localhost";
+		return hostName;
+	}
+
 	/**
 	 * Call this method to start the agent which will deploy the
 	 * service on JMX.
@@ -99,6 +110,11 @@ public class RemoteManagerAgent {
 				remoteManager.sendNotification(RemoteManager.STOP_CODE);
 			}
 			remoteManager = null;
+			
+			logger.debug("Model runner asked to stop");
+			if (ModelRunner.getRunningInstance()!=null) {
+				ModelRunner.getRunningInstance().stop();
+			}
 		}
 		
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -106,6 +122,7 @@ public class RemoteManagerAgent {
 	    	ObjectInstance inst = mbs.getObjectInstance(REMOTE_MANAGER);
 		    if (inst!=null) {
 		    	mbs.unregisterMBean(REMOTE_MANAGER);
+				logger.debug("Workflow service stopped on "+serverUrl);
 		    }
 	    } catch (Exception w) {
 	    	if (external) logger.error("Cannot unregisterMBean "+REMOTE_MANAGER, w);
@@ -118,6 +135,7 @@ public class RemoteManagerAgent {
 	    } catch (Exception w) {
 	    	if (external) logger.error("Cannot unregisterMBean "+REMOTE_MANAGER, w);
 	    }
+
 	}
 
 	/**
@@ -143,8 +161,7 @@ public class RemoteManagerAgent {
 			
 			waited+=100;
 			try {
-				String hostName = System.getProperty("org.dawb.workbench.jmx.host.name");
-				if (hostName==null) hostName = "localhost";
+				final String hostName       = getHostName();
 				final int     port          = Integer.parseInt(System.getProperty("com.isencia.jmx.service.port"));
 				JMXServiceURL serverUrl     = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+hostName+":"+port+"/workflow");
 				JMXConnector  conn = JMXConnectorFactory.connect(serverUrl);
@@ -154,7 +171,7 @@ public class RemoteManagerAgent {
                 
 			} catch (Throwable ne) {
 				if (waited>=timeout) {
-					throw new Exception("Cannot get connection", ne);
+					throw new Exception("Cannot get connection. Connection took longer than "+timeout, ne);
 				} else {
 					Thread.sleep(100);
 					continue;

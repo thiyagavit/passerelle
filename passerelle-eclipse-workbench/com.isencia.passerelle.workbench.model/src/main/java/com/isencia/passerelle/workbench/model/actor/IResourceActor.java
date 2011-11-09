@@ -39,8 +39,9 @@ public interface IResourceActor {
 	 * 
 	 * @param iresource
 	 * @return
+	 * @throws Exception 
 	 */
-	public ResourceObject getResource(final int iresource);
+	public ResourceObject getResource(final int iresource) throws Exception;
 
 	
 
