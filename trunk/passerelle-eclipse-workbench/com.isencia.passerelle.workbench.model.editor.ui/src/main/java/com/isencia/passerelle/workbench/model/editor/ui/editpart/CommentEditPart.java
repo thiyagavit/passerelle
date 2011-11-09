@@ -1,7 +1,10 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import org.eclipse.draw2d.ConnectionAnchor;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Shape;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
@@ -9,48 +12,35 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.ChangeRequest;
-import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
-import com.isencia.passerelle.workbench.model.editor.ui.INameable;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CommentFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CommentPropertySource;
-import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
-import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
-import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
-import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class CommentEditPart extends AbstractNodeEditPart {
 
 	protected void onChangePropertyResource(Object source) {
+		
+		final String nameChanged = ((StringAttribute)source).getContainer().getName();
+		final String thisName    = ((TextAttribute)getModel()).getName();
+		
+		if (!nameChanged.equals(thisName)) return;
+		
 		if (source instanceof TextAttribute || source instanceof StringAttribute) {
-			String name = getName(source);
-			if ((getComponentFigure() instanceof INameable)
-					&& name != null
-					&& !name.equals(((INameable) getComponentFigure())
-							.getName())) {
-				// Execute the dummy command force a dirty state
-				getViewer().getEditDomain().getCommandStack().execute(
-						new ChangeActorPropertyCommand());
-				((CommentFigure) getFigure()).setName(name);
-				getFigure().repaint();
-				refresh();
-			}
-		}
-		if (source instanceof StringAttribute) {
+			
+			String label = getText(source);
 
+			// Execute the dummy command force a dirty state
+			((CommentFigure) getFigure()).setText(label);
+			getFigure().repaint();
 		}
 	}
 
 	protected void createEditPolicies() {
-
-		installEditPolicy(EditPolicy.COMPONENT_ROLE,
-				new ComponentNodeDeletePolicy());
+		installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy());
 	}
 
 	/**
@@ -59,14 +49,13 @@ public class CommentEditPart extends AbstractNodeEditPart {
 	 * @return Figure of this.
 	 */
 	protected IFigure createFigure() {
-		Attribute attribute = ((TextAttribute) getModel()).getAttribute("text");
-		String name = "";
-		if (attribute instanceof StringAttribute) {
-			name = ((StringAttribute) attribute).getExpression();
-		}
-		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
-				TextAttribute.class);
-		return new CommentFigure(name, createImage(imageDescriptor));
+		
+		final Object model = getModel();
+		final String label = getText(model);
+		
+		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(TextAttribute.class);
+		
+		return new CommentFigure(label, createImage(imageDescriptor));
 	}
 
 	public CommentFigure getCommentFigure() {
@@ -89,7 +78,7 @@ public class CommentEditPart extends AbstractNodeEditPart {
 		return propertySource;
 	}
 
-	protected String getName(Object source) {
+	protected String getText(Object source) {
 		if (source instanceof StringAttribute) {
 			return ((StringAttribute) source).getExpression();
 		}
@@ -100,7 +89,6 @@ public class CommentEditPart extends AbstractNodeEditPart {
 		}
 		return "";
 	}
-
 	@Override
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart arg0) {
 		// Not source connection anchor for Comment
