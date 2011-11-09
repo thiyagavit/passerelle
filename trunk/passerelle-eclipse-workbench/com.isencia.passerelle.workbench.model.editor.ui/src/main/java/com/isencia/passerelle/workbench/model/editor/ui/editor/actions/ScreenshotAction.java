@@ -59,20 +59,20 @@ public class ScreenshotAction extends SelectionAction {
 	    ImageLoader loader = new ImageLoader();
 	    
 	    final IPasserelleEditor ed = (IPasserelleEditor)getWorkbenchPart();
-	    final IFigure     workflow = ed.getWorkflowFigure();
+//	    final IFigure     workflow = ed.getWorkflowFigure();
 	    
-	    final Rectangle bounds = workflow.getBounds();
-	    Image image = new Image(null, bounds.width + 6, bounds.height + 6);
-		GC gc = new GC(image);
-		SWTGraphics graphics = new SWTGraphics(gc); 
-		graphics.translate(-bounds.x + 3, -bounds.y + 3);
-		graphics.setForegroundColor(workflow.getForegroundColor());
-		graphics.setBackgroundColor(workflow.getBackgroundColor());		
-		workflow.paint(graphics);
-		gc.dispose();
-		
-	    loader.data = new ImageData[]{image.getImageData()};
-	    image.dispose();
+//	    final Rectangle bounds = workflow.getBounds();
+//	    Image image = new Image(null, bounds.width + 6, bounds.height + 6);
+//		GC gc = new GC(image);
+//		SWTGraphics graphics = new SWTGraphics(gc); 
+//		graphics.translate(-bounds.x + 3, -bounds.y + 3);
+//		graphics.setForegroundColor(workflow.getForegroundColor());
+//		graphics.setBackgroundColor(workflow.getBackgroundColor());		
+//		workflow.paint(graphics);
+//		gc.dispose();
+//		
+//	    loader.data = new ImageData[]{image.getImageData()};
+//	    image.dispose();
 		// Assert *.png at end of file name
 	    if (! path.toLowerCase().endsWith(".png")) path = path + ".png";
 	    // Save
