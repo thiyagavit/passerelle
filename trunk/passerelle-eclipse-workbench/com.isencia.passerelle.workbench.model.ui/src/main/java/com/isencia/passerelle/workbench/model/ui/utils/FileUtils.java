@@ -858,7 +858,7 @@ public final class FileUtils {
 	 * @throws Exception
 	 */
 	public static void write(final File file, final String text) throws Exception {
-		write(file, text, "US-ASCII");
+		write(file, text, "UTF-8");
 	}
 
 	/**
