@@ -17,8 +17,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.ui.actions.ActionFactory;
 
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CreateSubModelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
 
 /**
@@ -60,10 +64,23 @@ public class ActorTreeMenuProvider extends ContextMenuProvider {
 		TreeSelection treeSelection = (TreeSelection) tree.getSelection();
 		Object element = treeSelection.getFirstElement();
 		if (element instanceof SubModelPaletteItemDefinition) {
-			menu.appendToGroup(GEFActionConstants.GROUP_EDIT,
-					new EditSubmodelAction((SubModelPaletteItemDefinition)element));
+			createCompositeMenu(menu, element);
+		} else if (element instanceof PaletteGroup) {
+			if (((PaletteGroup)element).getName().equals("Composites")) {
+				createCompositeMenu(menu, element);
+			}
 		}
 
+	}
+
+	private void createCompositeMenu(IMenuManager menu, Object actionOrGroup) {
+		
+		CreateSubModelAction emptySubModelAction = new CreateSubModelAction();
+		emptySubModelAction.setText("Create new empty composite");
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, emptySubModelAction);	
+		
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new EditSubmodelAction(actionOrGroup));	
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new DeleteSubmodelAction(actionOrGroup));	
 	}
 
 }
