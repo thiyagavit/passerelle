@@ -103,6 +103,7 @@ import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.ui.utils.FileUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
@@ -545,14 +546,14 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			is = new FileInputStream(filePath);
 			PaletteItemFactory factory = PaletteItemFactory.getInstance();
 
-			Map<String, Flow> modelList = factory.getSubModels();
+			SubModelUtils.readSubModels();
 
 			FlowManager flowManager = new FlowManager();
 			FileReader reader = new FileReader(new File(filePath));
 			Flow compositeActor = flowManager.readMoml(reader);
 
 			this.parseError = false;
-			ModelUtils.setCompositeProjectName(compositeActor, filePath);
+//			ModelUtils.setCompositeProjectName(compositeActor, filePath);
 
 			setDiagram(compositeActor);
 
