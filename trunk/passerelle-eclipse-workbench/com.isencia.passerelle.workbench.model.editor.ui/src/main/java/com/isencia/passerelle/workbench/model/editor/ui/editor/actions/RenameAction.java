@@ -20,6 +20,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.views.RenameWizard;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 
 public class RenameAction extends SelectionAction {
+	
 	public RenameAction(IWorkbenchPart part) {
 		super(part);
 		setLazyEnablementCalculation(false);
@@ -57,12 +58,11 @@ public class RenameAction extends SelectionAction {
 	public void run() {
 		NamedObj node = getSelectedNode();
 		RenameWizard wizard = new RenameWizard(node.getName());
-		WizardDialog dialog = new WizardDialog(getWorkbenchPart().getSite()
-				.getShell(), wizard);
+		WizardDialog dialog = new WizardDialog(getWorkbenchPart().getSite().getShell(), wizard);
 		dialog.create();
-		dialog.getShell().setSize(400, 240);
-		dialog.setTitle("Rename wizard");
-		dialog.setMessage("Rename");
+		dialog.getShell().setSize(400, 300);
+		dialog.setTitle("Rename Actor");
+		dialog.setMessage("This is the same as setting the 'Name' attribute in the Actor Attributes view.");
 		if (dialog.open() == WizardDialog.OK) {
 			String name = wizard.getRenameValue();
 			execute(createRenameCommand(name,node));
