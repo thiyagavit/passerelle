@@ -65,7 +65,7 @@ public class VariableLabelProvider extends ColumnLabelProvider {
 				if (vis != null) {
 					final StringBuilder buf = new StringBuilder();
 					final List<String> vals = ListUtils.getList(label);
-					for (int i = 0; i < vals.size(); i++) {
+					if (vals!=null) for (int i = 0; i < vals.size(); i++) {
 						buf.append(vis.get(vals.get(i)));
 						if (i < vals.size() - 1) {
 							buf.append(", ");
