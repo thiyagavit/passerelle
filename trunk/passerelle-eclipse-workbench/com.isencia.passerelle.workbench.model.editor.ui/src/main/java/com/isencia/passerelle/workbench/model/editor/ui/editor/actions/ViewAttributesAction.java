@@ -32,8 +32,7 @@ public class ViewAttributesAction extends SelectionAction {
 	@Override
 	protected void init() {
 		super.init();
-		ISharedImages sharedImages = PlatformUI.getWorkbench()
-				.getSharedImages();
+		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
 		setText("Edit Attributes");
 		setId(ID);
 		setHoverImageDescriptor(ICON);
@@ -66,18 +65,15 @@ public class ViewAttributesAction extends SelectionAction {
 			List selection = getSelectedObjects();
 			for (Object o : selection) {
 				if (o instanceof EditPart) {
-					for (IViewPart part : EclipseUtils.getActivePage()
-							.getViews()) {
-						if (part instanceof ActorAttributesView) {
-							site = (IViewSite) part.getSite();
-							break;
-						}
-
-					}
+					final ActorAttributesView view = (ActorAttributesView)EclipseUtils.getActivePage().findView(ActorAttributesView.ID);
+					site = (IViewSite) view.getSite();
+					
 					if (site != null) {
-						ActorDialog dialog = new ActorDialog(site,
-								(NamedObj) ((EditPart) o).getModel());
+						ActorDialog dialog = new ActorDialog(site, (NamedObj) ((EditPart) o).getModel());
 						dialog.open();
+						
+						view.refresh(); // Attributes may have changed
+						
 						return;
 					}
 				}
