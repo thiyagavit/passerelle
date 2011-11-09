@@ -15,12 +15,9 @@
 
 package com.isencia.passerelle.domain.et.impl;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -32,7 +29,8 @@ import com.isencia.passerelle.domain.et.EventRefusedException;
 
 /**
  * A basic implementation of an event dispatcher, based on a BlockingQueue 
- * and a single thread for dispatching queued events.
+ * and a method for dispatching the oldest queued event.
+ * The method must be invoked by some external component (e.g. the model director).
  * 
  * @author delerw
  */
@@ -46,30 +44,21 @@ public class SimpleEventDispatcher implements EventDispatcher {
   private List<Event> eventHistory = new LinkedList<Event>();
   private List<Event> unhandledEvents = new LinkedList<Event>();
   
-  // 1-thread executor for the eventQSink
-  private ExecutorService queueDepletionExecutor;
-  
-  private Collection<EventHandler<? extends Event>> eventHandlers = new HashSet<EventHandler<? extends Event>>();
+  private EventHandler<? extends Event> eventHandlers[];
 
   // state variables for managing the shutdown sequence
   private boolean active = true;
   private boolean forcedShutdown = false;
 
-  public SimpleEventDispatcher(String name) {
+  public SimpleEventDispatcher(String name, EventHandler<? extends Event>... handlers) {
     this.name=name;
-    
-    eventHandlers.add(new SendEventHandler());
-    eventHandlers.add(new FireEventHandler());
-    
-//    queueDepletionExecutor = Executors.newSingleThreadExecutor();
-//    try {
-//      queueDepletionExecutor.execute(new EventQueueSink());
-//    } catch (RejectedExecutionException e) {
-//      // should not happen
-//      LOGGER.error("Failure to launch queueDepletionExecutor",e);
-//    }
+    eventHandlers=handlers;
   }
   
+  public String getName() {
+    return name;
+  }
+
   public void initialize() {
     for (EventHandler<? extends Event> evtHandler : eventHandlers) {
       evtHandler.initialize();
@@ -84,8 +73,6 @@ public class SimpleEventDispatcher implements EventDispatcher {
       throw new EventRefusedException(e, "Error accepting event", null, e1);
     }
   }
-  
-  
 
   @Override
   public boolean dispatch(long timeOut) {
@@ -127,40 +114,15 @@ public class SimpleEventDispatcher implements EventDispatcher {
 
   @Override
   public void shutdown() {
-    // TODO Auto-generated method stub
   }
 
   @Override
   public List<Event> shutdownNow() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-    // TODO Auto-generated method stub
     return false;
   }
-
-//  private class EventQueueSink implements Runnable {
-//
-//    @Override
-//    public void run() {
-//      LOGGER.info("Starting EventQueueSink for EventHandler {}", name);
-//      
-//      try {
-//        boolean result = true;
-//        while(result) {
-//          // watch out this 1s is quite low (e.g. for backend calls)
-//          result = dispatch(1000);
-//        }
-//      } catch (Exception e) {
-//        // TODO add callback to Director, to make it aware of interrupted EventDispatcher
-//        LOGGER.error("EventQueueSink loop interrupted for EventHandler "+name, e);
-//      } finally {
-//        LOGGER.info("Terminating EventQueueSink for EventHandler {}", name);
-//      }
-//    }
-//    
-//  }
 }

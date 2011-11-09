@@ -11,21 +11,20 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
+*/
 
 package com.isencia.passerelle.domain.et.impl;
 
 import java.util.LinkedList;
+import ptolemy.actor.AbstractReceiver;
+import ptolemy.actor.IOPort;
+import ptolemy.actor.NoTokenException;
+import ptolemy.data.Token;
+import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.EventRefusedException;
 import com.isencia.passerelle.domain.et.SendEvent;
-import ptolemy.actor.AbstractReceiver;
-import ptolemy.actor.IOPort;
-import ptolemy.actor.NoRoomException;
-import ptolemy.actor.NoTokenException;
-import ptolemy.data.Token;
-import ptolemy.kernel.util.IllegalActionException;
 
 /**
  * @author delerw
@@ -36,9 +35,6 @@ public class ETReceiver extends AbstractReceiver {
   
   private ETDirector director;
 
-  /**
-   * 
-   */
   public ETReceiver(ETDirector director) {
     this.director = director;
   }
@@ -107,5 +103,4 @@ public class ETReceiver extends AbstractReceiver {
       }
     }
   }
-
 }
