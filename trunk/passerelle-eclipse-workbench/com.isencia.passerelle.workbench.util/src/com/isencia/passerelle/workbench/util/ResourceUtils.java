@@ -3,6 +3,8 @@ package com.isencia.passerelle.workbench.util;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+
+import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.util.Settable;
 
 public class ResourceUtils {
@@ -13,7 +15,12 @@ public class ResourceUtils {
 	 * @return IResource
 	 */
 	public static IResource getResource(Settable parameter) {
-		String     path  = parameter.getValueAsString();
+		String     path;
+		if (parameter instanceof StringParameter) {
+			path = ((StringParameter)parameter).getExpression();
+		} else {
+			path = parameter.getValueAsString();
+		}
 		return getResource(path);
 	}
 	
