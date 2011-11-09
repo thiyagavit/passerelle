@@ -15,6 +15,9 @@ import ptolemy.actor.Manager;
  * Service run by the workflow to allow the RCP workbench
  * to interfact with the service.
  * 
+ * Other classes assume the location of this class and it cannot be refactored without
+ * searching for the string com.isencia.passerelle.workbench.model.jmx
+ * 
  * @author gerring
  *
  */
