@@ -16,6 +16,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlineEditPart;
@@ -57,38 +58,10 @@ public class HelpAction extends SelectionAction {
 	public void run() {
 		List selection = getSelectedObjects();
 		for (Object o : selection) {
-			// if (o instanceof OutlineEditPart) {
-			// OutlineEditPart out = (OutlineEditPart) o;
-			//
-			// Object model = out.getModel();
-			// if (model instanceof Attribute) {
-			// Attribute attr = (Attribute) model;
-			// NamedObj container = attr.getContainer();
-			// String actorName = container.getClass().getName();
-			//
-			// String href = "/"
-			// + PaletteItemFactory.get().getBuildId(actorName)
-			// + "/html/" + actorName + "_" + attr.getName()
-			// + ".html";
-			// WorkbenchHelpSystem.getInstance().displayHelpResource(href);
-			//
-			// } else {
-			// String actorName = model.getClass().getName();
-			//
-			// WorkbenchHelpSystem.getInstance().displayHelpResource(
-			// "/"
-			// + PaletteItemFactory.get().getBuildId(
-			// actorName) + "/html/" + actorName
-			// + ".html");
-			//
-			// }
-			// break;
-
 			if (o instanceof ActorEditPart) {
 				String actorName = ((ActorEditPart) o).getEntity().getClass()
 						.getName();
-				String string = "/"
-						+ PaletteItemFactory.get().getBuildId(actorName)
+				String string = "/" + PaletteItemFactory.getBuildId(actorName)
 						+ "/html/" + actorName + ".html";
 
 				WorkbenchHelpSystem.getInstance().displayHelpResource(string);
