@@ -73,35 +73,19 @@ public class EclipseUtils {
 		log.log(status);
 		
 	}
-
 	/**
-	 * Get the file path from a FileStoreEditorInput. Removes any "file:" from
-	 * the URI to the file path if it exists.
+	 * Get the file path from a FileStoreEditorInput. Removes any "file:"
+	 * from the URI to the file path if it exists.
 	 * 
 	 * @param fileInput
 	 * @return String
 	 */
-	public static String getFilePath(IEditorInput fileInput) {
+	public static URI getFileURI(IEditorInput fileInput) {
 		if (fileInput instanceof IURIEditorInput) {
-			URI uri = ((IURIEditorInput) fileInput).getURI();
-			String path = null;
-			if (uri != null)
-				path = uri.toString();
-			else if (fileInput instanceof FileEditorInput) {
-				path = ((FileEditorInput) fileInput).getFile().getFullPath()
-						.toString();
-			}
-			if (path.startsWith("file:"))
-				path = path.substring(5);
-			if (path.startsWith("/") && isWindowsOS())
-				path = path.substring(1);
-			return path;
-		}
+			URI uri = ((IURIEditorInput)fileInput).getURI();
+			return uri;
+		} 
 		return null;
-	}
-
-	static private boolean isWindowsOS() {
-		return (System.getProperty("os.name").indexOf("Windows") == 0);
 	}
 
 	/**
@@ -110,8 +94,17 @@ public class EclipseUtils {
 	 * @return File
 	 */
 	public static File getFile(IEditorInput fileInput) {
-		return new File(EclipseUtils.getFilePath(fileInput));
+		return new File(EclipseUtils.getFileURI(fileInput));
 	}
+	
+	public static String getFilePath(IEditorInput fileInput) {
+		return getFile(fileInput).getAbsolutePath();
+	}
+	
+	static private boolean isWindowsOS() {
+		return (System.getProperty("os.name").indexOf("Windows") == 0);
+	}
+
 
 	/**
 	 * Try to determine the IFile from the edit input
@@ -419,16 +412,12 @@ public class EclipseUtils {
 	 */
 	public static IEditorPart openEditor(IFile file) throws PartInitException {
 
-		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry()
-				.getDefaultEditor(file.getName());
-		if (desc == null)
-			desc = PlatformUI.getWorkbench().getEditorRegistry()
-					.getDefaultEditor(file.getName() + ".txt");
+		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+		if (desc == null) desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName() + ".txt");
 		return openEditor(file, desc.getId());
 	}
 
-	public static IEditorPart openEditor(IFile file, String id)
-			throws PartInitException {
+	public static IEditorPart openEditor(IFile file, String id) throws PartInitException {
 		final IWorkbenchPage page = EclipseUtils.getActivePage();
 		return page.openEditor(new FileEditorInput(file), id);
 	}
