@@ -61,7 +61,7 @@ public class CreateSubModelAction extends SelectionAction {
 		try {
 			
 			exportEntityToClassFile(parent.getSelectedContainer());
-			parent.getActorTreeViewPage().getTreeViewer().refresh();
+//			parent.getActorTreeViewPage().getTreeViewer().refresh();
 		} catch (Exception e) {
 		}
 	}

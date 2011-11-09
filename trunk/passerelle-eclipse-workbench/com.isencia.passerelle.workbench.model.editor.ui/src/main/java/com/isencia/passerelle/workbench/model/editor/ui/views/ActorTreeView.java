@@ -74,7 +74,7 @@ public class ActorTreeView extends PageBookView {
 	public void refresh() {
 		final IPage page = getCurrentPage();
 		if (page instanceof ActorTreeViewerPage) {
-			((ActorTreeViewerPage)page).refresh();
+//			((ActorTreeViewerPage)page).refresh();
 		}
 	}
 
