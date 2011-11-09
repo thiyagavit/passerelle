@@ -1,11 +1,16 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.IViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.ui.views.ActorTreeView;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
+import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
 public class DeleteSubmodelAction extends Action {
 	
@@ -41,14 +46,14 @@ public class DeleteSubmodelAction extends Action {
 			    final SubModelPaletteItemDefinition item = (SubModelPaletteItemDefinition)definition;
 				final String name = item.getName();
 				
-//				PaletteItemFactory factory = PaletteItemFactory.getInstance();
-//                factory.removeSubModel(name);
-//				SubModelUtils.deleteSubModel(name);
-//				
-//				final IViewPart part = EclipseUtils.getPage().findView(ActorTreeView.ID);
-//                if (part!=null && part instanceof ActorTreeView) {
-//                	((ActorTreeView)part).refresh();
-//                }
+				PaletteItemFactory factory = PaletteItemFactory.getInstance();
+                factory.removeSubModel(name);
+				SubModelUtils.deleteSubModel(name);
+				
+				final IViewPart part = EclipseUtils.getPage().findView(ActorTreeView.ID);
+                if (part!=null && part instanceof ActorTreeView) {
+                	((ActorTreeView)part).refresh();
+                }
 			} catch (Exception e) {
 				logger.error("Cannot edit submodel!", e);
 			}
