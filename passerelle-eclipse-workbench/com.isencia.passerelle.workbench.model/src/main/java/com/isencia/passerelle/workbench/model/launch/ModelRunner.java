@@ -4,9 +4,9 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -15,31 +15,25 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Manager;
+import ptolemy.kernel.util.Workspace;
 import ptolemy.moml.MoMLParser;
 
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorCollector;
-import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
 public class ModelRunner implements IApplication {
 	
-	
+    private static Logger logger = LoggerFactory.getLogger(ModelRunner.class);   
+
 	private static ModelRunner currentInstance;
 	public static ModelRunner getRunningInstance() {
 		return currentInstance;
 	}
-	
-    private static Logger logger = LoggerFactory.getLogger(ModelRunner.class);   
-    
-	public Logger getLogger() {
-		return logger;
-	}
-
-	private   long start;
+	 
 	private   Manager manager;
 	
 	/**
@@ -49,7 +43,7 @@ public class ModelRunner implements IApplication {
 	public Object start(IApplicationContext applicationContextMightBeNull) throws Exception {
 		
 		String model = System.getProperty("model");
-		runModel(model, false);
+		runModel(model, "true".equals(System.getProperty("com.isencia.jmx.service.terminate")));
 		return  IApplication.EXIT_OK;
 	}
 
@@ -80,8 +74,10 @@ public class ModelRunner implements IApplication {
 			//TODO Check that path works when model is run... Edna actors currently use 
 			// workspace to get resources.
 			// When run from command line may need to set variable for workspace.
-			final String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-			System.setProperty("eclipse.workspace.home", workspacePath);
+			String workspacePath = System.getProperty("com.isencia.jmx.service.workspace");
+            if (workspacePath==null) workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
+			
+            System.setProperty("eclipse.workspace.home", workspacePath);
 			System.setProperty("be.isencia.home",        workspacePath);		
 			logger.info("Workspace folder set to: "+workspacePath);
 			
@@ -90,44 +86,11 @@ public class ModelRunner implements IApplication {
 			CompositeActor compositeActor = null;
 			try {
 				currentInstance = this;
-				
+				SubModelUtils.readSubModels();
 				if( modelPath==null) {
 					throw new IllegalArgumentException("No model specified",null);
 				} else {
 					logger.info("Running model : " + modelPath);
-					reader = new FileReader(modelPath);
-					
-					// In debug mode the same model can be run in the
-					// same VM several times. We purge before running for this reason.
-					MoMLParser.purgeModelRecord(modelPath);
-				    MoMLParser.purgeAllModelRecords();
-					
-					ModelUtils.readSubModels();
-
-					compositeActor = FlowManager.readMoml(reader);
-					compositeActor.setPersistent(false);
-					
-					// The workspace is named after the RCP project. This enables actors
-					// running to determine which RCP project they are associated with and
-					// if they need to create folders or files, where to do that. For instance
-					// edna nodes have no end of auxiliary files which the user may need access to.
-					ModelUtils.setCompositeProjectName(compositeActor, modelPath);
-					
-					this.manager = new Manager(compositeActor.workspace(), "model");
-					manager.setPersistent(false); // Important for test decks to pass.
-		
-					compositeActor.setManager(manager);
-					
-					// Errors
-					final Director director = (Director)compositeActor.getDirector();
-					director.addErrorCollector(new ErrorCollector() {
-						@Override
-						public void acceptError(PasserelleException e) {
-							exceptions.add(e);
-							manager.stop();
-						}
-					});
-					director.setPersistent(false);
 					
 					// The manager JMX service is used to control the workflow from 
 					// the RCP workspace. This starts the registry on a port and has two
@@ -142,16 +105,49 @@ public class ModelRunner implements IApplication {
 						modelAgent.start();
 					}
 
+					notifyModelChangeStart();
+					
+					reader = new FileReader(modelPath);
+					
+					// In debug mode the same model can be run in the
+					// same VM several times. We purge before running for this reason.
+					MoMLParser.purgeModelRecord(modelPath);
+				    MoMLParser.purgeAllModelRecords();
+					
+					
+					final Workspace  workspace  = ModelUtils.getWorkspace(modelPath);
+				    final MoMLParser moMLParser = new MoMLParser(workspace);
+					compositeActor = (CompositeActor) moMLParser.parse(null, reader);
+//					compositeActor.setSource(modelPath);
+					
+					this.manager = new Manager(compositeActor.workspace(), getUniqueName());
+					manager.setPersistent(false); // Important for test decks to pass.
+		
+					compositeActor.setManager(manager);
+					
+					// Errors
+					final Director director = (Director)compositeActor.getDirector();
+					director.addErrorCollector(new ErrorCollector() {
+						@Override
+						public void acceptError(PasserelleException e) {
+							exceptions.add(e);
+							manager.stop();
+						}
+					});
+					
 					manager.execute(); // Blocks until done
 					
 					// Well almost
-					while (manager.isExitingAfterWrapup()) {
+					if (manager!=null) while (manager.isExitingAfterWrapup()) {
 						logger.info("Waiting for manager to wrap up.");
 						Thread.sleep(100);
 					}
 				}
 	
 			} finally {
+				
+				notifyModelChangeEnd(0);
+				
 				if (modelAgent!=null) {
 					modelAgent.stop();
 					logger.info("Closed model agent");
@@ -191,6 +187,44 @@ public class ModelRunner implements IApplication {
 				throw exceptions.get(0);
 			}
 		} 
+	}
+
+	/**
+	 * Ensures that the manager that runs with the actors has a unique
+	 * name for every run. This is one way that an actor can know which
+	 * runner they are dealing with and clear caches if required.
+	 * 
+	 * @return
+	 */
+	private String getUniqueName() {
+		return "Model_"+System.currentTimeMillis();
+	}
+
+	private void notifyModelChangeStart() {
+		
+		try {
+		    final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("com.isencia.passerelle.engine.model.listener");
+	        for (IConfigurationElement i : ele) {
+	        	final IModelListener l = (IModelListener)i.createExecutableExtension("modelListener");
+	            l.executionStarted();
+	        }
+		     
+		} catch (Exception ne) {
+			logger.error("Cannot notify model listeners");
+		}
+	}
+	private void notifyModelChangeEnd(final int returnCode) {
+		
+		try {
+		    final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("com.isencia.passerelle.engine.model.listener");
+	        for (IConfigurationElement i : ele) {
+	        	final IModelListener l = (IModelListener)i.createExecutableExtension("modelListener");
+	            l.executionTerminated(returnCode);
+	        }
+		     
+		} catch (Exception ne) {
+			logger.error("Cannot notify model listeners");
+		}
 	}
 
 	public static void main(String[] args) throws Throwable {
