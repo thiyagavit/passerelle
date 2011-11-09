@@ -20,6 +20,10 @@ import org.eclipse.ui.part.IPageBookViewPage;
 import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
 /**
  * Attribute view shows the attributes of the selected control. If no control is
@@ -34,9 +38,10 @@ import org.eclipse.ui.part.PageBookView;
  * 
  * 
  */
-public class ActorTreeView extends PageBookView
-{
+public class ActorTreeView extends PageBookView {
 
+	private static final Logger logger = LoggerFactory.getLogger(ActorTreeView.class);
+	
 	/**
 	 * the ID
 	 */
@@ -65,6 +70,13 @@ public class ActorTreeView extends PageBookView
 		page.createControl( book );
 		return page;
 	}
+	
+	public void refresh() {
+		final IPage page = getCurrentPage();
+		if (page instanceof ActorTreeViewerPage) {
+			((ActorTreeViewerPage)page).refresh();
+		}
+	}
 
 	/**
 	 * Creates a new page in the pagebook for a particular part. This page will
@@ -78,15 +90,33 @@ public class ActorTreeView extends PageBookView
 	 */
 	protected PageRec doCreatePage( IWorkbenchPart part )
 	{
-		 Object page = part.getAdapter( ActorPalettePage.class );
-		 if ( page instanceof IPageBookViewPage )
-		 {
-		 initPage( (IPageBookViewPage) page );
+		Object page = part.getAdapter( ActorPalettePage.class );
+		if ( page instanceof IPageBookViewPage ) {
+			initPage( (IPageBookViewPage) page );
+
+			( (IPageBookViewPage) page ).createControl( getPageBook( ) );
+			return new PageRec( part, (IPageBookViewPage) page );
+		}
 		
-		 ( (IPageBookViewPage) page ).createControl( getPageBook( ) );
-		 return new PageRec( part, (IPageBookViewPage) page );
-		 }
-		 return null;
+		// We select the project explorer as otherwise this
+		// page view is empty and that is not very user friendly
+		// Since the project explorer is normally shown in the 
+		// same place as the pallette, this usually works ok.
+		if (page==null) {
+			// This makes eclipse behave funnily
+//			getSite().getShell().getDisplay().asyncExec(new Runnable() {
+//				@Override
+//				public void run() {
+//					try {
+//						EclipseUtils.getActivePage().showView("org.eclipse.ui.navigator.ProjectExplorer");
+//					} catch (Throwable e) {
+//						logger.error("Cannot select actor tree view!");
+//					}
+//				}
+//			});
+		}
+		
+		return null;
 
 	}
 
