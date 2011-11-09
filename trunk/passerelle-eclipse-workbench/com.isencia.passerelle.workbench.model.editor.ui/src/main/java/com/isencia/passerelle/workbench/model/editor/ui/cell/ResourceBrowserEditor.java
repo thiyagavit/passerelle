@@ -42,7 +42,12 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 	 */
 	protected Object openDialogBox(Control cellEditorWindow, Object textValue) {
 		
-		final IResource currentValue = getSelectedResource((String)textValue);
+		IResource currentValue=null;
+		try {
+			currentValue = getSelectedResource((String)textValue);
+		} catch (Exception e1) {
+			logger.error("Cannot get resource!", e1);
+		}
         final Actor     actor        = (Actor)param.getContainer();
         final Parameter folder       = (Parameter)actor.getAttribute("Folder");
         final Parameter relative     = (Parameter)actor.getAttribute("Relative Path");
@@ -82,7 +87,7 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 		if (value==null) return textValue;
 		
 		final String fullPath = value.getRawLocation().toOSString();
-		if (value.isLinked() || (value instanceof IFile && value.getParent().isLinked())) {
+		if (value.isLinked(IResource.CHECK_ANCESTORS)) {
 			if (relative!=null) {
 				try {
 					relative.setToken(new BooleanToken(false));
@@ -90,7 +95,7 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 					logger.error("Cannot set Relative Path parameter to false",e);
 				}
 			}
-			return fullPath;
+			return fullPath.replace('\\', '/');
 		} else {
 			try {
 				if (relative!=null) relative.setToken(new BooleanToken(true));
@@ -98,13 +103,13 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 				logger.error("Cannot set Relative Path parameter to false",e);
 			}
 			final String workspace= ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-			return fullPath.substring(workspace.length(), fullPath.length());
+			return fullPath.substring(workspace.length(), fullPath.length()).replace('\\', '/');
 		}
 
 		
 	}
 
-	private IResource getSelectedResource(String textValue) {
+	private IResource getSelectedResource(String textValue) throws Exception {
 		if (textValue!=null) {
 			final Actor  actor        = (Actor)param.getContainer();
 			final String expandedPath = ModelUtils.substitute(textValue, actor);
