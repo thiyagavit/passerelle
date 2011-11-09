@@ -120,7 +120,7 @@ public abstract class ActorPalettePage extends Page implements ISelectionProvide
 	 * 
 	 * @return the tree viewer
 	 */
-	public TreeViewer getTreeViewer() {
+	protected TreeViewer getTreeViewer() {
 		return treeViewer;
 	}
 
