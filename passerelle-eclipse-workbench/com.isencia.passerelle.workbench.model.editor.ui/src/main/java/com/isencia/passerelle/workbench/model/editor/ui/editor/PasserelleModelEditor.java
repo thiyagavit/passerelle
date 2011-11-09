@@ -14,7 +14,10 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FigureCanvas;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gef.ContextMenuProvider;
@@ -30,6 +33,7 @@ import org.eclipse.gef.SnapToGeometry;
 import org.eclipse.gef.dnd.TemplateTransfer;
 import org.eclipse.gef.dnd.TemplateTransferDragSourceListener;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -47,14 +51,15 @@ import org.eclipse.gef.ui.actions.ToggleSnapToGeometryAction;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite;
+import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.gef.ui.palette.PaletteViewer;
 import org.eclipse.gef.ui.palette.PaletteViewerProvider;
-import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.gef.ui.parts.SelectionSynchronizer;
 import org.eclipse.gef.ui.rulers.RulerComposite;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -64,6 +69,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -79,6 +85,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IPageSite;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -96,12 +103,12 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CopyNodeA
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CreateSubModelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CutNodeAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DynamicHelpAction;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ExecutionFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.HelpAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.PasteNodeAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RenameAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ScreenshotAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.EditPartFactory;
@@ -112,25 +119,25 @@ import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
-		implements IPasserelleEditor, ITabbedPropertySheetPageContributor {
+public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
+		                           implements IPasserelleEditor, 
+		                                      ITabbedPropertySheetPageContributor {
 
 	// Static things
-	private static Logger logger = LoggerFactory
-			.getLogger(PasserelleModelEditor.class);
+	private static Logger logger = LoggerFactory.getLogger(PasserelleModelEditor.class);
 	protected static final String PALETTE_DOCK_LOCATION = "Dock location"; //$NON-NLS-1$
 	protected static final String PALETTE_SIZE = "Palette Size"; //$NON-NLS-1$
 	protected static final String PALETTE_STATE = "Palette state"; //$NON-NLS-1$
 	protected static final int DEFAULT_PALETTE_SIZE = 130;
-
+	
 	public static final int DELETE_KEYCODE = 127;
 	public static final int COPY_KEYCODE = 99;
 	public static final int PASTE_KEYCODE = 112;
 
 	private CompositeActor container;
 	private RefreshCommand RefreshCommand;
-	private int index;
-
+	private int            index;
+	
 	private List<String> stackActionIDs = new ArrayList<String>();
 	private List<String> editorActionIDs = new ArrayList<String>();
 	private List<Object> editPartActionIDs = new ArrayList<Object>();
@@ -144,13 +151,14 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	private PasserelleModelMultiPageEditor parent;
 
 	public PasserelleModelEditor(PasserelleModelMultiPageEditor parent,
-			CompositeActor actor, CompositeActor model) {
+			                     CompositeActor                 actor,
+			                     CompositeActor                 model) {
 		this(parent, model);
 		this.container = actor;
 	}
 
 	public PasserelleModelEditor(PasserelleModelMultiPageEditor parent,
-			CompositeActor model) {
+			                     CompositeActor                 model) {
 		this.parent = parent;
 		this.model = model;
 		setEditDomain(parent.getDefaultEditDomain());
@@ -167,28 +175,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		updateActions(getSelectionActions());
-		// if (EclipseUtils.getActivePage().getActivePart().equals(part)) {
-		// try {
-		//
-		// if (selection instanceof StructuredSelection) {
-		// StructuredSelection structure = (StructuredSelection) selection;
-		// Object o = structure.getFirstElement();
-		// if (o instanceof AbstractBaseEditPart) {
-		// NamedObj actor = (NamedObj) ((AbstractBaseEditPart) o)
-		// .getModel();
-		// String actorName = actor.getClassName().replace(".",
-		// "_");
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(
-		// getGraphicalViewer().getControl(),
-		// Constants.HELP_BUNDLE_ID + "." + actorName);
-		// PlatformUI.getWorkbench().getHelpSystem()
-		// .displayDynamicHelp();
-		// }
-		// }
-		// } catch (Exception e) {
-		//
-		// }
-		// }
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {
@@ -205,7 +191,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	protected ISelectionListener getSelectionListener() {
 		return selectionListener;
 	}
-
 	public PasserelleModelMultiPageEditor getParent() {
 
 		return parent;
@@ -279,19 +264,17 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		viewer.setRootEditPart(root);
 
 		viewer.setEditPartFactory(createEditPartFactory());
-		ContextMenuProvider provider = new PasserelleContextMenuProvider(
-				viewer, getActionRegistry());
+		ContextMenuProvider provider = new PasserelleContextMenuProvider(viewer, getActionRegistry());
 		viewer.setContextMenu(provider);
 		getSite()
 				.registerContextMenu(
 						"com.isencia.passerelle.workbench.model.editor.ui.editor.contextmenu", //$NON-NLS-1$
 						provider, viewer);
-		GraphicalViewerKeyHandler graphicalViewerKeyHandler = new GraphicalViewerKeyHandler(
-				viewer);
+		GraphicalViewerKeyHandler graphicalViewerKeyHandler = new GraphicalViewerKeyHandler(viewer);
 		graphicalViewerKeyHandler.setParent(getCommonKeyHandler());
 
 		graphicalViewerKeyHandler.put(KeyStroke.getPressed('X', SWT.CTRL, 0),
-				getActionRegistry().getAction(ActionFactory.CUT.getId()));
+				                      getActionRegistry().getAction(ActionFactory.CUT.getId()));
 		viewer.setKeyHandler(graphicalViewerKeyHandler);
 
 		// Zoom with the mouse wheel
@@ -338,9 +321,7 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 			protected void configurePaletteViewer(PaletteViewer viewer) {
 				super.configurePaletteViewer(viewer);
 				// viewer.setCustomizer(new LogicPaletteCustomizer());
-				viewer
-						.addDragSourceListener(new TemplateTransferDragSourceListener(
-								viewer));
+				viewer.addDragSourceListener(new TemplateTransferDragSourceListener(viewer));
 			}
 
 			protected void hookPaletteViewer(PaletteViewer viewer) {
@@ -351,8 +332,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 	public void dispose() {
 		final IFile file = EclipseUtils.getIFile(getEditorInput());
-		if (file != null)
-			file.getWorkspace().removeResourceChangeListener(resourceListener);
+		if (file!=null) file.getWorkspace()
+				.removeResourceChangeListener(resourceListener);
 		for (AbstractBaseEditPart part : editPartFactory.getParts()) {
 			for (Image image : part.getImages())
 				image.dispose();
@@ -387,6 +368,7 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		return super.getAdapter(type);
 	}
+
 
 	protected Control getGraphicalControl() {
 		return rulerComp;
@@ -423,7 +405,11 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 	protected PaletteRoot getPaletteRoot() {
 		if (palletBuilder == null) {
-			palletBuilder = PaletteBuilder.createPalette(this);
+			try {
+				palletBuilder = PaletteBuilder.createPalette(this);
+			} catch (Exception e) {
+				logger.error("Cannot create platte builder", e);
+			}
 		}
 		return palletBuilder;
 	}
@@ -437,24 +423,22 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	}
 
 	protected void initializeGraphicalViewer() {
-
+		
 		super.initializeGraphicalViewer();
 		getGraphicalViewer().setContents(getDiagram());
 		getGraphicalViewer().addDropTargetListener(
 				new PasserelleTemplateTransferDropTargetListener(
 						getGraphicalViewer()));
-
-		if (getGraphicalViewer().getProperty(
-				SnapToGeometry.PROPERTY_SNAP_ENABLED) == null) {
-			getGraphicalViewer().setProperty(
-					SnapToGeometry.PROPERTY_SNAP_ENABLED, true);
+		
+		if (getGraphicalViewer().getProperty(SnapToGeometry.PROPERTY_SNAP_ENABLED)==null) {
+			getGraphicalViewer().setProperty(SnapToGeometry.PROPERTY_SNAP_ENABLED, true);
 		}
 	}
 
 	protected void createActions() {
-
+		
 		super.createActions();
-
+		
 		ActionRegistry registry = getActionRegistry();
 		IAction action;
 
@@ -517,14 +501,31 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		PasteNodeAction pasteAction = setPasteNodeAction();
 		registry.registerAction(pasteAction);
 		getSelectionActions().add(pasteAction.getId());
-		CloseEditorAction closeEditorAction = new CloseEditorAction(this,
-				getParent());
+		CloseEditorAction closeEditorAction = new CloseEditorAction(this,getParent());
 		registry.registerAction(closeEditorAction);
 		getSelectionActions().add(closeEditorAction.getId());
-		CreateSubModelAction subModelAction = new CreateSubModelAction(this,
-				getParent());
-		registry.registerAction(subModelAction);
 		
+		CreateSubModelAction emptySubModelAction = new CreateSubModelAction(this);
+		emptySubModelAction.setText("Create new empty composite");
+		registry.registerAction(emptySubModelAction);
+		getSelectionActions().add(emptySubModelAction.getId());
+		
+		CreateSubModelAction subModelAction = new CreateSubModelAction(this,getParent());
+		subModelAction.setText("Create composite from this workflow");
+		registry.registerAction(subModelAction);
+		getSelectionActions().add(subModelAction.getId());
+		
+		final IToolBarManager man = getEditorSite().getActionBars().getToolBarManager();
+		final Separator sep = new Separator(getClass().getName() + ".openActions");
+		if (man.find(sep.getId()) == null) man.add(sep);
+		
+		registry.registerAction(new OpenFileAction(this, OpenFileAction.ID1));
+		if (man.find(OpenFileAction.ID1) == null) man.add(registry.getAction(OpenFileAction.ID1));
+		getSelectionActions().add(OpenFileAction.ID1);
+		registry.registerAction(new OpenFileAction(this, OpenFileAction.ID2));
+		if (man.find(OpenFileAction.ID2) == null) man.add(registry.getAction(OpenFileAction.ID2));
+		getSelectionActions().add(OpenFileAction.ID2);
+
 		RenameAction renameAction = new RenameAction(this);
 		registry.registerAction(renameAction);
 		getSelectionActions().add(renameAction.getId());
@@ -532,35 +533,23 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		ViewAttributesAction viewAttributes = new ViewAttributesAction(this);
 		registry.registerAction(viewAttributes);
 		getSelectionActions().add(viewAttributes.getId());
-
-		final IToolBarManager man = getEditorSite().getActionBars()
-				.getToolBarManager();
-		final Separator sep = new Separator(getClass().getName()
-				+ ".openActions");
-		if (man.find(sep.getId()) == null)
-			man.add(sep);
-		registry.registerAction(new OpenFileAction(this, OpenFileAction.ID1));
-		if (man.find(OpenFileAction.ID1) == null)
-			man.add(registry.getAction(OpenFileAction.ID1));
-		getSelectionActions().add(OpenFileAction.ID1);
-		registry.registerAction(new OpenFileAction(this, OpenFileAction.ID2));
-		if (man.find(OpenFileAction.ID2) == null)
-			man.add(registry.getAction(OpenFileAction.ID2));
-		getSelectionActions().add(OpenFileAction.ID2);
-
+		
 		HelpAction helpAction = new HelpAction(this, getParent());
 		registry.registerAction(helpAction);
 		getSelectionActions().add(helpAction.getId());
-		DynamicHelpAction dynamicHelpAction = new DynamicHelpAction(this,
-				getParent());
+		DynamicHelpAction dynamicHelpAction = new DynamicHelpAction(this, getParent());
 		registry.registerAction(dynamicHelpAction);
 		getSelectionActions().add(dynamicHelpAction.getId());
 
+		
+		ScreenshotAction screenshotAction = new ScreenshotAction(this);
+		screenshotAction.setText("Create screenshot from this workflow");
+		registry.registerAction(screenshotAction);
+		getSelectionActions().add(ScreenshotAction.ID);
+
 		RouterFactory.createRouterActions(getEditorSite().getActionBars());
 		RouterFactory.createConnectionActions(getEditorSite().getActionBars());
-
-		ExecutionFactory.createWorkflowActions(getEditorSite().getActionBars());
-
+		
 	}
 
 	protected PasteNodeAction setPasteNodeAction() {
@@ -591,8 +580,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		keyHandler.put(KeyStroke.getPressed(SWT.F2, 0), getActionRegistry()
 				.getAction(ActionFactory.DYNAMIC_HELP.getId()));
-		keyHandler.put(KeyStroke.getPressed(SWT.ALT, 0), getActionRegistry()
-				.getAction(ViewAttributesAction.ID));
 		keyHandler.put(KeyStroke.getPressed(SWT.F3, 0), getActionRegistry()
 				.getAction(ActionFactory.RENAME.getId()));
 		graphicalViewerKeyHandler.setParent(keyHandler);
@@ -606,8 +593,19 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		getGraphicalViewer().addDropTargetListener(
 				new FileTransferDropTargetListener(getGraphicalViewer()));
 
-		// FigureCanvas fc = getEditor();
-		// createFigureMenu(fc);
+
+		// We can get the editor action associated with highlighting actors
+		//TODO FIXME - After DAWB 0.8.2 move the selection feature to this
+		// plugin and keep everything in passerelle! This is a soft reference to
+		// dawb but there should be none at all in passerelle.
+		try {
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(),"org.dawb.workbench.ui");
+			final boolean isSel = store.getBoolean("org.dawb.actor.highlight.choice");
+			final ActionContributionItem action = (ActionContributionItem)getEditorSite().getActionBars().getToolBarManager().find("org.edna.workbench.editors.highlightWorkflowAction");
+			action.getAction().setChecked(isSel);
+		} catch (Throwable ne) {
+			logger.error("Cannot read dawb preferences because this is not dawb!");
+		}
 	}
 
 	// TODO implement a way to modify the paletteviewer
@@ -630,26 +628,6 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		}
 	}
 
-	private void createFigureMenu(final FigureCanvas fc) {
-
-		final ActionRegistry registry = getActionRegistry();
-
-		final MenuManager man = new MenuManager();
-		man.add(registry.getAction(OpenFileAction.ID1));
-		man.add(registry.getAction(OpenFileAction.ID2));
-		man.add(new Separator(getClass().getName() + ".separator1"));
-		man.add(registry.getAction(ActionFactory.UNDO.getId()));
-		man.add(registry.getAction(ActionFactory.REDO.getId()));
-		man.add(new Separator(getClass().getName() + ".separator2"));
-		man.add(registry.getAction(ActionFactory.COPY.getId()));
-		man.add(registry.getAction(ActionFactory.PASTE.getId()));
-		man.add(registry.getAction(ActionFactory.DELETE.getId()));
-
-		// Send the menu, we overide the menu here that is configured by RCP
-		final Menu rightClickMenu = man.createContextMenu(fc);
-		fc.setMenu(rightClickMenu);
-	}
-
 	/**
 	 * By default, this method returns a FlyoutPreferences object that stores
 	 * the flyout settings in the GEF plugin. Sub-classes may override.
@@ -662,10 +640,11 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		final FlyoutPreferences prefs = super.getPalettePreferences();
 		prefs.setPaletteState(FlyoutPaletteComposite.STATE_PINNED_OPEN);
 		prefs.setDockLocation(PositionConstants.WEST);
-		prefs.setPaletteWidth(250); // Some Workbench have long actor names
-
+		prefs.setPaletteWidth(180); // Some Workbench have long actor names
+		
 		return prefs;
 	}
+
 
 	protected FigureCanvas getEditor() {
 		return (FigureCanvas) getGraphicalViewer().getControl();
@@ -706,8 +685,7 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 
 		if (getEditorInput() != null) {
 			IFile file = EclipseUtils.getIFile(input);
-			if (file != null)
-				file.getWorkspace().addResourceChangeListener(resourceListener);
+			if (file!=null) file.getWorkspace().addResourceChangeListener(resourceListener);
 			setPartName(input.getName());
 		}
 	}
@@ -793,7 +771,8 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		}
 		return RefreshCommand;
 	}
-
+	
+	
 	@Override
 	public SelectionSynchronizer getSelectionSynchronizer() {
 		return super.getSelectionSynchronizer();
@@ -803,7 +782,7 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 	public GraphicalViewer getGraphicalViewer() {
 		return super.getGraphicalViewer();
 	}
-
+	
 	@Override
 	public DefaultEditDomain getEditDomain() {
 		return super.getEditDomain();
@@ -818,25 +797,65 @@ public class PasserelleModelEditor extends GraphicalEditorWithFlyoutPalette
 		getGraphicalViewer().setContents(getDiagram());
 	}
 
-	public void setActorSelected(final String actorName,
-			final boolean isSelected) {
-
-		final ComponentEntity sel = ModelUtils.findEntityByName(getContainer(),
-				actorName);
+	/**
+	 * 
+	 * @param actorName
+	 * @param isSelected
+	 * @param colorCode - One of the SWT color codes, for instance SWT.COLOR_RED.
+	 * not used if isSelected = false
+	 */
+	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
+		
+		final ComponentEntity sel = ModelUtils.findEntityByName(getContainer(), actorName);
 		GraphicalViewer gv = getGraphicalViewer();
 		final Map<?, ?> reg = gv.getEditPartRegistry();
-		final AbstractGraphicalEditPart part = (AbstractGraphicalEditPart) reg
-				.get(sel);
-		if (part != null) {
+		final AbstractGraphicalEditPart part = (AbstractGraphicalEditPart)reg.get(sel);
+		if (part!=null) {
 			if (isSelected) {
-				part.setSelected(EditPart.SELECTED_PRIMARY);
-				part.getFigure().setBorder(
-						new LineBorder(Display.getCurrent().getSystemColor(
-								SWT.COLOR_RED), 1));
+			    part.setSelected(EditPart.SELECTED);
+			    final Color selectionColor = Display.getCurrent().getSystemColor(colorCode);
+			    final LineBorder border    = new SpecialLineBorder(selectionColor, 1);
+			    part.getFigure().setBorder(border);
 			} else {
-				part.getFigure().setBorder(null);
+				part.setSelected(EditPart.SELECTED_NONE);
+			    part.getFigure().setBorder(null);
 			}
 		}
+	}
+	
+	private static class SpecialLineBorder extends LineBorder {
+
+		public SpecialLineBorder(Color selectionColor, int i) {
+			super(selectionColor, i);
+		}
+		
+	}
+
+	public void clearActorSelections() {
+		
+		GraphicalViewer gv  = getGraphicalViewer();
+		final Map<?, ?> reg = gv.getEditPartRegistry();
+		for (Object key : reg.keySet()) {
+			final Object ob = reg.get(key);
+			if (ob instanceof AbstractGraphicalEditPart) {
+				AbstractGraphicalEditPart part = (AbstractGraphicalEditPart)ob;
+				if (part.getFigure()!=null) {
+					if (part.getFigure().getBorder() instanceof SpecialLineBorder) {
+						part.getFigure().setBorder(null);
+					}
+				}
+			}
+		}
+	}
+
+	public ZoomManager getZoomManager() {
+		ScalableFreeformRootEditPart root = (ScalableFreeformRootEditPart)(getGraphicalViewer().getRootEditPart());
+		return root.getZoomManager();
+	}
+
+	@Override
+	public IFigure getWorkflowFigure() {
+		return getEditor().getContents();
 	}
 
 	// protected void updateActions(List actionIds) {
