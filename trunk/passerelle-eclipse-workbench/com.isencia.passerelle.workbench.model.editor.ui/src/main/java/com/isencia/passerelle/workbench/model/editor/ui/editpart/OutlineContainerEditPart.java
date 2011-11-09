@@ -69,8 +69,7 @@ public class OutlineContainerEditPart extends OutlineEditPart {
 
 		CompositeActor actor = getModelDiagram();
 		if (editor != null) {
-			PasserelleModelEditor page = (PasserelleModelEditor) editor
-					.getEditor(editor.getActivePage());
+			PasserelleModelEditor page = editor.getEditor();
 			if (page.getContainer() != null
 					&& !containsActor(page.getContainer(), actor))
 				actor = page.getContainer();
