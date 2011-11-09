@@ -15,11 +15,10 @@
 
 package com.isencia.passerelle.domain.et.impl;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
+import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventHandler;
 import com.isencia.passerelle.domain.et.FireEvent;
@@ -42,10 +41,14 @@ import com.isencia.passerelle.domain.et.FireEvent;
 public class FireEventHandler implements EventHandler<FireEvent> {
   private final static Logger LOGGER = LoggerFactory.getLogger(FireEventHandler.class);
   
-  private Set<Actor> inactiveActors = new HashSet<Actor>();
-  
+  private ETDirector director;
+
+  public FireEventHandler(ETDirector director) {
+    this.director = director;
+  }
+
+  @Override
   public void initialize() {
-    inactiveActors.clear();
   }
 
   @Override
@@ -57,7 +60,7 @@ public class FireEventHandler implements EventHandler<FireEvent> {
   public void handle(FireEvent event) throws Exception {
     Actor actor = event.getTarget();
     
-    if(!inactiveActors.contains(actor)) {
+    if(!director.isActorInactive(actor)) {
       LOGGER.debug("Handling FireEvent - iterating {}.",actor.getName());
       if(actor.prefire()) {
         actor.fire();
@@ -65,8 +68,7 @@ public class FireEventHandler implements EventHandler<FireEvent> {
         if(!actor.postfire()) {
           // actor requests to never be fired again,
           // so mark it as wrapping up
-          inactiveActors.add(actor);
-          LOGGER.debug("Marking actor {} as inactive.", actor.getName());
+          director.notifyActorInactive(actor);
         }
       } 
     } else {

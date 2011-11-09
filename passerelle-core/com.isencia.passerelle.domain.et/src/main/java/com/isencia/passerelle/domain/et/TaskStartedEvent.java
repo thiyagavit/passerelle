@@ -12,35 +12,45 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
 package com.isencia.passerelle.domain.et;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import ptolemy.actor.Actor;
 
-public class FireEvent extends AbstractEvent {
+/**
+ * @author delerw
+ *
+ */
+public class TaskStartedEvent<T> extends AbstractEvent {
+  
+  private Actor taskOwner;
+  private T task;
 
-  private static final long serialVersionUID = 5232545627399145043L;
-  
-  private Actor target;
-  
-  public FireEvent(Actor target) {
-    this(target, new Date());
+  protected TaskStartedEvent(T task, Actor taskOwner) {
+    this(task, taskOwner, new Date());
   }
 
-  public FireEvent(Actor target, Date timeStamp) {
+  protected TaskStartedEvent(T task, Actor taskOwner, Date timeStamp) {
     super(timeStamp);
-    this.target = target;
+    this.task = task;
+    this.taskOwner = taskOwner;
+  }
+  
+  public Actor getTaskOwner() {
+    return taskOwner;
   }
 
-  public Actor getTarget() {
-    return target;
+  public T getTask() {
+    return task;
   }
 
+  @Override
   public String toString(DateFormat dateFormat) {
-    return "FireEvent [timeStamp=" + dateFormat.format(getTimestamp()) 
-      + ", target=" + target.getFullName() 
-      + "]";
+    return "TaskStartedEvent [timeStamp=" + dateFormat.format(getTimestamp()) 
+        + ", taskOwner=" + taskOwner.getFullName() 
+        + ", task=" + task 
+        + "]";
   }
 }

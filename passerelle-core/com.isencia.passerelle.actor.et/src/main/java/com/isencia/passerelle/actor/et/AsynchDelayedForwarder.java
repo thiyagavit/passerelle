@@ -1,3 +1,17 @@
+/* Copyright 2011 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 package com.isencia.passerelle.actor.et;
 
 import ptolemy.kernel.CompositeEntity;
@@ -9,6 +23,7 @@ import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
@@ -31,6 +46,7 @@ public class AsynchDelayedForwarder extends NonBlockingActor {
     // and for the rest a complete copy of the received msg
     try {
       ManagedMessage outputMsg = MessageFactory.getInstance().createCausedCopyMessage(receivedMsg);
+      ((ETDirector)getDirector()).notifyActorStartedTask(this, outputMsg);
       new Thread(new DelayedSender(outputMsg)).start();
     } catch (MessageException e) {
       throw new ProcessingException("Failed to create & send output msg", receivedMsg, e);
@@ -38,19 +54,14 @@ public class AsynchDelayedForwarder extends NonBlockingActor {
   }
   
   private class DelayedSender implements Runnable {
-    
     private ManagedMessage outputMsg;
-
-    
     public DelayedSender(ManagedMessage outputMsg) {
       this.outputMsg = outputMsg;
     }
-
-
     @Override
     public void run() {
       try {
-        Thread.sleep(500);
+        Thread.sleep(1500);
       } catch (InterruptedException e1) {
         e1.printStackTrace();
       }
@@ -60,7 +71,7 @@ public class AsynchDelayedForwarder extends NonBlockingActor {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      ((ETDirector)getDirector()).notifyActorFinishedTask(AsynchDelayedForwarder.this, outputMsg);
     }
-    
   }
 }

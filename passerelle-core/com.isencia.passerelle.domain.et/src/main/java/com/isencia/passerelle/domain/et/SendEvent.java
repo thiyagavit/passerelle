@@ -41,10 +41,7 @@ public class SendEvent extends AbstractEvent {
   private Token token;
   
   public SendEvent(Token token, Port sendingPort, Port receivingPort) {
-    super(new Date());
-    this.token = token;
-    this.sendingPort = sendingPort;
-    this.receivingPort = receivingPort;
+   this(token, sendingPort, receivingPort, new Date());
   }
 
   public SendEvent(Token token, Port sendingPort, Port receivingPort, Date timeStamp) {
@@ -110,13 +107,7 @@ public class SendEvent extends AbstractEvent {
     return true;
   }
 
-  @Override
-  public String toString() {
-    return toString(new SimpleDateFormat());
-  }
-  
   public String toString(DateFormat dateFormat) {
     return "SendEvent [timeStamp=" + dateFormat.format(getTimestamp()) + ", receivingPort=" + receivingPort.getFullName() + "]";
   }
-  
 }
