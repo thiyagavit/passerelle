@@ -3,6 +3,8 @@ package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
 import javax.management.MBeanServerConnection;
 
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
@@ -14,7 +16,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.launch.ModelRunner;
 
-public class StopAction extends ExecutionAction implements IEditorActionDelegate {
+public class StopAction extends ExecutionAction implements IEditorActionDelegate, ModelChangeListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(StopAction.class);
 	
@@ -23,6 +25,7 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 		setId(getClass().getName());
 		setText("Stop the workflow if it is running.");
 		setImageDescriptor(Activator.getImageDescriptor("/icons/stop_workflow.gif"));
+   		ExecutionAction.addModelChangeListener(this);
 	}
 
 	@Override
@@ -36,17 +39,27 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 		try { 
 			if (System.getProperty("eclipse.debug.session")!=null) {
 			    ModelRunner.getRunningInstance().stop();
-				refreshToolbars();
 		    
 			} else {
-				final MBeanServerConnection client = RemoteManagerAgent.getServerConnection(5000);
+				final MBeanServerConnection client = RemoteManagerAgent.getServerConnection(2000);
 				addRefreshListener(client);
 				client.invoke(RemoteManagerAgent.REMOTE_MANAGER, "stop", null, null);
+				
+				
+				// Designed to kill the eclipse launch, something of a hack. The stop method 
+				final ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
+				for (ILaunch iLaunch : launches) {
+					if (iLaunch.getLaunchConfiguration() instanceof WorkflowLaunchConfiguration) {
+						iLaunch.terminate();
+					}
+				}
 			}
-            
+            fireStopListeners();
+			updateActionsAvailable(1000);
+           
 		} catch (Exception e) {
 			logger.error("Cannot read configuration", e);
-			refreshToolbars();
+			updateActionsAvailable(500);
 		}
 		
  	}
@@ -73,5 +86,16 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void executionStarted(ModelChangeEvent evt) {
+		updateActionsAvailable(100);
+	}
+
+	@Override
+	public void executionTerminated(ModelChangeEvent evt) {
+		updateActionsAvailable(500);
+	}
+	
 
 }
