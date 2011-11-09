@@ -45,8 +45,8 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		subPagesActive=false;
 		try {
 			createWizardPage(0);
-	        createWorkflowPage(1);
-	        createXmlPage(2);
+//	        createWorkflowPage(1);
+//	        createXmlPage(2);
 	        createDocPage(3);
 
 		} catch (Exception e) {
@@ -86,7 +86,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		addPage(wizEd, getEditorInput());
 		setPageText(pageIndex, "Run");
 		//setPageImage(pageIndex, Activator.getImageDescriptor("icons/run_workflow.gif").createImage());
-		pages.add(wizEd);
+//		pages.add(wizEd);
 	}
 	
 	protected void createDocPage(int pageIndex) throws Exception {
@@ -115,8 +115,8 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 			
 			wikiBrowser.redrawWebView(); 
 			
-			pages.add(composite);
-			pages.add(wikiEditor);
+//			pages.add(composite);
+//			pages.add(wikiEditor);
 			
 			// Horrible hack to give access to tabbed folder 
 			// to make the editor invisible.
@@ -138,12 +138,12 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		return new FileEditorInput(wiki);
 	}
 
-	@Override
-	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
-		
-		wizEd.setActorSelected(actorName, isSelected, colorCode);
-		super.setActorSelected(actorName, isSelected, colorCode);
-	}
+//	@Override
+//	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
+//		
+//		wizEd.setActorSelected(actorName, isSelected, colorCode);
+//		super.setActorSelected(actorName, isSelected, colorCode);
+//	}
 	
 	public void pageChange(final int ipage) {
 		
@@ -172,10 +172,10 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 	}
 	
 
-	@Override
-	public void setPasserelleEditorActive() {
-		setActivePage(1);
-	}
+//	@Override
+//	public void setPasserelleEditorActive() {
+//		setActivePage(1);
+//	}
 
 	public void setInput(IEditorInput input) {
 		if (input.getName().toLowerCase().endsWith(".moml")) {
