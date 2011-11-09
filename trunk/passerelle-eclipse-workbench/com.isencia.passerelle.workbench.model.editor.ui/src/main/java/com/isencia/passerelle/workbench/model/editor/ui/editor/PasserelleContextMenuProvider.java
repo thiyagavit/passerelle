@@ -7,21 +7,22 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.RetargetAction;
 
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ScreenshotAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 
-public class PasserelleContextMenuProvider extends
-		org.eclipse.gef.ContextMenuProvider {
+public class PasserelleContextMenuProvider extends org.eclipse.gef.ContextMenuProvider {
 
 	private ActionRegistry actionRegistry;
 
-	public PasserelleContextMenuProvider(EditPartViewer viewer,
-			ActionRegistry registry) {
+	public PasserelleContextMenuProvider(EditPartViewer viewer, ActionRegistry registry) {
 		super(viewer);
 		setActionRegistry(registry);
 	}
 
+	private final String GROUP_OPEN  = "com.isencia.passerelle.workbench.model.editor.ui.editor.open";
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -30,6 +31,8 @@ public class PasserelleContextMenuProvider extends
 	 * .action.IMenuManager)
 	 */
 	public void buildContextMenu(IMenuManager manager) {
+		
+		manager.add(new Separator(GROUP_OPEN));
 		manager.add(new Separator(GEFActionConstants.GROUP_VIEW));
 		manager.add(new Separator(GEFActionConstants.GROUP_UNDO));
 		manager.add(new Separator(GEFActionConstants.GROUP_COPY));
@@ -42,19 +45,17 @@ public class PasserelleContextMenuProvider extends
 		manager.add(new Separator(GEFActionConstants.GROUP_SAVE));
 		manager.add(new Separator(GEFActionConstants.GROUP_HELP));
 
-		IAction action;
-		action = getActionRegistry().getAction(ActionFactory.RENAME.getId());
-		if (action != null )
-			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
-		action = getActionRegistry().getAction(ViewAttributesAction.ID);
-		if (action != null )
-			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
+		IAction action = null;
+		
 		action = getActionRegistry().getAction(OpenFileAction.ID1);
-		if (action != null )
-			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
+		if (action != null ) manager.appendToGroup(GROUP_OPEN,action);
 		action = getActionRegistry().getAction(OpenFileAction.ID2);
-		if (action != null )
-			manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
+		if (action != null ) manager.appendToGroup(GROUP_OPEN,action);
+		
+		action = getActionRegistry().getAction(ActionFactory.RENAME.getId());
+		if (action != null ) manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
+		action = getActionRegistry().getAction(ViewAttributesAction.ID);
+		if (action != null ) manager.appendToGroup(GEFActionConstants.GROUP_VIEW,action);
 
 		action = getActionRegistry().getAction(ActionFactory.UNDO.getId());
 		manager.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
@@ -63,36 +64,33 @@ public class PasserelleContextMenuProvider extends
 		manager.appendToGroup(GEFActionConstants.GROUP_UNDO, action);
 
 		action = getActionRegistry().getAction(ActionFactory.COPY.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
 		action = getActionRegistry().getAction(ActionFactory.CUT.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
 		action = getActionRegistry().getAction(ActionFactory.PASTE.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
 		action = getActionRegistry().getAction(ActionFactory.CLOSE.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
-		action = getActionRegistry().getAction(ActionFactory.EXPORT.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+		
+		action = getActionRegistry().getAction(ActionFactory.NEW.getId());
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+		action = getActionRegistry().getAction(ActionFactory.EXPORT.getId());		
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+
+		action = getActionRegistry().getAction(ScreenshotAction.ID);		
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_PRINT, action);
+		
 		action = getActionRegistry().getAction(ActionFactory.DELETE.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		action = getActionRegistry().getAction(ActionFactory.CLOSE_PERSPECTIVE.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 
 		action = getActionRegistry().getAction(ActionFactory.SAVE.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_SAVE, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_SAVE, action);
 
 		
-
 		action = getActionRegistry().getAction(ActionFactory.HELP_CONTENTS.getId());
-		if (action != null && action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_HELP, action);
+		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_HELP, action);
 	}
 
 	private ActionRegistry getActionRegistry() {
