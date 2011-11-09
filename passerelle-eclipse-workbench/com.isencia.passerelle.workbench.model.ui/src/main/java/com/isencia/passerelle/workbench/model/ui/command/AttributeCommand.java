@@ -42,8 +42,8 @@ public class AttributeCommand extends Command {
 			Variable var = (Variable)attribute;
 			this.previousValue = (!var.isStringMode()
 					&& var.getToken() != null && var.getToken() instanceof BooleanToken) ? new Boolean(
-					((BooleanToken) var.getToken()).booleanValue())
-					: var.getExpression();
+							((BooleanToken) var.getToken()).booleanValue())
+			: var.getExpression();
 		}
 	}
 
@@ -73,7 +73,7 @@ public class AttributeCommand extends Command {
 						try {
 							if (attribute instanceof StringAttribute) {
 								((StringAttribute) attribute)
-										.setExpression((String) value);
+								.setExpression((String) value);
 							}
 							if (attribute instanceof Variable) {
 								Variable var = (Variable) attribute;
@@ -87,19 +87,19 @@ public class AttributeCommand extends Command {
 									var.setExpression((String) value);
 								} else {
 									logger
-											.error("Unrecognised value sent to Variable "
-													+ attribute.getName());
+									.error("Unrecognised value sent to Variable "
+											+ attribute.getName());
 									EclipseUtils.logError(null,
 											"Unrecognised value sent to Variable "
 													+ attribute.getName(),
-											IStatus.ERROR);
+													IStatus.ERROR);
 								}
 							}
 						} catch (Exception e) {
 							EclipseUtils.logError(e,
 									"Error changing value of Variable "
 											+ attribute.getName(),
-									IStatus.ERROR);
+											IStatus.ERROR);
 
 						}
 					} else {
