@@ -3,11 +3,8 @@ package com.isencia.passerelle.workbench.model.editor.ui.views;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.slf4j.Logger;
@@ -20,10 +17,10 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.StringAttribute;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Constants;
+import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CellEditorAttribute;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
 import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
-import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
  * Editing support for parameter column.
