@@ -19,6 +19,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNode
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CommentFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CommentPropertySource;
+import ptolemy.kernel.util.StringAttribute;
 
 public class CommentEditPart extends AbstractNodeEditPart {
 
