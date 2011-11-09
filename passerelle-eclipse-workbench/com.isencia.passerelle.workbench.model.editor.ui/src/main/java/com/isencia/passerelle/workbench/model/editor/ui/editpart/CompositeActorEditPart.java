@@ -270,7 +270,7 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 	}
 
 	protected ImageDescriptor getIcon() {
-		ImageDescriptor imageDescriptor = PaletteItemFactory.get().getIcon(
+		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
 				getModel().getClass());
 		return imageDescriptor;
 	}

@@ -133,7 +133,7 @@ public class CreateSubModelAction extends SelectionAction {
 		} finally {
 			fileWriter.close();
 		}
-		PaletteItemFactory factory = PaletteItemFactory.get();
+		PaletteItemFactory factory = PaletteItemFactory.getInstance();
 		Flow flow = FlowManager.readMoml(new FileReader(file));
 		factory.addSubModel(flow);
 

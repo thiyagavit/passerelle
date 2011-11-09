@@ -156,7 +156,7 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 	 * 
 	 */
 	private void initRoot() {
-		PaletteItemFactory builder = PaletteItemFactory.get();
+		PaletteItemFactory builder = PaletteItemFactory.getInstance();
 		getTreeViewer().setInput(builder.getPaletteGroups().toArray());
 	}
 

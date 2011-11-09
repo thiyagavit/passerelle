@@ -36,7 +36,7 @@ public class PaletteMouseListener implements MouseMotionListener {
 	}
 
 	private void addFavorite() {
-		PaletteItemFactory paletteItemFactory = PaletteItemFactory.get();
+		PaletteItemFactory paletteItemFactory = PaletteItemFactory.getInstance();
 		CreationFactory config = paletteItemFactory.getSelectedItem();
 		if (config != null && config instanceof TreeViewCreationFactory) {
 			Class type = (Class) config.getObjectType();

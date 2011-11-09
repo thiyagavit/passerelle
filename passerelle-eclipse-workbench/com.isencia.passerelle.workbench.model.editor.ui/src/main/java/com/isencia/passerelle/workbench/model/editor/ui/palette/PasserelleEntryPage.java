@@ -32,7 +32,7 @@ public class PasserelleEntryPage extends DefaultEntryPage {
 	protected Combo createGroupText(Composite panel, PaletteEntry entry) {
 		PaletteContainer container = entry.getParent();
 		Combo group = new Combo(panel, SWT.SINGLE);
-		String[] favoriteGroupNames = PaletteItemFactory.get()
+		String[] favoriteGroupNames = PaletteItemFactory.getInstance()
 				.getFavoriteGroupNames();
 		group.setItems(favoriteGroupNames);
 		String label = getEntry().getParent().getLabel();

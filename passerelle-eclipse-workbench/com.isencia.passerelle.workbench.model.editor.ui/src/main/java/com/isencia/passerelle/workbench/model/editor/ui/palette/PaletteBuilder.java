@@ -38,10 +38,10 @@ public class PaletteBuilder {
 	static public PaletteRoot createPalette(EditorPart parent) {
 		if (paletteRoot == null) {
 			paletteRoot = new PaletteRoot();
-			Collection<PaletteGroup> groups = PaletteItemFactory.get()
+			Collection<PaletteGroup> groups = PaletteItemFactory.getInstance()
 					.getAllPaletteGroups();
 			paletteRoot.addAll(createCategories(paletteRoot, parent,
-					PaletteItemFactory.get().getPaletteGroup(
+					PaletteItemFactory.getInstance().getPaletteGroup(
 							ACTORGROUP_UTILITIES)));
 		}
 
@@ -52,7 +52,7 @@ public class PaletteBuilder {
 			PaletteGroup group) {
 
 		List categories = new ArrayList();
-		PaletteItemFactory factory = PaletteItemFactory.get();
+		PaletteItemFactory factory = PaletteItemFactory.getInstance();
 		categories.add(createControlGroup(root));
 		try {
 			PaletteContainer paletteContainer = createPaletteContainer(group
@@ -112,7 +112,7 @@ public class PaletteBuilder {
 			if (e instanceof PaletteDrawer) {
 				PaletteContainer favoritesContainer = (PaletteDrawer) e;
 				if (!favoritesContainer.getLabel().equals(
-						PaletteItemFactory.get().getPaletteGroup(
+						PaletteItemFactory.getInstance().getPaletteGroup(
 								ACTORGROUP_UTILITIES).getName())) {
 					containers.append(favoritesContainer.getLabel());
 					containers.append(",");
