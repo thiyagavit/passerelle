@@ -9,6 +9,7 @@ import java.util.Map;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 public class PaletteGroup implements Serializable, Comparable<PaletteGroup> {
+	
 	private Map<String, PaletteItemDefinition> paletteItemMap = new HashMap<String, PaletteItemDefinition>();
 	private Map<String, PaletteGroup> paletteGroupMap = new HashMap<String, PaletteGroup>();
 	private List<PaletteItemDefinition> paletteItems = new ArrayList<PaletteItemDefinition>();
@@ -103,6 +104,11 @@ public class PaletteGroup implements Serializable, Comparable<PaletteGroup> {
 			paletteItems.remove(paletteItemMap.get(item.getId()));
 		}
 		paletteItems.add(item);
+	}
+
+	public void removePaletteItem(PaletteItemDefinition def) {
+		paletteItems.remove(def);
+		paletteItemMap.remove(def.getId());
 	}
 
 	public void addPaletteGroup(PaletteGroup group) {
