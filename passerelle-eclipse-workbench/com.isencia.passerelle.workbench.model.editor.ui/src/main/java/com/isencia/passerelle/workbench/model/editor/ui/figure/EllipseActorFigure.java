@@ -14,6 +14,10 @@ import org.eclipse.swt.graphics.Image;
 import com.isencia.passerelle.workbench.model.editor.ui.IBody;
 
 public class EllipseActorFigure extends ActorFigure {
+	
+	public EllipseActorFigure(String name,Image image, Clickable[] clickables) {
+		this(name,null, image, clickables);
+	}
 
 	public EllipseActorFigure(String name,Class type, Image image, Clickable[] clickables) {
 		super(name,type, image, clickables);
