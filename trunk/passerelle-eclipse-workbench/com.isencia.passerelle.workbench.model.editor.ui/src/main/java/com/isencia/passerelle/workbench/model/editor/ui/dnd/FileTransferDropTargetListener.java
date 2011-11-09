@@ -1,7 +1,6 @@
 package com.isencia.passerelle.workbench.model.editor.ui.dnd;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -90,16 +89,18 @@ public class FileTransferDropTargetListener  extends AbstractTransferDropTargetL
 	       return fullPath.substring(workspace.length()+1, fullPath.length()).replace('\\', '/');
 	   
 	   } else {
+		   
 		   final IResource res = getSelected();
 		   if (res!=null) {
 			   final String fullPath = res.getRawLocation().toOSString();
-			   isFullPath = res.isLinked() || (res instanceof IFile && res.getParent().isLinked());
+			   isFullPath = res.isLinked(IResource.CHECK_ANCESTORS);
 			   isFolder   = res instanceof IContainer;
 			   if (isFullPath) {
 				   return fullPath;
 			   } else {
 				   final String workspace= ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-				   return fullPath.substring(workspace.length()+1, fullPath.length()).replace('\\', '/');
+                   final int workLen = workspace.length()+1;
+ 				   return fullPath.substring(workLen, fullPath.length()).replace('\\', '/');
 			   }
 		   }
 	   }
@@ -145,6 +146,13 @@ public class FileTransferDropTargetListener  extends AbstractTransferDropTargetL
 			cmd.addConfigurableParameterValue("Relative Path", !isFullPath);
 			cmd.addConfigurableParameterValue("Folder",        isFolder);
 			cmd.addConfigurableParameterValue(FileParameter.class, getFilePath());
+			
+			// The drop factory may also add custom parameters
+			DropTargetEvent event = getCurrentEvent();
+			if (event!=null&&event.data!=null) {
+			    final String fullPath = ((String[])event.data)[0];	       
+			    dropFactory.setConfigurableParameters(cmd, fullPath);
+			}
 		}
 		return command;
 	}
