@@ -54,7 +54,14 @@ public class OpenFileAction extends SelectionAction {
 
 		setText("");
 
-		ResourceObject ob = getResourceObject();
+		ResourceObject ob=null;
+		try {
+			ob = getResourceObject();
+		} catch (Exception e) {
+			logger.error("Cannot get resource!", e);
+			return false;
+			
+		}
 		if (ob!=null) {
 			setText("Open "+ob.getResourceTypeName());
 			return ob.getResource()!=null;
@@ -66,7 +73,12 @@ public class OpenFileAction extends SelectionAction {
 	public void run() {
 		
 		final IResourceActor resActor = getResourceActor();		    
-		final ResourceObject ob       = getResourceObject();
+		ResourceObject ob=null;
+		try {
+			ob = getResourceObject();
+		} catch (Exception e) {
+			logger.error("Problem finding resource! "+getId(), e);
+		}
 		if (ob!=null) {
 			try {
 				if (resActor instanceof IPartListenerActor) {
@@ -109,7 +121,7 @@ public class OpenFileAction extends SelectionAction {
 		return getId()==ID1 ? 0 : 1;
 	}
 	
-	private ResourceObject getResourceObject() {
+	private ResourceObject getResourceObject() throws Exception {
 		
 		final IResourceActor res= getResourceActor();
 		if (res==null) return null;
