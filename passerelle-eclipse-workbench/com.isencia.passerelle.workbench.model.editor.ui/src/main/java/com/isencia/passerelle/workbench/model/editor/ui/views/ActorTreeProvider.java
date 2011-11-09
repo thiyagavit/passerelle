@@ -40,10 +40,8 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
 	public Object[] getChildren(Object parentElement) {
 
 		if (parentElement instanceof PaletteGroup) {
-			List<PaletteItemDefinition> paletteItems = ((PaletteGroup) parentElement)
-					.getPaletteItems();
-			List<PaletteGroup> groups = ((PaletteGroup) parentElement)
-					.getPaletteGroups();
+			List<PaletteItemDefinition> paletteItems = ((PaletteGroup) parentElement).getPaletteItems();
+			List<PaletteGroup> groups = ((PaletteGroup) parentElement).getPaletteGroups();
 			List allItems = new ArrayList();
 			allItems.addAll(paletteItems);
 			allItems.addAll(groups);
@@ -98,8 +96,12 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
 			return ((PaletteItemDefinition) element).getIcon().createImage();
 		}
 		if (element instanceof PaletteGroup) {
-			return Activator.getImageDescriptor("icons/folder.gif")
-					.createImage();
+			
+			if (((PaletteGroup)element).getIcon()!=null) {
+			    return ((PaletteGroup)element).getIcon().createImage();
+			} else {
+			    Activator.getImageDescriptor("icons/folder.gif").createImage();
+			}
 		}
 		return null;
 	}
