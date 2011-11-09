@@ -2,9 +2,10 @@ package com.isencia.passerelle.workbench.model.editor.ui.dnd;
 
 import org.eclipse.core.resources.IResource;
 
-import ptolemy.kernel.util.NamedObj;
-
 import com.isencia.passerelle.actor.io.FileReader;
+import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
+
+import ptolemy.kernel.util.NamedObj;
 
 /**
  * This factory should be overridden with user defined actors for different file types.
@@ -16,6 +17,12 @@ public class DefaultDropClassFactory implements IDropClassFactory {
 	@Override
 	public Class<? extends NamedObj> getClassForPath(IResource source, String filePath) {
 		return FileReader.class;
+	}
+
+	@Override
+	public void setConfigurableParameters(CreateComponentCommand cmd,
+			String filePath) {
+		// Nothing to do
 	}
 
 }
