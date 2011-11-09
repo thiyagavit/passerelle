@@ -6,16 +6,52 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            name="Passerelle Model"
+            class="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor"
+            contributorClass="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleActionBarContributor"
+            default="false"
             extensions="moml"
             icon="icons/model.gif"
-            contributorClass="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleActionBarContributor"
-            class="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor"
-            id="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor">
+            id="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor"
+            name="Passerelle Model">
          <contentTypeBinding
-               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml">
+               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml.content.type">
          </contentTypeBinding>
       </editor>
+      <editor
+            class="com.isencia.passerelle.workbench.model.editor.ui.editor.WizardModelEditor"
+            default="false"
+            extensions="moml"
+            icon="icons/run_workflow.gif"
+            id="com.isencia.passerelle.workbench.model.editor.ui.editor.WizardModelEditor"
+            name="Workflow Runner">
+      </editor>
+      <editor
+            class="com.isencia.passerelle.workbench.model.editor.ui.editor.WizardWorkflowEditor"
+            contributorClass="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleActionBarContributor"
+            default="true"
+            extensions="moml"
+            icon="icons/model.gif"
+            id="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
+            name="Passerelle Wizard">
+         <contentTypeBinding
+               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml.content.type">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   
+
+   <extension point="org.eclipse.core.contenttype.contentTypes">
+   
+        <content-type
+              base-type="org.eclipse.core.runtime.xml"
+              default-charset="UTF-8"
+              describer="org.eclipse.core.runtime.content.XMLContentDescriber"
+              file-extensions="moml"
+              id="com.isencia.passerelle.workbench.model.editor.ui.moml.content.type"
+              name="MOML"
+              priority="low">			
+		</content-type>
+   
    </extension>
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
@@ -24,10 +60,28 @@
          	labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
          	<propertyCategory category="actor" />
          </propertyContributor>
+         <propertyContributor 
+         	contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
+         	labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
+         	<propertyCategory category="actor" />
+         </propertyContributor>
    </extension>
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
          <propertyTabs contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor">
+            <propertyTab
+                  category="actor"
+                  id="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general"
+                  label="General">
+            </propertyTab>
+         	<propertyTab
+                afterTab="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general"
+                category="actor"
+                id="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.parameters"
+                label="Properties">
+         	</propertyTab>	
+         </propertyTabs>
+         <propertyTabs contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor">
             <propertyTab
                   category="actor"
                   id="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general"
@@ -58,19 +112,7 @@
             name="Workflow Preferences">
       </page>
    </extension>
-   
 
-   <extension point="org.eclipse.core.contenttype.contentTypes">
-   
-        <content-type id="com.isencia.passerelle.workbench.model.editor.ui.moml" name="MOML" 	
-			          base-type="org.eclipse.core.runtime.xml"
-			          priority="low"
-			          file-extensions="moml">			
-			<property name="org.eclipse.core.runtime.charset" default="UTF-8"/>
-			<describer class="org.eclipse.core.runtime.content.XMLContentDescriber"/>
-		</content-type>
-   
-   </extension>
    <extension
          point="org.eclipse.ui.views">
          <view
