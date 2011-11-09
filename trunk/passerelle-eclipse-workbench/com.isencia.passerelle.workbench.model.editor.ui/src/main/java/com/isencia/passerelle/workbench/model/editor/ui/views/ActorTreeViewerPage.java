@@ -11,13 +11,12 @@
 
 package com.isencia.passerelle.workbench.model.editor.ui.views;
 
+import java.util.List;
+
+import org.eclipse.draw2d.GridData;
 import org.eclipse.gef.dnd.TemplateTransfer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
-import org.eclipse.gef.ui.actions.GEFActionConstants;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -27,14 +26,16 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
@@ -46,6 +47,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
 public class ActorTreeViewerPage extends ActorPalettePage {
 
 	private ActionRegistry actionRegistry;
+	private FilteredTree tree;
 
 	public ActionRegistry getActionRegistry() {
 		return actionRegistry;
@@ -63,10 +65,20 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 	 *            the parent
 	 */
 	protected TreeViewer createTreeViewer(Composite parent) {
-		TreeViewer treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
-				| SWT.V_SCROLL);
+		
+		
+		PatternFilter filter = new PatternFilter();
+		this.tree   = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
+		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		TreeViewer treeViewer = tree.getViewer();
 		return treeViewer;
 	}
+	
+	public Control getControl() {
+		return tree;
+	}
+
 
 	/**
 	 * Initializes the data view page.
@@ -101,6 +113,15 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 						}
 					}
 				});
+		
+		
+		final List<PaletteGroup> grps = PaletteItemFactory.getInstance().getPaletteGroups();
+		for (PaletteGroup grp : grps) {
+			if (grp.isExpanded()) {
+				getTreeViewer().expandToLevel(grp, 1);
+			}
+		}
+
 	}
 
 	private void createContextMenus() {
@@ -167,6 +188,10 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 	 */
 	public void dispose() {
 		super.dispose();
+	}
+
+	public void refresh() {
+		getTreeViewer().refresh();
 	}
 
 }
