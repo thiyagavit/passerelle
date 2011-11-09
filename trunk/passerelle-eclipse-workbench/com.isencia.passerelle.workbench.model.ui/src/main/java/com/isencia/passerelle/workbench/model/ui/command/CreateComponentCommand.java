@@ -3,7 +3,6 @@ package com.isencia.passerelle.workbench.model.ui.command;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -19,6 +18,7 @@ import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
+import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.model.Flow;
@@ -88,8 +88,7 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 
 	public void doExecute() {
 		// Perform Change in a ChangeRequest so that all Listeners are notified
-		parent.requestChange(new ModelChangeRequest(this.getClass(), parent,
-				"create") {
+		parent.requestChange(new ModelChangeRequest(this.getClass(), parent, "create") {
 			@Override
 			protected void _execute() throws Exception {
 				try {
@@ -100,53 +99,48 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
 								.findUniqueName(
 										parentModel,
 										clazz,
-										name.equalsIgnoreCase("INPUT") ? DEFAULT_INPUT_PORT
-												: DEFAULT_OUTPUT_PORT, name);
+										name, name);
 						componentName = ModelUtils.getLegalName(componentName);
 						Class constructorClazz = CompositeEntity.class;
-						if (clazz.getSimpleName().equals("TypedIOPort")) {
+						if (TypedIOPort.class.isAssignableFrom(clazz)) {
 							constructorClazz = ComponentEntity.class;
-						} else if (clazz.getSimpleName()
-								.equals("TextAttribute")) {
+							
+						} else if (TextAttribute.class.isAssignableFrom(clazz)) {
 							constructorClazz = NamedObj.class;
-						}
-						if (clazz.getSimpleName().equals("Vertex")) {
-							TypedIORelation rel = new TypedIORelation(
-									parentModel, componentName);
+							
+						} else if (Vertex.class.isAssignableFrom(clazz)) {
+							
+							TypedIORelation rel = new TypedIORelation(parentModel, componentName);
 							child = new Vertex(rel, "Vertex");
 
-						} else if (clazz.equals(Flow.class)) {
+						} 
+						
+						if (Flow.class.isAssignableFrom(clazz)) {
 							if (flow != null) {
 								
 								child = (NamedObj) flow.instantiate(parentModel, componentName);
-								((CompositeActor) child).setClassName(flow
-										.getName());
+								((CompositeActor) child).setClassName(flow.getName());
 								
 
 							}
 
 						} else {
-							Constructor constructor = clazz.getConstructor(
-									constructorClazz, String.class);
+							Constructor constructor = clazz.getConstructor(constructorClazz, String.class);
 
-							child = (NamedObj) constructor.newInstance(
-									parentModel, componentName);
+							child = (NamedObj) constructor.newInstance(parentModel, componentName);
 							if (child instanceof TypedIOPort) {
-								boolean isInput = name
-										.equalsIgnoreCase("INPUT");
+								boolean isInput = name.equalsIgnoreCase("INPUT")||clazz.getName().toLowerCase().endsWith(".input");
 								((TypedIOPort) child).setInput(isInput);
 								((TypedIOPort) child).setOutput(!isInput);
 							}
 						}
 					} else {
-						if (model instanceof TypedIOPort) {
-							name = ((TypedIOPort) model).isInput() ? DEFAULT_INPUT_PORT
-									: DEFAULT_OUTPUT_PORT;
-						}
+					
 						componentName = ModelUtils.findUniqueName(parentModel,
 								model.getClass(), name, name);
+						
 						componentName = ModelUtils.getLegalName(componentName);
-						if (model instanceof Vertex) {
+						if (Vertex.class.isAssignableFrom(model.getClass())) {
 							TypedIORelation rel = new TypedIORelation(
 									parentModel, componentName);
 							child = new Vertex(rel, "Vertex");
