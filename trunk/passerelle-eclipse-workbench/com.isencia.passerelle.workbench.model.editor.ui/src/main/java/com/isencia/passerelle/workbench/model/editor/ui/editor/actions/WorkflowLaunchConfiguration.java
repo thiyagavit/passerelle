@@ -25,6 +25,7 @@ import org.eclipse.debug.internal.core.LaunchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"restriction", "rawtypes"})
 public class WorkflowLaunchConfiguration extends LaunchConfiguration {
 
 	private static Logger logger = LoggerFactory.getLogger(WorkflowLaunchConfiguration.class);
@@ -92,9 +93,10 @@ public class WorkflowLaunchConfiguration extends LaunchConfiguration {
 		
 		// REMOVE LD_PRELOAD if it is already in environment
 		final Map superMap = super.getAttribute(attributeName, defaultValue);
-		if (superMap!=null&&superMap.containsKey("LD_PRELOAD")&&System.getenv().containsKey("LD_PRELOAD")) {
-			logger.debug("LD_PRELOAD already set, use system version which is "+System.getenv("LD_PRELOAD"));
-			superMap.put("LD_PRELOAD", System.getenv("LD_PRELOAD"));
+		syncValue(superMap, "LD_PRELOAD");
+		syncValue(superMap, "EDNA_SITE");
+		if (System.getProperty("org.dawb.edna.use.evironment.home")!=null) {
+		    syncValue(superMap, "EDNA_HOME");
 		}
 
 			
@@ -112,6 +114,14 @@ public class WorkflowLaunchConfiguration extends LaunchConfiguration {
 		
 	}
 	
+	private void syncValue(final Map superMap, final String envName) {
+		
+		if (superMap!=null&&superMap.containsKey(envName)&&System.getenv().containsKey(envName)) {
+			logger.debug(envName+" already set, use system version which is "+System.getenv(envName));
+			superMap.put(envName, System.getenv(envName));
+		}		
+	}
+
 	/* (non-Javadoc)
      * @see org.eclipse.debug.core.ILaunchConfiguration#launch(java.lang.String, org.eclipse.core.runtime.IProgressMonitor, boolean, boolean)
      */
