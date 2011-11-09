@@ -180,7 +180,7 @@ abstract public class AbstractBaseEditPart extends
 			}
 			if (RenameCommand.class.equals(type)) {
 				if (source == this.getModel() && source instanceof NamedObj) {
-					String name = getName(source);
+					String name = getText(source);
 					if ((getComponentFigure() instanceof INameable)
 							&& name != null
 							&& !name.equals(((INameable) getComponentFigure())
@@ -217,7 +217,7 @@ abstract public class AbstractBaseEditPart extends
 		}
 	}
 
-	protected String getName(Object source) {
+	protected String getText(Object source) {
 		return ((NamedObj) source).getDisplayName();
 	}
 
