@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
+import org.eclipse.help.ui.internal.views.HelpView;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -25,7 +26,9 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.WorkbenchHelp;
+import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +41,12 @@ import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
+import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
+import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.Constants;
+import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
@@ -52,7 +58,6 @@ import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
-import com.isencia.passerelle.workbench.util.HelpUtils;
 
 /**
  * Optional replacement for PropertiesView which renders the actor properties
@@ -76,8 +81,7 @@ public class ActorAttributesView extends ViewPart implements
 		this.dialogActor = actor;
 	}
 
-	private static Logger logger = LoggerFactory
-			.getLogger(ActorAttributesView.class);
+	private static Logger logger = LoggerFactory.getLogger(ActorAttributesView.class);
 
 	public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView"; //$NON-NLS-1$
 
@@ -90,16 +94,14 @@ public class ActorAttributesView extends ViewPart implements
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (part instanceof PasserelleModelMultiPageEditor) {
 			this.part = part;
-			if (updateSelection(selection))
-				return;
+			if (updateSelection(selection)) return;
 			clear();
 		}
 	}
 
 	protected boolean updateSelection(final ISelection selection) {
 
-		if (!(selection instanceof StructuredSelection))
-			return false;
+		if (!(selection instanceof StructuredSelection)) return false;
 
 		final Object sel = ((StructuredSelection) selection).getFirstElement();
 		if (sel instanceof AbstractBaseEditPart) {
@@ -111,8 +113,7 @@ public class ActorAttributesView extends ViewPart implements
 
 			if (this.actor instanceof NamedObj) {
 
-				if (!addedListener
-						&& part instanceof PasserelleModelMultiPageEditor) {
+				if (!addedListener && part instanceof PasserelleModelMultiPageEditor) {
 					// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
 					// addedListener = true;
 				}
@@ -122,14 +123,11 @@ public class ActorAttributesView extends ViewPart implements
 				} else {
 					filter = Parameter.class;
 				}
-				Iterator parameterIterator = actor.attributeList(filter)
-						.iterator();
+				Iterator parameterIterator = actor.attributeList(filter).iterator();
 				while (parameterIterator.hasNext()) {
 					Attribute parameter = (Attribute) parameterIterator.next();
 
-					if (!(parameter instanceof Parameter)
-							|| (PasserelleConfigurer.isVisible(actor,
-									(Parameter) parameter))) {
+					if (!(parameter instanceof Parameter) || (PasserelleConfigurer.isVisible(actor,(Parameter) parameter))) {
 						parameterList.add(parameter);
 					}
 				}
@@ -159,21 +157,17 @@ public class ActorAttributesView extends ViewPart implements
 
 				@Override
 				public Object[] getElements(Object inputElement) {
-					if (parameterList == null)
-						return new Parameter[] {};
-					final List<Object> ret = new ArrayList<Object>(
-							parameterList.size() + 1);
-					ret
-							.add(new GeneralAttribute(
-									GeneralAttribute.ATTRIBUTE_TYPE.TYPE,
-									PaletteItemFactory.get().getType(
-											actor.getClass())));
-					ret.add(new GeneralAttribute(
-							GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor
-									.getClass().getName()));
-					ret.add(new GeneralAttribute(
-							GeneralAttribute.ATTRIBUTE_TYPE.NAME,
-							PaletteItemFactory.get().getType(actor.getName())));
+					if (parameterList == null) return new Parameter[] {};
+					final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
+					
+					final Director director = actor instanceof Actor
+					                        ? (Director)((Actor)actor).getDirector()
+					                        : null;
+					if (actor instanceof Actor && director!=null && director.isExpertMode()) {
+						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
+						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
+					}
+					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.getInstance().getType(actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
 				}
@@ -182,7 +176,7 @@ public class ActorAttributesView extends ViewPart implements
 			viewer.setInput(new Object());
 			viewer.refresh();
 		} catch (Exception e) {
-
+            logger.error("Cannot set input", e);
 		}
 	}
 
@@ -206,34 +200,8 @@ public class ActorAttributesView extends ViewPart implements
 	public void createPartControl(Composite parent) {
 
 		this.viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER) {
-
-			@Override
-			protected void doShowItem(Item item) {
-				// TODO Auto-generated method stub
-				super.doShowItem(item);
-			}
-
-			@Override
-			protected void doSelect(int[] indices) {
-				// TODO Auto-generated method stub
-				super.doSelect(indices);
-
-			}
-
-			public String showHelpSelectedParameter(Variable param) {
-
-				Attribute attr = (Attribute) param;
-				if (param.getContainer() != null) {
-					String helpBundle = Constants.HELP_BUNDLE_ID;
-					String actorName = param.getContainer().getClass()
-							.getName().replace(".", "_");
-					return helpBundle + "." + actorName + "_" + attr.getName();
-				}
-				return "";
-			}
-
-		};
+				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -284,14 +252,12 @@ public class ActorAttributesView extends ViewPart implements
 
 	private void createColumns(final TableViewer viewer) {
 
-		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT,
-				0);
+		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT, 0);
 
 		name.getColumn().setText("Property");
 		name.getColumn().setWidth(200);
 		name.setLabelProvider(new PropertyLabelProvider());
-		final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT,
-				1);
+		final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT, 1);
 
 		value.getColumn().setText("Value");
 		value.getColumn().setWidth(700);
@@ -312,14 +278,12 @@ public class ActorAttributesView extends ViewPart implements
 	private void createPopupMenu() {
 		MenuManager menuMan = new MenuManager();
 
-		menuMan.add(new Action("Delete Attribute", Activator
-				.getImageDescriptor("icons/delete_attribute.gif")) {
+		menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_attribute.gif")) {
 			public void run() {
 				(new DeleteAttributeHandler()).run(null);
 			}
 		});
-		menuMan.add(new Action("Help", Activator
-				.getImageDescriptor("icons/help.gif")) {
+		menuMan.add(new Action("Help", Activator.getImageDescriptor("icons/help.gif")) {
 			public void run() {
 				try {
 					showHelpSelectedParameter();
@@ -327,8 +291,13 @@ public class ActorAttributesView extends ViewPart implements
 				}
 			}
 		});
-		viewer.getControl().setMenu(
-				menuMan.createContextMenu(viewer.getControl()));
+		menuMan.add(new Action("Help Contents", Activator.getImageDescriptor("icons/help.gif")) {
+			public void run() {
+				WorkbenchHelpSystem.getInstance().displayHelp();
+			}
+		});
+
+		viewer.getControl().setMenu(menuMan.createContextMenu(viewer.getControl()));
 	}
 
 	@Override
@@ -339,17 +308,19 @@ public class ActorAttributesView extends ViewPart implements
 	}
 
 	public void dispose() {
-		getSite().getWorkbenchWindow().getSelectionService()
-				.removeSelectionListener(this);
+		getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
 		if (part != null && part instanceof PasserelleModelMultiPageEditor) {
-			((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain()
-					.getCommandStack().removeCommandStackEventListener(this);
+			((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
 		}
 		super.dispose();
 	}
 
 	@Override
 	public void stackChanged(CommandStackEvent event) {
+		viewer.refresh();
+	}
+	
+	public void refresh() {
 		viewer.refresh();
 	}
 
@@ -416,7 +387,7 @@ public class ActorAttributesView extends ViewPart implements
 				value);
 		ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
 		ed.refreshActions();
-		ed.getEditor().refresh();
+
 	}
 
 }
