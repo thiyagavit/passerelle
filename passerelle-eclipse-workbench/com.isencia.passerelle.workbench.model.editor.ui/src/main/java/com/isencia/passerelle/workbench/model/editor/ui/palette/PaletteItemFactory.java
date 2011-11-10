@@ -394,31 +394,31 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 
-
-	private static Class<?> loadClass(final IConfigurationElement configurationElement, final String bundleId) {
+	private static Class<?> loadClass(final IConfigurationElement ele, final String bundleId) {
 
 		try {
 			// Because Eclipse Buddy is being used.
-            return Class.forName(configurationElement.getAttribute("class"));
+            return Class.forName(ele.getAttribute("class"));
             
 		} catch (Exception ne) {
 			
 			final Bundle bundle = Platform.getBundle(bundleId);
 			try {
-				return bundle.loadClass(configurationElement.getAttribute("class"));
+				return bundle.loadClass(ele.getAttribute("class"));
 				
 			} catch (Exception e) {
 				final Bundle actors = Platform.getBundle("com.isencia.passerelle.actor");
 				try {
-					return actors.loadClass(configurationElement.getAttribute("class"));
+					return actors.loadClass(ele.getAttribute("class"));
 				} catch (Exception e1) {
-					logger.error("Cannot load "+configurationElement.getAttribute("class"), e1);
+					logger.error("Cannot load "+ele.getAttribute("class"), e1);
 					return null;
 				}
 			}
 		}
 
 	}
+
 
 	@SuppressWarnings("unchecked")
 	public static void setLocation(NamedObj model, double[] location) {
