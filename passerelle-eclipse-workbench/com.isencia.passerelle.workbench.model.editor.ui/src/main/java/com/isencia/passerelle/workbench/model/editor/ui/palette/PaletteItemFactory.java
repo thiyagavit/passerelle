@@ -66,7 +66,6 @@ public class PaletteItemFactory implements Serializable {
 
 
 	private List<PaletteGroup> paletteGroups;
-
 	private static PaletteItemFactory factory;
 	private static Map<String, String> actorBundleMap = new HashMap<String, String>();
 
@@ -174,19 +173,6 @@ public class PaletteItemFactory implements Serializable {
 		return Activator.getImageDescriptor("icons/folder.gif");
 	}
 
-	public CombinedTemplateCreationEntry createPaletteEntryFromPaletteDefinition(
-			String type) {
-
-		return createPaletteEntryFromPaletteDefinition(getPaletteItem(type));
-	}
-
-	public CombinedTemplateCreationEntry createPaletteEntryFromPaletteDefinition(
-			Class type) {
-		if (type == null) {
-			return null;
-		}
-		return createPaletteEntryFromPaletteDefinition(type.getName());
-	}
 
 	public CombinedTemplateCreationEntry createPaletteEntryFromPaletteDefinition(
 			PaletteItemDefinition def) {
@@ -242,7 +228,7 @@ public class PaletteItemFactory implements Serializable {
 		return false;
 
 	}
-	
+
 	public Color getColor(Class clazz) {
 		if (clazz == null) {
 			return null;
@@ -279,7 +265,6 @@ public class PaletteItemFactory implements Serializable {
 		}
 		return clazz;
 	}
-
 
 	public static final String COMPOSITE_ID    = "com.isencia.passerelle.workbench.model.editor.ui.palette.composites";
 	public static final String COMPOSITE_LABEL = "Composites";
@@ -388,7 +373,7 @@ public class PaletteItemFactory implements Serializable {
 			}
 		}
 	}
-		
+	
 	public void addSubModel(Flow flow) throws Exception {
 		
 		if (!paletteItemMap.containsKey(flow.getName())) {
