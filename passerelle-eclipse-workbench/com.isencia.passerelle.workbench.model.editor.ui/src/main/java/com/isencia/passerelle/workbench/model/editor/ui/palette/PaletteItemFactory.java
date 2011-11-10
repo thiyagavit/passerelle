@@ -394,21 +394,27 @@ public class PaletteItemFactory implements Serializable {
 	}
 
 
-	private static Class<?> loadClass(
-			final IConfigurationElement configurationElement,
-			final String bundleId) {
 
-		final Bundle bundle = Platform.getBundle(bundleId);
+	private static Class<?> loadClass(final IConfigurationElement configurationElement, final String bundleId) {
+
 		try {
-			return bundle.loadClass(configurationElement.getAttribute("class"));
-		} catch (Exception e) {
-			final Bundle actors = Platform
-					.getBundle("com.isencia.passerelle.actor");
+			// Because Eclipse Buddy is being used.
+            return Class.forName(configurationElement.getAttribute("class"));
+            
+		} catch (Exception ne) {
+			
+			final Bundle bundle = Platform.getBundle(bundleId);
 			try {
-				return actors.loadClass(configurationElement
-						.getAttribute("class"));
-			} catch (Exception e1) {
-				return null;
+				return bundle.loadClass(configurationElement.getAttribute("class"));
+				
+			} catch (Exception e) {
+				final Bundle actors = Platform.getBundle("com.isencia.passerelle.actor");
+				try {
+					return actors.loadClass(configurationElement.getAttribute("class"));
+				} catch (Exception e1) {
+					logger.error("Cannot load "+configurationElement.getAttribute("class"), e1);
+					return null;
+				}
 			}
 		}
 
