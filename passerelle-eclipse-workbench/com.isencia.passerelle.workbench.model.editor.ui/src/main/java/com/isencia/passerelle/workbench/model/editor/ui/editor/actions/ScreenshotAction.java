@@ -72,7 +72,8 @@ public class ScreenshotAction extends SelectionAction {
 		gc.dispose();
 		
 	    loader.data = new ImageData[]{image.getImageData()};
-	    image.dispose();		// Assert *.png at end of file name
+	    image.dispose();
+		// Assert *.png at end of file name
 	    if (! path.toLowerCase().endsWith(".png")) path = path + ".png";
 	    // Save
 	    loader.save(path, SWT.IMAGE_PNG);
