@@ -12,14 +12,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
+import ptolemy.kernel.util.StringAttribute;
+
 
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CommentFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.CommentPropertySource;
-import ptolemy.kernel.util.StringAttribute;
 
 public class CommentEditPart extends AbstractNodeEditPart {
 
