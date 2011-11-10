@@ -67,7 +67,7 @@ public class WizardModelEditor extends EditorPart implements ExecuteActionListen
 		
 		this.runAction  = (RunAction)run.getAction();
 		this.stopAction = (StopAction)stop.getAction();
-//		runAction.addExecuteActionListener(this);
+		runAction.addExecuteActionListener(this);
 	
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -134,7 +134,7 @@ public class WizardModelEditor extends EditorPart implements ExecuteActionListen
 	
 	public void dispose() {
 		formToolkit.dispose();
-//		runAction.removeExecuteActionListener(this);
+		runAction.removeExecuteActionListener(this);
 		runAction  = null;
 		stopAction = null;
 	}

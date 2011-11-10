@@ -45,8 +45,8 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		subPagesActive=false;
 		try {
 			createWizardPage(0);
-//	        createWorkflowPage(1);
-//	        createXmlPage(2);
+	        createWorkflowPage(1);
+	        createXmlPage(2);
 	        createDocPage(3);
 
 		} catch (Exception e) {
