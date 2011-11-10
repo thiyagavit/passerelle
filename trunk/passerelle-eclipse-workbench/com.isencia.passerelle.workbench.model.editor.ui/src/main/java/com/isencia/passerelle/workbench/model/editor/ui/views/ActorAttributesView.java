@@ -188,7 +188,7 @@ public class ActorAttributesView extends ViewPart implements
 		}
 		this.part = null;
 		this.addedListener = false;
-//		createTableModel(null);
+		createTableModel(null);
 	}
 
 	/**
