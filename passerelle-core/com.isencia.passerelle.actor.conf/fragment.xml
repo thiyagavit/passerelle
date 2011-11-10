@@ -63,13 +63,7 @@
             id="com.isencia.passerelle.actor.RegExpFilter"
             name="RegExpFilter">
       </actor>
-      <actor
-            class="com.isencia.passerelle.actor.filter.XPathFilter"
-            group="com.isencia.passerelle.actor.actorgroup.filter"
-            id="com.isencia.passerelle.actor.XPathFilter"
-            name="XPathFilter">
-      </actor>
-      <actor
+       <actor
             class="com.isencia.passerelle.actor.flow.Synchronizer"
             group="com.isencia.passerelle.actor.actorgroup.flow"
             id="com.isencia.passerelle.actor.Synchronizer"
