@@ -52,21 +52,13 @@ public class PaletteBuilder {
 		PaletteItemFactory factory = PaletteItemFactory.getInstance();
 		categories.add(createControlGroup(root));
 
-		try {
-			PaletteContainer paletteContainer = createPaletteContainer(group
-					.getName(), group.getIcon(), true);
-			logger.trace("Created category " + paletteContainer.getLabel());
-			for (PaletteItemDefinition def : group.getPaletteItems()) {
+		PaletteContainer paletteContainer = createPaletteContainer(group.getName(), group.getIcon(), true);
+		for (PaletteItemDefinition def : group.getPaletteItems()) {
 				CombinedTemplateCreationEntry entry = factory
 						.createPaletteEntryFromPaletteDefinition(def);
 				paletteContainer.add(entry);
-
-			}
-
-			categories.add(paletteContainer);
-		} catch (Exception e) {
-			logger.error("Error creating Palette Categories", e);
 		}
+		categories.add(paletteContainer);
 
 		String[] favoriteGroups = factory.getFavoriteGroupNames();
 		for (String favoriteGroup : favoriteGroups) {
