@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.draw2d.Viewport;
@@ -69,15 +68,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.part.Page;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
@@ -102,7 +100,6 @@ import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.ui.utils.FileUtils;
-import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
 /**
@@ -114,14 +111,13 @@ import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
  * <li>page 2 shows the words in page 0 in sorted order
  * </ul>
  */
-public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
-		implements IPasserelleMultiPageEditor, IResourceChangeListener {
+public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implements IPasserelleMultiPageEditor, IResourceChangeListener {
+
 
 	public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor";
 
-	private static Logger logger = LoggerFactory
-			.getLogger(PasserelleModelMultiPageEditor.class);
-
+	private static Logger logger = LoggerFactory.getLogger(PasserelleModelMultiPageEditor.class);
+	
 	private CompositeActor model = new CompositeActor();
 	protected boolean editorSaving = false;
 	private RefreshCommand RefreshCommand;
@@ -134,8 +130,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 
 	public IPasserelleEditor getSelectedPage() {
 		IEditorPart ed = getEditor(getActivePage());
-		if (ed instanceof IPasserelleEditor)
-			return (IPasserelleEditor) ed;
+		if (ed instanceof IPasserelleEditor) return (IPasserelleEditor) ed;
 		return editor;
 	}
 
@@ -155,9 +150,9 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			outlinePage = new OutlinePage(new TreeViewer());
 			return outlinePage;
 		}
-		if (type == ActorPalettePage.class) {
-			actorTreeViewPage = new ActorTreeViewerPage(editor
-					.getActionRegistry());
+		
+		if (type == ActorPalettePage.class || type==Page.class) {
+			actorTreeViewPage = new ActorTreeViewerPage(editor.getActionRegistry());
 			return actorTreeViewPage;
 		}
 
@@ -230,7 +225,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	public PasserelleModelMultiPageEditor() {
 		super();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-
 	}
 
 	/**
@@ -257,6 +251,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 				}
 			}
 		});	}
+	
 	/**
 	 * Creates page 0 of the multi-page editor, which contains a text editor.
 	 * 
@@ -309,6 +304,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	}
 
 	public void doSave(final IProgressMonitor monitor) {
+		
 		editorSaving = true;
 		if (!this.parseError) {
 			SafeRunner.run(new SafeRunnable() {
@@ -316,7 +312,8 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 					CompositeActor diagram = getDiagram();
 					StringWriter writer = new StringWriter();
 					diagram.exportMoML(writer);
-					IFile file = EclipseUtils.getIFile(getEditorInput());
+					
+					final IFile file = EclipseUtils.getIFile(getEditorInput());
 					if (file != null && !(file instanceof SubModelFile)) {
 						file.setContents(new ByteArrayInputStream(writer
 								.toString().getBytes()), true, false, monitor);
