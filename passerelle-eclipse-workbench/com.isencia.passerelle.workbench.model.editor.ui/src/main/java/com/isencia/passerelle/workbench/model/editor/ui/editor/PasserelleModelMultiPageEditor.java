@@ -246,24 +246,8 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	 */
 	protected void createPages() {
 		try {
-			createWorkflowPage();
-
-			/**
-			 * Important use StructuredTextEditor and set .moml as an xml file
-			 * using the eclipse content type extension point.
-			 */
-			this.textEditor = new StructuredTextEditor() {
-				@Override
-				public boolean isEditable() {
-					return false;
-				}
-			};
-			if (!getModel().isClassDefinition()) {
-				addPage(1, textEditor, getEditorInput());
-				setPageText(1, "XML");
-			}
-			// setPageImage(1,
-			// Activator.getImageDescriptor("icons/xml.png").createImage());
+			createWorkflowPage(0);
+			createXmlPage(1);
 
 		} catch (PartInitException e) {
 			EclipseUtils.logError(e, "Cannot open passerelle editor "
@@ -286,7 +270,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	 * 
 	 * @throws PartInitException
 	 */
-	private void createWorkflowPage() throws PartInitException {
+	protected void createWorkflowPage(int pageIndex) throws PartInitException {
 
 		editor = new PasserelleModelEditor(this, model);
 
@@ -295,6 +279,26 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		setPageText(index, "Workflow");
 		pages.add(0, editor.getDiagram());
 
+	}
+
+	protected void createXmlPage(final int pageIndex) throws PartInitException {
+
+		/**
+		 * Important use StructuredTextEditor and set .moml as an xml file using
+		 * the eclipse content type extension point.
+		 */
+		this.textEditor = new StructuredTextEditor() {
+			@Override
+			public boolean isEditable() {
+				return false;
+			}
+		};
+		if (!getModel().isClassDefinition()) {
+			addPage(1, textEditor, getEditorInput());
+			setPageText(1, "XML");
+		}
+		// setPageImage(1,
+		// Activator.getImageDescriptor("icons/xml.png").createImage());
 	}
 
 	void removePage(PasserelleModelEditor editor) {
@@ -330,8 +334,8 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 						FileUtils.write(fileIO, writer.toString());
 						if (file instanceof SubModelFile
 								&& diagram.isClassDefinition()) {
-							PaletteItemFactory.getInstance()
-									.addSubModel((Flow) diagram);
+							PaletteItemFactory.getInstance().addSubModel(
+									(Flow) diagram);
 						}
 					}
 				}
@@ -555,7 +559,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			Flow compositeActor = flowManager.readMoml(reader);
 
 			this.parseError = false;
-//			ModelUtils.setCompositeProjectName(compositeActor, filePath);
+			// ModelUtils.setCompositeProjectName(compositeActor, filePath);
 
 			setDiagram(compositeActor);
 
@@ -830,20 +834,20 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			if (newEditor instanceof PasserelleModelEditor)
 				editor = (PasserelleModelEditor) newEditor;
 			thumbnail = thumbnails.get(editor);
+			if (editor != null) {
+				GraphicalViewer viewer = editor.getGraphicalViewer();
+				if (lws == null) {
+					lws = new LightweightSystem(overview);
+				}
+				if (thumbnail != null) {
+					thumbnail.setVisible(true);
+					lws.setContents(thumbnail);
+				} else {
 
-			GraphicalViewer viewer = editor.getGraphicalViewer();
-			if (lws == null) {
-				lws = new LightweightSystem(overview);
+					thumbnail = createThumbnail(lws, viewer);
+					thumbnails.put(editor, thumbnail);
+				}
 			}
-			if (thumbnail != null) {
-				thumbnail.setVisible(true);
-				lws.setContents(thumbnail);
-			} else {
-
-				thumbnail = createThumbnail(lws, viewer);
-				thumbnails.put(editor, thumbnail);
-			}
-
 		}
 
 		protected void initializeOverview() {
