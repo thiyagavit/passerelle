@@ -944,17 +944,29 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 
 	/**
 	 * Selects an actor in the editor by highlighting it.
-	 * 
 	 * @param actorName
 	 * @param isSelected
+	 * @param colorCode - one of the SWT color codes.
 	 */
-	public void setActorSelected(final String actorName,final boolean isSelected) {
-		editor.setActorSelected(actorName, isSelected);
-	}
-	
 	public void setActorSelected(String actorName, boolean isSelected, final int colorCode) {
 		editor.setActorSelected(actorName, isSelected, colorCode);
 	}
+
+	public void clearActorSelections() {
+		editor.clearActorSelections();
+	}
+
+	public boolean isParseError() {
+		return parseError;
+	}
+	
+	/**
+	 * Required by unit tests in dawb.
+	 */
+	public void setActivePage(final int ipage) {
+		super.setActivePage(ipage);
+	}
+	
 	@Override
 	public void setPasserelleEditorActive() {
 		setActivePage(0);
