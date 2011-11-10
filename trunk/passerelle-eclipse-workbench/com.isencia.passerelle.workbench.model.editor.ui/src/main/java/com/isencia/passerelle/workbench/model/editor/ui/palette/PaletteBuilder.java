@@ -46,14 +46,14 @@ public class PaletteBuilder {
 		return paletteRoot;
 	}
 
-	static private List createCategories(PaletteRoot root, EditorPart parent, PaletteGroup group) throws Exception {
+	static private List createCategories(PaletteRoot root, EditorPart parent, PaletteGroup utilitiesGroup) throws Exception {
 
 		List categories = new ArrayList();
 		PaletteItemFactory factory = PaletteItemFactory.getInstance();
 		categories.add(createControlGroup(root));
 
-		PaletteContainer paletteContainer = createPaletteContainer(group.getName(), group.getIcon(), true);
-		for (PaletteItemDefinition def : group.getPaletteItems()) {
+		PaletteContainer paletteContainer = createPaletteContainer(utilitiesGroup.getName(), utilitiesGroup.getIcon(), true);
+		for (PaletteItemDefinition def : utilitiesGroup.getPaletteItems()) {
 				CombinedTemplateCreationEntry entry = factory
 						.createPaletteEntryFromPaletteDefinition(def);
 				paletteContainer.add(entry);
