@@ -129,13 +129,7 @@
             id="Vertex"
             name="Vertex">
       </actor>
-      <actor
-            class="com.isencia.passerelle.actor.flow.Delay"
-            group="com.isencia.passerelle.actor.actorgroup.general"
-            id="Delay"
-            name="Delay">
-      </actor>
-      
+       
    </extension>
    <extension
          point="com.isencia.passerelle.engine.actorGroups">
