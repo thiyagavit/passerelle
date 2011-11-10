@@ -187,10 +187,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		return -1;
 	}
 
-	public boolean containsModel(TypedCompositeActor model) {
-		return getPageIndex(model) == -1;
-	}
-
 	public IEditorPart getEditor(int index) {
 		return super.getEditor(index);
 	}
