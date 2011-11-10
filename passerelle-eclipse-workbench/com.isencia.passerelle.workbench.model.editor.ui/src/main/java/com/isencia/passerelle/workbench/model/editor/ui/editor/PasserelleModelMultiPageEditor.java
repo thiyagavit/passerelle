@@ -568,7 +568,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		}
 
 	}
-
 	class ResourceTracker implements IResourceChangeListener,
 			IResourceDeltaVisitor {
 		public void resourceChanged(IResourceChangeEvent event) {
@@ -814,6 +813,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 
 				thumbnail = createThumbnail(lws, viewer);
 				thumbnails.put(editor, thumbnail);
+				
 			}
 		}
 
@@ -943,4 +943,5 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	@Override
 	public void setPasserelleEditorActive() {
 		setActivePage(0);
-	}}
+	}
+}
