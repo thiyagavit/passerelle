@@ -61,7 +61,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
                     if (page >-1 && page<getPageCount()) setActivePage(page);
 
                     EclipseUtils.getActivePage().showView(ActorAttributesView.ID);
-					
+                    EclipseUtils.getActivePage().activate(WizardWorkflowEditor.this);
 				} catch (Throwable ignored) {
 					// Nowt
 				}
@@ -86,7 +86,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		addPage(wizEd, getEditorInput());
 		setPageText(pageIndex, "Run");
 		//setPageImage(pageIndex, Activator.getImageDescriptor("icons/run_workflow.gif").createImage());
-//		pages.add(wizEd);
+		pages.add(wizEd);
 	}
 	
 	protected void createDocPage(int pageIndex) throws Exception {
@@ -115,8 +115,8 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 			
 			wikiBrowser.redrawWebView(); 
 			
-//			pages.add(composite);
-//			pages.add(wikiEditor);
+			pages.add(composite);
+			pages.add(wikiEditor);
 			
 			// Horrible hack to give access to tabbed folder 
 			// to make the editor invisible.
@@ -138,12 +138,12 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		return new FileEditorInput(wiki);
 	}
 
-//	@Override
-//	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
-//		
-//		wizEd.setActorSelected(actorName, isSelected, colorCode);
-//		super.setActorSelected(actorName, isSelected, colorCode);
-//	}
+	@Override
+	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
+		
+		wizEd.setActorSelected(actorName, isSelected, colorCode);
+		super.setActorSelected(actorName, isSelected, colorCode);
+	}
 	
 	public void pageChange(final int ipage) {
 		
@@ -158,24 +158,16 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 			} catch (Throwable e) {
 				logger.error("Cannot select actor tree view!");
 			}
-		} else if (ipage==1) {
-			// We select the actor tree view aswell here
-	        try {
-			    EclipseUtils.getActivePage().showView(ActorTreeView.ID);
-			} catch (Throwable e) {
-				logger.error("Cannot select actor tree view!");
-			}
-
 		}
 		
 		Activator.getDefault().getPreferenceStore().setValue(getPageKey(), ipage);
 	}
 	
 
-//	@Override
-//	public void setPasserelleEditorActive() {
-//		setActivePage(1);
-//	}
+	@Override
+	public void setPasserelleEditorActive() {
+		setActivePage(1);
+	}
 
 	public void setInput(IEditorInput input) {
 		if (input.getName().toLowerCase().endsWith(".moml")) {
