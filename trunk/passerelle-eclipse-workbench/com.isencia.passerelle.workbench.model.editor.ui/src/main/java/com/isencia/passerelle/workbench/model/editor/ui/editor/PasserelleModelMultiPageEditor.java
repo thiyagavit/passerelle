@@ -176,13 +176,17 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		setActivePage(0);
 	}
 
-	private List<CompositeActor> pages = new ArrayList<CompositeActor>();
+	protected List pages = new ArrayList();
 
 	public int getPageIndex(CompositeActor actor) {
 
 		for (int i = 0; i < pages.size(); i++) {
-			if (actor == pages.get(i))
+			final Object part = pages.get(i);
+			if (!(part instanceof PasserelleModelEditor)) continue;
+			
+			if (((PasserelleModelEditor)part).getDiagram() == actor) {
 				return i;
+			}
 		}
 		return -1;
 	}
@@ -259,7 +263,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		int index = addPage(editor, getEditorInput());
 		editor.setIndex(index);
 		setPageText(index, "Workflow");
-		pages.add(0, editor.getDiagram());
+		pages.add(editor);
 
 	}
 
@@ -325,11 +329,14 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 			});
 
 			getEditor(0).doSave(monitor);
-			for (CompositeActor actor : pages) {
-				int index = getPageIndex(actor);
-				if (index != -1 && index != 0) {
-					IEditorPart editor = getEditor(getPageIndex(actor));
-					editor.doSave(monitor);
+			for (Object page : pages) {
+				if (page instanceof PasserelleModelEditor){
+					CompositeActor actor = ((PasserelleModelEditor)page).getContainer();
+					int index = getPageIndex(actor);
+					if (index != -1 && index != 0) {
+						IEditorPart editor = getEditor(index);
+						editor.doSave(monitor);
+					}
 				}
 			}
 		}
@@ -344,13 +351,16 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	 */
 	public void doSaveAs() {
 		performSaveAs();
-		for (CompositeActor actor : pages) {
-			int index = getPageIndex(actor);
-			if (index != -1 && index != 0) {
-				IEditorPart editor = getEditor(index);
-				editor.doSaveAs();
-				setPageText(0, editor.getTitle());
-				setInput(editor.getEditorInput());
+		for (Object page : pages) {
+			if (page instanceof PasserelleModelEditor){
+				CompositeActor actor = ((PasserelleModelEditor)page).getContainer();
+				int index = getPageIndex(actor);
+				if (index != -1 && index != 0) {
+					IEditorPart editor = getEditor(index);
+					editor.doSaveAs();
+					setPageText(0, editor.getTitle());
+					setInput(editor.getEditorInput());
+				}
 			}
 		}
 
