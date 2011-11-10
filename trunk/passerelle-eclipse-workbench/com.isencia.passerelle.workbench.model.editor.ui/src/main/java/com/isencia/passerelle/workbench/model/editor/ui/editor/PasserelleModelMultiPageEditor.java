@@ -196,14 +196,13 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	}
 
 	public int addPage(TypedCompositeActor model, IEditorPart editor,
-			IEditorInput input) throws PartInitException {
+			           IEditorInput input) throws PartInitException {
 		int index = super.addPage(editor, input);
-		pages.add(model);
+		pages.add(editor);
 		return index;
-
 	}
 
-	/** The text editor used in page 0. */
+	/** The text editor used in page 0 or 1 */
 	private PasserelleModelEditor editor;
 
 	public PasserelleModelEditor getEditor() {
@@ -257,6 +256,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	 * @throws PartInitException
 	 */
 	protected void createWorkflowPage(int pageIndex) throws PartInitException {
+
 		editor = new PasserelleModelEditor(this, model);
 
 		addPage(editor, getEditorInput());
@@ -368,7 +368,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	 */
 	public void gotoMarker(IMarker marker) {
 		setActivePage(0);
-		IDE.gotoMarker(getEditor(0), marker);
+		IDE.gotoMarker(editor, marker);
 	}
 
 	/**
@@ -816,12 +816,12 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 
 				thumbnail = createThumbnail(lws, viewer);
 				thumbnails.put(editor, thumbnail);
-				
 			}
+
 		}
 
 		protected void initializeOverview() {
-			editor = (PasserelleModelEditor) getEditor(0);
+			editor = PasserelleModelMultiPageEditor.this.editor;
 
 			thumbnail = thumbnails.get(editor);
 			lws = new LightweightSystem(overview);
