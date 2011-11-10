@@ -396,33 +396,37 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IFile file = workspace.getRoot().getFile(path);
 
-		if (!file.exists()) {
-			WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-				public void execute(final IProgressMonitor monitor) {
-					// saveProperties();
-					try {
-						CompositeActor diagram = getDiagram();
-						StringWriter writer = new StringWriter();
-						diagram.exportMoML(writer);
-						file.create(new ByteArrayInputStream(writer.toString()
-								.getBytes()), true, monitor);
-						writer.close();
-					} catch (Exception e) {
-						getLogger().error(
-								"Error saving model file : " + file.getName(),
-								e);
+		WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
+			public void execute(final IProgressMonitor monitor) {
+				
+				try {
+					CompositeActor diagram = getDiagram();
+					StringWriter writer = new StringWriter();
+					diagram.exportMoML(writer);
+					
+					final ByteArrayInputStream contents = new ByteArrayInputStream(writer.toString().getBytes());
+					if (!file.exists()) {
+						file.create(contents, true, monitor);
+					} else {
+						file.setContents(contents,true,true,monitor);
 					}
-				}
-			};
-			try {
-				new ProgressMonitorDialog(getSite().getWorkbenchWindow().getShell()).run(false, true, op);
-			} catch (Exception e) {
-				getLogger().error(
-						"Error showing progress monitor during saving of model file : "
-						+ file.getName(), e);
-			}
 
+				} catch (Exception e) {
+					getLogger().error(
+							"Error saving model file : " + file.getName(),
+							e);
+				}
+			}
 		};
+		try {
+			new ProgressMonitorDialog(getSite().getWorkbenchWindow().getShell()).run(false, true, op);
+		} catch (Exception e) {
+			getLogger().error(
+					"Error showing progress monitor during saving of model file : "
+					+ file.getName(), e);
+		}
+
+
 
 		try {
 			superSetInput(new FileEditorInput(file));
