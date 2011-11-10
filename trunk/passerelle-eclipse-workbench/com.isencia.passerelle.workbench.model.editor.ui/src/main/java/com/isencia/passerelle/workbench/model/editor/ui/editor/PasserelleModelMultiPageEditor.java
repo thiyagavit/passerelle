@@ -706,7 +706,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 
 		public void init(IPageSite pageSite) {
 			super.init(pageSite);
-			editor = (PasserelleModelEditor) getEditor(0);
+			editor = PasserelleModelMultiPageEditor.this.editor;
 
 		}
 
