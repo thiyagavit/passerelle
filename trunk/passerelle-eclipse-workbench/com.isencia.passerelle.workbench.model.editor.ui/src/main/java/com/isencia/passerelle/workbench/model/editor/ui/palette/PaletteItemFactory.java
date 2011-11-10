@@ -450,4 +450,5 @@ public class PaletteItemFactory implements Serializable {
 			}
 		}
 	}
+	
 }
