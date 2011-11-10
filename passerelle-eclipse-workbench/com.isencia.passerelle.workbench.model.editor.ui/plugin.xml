@@ -10,7 +10,7 @@
             extensions="moml"
             icon="icons/model.gif"
             contributorClass="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleActionBarContributor"
-            class="com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor"
+            class="com.isencia.passerelle.workbench.model.editor.ui.editor.WizardWorkflowEditor"
             id="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor">
          <contentTypeBinding
                contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml">
