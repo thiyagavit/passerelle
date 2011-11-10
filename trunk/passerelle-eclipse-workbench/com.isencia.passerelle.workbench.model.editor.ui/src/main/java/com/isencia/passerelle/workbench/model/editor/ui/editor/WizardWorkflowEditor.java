@@ -139,7 +139,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 	}
 
 	@Override
-	public void setActorSelected(final String actorName,final boolean isSelected, final int colorCode) {
+	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
 		
 		wizEd.setActorSelected(actorName, isSelected, colorCode);
 		super.setActorSelected(actorName, isSelected, colorCode);
