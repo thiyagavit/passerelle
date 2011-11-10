@@ -163,10 +163,12 @@ public class ActorAttributesView extends ViewPart implements
 					final Director director = actor instanceof Actor
 					                        ? (Director)((Actor)actor).getDirector()
 					                        : null;
-					if (actor instanceof Actor && director!=null && director.isExpertMode()) {
+					if (actor instanceof Actor)
 						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
+
+					if (actor instanceof Actor && director!=null && director.isExpertMode())
 						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
-					}
+
 					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.getInstance().getType(actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
