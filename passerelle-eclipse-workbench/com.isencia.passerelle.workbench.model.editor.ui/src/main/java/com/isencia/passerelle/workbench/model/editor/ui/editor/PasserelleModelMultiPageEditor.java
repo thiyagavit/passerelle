@@ -261,10 +261,9 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 
 		addPage(editor, getEditorInput());
 		editor.setIndex(pageIndex);
-		setPageText(pageIndex, "Workflow");
+		setPageText(pageIndex, "Edit");
 		pages.add(editor);
 		
-
 	}
 	
 	protected void createXmlPage(final int pageIndex) throws PartInitException {
