@@ -89,7 +89,6 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.SubModelFile;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlinePartFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
@@ -101,6 +100,7 @@ import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.ui.utils.FileUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.SubModelFile;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
