@@ -427,7 +427,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		}
 
 
-
 		try {
 			superSetInput(new FileEditorInput(file));
 
@@ -538,16 +537,15 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 		InputStream is = null;
 		try {
 			is = new FileInputStream(filePath);
-			PaletteItemFactory factory = PaletteItemFactory.getInstance();
 
-			SubModelUtils.readSubModels();
-
-			FlowManager flowManager = new FlowManager();
 			FileReader reader = new FileReader(new File(filePath));
-			Flow compositeActor = flowManager.readMoml(reader);
+				
+			final IFile ifile   = EclipseUtils.getIFile(input);
+			SubModelUtils.readSubModels();
+			Flow compositeActor = FlowManager.readMoml(reader);
+//			compositeActor.setSource(filePath);
 
 			this.parseError = false;
-			// ModelUtils.setCompositeProjectName(compositeActor, filePath);
 
 			setDiagram(compositeActor);
 
