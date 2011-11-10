@@ -86,7 +86,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 		addPage(wizEd, getEditorInput());
 		setPageText(pageIndex, "Run");
 		//setPageImage(pageIndex, Activator.getImageDescriptor("icons/run_workflow.gif").createImage());
-		pages.add(wizEd);
+//		pages.add(wizEd);
 	}
 	
 	protected void createDocPage(int pageIndex) throws Exception {
@@ -115,8 +115,8 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 			
 			wikiBrowser.redrawWebView(); 
 			
-			pages.add(composite);
-			pages.add(wikiEditor);
+//			pages.add(composite);
+//			pages.add(wikiEditor);
 			
 			// Horrible hack to give access to tabbed folder 
 			// to make the editor invisible.
@@ -139,7 +139,7 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
 	}
 
 	@Override
-	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
+	public void setActorSelected(final String actorName,final boolean isSelected, final int colorCode) {
 		
 		wizEd.setActorSelected(actorName, isSelected, colorCode);
 		super.setActorSelected(actorName, isSelected, colorCode);
