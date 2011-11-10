@@ -948,10 +948,13 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	 * @param actorName
 	 * @param isSelected
 	 */
-	public void setActorSelected(String actorName, boolean isSelected) {
+	public void setActorSelected(final String actorName,final boolean isSelected) {
 		editor.setActorSelected(actorName, isSelected);
 	}
-
+	
+	public void setActorSelected(String actorName, boolean isSelected, final int colorCode) {
+		editor.setActorSelected(actorName, isSelected, colorCode);
+	}
 	@Override
 	public void setPasserelleEditorActive() {
 		setActivePage(0);
