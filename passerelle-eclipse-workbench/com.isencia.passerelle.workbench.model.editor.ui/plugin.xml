@@ -45,6 +45,11 @@
          	labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
          	<propertyCategory category="actor" />
          </propertyContributor>
+         <propertyContributor 
+         	contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
+         	labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
+         	<propertyCategory category="actor" />
+         </propertyContributor>
    </extension>
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
