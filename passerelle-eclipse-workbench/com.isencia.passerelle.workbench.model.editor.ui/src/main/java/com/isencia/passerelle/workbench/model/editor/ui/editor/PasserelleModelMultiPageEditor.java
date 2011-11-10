@@ -98,9 +98,8 @@ import com.isencia.passerelle.workbench.model.ui.IPasserelleEditor;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
-import com.isencia.passerelle.workbench.model.ui.utils.FileUtils;
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.SubModelFile;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
@@ -314,17 +313,16 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 					diagram.exportMoML(writer);
 					
 					final IFile file = EclipseUtils.getIFile(getEditorInput());
-					if (file != null && !(file instanceof SubModelFile)) {
-						file.setContents(new ByteArrayInputStream(writer
-								.toString().getBytes()), true, false, monitor);
+					if (!file.exists()) {
+						file.create(new ByteArrayInputStream(writer.toString().getBytes("UTF-8")), true, monitor);
 					} else {
-						final File fileIO = EclipseUtils
-								.getFile(getEditorInput());
-						FileUtils.write(fileIO, writer.toString());
-						if (file instanceof SubModelFile
-								&& diagram.isClassDefinition()) {
-							PaletteItemFactory.getInstance().addSubModel(
-									(Flow) diagram);
+					    file.setContents(new ByteArrayInputStream(writer.toString().getBytes("UTF-8")), true, false, monitor);
+					}
+					
+					if (ModelUtils.getPasserelleProject().equals(file.getProject())) {
+                        if (diagram.isClassDefinition()) {
+							PaletteItemFactory.getInstance().addSubModel((Flow) diagram);
+							SubModelUtils.addSubModel((Flow) diagram);
 						}
 					}
 				}
