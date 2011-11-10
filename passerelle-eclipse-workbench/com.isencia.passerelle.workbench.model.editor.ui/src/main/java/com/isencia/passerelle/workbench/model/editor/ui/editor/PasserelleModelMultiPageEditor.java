@@ -257,16 +257,16 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 	 * @throws PartInitException
 	 */
 	protected void createWorkflowPage(int pageIndex) throws PartInitException {
-
 		editor = new PasserelleModelEditor(this, model);
 
-		int index = addPage(editor, getEditorInput());
-		editor.setIndex(index);
-		setPageText(index, "Workflow");
+		addPage(editor, getEditorInput());
+		editor.setIndex(pageIndex);
+		setPageText(pageIndex, "Workflow");
 		pages.add(editor);
+		
 
 	}
-
+	
 	protected void createXmlPage(final int pageIndex) throws PartInitException {
 
 		/**
@@ -279,12 +279,9 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 				return false;
 			}
 		};
-		if (!getModel().isClassDefinition()) {
-			addPage(1, textEditor, getEditorInput());
-			setPageText(1, "XML");
-		}
-		// setPageImage(1,
-		// Activator.getImageDescriptor("icons/xml.png").createImage());
+		addPage(pageIndex, textEditor, getEditorInput());
+		setPageText(pageIndex, "XML");
+		pages.add(textEditor);
 	}
 
 	void removePage(PasserelleModelEditor editor) {
