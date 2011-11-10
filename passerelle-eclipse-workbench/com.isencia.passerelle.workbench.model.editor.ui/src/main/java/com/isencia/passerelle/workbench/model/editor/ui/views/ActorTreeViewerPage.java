@@ -10,9 +10,9 @@
  ************************************************************************************/
 
 package com.isencia.passerelle.workbench.model.editor.ui.views;
-
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.draw2d.GridData;
 import org.eclipse.gef.dnd.TemplateTransfer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -26,10 +26,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -44,7 +42,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
  * This class represents the tree view page of the data view
  * 
  */
-public class ActorTreeViewerPage extends ActorPalettePage {
+public class ActorTreeViewerPage extends ActorPalettePage  implements IAdaptable{
 
 	private ActionRegistry actionRegistry;
 	private FilteredTree tree;
@@ -193,5 +191,14 @@ public class ActorTreeViewerPage extends ActorPalettePage {
 	public void refresh() {
 		getTreeViewer().refresh();
 	}
+	
+	@Override
+	public Object getAdapter(Class type) {
+		if (type == String.class) {
+			return "Pallette";
+		}
+		return null;
+	}
+
 
 }
