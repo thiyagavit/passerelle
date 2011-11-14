@@ -184,7 +184,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 			final Object part = pages.get(i);
 			if (!(part instanceof PasserelleModelEditor)) continue;
 			
-			if (((PasserelleModelEditor)part).getDiagram() == actor) {
+			if (((PasserelleModelEditor)part).getContainer() == actor) {
 				return i;
 			}
 		}
