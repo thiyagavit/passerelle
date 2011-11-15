@@ -177,7 +177,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	public void removePage(int pageIndex) {
 
 		super.removePage(pageIndex);
-		pages.remove(pageIndex - 1);
+		pages.remove(pageIndex);
 		setActivePage(0);
 	}
 
