@@ -102,48 +102,6 @@ public class ActorEditPart extends AbstractNodeEditPart implements
 		drillDownImageFigure.setAlignment(PositionConstants.SOUTH);
 		drillDownImageFigure.setBorder(new MarginBorder(0, 0, 5, 0));
 
-		// Implement drilldown in composite
-//		Clickable button = new Clickable(drillDownImageFigure);
-//		button.addMouseListener(new MouseListener() {
-//
-//			@Override
-//			public void mouseDoubleClicked(MouseEvent e) {
-//				try {
-//					IViewSite site = null;
-//					for (IViewPart part : EclipseUtils.getActivePage()
-//							.getViews()) {
-//						if (part instanceof ActorAttributesView) {
-//							site = (IViewSite) part.getSite();
-//							break;
-//						}
-//
-//					}
-//					if (site != null) {
-//						ActorDialog dialog = new ActorDialog(site,
-//								(NamedObj) getModel());
-//						dialog.open();
-//					}
-//
-//				} catch (Exception e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
-//
-//			}
-//
-//			@Override
-//			public void mousePressed(MouseEvent arg0) {
-//				// Not action when mouse pressed
-//
-//			}
-//
-//			@Override
-//			public void mouseReleased(MouseEvent arg0) {
-//				// Not action when mouse released
-//
-//			}
-//		});
-
 		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
 				actorModel.getClass());
 		if (imageDescriptor == null) {
@@ -151,9 +109,6 @@ public class ActorEditPart extends AbstractNodeEditPart implements
 		}
 		ActorFigure actorFigure = getActorFigure(actorModel.getDisplayName(),
 				createImage(imageDescriptor), new Clickable[] {  });
-//		ActorFigure actorFigure = getActorFigure(actorModel.getDisplayName(),
-//				createImage(imageDescriptor), new Clickable[] { button });
-		// Add TargetConnectionAnchors
 		List<TypedIOPort> inputPortList = actorModel.inputPortList();
 		if (inputPortList != null) {
 			for (TypedIOPort inputPort : inputPortList) {
