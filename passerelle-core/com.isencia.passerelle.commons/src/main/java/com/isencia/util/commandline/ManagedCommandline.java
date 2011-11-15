@@ -76,6 +76,15 @@ public class ManagedCommandline extends EnvCommandline {
     return currentProcess != null ? currentProcess.exitValue() : -1;
   }
 
+    public boolean hasTerminated() {
+		try {
+			currentProcess.exitValue();
+			return true;
+		} catch (IllegalThreadStateException e) {
+			return false;
+		}
+	}
+
   /**
    * Returns the stdout from the command as a String
    * 
@@ -152,6 +161,10 @@ public class ManagedCommandline extends EnvCommandline {
     return currentProcess;
   }
 
+    public Process getProcess() {
+    	return currentProcess;
+    }
+    
   public Process waitForProcessFinished() throws IOException, IllegalStateException {
     if (currentProcess == null) throw new IllegalStateException("No running process");
 
