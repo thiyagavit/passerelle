@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.action.IAction;
@@ -131,7 +132,9 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 				// TODO Find way of sending port, addSystemProperty not working
 				WorkflowLaunchConfiguration configuration = new WorkflowLaunchConfiguration(config);
 				configuration.addSystemProperty("com.isencia.jmx.service.port");
-				DebugUITools.launch(configuration, ILaunchManager.RUN_MODE);
+				ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
+				workingCopy.setAttribute("automaticValidate", false);
+				DebugUITools.launch(workingCopy, ILaunchManager.RUN_MODE);
 				
 			}
             
