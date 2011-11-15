@@ -10,6 +10,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
@@ -22,7 +23,7 @@ public class CommentEditPart extends AbstractNodeEditPart {
 
 	protected void onChangePropertyResource(Object source) {
 		
-		final String nameChanged = ((StringParameter)source).getContainer().getName();
+		final String nameChanged = ((NamedObj)source).getContainer().getName();
 		final String thisName    = ((TextAttribute)getModel()).getName();
 		
 		if (!nameChanged.equals(thisName)) return;
