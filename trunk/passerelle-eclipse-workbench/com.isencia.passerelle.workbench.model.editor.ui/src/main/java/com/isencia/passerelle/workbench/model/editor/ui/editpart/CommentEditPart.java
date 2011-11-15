@@ -1,20 +1,17 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import org.eclipse.draw2d.ConnectionAnchor;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Shape;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
+import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.util.Attribute;
-import ptolemy.vergil.kernel.attributes.TextAttribute;
 import ptolemy.kernel.util.StringAttribute;
-
+import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CommentFigure;
@@ -25,7 +22,7 @@ public class CommentEditPart extends AbstractNodeEditPart {
 
 	protected void onChangePropertyResource(Object source) {
 		
-		final String nameChanged = ((StringAttribute)source).getContainer().getName();
+		final String nameChanged = ((StringParameter)source).getContainer().getName();
 		final String thisName    = ((TextAttribute)getModel()).getName();
 		
 		if (!nameChanged.equals(thisName)) return;
