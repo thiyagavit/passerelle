@@ -2,10 +2,9 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.gef.EditPolicy;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Tree;
@@ -17,7 +16,6 @@ import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedAtomicActor;
-import ptolemy.actor.TypedIOPort;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.ChangeListener;
 import ptolemy.kernel.util.ChangeRequest;
@@ -28,7 +26,6 @@ import ptolemy.kernel.util.ValueListener;
 import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 
 /**
@@ -37,7 +34,11 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
 public class OutlineEditPart extends
 		org.eclipse.gef.editparts.AbstractTreeEditPart implements
 		ValueListener, ChangeListener {
-	private static HashMap<String, Image> modelImages = new HashMap<String, Image>();
+	private HashSet<Image> modelImages = new HashSet<Image>();
+	public HashSet<Image> getModelImages() {
+		return modelImages;
+	}
+
 	private static Logger logger = LoggerFactory
 			.getLogger(OutlineEditPart.class);
 
@@ -160,8 +161,8 @@ public class OutlineEditPart extends
 		} else if (model instanceof TypedAtomicActor) {
 			setWidgetImage(ActorEditPart.IMAGE_DESCRIPTOR_ACTOR, model);
 		} else if (model instanceof CompositeActor) {
-			setWidgetImage(PaletteItemFactory.getInstance().getIcon(model.getClass()),
-					model);
+			setWidgetImage(PaletteItemFactory.getInstance().getIcon(
+					model.getClass()), model);
 		}
 		// Set Text
 		if (model instanceof Parameter) {
@@ -207,12 +208,8 @@ public class OutlineEditPart extends
 	}
 
 	protected void setWidgetImage(ImageDescriptor image, NamedObj obj) {
-		if (modelImages.get(obj.getClass().getName()) == null) {
-			Image createImage = image.createImage();
-			setWidgetImage(createImage);
-			modelImages.put(obj.getClass().getName(), createImage);
-		} else {
-			setWidgetImage(modelImages.get(obj.getClass().getName()));
-		}
+		Image createImage = image.createImage();
+		setWidgetImage(createImage);
+		modelImages.add(createImage);
 	}
 }
