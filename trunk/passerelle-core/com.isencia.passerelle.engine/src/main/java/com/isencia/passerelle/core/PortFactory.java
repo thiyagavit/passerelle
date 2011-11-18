@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.core;
 
-import com.isencia.passerelle.actor.Actor;
+import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
@@ -41,10 +41,10 @@ public class PortFactory {
 	 * @throws NameDuplicationException 
 	 * @throws IllegalActionException 
 	 */
-	public Port createOutputPort(Actor container) throws IllegalActionException, NameDuplicationException {
+	public Port createOutputPort(Entity container) throws IllegalActionException, NameDuplicationException {
 		return createOutputPort(container,"output");
 	}
-	public Port createOutputPort(Actor container, String name) throws IllegalActionException, NameDuplicationException {
+	public Port createOutputPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		Port res = new Port(container,name,false,true);
 		return res;
 	}
@@ -54,22 +54,22 @@ public class PortFactory {
 	 * @throws NameDuplicationException 
 	 * @throws IllegalActionException 
 	 */
-	public ErrorPort createOutputErrorPort(Actor container) throws IllegalActionException, NameDuplicationException {
+	public ErrorPort createOutputErrorPort(Entity container) throws IllegalActionException, NameDuplicationException {
 		return createOutputErrorPort(container,"error");
 	}
-	public ControlPort createInputControlPort(Actor container, String name) throws IllegalActionException, NameDuplicationException {
+	public ControlPort createInputControlPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		ControlPort res = new ControlPort(container,name,true,false);
 		return res;
 	}
-	public ControlPort createOutputControlPort(Actor container, String name) throws IllegalActionException, NameDuplicationException {
+	public ControlPort createOutputControlPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		ControlPort res = new ControlPort(container,name,false,true);
 		return res;
 	}
-	public ErrorPort createInputErrorPort(Actor container, String name) throws IllegalActionException, NameDuplicationException {
+	public ErrorPort createInputErrorPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		ErrorPort res = new ErrorPort(container,name,true,false);
 		return res;
 	}
-	public ErrorPort createOutputErrorPort(Actor container, String name) throws IllegalActionException, NameDuplicationException {
+	public ErrorPort createOutputErrorPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		ErrorPort res = new ErrorPort(container,name,false,true);
 		return res;
 	}
@@ -81,7 +81,7 @@ public class PortFactory {
 	 * @throws NameDuplicationException 
 	 * @throws IllegalActionException 
 	 */
-	public Port createInputPort(Actor container, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
+	public Port createInputPort(Entity container, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
 		return createInputPort(container,"input", PortMode.PULL, expectedContentType);
 	}
 	 /**
@@ -93,7 +93,7 @@ public class PortFactory {
 	  * @throws IllegalActionException
 	  * @throws NameDuplicationException
 	  */
-	public Port createInputPort(Actor container, String name, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
+	public Port createInputPort(Entity container, String name, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
 		return createInputPort(container, name, PortMode.PULL, expectedContentType);
 	}
 	/**
@@ -104,7 +104,7 @@ public class PortFactory {
 	 * @throws NameDuplicationException 
 	 * @throws IllegalActionException 
 	 */
-	public Port createInputPort(Actor container, PortMode mode, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
+	public Port createInputPort(Entity container, PortMode mode, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
 		return createInputPort(container, "input", mode, expectedContentType);
 	}
 	 /**
@@ -117,7 +117,7 @@ public class PortFactory {
 	  * @throws IllegalActionException
 	  * @throws NameDuplicationException
 	  */
-	public Port createInputPort(Actor container, String name, PortMode mode, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
+	public Port createInputPort(Entity container, String name, PortMode mode, Class expectedContentType) throws IllegalActionException, NameDuplicationException {
 		Port res = new Port(container,name,mode,true,false);
 		res.setExpectedMessageContentType(expectedContentType);
 		return res;

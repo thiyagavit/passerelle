@@ -16,10 +16,8 @@ package com.isencia.passerelle.core;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.IOPort;
 import ptolemy.actor.IORelation;
 import ptolemy.actor.NoRoomException;
@@ -29,13 +27,12 @@ import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.process.ProcessReceiver;
 import ptolemy.data.Token;
 import ptolemy.data.type.Type;
-import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
 import ptolemy.kernel.util.StringAttribute;
-
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.domain.cap.BlockingQueueReceiver;
 import com.isencia.passerelle.message.MessageBuffer;
@@ -104,7 +101,7 @@ public class Port extends TypedIOPort {
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public Port(ComponentEntity container, String name) throws IllegalActionException, NameDuplicationException {
+	public Port(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		this(container, name, false, false);
 	}
 
@@ -116,7 +113,7 @@ public class Port extends TypedIOPort {
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public Port(ComponentEntity container, String name, boolean isInput, boolean isOutput) throws IllegalActionException,
+	public Port(Entity container, String name, boolean isInput, boolean isOutput) throws IllegalActionException,
 			NameDuplicationException {
 		this(container, name, PortMode.PULL, isInput, isOutput);
 	}
@@ -130,7 +127,7 @@ public class Port extends TypedIOPort {
 	 * @throws IllegalActionException
 	 * @throws NameDuplicationException
 	 */
-	public Port(ComponentEntity container, String name, PortMode mode, boolean isInput, boolean isOutput) throws IllegalActionException,
+	public Port(Entity container, String name, PortMode mode, boolean isInput, boolean isOutput) throws IllegalActionException,
 			NameDuplicationException {
 		// we explicitly do not call the default matching super() constructor
 		// with a container param etc, as this leads to initialization/construction ordering problems...

@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.core;
 
-import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.StringAttribute;
@@ -34,7 +34,7 @@ public class ErrorPort extends Port {
 	 * @throws ptolemy.kernel.util.IllegalActionException
 	 * @throws ptolemy.kernel.util.NameDuplicationException
 	 */
-	public ErrorPort(ComponentEntity container, String name) throws IllegalActionException, NameDuplicationException {
+	public ErrorPort(Entity container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
 		try {
 			// hack to get port layout a bit nicer
@@ -55,7 +55,7 @@ public class ErrorPort extends Port {
 	 * @throws ptolemy.kernel.util.IllegalActionException
 	 * @throws ptolemy.kernel.util.NameDuplicationException
 	 */
-	public ErrorPort(ComponentEntity container, String name, boolean isInput, boolean isOutput)
+	public ErrorPort(Entity container, String name, boolean isInput, boolean isOutput)
 		throws IllegalActionException, NameDuplicationException {
 		super(container, name, isInput, isOutput);
 		try {
