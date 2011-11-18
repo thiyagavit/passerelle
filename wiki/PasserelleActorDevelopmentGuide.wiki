@@ -294,11 +294,11 @@ public class HelloPasserelle extends Actor {
 
 Such an actor can be used in a small variation on the classic "Hello World", adapted to Passerelle :
 
-!HelloPasserelleModel.jpg!
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/HelloPasserelleModel.jpg
 
 When this model is launched, the tracer-log-view will show the transformed message :
 
-!HelloPasserelleResult.jpg!
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/HelloPasserelleResult.jpg
 
 
 
