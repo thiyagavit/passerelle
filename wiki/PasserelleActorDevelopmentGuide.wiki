@@ -738,7 +738,7 @@ The configured header modification is then applied on the copy, and this one wil
 
 The actor's parameters can be configured via an automatically generated panel, e.g. in the Swing HMI :
 
-!AddRemoveMsgHdrConfigPanel.jpg!
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/AddRemoveMsgHdrConfigPanel.jpg
 
 Running this model will result in a final message being sent to the TracerConsole with the added header.
 From the logs we can see that indeed a header _MyHeader_ was added in the _Body_ :
@@ -900,7 +900,7 @@ This actor can be used in an extension of the model with the _AddRemoveMessageHe
 When the filter matches, the message can be routed to the TracerConsole as before.
 When the filter does not match, we can now send the message to an ErrorConsole to notify someone that the header was not correctly set.
 
-!HdrFilterConfigPanel.jpg!
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/HdrFilterConfigPanel.jpg
 
 The screenshot also shows the configuration panel where the port names can be specified, together with the header name for which the filter will check the presence.
 
