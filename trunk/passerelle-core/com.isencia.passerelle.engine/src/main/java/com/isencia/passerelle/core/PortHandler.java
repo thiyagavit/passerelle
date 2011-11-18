@@ -43,21 +43,21 @@ public class PortHandler {
 
     private static Logger logger = LoggerFactory.getLogger(PortHandler.class);
     // for logging MDC
-	private String actorInfo="none";
+	protected String actorInfo="none";
 
     //~ Instance variables ·····································································································································
 
-    private BlockingQueue<Token> queue = null;
-    private IOPort ioPort = null;
-    private Object channelLock = new Object();
-    private PortListener listener = null;
-    private ChannelHandler[] channelHandlers = null;
+	protected BlockingQueue<Token> queue = null;
+    protected IOPort ioPort = null;
+    protected Object channelLock = new Object();
+    protected PortListener listener = null;
+    protected ChannelHandler[] channelHandlers = null;
     private boolean started = false;
     
     // A counter for channels that are still active
     // When this counter reaches 0 again, it means the handler
     // can stop.
-    private int channelCount = 0;
+    protected int channelCount = 0;
 
     //~ Constructors ···········································································································································
 
@@ -181,7 +181,7 @@ public class PortHandler {
      * @return flag indicating whether there are tokens
      * in the message queue for this handler
      */
-    private boolean hasNoMoreTokens() {
+    protected boolean hasNoMoreTokens() {
         return queue.isEmpty();
     }
 
@@ -225,7 +225,7 @@ public class PortHandler {
 	 *
 	 * @return flag indicating whether extra handler threads must be used.
 	 */
-	private boolean mustUseHandlers() {
+    protected boolean mustUseHandlers() {
 		if(listener!=null)
 			return true;
 		
