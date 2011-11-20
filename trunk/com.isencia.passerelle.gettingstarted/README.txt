@@ -28,3 +28,4 @@ Breaking old APIs
 - removed MessageAndPort, MessageFLowContext, MultiMessageFLowContext
 - on Actor base class :
 -- removed sendOutputMsg(MessageAndPort) and SendOutputMsgs(MessageAndPort[])
+- removed portIndex parameter in sendOutputMsg() and MessageOutputContext

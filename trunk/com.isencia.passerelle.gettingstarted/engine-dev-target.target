@@ -5,5 +5,6 @@
 <locations>
 <location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base" type="Directory"/>
 <location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/ptolemy" type="Directory"/>
+<location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/rcp-deltapack" type="Directory"/>
 </locations>
 </target>
