@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Passerelle Workbench" uid="com.isencia.passerelle.workbench" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="7.0.0" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
       <text>
-         Passerelle 4 by iSencia Belgium
+         Passerelle 7 by iSencia Belgium
       </text>
    </aboutInfo>
 
@@ -24,15 +24,36 @@
       startupProgressRect="0,260,400,10"
       startupMessageRect="7,0,400,20"
       startupForegroundColor="F5F5F5" />
-   <launcher>
+   <launcher name="PasserelleWorkBench">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
+   <license>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <text>
+   /* Copyright 2011 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
+         </text>
+   </license>
 
    <plugins>
       <plugin id="activation"/>
@@ -43,17 +64,12 @@
       <plugin id="com.isencia.passerelle.commons.ume"/>
       <plugin id="com.isencia.passerelle.engine"/>
       <plugin id="com.isencia.passerelle.workbench"/>
-      <plugin id="com.isencia.passerelle.workbench.logging.development" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
       <plugin id="com.isencia.passerelle.workbench.model.ui"/>
       <plugin id="com.isencia.passerelle.workbench.util"/>
       <plugin id="com.microstar"/>
-      <plugin id="com.springsource.net.sf.cglib" fragment=""/>
-      <plugin id="com.springsource.org.apache.commons.beanutils" fragment=""/>
-      <plugin id="com.springsource.org.apache.commons.collections" fragment=""/>
-      <plugin id="com.springsource.org.apache.commons.digester" fragment=""/>
       <plugin id="com.teaminabox.eclipse.wiki"/>
       <plugin id="com.thoughtworks.xstream"/>
       <plugin id="diva"/>
@@ -121,7 +137,6 @@
       <plugin id="org.eclipse.emf.codegen.ui"/>
       <plugin id="org.eclipse.emf.common"/>
       <plugin id="org.eclipse.emf.common.ui"/>
-      <plugin id="org.eclipse.emf.commonj.sdo" fragment=""/>
       <plugin id="org.eclipse.emf.converter"/>
       <plugin id="org.eclipse.emf.databinding"/>
       <plugin id="org.eclipse.emf.databinding.edit"/>
@@ -130,7 +145,6 @@
       <plugin id="org.eclipse.emf.ecore.change.edit"/>
       <plugin id="org.eclipse.emf.ecore.edit"/>
       <plugin id="org.eclipse.emf.ecore.editor"/>
-      <plugin id="org.eclipse.emf.ecore.sdo" fragment=""/>
       <plugin id="org.eclipse.emf.ecore.xmi"/>
       <plugin id="org.eclipse.emf.edit"/>
       <plugin id="org.eclipse.emf.edit.ui"/>
