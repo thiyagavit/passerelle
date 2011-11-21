@@ -1,5 +1,5 @@
 #summary work in progress for actor developers
-#labels Phase-Implementation,Phase-Requirements
+#labels Phase-Implementation,Phase-Requirements,Featured
 
 = Introduction =
  The goal of this page is to work on a guide that must ultimately be delivered as document/PDF/...
