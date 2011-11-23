@@ -428,12 +428,17 @@ public class ModelUtils {
 			comp = (CompositeActor) comp.getContainer();
 		}
 
-		final IProject project =  (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(comp.workspace().getName());
+		IProject project = null;
+		String name = comp.workspace().getName();
 		
-		if (project != null) return project;
+		if (name == null || name.equals("")) {
+			// If this .moml is in .passerelle we return that project
+			project = ModelUtils.getPasserelleProject();
+		} else {
+			project =  (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
+		}
 		
-		// If this .moml is in .passerelle we return that project
-		return ModelUtils.getPasserelleProject();
+		return project;
 	}
 
 	/**
