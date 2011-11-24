@@ -23,14 +23,14 @@
          point="org.eclipse.core.runtime.products">
       <product
          application="com.isencia.passerelle.workbench.application"
-               name="Passerelle Workbench">
+               name="PasserelleWorkbench">
          <property
                name="windowImages"
                value="icons/ide.gif,icons/ide32.gif,icons/ide48.gif">
          </property>
          <property
                name="aboutText"
-               value="Passerelle 4 by iSencia Belgium">
+               value="Passerelle 7 by iSencia Belgium">
          </property>
          <property
                name="aboutImage"
@@ -50,7 +50,7 @@
          </property>
          <property
                name="appName"
-               value="Passerelle Workbench">
+               value="PasserelleWorkbench">
          </property>
          <property
                name="preferenceCustomization"
