@@ -46,5 +46,5 @@ Import-Package: com.teaminabox.eclipse.wiki.editors,
  org.eclipse.gmf.runtime.draw2d.ui.figures,
  org.eclipse.gmf.runtime.draw2d.ui.internal.routers,
  org.eclipse.wst.sse.ui,
- org.slf4j
+ org.slf4j;version="1.5.0"
 
