@@ -39,17 +39,12 @@ import com.isencia.passerelle.ext.ConfigurationExtender;
  * @author delerw
  *
  */
-public class InputPortConfigurationExtender extends Attribute implements ConfigurationExtender, ValueListener {
+public class InputPortConfigurationExtender extends InputPortBuilder implements ConfigurationExtender, ValueListener {
   private static Logger LOGGER = LoggerFactory.getLogger(InputPortConfigurationExtender.class);
 
   private static final String INPUT_PORTNAMES = "Input port names (comma-separated)";
   public StringParameter inputPortNamesParameter = null;
   
-  private Set<String> inputPortNames = new HashSet<String>();
-  // this will deliver a secured interface on the available input port names
-  private Set<String> inputPortNamesForContainerAccess = Collections.unmodifiableSet(inputPortNames);
-  private Entity container;
-
   /**
    * @param container
    * @param name
@@ -58,15 +53,10 @@ public class InputPortConfigurationExtender extends Attribute implements Configu
    */
   public InputPortConfigurationExtender(Entity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-    this.container = container;
     inputPortNamesParameter = new StringParameter(container, INPUT_PORTNAMES);
     inputPortNamesParameter.addValueListener(this);
   }
   
-  public Collection<String> getInputPortNames() {
-    return inputPortNamesForContainerAccess; 
-  }
-
   // TODO : problem is that there's no way to pass error info to the source of the change
   // so no possibility to warn user that the configured ports could not be created correctly
   // Maybe need to do this change via the attributeChanged() of the containing actor after all?
@@ -79,91 +69,5 @@ public class InputPortConfigurationExtender extends Attribute implements Configu
       String inputPortNames = inputPortNamesParameter.getExpression();
       changeInputPorts(inputPortNames);
     }
-  }
-
-  /**
-   * @return Returns the inputPorts.
-   */
-  @SuppressWarnings("unchecked")
-  public List<Port> getInputPorts() {
-    // in order to avoid cloning issues
-    // when we would maintain the list of dynamically cfg-ed
-    // input ports in an instance variable,
-    // we build this list dynamically here from
-    // Ptolemy's internal port list
-    List<Port> ports = new ArrayList<Port>();
-    for (String portName : inputPortNames) {
-      Port p = (Port) container.getPort(portName);
-      if (p != null)
-        ports.add(p);
-      else {
-        LOGGER.error("{} - internal error - configured port not found with name {}", container.getFullName(), portName);
-      }
-    }
-    return ports;
-  }
-
-  /**
-   * @param portNames comma-separated
-   * @throws IllegalActionException
-   * @throws IllegalArgumentException
-   */
-  protected void changeInputPorts(String portNames) {
-    LOGGER.trace("{} - changeInputPorts() - entry - portNames : {}", container.getFullName(), portNames);
-
-    Set<String> previousPortNames = new HashSet<String>(inputPortNames);
-    inputPortNames.clear();
-    String[] newPortNames = portNames.split(",");
-
-    // first add new ports
-    for (String portName : newPortNames) {
-      Port aPort = (Port) container.getPort(portName);
-      if (aPort == null) {
-        // create a new one
-        try {
-          createPort(portName);
-        } catch (IllegalActionException e) {
-          LOGGER.error("{} - internal error - failed to create port with name {}", container.getFullName(), portName);
-        }
-      }
-      previousPortNames.remove(portName);
-      inputPortNames.add(portName);
-    }
-    // then remove removed ports, based on remaining names in the old port names list
-    for (String portName : previousPortNames) {
-      try {
-        container.getPort(portName).setContainer(null);
-      } catch (Exception e) {
-        LOGGER.error("{} - internal error - failed to remove port with name {}", container.getFullName(), portName);
-      }
-    }
-
-    LOGGER.trace("{} - changeInputPorts() - exit", container.getFullName());
-  }
-
-  /**
-   * @param portName
-   * @return
-   * @throws IllegalActionException
-   */
-  protected Port createPort(String portName) throws IllegalActionException {
-    LOGGER.trace("{} - createPort() - entry - name : {}", container.getFullName(), portName);
-    
-    Port aPort = null;
-    try {
-      aPort = (Port) container.getPort(portName);
-
-      if (aPort == null) {
-        LOGGER.debug("{} - createPort() - port {} will be constructed", container.getFullName(), portName);
-        aPort = PortFactory.getInstance().createInputPort(container, portName, PortMode.PUSH, null);
-        aPort.setMultiport(true);
-      } else {
-        throw new IllegalActionException(container, "port " + portName + " already exists");
-      }
-    } catch (Exception e) {
-      throw new IllegalActionException(this, e, "failed to create port " + portName);
-    }
-    LOGGER.trace("{} - createPort() - exit - port : {}", container.getFullName(), portName);
-    return aPort;
   }
 }
