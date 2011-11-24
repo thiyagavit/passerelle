@@ -29,5 +29,5 @@ Import-Package: org.eclipse.core.filesystem,
  org.eclipse.draw2d,
  org.eclipse.gef.commands,
  org.eclipse.gef.ui.actions,
- org.slf4j
+ org.slf4j;version="1.5.0"
 DynamicImport-Package: *
