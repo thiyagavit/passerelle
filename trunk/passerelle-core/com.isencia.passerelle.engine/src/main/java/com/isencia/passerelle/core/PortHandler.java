@@ -51,8 +51,8 @@ public class PortHandler {
     protected IOPort ioPort = null;
     protected Object channelLock = new Object();
     protected PortListener listener = null;
-    protected ChannelHandler[] channelHandlers = null;
-    private boolean started = false;
+    protected Thread[] channelHandlers = null;
+    protected boolean started = false;
     
     // A counter for channels that are still active
     // When this counter reaches 0 again, it means the handler
@@ -204,10 +204,10 @@ public class PortHandler {
         channelCount = getWidth();
 
 		if(mustUseHandlers()) {		
-			channelHandlers = new ChannelHandler[getWidth()];
+			channelHandlers = new Thread[getWidth()];
 
 			for (int i = 0; i < getWidth(); i++) {
-				channelHandlers[i] = new ChannelHandler(i);
+				channelHandlers[i] = createChannelHandler(i);
 				channelHandlers[i].start();
 			}
 		}
@@ -239,9 +239,17 @@ public class PortHandler {
 		return (getWidth()>1);
 	}
 
+	/**
+	 * Override to provide alternative implementation.
+	 * @param index
+	 * @return
+	 */
+	protected Thread createChannelHandler(final int index) {
+		return new ChannelHandler(index);
+	}
     //~ Classes ················································································································································
 
-    private class ChannelHandler extends Thread {
+	public final class ChannelHandler extends Thread {
         private Token token = null;
         private boolean terminated = false;
         private int channelIndex = 0;
