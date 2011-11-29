@@ -132,6 +132,8 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 				// TODO Find way of sending port, addSystemProperty not working
 				WorkflowLaunchConfiguration configuration = new WorkflowLaunchConfiguration(config);
 				configuration.addSystemProperty("com.isencia.jmx.service.port");
+				// TODO Find an alternative way to maintain a "editor/session" key
+				configuration.addSystemProperty("com.isencia.require.file.source");
 				ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
 				workingCopy.setAttribute("automaticValidate", false);
 				DebugUITools.launch(workingCopy, ILaunchManager.RUN_MODE);

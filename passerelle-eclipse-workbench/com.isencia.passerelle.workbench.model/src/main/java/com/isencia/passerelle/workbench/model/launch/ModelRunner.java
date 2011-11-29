@@ -118,7 +118,9 @@ public class ModelRunner implements IApplication {
 					final Workspace  workspace  = ModelUtils.getWorkspace(modelPath);
 				    final MoMLParser moMLParser = new MoMLParser(workspace);
 					compositeActor = (CompositeActor) moMLParser.parse(null, reader);
-//					compositeActor.setSource(modelPath);
+					if (System.getProperty("com.isencia.require.file.source")!=null) {
+					    compositeActor.setSource(modelPath);
+					}
 					
 					this.manager = new Manager(compositeActor.workspace(), getUniqueName());
 					manager.setPersistent(false); // Important for test decks to pass.
