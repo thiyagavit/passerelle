@@ -2279,7 +2279,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                 // NamedObj container = _current;
                 _pushContext();
 
-                Class newClass = Class.forName(className, true, _classLoader);
+                Class newClass = loadClass(className);
 
                 // NOTE: No propagation occurs here... Hopefully, deprecated
                 // elements are not used with class structures.
@@ -2626,7 +2626,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                 Class newClass = null;
 
                 if ((className != null) && !className.trim().equals("")) {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 }
 
                 Port port = container.getPort(portName);
@@ -2800,7 +2800,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                 Class newClass = null;
 
                 if (className != null) {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 }
 
                 Relation relation = container.getRelation(relationName);
@@ -3693,7 +3693,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                 // with the cause of the original error in the unlikely event
                 // that our error correction fails
                 try {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 } catch (Exception ex) {
                     // NOTE: Java sometimes throws ClassNotFoundException
                     // and sometimes NullPointerException when the class
@@ -4986,7 +4986,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
 
             if (className != null) {
                 try {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 } catch (NoClassDefFoundError ex) {
                     throw new XmlException("Failed to find class '" + className
                             + "'", _currentExternalEntity(), _getLineNumber(),
@@ -5229,6 +5229,19 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
                 }
             }
         }
+    }
+
+    protected Class loadClass(String className) throws ClassNotFoundException {
+      Class newClass=null;
+      try {
+        newClass = Class.forName(className, true, _classLoader);
+      } catch(Exception e) {
+        // if className not found and it starts with "be.", 
+        // try it for alias starting with "com."
+        className = className.replace("be.isencia", "com.isencia");
+        newClass = Class.forName(className, true, _classLoader);
+      }
+      return newClass;
     }
 
     /** Return true if the link between the specified port and
