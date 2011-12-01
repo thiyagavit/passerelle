@@ -69,17 +69,18 @@ public class VariableEditingSupport extends EditingSupport {
 		if (desc != null) {
 			CellEditor createPropertyEditor = desc
 					.createPropertyEditor((Composite) getViewer().getControl());
-			String contextId = HelpUtils.getContextId(element);
-			if (contextId != null) {
-				try {
-					PlatformUI.getWorkbench().getHelpSystem().setHelp(
-							createPropertyEditor.getControl(), contextId);
-					PlatformUI.getWorkbench().getHelpSystem()
-							.displayDynamicHelp();
-				} catch (Exception e) {
-
-				}
-			}
+// TODO later if context help is used again
+//			String contextId = HelpUtils.getContextId(element);
+//			if (contextId != null) {
+//				try {
+//					PlatformUI.getWorkbench().getHelpSystem().setHelp(
+//							createPropertyEditor.getControl(), contextId);
+//					PlatformUI.getWorkbench().getHelpSystem()
+//							.displayDynamicHelp();
+//				} catch (Exception e) {
+//
+//				}
+//			}
 			return createPropertyEditor;
 		}
 		return null;
