@@ -59,12 +59,15 @@ public class HelpAction extends SelectionAction {
 		List selection = getSelectedObjects();
 		for (Object o : selection) {
 			if (o instanceof ActorEditPart) {
-				String actorName = ((ActorEditPart) o).getEntity().getClass()
-						.getName();
-				String string = "/" + PaletteItemFactory.getBuildId(actorName)
-						+ "/html/" + actorName + ".html";
+// TODO revert this code when enabling context specific help
+//				String actorName = ((ActorEditPart) o).getEntity().getClass()
+//						.getName();
+//				String path = "/" + PaletteItemFactory.getBuildId(actorName)
+//						+ "/html/" + actorName + ".html";
 
-				WorkbenchHelpSystem.getInstance().displayHelpResource(string);
+				final String path = HelpUtils.getContextId(o);
+
+				WorkbenchHelpSystem.getInstance().displayHelpResource(path);
 				break;
 			}
 		}
