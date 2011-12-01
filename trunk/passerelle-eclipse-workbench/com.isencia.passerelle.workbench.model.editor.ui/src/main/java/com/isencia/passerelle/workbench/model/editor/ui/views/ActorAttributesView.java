@@ -375,7 +375,9 @@ public class ActorAttributesView extends ViewPart implements
 			final Object o = s.getFirstElement();
 			String contextId = HelpUtils.getContextId(o);
 			if (contextId != null) {
-				WorkbenchHelp.displayHelp(contextId);
+// TODO revert this when using context specific help				
+//				WorkbenchHelp.displayHelp(contextId);
+				WorkbenchHelpSystem.getInstance().displayHelpResource(contextId);
 			}
 
 		}
