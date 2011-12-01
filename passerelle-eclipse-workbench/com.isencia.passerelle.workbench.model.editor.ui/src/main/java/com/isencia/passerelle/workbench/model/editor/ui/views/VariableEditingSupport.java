@@ -69,7 +69,7 @@ public class VariableEditingSupport extends EditingSupport {
 		if (desc != null) {
 			CellEditor createPropertyEditor = desc
 					.createPropertyEditor((Composite) getViewer().getControl());
-// TODO later if context help is used again
+// TODO later revert if context specific help
 //			String contextId = HelpUtils.getContextId(element);
 //			if (contextId != null) {
 //				try {
