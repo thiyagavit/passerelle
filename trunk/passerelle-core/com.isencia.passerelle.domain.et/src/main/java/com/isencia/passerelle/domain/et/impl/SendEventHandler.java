@@ -46,14 +46,11 @@ public class SendEventHandler implements EventHandler<SendEvent> {
   public SendEventHandler(ETDirector director) {
     this.director = director;
   }
-  @Override
   public void initialize() {
   }
-  @Override
   public boolean canHandle(Event event) {
     return (event instanceof SendEvent);
   }
-  @Override
   public void handle(SendEvent event) throws Exception {
     Actor actor = (Actor) event.getReceivingPort().getContainer();
     

@@ -26,7 +26,6 @@ abstract class AbstractEvent implements Event {
     this.timeStamp = timeStamp;
   }
 
-  @Override
   public Date getTimestamp() {
     return timeStamp;
   }

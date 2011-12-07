@@ -50,7 +50,6 @@ public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
   }
   
   private class EventQueueSink implements Runnable {
-    @Override
     public void run() {
       LOGGER.info("Starting EventQueueSink for EventHandler {}", getName());
       try {

@@ -65,7 +65,6 @@ public class SimpleEventDispatcher implements EventDispatcher {
     }
   }
   
-  @Override
   public void accept(Event e) throws EventRefusedException {
     try {
       eventQ.put(e);
@@ -74,7 +73,6 @@ public class SimpleEventDispatcher implements EventDispatcher {
     }
   }
 
-  @Override
   public boolean dispatch(long timeOut) {
     boolean eventDispatched = false;
     try {
@@ -112,16 +110,13 @@ public class SimpleEventDispatcher implements EventDispatcher {
     return unhandledEvents;
   }
 
-  @Override
   public void shutdown() {
   }
 
-  @Override
   public List<Event> shutdownNow() {
     return null;
   }
 
-  @Override
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
     return false;
   }

@@ -62,7 +62,6 @@ public class InputPortConfigurationExtender extends InputPortBuilder implements 
   // Maybe need to do this change via the attributeChanged() of the containing actor after all?
   // But then this config extender can only work on some specific Passerelle actors that 
   // have adapted attributeChanged()...
-  @Override
   public void valueChanged(Settable settable) {
     // should always be our output port parameter, but still...
     if (settable == inputPortNamesParameter) {
