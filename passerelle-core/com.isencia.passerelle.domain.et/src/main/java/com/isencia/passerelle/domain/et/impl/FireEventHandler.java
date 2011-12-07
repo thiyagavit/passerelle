@@ -47,16 +47,13 @@ public class FireEventHandler implements EventHandler<FireEvent> {
     this.director = director;
   }
 
-  @Override
   public void initialize() {
   }
 
-  @Override
   public boolean canHandle(Event event) {
     return (event instanceof FireEvent);
   }
   
-  @Override
   public void handle(FireEvent event) throws Exception {
     Actor actor = event.getTarget();
     

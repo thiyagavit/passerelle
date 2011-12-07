@@ -64,6 +64,12 @@
             name="RegExpFilter">
       </actor>
        <actor
+            class="com.isencia.passerelle.actor.flow.Delay"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.Delay"
+            name="ThrottlingDelay">
+      </actor>
+       <actor
             class="com.isencia.passerelle.actor.flow.Synchronizer"
             group="com.isencia.passerelle.actor.actorgroup.flow"
             id="com.isencia.passerelle.actor.Synchronizer"
