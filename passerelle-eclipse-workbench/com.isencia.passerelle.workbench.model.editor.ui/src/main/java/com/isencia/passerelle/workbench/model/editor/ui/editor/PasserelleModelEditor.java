@@ -334,10 +334,10 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		final IFile file = EclipseUtils.getIFile(getEditorInput());
 		if (file!=null) file.getWorkspace()
 				.removeResourceChangeListener(resourceListener);
-		for (AbstractBaseEditPart part : editPartFactory.getParts()) {
-			for (Image image : part.getImages())
-				image.dispose();
-		}
+//		for (AbstractBaseEditPart part : editPartFactory.getParts()) {
+//			for (Image image : part.getImages())
+//				image.dispose();
+//		}
 		// model.removeAllEntities();
 		// model.removeAllPorts();
 		// model.removeAllRelations();

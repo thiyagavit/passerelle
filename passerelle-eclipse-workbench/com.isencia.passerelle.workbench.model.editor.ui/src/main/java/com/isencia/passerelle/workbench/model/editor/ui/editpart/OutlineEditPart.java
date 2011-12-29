@@ -26,6 +26,7 @@ import ptolemy.kernel.util.ValueListener;
 import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
+import com.isencia.passerelle.workbench.model.editor.ui.ImageRegistry;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 
 /**
@@ -34,10 +35,10 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
 public class OutlineEditPart extends
 		org.eclipse.gef.editparts.AbstractTreeEditPart implements
 		ValueListener, ChangeListener {
-	private HashSet<Image> modelImages = new HashSet<Image>();
-	public HashSet<Image> getModelImages() {
-		return modelImages;
-	}
+//	private HashSet<Image> modelImages = new HashSet<Image>();
+//	public HashSet<Image> getModelImages() {
+//		return modelImages;
+//	}
 
 	private static Logger logger = LoggerFactory
 			.getLogger(OutlineEditPart.class);
@@ -208,8 +209,8 @@ public class OutlineEditPart extends
 	}
 
 	protected void setWidgetImage(ImageDescriptor image, NamedObj obj) {
-		Image createImage = image.createImage();
+		Image createImage = ImageRegistry.getInstance().getImage(image);
 		setWidgetImage(createImage);
-		modelImages.add(createImage);
+//		modelImages.add(createImage);
 	}
 }

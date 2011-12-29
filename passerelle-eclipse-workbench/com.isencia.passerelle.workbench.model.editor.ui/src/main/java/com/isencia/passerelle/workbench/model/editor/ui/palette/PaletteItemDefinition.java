@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 
+import com.isencia.passerelle.workbench.model.editor.ui.ColorRegistry;
+
 public class PaletteItemDefinition implements Serializable {
 	
 	/**
@@ -15,18 +17,7 @@ public class PaletteItemDefinition implements Serializable {
 	public PaletteItemDefinition(ImageDescriptor icon, PaletteGroup group,
 			String id, String name, String color, Class clazz) {
 		this(icon, group, id, name, clazz);
-		if (color != null) {
-			String[] colors = color.split(",");
-			if (colors.length == 3) {
-				try {
-					this.color = new Color(null, Integer.parseInt(colors[0]),
-							Integer.parseInt(colors[1]), Integer
-									.parseInt(colors[2]));
-				} catch (Exception e) {
-
-				}
-			}
-		}
+		this.color = ColorRegistry.getInstance().getColor(color);
 
 	}
 

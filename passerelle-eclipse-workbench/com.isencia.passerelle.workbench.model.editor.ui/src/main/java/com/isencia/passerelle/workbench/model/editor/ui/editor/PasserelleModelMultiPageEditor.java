@@ -821,13 +821,13 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 				thumbnail = null;
 			}
 			super.dispose();
-			if (getFactory() != null) {
-				for (OutlineEditPart part : getFactory().getParts()) {
-					for (Image image : part.getModelImages()) {
-						image.dispose();
-					}
-				}
-			}
+//			if (getFactory() != null) {
+//				for (OutlineEditPart part : getFactory().getParts()) {
+//					for (Image image : part.getModelImages()) {
+//						image.dispose();
+//					}
+//				}
+//			}
 			outlinePage = null;
 		}
 
