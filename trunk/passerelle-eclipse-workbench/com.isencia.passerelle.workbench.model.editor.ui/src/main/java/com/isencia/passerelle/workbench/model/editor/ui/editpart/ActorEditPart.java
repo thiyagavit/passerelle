@@ -97,10 +97,10 @@ public class ActorEditPart extends AbstractNodeEditPart implements
 	 */
 	protected IFigure createFigure() {
 		Actor actorModel = getActor();
-		ImageFigure drillDownImageFigure = new ImageFigure(
-				createImage(IMAGE_DESCRIPTOR_ACTOR));
-		drillDownImageFigure.setAlignment(PositionConstants.SOUTH);
-		drillDownImageFigure.setBorder(new MarginBorder(0, 0, 5, 0));
+//		ImageFigure drillDownImageFigure = new ImageFigure(
+//				createImage(IMAGE_DESCRIPTOR_ACTOR));
+//		drillDownImageFigure.setAlignment(PositionConstants.SOUTH);
+//		drillDownImageFigure.setBorder(new MarginBorder(0, 0, 5, 0));
 
 		ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(
 				actorModel.getClass());

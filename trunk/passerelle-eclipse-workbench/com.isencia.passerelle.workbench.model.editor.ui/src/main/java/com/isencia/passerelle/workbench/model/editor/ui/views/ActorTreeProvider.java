@@ -14,18 +14,15 @@ package com.isencia.passerelle.workbench.model.editor.ui.views;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.gef.ui.actions.GEFActionConstants;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
 
@@ -93,7 +90,11 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof PaletteItemDefinition) {
-			return ((PaletteItemDefinition) element).getIcon().createImage();
+			ImageDescriptor icon = ((PaletteItemDefinition) element).getIcon();
+			if (icon == null){
+				return ActorEditPart.IMAGE_DESCRIPTOR_ACTOR.createImage();
+			}
+			return icon.createImage();
 		}
 		if (element instanceof PaletteGroup) {
 			

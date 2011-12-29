@@ -10,6 +10,8 @@ import org.eclipse.swt.graphics.Color;
 
 public class ShadowBorder extends AbstractBorder {
 
+	private static final Color SHADOW_COLOR = new Color(null,221,221,221);
+
 	@Override
 	public Insets getInsets(IFigure ifigure) {
 		return new Insets(0,0,0,0);
@@ -24,7 +26,7 @@ public class ShadowBorder extends AbstractBorder {
 		graphics.restoreState();
 		graphics.setLineWidth(2);
 		rect.resize(2, 2);
-		graphics.setForegroundColor(new Color(null,221,221,221));
+		graphics.setForegroundColor(SHADOW_COLOR);
 		graphics.drawLine(rect.x+3, rect.bottom(),rect.right(),rect.bottom());
 		graphics.drawLine(rect.right(), rect.y+3, rect.right(), rect.bottom());
 	}

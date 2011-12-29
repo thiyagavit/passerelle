@@ -25,6 +25,7 @@ import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.INameable;
+import com.isencia.passerelle.workbench.model.editor.ui.ImageRegistry;
 import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
@@ -44,15 +45,15 @@ abstract public class AbstractBaseEditPart extends
 		org.eclipse.gef.editparts.AbstractGraphicalEditPart implements
 		ChangeListener {
 
-	protected Set<Image> images = new HashSet<Image>();
-
-	public Set<Image> getImages() {
-		return images;
-	}
+//	protected Set<Image> images = new HashSet<Image>();
+//
+//	public Set<Image> getImages() {
+//		return images;
+//	}
 
 	protected Image createImage(ImageDescriptor imageDescriptor) {
-		Image image = imageDescriptor.createImage();
-		images.add(image);
+		Image image = ImageRegistry.getInstance().getImage(imageDescriptor);;
+//		images.add(image);
 		return image;
 	}
 
