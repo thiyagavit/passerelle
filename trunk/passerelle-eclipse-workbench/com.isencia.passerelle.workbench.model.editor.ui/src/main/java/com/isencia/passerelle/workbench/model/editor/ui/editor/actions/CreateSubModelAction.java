@@ -37,46 +37,54 @@ import com.isencia.passerelle.workbench.model.ui.wizards.NameWizard;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
-public class CreateSubModelAction extends SelectionAction implements NameChecker {
-	
-	private static final Logger logger = LoggerFactory.getLogger(CreateSubModelAction.class);
-	
+public class CreateSubModelAction extends SelectionAction implements
+		NameChecker {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(CreateSubModelAction.class);
+
 	private PasserelleModelMultiPageEditor parent;
 	private final String icon = "icons/flow.png";
 	public static String CREATE_SUBMODEL = "createSubModel";
 
 	/**
 	 * Creates an empty model
+	 * 
 	 * @param part
 	 */
 	public CreateSubModelAction() {
-		this(null,null);
+		this(null, null);
 		setId(ActionFactory.NEW.getId());
 	}
+
 	/**
 	 * Creates an empty model
+	 * 
 	 * @param part
 	 */
 	public CreateSubModelAction(final IEditorPart part) {
-		this(part,null);
+		this(part, null);
 		setId(ActionFactory.NEW.getId());
 	}
+
 	/**
 	 * Creates the model from the contents of the part
+	 * 
 	 * @param part
 	 * @param parent
 	 */
-	public CreateSubModelAction(final IEditorPart part, 
-			                    final PasserelleModelMultiPageEditor parent) {
+	public CreateSubModelAction(final IEditorPart part,
+			final PasserelleModelMultiPageEditor parent) {
 		super(part);
 		this.parent = parent;
 		setLazyEnablementCalculation(true);
-		if (parent!=null) setId(ActionFactory.EXPORT.getId());
+		if (parent != null)
+			setId(ActionFactory.EXPORT.getId());
 	}
 
 	@Override
 	protected void init() {
-		
+
 		super.init();
 		Activator.getImageDescriptor(icon);
 		setHoverImageDescriptor(Activator.getImageDescriptor(icon));
@@ -88,57 +96,65 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
 
 	@Override
 	public void run() {
-		
+
 		try {
-			if (parent!=null) {
+			if (parent != null) {
 				final Entity entity = parent.getSelectedContainer();
-				final String name   = getName(entity.getName());
-				if (name!=null) {
+				final String name = getName(entity.getName());
+				if (name != null) {
 					entity.setName(name);
 					exportEntityToClassFile(entity);
-					parent.getActorTreeViewPage().refresh();
+					if (parent != null && parent.getActorTreeViewPage() != null)
+						parent.getActorTreeViewPage().refresh();
 				}
 			} else {
 				final String name = getName("emptyComposite");
-				if (name!=null) {
+				if (name != null) {
 					final IProject pass = ModelUtils.getPasserelleProject();
-					final File     file = new File(pass.getLocation().toOSString()+ "/" + name + ".moml");
-					final InputStream stream = ModelUtils.getEmptyCompositeStream(file.getAbsolutePath());
+					final File file = new File(pass.getLocation().toOSString()
+							+ "/" + name + ".moml");
+					final InputStream stream = ModelUtils
+							.getEmptyCompositeStream(file.getAbsolutePath());
 					FileUtils.write(stream, new FileOutputStream(file));
-					
-					PaletteItemFactory factory = PaletteItemFactory.getInstance();
+
+					PaletteItemFactory factory = PaletteItemFactory
+							.getInstance();
 					Flow flow = FlowManager.readMoml(new FileReader(file));
 					flow.setName(name);
 					factory.addSubModel(flow);
 					SubModelUtils.addSubModel(flow);
 
-                    final IViewPart part = EclipseUtils.getPage().findView(ActorTreeView.ID);
-                    if (part!=null && part instanceof ActorTreeView) {
-                    	((ActorTreeView)part).refresh();
-                    }
+					final IViewPart part = EclipseUtils.getPage().findView(
+							ActorTreeView.ID);
+					if (part != null && part instanceof ActorTreeView) {
+						((ActorTreeView) part).refresh();
+					}
 				}
 			}
-			
+
 		} catch (Exception e) {
 			logger.error("Cannot export sub-model", e);
 		}
 	}
 
 	private String getName(final String name) {
-		
-		NameWizard   wizard = new NameWizard(name, this);
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+
+		NameWizard wizard = new NameWizard(name, this);
+		WizardDialog dialog = new WizardDialog(Display.getCurrent()
+				.getActiveShell(), wizard);
 		dialog.create();
 		dialog.getShell().setSize(400, 300);
 		dialog.setTitle("Name of Composite");
-		dialog.setMessage("Please choose a unique name for your exported composite.");
+		dialog
+				.setMessage("Please choose a unique name for your exported composite.");
 		if (dialog.open() == WizardDialog.OK) {
 			return wizard.getRenameValue();
 		}
 		return null;
 	}
+
 	public Entity exportEntityToClassFile(Entity entity) throws Exception {
-		
+
 		Entity entityAsClass = (Entity) entity.clone(entity.workspace());
 		entityAsClass.setClassDefinition(true);
 
@@ -175,9 +191,10 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
 				new PasserelleEditorPaneFactory(compActor, "_editorPaneFactory");
 			}
 		}
-		
+
 		final IProject pass = ModelUtils.getPasserelleProject();
-		final File     file = new File(pass.getLocation().toOSString() +"/"+ entityAsClass.getName() + ".moml");
+		final File file = new File(pass.getLocation().toOSString() + "/"
+				+ entityAsClass.getName() + ".moml");
 		String name = entityAsClass.getName();
 		String filename = file.getName();
 		int period = filename.indexOf(".");
@@ -226,7 +243,7 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
 	@Override
 	public String getErrorMessage(String name) {
 		if (SubModelUtils.isSubModel(name)) {
-			return "'"+name+"' is already existing as a composite.";
+			return "'" + name + "' is already existing as a composite.";
 		}
 		return null;
 	}
