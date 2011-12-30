@@ -51,6 +51,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction undoAction;
     private IWorkbenchAction redoAction;
     
+    // Import/Export
+    private IWorkbenchAction importAction;  
+    private IWorkbenchAction exportAction;
+    
+    
     private IWorkbenchAction cutAction;
     private IWorkbenchAction copyAction;
     private IWorkbenchAction closeEditorAction;
@@ -98,7 +103,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         register(saveAllAction);
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
-
+        
+        //Import - Export
+        importAction = ActionFactory.IMPORT.create(window);
+        register(importAction);
+        exportAction = ActionFactory.EXPORT.create(window);
+        register(exportAction);
         // Edit
     	undoAction = ActionFactory.UNDO.create(window);
         register(undoAction);
@@ -208,6 +218,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(saveAllAction);
 		fileMenu.add(new Separator());
 		fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		fileMenu.add(new Separator());
+        fileMenu.add(importAction);
+        fileMenu.add(exportAction);
 		fileMenu.add(new Separator());
         fileMenu.add(exitAction);
 		// Edit
