@@ -29,12 +29,12 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-//		DeviceData data = new DeviceData();
-//
-//	    data.tracking = true;
-//
-//	    Display display = new Display(data);
-//
+		DeviceData data = new DeviceData();
+
+	    data.tracking = true;
+
+	    Display display = new Display(data);
+
 //	    Sleak sleak = new Sleak();
 //
 //	    sleak.open();

@@ -28,115 +28,140 @@ import org.eclipse.ui.internal.registry.ViewRegistry;
 import org.eclipse.ui.views.IViewDescriptor;
 
 /**
- * An action bar advisor is responsible for creating, adding, and disposing of the
- * actions added to a workbench window. Each window will be populated with
+ * An action bar advisor is responsible for creating, adding, and disposing of
+ * the actions added to a workbench window. Each window will be populated with
  * new actions.
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-    // Actions - important to allocate these only in makeActions, and then use them
-    // in the fill methods.  This ensures that the actions aren't recreated
-    // when fillActionBars is called with FILL_PROXY.
-	
+	// Actions - important to allocate these only in makeActions, and then use
+	// them
+	// in the fill methods. This ensures that the actions aren't recreated
+	// when fillActionBars is called with FILL_PROXY.
+
 	// File Actions
-    private IContributionItem newWizardShortList;
-    private IWorkbenchAction closeAction;
-    private IWorkbenchAction createSubmodelAction;
-    private IWorkbenchAction closeAllAction;
-    private IWorkbenchAction saveAction;
-    private IWorkbenchAction saveAsAction;
-    private IWorkbenchAction saveAllAction;
-    private IWorkbenchAction exitAction;
-    // Edit Actions
-    private IWorkbenchAction undoAction;
-    private IWorkbenchAction redoAction;
-    
-    // Import/Export
-    private IWorkbenchAction importAction;  
-    private IWorkbenchAction exportAction;
-    
-    
-    private IWorkbenchAction cutAction;
-    private IWorkbenchAction copyAction;
-    private IWorkbenchAction closeEditorAction;
-    private IWorkbenchAction pasteAction;
-    private IWorkbenchAction deleteAction;
-    
-    // Run Actions
-    private IAction runConfigurationsAction;
-    
-    // Window Actions
-    private IContributionItem perspectiveList;
-    private IContributionItem viewList;
-    private IAction preferencesAction;
-    
+	private IContributionItem newWizardShortList;
+	private IWorkbenchAction closeAction;
+	private IWorkbenchAction createSubmodelAction;
+	private IWorkbenchAction closeAllAction;
+	private IWorkbenchAction saveAction;
+	private IWorkbenchAction saveAsAction;
+	private IWorkbenchAction saveAllAction;
+	private IWorkbenchAction exitAction;
+	// Edit Actions
+	private IWorkbenchAction undoAction;
+	private IWorkbenchAction redoAction;
+
+	// Import/Export
+	private IWorkbenchAction importAction;
+	private IWorkbenchAction exportAction;
+
+	private IWorkbenchAction cutAction;
+	private IWorkbenchAction copyAction;
+	private IWorkbenchAction closeEditorAction;
+	private IWorkbenchAction pasteAction;
+	private IWorkbenchAction deleteAction;
+
+	// Run Actions
+	private IAction runConfigurationsAction;
+
+	// Window Actions
+	private IContributionItem viewList;
+	private IAction preferencesAction;
+
+	private IContributionItem perspectiveList;
+	private IAction customizePerspective;
+	private IAction resetPerspective;
+	private IAction savePerspective;
+	private IAction closePerspective;
+	private IAction closeAllPerspective;
+
 	// Help Actions
 	private IWorkbenchAction showHelpAction; // NEW
 	private IWorkbenchAction searchHelpAction; // NEW
-	private IWorkbenchAction dynamicHelpAction; // NEW    
+	private IWorkbenchAction dynamicHelpAction; // NEW
+	private IWorkbenchAction aboutAction;
 
-    public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
-        super(configurer);
-    }
-    
-    /**
-     * Creates the actions and registers them.
-     * Registering is needed to ensure that key bindings work.
-     * The corresponding commands keybindings are defined in the plugin.xml file.
-     * Registering also provides automatic disposal of the actions when
-     * the window is closed.
-     * 
-     */
-    protected void makeActions(final IWorkbenchWindow window) {
-    	// File
-    	closeAction = ActionFactory.CLOSE.create(window);
-        register(closeAction);
-        createSubmodelAction = ActionFactory.EXPORT.create(window);
-        register(createSubmodelAction);
-        closeAllAction = ActionFactory.CLOSE_ALL.create(window);
-        register(closeAllAction);
-        saveAction = ActionFactory.SAVE.create(window);
-        register(saveAction);
-        saveAsAction = ActionFactory.SAVE_AS.create(window);
-        register(saveAsAction);
-        saveAllAction = ActionFactory.SAVE_ALL.create(window);
-        register(saveAllAction);
-        exitAction = ActionFactory.QUIT.create(window);
-        register(exitAction);
-        
-        //Import - Export
-        importAction = ActionFactory.IMPORT.create(window);
-        register(importAction);
-        exportAction = ActionFactory.EXPORT.create(window);
-        register(exportAction);
-        // Edit
-    	undoAction = ActionFactory.UNDO.create(window);
-        register(undoAction);
-    	redoAction = ActionFactory.REDO.create(window);
-        register(redoAction);
-    	cutAction = ActionFactory.CUT.create(window);
-        register(cutAction);
-    	copyAction = ActionFactory.COPY.create(window);
-        register(copyAction);
-    	pasteAction = ActionFactory.PASTE.create(window);
-        register(pasteAction);
-    	deleteAction = ActionFactory.DELETE.create(window);
-        register(deleteAction);
+	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
+		super(configurer);
+	}
 
-        closeEditorAction = ActionFactory.CLOSE.create(window);
-        register(closeEditorAction);
+	/**
+	 * Creates the actions and registers them. Registering is needed to ensure
+	 * that key bindings work. The corresponding commands keybindings are
+	 * defined in the plugin.xml file. Registering also provides automatic
+	 * disposal of the actions when the window is closed.
+	 * 
+	 */
+	protected void makeActions(final IWorkbenchWindow window) {
+		// File
+		closeAction = ActionFactory.CLOSE.create(window);
+		register(closeAction);
+		createSubmodelAction = ActionFactory.EXPORT.create(window);
+		register(createSubmodelAction);
+		closeAllAction = ActionFactory.CLOSE_ALL.create(window);
+		register(closeAllAction);
+		saveAction = ActionFactory.SAVE.create(window);
+		register(saveAction);
+		saveAsAction = ActionFactory.SAVE_AS.create(window);
+		register(saveAsAction);
+		saveAllAction = ActionFactory.SAVE_ALL.create(window);
+		register(saveAllAction);
+		exitAction = ActionFactory.QUIT.create(window);
+		register(exitAction);
 
-        // Run
-//        runConfigurationsAction = new org.eclipse.debug.ui.actions.internal.ui.actions.OpenRunConfigurations();
-//        register(runConfigurationsAction);
-        
-        // Window
-        perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(window);
-        viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
-        newWizardShortList = ContributionItemFactory.NEW_WIZARD_SHORTLIST.create(window);
-        preferencesAction = ActionFactory.PREFERENCES.create(window);
-        register(preferencesAction);
-        
+		// Import - Export
+		importAction = ActionFactory.IMPORT.create(window);
+		register(importAction);
+		exportAction = ActionFactory.EXPORT.create(window);
+		register(exportAction);
+		// Edit
+		undoAction = ActionFactory.UNDO.create(window);
+		register(undoAction);
+		redoAction = ActionFactory.REDO.create(window);
+		register(redoAction);
+		cutAction = ActionFactory.CUT.create(window);
+		register(cutAction);
+		copyAction = ActionFactory.COPY.create(window);
+		register(copyAction);
+		pasteAction = ActionFactory.PASTE.create(window);
+		register(pasteAction);
+		deleteAction = ActionFactory.DELETE.create(window);
+		register(deleteAction);
+
+		closeEditorAction = ActionFactory.CLOSE.create(window);
+		register(closeEditorAction);
+
+		// Run
+		// runConfigurationsAction = new
+		// org.eclipse.debug.ui.actions.internal.ui.actions.OpenRunConfigurations();
+		// register(runConfigurationsAction);
+
+		// Window
+		perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST
+				.create(window);
+		
+		resetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(resetPerspective);
+		
+		savePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
+		register(savePerspective);
+		
+		customizePerspective = ActionFactory.EDIT_ACTION_SETS.create(window);
+		register(customizePerspective);
+		
+		closePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
+		register(closePerspective);
+		
+		closeAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+		register(closeAllPerspective);
+		
+		viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		newWizardShortList = ContributionItemFactory.NEW_WIZARD_SHORTLIST
+				.create(window);
+		preferencesAction = ActionFactory.PREFERENCES.create(window);
+		register(preferencesAction);
+
 		// Help
 		showHelpAction = ActionFactory.HELP_CONTENTS.create(window); // NEW
 		register(showHelpAction); // NEW
@@ -146,26 +171,30 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		dynamicHelpAction = ActionFactory.DYNAMIC_HELP.create(window); // NEW
 		register(dynamicHelpAction); // NEW
-        
-        // Remove unwanted actions
-        ActionSetRegistry reg = WorkbenchPlugin.getDefault().getActionSetRegistry();
-        IActionSetDescriptor actionSets[] = reg.getActionSets();
-        HashSet<String> actionsToBeRemoved = new HashSet<String>();
-        actionsToBeRemoved.add("org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo");
-        actionsToBeRemoved.add("org.eclipse.ui.edit.text.actionSet.openExternalFile");
-        actionsToBeRemoved.add("org.eclipse.ui.actionSet.openFiles");
-//        actionsToBeRemoved.add("org.eclipse.ui.WorkingSetActionSet");
-//        actionsToBeRemoved.add("org.eclipse.update.ui.softwareUpdates");
-        for(int i = 0; i < actionSets.length; i++) {
-            if(actionsToBeRemoved.contains(actionSets[i].getId()))
-            {
-                org.eclipse.core.runtime.IExtension ext = actionSets[i].getConfigurationElement().getDeclaringExtension();
-                reg.removeExtension(ext, new Object[] {
-                    actionSets[i]
-                });
-            }
-        }
-        // Remove unwanted views
+
+		aboutAction = ActionFactory.ABOUT.create(window); // NEW
+		register(aboutAction); // NEW
+
+		// Remove unwanted actions
+		ActionSetRegistry reg = WorkbenchPlugin.getDefault()
+				.getActionSetRegistry();
+		IActionSetDescriptor actionSets[] = reg.getActionSets();
+		HashSet<String> actionsToBeRemoved = new HashSet<String>();
+		actionsToBeRemoved
+				.add("org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo");
+		actionsToBeRemoved
+				.add("org.eclipse.ui.edit.text.actionSet.openExternalFile");
+		actionsToBeRemoved.add("org.eclipse.ui.actionSet.openFiles");
+		// actionsToBeRemoved.add("org.eclipse.ui.WorkingSetActionSet");
+		// actionsToBeRemoved.add("org.eclipse.update.ui.softwareUpdates");
+		for (int i = 0; i < actionSets.length; i++) {
+			if (actionsToBeRemoved.contains(actionSets[i].getId())) {
+				org.eclipse.core.runtime.IExtension ext = actionSets[i]
+						.getConfigurationElement().getDeclaringExtension();
+				reg.removeExtension(ext, new Object[] { actionSets[i] });
+			}
+		}
+		// Remove unwanted views
 		HashSet<String> viewsToBeRemoved = new HashSet<String>();
 		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
 		viewsToBeRemoved.add("org.eclipse.ui.views.ProblemView");
@@ -186,29 +215,37 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			}
 		}
 	}
-    
-    protected void fillMenuBar(IMenuManager menuBar) {
-    	// TODO replace constants with Intl Strings Messages.getString("ApplicationActionBarAdvisor.window")
-        MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
-        MenuManager fileNewWizardMenu = new MenuManager("New");
-		MenuManager editMenu = new MenuManager("Edit" , IWorkbenchActionConstants.M_EDIT); //$NON-NLS-1$        
-		MenuManager runMenu = new MenuManager("&Run" , IWorkbenchActionConstants.M_LAUNCH); //$NON-NLS-1$        
-		MenuManager windowMenu = new MenuManager("&Window" , IWorkbenchActionConstants.M_WINDOW); //$NON-NLS-1$        
-        MenuManager windowPerspectiveMenu = new MenuManager("Open Perspective");
-        MenuManager windowShowViewMenu = new MenuManager("Show View");
-        MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
-        
-        menuBar.add(fileMenu);
-        menuBar.add(editMenu);
-        // Add a group marker indicating where action set menus will appear.
-        menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-        menuBar.add(runMenu);
-		menuBar.add(windowMenu);        
-        menuBar.add(helpMenu);
-        
-        // File
-        fileNewWizardMenu.add(newWizardShortList);
-        fileMenu.add(fileNewWizardMenu);
+
+	protected void fillMenuBar(IMenuManager menuBar) {
+		// TODO replace constants with Intl Strings
+		// Messages.getString("ApplicationActionBarAdvisor.window")
+		MenuManager fileMenu = new MenuManager("&File",
+				IWorkbenchActionConstants.M_FILE);
+		MenuManager fileNewWizardMenu = new MenuManager("New");
+		MenuManager editMenu = new MenuManager(
+				"Edit", IWorkbenchActionConstants.M_EDIT); //$NON-NLS-1$        
+		MenuManager runMenu = new MenuManager(
+				"&Run", IWorkbenchActionConstants.M_LAUNCH); //$NON-NLS-1$        
+		MenuManager windowMenu = new MenuManager(
+				"&Window", IWorkbenchActionConstants.M_WINDOW); //$NON-NLS-1$        
+		MenuManager windowPerspectiveMenu = new MenuManager("Open Perspective");
+		MenuManager windowShowViewMenu = new MenuManager("Show View");
+		
+		
+		MenuManager helpMenu = new MenuManager("&Help",
+				IWorkbenchActionConstants.M_HELP);
+
+		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
+		// Add a group marker indicating where action set menus will appear.
+		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		menuBar.add(runMenu);
+		menuBar.add(windowMenu);
+		menuBar.add(helpMenu);
+
+		// File
+		fileNewWizardMenu.add(newWizardShortList);
+		fileMenu.add(fileNewWizardMenu);
 		fileMenu.add(new Separator());
 		fileMenu.add(closeAction);
 		fileMenu.add(closeAllAction);
@@ -219,62 +256,71 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(new Separator());
 		fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		fileMenu.add(new Separator());
-        fileMenu.add(importAction);
-        fileMenu.add(exportAction);
+		fileMenu.add(importAction);
+		fileMenu.add(exportAction);
 		fileMenu.add(new Separator());
-        fileMenu.add(exitAction);
+		fileMenu.add(exitAction);
 		// Edit
-        editMenu.add(undoAction);
-        editMenu.add(redoAction);
-        editMenu.add(new Separator());
-        editMenu.add(cutAction);
-        editMenu.add(copyAction);
-        editMenu.add(pasteAction);
-        editMenu.add(new Separator());
-        editMenu.add(deleteAction);
-        
+		editMenu.add(undoAction);
+		editMenu.add(redoAction);
+		editMenu.add(new Separator());
+		editMenu.add(cutAction);
+		editMenu.add(copyAction);
+		editMenu.add(pasteAction);
+		editMenu.add(new Separator());
+		editMenu.add(deleteAction);
+
 		// Window
-        windowPerspectiveMenu.add(perspectiveList);
-        windowMenu.add(windowPerspectiveMenu);
-        windowShowViewMenu.add(viewList);
-        windowMenu.add(windowShowViewMenu);
+		windowPerspectiveMenu.add(perspectiveList);
+		windowMenu.add(windowPerspectiveMenu);
+		windowShowViewMenu.add(viewList);
+		windowMenu.add(windowShowViewMenu);
+		windowMenu.add(new Separator());
+		windowMenu.add(customizePerspective);
+		windowMenu.add(resetPerspective);
+		windowMenu.add(savePerspective);
+		windowMenu.add(closePerspective);
+		windowMenu.add(closeAllPerspective);
+		
 		windowMenu.add(new Separator());
 		windowMenu.add(preferencesAction);
-        
+
 		// Help
 		helpMenu.add(showHelpAction); // NEW
 		helpMenu.add(searchHelpAction); // NEW
 		helpMenu.add(dynamicHelpAction); // NEW
-        
-    }
-    
-    protected void fillCoolBar(ICoolBarManager coolBar) {
-        // File
-    	IToolBarManager fileToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-    	fileToolbar.add(saveAction);
-    	fileToolbar.add(saveAllAction);
-        coolBar.add(new ToolBarContributionItem(fileToolbar, "file"));
-    	
-        // Edit
-    	IToolBarManager editToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-    	editToolbar.add(undoAction);
-    	editToolbar.add(redoAction);
-    	editToolbar.add(new Separator());
-    	editToolbar.add(cutAction);
-    	editToolbar.add(copyAction);
-    	editToolbar.add(pasteAction);
-    	editToolbar.add(new Separator());
-    	editToolbar.add(deleteAction);
-        coolBar.add(new ToolBarContributionItem(editToolbar, "edit"));
-    	
-        // Run
-    	IToolBarManager runToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-//    	runToolbar.add(undoAction);
-//    	runToolbar.add(redoAction);
-        coolBar.add(new ToolBarContributionItem(runToolbar, "run"));
-    	
-        // Additions
-        coolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		helpMenu.add(new Separator());
+		helpMenu.add(aboutAction);
 
-    }
+	}
+
+	protected void fillCoolBar(ICoolBarManager coolBar) {
+		// File
+		IToolBarManager fileToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		fileToolbar.add(saveAction);
+		fileToolbar.add(saveAllAction);
+		coolBar.add(new ToolBarContributionItem(fileToolbar, "file"));
+
+		// Edit
+		IToolBarManager editToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		editToolbar.add(undoAction);
+		editToolbar.add(redoAction);
+		editToolbar.add(new Separator());
+		editToolbar.add(cutAction);
+		editToolbar.add(copyAction);
+		editToolbar.add(pasteAction);
+		editToolbar.add(new Separator());
+		editToolbar.add(deleteAction);
+		coolBar.add(new ToolBarContributionItem(editToolbar, "edit"));
+
+		// Run
+		IToolBarManager runToolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+		// runToolbar.add(undoAction);
+		// runToolbar.add(redoAction);
+		coolBar.add(new ToolBarContributionItem(runToolbar, "run"));
+
+		// Additions
+		coolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+	}
 }
