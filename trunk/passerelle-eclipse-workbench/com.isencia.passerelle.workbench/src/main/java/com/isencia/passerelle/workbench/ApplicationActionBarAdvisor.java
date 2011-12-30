@@ -2,6 +2,7 @@ package com.isencia.passerelle.workbench;
 
 import java.util.HashSet;
 
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -14,6 +15,7 @@ import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
@@ -21,6 +23,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.handlers.ShowKeyAssistHandler;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
@@ -77,10 +80,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction closeAllPerspective;
 
 	// Help Actions
-	private IWorkbenchAction showHelpAction; // NEW
-	private IWorkbenchAction searchHelpAction; // NEW
-	private IWorkbenchAction dynamicHelpAction; // NEW
+	private IWorkbenchAction showHelpAction;
+	private IWorkbenchAction searchHelpAction;
+	private IWorkbenchAction dynamicHelpAction;
 	private IWorkbenchAction aboutAction;
+	private IWorkbenchAction updateSoftware;
+	private IWorkbenchAction checkUpdates;
+	private IWorkbenchAction keyAssist;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -140,22 +146,23 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		// Window
 		perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST
 				.create(window);
-		
+
 		resetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
 		register(resetPerspective);
-		
+
 		savePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
 		register(savePerspective);
-		
+
 		customizePerspective = ActionFactory.EDIT_ACTION_SETS.create(window);
 		register(customizePerspective);
-		
+
 		closePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
 		register(closePerspective);
-		
-		closeAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
+
+		closeAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES
+				.create(window);
 		register(closeAllPerspective);
-		
+
 		viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 		newWizardShortList = ContributionItemFactory.NEW_WIZARD_SHORTLIST
 				.create(window);
@@ -163,17 +170,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(preferencesAction);
 
 		// Help
-		showHelpAction = ActionFactory.HELP_CONTENTS.create(window); // NEW
-		register(showHelpAction); // NEW
+		showHelpAction = ActionFactory.HELP_CONTENTS.create(window);
+		register(showHelpAction);
 
-		searchHelpAction = ActionFactory.HELP_SEARCH.create(window); // NEW
-		register(searchHelpAction); // NEW
+		searchHelpAction = ActionFactory.HELP_SEARCH.create(window);
+		register(searchHelpAction);
 
-		dynamicHelpAction = ActionFactory.DYNAMIC_HELP.create(window); // NEW
-		register(dynamicHelpAction); // NEW
+		dynamicHelpAction = ActionFactory.DYNAMIC_HELP.create(window);
+		register(dynamicHelpAction);
 
-		aboutAction = ActionFactory.ABOUT.create(window); // NEW
-		register(aboutAction); // NEW
+		aboutAction = ActionFactory.ABOUT.create(window);
+		register(aboutAction);
 
 		// Remove unwanted actions
 		ActionSetRegistry reg = WorkbenchPlugin.getDefault()
@@ -184,9 +191,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				.add("org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo");
 		actionsToBeRemoved
 				.add("org.eclipse.ui.edit.text.actionSet.openExternalFile");
+
 		actionsToBeRemoved.add("org.eclipse.ui.actionSet.openFiles");
-		// actionsToBeRemoved.add("org.eclipse.ui.WorkingSetActionSet");
-		// actionsToBeRemoved.add("org.eclipse.update.ui.softwareUpdates");
 		for (int i = 0; i < actionSets.length; i++) {
 			if (actionsToBeRemoved.contains(actionSets[i].getId())) {
 				org.eclipse.core.runtime.IExtension ext = actionSets[i]
@@ -194,6 +200,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				reg.removeExtension(ext, new Object[] { actionSets[i] });
 			}
 		}
+
 		// Remove unwanted views
 		HashSet<String> viewsToBeRemoved = new HashSet<String>();
 		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
@@ -201,6 +208,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		viewsToBeRemoved.add("org.eclipse.ui.views.BookmarkView");
 		viewsToBeRemoved.add("org.eclipse.ui.views.ProgressView");
 		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
+		viewsToBeRemoved.add("org.eclipse.ui.window.showKeyAssist");
+
 		ViewRegistry viewReg = (ViewRegistry) WorkbenchPlugin.getDefault()
 				.getViewRegistry();
 		IViewDescriptor viewDescriptors[] = viewReg.getViews();
@@ -214,6 +223,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 						new Object[] { viewDescriptors[i] });
 			}
 		}
+
 	}
 
 	protected void fillMenuBar(IMenuManager menuBar) {
@@ -230,10 +240,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				"&Window", IWorkbenchActionConstants.M_WINDOW); //$NON-NLS-1$        
 		MenuManager windowPerspectiveMenu = new MenuManager("Open Perspective");
 		MenuManager windowShowViewMenu = new MenuManager("Show View");
-		
-		
-		MenuManager helpMenu = new MenuManager("&Help",
-				IWorkbenchActionConstants.M_HELP);
+
+//		MenuManager softwareMenu = new MenuManager("&Software",
+//				IWorkbenchActionConstants.M_HELP);
+		MenuManager helpMenu = new MenuManager("&Help", "Help");
 
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
@@ -241,6 +251,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menuBar.add(runMenu);
 		menuBar.add(windowMenu);
+//		menuBar.add(softwareMenu);
 		menuBar.add(helpMenu);
 
 		// File
@@ -281,17 +292,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(savePerspective);
 		windowMenu.add(closePerspective);
 		windowMenu.add(closeAllPerspective);
-		
+
 		windowMenu.add(new Separator());
 		windowMenu.add(preferencesAction);
 
 		// Help
-		helpMenu.add(showHelpAction); // NEW
-		helpMenu.add(searchHelpAction); // NEW
-		helpMenu.add(dynamicHelpAction); // NEW
+
+		helpMenu.add(showHelpAction);
+		helpMenu.add(searchHelpAction);
+		helpMenu.add(dynamicHelpAction);
 		helpMenu.add(new Separator());
 		helpMenu.add(aboutAction);
-
+		helpMenu.add(new Separator());
 	}
 
 	protected void fillCoolBar(ICoolBarManager coolBar) {
