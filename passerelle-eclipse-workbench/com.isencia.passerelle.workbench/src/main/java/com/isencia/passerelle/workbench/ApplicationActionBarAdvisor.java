@@ -208,7 +208,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		viewsToBeRemoved.add("org.eclipse.ui.views.BookmarkView");
 		viewsToBeRemoved.add("org.eclipse.ui.views.ProgressView");
 		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
-		viewsToBeRemoved.add("org.eclipse.ui.window.showKeyAssist");
 
 		ViewRegistry viewReg = (ViewRegistry) WorkbenchPlugin.getDefault()
 				.getViewRegistry();
@@ -241,8 +240,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager windowPerspectiveMenu = new MenuManager("Open Perspective");
 		MenuManager windowShowViewMenu = new MenuManager("Show View");
 
-//		MenuManager softwareMenu = new MenuManager("&Software",
-//				IWorkbenchActionConstants.M_HELP);
+		MenuManager softwareMenu = new MenuManager("&Software",
+				IWorkbenchActionConstants.M_HELP);
 		MenuManager helpMenu = new MenuManager("&Help", "Help");
 
 		menuBar.add(fileMenu);
@@ -251,7 +250,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menuBar.add(runMenu);
 		menuBar.add(windowMenu);
-//		menuBar.add(softwareMenu);
+		menuBar.add(softwareMenu);
 		menuBar.add(helpMenu);
 
 		// File
