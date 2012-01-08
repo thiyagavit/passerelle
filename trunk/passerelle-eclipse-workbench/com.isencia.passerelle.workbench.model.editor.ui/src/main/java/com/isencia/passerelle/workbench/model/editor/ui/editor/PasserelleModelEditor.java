@@ -806,6 +806,11 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 	 */
 	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
 		
+		if (actorName==null) {
+			clearActorSelections();
+			return;
+		}
+
 		final ComponentEntity sel = ModelUtils.findEntityByName(getContainer(), actorName);
 		GraphicalViewer gv = getGraphicalViewer();
 		final Map<?, ?> reg = gv.getEditPartRegistry();

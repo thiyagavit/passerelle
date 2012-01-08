@@ -9,15 +9,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFacto
 
 public class HelpUtils {
 	public static final String HELP_BUNDLE_ID = "com.isencia.passerelle.actor.conf";
-// TODO enable again when we decide to use context specific help
-//	public static String getContextId(Object element) {
-//		if (element instanceof String) {
-//			return HELP_BUNDLE_ID + ".name";
-//		} else if (element instanceof Variable) {
-//			return getContextIdOfVariable((Variable) element);
-//		}
-//		return null;
-//	}
 
 	public static String getContextId(Object element) {
 		if (element instanceof String) {

@@ -42,6 +42,9 @@ public class WorkflowLaunchConfiguration extends LaunchConfiguration {
         if (value!=null) {
         	if (this.systemProperties==null) systemProperties= new HashMap<String,String>(7);
         	systemProperties.put(name, value);
+        	logger.debug("Found property '"+name+"' of value '"+value+"'");
+        } else {
+        	logger.debug("Property '"+name+"' has no value.");
         }
 	}
 	

@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
-import org.eclipse.help.ui.internal.views.HelpView;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -22,30 +21,23 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.expr.Parameter;
-import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
-
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
-import com.isencia.passerelle.workbench.model.editor.ui.Constants;
 import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
@@ -56,7 +48,6 @@ import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
-import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 /**
@@ -89,6 +80,8 @@ public class ActorAttributesView extends ViewPart implements
 	private NamedObj actor;
 	private boolean addedListener = false;
 	private IWorkbenchPart part;
+
+	private VariableEditingSupport valueColumnEditor;
 
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -264,7 +257,12 @@ public class ActorAttributesView extends ViewPart implements
 		value.getColumn().setText("Value");
 		value.getColumn().setWidth(700);
 		value.setLabelProvider(new VariableLabelProvider(this));
-		value.setEditingSupport(new VariableEditingSupport(this, viewer));
+		this.valueColumnEditor = new VariableEditingSupport(this, viewer);
+		value.setEditingSupport(valueColumnEditor);
+	}
+	
+	public boolean canEditAttribute(final Object attribute) {
+		return valueColumnEditor.canEdit(attribute);
 	}
 
 	/**
@@ -280,11 +278,12 @@ public class ActorAttributesView extends ViewPart implements
 	private void createPopupMenu() {
 		MenuManager menuMan = new MenuManager();
 
-		menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_attribute.gif")) {
+		menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_obj.gif")) {
 			public void run() {
 				(new DeleteAttributeHandler()).run(null);
 			}
 		});
+		menuMan.add(new Separator());
 		menuMan.add(new Action("Help", Activator.getImageDescriptor("icons/help.gif")) {
 			public void run() {
 				try {

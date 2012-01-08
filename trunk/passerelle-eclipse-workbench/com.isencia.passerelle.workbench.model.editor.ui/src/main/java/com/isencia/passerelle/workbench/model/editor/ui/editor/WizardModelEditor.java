@@ -197,6 +197,7 @@ public class WizardModelEditor extends EditorPart implements ExecuteActionListen
 
 	public void setActorSelected(final String actorName, final boolean isSelected, final int colorCode) {
 		
+		if (actorName==null) return;
 		if (actorText==null||actorText.isDisposed()) return;
 
 		actorText.append("'");

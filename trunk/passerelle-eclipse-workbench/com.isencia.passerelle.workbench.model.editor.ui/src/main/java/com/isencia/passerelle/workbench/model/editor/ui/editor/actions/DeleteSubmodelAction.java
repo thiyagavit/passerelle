@@ -50,10 +50,7 @@ public class DeleteSubmodelAction extends Action {
                 factory.removeSubModel(name);
 				SubModelUtils.deleteSubModel(name);
 				
-				final IViewPart part = EclipseUtils.getPage().findView(ActorTreeView.ID);
-                if (part!=null && part instanceof ActorTreeView) {
-                	((ActorTreeView)part).refresh();
-                }
+        SubModelViewUtils.refreshPallette();
 			} catch (Exception e) {
 				logger.error("Cannot edit submodel!", e);
 			}
