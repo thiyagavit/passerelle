@@ -37,12 +37,10 @@ public class LookInsideViewFactory implements ViewFactory {
 
   private final class LookInsideTabListener implements TabListener {
 
-    @Override
     public void tabSelected(final TabStateChangedEvent event) {
 
     }
 
-    @Override
     public void tabRemoved(final TabRemovedEvent event) {
       final TitledTab pan = (TitledTab) event.getTab();
       if (openTabs.containsKey(pan.getText())) {
@@ -58,49 +56,41 @@ public class LookInsideViewFactory implements ViewFactory {
       }
     }
 
-    @Override
     public void tabMoved(final TabEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabHighlighted(final TabStateChangedEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabDropped(final TabDragEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabDragged(final TabDragEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabDragAborted(final TabEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabDeselected(final TabStateChangedEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabDehighlighted(final TabStateChangedEvent event) {
       // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void tabAdded(final TabEvent event) {
       // TODO Auto-generated method stub
 

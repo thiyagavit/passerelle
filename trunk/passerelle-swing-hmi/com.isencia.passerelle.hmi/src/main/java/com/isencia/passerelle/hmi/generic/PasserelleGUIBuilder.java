@@ -15,13 +15,12 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-
+import net.infonode.docking.DockingWindow;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.View;
@@ -32,15 +31,12 @@ import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.PropertiesUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
-
 import org.apache.log4j.Logger;
-
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.hmi.PopupUtil;
-import com.isencia.passerelle.hmi.definition.ModelBundle;
 import com.isencia.passerelle.hmi.state.StateMachine;
 import com.isencia.passerelle.hmi.util.GenericHMIUserPref;
 
@@ -60,7 +56,7 @@ public class PasserelleGUIBuilder {
 
 	private View parametersView;
 	private View logView;
-	private SplitWindow mainWindow;
+	private DockingWindow mainWindow;
 
 	private RootWindow rootWindow;
 
@@ -72,14 +68,16 @@ public class PasserelleGUIBuilder {
 
 	private boolean standalone;
 	private final boolean showModelGraph;
+  private final boolean showModelForms;
 
 	private View graphView;
 
 	public PasserelleGUIBuilder(final boolean showModelGraph, final boolean standalone) {
+	  this.showModelForms = true;
 		this.showModelGraph = showModelGraph;
 		this.standalone = standalone;
 		try {
-			buildGenericHMI(showModelGraph);
+			buildGenericHMI(showModelForms,showModelGraph);
 			if (standalone) {
 				displayFrame();
 			}
@@ -93,12 +91,33 @@ public class PasserelleGUIBuilder {
 		}
 	}
 
+  public PasserelleGUIBuilder(final boolean showModelForms, final boolean showModelGraph, final boolean standalone) {
+    this.showModelForms = showModelForms;
+    this.showModelGraph = showModelGraph;
+    this.standalone = standalone;
+    try {
+      buildGenericHMI(showModelForms,showModelGraph);
+      if (standalone) {
+        displayFrame();
+      }
+    } catch (final Throwable t) {
+      System.err.println("ERROR: Impossible to create MainGenericHMI");
+      StringWriter errWriter = new StringWriter();
+      PrintWriter errPrtWriter = new PrintWriter(errWriter ,true);
+      t.printStackTrace(errPrtWriter);
+      PopupUtil.showError(new TextArea(), "Please contact ICA:\n"+errWriter.toString());
+      System.exit(1);
+    }
+  }
+
 	public PasserelleGUIBuilder(final URL modelToLoad, final boolean showModelGraph) {
+	  this.showModelForms = true;
 		this.showModelGraph = showModelGraph;
 		loadModel(modelToLoad);
 	}
 
 	public PasserelleGUIBuilder(final String modelToLoad, final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
+    this.showModelForms = true;
 		this.showModelGraph = showModelGraph;
 		this.standalone = standalone;
 		URL url = null;
@@ -116,7 +135,7 @@ public class PasserelleGUIBuilder {
 
 	private void loadModel(final URL modelToLoad) {
 		try {
-			buildGenericHMI(showModelGraph);
+			buildGenericHMI(showModelForms,showModelGraph);
 		} catch (final Throwable t) {
 			System.err.println("ERROR: can not configure HMI");
 			t.printStackTrace();
@@ -141,8 +160,8 @@ public class PasserelleGUIBuilder {
 		}
 	}
 
-	private void buildGenericHMI(final boolean showModelGraph) throws PasserelleException, IOException, NameDuplicationException, IllegalActionException {
-		genericHMI = new GenericHMI(showModelGraph);
+	private void buildGenericHMI(final boolean showModelForms,final boolean showModelGraph) throws PasserelleException, IOException, NameDuplicationException, IllegalActionException {
+		genericHMI = new GenericHMI(showModelForms,showModelGraph);
 		genericHMI.setEditorPaneFactory(new PasserelleEditorPaneFactory());
 		genericHMI.init();
 	}
@@ -182,10 +201,11 @@ public class PasserelleGUIBuilder {
 						try {
 							int i = 0;
 							if (showModelGraph) {
-
 								viewMap.addView(i++, getGraphView());
 							}
-							viewMap.addView(i++, getParametersView());
+							if(showModelForms) {
+							  viewMap.addView(i++, getParametersView());
+							}
 							viewMap.addView(i++, getLogView());
 
 							rootWindow = DockingUtil.createRootWindow(viewMap, true);
@@ -195,11 +215,17 @@ public class PasserelleGUIBuilder {
 								// .addSuperObject(
 								// rootWindow
 								// // .getWindowProperties());
-								mainWindow = new SplitWindow(true, 0.75f, graphView, getParametersView());
+							  if(showModelForms) {
+							    mainWindow = new SplitWindow(true, 0.75f, graphView, getParametersView());
+							  } else {
+							    mainWindow = graphView;
+							  }
 								// mainWindow.setSelectedTab(0);
 								rootWindow.setWindow(new SplitWindow(false, 0.75f, mainWindow, getLogView()));
-							} else {
+							} else if (showModelForms) {
 								rootWindow.setWindow(new SplitWindow(false, 0.5f, getParametersView(), getLogView()));
+							} else {
+                rootWindow.setWindow(getLogView());
 							}
 
 							// loadWindowLayoutPreferences(rootWindow, null);
@@ -245,7 +271,7 @@ public class PasserelleGUIBuilder {
 
 	public GenericHMI getGenericHMI() throws IOException, IllegalActionException, NameDuplicationException, PasserelleException {
 		if (genericHMI == null) {
-			buildGenericHMI(true);
+			buildGenericHMI(true,true);
 		}
 		return genericHMI;
 	}

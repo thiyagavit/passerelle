@@ -162,7 +162,8 @@ public abstract class HMIBase implements ChangeListener {
 	private TraceVisualizer traceComponent;
 	private RemoteExecutionTracePoller remoteExecutionTracePoller;
 
-	protected final boolean showModelGraph;
+	protected final boolean showModelForms;
+  protected final boolean showModelGraph;
 	protected ModelGraphPanel graphPanel;
 	protected PtolemyEffigy graphPanelEffigy;
 
@@ -211,8 +212,9 @@ public abstract class HMIBase implements ChangeListener {
 	 * @param cfgDefPath
 	 * @param showModelGraph
 	 */
-	public HMIBase(final Mode mode, final boolean showModelGraph) {
+	public HMIBase(final Mode mode, final boolean showModelForms, final boolean showModelGraph) {
 		this.mode = mode;
+    this.showModelForms = showModelForms;
 		this.showModelGraph = showModelGraph;
 	}
 	
@@ -390,28 +392,30 @@ public abstract class HMIBase implements ChangeListener {
 				// XXX find a better way to filter changes. When desc does
 				// not contain _controllerFactory, ... it means that an
 				// entity has only moved
-				boolean shouldRefreshForms = hasChangeImpact(change);
-				if (shouldRefreshForms) {
-					showModelForm(null);
+				if(hasChangeImpact(change)) {
+  				if (showModelForms) {
+  					showModelForm(null);
+  				}
+  	      // ico Bossanova or other "wild" derived GUIs, there's not always a current model URL
+  	      if(getModelURL()!=null) {
+  	        setChanged(getModelURL());
+  	      }
 				}
 			}
-			// ico Bossanova or other "wild" derived GUIs, there's not always a current model URL
-			if(getModelURL()!=null)
-				modelsChangedStatus.put(getModelURL(), Boolean.TRUE);
 		}
 	}
 
 	protected boolean hasChangeImpact(final ChangeRequest change) {
-		boolean shouldRefreshForms = false;
+		boolean hasChangeImpact = false;
 		final String[] importantChanges = new String[] { "_controllerFactory", "_editorFactory", "_editorPaneFactory", "deleteEntity", "deleteProperty",
 				"class" };
 		for (final String changeType : importantChanges) {
 			if (change.getDescription().contains(changeType)) {
-				shouldRefreshForms = true;
+				hasChangeImpact = true;
 				break;
 			}
 		}
-		return shouldRefreshForms;
+		return hasChangeImpact;
 	}
 
 	public void changeFailed(final ChangeRequest change, final Exception exception) {
@@ -757,7 +761,7 @@ public abstract class HMIBase implements ChangeListener {
 		//
 		// });
 		// }
-		if (showThing(HMIMessages.MENU_ANIMATE, menuItemsToShow, menuItemsToHide)) {
+		if (showModelGraph && showThing(HMIMessages.MENU_ANIMATE, menuItemsToShow, menuItemsToHide)) {
 			final JMenuItem animateGraphViewMenuItem = new JCheckBoxMenuItem(HMIMessages.getString(HMIMessages.MENU_ANIMATE));
 			animateGraphViewMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
@@ -1305,7 +1309,7 @@ public abstract class HMIBase implements ChangeListener {
 			if (loadGraphPanel) {
 				showModelGraph(modelKey);
 				// the above also indirectly will show the cfg forms
-			} else {
+			} else if(showModelForms) {
 				showModelForm(modelKey);
 			}
 			if (currentModel != null) {
@@ -1351,9 +1355,13 @@ public abstract class HMIBase implements ChangeListener {
 		this.modelURL = modelURL;
 	}
 
-	public void setSaved(final URL modelURL) {
-		modelsChangedStatus.remove(modelURL);
+	public void setChanged(final URL modelURL) {
+		modelsChangedStatus.put(modelURL, Boolean.TRUE);
 	}
+
+  public void setSaved(final URL modelURL) {
+    modelsChangedStatus.remove(modelURL);
+  }
 
 	public void setTraceComponent(final TraceVisualizer traceComponent) {
 		this.traceComponent = traceComponent;
@@ -1565,7 +1573,6 @@ public abstract class HMIBase implements ChangeListener {
 
 		private boolean continuePolling = true;
 
-		@Override
 		public void run() {
 			while (continuePolling) {
 				if (flowManager != null && flowManager.getRemoteFlowExecutionsList() != null) {

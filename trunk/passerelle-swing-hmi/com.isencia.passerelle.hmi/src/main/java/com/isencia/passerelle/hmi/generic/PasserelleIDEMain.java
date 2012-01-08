@@ -29,7 +29,7 @@ public class PasserelleIDEMain {
       } else {
         // build GUI with model graph
         System.out.println("no model ");
-        new PasserelleGUIBuilder(true, true);
+        new PasserelleGUIBuilder(false, true, true);
       }
     } catch (final Throwable t) {
       t.printStackTrace();
