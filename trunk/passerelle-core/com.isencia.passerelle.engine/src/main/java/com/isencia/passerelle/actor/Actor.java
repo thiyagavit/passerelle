@@ -169,7 +169,7 @@ import com.isencia.passerelle.statistics.StatisticsServiceFactory;
  */
 public abstract class Actor extends TypedAtomicActor implements IMessageCreator {
 	// ~ Static variables/initializers
-	// ··························································································································
+	// __________________________________________________________________________________________________________________________
 
 	private static Logger logger = LoggerFactory.getLogger(Actor.class);
 

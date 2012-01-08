@@ -46,17 +46,17 @@ import ptolemy.kernel.util.NameDuplicationException;
  * @author edeley
  */
 public abstract class ChannelSource extends Source {
-	//~ Static variables/initializers ··························································································································
+	//~ Static variables/initializers __________________________________________________________________________________________________________________________
 
 	private static Logger logger = LoggerFactory.getLogger(ChannelSource.class);
 
-	//~ Instance variables ·····································································································································
+	//~ Instance variables _____________________________________________________________________________________________________________________________________
 
 	private IReceiverChannel receiverChannel = null;
 	public Parameter passThroughParam = null;
 	private boolean passThrough = false;
 
-	//~ Constructors ···········································································································································
+	//~ Constructors ___________________________________________________________________________________________________________________________________________
 
 	/**
 	 * Constructor for Source.

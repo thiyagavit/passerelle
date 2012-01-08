@@ -37,7 +37,7 @@ import ptolemy.kernel.util.NameDuplicationException;
  * @author erwin
  */
 public abstract class Filter extends Actor {
-	//~ Static variables/initializers ··························································································································
+	//~ Static variables/initializers __________________________________________________________________________________________________________________________
 
 	private static Logger logger = LoggerFactory.getLogger(Filter.class);
 

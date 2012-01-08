@@ -39,7 +39,7 @@ import com.isencia.passerelle.core.PortMode;
  */
 public abstract class DynamicNamedInputPortsActor extends Actor {
 
-  // ~ Static variables/initializers ····································
+  // ~ Static variables/initializers ____________________________________
   public static final String INPUT_PORTNAMES = "Input port names (comma-separated)";
 
   private static Logger logger = LoggerFactory.getLogger(DynamicNamedInputPortsActor.class);
@@ -63,7 +63,7 @@ public abstract class DynamicNamedInputPortsActor extends Actor {
     inPortNamesParameter = new StringParameter(this, INPUT_PORTNAMES);
   }
 
-  // ~ Methods ··························································
+  // ~ Methods __________________________________________________________
 
   /**
    * @param attribute The attribute that changed.

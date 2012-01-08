@@ -56,11 +56,11 @@ import com.isencia.passerelle.message.xml.XmlMessageHelper;
  * @author edeley
  */
 public abstract class ReqReplyChannelSource extends Source {
-	//~ Static variables/initializers ··························································································································
+	//~ Static variables/initializers __________________________________________________________________________________________________________________________
 
 	private static Logger logger = LoggerFactory.getLogger(ReqReplyChannelSource.class);
 
-	//~ Instance variables ·····································································································································
+	//~ Instance variables _____________________________________________________________________________________________________________________________________
 
 	private IRequestReplyChannel receiverChannel = null;
 	public Parameter passThroughParam = null;
@@ -70,7 +70,7 @@ public abstract class ReqReplyChannelSource extends Source {
     private PortHandler replyHandler = null;
 
 
-	//~ Constructors ···········································································································································
+	//~ Constructors ___________________________________________________________________________________________________________________________________________
 
 	/**
 	 * Constructor for Source.

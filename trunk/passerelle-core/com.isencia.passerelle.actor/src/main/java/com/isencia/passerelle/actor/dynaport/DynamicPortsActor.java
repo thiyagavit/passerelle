@@ -43,7 +43,7 @@ public abstract class DynamicPortsActor extends Actor {
     INPUT, OUTPUT;
   }
 
-  // ~ Static variables/initializers ····································
+  // ~ Static variables/initializers ____________________________________
   public static final String NUMBER_OF_INPUTS = "Number of inputs";
   public static final String NUMBER_OF_OUTPUTS = "Number of outputs";
   public static final String INPUTPORTPREFIX = "input";
@@ -51,7 +51,7 @@ public abstract class DynamicPortsActor extends Actor {
 
   private static Logger logger = LoggerFactory.getLogger(DynamicPortsActor.class);
 
-  // ~ Instance variables ···············································
+  // ~ Instance variables _______________________________________________
   // private List inputPorts = null;
   public Parameter numberOfInputs = null;
   protected int nrInputPorts = 0;
@@ -80,7 +80,7 @@ public abstract class DynamicPortsActor extends Actor {
     numberOfOutputs.setTypeEquals(BaseType.INT);
   }
 
-  // ~ Methods ··························································
+  // ~ Methods __________________________________________________________
 
   /**
    * @param attribute The attribute that changed.

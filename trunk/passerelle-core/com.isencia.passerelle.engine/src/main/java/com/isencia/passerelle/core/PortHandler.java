@@ -39,15 +39,15 @@ import ptolemy.kernel.util.NamedObj;
  * @author Dirk Jacobs
  */
 public class PortHandler {
-    //~ Static variables/initializers ··························································································································
+    //~ Static variables/initializers 
 
-    private static Logger logger = LoggerFactory.getLogger(PortHandler.class);
+    protected static Logger logger = LoggerFactory.getLogger(PortHandler.class);
     // for logging MDC
 	protected String actorInfo="none";
 
-    //~ Instance variables ·····································································································································
+    //~ Instance variables 
 
-	protected BlockingQueue<Token> queue = null;
+		protected BlockingQueue<Token> queue = null;
     protected IOPort ioPort = null;
     protected Object channelLock = new Object();
     protected PortListener listener = null;
@@ -59,7 +59,7 @@ public class PortHandler {
     // can stop.
     protected int channelCount = 0;
 
-    //~ Constructors ···········································································································································
+    //~ Constructors 
 
     /** Creates a new instance of PortHandler */
     public PortHandler(IOPort ioPort) {
@@ -247,7 +247,7 @@ public class PortHandler {
 	protected Thread createChannelHandler(final int index) {
 		return new ChannelHandler(index);
 	}
-    //~ Classes ················································································································································
+    //~ Classes 
 
 	public final class ChannelHandler extends Thread {
         private Token token = null;

@@ -44,7 +44,7 @@ import com.isencia.passerelle.message.MessageHelper;
  */
 public class CommandExecutor extends Actor {
   // ~ Static variables/initializers
-  // ··························································································································
+  // __________________________________________________________________________________________________________________________
 
   private static Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
   public static final String COMMAND_HEADER = "Command";
@@ -53,7 +53,7 @@ public class CommandExecutor extends Actor {
   public static final String PARAMETERS_PARAMETER = "params";
 
   // ~ Instance variables
-  // ·····································································································································
+  // _____________________________________________________________________________________________________________________________________
 
   public Parameter commandParameter;
   public Parameter paramsParameter;
@@ -63,7 +63,7 @@ public class CommandExecutor extends Actor {
   private boolean triggerConnected = false;
 
   // ~ Constructors
-  // ···········································································································································
+  // ___________________________________________________________________________________________________________________________________________
 
   public CommandExecutor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
