@@ -334,9 +334,9 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int dir=e.getWheelRotation();
 				if(dir>0)
-					zoom(1.1);
-				else
 					zoom(0.9);
+				else
+					zoom(1.1);
 			}
 		});
 		
