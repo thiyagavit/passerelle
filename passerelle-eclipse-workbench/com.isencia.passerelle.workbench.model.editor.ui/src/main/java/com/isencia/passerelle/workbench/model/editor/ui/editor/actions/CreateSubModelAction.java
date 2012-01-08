@@ -37,12 +37,10 @@ import com.isencia.passerelle.workbench.model.ui.wizards.NameWizard;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
 
-public class CreateSubModelAction extends SelectionAction implements
-		NameChecker {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(CreateSubModelAction.class);
-
+public class CreateSubModelAction extends SelectionAction implements NameChecker {
+	
+	private static final Logger logger = LoggerFactory.getLogger(CreateSubModelAction.class);
+	
 	private PasserelleModelMultiPageEditor parent;
 	private final String icon = "icons/flow.png";
 	public static String CREATE_SUBMODEL = "createSubModel";
@@ -73,8 +71,7 @@ public class CreateSubModelAction extends SelectionAction implements
 	 * @param part
 	 * @param parent
 	 */
-	public CreateSubModelAction(final IEditorPart part,
-			final PasserelleModelMultiPageEditor parent) {
+	public CreateSubModelAction(final IEditorPart part, final PasserelleModelMultiPageEditor parent) {
 		super(part);
 		this.parent = parent;
 		setLazyEnablementCalculation(true);
@@ -84,7 +81,6 @@ public class CreateSubModelAction extends SelectionAction implements
 
 	@Override
 	protected void init() {
-
 		super.init();
 		Activator.getImageDescriptor(icon);
 		setHoverImageDescriptor(Activator.getImageDescriptor(icon));
@@ -96,7 +92,6 @@ public class CreateSubModelAction extends SelectionAction implements
 
 	@Override
 	public void run() {
-
 		try {
 			if (parent != null) {
 				final Entity entity = parent.getSelectedContainer();
@@ -111,21 +106,17 @@ public class CreateSubModelAction extends SelectionAction implements
 				final String name = getName("emptyComposite");
 				if (name != null) {
 					final IProject pass = ModelUtils.getPasserelleProject();
-					final File file = new File(pass.getLocation().toOSString()
-							+ "/" + name + ".moml");
-					final InputStream stream = ModelUtils
-							.getEmptyCompositeStream(file.getAbsolutePath());
+					final File file = new File(pass.getLocation().toOSString() + "/" + name + ".moml");
+					final InputStream stream = ModelUtils.getEmptyCompositeStream(file.getAbsolutePath());
 					FileUtils.write(stream, new FileOutputStream(file));
 
-					PaletteItemFactory factory = PaletteItemFactory
-							.getInstance();
+					PaletteItemFactory factory = PaletteItemFactory.getInstance();
 					Flow flow = FlowManager.readMoml(new FileReader(file));
 					flow.setName(name);
 					factory.addSubModel(flow);
 					SubModelUtils.addSubModel(flow);
 
-					final IViewPart part = EclipseUtils.getPage().findView(
-							ActorTreeView.ID);
+					final IViewPart part = EclipseUtils.getPage().findView(ActorTreeView.ID);
 					if (part != null && part instanceof ActorTreeView) {
 						((ActorTreeView) part).refresh();
 					}
@@ -140,13 +131,11 @@ public class CreateSubModelAction extends SelectionAction implements
 	private String getName(final String name) {
 
 		NameWizard wizard = new NameWizard(name, this);
-		WizardDialog dialog = new WizardDialog(Display.getCurrent()
-				.getActiveShell(), wizard);
+		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.create();
 		dialog.getShell().setSize(400, 300);
 		dialog.setTitle("Name of Composite");
-		dialog
-				.setMessage("Please choose a unique name for your exported composite.");
+		dialog.setMessage("Please choose a unique name for your exported composite.");
 		if (dialog.open() == WizardDialog.OK) {
 			return wizard.getRenameValue();
 		}
@@ -193,8 +182,7 @@ public class CreateSubModelAction extends SelectionAction implements
 		}
 
 		final IProject pass = ModelUtils.getPasserelleProject();
-		final File file = new File(pass.getLocation().toOSString() + "/"
-				+ entityAsClass.getName() + ".moml");
+		final File file = new File(pass.getLocation().toOSString() + "/" + entityAsClass.getName() + ".moml");
 		String name = entityAsClass.getName();
 		String filename = file.getName();
 		int period = filename.indexOf(".");

@@ -104,6 +104,11 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 				}
 			}
 			
+			// Clear selection.
+			if (editor!=null && editor instanceof PasserelleModelMultiPageEditor) {
+				((PasserelleModelMultiPageEditor)editor).setActorSelected(null, false, -1);
+			}
+			
 			// Save the current workspace.
 			saveWorkSpace();
 			
@@ -129,14 +134,13 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 				updateActionsAvailable(200);
 				
 			} else { // Normally the case in real application
-				// TODO Find way of sending port, addSystemProperty not working
 				WorkflowLaunchConfiguration configuration = new WorkflowLaunchConfiguration(config);
 				configuration.addSystemProperty("com.isencia.jmx.service.port");
 				// TODO Find an alternative way to maintain a "editor/session" key
 				configuration.addSystemProperty("com.isencia.require.file.source");
-				ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
-				workingCopy.setAttribute("automaticValidate", false);
-				DebugUITools.launch(workingCopy, ILaunchManager.RUN_MODE);
+				// DO NOT CHANGE THIS. IF THESE PROPERTIES ARE NOT PASSED TO THE WORKFLOW,
+				// IT DOES NOT WORK, THE JMX SERVICE WILL BE BROKEN
+				DebugUITools.launch(configuration, ILaunchManager.RUN_MODE);
 				
 			}
             

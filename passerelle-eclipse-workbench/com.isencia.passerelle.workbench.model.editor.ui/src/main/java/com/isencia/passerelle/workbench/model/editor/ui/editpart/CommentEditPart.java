@@ -8,7 +8,6 @@ import org.eclipse.gef.Request;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;

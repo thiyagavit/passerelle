@@ -36,9 +36,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.ILogListener;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
@@ -116,7 +113,7 @@ public class EclipseUtils {
 		if (input instanceof FileEditorInput) {
 			return ((FileEditorInput) input).getFile();
 		}
-		return null;
+		return (IFile)input.getAdapter(IFile.class);
 	}
 
 	public static String getFileName(IEditorInput input) {
