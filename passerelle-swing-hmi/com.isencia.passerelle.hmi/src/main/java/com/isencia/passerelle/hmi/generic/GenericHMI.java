@@ -146,8 +146,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	 * 
 	 * @param showModelGraph if true, also show the graphical model editor.
 	 */
-	public GenericHMI(final boolean showModelGraph) {
-		super(GENERIC, showModelGraph);
+	public GenericHMI(final boolean showModelForms,final boolean showModelGraph) {
+		super(GENERIC, showModelForms, showModelGraph);
 	}
 	
 	@Override
@@ -167,6 +167,10 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void showModelForm(final String modelKey) {
+	  if(!showModelForms) {
+	    return;
+	  }
+	  
 		final URL modelURL = getModelURL();
 		clearModelForms(modelURL);
 
@@ -330,14 +334,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 			for (final String changeType : importantChanges) {
 				if (change.getDescription().contains(changeType)) {
 					hasImpact=true;
-					if (graphTabsMap != null && getModelURL() != null) {
-						// graphTabsMap.get(this.getModelURL().toString()).setText(
-						// getCurrentModel().getName() + " - ***");
-						graphTabsMap.get(getModelURL().toString()).setIcon(
-								new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-										getClass().getResource("/com/isencia/passerelle/hmi/resources/star.png"))));
-						break;
-					}
+          break;
 				}
 			}
 		}
@@ -345,6 +342,18 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	}
 
 	@Override
+  public void setChanged(URL modelURL) {
+    super.setChanged(modelURL);
+    if (graphTabsMap != null && getModelURL() != null) {
+      // graphTabsMap.get(this.getModelURL().toString()).setText(
+      // getCurrentModel().getName() + " - ***");
+      graphTabsMap.get(getModelURL().toString()).setIcon(
+          new ImageIcon(Toolkit.getDefaultToolkit().getImage(
+              getClass().getResource("/com/isencia/passerelle/hmi/resources/star.png"))));
+    }
+  }
+
+  @Override
 	public void setSaved(URL modelURL) {
 		super.setSaved(modelURL);
 		if (modelURL != null) {
@@ -698,10 +707,12 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 		if (getDialogHookComponent() != null) {
 			getDialogHookComponent().setTitle("Passerelle");
 		}
-		if (modelNameLabel != null) {
-			parameterScrollPane.getParent().remove(modelNameLabel);
+		if(parameterScrollPane!=null) {
+  		if (modelNameLabel != null) {
+  			parameterScrollPane.getParent().remove(modelNameLabel);
+  		}
+  		parameterScrollPane.getParent().validate();
 		}
-		parameterScrollPane.getParent().validate();
 		// getConfigPanel().validate();
 	}
 
@@ -884,34 +895,40 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	}
 
 	public void addPrefsMenu(final JMenuBar menuBar) {
-		final JMenu prefsMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_PREFS));
-		prefsMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_PREFS + HMIMessages.KEY).charAt(0));
-		
-		final JMenuItem layoutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_LAYOUT), HMIMessages.getString(
-				HMIMessages.MENU_LAYOUT + HMIMessages.KEY).charAt(0));
-		layoutMenuItem.addActionListener(new ColumnCountDialogOpener());
-		prefsMenu.add(layoutMenuItem);
-		final JMenuItem actorOrderMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ACTOR_ORDER), HMIMessages.getString(
-				HMIMessages.MENU_ACTOR_ORDER + HMIMessages.KEY).charAt(0));
-		actorOrderMenuItem.addActionListener(new ActorOrderOpener());
-		prefsMenu.add(actorOrderMenuItem);
-		final JMenuItem paramFilterMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_PARAM_VISIBILITY), HMIMessages.getString(
-				HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
-		paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
-		prefsMenu.add(paramFilterMenuItem);
-		
-		prefsMenu.add(new JSeparator());
-		
-		final JMenuItem graphPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_GRAPH_PREFERENCES), HMIMessages.getString(
-				HMIMessages.MENU_GRAPH_PREFERENCES + HMIMessages.KEY).charAt(0));
-		graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
-		prefsMenu.add(graphPrefsMenuItem);
+	  // prefs are about form editor and graph editor, so only need to create this menu when one of those editors is enabled
+	  if(showModelForms||showModelGraph) {
+  		final JMenu prefsMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_PREFS));
+  		prefsMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_PREFS + HMIMessages.KEY).charAt(0));
+  		
+  		if(showModelForms) {
+    		final JMenuItem layoutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_LAYOUT), HMIMessages.getString(
+    				HMIMessages.MENU_LAYOUT + HMIMessages.KEY).charAt(0));
+    		layoutMenuItem.addActionListener(new ColumnCountDialogOpener());
+    		prefsMenu.add(layoutMenuItem);
+    		final JMenuItem actorOrderMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ACTOR_ORDER), HMIMessages.getString(
+    				HMIMessages.MENU_ACTOR_ORDER + HMIMessages.KEY).charAt(0));
+    		actorOrderMenuItem.addActionListener(new ActorOrderOpener());
+    		prefsMenu.add(actorOrderMenuItem);
+    		final JMenuItem paramFilterMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_PARAM_VISIBILITY), HMIMessages.getString(
+    				HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
+    		paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
+    		prefsMenu.add(paramFilterMenuItem);
+    		
+    		prefsMenu.add(new JSeparator());
+        StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, layoutMenuItem);
+        StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, actorOrderMenuItem);
+        StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, paramFilterMenuItem);
+  		}
 
-		menuBar.add(prefsMenu);
-
-		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, layoutMenuItem);
-		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, actorOrderMenuItem);
-		StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, paramFilterMenuItem);
+  		if(showModelGraph) {
+    		final JMenuItem graphPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_GRAPH_PREFERENCES), HMIMessages.getString(
+    				HMIMessages.MENU_GRAPH_PREFERENCES + HMIMessages.KEY).charAt(0));
+    		graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
+    		prefsMenu.add(graphPrefsMenuItem);
+  		}
+  		menuBar.add(prefsMenu);
+  
+	  }
 	}
 	public void addHelpMenu(final JMenuBar menuBar) {
 		final JMenu helpMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_HELP));
@@ -1001,7 +1018,6 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
 			modelGraphTabPanel.addTabListener(new TabListener() {
 
-				@Override
 				public void tabSelected(final TabStateChangedEvent event) {
 					// refresh the parameters panel upon the selected model
 					// graph
@@ -1009,7 +1025,6 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
 				}
 
-				@Override
 				public void tabRemoved(final TabRemovedEvent event) {
 					// refresh the parameters panel upon the selected model
 					// graph
@@ -1035,49 +1050,41 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 					}
 				}
 
-				@Override
 				public void tabMoved(final TabEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabHighlighted(final TabStateChangedEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabDropped(final TabDragEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabDragged(final TabDragEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabDragAborted(final TabEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabDeselected(final TabStateChangedEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabDehighlighted(final TabStateChangedEvent event) {
 					// TODO Auto-generated method stub
 
 				}
 
-				@Override
 				public void tabAdded(final TabEvent event) {
 					// TODO Auto-generated method stub
 

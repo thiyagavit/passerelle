@@ -34,7 +34,6 @@ public class DeleteFileAction extends AbstractAction {
 
 	}
 
-	@Override
 	public void actionPerformed(final ActionEvent e) {
 		final File file = chooser.getSelectedFile();
 		if (file != null) {

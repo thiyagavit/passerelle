@@ -31,7 +31,7 @@ public class Activator implements BundleActivator {
 
       @Override
       public void run() {
-        new PasserelleGUIBuilder(true, true);
+        new PasserelleGUIBuilder(false, true, true);
       }
     }).start();
   }
