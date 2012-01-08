@@ -57,11 +57,11 @@ import ptolemy.kernel.util.Workspace;
  * @author erwin
  */
 public class Director extends ProcessDirector {
-	//~ Static variables/initializers ··························································································································
+	//~ Static variables/initializers __________________________________________________________________________________________________________________________
 
 	private static Logger logger = LoggerFactory.getLogger(Director.class);
 
-	//~ Instance variables ·····································································································································
+	//~ Instance variables _____________________________________________________________________________________________________________________________________
 	private File propsFile=null;
 	public FileParameter propsFileParameter;
 	public final static String PROPSFILE_PARAM = "Properties File";
@@ -87,7 +87,7 @@ public class Director extends ProcessDirector {
 
 	private Collection<BlockingQueueReceiver> managedReceivers = new HashSet<BlockingQueueReceiver>();
 	
-	//~ Constructors ···········································································································································
+	//~ Constructors ___________________________________________________________________________________________________________________________________________
 
 	/** Construct a director in the default workspace with an empty string
 	 *  as its name. The director is added to the list of objects in

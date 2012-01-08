@@ -53,11 +53,11 @@ import com.isencia.passerelle.message.xml.XmlMessageHelper;
  * @author erwin
  */
 public abstract class TriggeredChannelSource extends TriggeredSource {
-    //~ Static variables/initializers ··························································································································
+    //~ Static variables/initializers __________________________________________________________________________________________________________________________
 
     private static Logger logger = LoggerFactory.getLogger(TriggeredChannelSource.class);
 
-    //~ Instance variables ·····································································································································
+    //~ Instance variables _____________________________________________________________________________________________________________________________________
 
     private IReceiverChannel receiverChannel = null;
 	public Parameter passThroughParam = null;
@@ -83,7 +83,7 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
 	// the message 1 step in advance...
 	private IMessageInterceptorChain interceptorChain = null;
 
-    //~ Constructors ···········································································································································
+    //~ Constructors ___________________________________________________________________________________________________________________________________________
 
     /**
      * Constructor for Source.

@@ -41,7 +41,7 @@ import com.isencia.passerelle.message.MessageInputContext;
  */
 public class BlockingQueueReceiver extends QueueReceiver
     implements ProcessReceiver {
-    //~ Instance variables ·····································································································································
+    //~ Instance variables _____________________________________________________________________________________________________________________________________
 
 	private final static Logger logger = LoggerFactory.getLogger(BlockingQueueReceiver.class);
 	
@@ -52,7 +52,7 @@ public class BlockingQueueReceiver extends QueueReceiver
 	
 	private MessageBuffer buffer;
 
-    //~ Constructors ···········································································································································
+    //~ Constructors ___________________________________________________________________________________________________________________________________________
 
     /** Construct an empty receiver with no container
      */

@@ -38,7 +38,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  */
 public class HeaderFilter extends Filter {
   // ~ Static variables/initializers
-  // ··························································································································
+  // __________________________________________________________________________________________________________________________
 
   private static Logger logger = LoggerFactory.getLogger(HeaderFilter.class);
   private static final String STARTS_WITH = "StartsWith";
@@ -49,7 +49,7 @@ public class HeaderFilter extends Filter {
   private static final String REGEXP = "RegularExpression";
 
   // ~ Instance variables
-  // ·····································································································································
+  // _____________________________________________________________________________________________________________________________________
 
   public Parameter filterParam;
 
@@ -65,7 +65,7 @@ public class HeaderFilter extends Filter {
   private String property = "";
 
   // ~ Constructors
-  // ···········································································································································
+  // ___________________________________________________________________________________________________________________________________________
 
   /**
    * Construct an actor in the specified container with the specified name.
