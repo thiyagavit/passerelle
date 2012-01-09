@@ -585,8 +585,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 			final IFile ifile = EclipseUtils.getIFile(input);
 			SubModelUtils.readSubModels();
 			Flow compositeActor = FlowManager.readMoml(reader);
-			compositeActor.setSource(filePath);
-      compositeActor.workspace().setName(ifile.getProject().getName());
 			
 			this.parseError = false;
 
