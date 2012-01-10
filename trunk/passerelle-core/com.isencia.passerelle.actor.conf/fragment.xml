@@ -18,6 +18,18 @@
             name="FileWriter">
       </actor>
       <actor
+            class="com.isencia.passerelle.actor.mail.MailReceiver"
+            group="com.isencia.passerelle.actor.actorgroup.io"
+            id="MailReceiver"
+            name="MailReceiver">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.mail.SMTPSender"
+            group="com.isencia.passerelle.actor.actorgroup.io"
+            id="SMTPSender"
+            name="MailSender">
+      </actor>
+      <actor
             class="com.isencia.passerelle.actor.net.SocketServerReceiver"
             group="com.isencia.passerelle.actor.actorgroup.io"
             id="SocketServerReceiver"
@@ -28,6 +40,24 @@
             group="com.isencia.passerelle.actor.actorgroup.io"
             id="SocketClientSender"
             name="SocketClientSender">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.net.SocketServerRequestReplier"
+            group="com.isencia.passerelle.actor.actorgroup.io"
+            id="SocketServerRequestReplier"
+            name="SocketServerRequestReplier">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.net.MulticastReceiver"
+            group="com.isencia.passerelle.actor.actorgroup.io"
+            id="MulticastReceiver"
+            name="MulticastReceiver">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.net.MulticastSender"
+            group="com.isencia.passerelle.actor.actorgroup.io"
+            id="MulticastSender"
+            name="MulticastSender">
       </actor>
       <actor
             class="com.isencia.passerelle.actor.general.Const"
@@ -56,6 +86,12 @@
             icon="icons/console.gif"
             id="com.isencia.passerelle.actor.TracerConsole"
             name="Tracer Console">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.general.CommandExecutor"
+            group="com.isencia.passerelle.actor.actorgroup.general"
+            id="com.isencia.passerelle.actor.CommandExecutor"
+            name="CommandExecutor">
       </actor>
       <actor
             class="com.isencia.passerelle.actor.convert.HeaderModifier"
@@ -92,6 +128,36 @@
             name="RegExpFilter">
       </actor>
       <actor
+            class="com.isencia.passerelle.actor.control.Trigger"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.Trigger"
+            name="Trigger">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.flow.Synchronizer"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.Synchronizer"
+            name="Synchronizer">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.sequence.SequenceToArrayConverter"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.SequenceToArrayConverter"
+            name="SequenceToArrayConverter">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.sequence.ArrayToSequenceConverter"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.ArrayToSequenceConverter"
+            name="ArrayToSequenceConverter">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.sequence.SequenceTracker"
+            group="com.isencia.passerelle.actor.actorgroup.flow"
+            id="com.isencia.passerelle.actor.SequenceTracker"
+            name="SequenceTracker">
+      </actor>
+      <actor
             class="com.isencia.passerelle.actor.control.Stop"
             group="com.isencia.passerelle.actor.actorgroup.flow"
             id="com.isencia.passerelle.actor.Stop"
@@ -99,17 +165,25 @@
             name="Stop">
       </actor>
       <actor
-            class="com.isencia.passerelle.actor.flow.Delay"
-            group="com.isencia.passerelle.actor.actorgroup.flow"
+            class="com.isencia.passerelle.actor.control.Chronometer"
+            group="com.isencia.passerelle.actor.actorgroup.time"
              icon="icons/time.png"
-            id="com.isencia.passerelle.actor.Delay"
-            name="Delay">
+            id="com.isencia.passerelle.actor.Chronometer"
+            name="Chronometer">
       </actor>
       <actor
-            class="com.isencia.passerelle.actor.flow.Synchronizer"
-            group="com.isencia.passerelle.actor.actorgroup.flow"
-            id="com.isencia.passerelle.actor.Synchronizer"
-            name="Synchronizer">
+            class="com.isencia.passerelle.actor.control.Timer"
+            group="com.isencia.passerelle.actor.actorgroup.time"
+             icon="icons/time.png"
+            id="com.isencia.passerelle.actor.Timer"
+            name="Timer">
+      </actor>
+      <actor
+            class="com.isencia.passerelle.actor.flow.Delay"
+            group="com.isencia.passerelle.actor.actorgroup.time"
+             icon="icons/time.png"
+            id="com.isencia.passerelle.actor.ThrottlingDelay"
+            name="Throttling Delay">
       </actor>
       <actor
             class="ptolemy.actor.TypedCompositeActor"
@@ -176,6 +250,11 @@
       		parent="com.isencia.passerelle.actor.actorgroup.general"
             id="com.isencia.passerelle.actor.actorgroup.flow"
             name="Flow Control">
+      </actorgroup>
+      <actorgroup
+      		parent="com.isencia.passerelle.actor.actorgroup.general"
+            id="com.isencia.passerelle.actor.actorgroup.time"
+            name="Time Control">
       </actorgroup>
    </extension>
 </fragment>
