@@ -1114,6 +1114,28 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 		}
 	}
 
+	public static void invalidateUserLibrary(Configuration configuration) throws Exception {
+		final CompositeEntity libraryContainer = (CompositeEntity) configuration.getEntity("actor library");
+		if (libraryContainer != null) {
+			final ModelDirectory directory = (ModelDirectory) configuration.getEntity(Configuration._DIRECTORY_NAME);
+			if (directory != null) {
+				// If we have a jar URL, convert spaces to %20
+				URL fileURL = JNLPUtilities.canonicalizeJarURL(EnvironmentUtils.getUserLibraryURL());
+				MoMLParser.purgeModelRecord(fileURL);
+				MoMLParser.purgeAllModelRecords();
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param configuration
+	 * @param usrLibURL
+	 * @param forceRefresh if true, the library is reloaded and its view representation is refreshed if it was already present.
+	 * if false, an existing model/view is maintained for the library.
+	 * @return
+	 * @throws Exception
+	 */
 	public static EntityLibrary openLibrary(Configuration configuration, URL usrLibURL) throws Exception {
 		final CompositeEntity libraryContainer = (CompositeEntity) configuration.getEntity("actor library");
 		if (libraryContainer == null) {
@@ -1176,7 +1198,6 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			// This is used by TableauFrame in its
 			// _save() method.
 			finalLibraryEffigy.uri.setURL(fileURL);
-
 			finalLibraryEffigy.identifier.setExpression(identifier);
 
 			return userLibrary;

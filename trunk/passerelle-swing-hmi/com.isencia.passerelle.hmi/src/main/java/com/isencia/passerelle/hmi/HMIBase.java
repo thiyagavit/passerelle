@@ -30,10 +30,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.Action;
@@ -49,10 +48,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Manager;
@@ -81,6 +78,7 @@ import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.ext.FiringEventListener;
 import com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy;
 import com.isencia.passerelle.ext.impl.DefaultExecutionTracer;
+import com.isencia.passerelle.hmi.action.ActorLibraryReloader;
 import com.isencia.passerelle.hmi.action.AskTheUserErrorControlStrategy;
 import com.isencia.passerelle.hmi.action.CloseAction;
 import com.isencia.passerelle.hmi.action.CloseAllAction;
@@ -180,6 +178,7 @@ public abstract class HMIBase implements ChangeListener {
 	private SaveAllAction saveAllAction;
 
 	private OpenAction openAction;
+	private ActorLibraryReloader actorLibReloadAction;
 	private ModelPrinter printAction;
 	private CloseAction closeAction;
 	private CloseAllAction closeAllAction;
@@ -616,19 +615,6 @@ public abstract class HMIBase implements ChangeListener {
 					modelCreatorAction = new ModelCreator(this);
 				}
 				fileMenu.add(modelCreatorAction);
-				// final JMenuItem fileNewMenuItem = new JMenuItem(HMIMessages
-				// .getString(HMIMessages.MENU_NEW), HMIMessages.getString(
-				// HMIMessages.MENU_NEW + HMIMessages.KEY).charAt(0));
-				// fileNewMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				// KeyEvent.VK_N, InputEvent.CTRL_MASK));
-				// fileNewMenuItem.addActionListener(new ModelCreator());
-				// fileMenu.add(fileNewMenuItem);
-
-				// StateMachine.getInstance().registerActionForState(
-				// StateMachine.READY, HMIMessages.MENU_NEW, fileNewMenuItem);
-				// StateMachine.getInstance().registerActionForState(
-				// StateMachine.MODEL_OPEN, HMIMessages.MENU_NEW,
-				// fileNewMenuItem);
 			}
 		}
 
@@ -673,6 +659,14 @@ public abstract class HMIBase implements ChangeListener {
 				saveAllAction = new SaveAllAction(this);
 			}
 			fileMenu.add(saveAllAction);
+		}
+		
+		if (showThing(HMIMessages.MENU_ACTORLIBRARY_RELOAD, menuItemsToShow, menuItemsToHide)) {
+			fileMenu.add(new JSeparator());
+			if (actorLibReloadAction == null) {
+				actorLibReloadAction = new ActorLibraryReloader(this);
+			}
+			fileMenu.add(actorLibReloadAction);
 		}
 		
 		if (showThing(HMIMessages.MENU_PRINT, menuItemsToShow, menuItemsToHide)) {
@@ -733,34 +727,6 @@ public abstract class HMIBase implements ChangeListener {
 		final JMenu graphMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_GRAPH));
 		graphMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_GRAPH + HMIMessages.KEY).charAt(0));
 
-		// if (showThing(HMIMessages.MENU_SHOW, menuItemsToShow,
-		// menuItemsToHide)) {
-		// JMenuItem graphViewMenuItem = new
-		// JCheckBoxMenuItem(HMIMessages.getString(HMIMessages.MENU_SHOW));
-		// graphMenu.add(graphViewMenuItem);
-		//
-		// graphViewMenuItem.addActionListener(new ActionListener() {
-		// public void actionPerformed(ActionEvent e) {
-		// if (logger.isTraceEnabled()) {
-		//						logger.trace("Graph Show action - entry"); //$NON-NLS-1$
-		// }
-		// boolean showGraph = ((JCheckBoxMenuItem) e.getSource()).getState();
-		// if(showGraph) {
-		// applyFieldValuesToParameters();
-		// clearModelForms();
-		// showModelGraph(HMIBase.this.currentModel.getName());
-		// } else {
-		// clearModelGraphs();
-		// showModelForm(HMIBase.this.currentModel.getName());
-		// }
-		// if (logger.isTraceEnabled()) {
-		//						logger.trace("Graph Show action - exit"); //$NON-NLS-1$
-		// }
-		// }
-		//
-		//
-		// });
-		// }
 		if (showModelGraph && showThing(HMIMessages.MENU_ANIMATE, menuItemsToShow, menuItemsToHide)) {
 			final JMenuItem animateGraphViewMenuItem = new JCheckBoxMenuItem(HMIMessages.getString(HMIMessages.MENU_ANIMATE));
 			animateGraphViewMenuItem.addActionListener(new ActionListener() {
@@ -1060,7 +1026,7 @@ public abstract class HMIBase implements ChangeListener {
 		return modelURL;
 	}
 
-	protected Configuration getPtolemyConfiguration() {
+	public Configuration getPtolemyConfiguration() {
 		return config;
 	}
 
