@@ -1,0 +1,41 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="Writer" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Passerelle Std" class="be.isencia.passerelle.domain.cap.Director">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="dsdsq">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{195, 55}">
+        </property>
+    </property>
+    <entity name="Constant" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="10">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{165, 295}">
+        </property>
+    </entity>
+    <entity name="AttributeWriter" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Wait read part equals write part" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="Tolerance" class="ptolemy.data.expr.StringParameter" value="10000">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[345.0, 295.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="Constant.output" relation="relation"/>
+    <link port="AttributeWriter.Value (Scalar only)" relation="relation"/>
+</entity>
