@@ -35,6 +35,7 @@ public class Manager extends ptolemy.actor.Manager {
 	@Override
 	public void pause() {
 		super.pause();
+		_setState(PAUSED);
 		// the invocation of stopFire/pauseFire is already done in the Manager base class
 		
 		// if super.pause is not done :

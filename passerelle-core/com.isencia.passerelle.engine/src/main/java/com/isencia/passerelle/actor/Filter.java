@@ -79,7 +79,7 @@ public abstract class Filter extends Actor {
             throws NameDuplicationException, IllegalActionException  {
         super(container, name);
 
-        input = PortFactory.getInstance().createInputPort(this, String.class);
+        input = PortFactory.getInstance().createInputPort(this, null);
         outputOk = PortFactory.getInstance().createOutputPort(this, "outputOk");
 		outputNotOk = PortFactory.getInstance().createOutputPort(this, "outputNotOk");
 
