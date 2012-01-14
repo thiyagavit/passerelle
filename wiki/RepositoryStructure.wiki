@@ -20,10 +20,10 @@ The structure is as follows :
   * passerelle-core : the core projects for the engine and a basic actor library.
   * passerelle-eclipse-workbench : the projects for the RCP, including product definition.
   * passerelle-swing-hmi : the Swing-based tool.
+  * ptolemy : a subset of Ptolemy v7.0.1, repackaged as OSGi bundles, and with a limited number of small code changes needed for Passerelle.
   * contributions-actors : this is where other participants may maintain their actor libraries, that are not part of the "basic" Passerelle distribution.
   * contributions-tools : the place for contributions of miscellaneous extras.
 
 In the contributions sections, Soleil has already provided their custom actor library with dependencies, and a custom GUI to create and run batches of Passerelle models (Bossanova).
 
 Soleil's dependencies are currently collected in one big collection of jars in a single bundle. Work is planned to move to a cleaner approach of bundle-izing each dependency separately.
-
