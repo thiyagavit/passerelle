@@ -13,3 +13,19 @@ Finally, some advanced topics are discussed.
 = User guides =
 
 = Links & References =
+
+Some of the stuff used in Passerelle :
+
+[http://ptolemy.berkeley.edu/ptolemyII/ Ptolemy II] : the platform for actor-based solutions for hybrid modeling in Java.
+
+[http://www.osgi.org OSGi] : besides Ptolemy, the second most important element of Passerelle's software architecture
+
+[http://www.eclipse.org eclipse] : our IDE and RCP platform
+
+[http://eclipse.org/equinox/ eclipse's equinox] : the OSGi implementation on which Passerelle is based
+
+[http://commons.apache.org/ Apache Commons] : Passerelle uses many libraries from Apache Commons, such as Collections, IO, HTTP Client, Lang, Net etc.
+
+[http://www.jdom.org/ JDOM] : our preferred XML API
+
+[http://www.slf4j.org/ SLF4J] : our preferred logging API
