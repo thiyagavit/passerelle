@@ -3,8 +3,10 @@
 
 = Developer guides =
 
+RepositoryStructure : a short overview of the project structure in the Passerelle repository.
+
 PasserelleActorDevelopmentGuide : This guide presents an overview of the technological basis for the Passerelle actor model.
-Then it describes the actor lifecycle, actor development APIs and types of actors.For each major actor type, a complete example is developed.
+Then it describes the actor lifecycle, actor development APIs and types of actors. For each major actor type, a complete example is developed.
 Finally, some advanced topics are discussed.
 
 
