@@ -3,20 +3,23 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>SocketClientSender</title>
+<title>ErrorGenerator</title>
 </head>
 
 <body>
 <BODY LANG="en-US" DIR="LTR">
-<H2>SocketClientSender</H2>
-<H4>com.isencia.passerelle.actor.net.SocketClientSender</H4>
+<H2>ErrorGenerator</H2>
+<H4>com.isencia.passerelle.actor.error.ErrorGenerator</H4>
 <ul>
 </ul>
 <p>
-no documentation found
+Generate a configurable exception, thrown during the actor's process() iteration,
+ i.e. each time when a message is received on the input port.
+ <br/>
+ The received message is set as the exception's error context.
 </p>
 <br/><br/>
-<H2>SocketClientSender Attributes</H2>
+<H2>ErrorGenerator Attributes</H2>
 <TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=3>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%" BGCOLOR="#c0c0c0">
@@ -28,7 +31,7 @@ no documentation found
 	</TR>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%">
-			<P>hostParam</P>
+			<P>exceptionClassParam</P>
 		</TD>
 		<TD WIDTH="69%">
 			<P>no documentation found</P>
@@ -36,7 +39,7 @@ no documentation found
 	</TR>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%">
-			<P>msgGeneratorType</P>
+			<P>messageParam</P>
 		</TD>
 		<TD WIDTH="69%">
 			<P>no documentation found</P>
@@ -44,10 +47,10 @@ no documentation found
 	</TR>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%">
-			<P>portParam</P>
+			<P>severityParam</P>
 		</TD>
 		<TD WIDTH="69%">
-			<P>The server listen socket port.</P>
+			<P>no documentation found</P>
 		</TD>
 	</TR>
 </TABLE>

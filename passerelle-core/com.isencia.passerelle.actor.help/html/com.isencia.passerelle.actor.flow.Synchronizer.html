@@ -3,20 +3,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>SocketClientSender</title>
+<title>Synchronizer</title>
 </head>
 
 <body>
 <BODY LANG="en-US" DIR="LTR">
-<H2>SocketClientSender</H2>
-<H4>com.isencia.passerelle.actor.net.SocketClientSender</H4>
+<H2>Synchronizer</H2>
+<H4>com.isencia.passerelle.actor.flow.Synchronizer</H4>
 <ul>
 </ul>
 <p>
-no documentation found
+An actor that synchronizes the messages on all input ports, and then sends
+ them onwards via the corresponding output ports. It has one fixed input port,
+ the syncInput port which is multi-channel. This allows to resolve bootstrap
+ issues for synchronized loops, e.g. combining the loop feedback msg and an
+ ordinary start-up trigger. Besides this port, it can have a configurable,
+ equal nr of extra input and output ports. The extra input ports are all
+ single-channel.
 </p>
 <br/><br/>
-<H2>SocketClientSender Attributes</H2>
+<H2>Synchronizer Attributes</H2>
 <TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=3>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%" BGCOLOR="#c0c0c0">
@@ -28,26 +34,10 @@ no documentation found
 	</TR>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%">
-			<P>hostParam</P>
+			<P>numberOfPorts</P>
 		</TD>
 		<TD WIDTH="69%">
 			<P>no documentation found</P>
-		</TD>
-	</TR>
-	<TR VALIGN="TOP">
-		<TD WIDTH="31%">
-			<P>msgGeneratorType</P>
-		</TD>
-		<TD WIDTH="69%">
-			<P>no documentation found</P>
-		</TD>
-	</TR>
-	<TR VALIGN="TOP">
-		<TD WIDTH="31%">
-			<P>portParam</P>
-		</TD>
-		<TD WIDTH="69%">
-			<P>The server listen socket port.</P>
 		</TD>
 	</TR>
 </TABLE>
