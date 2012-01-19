@@ -171,7 +171,10 @@ public class ActorAttributesView extends ViewPart implements
 			viewer.setInput(new Object());
 			viewer.refresh();
 		} catch (Exception e) {
-            logger.error("Cannot set input", e);
+		  // TODO : fix error java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?)
+		  // that happens for every actor selection after an ActorDialog(containing an ActorAttributesView) has been opened&closed.
+		  // but for the moment, just disable this error logging as it pollutes our log files for a known, non-critical issue.
+         //   logger.error("Cannot set input", e);
 		}
 	}
 
