@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Workbench Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.workbench; singleton:=true
-Bundle-Version: 7.0.0
+Bundle-Version: 7.0.1
 Bundle-Activator: com.isencia.passerelle.workbench.Activator
 Bundle-Vendor: iSencia
 Require-Bundle: org.eclipse.ui,
@@ -12,5 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui;bundle-version="3.4.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: ptolemy.kernel.util
+Import-Package: org.slf4j;version="1.5.8",
+ ptolemy.kernel.util
 
