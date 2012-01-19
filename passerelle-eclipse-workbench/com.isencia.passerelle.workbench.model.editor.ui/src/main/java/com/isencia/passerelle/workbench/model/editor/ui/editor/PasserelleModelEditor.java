@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -15,7 +14,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
@@ -62,7 +60,6 @@ import org.eclipse.gef.ui.rulers.RulerComposite;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -70,13 +67,11 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -91,10 +86,8 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.ComponentEntity;
-
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.FileTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.PasserelleTemplateTransferDropTargetListener;
@@ -110,7 +103,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RenameAct
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ScreenshotAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.EditPartFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.DropFavouriteListener;
@@ -602,9 +594,11 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 			final ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(),"org.dawb.workbench.ui");
 			final boolean isSel = store.getBoolean("org.dawb.actor.highlight.choice");
 			final ActionContributionItem action = (ActionContributionItem)getEditorSite().getActionBars().getToolBarManager().find("org.edna.workbench.editors.highlightWorkflowAction");
-			action.getAction().setChecked(isSel);
+			if(action!=null) {
+			  action.getAction().setChecked(isSel);
+			}
 		} catch (Throwable ne) {
-			logger.error("Cannot read dawb preferences because this is not dawb!");
+			logger.error("Cannot read dawb-specific preferences in generic Passerelle Workbench!");
 		}
 	}
 
