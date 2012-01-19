@@ -3,20 +3,22 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Const</title>
+<title>MulticastSender</title>
 </head>
 
 <body>
 <BODY LANG="en-US" DIR="LTR">
-<H2>Const</H2>
-<H4>com.isencia.passerelle.actor.general.Const</H4>
+<H2>MulticastSender</H2>
+<H4>com.isencia.passerelle.actor.net.MulticastSender</H4>
 <ul>
 </ul>
 <p>
-Produce a constant output.
+This actor sends its input as a Datagram over the network using the
+ UDP-multicast protocol. The group and port number towards which the datagram
+ is sent are given by optional inputs <i>group</i> and <i>port</i>.
 </p>
 <br/><br/>
-<H2>Const Attributes</H2>
+<H2>MulticastSender Attributes</H2>
 <TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=3>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%" BGCOLOR="#c0c0c0">
@@ -28,10 +30,18 @@ Produce a constant output.
 	</TR>
 	<TR VALIGN="TOP">
 		<TD WIDTH="31%">
-			<P>value</P>
+			<P>groupParam</P>
 		</TD>
 		<TD WIDTH="69%">
-			<P>The value produced by this constant source. By default, it contains an&#10; StringToken with an empty string.</P>
+			<P>no documentation found</P>
+		</TD>
+	</TR>
+	<TR VALIGN="TOP">
+		<TD WIDTH="31%">
+			<P>portParam</P>
+		</TD>
+		<TD WIDTH="69%">
+			<P>no documentation found</P>
 		</TD>
 	</TR>
 </TABLE>
