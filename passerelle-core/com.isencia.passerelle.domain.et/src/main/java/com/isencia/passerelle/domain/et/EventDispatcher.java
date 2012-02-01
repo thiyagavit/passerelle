@@ -75,7 +75,7 @@ public interface EventDispatcher {
    *
    * @param timeout
    * @param unit
-   * @return
+   * @return true if a real shutdown was terminated, false if no shutdown ongoing, or timed out
    * @throws InterruptedException
    */
     boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException;

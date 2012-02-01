@@ -52,11 +52,13 @@ import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.message.MessageOutputContext;
 
 /**
- * This is a base class for actors to be used in the experimental "event-driven" domain for Passerelle. The goal is to have the director maintain a
- * "msg-transport-event"-queue. Each msg sent to an input port is queued. The Director thread reads the top-event and sends the msg to the destination port.
- * Then it checks whether the related actor is ready to fire, by calling its prefire(). When prefire() returns true, the actor's fire() method is invoked,
- * followed by postfire(). When prefire() returns false, the director "forgets" about that actor and sends the next msg from its event queue, probably to
- * another actor and tries this one's prefire(). Etc.
+ * This is a base class for actors to be used in the experimental "event-driven" domain for Passerelle. 
+ * The goal is to have the director maintain a "msg-transport-event"-queue. Each msg sent to an input port is queued. 
+ * The Director thread reads the top-event and sends the msg to the destination port.
+ * Then it checks whether the related actor is ready to fire, by calling its prefire(). 
+ * When prefire() returns true, the actor's fire() method is invoked, followed by postfire(). 
+ * When prefire() returns false, the director "forgets" about that actor and sends the next msg from its event queue, 
+ * probably to another actor and tries this one's prefire(). Etc.
  * 
  * @author delerw
  */
