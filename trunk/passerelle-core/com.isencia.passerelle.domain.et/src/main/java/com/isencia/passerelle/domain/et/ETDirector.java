@@ -40,7 +40,7 @@ import com.isencia.passerelle.domain.et.impl.SimpleEventDispatcher;
  * @author delerw
  *
  */
-public class ETDirector extends Director {
+public class ETDirector extends Director implements EventDispatchReporter {
   private final static Logger LOGGER = LoggerFactory.getLogger(ETDirector.class);
   
   // not sure yet if this is a good idea or not,
@@ -49,6 +49,7 @@ public class ETDirector extends Director {
   // splitting it out may allow to e.g. plugin different impls,
   // like one using OSGi event bus etc...
   private EventDispatcher dispatcher;
+  private EventDispatchReporter dispatchReporter;
   
   private boolean notDone = true;
   private Set<Actor> inactiveActors = new HashSet<Actor>();
@@ -79,6 +80,7 @@ public class ETDirector extends Director {
     dispatcher=new SimpleEventDispatcher(getFullName(),
         new SendEventHandler(this),
         new FireEventHandler(this));
+    dispatchReporter = (EventDispatchReporter) dispatcher;
     notDone = true;
     inactiveActors.clear();
   }
@@ -133,14 +135,14 @@ public class ETDirector extends Director {
   
   public void reportEvents() {
     DateFormat dateFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss,SSS");
-    List<Event> evtList = ((SimpleEventDispatcher)dispatcher).getEventHistory();
+    List<Event> evtList = dispatchReporter.getEventHistory();
     if(!evtList.isEmpty()) {
       System.out.println("Event History");
       for (Event event : evtList) {
         System.out.println(((AbstractEvent)event).toString(dateFmt));
       }
     }
-    evtList = ((SimpleEventDispatcher)dispatcher).getUnhandledEvents();
+    evtList = dispatchReporter.getUnhandledEvents();
     if(!evtList.isEmpty()) {
       System.out.println("Unhandled Events");
       for (Event event : evtList) {
@@ -184,5 +186,17 @@ public class ETDirector extends Director {
   
   public boolean isActorInactive(Actor actor) {
     return inactiveActors.contains(actor);
+  }
+  public List<Event> getEventHistory() {
+    return dispatchReporter.getEventHistory();
+  }
+  public List<Event> getUnhandledEvents() {
+    return dispatchReporter.getUnhandledEvents();
+  }
+  public List<EventError> getEventErrors() {
+    return dispatchReporter.getEventErrors();
+  }
+  public void clearEvents() {
+    dispatchReporter.clearEvents();
   }
 }

@@ -15,6 +15,8 @@
 
 package com.isencia.passerelle.domain.et.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -23,7 +25,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.domain.et.Event;
+import com.isencia.passerelle.domain.et.EventDispatchReporter;
 import com.isencia.passerelle.domain.et.EventDispatcher;
+import com.isencia.passerelle.domain.et.EventError;
 import com.isencia.passerelle.domain.et.EventHandler;
 import com.isencia.passerelle.domain.et.EventRefusedException;
 
@@ -34,7 +38,7 @@ import com.isencia.passerelle.domain.et.EventRefusedException;
  * 
  * @author delerw
  */
-public class SimpleEventDispatcher implements EventDispatcher {
+public class SimpleEventDispatcher implements EventDispatcher, EventDispatchReporter {
   
   private final static Logger LOGGER = LoggerFactory.getLogger(SimpleEventDispatcher.class);
   
@@ -43,6 +47,7 @@ public class SimpleEventDispatcher implements EventDispatcher {
   private BlockingQueue<Event> eventQ = new LinkedBlockingQueue<Event>();
   private List<Event> eventHistory = new LinkedList<Event>();
   private List<Event> unhandledEvents = new LinkedList<Event>();
+  private List<EventError> eventErrors = new LinkedList<EventError>();
   
   private EventHandler<? extends Event> eventHandlers[];
 
@@ -75,8 +80,9 @@ public class SimpleEventDispatcher implements EventDispatcher {
 
   public boolean dispatch(long timeOut) {
     boolean eventDispatched = false;
+    Event event = null;
     try {
-      Event event = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
+      event = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
       if(event!=null) {
         eventHistory.add(0, event);
         for (EventHandler evtHandler : eventHandlers) {
@@ -87,17 +93,16 @@ public class SimpleEventDispatcher implements EventDispatcher {
               break;
             }
           } catch (Exception e) {
-            // TODO remove this logging?? The goal of the for-loop is to find a matching handler
-            // the others are free to throw exceptions, and these should not polute the log files.
-            LOGGER.error("",e);
+            eventErrors.add(0,new EventError(event, e));
           }
-        }
-        if(!eventDispatched) {
-          unhandledEvents.add(0, event);
         }
       }
     } catch (InterruptedException e) {
-      LOGGER.error("",e);
+      LOGGER.error("Event dispatch was interrupted",e);
+    } finally {
+      if(!eventDispatched && event!=null) {
+        unhandledEvents.add(0, event);
+      }
     }
     return eventDispatched;
   }
@@ -109,15 +114,31 @@ public class SimpleEventDispatcher implements EventDispatcher {
   public List<Event> getUnhandledEvents() {
     return unhandledEvents;
   }
+  
+  public List<EventError> getEventErrors() {
+    return eventErrors;
+  }
+  
+  public void clearEvents() {
+    eventHistory.clear();
+    unhandledEvents.clear();
+    eventErrors.clear();
+  }
 
   public void shutdown() {
+    active=false;
   }
 
   public List<Event> shutdownNow() {
-    return null;
+    shutdown();
+    List<Event> pendingEvents = new ArrayList<Event>(eventQ);
+    return Collections.unmodifiableList(pendingEvents);
   }
 
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+    if(active)
+      return false;
+    // TODO do something here to block till all events have been processed
     return false;
   }
 }
