@@ -1,10 +1,10 @@
 package com.isencia.passerelle.actor;
 
-import ptolemy.actor.lib.hoc.ModelUtilities;
 import ptolemy.kernel.util.NamedObj;
 
 public class FlowUtils {
 	public static final String FLOW_SEPARATOR = "#sep";
+	public static final String TRANSLATION_ID = "translationId";
 
 	public static String extractFlowName(NamedObj actor) {
 		String fullName = actor.getFullName();
