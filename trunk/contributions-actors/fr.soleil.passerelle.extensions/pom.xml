@@ -92,6 +92,11 @@
 
 		</plugins>
 	</build>
+	
+	<properties>
+		<maven.test.skip>true </maven.test.skip>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
@@ -139,17 +144,17 @@
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
-			<version>3.3.0-SNAPSHOT</version>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaLocal</artifactId>
-			<version>3.3.0-SNAPSHOT</version>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaEntity</artifactId>
-			<version>3.3.0-SNAPSHOT</version>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
@@ -202,26 +207,22 @@
 			<groupId>com.microstar</groupId>
 			<artifactId>xml</artifactId>
 		</dependency>
-		
-<!-- 		A décommenter pour super-pom -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>commons</artifactId> -->
-<!-- 			<version>7.0.0</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>ume</artifactId> -->
-<!-- 			<version>7.0.0</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>actor</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>engine</artifactId> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>commons.ume</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>actor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>engine</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>diva</groupId>
 			<artifactId>diva</artifactId>
