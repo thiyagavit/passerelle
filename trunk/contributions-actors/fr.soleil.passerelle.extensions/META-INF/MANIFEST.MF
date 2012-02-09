@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil's Passerelle Actors/Extensions
-Bundle-SymbolicName: fr.soleil.passerelle.extensions
-Bundle-Version: 4.4.6.qualifier
+Bundle-SymbolicName: fr.soleil.passerelle.actor
+Bundle-Version: 4.5.0.qualifier
 Bundle-Vendor: synchrotron soleil
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.isencia.passerelle.engine;bundle-version="7.0.0",
