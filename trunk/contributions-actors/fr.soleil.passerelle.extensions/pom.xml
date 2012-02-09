@@ -10,8 +10,8 @@
 		<version>RELEASE</version>
 	</parent>
 
-	<groupId>fr.soleil.passerelle.extensions</groupId>
-	<artifactId>passerelle-soleil</artifactId>
+	<groupId>fr.soleil.passerelle</groupId>
+	<artifactId>actor</artifactId>
 	<version>4.5.0-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
@@ -19,75 +19,33 @@
 
 	<developers>
 		<developer>
-			<id>abeille</id>
-			<name>Gwenaelle ABEILLE</name>
-			<email>gwenaelle.abeille@synchrotron-soleil.fr
-			</email>
+			<id>pierrejosephzephir</id>
+			<name>Sandra PIERRE-JOSEPH ZEPHIR</name>
+			<email>sandra.pierrejoseph@synchrotron-soleil.fr</email>
 			<organization>Synchrotron Soleil</organization>
-			<organizationUrl>http://www.synchrotron-soleil.fr
-			</organizationUrl>
+			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
 			<roles>
-				<role>Java Developer</role>
+				<role>Manager</role>
 			</roles>
 			<timezone>1</timezone>
 		</developer>
 	</developers>
 	<scm>
 		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions</connection>
-		<developerConnection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions</developerConnection>
+		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions</developerConnection>
 		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions</url>
 	</scm>
 	<build>
 		<plugins>
-			<!-- <plugin> -->
-			<!-- <groupId>fr.soleil.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-script-plugin</artifactId> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <id>install</id> -->
-			<!-- <goals> -->
-			<!-- <goal>generate</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- <configuration> -->
-			<!-- <mainClass /> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
-			<!-- <plugin> -->
-			<!-- <artifactId>maven-assembly-plugin</artifactId> -->
-			<!-- <version>2.2-beta-2</version> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <id>create-executable-jar</id> -->
-			<!-- <phase>package</phase> -->
-			<!-- <goals> -->
-			<!-- <goal>single</goal> -->
-			<!-- </goals> -->
-			<!-- <configuration> -->
-			<!-- <descriptors> -->
-			<!-- <descriptor> -->
-			<!-- main/assembly/assembly.xml</descriptor> -->
-			<!-- </descriptors> -->
-			<!-- <archive> -->
-			<!-- <manifest> -->
-			<!-- <mainClass>fr.soleil.passerelle.actor</mainClass> -->
-			<!-- </manifest> -->
-			<!-- </archive> -->
-			<!-- </configuration> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-				</configuration>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-eclipse-plugin</artifactId> -->
+<!-- 				<version>2.8</version> -->
+<!-- 				<configuration> -->
+<!-- 					<downloadSources>true</downloadSources> -->
+<!-- 					<downloadJavadocs>true</downloadJavadocs> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
