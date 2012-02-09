@@ -28,7 +28,7 @@
 	</developers>
 	<scm>
 		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</connection>
-		<developerConnection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
+		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
 		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</url>
 	</scm>
 	<build>
@@ -65,18 +65,22 @@
 			<artifactId>swingx</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>fr.soleil.passerelle.extensions</groupId>
-			<artifactId>passerelle-soleil</artifactId>
+			<groupId>fr.soleil.passerelle</groupId>
+			<artifactId>actor</artifactId>
 			<version>4.5.0-SNAPSHOT</version>
 		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>fr.soleil.passerelle</groupId> -->
 <!-- 			<artifactId>passerelle-beans</artifactId> -->
 <!-- 		</dependency> -->
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>hmi.definition</artifactId>
-		</dependency>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.isencia.passerelle</groupId> -->
+<!-- 			<artifactId>hmi.definition</artifactId> -->
+<!-- 		</dependency> -->
+
+
+
 		<!-- diagnose dependencies -->
 <!-- 		<dependency> -->
 <!-- 			<groupId>com.isencia.passerelle</groupId> -->
