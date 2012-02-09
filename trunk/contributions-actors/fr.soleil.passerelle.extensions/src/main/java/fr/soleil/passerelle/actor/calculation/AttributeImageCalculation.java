@@ -94,8 +94,7 @@ public class AttributeImageCalculation extends TransformerV3 {
 			storedAttributeName = PasserelleUtil
 					.getParameterValue(storedAttributeNameParam);
 		} else if (arg0 == operationParam) {
-			final String value = PasserelleUtil
-					.getParameterValue(operationParam);
+			//final String value = PasserelleUtil.getParameterValue(operationParam);
 			// if (value.equals(Operation.ACCUMULATE.toString())) {
 			operation = Operation.ACCUMULATE;
 			// }
@@ -205,7 +204,7 @@ public class AttributeImageCalculation extends TransformerV3 {
 				int dimy = attrHelp.getDimY();
 				//System.out.println("DimX = " + dimx + ", dimy = " + dimy + ", accumul.length" + accumul.length);
 
-				storedTangoAttribute.writeImage(dimx, dimy, ArrayUtils.toObject(accumul));
+				storedTangoAttribute.writeImage(dimx, dimy, (Object []) ArrayUtils.toObject(accumul));
 				ExecutionTracerService.trace(this, "write Attribute " + storedAttributeName);
 
 				//storedTangoAttribute.writeImage(dimx, dimy, accumul);
