@@ -77,7 +77,7 @@ public class GroupedAttributeWriter extends ATangoActor {
 		} else {
 		    attributeNameList = FilterHelper.getDevicesForPatternAsArray(attributeNames);
 		}
-		attr = new TangoGroupAttribute("test", attributeNameList);
+		attr = new TangoGroupAttribute(attributeNameList);
 	    } catch (final DevFailed e) {
 		throw new DevFailedInitializationException(e, this);
 	    }
