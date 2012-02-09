@@ -22,6 +22,7 @@ import fr.soleil.passerelle.tango.util.FilterHelper;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoGroupCommand;
 
 /**
@@ -134,8 +135,8 @@ public class GroupedCommand extends Transformer {
 							+ commandName + " with value " + argin + " on:");
 				} else if (group.isArginMixFormat()) {
 					// mix spectrum
-					throw new ProcessingException(
-							"command argin type not supported", null, null);
+					throw new ProcessingExceptionWithLog(this,
+							"command argin type not supported", this, null);
 				} else {
 					// void argin
 					ExecutionTracerService.trace(this, "executing "
