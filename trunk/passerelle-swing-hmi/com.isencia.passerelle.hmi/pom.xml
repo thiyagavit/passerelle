@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>com.isencia.passerelle</groupId>
-	<artifactId>hmi</artifactId>
+	<artifactId>passerelle-HMI</artifactId>
 	<name>passerelle HMI</name>
 	<version>7.0.0-SNAPSHOT</version>
 
@@ -77,7 +77,32 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>hmi.definition</artifactId>
+			<version>7.0.0</version>
 		</dependency>
+
+<!-- 		begin of Temporary description -->
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>commons</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>commons.ume</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>actor</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>engine</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+<!-- 		end of Temporary description -->
+
 
 		<!-- diagnose dependencies -->
 <!-- 		<dependency> -->
