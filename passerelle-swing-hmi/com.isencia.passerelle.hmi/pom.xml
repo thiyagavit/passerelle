@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>actor</artifactId>
-			<scope>runtime</scope>
+<!-- 			<scope>runtime</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
