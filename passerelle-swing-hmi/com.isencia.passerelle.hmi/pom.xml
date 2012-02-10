@@ -67,12 +67,12 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
-			<artifactId>actor</artifactId>
-<!-- 			<scope>runtime</scope> -->
+			<artifactId>soleil.actor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>passerelle-beans</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
