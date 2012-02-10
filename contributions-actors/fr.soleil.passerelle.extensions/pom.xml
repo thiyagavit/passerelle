@@ -210,18 +210,22 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>commons</artifactId>
+			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>commons.ume</artifactId>
+			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>actor</artifactId>
+			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>engine</artifactId>
+			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>diva</groupId>
