@@ -67,7 +67,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
-			<artifactId>soleil.actor</artifactId>
+			<artifactId>soleil-actor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
