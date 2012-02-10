@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/SalsaAPI-3.2.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/SalsaEntity-3.2.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/SalsaLocal-3.2.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/SalsaUtils-3.2.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/CometeAbstraction-1.1.4-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.BasicUtilities-0.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.SoleilUtilities.Display-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.SoleilUtilities.Pattern-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.SoleilUtilities.Swing-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.SoleilUtilities.TangoCore-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.tango.TangORB-7.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.tango.TangORB-javacommon-7.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.tango.JTangoClientLang-0.0.17-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.tango.JTangoCommons-0.0.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.esrf.atk.ATKCore-4.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.esrf.atk.ATKWidget-4.0.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.gui.salsa.SalsaAPI-3.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.gui.salsa.SalsaEntity-3.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.gui.salsa.SalsaLocal-3.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.gui.salsa.SalsaUtils-3.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fr.soleil.lib.comete.CometeAbstraction-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.15.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Swing-2.0.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/BasicUtilities-0.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jacorb-2.3.1jboss.patch01-brew.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/TangoCore-2.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Display-2.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ATKCore-4.0.12.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ATKWidget-4.0.14.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/JTangoClientLang-0.0.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/JTangoCommons-0.0.7.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/Pattern-2.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/salsa-2.7.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/SoleilUtilities-2.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/TangORB-7.3.11.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/TangORB-javacommon-7.3.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/TangORB-javadao-7.3.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/transmorph-3.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar"/>
