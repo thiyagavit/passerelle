@@ -1,11 +1,11 @@
 package fr.soleil.passerelle.util;
 
-import ptolemy.actor.CompositeActor;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.message.ManagedMessage;
