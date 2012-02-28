@@ -29,7 +29,8 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class DoWhileLoop extends Transformer {
 
-	private final static Logger logger = LoggerFactory.getLogger(DoWhileLoop.class);
+	private final static Logger logger = LoggerFactory
+			.getLogger(DoWhileLoop.class);
 
 	public Parameter comparisonParam;
 
@@ -130,7 +131,7 @@ public class DoWhileLoop extends Transformer {
 				}
 
 				public void noMoreTokens() {
-					// requestFinish();
+					requestFinish();
 				}
 			});
 			if (leftHandler != null) {
@@ -158,49 +159,52 @@ public class DoWhileLoop extends Transformer {
 				} catch (final InterruptedException e) {
 				}
 			}
-			valueReceived = false;
-			if (isFinishRequested()) {
-				logger.debug("break");
-				break;
-			}
-
-			double rightValueD = 0;
-			double leftValueD = 0;
-			final ComparisonType compType = ComparatorHelper.getComparisonType(
-					leftValueS, rightValue);
-			// 0=string, 1= boolean, 2= double
-			switch (compType) {
-			case DOUBLE:
-				leftValueD = Double.parseDouble(leftValueS);
-				rightValueD = Double.parseDouble(rightValue);
-				break;
-			case BOOLEAN:
-				if (Boolean.parseBoolean(leftValueS)) {
-					leftValueD = 1;
-				} else {
-					leftValueD = 0;
+			if (valueReceived) {
+				valueReceived = false;
+				if (isFinishRequested()) {
+					logger.debug("break");
+					break;
 				}
-				if (Boolean.parseBoolean(rightValue)) {
-					rightValueD = 1;
-				} else {
-					rightValueD = 0;
-				}
-				break;
-			}
 
-			if (compType == ComparisonType.STRING) {
-				continu = ComparatorHelper.compareString(leftValueS,
-						rightValue, comparison);
-				ExecutionTracerService.trace(this, "comparison " + leftValueS
-						+ " " + comparisonName + " " + rightValue + " is "
-						+ continu);
+				double rightValueD = 0;
+				double leftValueD = 0;
+				final ComparisonType compType = ComparatorHelper
+						.getComparisonType(leftValueS, rightValue);
+				// 0=string, 1= boolean, 2= double
+				switch (compType) {
+				case DOUBLE:
+					leftValueD = Double.parseDouble(leftValueS);
+					rightValueD = Double.parseDouble(rightValue);
+					break;
+				case BOOLEAN:
+					if (Boolean.parseBoolean(leftValueS)) {
+						leftValueD = 1;
+					} else {
+						leftValueD = 0;
+					}
+					if (Boolean.parseBoolean(rightValue)) {
+						rightValueD = 1;
+					} else {
+						rightValueD = 0;
+					}
+					break;
+				}
+
+				if (compType == ComparisonType.STRING) {
+					continu = ComparatorHelper.compareString(leftValueS,
+							rightValue, comparison);
+					ExecutionTracerService.trace(this, "comparison "
+							+ leftValueS + " " + comparisonName + " "
+							+ rightValue + " is " + continu);
+				} else {
+					continu = ComparatorHelper.compareDouble(leftValueD,
+							rightValueD, comparison);
+					ExecutionTracerService.trace(this, "comparison "
+							+ leftValueD + " " + comparisonName + rightValueD
+							+ " is " + continu);
+				}
 			} else {
-				continu = ComparatorHelper.compareDouble(leftValueD,
-						rightValueD, comparison);
-				ExecutionTracerService
-						.trace(this, "comparison " + leftValueD + " "
-								+ comparisonName + rightValueD + " is "
-								+ continu);
+				continu = false;
 			}
 			if (continu) {
 				sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
@@ -210,8 +214,8 @@ public class DoWhileLoop extends Transformer {
 			ExecutionTracerService.trace(this, "Finish requested");
 		} else {
 			ExecutionTracerService.trace(this, "End while");
+			sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
 		}
-		sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
 	}
 
 	@Override

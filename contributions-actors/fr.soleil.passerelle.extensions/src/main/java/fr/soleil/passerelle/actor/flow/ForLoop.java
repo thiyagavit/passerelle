@@ -349,19 +349,19 @@ public class ForLoop extends Actor {
 					throw new ProcessingException("Error on loop", null, e);
 				}
 			} // while
-			if (isFinishRequested()) {
-				ExecutionTracerService.trace(this, "Finish requested");
-				sendOutputMsg(endLoopPort, PasserelleUtil
-						.createTriggerMessage());
-			} else if (currentStep >= stepNumber) {
+
+			if (currentStep >= stepNumber) {
 				// output end loop signal
 				// if(currentValue == endValue)
 				currentValue = startValue;
 				ExecutionTracerService.trace(this, "All loops done");
 				sendOutputMsg(endLoopPort, PasserelleUtil
 						.createTriggerMessage());
-
 			}
+			else if (isFinishRequested()) {
+				ExecutionTracerService.trace(this, "Loop has been interrupted at step number " + currentStep);
+			} 
+			
 			if (currentStep == stepNumber) {
 				currentStep = 0;
 			}
