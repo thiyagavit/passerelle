@@ -26,11 +26,11 @@ import com.isencia.passerelle.actor.v3.Actor;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.domain.BasicDirector;
@@ -48,24 +48,25 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * <li>goto position (define the next brace Key/Value to restore)</li>
  * </ul>
  * 
- * Each actions is triggered by an activation of inputPort. Moreover for each actions you have to
+ * Each actions is triggered by an activation of inputPort. Moreover for each actions, you have to
  * fill in the list name parameter which indicate on which list you work.
  * 
  * <p>
  * <b>Store Action:</b> store a brace Key/Value in the list .If the list does not exist, it is
  * automatically created. The actor get a String from his inputPort. This String is cut in two part(
- * Key and Value) thanks to a separator defined thought the separator Parameter.</br> If the
- * separator appear many times then only the first is used to cut the String, others are integrated
- * in value.</br> eg: separator = ":", stringToCut =
- * "just:a:test) => key= "just", value= "a:test").</br></br>
+ * Key and Value) thanks to a separator defined thought the separator Parameter (@see
+ * KeyValueListMemorizer.DEFAULT_SEPARATOR).</br> If the separator appear many times then only the
+ * first is used to cut the String, others are integrated in value.</br>
+ * 
+ * eg: separator = ":", stringToCut ="just:a:test) => key= "just", value= "a:test").</br></br>
  * 
  * The key and value are trimed.
  * </p>
  * 
  * <p>
- * <b>Restore Action:</b> send the next brace Key/Value of the list on key and value ports.List does
- * not exist then a ProcessingException is raised and sequence is stopped. if there nor more in list
- * and fixedNumberOfValueParam is:
+ * <b>Restore Action:</b> send the next brace Key/Value of the list on key and value ports. If the
+ * list does not exist then a ProcessingException is raised and sequence is stopped. If there no
+ * more element in list and fixedNumberOfValueParam is:
  * <ul>
  * <li>True: a ProcessingException is raised and sequence is stopped.</li>
  * <li>False: a empty brace Key/Value is send on Key/Value Port</li>
@@ -74,14 +75,18 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * 
  * <p>
  * <b>Clear Action:</b> clear the list. If the list does not exist then a ProcessingException is
- * raised and sequence is stopped. Send an empty message on outputPort at the end of action.
+ * raised and sequence is stopped.
  * </p>
  * 
  * <p>
- * <b>Goto position Action:</b> define the next brace Key/Value to restore. The fist element of the
- * list is at position 1 and the last at number_of_element_in_list. A position less than 1 can not
- * be entered. If the position is superior to the number of element a ProcessingException is raised
- * and sequence is stopped. Send an empty message on outputPort at the end of action.
+ * <b>Position value Action:</b> define the next brace Key/Value to restore. The fist element of the
+ * list is at position 0 and the last at (number_of_element_in_list - 1). A position less than 0 can
+ * not be entered. If the position is superior to (the number of element - 1) a ProcessingException
+ * is raised and sequence is stopped.
+ * </p>
+ * 
+ * <p>
+ * <b>An empty message is sent on outputPort at the end of all actions.</b>
  * </p>
  * 
  * @author GRAMER
@@ -96,11 +101,11 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
     public static final String SEPARATOR_LABEL = "Separator";
     public static final String OPERATION_LABEL = "Operation";
     public static final String FIXED_NUMBER_OF_VALUE_LABEL = "Limited to last list value";
-    public static final String GOTO_POSITION_LABEL = "Position value";
+    public static final String POSITION_VALUE_LABEL = "Position value";
     public static final String FILTERED_KEYS_LABEL = "Filtered keys";
     public static final String FILTERED_KEYS_SEPARATOR = ";";
     private static final String DEFAULT_SEPARATOR = ":";
-    
+
     private static Map<String, StringPairList> memorizedKeyValues = new HashMap<String, StringPairList>();
 
     public Port inputPort;
@@ -148,9 +153,9 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
      * define the next brace key/value to restore. fist element is 0 and last is
      * number_of_element_in_list -1
      */
-    @ParameterName(name = GOTO_POSITION_LABEL)
-    public Parameter gotoPositionParam;
-    private int gotoPosition = 0;
+    @ParameterName(name = POSITION_VALUE_LABEL)
+    public Parameter positionValueParam;
+    private int positionValue = 0;
 
     /**
      * filter the outputs according to a list of key. Key must be separated by a semicolon .
@@ -184,8 +189,8 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                 new BooleanToken(fixedNumberOfValue));
         fixedNumberOfValueParam.setTypeEquals(BaseType.BOOLEAN);
 
-        gotoPositionParam = new Parameter(this, GOTO_POSITION_LABEL, new IntToken(gotoPosition));
-        gotoPositionParam.setTypeEquals(BaseType.INT);
+        positionValueParam = new Parameter(this, POSITION_VALUE_LABEL, new IntToken(positionValue));
+        positionValueParam.setTypeEquals(BaseType.INT);
 
         FilteredKeysParam = new StringParameter(this, FILTERED_KEYS_LABEL);
         FilteredKeysParam.setExpression("");
@@ -247,13 +252,13 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                 }
             }
         }
-        else if (attribute == gotoPositionParam) {
-            final int tmpValue = ((IntToken) gotoPositionParam.getToken()).intValue();
+        else if (attribute == positionValueParam) {
+            final int tmpValue = ((IntToken) positionValueParam.getToken()).intValue();
 
             if (tmpValue < 0) {
-                throw new IllegalActionException(GOTO_POSITION_LABEL + " can not be negative");
+                throw new IllegalActionException(POSITION_VALUE_LABEL + " can not be negative");
             }
-            gotoPosition = tmpValue;
+            positionValue = tmpValue;
         }
         else if (attribute == fixedNumberOfValueParam) {
             fixedNumberOfValue = ((BooleanToken) fixedNumberOfValueParam.getToken()).booleanValue();
@@ -289,12 +294,14 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
 
             case GOTO:
                 synchronized (memorizedKeyValues) {
-                    LOGGER.debug("set goto position to {} for  list \"{}\"", gotoPosition, listName);
+                    LOGGER.debug("set goto position to {} for  list \"{}\"", positionValue,
+                            listName);
 
                     if (memorizedKeyValues.containsKey(listName)) {
                         try {
-                        	ExecutionTracerService.trace(this, "Goto " + gotoPosition + " for the list " + listName );
-                            memorizedKeyValues.get(listName).setCursor(gotoPosition);
+                            ExecutionTracerService.trace(this, "Goto " + positionValue
+                                    + " for the list " + listName);
+                            memorizedKeyValues.get(listName).setCursor(positionValue);
                             response.addOutputMessage(2, outputValuePort, createMessage());
                         }
                         catch (final IndexOutOfBoundsException e) {
@@ -512,7 +519,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
          */
         public void setCursor(final int cursor) {
             if (cursor < 0 || cursor >= size()) {
-                throw new IndexOutOfBoundsException("invalid goto position: " + cursor
+                throw new IndexOutOfBoundsException("invalid position value: " + cursor
                         + ". The list have " + size() + " element(s)");
             }
             this.cursor = cursor;
@@ -666,7 +673,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
             if (value != null) {
                 return value;
             }
-            throw new IllegalArgumentException("Description incconu : " + desc);
+            throw new IllegalArgumentException("Unknown operation description: " + desc);
         }
     }
 }
