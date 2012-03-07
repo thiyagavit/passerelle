@@ -99,18 +99,18 @@ public class DefineAllPositionsFromSnap extends Transformer {
 	} else {
 	    try {
 		final String snapID = (String) PasserelleUtil.getInputValue(arg0);
-		final List<String> result = getSnap.executeExtractList(String.class, snapID);
-		for (int i = 0; i < result.size(); i = i + 3) {
-		    final String attributeName = result.get(i);
+		final String[] result = getSnap.execute(String[].class, snapID);
+		for (int i = 0; i < result.length; i = i + 3) {
+		    final String attributeName = result[i];
 
 		    String equipmentDeviceName = null;
 		    Double snapValue = null;
 		    if (attributeName.endsWith("offset") || attributeName.endsWith("position")) {
 			String snapValueAttr = "";
 			if (getReadPart) {
-			    snapValueAttr = result.get(i + 1);
+			    snapValueAttr = result[i + 1];
 			} else {
-			    snapValueAttr = result.get(i + 2);
+			    snapValueAttr = result[i + 2];
 			}
 			final TangoAttribute attr = new TangoAttribute(snapExtractorName + "/"
 				+ snapValueAttr);
@@ -161,7 +161,7 @@ public class DefineAllPositionsFromSnap extends Transformer {
 			}
 		    }
 
-		    removeDynAttrs.execute(result.get(i + 1), result.get(i + 2));
+		    removeDynAttrs.execute(result[i + 1], result[i + 2]);
 		}
 	    } catch (final DevFailed e) {
 		throw new DevFailedProcessingException(e, this);
