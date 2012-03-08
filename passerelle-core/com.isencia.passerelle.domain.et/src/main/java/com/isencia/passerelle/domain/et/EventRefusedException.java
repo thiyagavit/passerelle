@@ -21,6 +21,7 @@ import com.isencia.passerelle.core.PasserelleException;
  * @author delerw
  *
  */
+@SuppressWarnings("serial")
 public class EventRefusedException extends PasserelleException {
   
   private Event refusedEvent;

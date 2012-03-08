@@ -850,6 +850,20 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 			getErrorControlStrategy().handleTerminationException(this, e);
 		}
 
+		// This may seem duplicate work, but it's not.
+		// In process-like domains, models shut down nicely in an automatic way
+		// when the input ports notice that there all their "src" ports are exhausted.
+		// I.e. for those domains. ports typically are already "finished" before the actor starts wrapping up.
+		// So there, this next piece of code is not needed.
+		// For event-like domains the wrap-up flow is different however.
+		// There, the Director decides when to shut down the model,
+		// which is more similar to a forced stop by a user.
+		Iterator inputPorts = inputPortList().iterator();
+		while (inputPorts.hasNext()) {
+      Port inputPort = (Port) inputPorts.next();
+      inputPort.requestFinish();
+    }
+		
 		try {
 			hasFinishedPort.broadcast(new PasserelleToken(MessageFactory.getInstance().createTriggerMessage()));
 		} catch (Exception e) {
@@ -857,10 +871,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		}
 
 		// Inform connected receivers that this actor has stopped
-		Iterator ports = outputPortList().iterator();
+		Iterator outputPorts = outputPortList().iterator();
 
-		while (ports.hasNext()) {
-			Port port = (Port) ports.next();
+		while (outputPorts.hasNext()) {
+			Port port = (Port) outputPorts.next();
 			Receiver[][] farReceivers = port.getRemoteReceivers();
 
 			for (int i = 0; i < farReceivers.length; i++) {
