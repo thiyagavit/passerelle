@@ -15,8 +15,6 @@
 
 package com.isencia.passerelle.domain.et;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +38,7 @@ import com.isencia.passerelle.domain.et.impl.SimpleEventDispatcher;
  * @author delerw
  *
  */
+@SuppressWarnings("serial")
 public class ETDirector extends Director implements EventDispatchReporter {
   private final static Logger LOGGER = LoggerFactory.getLogger(ETDirector.class);
   
@@ -133,24 +132,6 @@ public class ETDirector extends Director implements EventDispatchReporter {
     return new ETReceiver(this);
   }
   
-  public void reportEvents() {
-    DateFormat dateFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss,SSS");
-    List<Event> evtList = dispatchReporter.getEventHistory();
-    if(!evtList.isEmpty()) {
-      System.out.println("Event History");
-      for (Event event : evtList) {
-        System.out.println(((AbstractEvent)event).toString(dateFmt));
-      }
-    }
-    evtList = dispatchReporter.getUnhandledEvents();
-    if(!evtList.isEmpty()) {
-      System.out.println("Unhandled Events");
-      for (Event event : evtList) {
-        System.out.println(((AbstractEvent)event).toString(dateFmt));
-      }
-    }
-  }
-
   public void enqueueEvent(Event event) throws EventRefusedException {
     if(dispatcher!=null)
       dispatcher.accept(event);

@@ -16,7 +16,6 @@
 package com.isencia.passerelle.domain.et;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import ptolemy.data.Token;
 import com.isencia.passerelle.core.Port;
@@ -34,8 +33,6 @@ import com.isencia.passerelle.core.Port;
  */
 public class SendEvent extends AbstractEvent {
 
-  private static final long serialVersionUID = 2244804696667897740L;
-  
   private Port sendingPort;
   private Port receivingPort;
   private Token token;

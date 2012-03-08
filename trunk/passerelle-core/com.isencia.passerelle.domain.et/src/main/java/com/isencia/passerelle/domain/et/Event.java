@@ -16,6 +16,7 @@
 package com.isencia.passerelle.domain.et;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -29,5 +30,12 @@ public interface Event extends Serializable {
    * @return
    */
   Date getTimestamp();
-
+  
+  /**
+   * 
+   * @param dateFormat
+   * @return a toString representation of the event, 
+   * where dates are formatted with the given dateFormat.
+   */
+  String toString(DateFormat dateFormat);
 }

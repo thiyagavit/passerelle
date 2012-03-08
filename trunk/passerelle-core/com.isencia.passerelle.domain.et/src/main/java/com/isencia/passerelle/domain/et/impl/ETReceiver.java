@@ -21,19 +21,29 @@ import ptolemy.actor.IOPort;
 import ptolemy.actor.NoTokenException;
 import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
+import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.EventRefusedException;
 import com.isencia.passerelle.domain.et.SendEvent;
+import com.isencia.passerelle.message.ManagedMessage;
+import com.isencia.passerelle.message.MessageBuffer;
+import com.isencia.passerelle.message.MessageHelper;
+import com.isencia.passerelle.message.MessageInputContext;
+import com.isencia.passerelle.message.MessageProvider;
 
 /**
  * @author delerw
  */
-public class ETReceiver extends AbstractReceiver {
+public class ETReceiver extends AbstractReceiver implements MessageProvider {
 
   private LinkedList<Token> tokens = new LinkedList<Token>();
   
   private ETDirector director;
+
+  // When this receiver is linked to a collecting MessageBuffer, 
+  // all tokens that are put() here are directly forwarded to the buffer.
+  private MessageBuffer buffer;
 
   public ETReceiver(ETDirector director) {
     this.director = director;
@@ -61,7 +71,9 @@ public class ETReceiver extends AbstractReceiver {
    */
   @Override
   public Token get() throws NoTokenException {
-    if (tokens.isEmpty()) {
+    if (buffer != null) {
+      throw new UnsupportedOperationException("get() not supported for shared buffer");
+    } else if (tokens.isEmpty()) {
       throw new NoTokenException(getContainer(), "No more tokens in the ET receiver.");
     }
     return (Token) tokens.removeFirst();
@@ -91,16 +103,44 @@ public class ETReceiver extends AbstractReceiver {
   public void put(Token token) throws IllegalActionException{
     if(token==null) {
       return;
+    } else if (buffer != null) {
+      try {
+        if (getContainer() instanceof Port) {
+          Port _p = (Port) getContainer();
+          try {
+            token = _p.convertTokenForMe(token);
+          } catch (Exception e) {
+            throw new RuntimeException("Failed to convert token " + token, e);
+          }
+        }
+        ManagedMessage msg = MessageHelper.getMessageFromToken(token);
+        MessageInputContext ctxt = new MessageInputContext(0, getContainer().getName(), msg);
+        buffer.offer(ctxt);
+      } catch (PasserelleException e) {
+        throw new RuntimeException("Failed to interpret token " + token, e);
+      }
     } else {
       tokens.add(token);
-      // Is it possible to determine the sending port here?
-      // I don't think so...
-      // Alternatively we could generate this event in the sending Port??
-      try {
-        director.enqueueEvent(new SendEvent(token, null, (Port) getContainer()));
-      } catch (EventRefusedException e) {
-        throw new IllegalActionException(null, e, null);
-      }
     }
+    // Is it possible to determine the sending port here?
+    // I don't think so...
+    // Alternatively we could generate this event in the sending Port??
+    try {
+      director.enqueueEvent(new SendEvent(token, null, (Port) getContainer()));
+    } catch (EventRefusedException e) {
+      throw new IllegalActionException(null, e, null);
+    }
+  }
+
+  public synchronized void requestFinish() {
+    if (buffer != null) buffer.unregisterMessageProvider(this);
+  }
+
+  /**
+   * @param queue
+   */
+  public void setMessageBuffer(MessageBuffer buffer) {
+    this.buffer = buffer;
+    if (buffer != null) buffer.registerMessageProvider(this);
   }
 }

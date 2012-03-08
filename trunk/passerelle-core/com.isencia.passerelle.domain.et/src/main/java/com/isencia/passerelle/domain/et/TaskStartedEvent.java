@@ -46,7 +46,6 @@ public class TaskStartedEvent<T> extends AbstractEvent {
     return task;
   }
 
-  @Override
   public String toString(DateFormat dateFormat) {
     return "TaskStartedEvent [timeStamp=" + dateFormat.format(getTimestamp()) 
         + ", taskOwner=" + taskOwner.getFullName() 

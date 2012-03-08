@@ -14,7 +14,6 @@
 */
 package com.isencia.passerelle.domain.et;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,6 +33,4 @@ abstract class AbstractEvent implements Event {
   public String toString() {
     return toString(new SimpleDateFormat());
   }
-
-  public abstract String toString(DateFormat dateFormat);
 }
