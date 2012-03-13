@@ -47,7 +47,6 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListenerAdapter;
-import com.isencia.passerelle.domain.ProcessDirector;
 import com.isencia.passerelle.domain.cap.BlockingQueueReceiver;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
@@ -324,6 +323,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		actorMsgHeaders.put(ManagedMessage.SystemHeader.HEADER_SOURCE_REF, getFullName());
 
 		statistics = new ActorStatistics(this);
+	}
+	
+  /**
+   * 
+   * @return the execution statistics of this actor
+   */
+	public ActorStatistics getStatistics() {
+	  return statistics;
 	}
 
 	/**
