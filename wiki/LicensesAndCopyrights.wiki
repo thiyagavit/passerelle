@@ -1,5 +1,4 @@
 #summary Copyrights and licenses of included 3rd party packages.
-#labels Featured
 
 = Introduction =
 
