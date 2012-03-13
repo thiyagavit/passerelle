@@ -63,7 +63,11 @@ public class TextSource extends Actor {
         ManagedMessage outputMsg = createMessage();
         outputMsg.setBodyContentPlainText(tokenMessage);
         response.addOutputMessage(output, outputMsg);
-      } else {
+      }
+      // By already checking here if we've reached the end of the msg contents list,
+      // we can prevent a next actor cycle that would not generate any more outputs anyway
+      // in the conditional block above.
+      if(count>=messageContents.length) {
         requestFinish();
       }
     } catch (Exception e) {
