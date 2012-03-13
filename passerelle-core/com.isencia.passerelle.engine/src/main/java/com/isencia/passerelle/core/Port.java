@@ -38,6 +38,7 @@ import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageProvider;
 import com.isencia.passerelle.message.type.TypeConversionChain;
 import com.isencia.passerelle.statistics.PortStatistics;
+import com.isencia.passerelle.statistics.StatisticsServiceFactory;
 
 /**
  * A customization of the std Ptolemy Ports, that includes automatic conversions between Passerelle messages and plain Ptolemy tokens (to integrate with plain
@@ -132,6 +133,14 @@ public class Port extends TypedIOPort {
     setMultiport(true);
     statistics = new PortStatistics(this);
     setContainer(container);
+  }
+  
+  /**
+   * 
+   * @return the execution statistics of this port
+   */
+  public PortStatistics getStatistics() {
+    return statistics;
   }
 
   @Override
@@ -755,10 +764,10 @@ public class Port extends TypedIOPort {
         setMessageBuffer(null);
       }
     }
-    // first need to find a way to register the port statistics
-    // as children of the actor statistics
-    // statistics.reset();
-    // StatisticsServiceFactory.getService().registerStatistics(statistics);
+//     first need to find a way to register the port statistics
+//     as children of the actor statistics
+     statistics.reset();
+     StatisticsServiceFactory.getService().registerStatistics(statistics);
   }
 
   public synchronized void notifySourcePortFinished(Port port) {
