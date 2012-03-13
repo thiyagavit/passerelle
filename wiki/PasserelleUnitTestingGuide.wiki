@@ -6,8 +6,7 @@ Testing Passerelle models and/or actors can be done manually, by designing and r
 
 This guide introduces some test features of Passerelle, to support the construction of unit tests that can become part of automated test suites.
 
-*Remark that the described test support is available on the current development trunk, 
-but not yet included with the v7.0.0 release.*
+*Remark that the described test support is available on the current development trunk, but not yet included with the v7.0.0 release.*
 
 = Main goals =
 
@@ -22,8 +21,7 @@ With these things in place, a wide variety of test scenarios can be implemented.
 = Overview of a test case =
 
 The Passerelle test support builds on [http://junit.org/ JUnit]. 
-Any kind of JUnit-based test approach could be followed, but in this introduction 
-we assume a plain usage of JUnit 3 `junit.framework.TestCase` implementations.
+Any kind of JUnit-based test approach could be followed, but in this introduction we assume a plain usage of JUnit 3 `junit.framework.TestCase` implementations.
 
 Using plain actor constructors combined with the API provided by `com.isencia.passerelle.model.Flow` and `com.isencia.passerelle.model.FlowManager`, it is possible to define
 and execute a Passerelle model in code :
@@ -60,8 +58,7 @@ public class PasserelleExamplesTest extends TestCase {
 //...
 }}}
 
-The only things it takes, is optionally preparing reusable instances of a `Flow` and a `FlowManager`.
-Then we're set to implement the actual test methods...
+The only things it takes, is optionally preparing reusable instances of a `Flow` and a `FlowManager`. Then we're set to implement the actual test methods...
  
 == Hello Passerelle ==
 
@@ -94,11 +91,9 @@ This flow can also be created programmatically, as follows :
 }}}
 
 The `Flow` class provides utility methods to connect actors. 
-When the actors have default-named input and output ports, it is sufficient to just pass
-the actors themselves, in the right order.
+When the actors have default-named input and output ports, it is sufficient to just pass the actors themselves, in the right order.
 
-Actor parameters can be configured by passing in a `Map` of parameter names and values.
-(This is somewhat similar as overriding a model's actor parameter values when launching a model using
+Actor parameters can be configured by passing in a `Map` of parameter names and values. (This is somewhat similar as overriding a model's actor parameter values when launching a model using
 Passerelle's `CommandLineExecutor`.)
 
 {{{
@@ -135,27 +130,21 @@ Once the model execution is done, we may be interested in checking some executio
 
 `com.isencia.passerelle.testsupport.FlowStatisticsAssertion` offers a somewhat fluent API to define test expectations and assert them.
 Test expectations can be set related to :
-* number of messages sent by an output port. 
-* number of messages received by an input port.
-* number of iterations done by an actor
+  * number of messages sent by an output port. 
+  * number of messages received by an input port.
+  * number of iterations done by an actor
 
-If the actor has a default-named output or input port, we can directly pass
-the actor instance in the respective `expectMsg...()` methods, 
+If the actor has a default-named output or input port, we can directly pass the actor instance in the respective `expectMsg...()` methods, 
 similarly to the `Flow.connect()` approach.
 
-The above code simply expresses that we hope that the `constant` actor generates exactly one message, through its
-output port named "output". And also that a message arrives at the `tracerConsole` via its input port
-named "input". Sometime during the model execution, we also wish that the `helloHello` actor performed
-exactly 1 processing iteration. 
+The above code simply expresses that we hope that the `constant` actor generates exactly one message, through its output port named "output". And also that a message arrives at the `tracerConsole` via its input port named "input". Sometime during the model execution, we also wish that the `helloHello` actor performed exactly 1 processing iteration. 
 
-Remark that we don't check actual message contents, or actor processing results. 
-Such "advanced" test conditions will be added in a later stage.
+Remark that we don't check actual message contents, or actor processing results. Such "advanced" test conditions will be added in a later stage.
 
 == Using a !HeaderFilter ==
 
 `PasserelleExamplesTest.testAddRemoveMessageHeaderWithMatch()` 
-and `PasserelleExamplesTest.testAddRemoveMessageHeaderWithNoMatch()`
-use the example with the `HeaderFilter` and `AddRemoveMessageHeader` example actors 
+and `testAddRemoveMessageHeaderWithNoMatch()` use the example with the `HeaderFilter` and `AddRemoveMessageHeader` example actors 
 from the [PasserelleActorDevelopmentGuide#Filter_actors actor development guide].
 
 http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/HdrFilterConfigPanel.jpg
@@ -196,9 +185,7 @@ This can be done e.g. by the following parameter configuration for the model exe
 //...
 }}}
 
-We want to ensure that the `headerFilter` has identified a "match", so has sent the outgoing message via its
-`outputMatch` output port. So the message must have arrived at the `tracerConsole`, and not at the `errorConsole`.
-Together with some other straightforward expectations, this can be done as follows :
+We want to ensure that the `headerFilter` has identified a "match", so has sent the outgoing message via its `outputMatch` output port. So the message must have arrived at the `tracerConsole`, and not at the `errorConsole`. Together with some other straightforward expectations, this can be done as follows :
 
 {{{
 //...
