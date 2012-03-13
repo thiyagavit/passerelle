@@ -1,0 +1,13 @@
+#summary Introducing the usage of Passerelle's test support tools, for unit-testing actors and simple flows.
+
+= Introduction =
+
+Testing Passerelle models and/or actors can be done manually, by designing and running some test models from one of the available model editors and runtimes. But this is not a scalable approach, nor can it be integrated in automated builds, continuous integration setups etc.
+
+This guide introduces some test features of Passerelle, to support the construction of unit tests that can become part of automated test suites.
+
+= Main goals =
+
+
+
+= Some examples =
