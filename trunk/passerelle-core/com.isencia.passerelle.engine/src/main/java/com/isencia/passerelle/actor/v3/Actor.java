@@ -318,7 +318,12 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor {
 			ProcessResponse response = new ProcessResponse(req);
 			if (logger.isTraceEnabled())
 				logger.trace("doFire() - processing request " + req);
-			process(ctxt, req, response);
+			try {
+  			notifyStartingFireProcessing();
+  			process(ctxt, req, response);
+			} finally {
+			  notifyFinishedFireProcessing();
+			}
 			if (logger.isTraceEnabled())
 				logger.trace("doFire() - obtained response " + response);
 

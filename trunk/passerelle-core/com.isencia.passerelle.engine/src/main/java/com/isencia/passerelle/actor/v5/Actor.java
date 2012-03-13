@@ -351,7 +351,12 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         }
       }
       currentProcessResponse = new ProcessResponse(currentProcessRequest);
-      process(ctxt, currentProcessRequest, currentProcessResponse);
+      try {
+        notifyStartingFireProcessing();
+        process(ctxt, currentProcessRequest, currentProcessResponse);
+      } finally {
+        notifyFinishedFireProcessing();
+      }
 
       getLogger().trace("{} - doFire() - obtained response {}", getFullName(), currentProcessResponse);
     }
