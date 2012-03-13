@@ -19,9 +19,9 @@ With these things in place, a wide variety of test scenarios can be implemented.
 = Overview of a test case =
 
 The Passerelle test support builds on [http://junit.org/ JUnit]. 
-Any kind of JUnit-based test approach could be followed, but we assume a plain usage of JUnit 3 'junit.framework.TestCase' implementations.
+Any kind of JUnit-based test approach could be followed, but we assume a plain usage of JUnit 3 `junit.framework.TestCase` implementations.
 
-Using plain actor constructors combined with the API provided by 'com.isencia.passerelle.model.Flow' and 'com.isencia.passerelle.model.FlowManager', it is possible to define
+Using plain actor constructors combined with the API provided by `com.isencia.passerelle.model.Flow` and `com.isencia.passerelle.model.FlowManager`, it is possible to define
 and execute a Passerelle model in code :
   # first a Flow instance must be created, and a Director must be assigned to it
   # then all required actors can be constructed in that Flow
@@ -30,8 +30,8 @@ and execute a Passerelle model in code :
   # the Flow API has several utility methods to connect actor ports
   # the !FlowManager has methods to execute models in blocking and non-blocking ways. 
     * For simple test control, the blocking approach is preferred.
-    * For advanced and/or high-volume testing, non-blocking testing may be advisable, exploiting an !ExecutionListener to be notified when a certain execution has finished.
-  # expected test results can be specified and asserted using 'com.isencia.passerelle.testsupport.FlowStatisticsAssertion'
+    * For advanced and/or high-volume testing, non-blocking testing may be advisable, exploiting an `ExecutionListener` to be notified when a certain execution has finished.
+  # expected test results can be specified and asserted using `com.isencia.passerelle.testsupport.FlowStatisticsAssertion`
 
 
 = Some examples =
