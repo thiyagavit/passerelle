@@ -1,4 +1,5 @@
 #summary Introducing the usage of Passerelle's test support tools, for unit-testing actors and simple flows.
+#labels Featured
 
 = Introduction =
 
