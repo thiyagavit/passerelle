@@ -109,6 +109,7 @@ public class ETReceiver extends AbstractReceiver implements MessageProvider {
           Port _p = (Port) getContainer();
           try {
             token = _p.convertTokenForMe(token);
+            _p.getStatistics().acceptReceivedMessage(null);
           } catch (Exception e) {
             throw new RuntimeException("Failed to convert token " + token, e);
           }
