@@ -151,7 +151,7 @@ exactly 1 processing iteration.
 Remark that we don't check actual message contents, or actor processing results. 
 Such "advanced" test conditions will be added in a later stage.
 
-== Using a HeaderFilter ==
+== Using a !HeaderFilter ==
 
 `PasserelleExamplesTest.testAddRemoveMessageHeaderWithMatch()` 
 and `PasserelleExamplesTest.testAddRemoveMessageHeaderWithNoMatch()`
