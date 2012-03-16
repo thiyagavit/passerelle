@@ -32,7 +32,7 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 
 /**
- * This abstract class provides the basis for "mixin" components
+ * This base class provides the basis for "mixin" components
  * that can be registered on actors to add support for dynamically creating
  * an arbitrary number of named output ports.
  * <p>
@@ -43,7 +43,7 @@ import com.isencia.passerelle.core.PortFactory;
  * @author delerw
  *
  */
-public abstract class OutputPortBuilder extends Attribute {
+public class OutputPortBuilder extends Attribute {
   private static Logger LOGGER = LoggerFactory.getLogger(OutputPortBuilder.class);
 
   /**
