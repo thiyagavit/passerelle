@@ -511,10 +511,12 @@ public class FlowManager {
 			dir.addErrorCollector(executionListener);
 			manager.addExecutionListener(executionListener);
 			manager.execute();
-		} catch (IllegalActionException e) {
-			throw new FlowAlreadyExecutingException("", flow, e);
-		} catch (Exception e) {
-			throw new PasserelleException("Error executing flow", flow, e);
+    } catch (Exception e) {
+      if(e.getCause() instanceof PasserelleException) {
+        throw ((PasserelleException)e.getCause());
+      } else {
+        throw new PasserelleException("Error executing flow", flow, e);
+      }
 		} finally {
 			executionFinished(flow);
 		}
@@ -570,10 +572,12 @@ public class FlowManager {
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
 			manager.execute();
-		} catch (IllegalActionException e) {
-			throw new FlowAlreadyExecutingException("", flow, e);
 		} catch (Exception e) {
-			throw new PasserelleException("Error executing flow", flow, e);
+      if(e.getCause() instanceof PasserelleException) {
+        throw ((PasserelleException)e.getCause());
+      } else {
+        throw new PasserelleException("Error executing flow", flow, e);
+      }
 		} finally {
 			executionFinished(flow);
 		}
@@ -619,7 +623,11 @@ public class FlowManager {
 			manager.addExecutionListener(listener);
 			manager.run();
 		} catch (Exception e) {
-			throw new PasserelleException("Error executing flow", flow, e);
+      if(e.getCause() instanceof PasserelleException) {
+        throw ((PasserelleException)e.getCause());
+      } else {
+        throw new PasserelleException("Error executing flow", flow, e);
+      }
 		} finally {
 			executionFinished(flow);
 		}
@@ -659,8 +667,12 @@ public class FlowManager {
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
 			manager.startRun();
-		} catch (IllegalActionException e) {
-			throw new FlowAlreadyExecutingException("", flow, e);
+    } catch (Exception e) {
+      if(e.getCause() instanceof PasserelleException) {
+        throw ((PasserelleException)e.getCause());
+      } else {
+        throw new PasserelleException("Error executing flow", flow, e);
+      }
 		}
 
 	}
@@ -685,8 +697,12 @@ public class FlowManager {
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
 			manager.startRun();
-		} catch (final IllegalActionException e) {
-			throw new FlowAlreadyExecutingException("", flow, e);
+    } catch (Exception e) {
+      if(e.getCause() instanceof PasserelleException) {
+        throw ((PasserelleException)e.getCause());
+      } else {
+        throw new PasserelleException("Error executing flow", flow, e);
+      }
 		}
 
 	}
