@@ -33,7 +33,7 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortMode;
 
 /**
- * This abstract class provides the basis for "mixin" components
+ * This base class provides the basis for "mixin" components
  * that can be registered on actors to add support for dynamically creating
  * an arbitrary number of named input ports.
  * <p>
