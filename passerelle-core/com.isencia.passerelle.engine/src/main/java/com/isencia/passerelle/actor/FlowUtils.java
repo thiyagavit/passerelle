@@ -4,7 +4,7 @@ import ptolemy.kernel.util.NamedObj;
 
 public class FlowUtils {
 
-	public static final String TRANSLATION_ID = "translationId";
+//	public static final String TRANSLATION_ID = "translationId";
 	
 	public static String generateTranslationKey(NamedObj actor, String key) {
 		if (actor == null){
@@ -44,6 +44,12 @@ public class FlowUtils {
 	public static String getFullNameWithoutFlow(NamedObj no) {
 		NamedObj container = no.toplevel();
 		return no.getFullName().substring(container.getName().length() + 1);
+	}
+	public static String getOriginalFullName(NamedObj no) {
+		String fullNameWithoutFlow = getFullNameWithoutFlow(no);
+		StringBuffer sb = new StringBuffer(extractFlowName(no));
+		sb.append(fullNameWithoutFlow);
+		return sb.toString();
 	}
 
 }
