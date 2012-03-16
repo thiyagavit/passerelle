@@ -369,6 +369,18 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     this.optionsFactory = optionsFactory;
   }
 
+  /**
+  * <p>
+  * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked
+  * during <code>Actor.initialize()</code> to <code>Actor.preinitialize()</code>!
+  * This to allow a completely reliable stop of a model execution, 
+  * i.c.o. a <code>ValidationException</code>,
+  * without running the risk that some other actor already did some work.
+  * In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all actors,
+  * i.a. when the actor threads have already started.
+  * <code>Actor.preinitialize()</code> is done sequentially for all actors, before their threads are started.
+  * </p>
+  * **/
 	@SuppressWarnings("unchecked")
   final public void preinitialize() throws IllegalActionException {
 		if (logger.isTraceEnabled()) {
@@ -388,6 +400,16 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 					((Port)port).initialize();
 				}
 			}
+
+		   if(mustValidateInitialization()) {
+		      try {
+		        validateInitialization();
+		        if (getAuditLogger().isDebugEnabled())
+		          getAuditLogger().debug(getInfo() + " - (PRE)INITIALIZATION VALIDATED");
+		      } catch (ValidationException e) {
+		        getErrorControlStrategy().handleInitializationValidationException(this, e);
+		      }
+		    }
 		} catch (InitializationException e) {
 			logger.error(getInfo() + " generated exception during doPreInitialize()", e);
 			throw new IllegalActionException(this, e.toString());
@@ -422,11 +444,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	protected void doPreInitialize() throws InitializationException {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ptolemy.actor.Executable#initialize()
-	 */
 	final public void initialize() throws IllegalActionException {
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " initialize() - entry");
@@ -478,16 +495,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 		if (getAuditLogger().isDebugEnabled())
 			getAuditLogger().debug(getInfo() + " - INITIALIZED");
 
-		if(mustValidateInitialization()) {
-			try {
-				validateInitialization();
-				if (getAuditLogger().isDebugEnabled())
-					getAuditLogger().debug(getInfo() + " - INITIALIZATION VALIDATED");
-			} catch (ValidationException e) {
-				getErrorControlStrategy().handleInitializationValidationException(this, e);
-			}
-		}
-		
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " initialize() - exit ");
 		}
@@ -526,11 +533,18 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 	/**
 	 * <p>
 	 * Method that should be overridden for actors that need to be 
-	 * able to validate their initial conditions, after the actor's doInitialize() is done
+	 * able to validate their initial conditions, after the actor's doPreInitialize() is done
 	 * and before their first iteration is executed when a model is launched.
 	 * </p>
 	 * <p>
-	 * E.g. it can typically be used to validate parameter settings.
+	 * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked
+	 * during <code>Actor.initialize()</code> to <code>Actor.preinitialize()</code>!
+	 * This to allow a completely reliable stop of a model execution, 
+	 * i.c.o. a <code>ValidationException</code>,
+	 * without running the risk that some other actor already did some work.
+	 * In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all actors,
+	 * i.a. when the actor threads have already started.
+	 * <code>Actor.preinitialize()</code> is done sequentially for all actors, before their threads are started.
 	 * </p>
 	 * @throws ValidationException
 	 */
