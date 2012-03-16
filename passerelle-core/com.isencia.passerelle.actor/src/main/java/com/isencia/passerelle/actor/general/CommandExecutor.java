@@ -15,7 +15,6 @@
 
 package com.isencia.passerelle.actor.general;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.StringToken;
@@ -36,6 +35,9 @@ import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
+import com.isencia.util.RuntimeStreamReader;
+import com.isencia.util.RuntimeStreamReader.RuntimeStreamListener;
+import com.isencia.util.commandline.EnvCommandline;
 
 /**
  * Executes a configurable shell command when receiving a trigger message.
@@ -43,8 +45,6 @@ import com.isencia.passerelle.message.MessageHelper;
  * @author erwin
  */
 public class CommandExecutor extends Actor {
-  // ~ Static variables/initializers
-  // __________________________________________________________________________________________________________________________
 
   private static Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
   public static final String COMMAND_HEADER = "Command";
@@ -52,22 +52,27 @@ public class CommandExecutor extends Actor {
   public static final String COMMAND_PARAMETER = "command";
   public static final String PARAMETERS_PARAMETER = "params";
 
-  // ~ Instance variables
-  // _____________________________________________________________________________________________________________________________________
-
   public Parameter commandParameter;
   public Parameter paramsParameter;
-  public Port trigger = null;
-  private PortHandler triggerHandler = null;
-  private String defaultSourcePath = null;
-  private boolean triggerConnected = false;
+  public Port trigger;
+  public Port cmdOut;
+  public Port cmdErr;
 
-  // ~ Constructors
-  // ___________________________________________________________________________________________________________________________________________
+  private RuntimeStreamListener cmdOutListener;
+  private RuntimeStreamListener cmdErrListener;
 
+  private PortHandler triggerHandler;
+  private String defaultSourcePath;
+  private boolean triggerConnected;
+
+  /**
+   * @param container
+   * @param name
+   * @throws IllegalActionException
+   * @throws NameDuplicationException
+   */
   public CommandExecutor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-
     commandParameter = new StringParameter(this, COMMAND_PARAMETER);
     commandParameter.setExpression("");
     registerConfigurableParameter(commandParameter);
@@ -76,6 +81,10 @@ public class CommandExecutor extends Actor {
     registerConfigurableParameter(paramsParameter);
 
     trigger = PortFactory.getInstance().createInputPort(this, TRIGGER_PORT, null);
+    cmdOut = PortFactory.getInstance().createOutputPort(this, "cmdOut");
+    cmdErr = PortFactory.getInstance().createOutputPort(this, "cmdErr");
+    cmdOutListener = new CommandOutputListener(cmdOut);
+    cmdErrListener = new CommandOutputListener(cmdErr);
 
     _attachText("_iconDescription", "<svg>\n"
         + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
@@ -93,7 +102,6 @@ public class CommandExecutor extends Actor {
         + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
         + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
         +
-
         // body
         "<line x1=\"-9\" y1=\"-16\" x2=\"-12\" y2=\"-8\" "
         + "style=\"stroke-width:2.0\"/>\n"
@@ -106,7 +114,6 @@ public class CommandExecutor extends Actor {
         + "<line x1=\"-16\" y1=\"-7\" x2=\"-16\" y2=\"-5\" "
         + "style=\"stroke-width:1.0\"/>\n"
         +
-
         // forward leg
         "<line x1=\"-11\" y1=\"-11\" x2=\"-8\" y2=\"-8\" "
         + "style=\"stroke-width:1.5\"/>\n"
@@ -115,7 +122,6 @@ public class CommandExecutor extends Actor {
         + "<line x1=\"-8\" y1=\"-5\" x2=\"-6\" y2=\"-5\" "
         + "style=\"stroke-width:1.0\"/>\n"
         +
-
         // forward arm
         "<line x1=\"-10\" y1=\"-14\" x2=\"-7\" y2=\"-11\" "
         + "style=\"stroke-width:1.0\"/>\n"
@@ -136,16 +142,8 @@ public class CommandExecutor extends Actor {
         + "<text x=\"-15\" y=\"5\" style=\"font-size:8\"> cmd </text>\n" + "</svg>\n");
   }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * ptolemy.kernel.util.NamedObj#attributeChanged(ptolemy.kernel.util.Attribute
-   * )
-   */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " :" + attribute);
-    }
+    logger.trace("{} - attributeChanged() - entry : {}", getInfo(), attribute);
 
     if ((attribute == commandParameter) || (attribute == paramsParameter)) {
       StringToken commandToken = (StringToken) commandParameter.getToken();
@@ -158,27 +156,19 @@ public class CommandExecutor extends Actor {
     } else {
       super.attributeChanged(attribute);
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    logger.trace("{} - attributeChanged() - exit", getInfo());
   }
 
   protected void doFire() throws ProcessingException {
+    logger.trace("{} - doFire() - entry", getInfo());
+
     ManagedMessage msg = null;
     String[] sourcePath = null;
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     if (triggerConnected) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(getInfo() + " - Waiting for trigger");
-      }
+      logger.debug("{} - Waiting for trigger", getInfo());
 
       Token token = triggerHandler.getToken();
-
       if (token == null) {
         requestFinish();
       } else {
@@ -187,12 +177,9 @@ public class CommandExecutor extends Actor {
         } catch (PasserelleException e) {
           throw new ProcessingException(getInfo() + " - doFire() generated an exception while reading message", token, e);
         }
-        if (logger.isDebugEnabled()) {
-          logger.debug("Received msg :" + msg);
-        }
+        logger.debug("{} - Received msg : {}", getInfo(), msg);
       }
     }
-
     if (!isFinishRequested()) {
       try {
         // Check for command in header
@@ -209,28 +196,45 @@ public class CommandExecutor extends Actor {
       }
 
       if ((sourcePath != null) && (sourcePath.length > 0)) {
-        for (int i = 0; i < sourcePath.length; i++) {
-          try {
-            if (getAuditLogger().isInfoEnabled()) {
-              getAuditLogger().info("Executing " + sourcePath[i]);
+        getAuditLogger().info("Executing {}", sourcePath[0]);
+
+        EnvCommandline commandline = new EnvCommandline(sourcePath[0]);
+        Object errorStreamLock = new Object();
+        Object outputStreamLock = new Object();
+
+        try {
+          Process process = commandline.execute();
+          synchronized (errorStreamLock) {
+            synchronized (outputStreamLock) {
+              // any output message ?
+              RuntimeStreamReader outputStream = 
+                  new RuntimeStreamReader(outputStreamLock, process.getInputStream(), RuntimeStreamReader.Type.output, cmdOutListener);
+              // any error message ?
+              RuntimeStreamReader errorStream = 
+                  new RuntimeStreamReader(errorStreamLock, process.getErrorStream(), RuntimeStreamReader.Type.error, cmdErrListener);
+              outputStream.start();
+              errorStream.start();
+              outputStreamLock.wait();
             }
-            Runtime.getRuntime().exec(sourcePath[i]);
-          } catch (IOException e) {
-            logger.error("Unable to execute command : " + sourcePath[i]);
+            errorStreamLock.wait();
           }
+          
+          int exitValue = process.exitValue();
+          if(exitValue!=0) {
+            // this indicates an error exit from the executed command
+            // then this actor generates an error msg with the exit value
+            throw new ProcessingException("Exit : " + exitValue + " for command : " + sourcePath[0], msg, null);
+          }
+        } catch (Exception e) {
+          throw new ProcessingException("Unable to execute command : " + sourcePath[0], msg, e);
         }
       }
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    logger.trace("{} - doFire() - exit", getInfo());
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
+    logger.trace("{} - doInitialize() - entry", getInfo());
 
     super.doInitialize();
 
@@ -242,15 +246,11 @@ public class CommandExecutor extends Actor {
       triggerHandler.start();
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    logger.trace("{} - doInitialize() - exit", getInfo());
   }
 
   protected boolean doPostFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
+    logger.trace("{} - doPostFire() - entry", getInfo());
 
     boolean res = triggerConnected;
 
@@ -258,9 +258,7 @@ public class CommandExecutor extends Actor {
       res = super.doPostFire();
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " :" + res);
-    }
+    logger.trace("{} - doPostFire() - exit - {}", getInfo(), res);
 
     return res;
   }
@@ -269,4 +267,28 @@ public class CommandExecutor extends Actor {
     return defaultSourcePath;
   }
 
+
+  /**
+   * Receives lines from the out or err stream
+   * from a running process.
+   */
+  private class CommandOutputListener implements RuntimeStreamListener {
+    private Port outputPort;
+    
+    public CommandOutputListener(Port outputPort) {
+      this.outputPort = outputPort;
+    }
+    public void acceptLine(String newLine) {
+      ManagedMessage message = createMessage();
+      try {
+        message.setBodyContentPlainText(newLine);
+        sendOutputMsg(outputPort, message);
+      } catch (MessageException e) {
+        // should never happen...
+        logger.error("Error setting msg content for "+newLine, e);
+      } catch (Exception e) {
+        logger.error("Error sending msg for "+newLine, e);
+      }
+    }
+  }
 }
