@@ -196,13 +196,15 @@ public class CommandExecutor extends Actor {
       }
 
       if ((sourcePath != null) && (sourcePath.length > 0)) {
-        getAuditLogger().info("Executing {}", sourcePath[0]);
-
-        EnvCommandline commandline = new EnvCommandline(sourcePath[0]);
-        Object errorStreamLock = new Object();
-        Object outputStreamLock = new Object();
-
         try {
+          EnvCommandline commandline = new EnvCommandline(sourcePath[0]);
+          commandline.setWorkingDirectory(System.getProperty("user.dir"));
+          
+          getAuditLogger().info("Executing {}", commandline.toString());
+
+          Object errorStreamLock = new Object();
+          Object outputStreamLock = new Object();
+
           Process process = commandline.execute();
           synchronized (errorStreamLock) {
             synchronized (outputStreamLock) {
@@ -219,12 +221,14 @@ public class CommandExecutor extends Actor {
             errorStreamLock.wait();
           }
           
-          int exitValue = process.exitValue();
+          int exitValue = process.waitFor();
           if(exitValue!=0) {
             // this indicates an error exit from the executed command
             // then this actor generates an error msg with the exit value
             throw new ProcessingException("Exit : " + exitValue + " for command : " + sourcePath[0], msg, null);
           }
+        } catch (ProcessingException e) {
+          throw e;
         } catch (Exception e) {
           throw new ProcessingException("Unable to execute command : " + sourcePath[0], msg, e);
         }
