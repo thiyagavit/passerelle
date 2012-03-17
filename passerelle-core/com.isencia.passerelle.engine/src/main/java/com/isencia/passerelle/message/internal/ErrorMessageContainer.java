@@ -45,20 +45,34 @@ public class ErrorMessageContainer extends MessageContainer {
 			logger.error("",ex);
 		}
 	}
-
+	
 	/**
-	 * @return
+	 * 
+	 * @return the exception contained in this message
 	 */
-	public Object getContext() {
-		try {
-			return ((PasserelleException)getBodyContent()).getContext();
-		} catch (Throwable e) {
-			return null;
-		}
-	}
+  public PasserelleException getException() {
+    try {
+      return ((PasserelleException)getBodyContent());
+    } catch (Throwable e) {
+      return null;
+    }
+  }
+
+  /**
+   * @return the context object associated with the contained
+   * passerelle exception
+   */
+  public Object getContext() {
+    try {
+      return ((PasserelleException)getBodyContent()).getContext();
+    } catch (Throwable e) {
+      return null;
+    }
+  }
 
 	/**
-	 * @return
+	 * @return the (optional) root exception that
+	 * has caused the contained Passerelle exception 
 	 */
 	public Throwable getRootException() {
 		try {

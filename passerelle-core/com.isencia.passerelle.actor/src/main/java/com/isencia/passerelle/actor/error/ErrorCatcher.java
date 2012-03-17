@@ -104,8 +104,8 @@ public class ErrorCatcher extends Actor {
 				if(context!=null && context instanceof ManagedMessage) {
 					outputMsg = (ManagedMessage) context;
 				}
-				if(errorMsg.getRootException()!=null) {
-  				String errDescr = errorMsg.getRootException().getMessage();
+				if(errorMsg.getException()!=null) {
+  				String errDescr = errorMsg.getException().getMessage();
   				if(errDescr!=null) {
   				  try {
               ManagedMessage errDescrOutputMsg = createMessage();
