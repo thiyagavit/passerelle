@@ -1,4 +1,4 @@
-/* Copyright 2011 - iSencia Belgium NV
+/* Copyright 2012 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
-package com.isencia.passerelle.actor;
+*/
+package com.isencia.passerelle.testsupport.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,6 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 public class Const extends TriggeredSource {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6555818249656144384L;
-	
   private static Logger logger = LoggerFactory.getLogger(Const.class);
   private boolean messageSent = false;
 
