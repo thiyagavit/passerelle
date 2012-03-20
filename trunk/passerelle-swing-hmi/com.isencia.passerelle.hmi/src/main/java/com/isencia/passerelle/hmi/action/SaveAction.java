@@ -38,7 +38,7 @@ public class SaveAction extends AbstractAction {
     }
     final HMIBase hmi = getHMI();
     try {
-      hmi.saveModelAs(hmi.getCurrentModel(), hmi.getModelURL());
+      hmi.saveModelAs(hmi.getCurrentModel(), hmi.getModelURL().toURI());
     } catch (Exception e) {
       logger.error("Error saving model", e);
       PopupUtil.showError(getHMI().getDialogHookComponent(), "error.file.save");

@@ -21,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -146,8 +147,8 @@ public abstract class HMIBase implements ChangeListener {
 
 	private Configuration config;
 
-	private final Map<URL, Flow> loadedModels = new ConcurrentHashMap<URL, Flow>();
-	private final Map<URL, Boolean> modelsChangedStatus = new ConcurrentHashMap<URL, Boolean>();
+	private final Map<URI, Flow> loadedModels = new ConcurrentHashMap<URI, Flow>();
+	private final Map<URI, Boolean> modelsChangedStatus = new ConcurrentHashMap<URI, Boolean>();
 
 	// this is constructed when a model is selected
 	private Flow currentModel;
@@ -384,6 +385,7 @@ public abstract class HMIBase implements ChangeListener {
 	 * If it's a structural change, we need to adapt the cfg forms. Any
 	 * graphical views should be model change listeners already, and will
 	 * probably be the origin of the change anyway...
+	 * @throws URISyntaxException 
 	 */
 	public void changeExecuted(final ChangeRequest change) {
 		if(changeImpactEnabled && !(change instanceof PrintRequest)) {
@@ -392,13 +394,13 @@ public abstract class HMIBase implements ChangeListener {
 				// not contain _controllerFactory, ... it means that an
 				// entity has only moved
 				if(hasChangeImpact(change)) {
-  				if (showModelForms) {
-  					showModelForm(null);
-  				}
-  	      // ico Bossanova or other "wild" derived GUIs, there's not always a current model URL
-  	      if(getModelURL()!=null) {
-  	        setChanged(getModelURL());
-  	      }
+	  				if (showModelForms) {
+	  					showModelForm(null);
+	  				}
+					// ico Bossanova or other "wild" derived GUIs, there's not always a current model URL
+					if(getModelURL()!=null) {
+						setChanged(getModelURL());
+					}
 				}
 			}
 		}
@@ -422,15 +424,22 @@ public abstract class HMIBase implements ChangeListener {
 
 	}
 
-	protected abstract void clearModelForms(URL modelURL);
+	protected abstract void clearModelForms(URI modelURI);
 
-	protected abstract void clearModelGraphs(URL modelURL);
+	protected abstract void clearModelGraphs(URI modelURI);
 
 	public void close(URL modelURL) {
-		if(checkUnsavedChanges(modelURL)) {
-			clearModelForms(modelURL);
+		URI modelURI = null;
+		try {
+			modelURI = modelURL.toURI();
+		} catch (URISyntaxException ex) {
+			// We can safely ignore this since the modelURL is in compliance with RFC2396
+		}
+		
+		if(checkUnsavedChanges(modelURI)) {
+			clearModelForms(modelURI);
 			if (showModelGraph == true) {
-				clearModelGraphs(modelURL);
+				clearModelGraphs(modelURI);
 			}
 			loadedModels.remove(modelURL);
 			modelsChangedStatus.remove(modelURL);
@@ -515,8 +524,8 @@ public abstract class HMIBase implements ChangeListener {
 		return checkUnsavedChanges(modelsChangedStatus.keySet());
 	}
 	
-	protected boolean checkUnsavedChanges(URL modelURL) {
-		Collection<URL> modelURLs = new HashSet<URL>();
+	protected boolean checkUnsavedChanges(URI modelURL) {
+		Collection<URI> modelURLs = new HashSet<URI>();
 		modelURLs.add(modelURL);
 		return checkUnsavedChanges(modelURLs );
 	}
@@ -528,11 +537,11 @@ public abstract class HMIBase implements ChangeListener {
 	 * @return true if all's OK, i.e. the close/exit can be done,
 	 * false if it can not be done.
 	 */
-	protected boolean checkUnsavedChanges(Collection<URL> modelURLs) {
+	protected boolean checkUnsavedChanges(Collection<URI> modelURLs) {
 		boolean result = true;
 		Boolean chgStatus = Boolean.FALSE;
 		StringBuilder changedModels = new StringBuilder();
-		for (URL modelURL : modelURLs) {
+		for (URI modelURL : modelURLs) {
 			Boolean modelChgStatus = modelsChangedStatus.get(modelURL);
 			if(Boolean.TRUE.equals(modelChgStatus)) {
 				chgStatus = Boolean.TRUE;
@@ -979,29 +988,33 @@ public abstract class HMIBase implements ChangeListener {
 		return hmiModelsDef;
 	}
 
-	public Map<URL, Flow> getLoadedModels() {
+	public Map<URI, Flow> getLoadedModels() {
 		return loadedModels;
 	}
 	
-	public Map<URL, Boolean> getModelsChangedStatus() {
+	public Map<URI, Boolean> getModelsChangedStatus() {
 		return modelsChangedStatus;
 	}
 	
-	public boolean isChangedModel(URL modelURL) {
-		Boolean changeStatus = getModelsChangedStatus().get(modelURL);
+	public boolean isChangedModel(URI modelURI) {
+		Boolean changeStatus = getModelsChangedStatus().get(modelURI);
 		return (changeStatus != null) && changeStatus;
 	}
 	
-	public boolean isChangedModel(Flow model) {
+	public boolean isChangedModel(Flow model) throws IOException {
 		if(model==null)
 			return false;
 		
 		URL modelURL = model.getAuthorativeResourceLocation();
 		if(modelURL==null) {
 			// should not happen, but if it does, we'll try to find it in the loadedModels map...
-			for (Entry<URL, Flow> modelEntry : getLoadedModels().entrySet()) {
+			for (Entry<URI, Flow> modelEntry : getLoadedModels().entrySet()) {
 				if(model.equals(modelEntry.getValue())) {
-					modelURL = modelEntry.getKey();
+					try {
+						modelURL = modelEntry.getKey().toURL();
+					} catch (MalformedURLException e) {
+						throw new IOException("Model URL not a valid local file " + modelEntry.getKey());
+					}
 					break;
 				}
 			}
@@ -1012,13 +1025,10 @@ public abstract class HMIBase implements ChangeListener {
 			return false;
 	}
 	
-	public File getLocalFileFromURL(final URL destinationURL) throws IOException {
+	public File getLocalFileFromURL(final URI destinationURL) throws IOException {
 		File destinationFile = null;
-		try {
-			destinationFile = new File(destinationURL.toURI());
-		} catch (final URISyntaxException e) {
-			throw new IOException("Destination URL not a valid local file " + destinationURL);
-		}
+		destinationFile = new File(destinationURL);
+
 		return destinationFile;
 	}
 
@@ -1141,7 +1151,7 @@ public abstract class HMIBase implements ChangeListener {
 		Flow currentModelTmp = loadedModels.get(_modelURL);
 		if(currentModelTmp==null) {
 			currentModelTmp = ModelUtils.loadModel(_modelURL);
-			loadedModels.put(_modelURL, currentModelTmp);
+			loadedModels.put(_modelURL.toURI(), currentModelTmp);
 			modelKey = validateModel(currentModelTmp, modelKey);
 			setCurrentModel(currentModelTmp, _modelURL, modelKey, showModelGraph);
 		} else {
@@ -1203,7 +1213,7 @@ public abstract class HMIBase implements ChangeListener {
 		return uiWidget;
 	}
 
-	public void saveModelAs(final Flow model, final URL destinationURL) throws IOException, IllegalActionException, NameDuplicationException {
+	public void saveModelAs(final Flow model, final URI destinationURL) throws IOException, IllegalActionException, NameDuplicationException {
 		
 		if(checkFlowLoadingError(model)) {
 			File destinationFile = null;
@@ -1242,7 +1252,7 @@ public abstract class HMIBase implements ChangeListener {
 				Flow f = (Flow) model;
 				if (f.getHandle().isRemote()) {
 					try {
-						FlowManager.save(f, destinationURL);
+						FlowManager.save(f, destinationURL.toURL());
 						setSaved(destinationURL);
 					} catch (Exception e) {
 						throw new IOException("Error saving remote flow", e);
@@ -1322,10 +1332,14 @@ public abstract class HMIBase implements ChangeListener {
 	}
 
 	public void setChanged(final URL modelURL) {
-		modelsChangedStatus.put(modelURL, Boolean.TRUE);
+		try {
+			modelsChangedStatus.put(modelURL.toURI(), Boolean.TRUE);
+		} catch (URISyntaxException e) {
+			// We can safely ignore this since all used URLs are in compliance with RFC2396 
+		}
 	}
 
-  public void setSaved(final URL modelURL) {
+  public void setSaved(final URI modelURL) {
     modelsChangedStatus.remove(modelURL);
   }
 
@@ -1356,7 +1370,11 @@ public abstract class HMIBase implements ChangeListener {
 			gf.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosed(final WindowEvent e) {
-					clearModelGraphs(getModelURL());
+					try {
+						clearModelGraphs(getModelURL().toURI());
+					} catch (URISyntaxException ex) {
+						// Ignore. Just trying to clean up
+					}
 				}
 			});
 			gf.getContentPane().add(graphPanel);

@@ -21,6 +21,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -172,7 +174,11 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	  }
 	  
 		final URL modelURL = getModelURL();
-		clearModelForms(modelURL);
+		try {
+			clearModelForms(modelURL.toURI());
+		} catch (URISyntaxException ex) {
+			// We can safely ignore this since the modelURL is in compliance with RFC2396
+		}
 
 		if (getDialogHookComponent() != null) {
 			if (modelURL != null) {
@@ -354,11 +360,11 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
   }
 
   @Override
-	public void setSaved(URL modelURL) {
-		super.setSaved(modelURL);
-		if (modelURL != null) {
-			if (graphTabsMap.get(modelURL.toString()) != null) {
-				final TitledTab tab = graphTabsMap.get(modelURL.toString());
+	public void setSaved(URI modelURI) {
+		super.setSaved(modelURI);
+		if (modelURI != null) {
+			if (graphTabsMap.get(modelURI.toString()) != null) {
+				final TitledTab tab = graphTabsMap.get(modelURI.toString());
 				tab.setIcon(null);
 				// tab.setText(getCurrentModel().getName());
 			}
@@ -416,12 +422,12 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	}
 
 	@Override
-	protected void clearModelGraphs(URL modelURL) {
+	protected void clearModelGraphs(URI modelURI) {
 		// if (graphTabsMap.containsKey(this.getModelURL().toString())) {
 		// final View view =
 		// graphTabsMap.get(this.getModelURL().toString());
 		// view.close();
-		Tab tabToClear = graphTabsMap.get(modelURL.toString());
+		Tab tabToClear = graphTabsMap.get(modelURI.toString());
 		if(tabToClear!=null)
 			modelGraphTabPanel.removeTab(tabToClear);
 	}
@@ -700,7 +706,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	}
 
 	@Override
-	protected void clearModelForms(URL modelURL) {
+	protected void clearModelForms(URI modelURI) {
 		clearPanel(getConfigPanel());
 		listQuery.clear();
 

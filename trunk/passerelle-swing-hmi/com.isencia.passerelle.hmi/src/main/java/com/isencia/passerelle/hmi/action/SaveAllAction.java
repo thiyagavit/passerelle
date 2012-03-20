@@ -3,13 +3,16 @@ package com.isencia.passerelle.hmi.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
+import java.net.URI;
 import java.util.Map.Entry;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
 import com.isencia.passerelle.hmi.PopupUtil;
@@ -40,17 +43,17 @@ public class SaveAllAction extends AbstractAction {
       logger.trace("File Save All action - entry");
     }
     final HMIBase hmi = getHMI();
-    for (Entry<URL, Flow> loadedModelEntry : hmi.getLoadedModels().entrySet()) {
-      URL modelURL = loadedModelEntry.getKey();
-      if (hmi.isChangedModel(modelURL)) {
+    for (Entry<URI, Flow> loadedModelEntry : hmi.getLoadedModels().entrySet()) {
+      URI modelURI = loadedModelEntry.getKey();
+      if (hmi.isChangedModel(modelURI)) {
         Flow flowToSave = loadedModelEntry.getValue();
         try {
-          hmi.saveModelAs(flowToSave, modelURL);
+          hmi.saveModelAs(flowToSave, modelURI);
         } catch (Exception e) {
           logger.error("Error saving model", e);
           PopupUtil.showError(getHMI().getDialogHookComponent(), "error.file.save", flowToSave.getName());
         }
-        System.out.println("Saved " + modelURL);
+        System.out.println("Saved " + modelURI);
       }
     }
 

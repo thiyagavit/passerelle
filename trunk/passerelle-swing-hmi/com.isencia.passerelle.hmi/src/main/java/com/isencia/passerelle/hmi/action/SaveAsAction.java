@@ -123,7 +123,7 @@ public class SaveAsAction extends AbstractAction {
 
         try {
           final HMIBase hmi = getHMI();
-          hmi.saveModelAs(model, destinationFile.toURI().toURL());
+          hmi.saveModelAs(model, destinationFile.toURI());
           hmi.setModelURL(destinationFile.toURI().toURL());
           // load saved file
           hmi.loadModel(hmi.getModelURL(), null);
