@@ -3,6 +3,8 @@ package com.isencia.passerelle.hmi.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map.Entry;
 import javax.swing.Action;
@@ -39,9 +41,13 @@ public class CloseAllAction extends AbstractAction {
       logger.trace("File Close All action - entry");
     }
     final HMIBase hmi = getHMI();
-    for (Entry<URL, Flow> loadedModelEntry : hmi.getLoadedModels().entrySet()) {
-      URL modelURL = loadedModelEntry.getKey();
-      hmi.close(modelURL);
+    for (Entry<URI, Flow> loadedModelEntry : hmi.getLoadedModels().entrySet()) {
+		URI modelURI = loadedModelEntry.getKey();
+		try {
+    	  	hmi.close(modelURI.toURL());
+		} catch (MalformedURLException ex) {
+			// We can safely ignore this since the modelURL is in compliance with RFC2396
+		}
     }
 
     if (logger.isTraceEnabled()) {
