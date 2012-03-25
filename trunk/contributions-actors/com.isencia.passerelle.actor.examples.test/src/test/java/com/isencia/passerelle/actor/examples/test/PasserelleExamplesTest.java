@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
 import com.isencia.passerelle.actor.examples.AddRemoveMessageHeader;
+import com.isencia.passerelle.actor.examples.DelayWithExecutionTrace;
 import com.isencia.passerelle.actor.examples.HeaderFilter;
 import com.isencia.passerelle.actor.examples.HelloPasserelle;
 import com.isencia.passerelle.actor.examples.MultiInputsTracerConsole;
@@ -27,10 +28,12 @@ import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.actor.general.ErrorConsole;
 import com.isencia.passerelle.actor.general.TracerConsole;
 import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
+import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
 
 /**
  * Some sample unit tests for Passerelle flow executions with example actors
@@ -235,4 +238,64 @@ public class PasserelleExamplesTest extends TestCase {
       .expectMsgReceiptCount(errorConsole, 1L)
       .assertFlow(flow);
   }
+  
+  public void testChainedDelaysET() throws Exception {
+    flow.setDirector(new ETDirector(flow,"director"));
+    
+    TextSource src = new TextSource(flow, "src");
+    DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
+    DelayWithExecutionTrace delay2 = new DelayWithExecutionTrace(flow, "delay2");
+    DelayWithExecutionTrace delay3 = new DelayWithExecutionTrace(flow, "delay3");
+    MessageHistoryStack sink = new MessageHistoryStack(flow, "sink");
+
+    flow.connect(src, delay1);
+    flow.connect(delay1, delay2);
+    flow.connect(delay2, delay3);
+    flow.connect(delay3, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src.values", "pol,pel,pingo");
+    props.put("delay1.time(s)", "3");
+    props.put("delay2.time(s)", "3");
+    props.put("delay3.time(s)", "3");
+
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow)
+    ;
+  }
+  
+  public void testChainedDelaysPN() throws Exception {
+    flow.setDirector(new Director(flow,"director"));
+    
+    TextSource src = new TextSource(flow, "src");
+    DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
+    DelayWithExecutionTrace delay2 = new DelayWithExecutionTrace(flow, "delay2");
+    DelayWithExecutionTrace delay3 = new DelayWithExecutionTrace(flow, "delay3");
+    MessageHistoryStack sink = new MessageHistoryStack(flow, "sink");
+
+    flow.connect(src, delay1);
+    flow.connect(delay1, delay2);
+    flow.connect(delay2, delay3);
+    flow.connect(delay3, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src.values", "pol,pel,pingo");
+    props.put("delay1.time(s)", "3");
+    props.put("delay2.time(s)", "3");
+    props.put("delay3.time(s)", "3");
+    props.put("delay1.Buffer time (ms)", "10");
+    props.put("delay2.Buffer time (ms)", "10");
+    props.put("delay3.Buffer time (ms)", "10");
+    
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow)
+    ;
+  }
+
 }

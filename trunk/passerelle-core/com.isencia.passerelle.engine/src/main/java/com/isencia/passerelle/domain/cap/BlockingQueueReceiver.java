@@ -18,7 +18,9 @@ package com.isencia.passerelle.domain.cap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
+import ptolemy.actor.Manager;
 import ptolemy.actor.QueueReceiver;
 import ptolemy.actor.process.BoundaryDetector;
 import ptolemy.actor.process.ProcessReceiver;
@@ -179,7 +181,7 @@ public class BlockingQueueReceiver extends QueueReceiver implements ProcessRecei
       throw new UnsupportedOperationException("get() not supported for shared buffer");
     } else {
       synchronized (this) {
-        while (!_terminate && !super.hasToken()) {
+        while (isPaused() || (!_terminate && !super.hasToken())) {
           try {
             workspace.wait(this, 1000);
           } catch (InterruptedException e) {
@@ -192,6 +194,15 @@ public class BlockingQueueReceiver extends QueueReceiver implements ProcessRecei
       }
     }
     return result;
+  }
+
+  private boolean isPaused() {
+    try {
+      Manager manager = ((CompositeActor) getContainer().toplevel()).getManager();
+      return Manager.PAUSED.equals(manager.getState());
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   /**
@@ -280,26 +291,28 @@ public class BlockingQueueReceiver extends QueueReceiver implements ProcessRecei
     synchronized (this) {
       if (_terminate) {
         return;
-      } else if (buffer != null) {
-        try {
-          if (getContainer() instanceof Port) {
-            Port _p = (Port) getContainer();
-            try {
-              token = _p.convertTokenForMe(token);
-              _p.getStatistics().acceptReceivedMessage(null);
-            } catch (Exception e) {
-              throw new RuntimeException("Failed to convert token " + token, e);
-            }
-          }
-          ManagedMessage msg = MessageHelper.getMessageFromToken(token);
-          MessageInputContext ctxt = new MessageInputContext(0, getContainer().getName(), msg);
-          buffer.offer(ctxt);
-        } catch (PasserelleException e) {
-          throw new RuntimeException("Failed to interpret token " + token, e);
-        }
       } else {
-        // token can be put in the queue;
-        super.put(token);
+        if (buffer != null) {
+          try {
+            if (getContainer() instanceof Port) {
+              Port _p = (Port) getContainer();
+              try {
+                token = _p.convertTokenForMe(token);
+                _p.getStatistics().acceptReceivedMessage(null);
+              } catch (Exception e) {
+                throw new RuntimeException("Failed to convert token " + token, e);
+              }
+            }
+            ManagedMessage msg = MessageHelper.getMessageFromToken(token);
+            MessageInputContext ctxt = new MessageInputContext(0, getContainer().getName(), msg);
+            buffer.offer(ctxt);
+          } catch (PasserelleException e) {
+            throw new RuntimeException("Failed to interpret token " + token, e);
+          }
+        } else {
+          // token can be put in the queue;
+          super.put(token);
+        }
       }
       // Wake up all threads waiting on a write to this receiver;
       notifyAll();
