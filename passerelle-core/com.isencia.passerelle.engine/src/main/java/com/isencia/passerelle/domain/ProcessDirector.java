@@ -250,6 +250,8 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
         		((com.isencia.passerelle.actor.Actor)thread.getActor()).resumeFire();
         	}
         }
+        
+        _stopFireRequested = false;
 	}
     
     public void setExecutionControlStrategy(ExecutionControlStrategy execCtrlStrategy) {

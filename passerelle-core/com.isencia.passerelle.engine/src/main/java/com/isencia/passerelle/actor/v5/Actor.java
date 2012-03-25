@@ -171,6 +171,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   public void offer(MessageInputContext ctxt) throws PasserelleException {
+    getLogger().debug("{} - offer {}", getFullName(), ctxt);
     try {
       if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
         // if we did not get the lock, something is getting overcharged, so refuse the task
@@ -297,33 +298,29 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           }
         }
       }
-      if (readyToFire) {
-        if (!msgProviders.isEmpty() || !pushedMessages.isEmpty()) {
-          try {
-            // TODO check if it's not nicer to maintain buffer time from 1st preFire() call
-            // to when readyToFire, i.o. adding it after the time we've already been waiting
-            // for all PULL ports having a message.
-            int bufferTime = ((IntToken) bufferTimeParameter.getToken()).intValue();
-            if (bufferTime > 0) {
-              getLogger().debug("{} - doPreFire() - sleeping for buffer time {}", getInfo(), bufferTime);
-              Thread.sleep(bufferTime);
-            }
-          } catch (Exception e) {
-            getLogger().warn(getInfo() + " - Failed to enforce buffer time", e);
+      if (!pushedMessages.isEmpty() || (readyToFire && !msgProviders.isEmpty())) {
+        try {
+          // TODO check if it's not nicer to maintain buffer time from 1st preFire() call
+          // to when readyToFire, i.o. adding it after the time we've already been waiting
+          // for all PULL ports having a message.
+          int bufferTime = ((IntToken) bufferTimeParameter.getToken()).intValue();
+          if (bufferTime > 0) {
+            getLogger().debug("{} - doPreFire() - sleeping for buffer time {}", getInfo(), bufferTime);
+            Thread.sleep(bufferTime);
           }
-
-          // we've got at least one PUSH port that registered a msg provider
-          // so we need to include all pushed msgs in the request as well
-          addPushedMessages(currentProcessRequest);
+        } catch (Exception e) {
+          getLogger().warn(getInfo() + " - Failed to enforce buffer time", e);
         }
+        // we've got at least one PUSH port that registered a msg provider
+        // so we need to include all pushed msgs in the request as well
+        addPushedMessages(currentProcessRequest);
       }
-
+      readyToFire = currentProcessRequest.hasSomethingToProcess();
+      
       // when all ports are exhausted, we can stop this actor
-      if (areAllInputsFinished()) {
+      if (!readyToFire && areAllInputsFinished() && !hasPushedMessages()) {
         requestFinish();
       }
-
-      readyToFire = currentProcessRequest.hasSomethingToProcess();
     }
 
     getLogger().trace("{} - doPreFire() - exit : {}", getFullName(), readyToFire);
@@ -332,6 +329,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   @Override
   protected void doFire() throws ProcessingException {
+    getLogger().trace("{} - doFire() - entry", getFullName());
     if (isSource || currentProcessRequest.hasSomethingToProcess()) {
       getLogger().trace("{} - doFire() - processing request {}", getFullName(), currentProcessRequest);
       ActorContext ctxt = new ActorContext();
@@ -360,6 +358,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
       getLogger().trace("{} - doFire() - obtained response {}", getFullName(), currentProcessResponse);
     }
+    getLogger().trace("{} - doFire() - exit", getFullName());
   }
 
   @Override
@@ -431,6 +430,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    */
   protected void addPushedMessages(ProcessRequest req) throws ProcessingException {
     getLogger().trace("{} - addPushedMessages() - entry", getFullName());
+    int msgCtr = 0;
     try {
       if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
         // if we did not get the lock, something is getting overcharged,
@@ -443,6 +443,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
       while (!pushedMessages.isEmpty()) {
         req.addInputContext(pushedMessages.poll());
+        msgCtr++;
       }
     } catch (InterruptedException e) {
       throw new ProcessingException("Msg Queue lock interrupted...", this, null);
@@ -451,10 +452,32 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         msgQLock.unlock();
       } catch (Exception e) {
       }
-      getLogger().trace("{} - addPushedMessages() - exit", getFullName());
+      getLogger().trace("{} - addPushedMessages() - exit - added {}", getFullName(), msgCtr);
     }
   }
 
+  protected boolean hasPushedMessages() throws ProcessingException {
+    getLogger().trace("{} - hasPushedMessages() - entry", getFullName());
+    boolean result = false;
+    try {
+      if (!msgQLock.tryLock(1, TimeUnit.SECONDS)) {
+        // if we did not get the lock, something is getting overcharged,
+        // so refuse the task
+        throw new ProcessingException("Msg Queue lock overcharged...", this, null);
+      }
+      result = !pushedMessages.isEmpty();
+    } catch (InterruptedException e) {
+      throw new ProcessingException("Msg Queue lock interrupted...", this, null);
+    } finally {
+      try {
+        msgQLock.unlock();
+      } catch (Exception e) {
+      }
+      getLogger().trace("{} - hasPushedMessages() - exit - {}", getFullName(), result);
+    }
+    return result;
+  }
+  
   /**
    * @return true when all input ports are exhausted
    */

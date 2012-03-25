@@ -39,7 +39,7 @@ public class Manager extends ptolemy.actor.Manager {
 		// the invocation of stopFire/pauseFire is already done in the Manager base class
 		
 		// if super.pause is not done :
-		// we explicitly invoke resumeFire on all contained actors (if they're passerelle actors)
+		// we explicitly invoke pauseFire on all contained actors (if they're passerelle actors)
 //		NamedObj container = getContainer();
 //		if(container instanceof CompositeActor) {
 //			Director director = ((CompositeActor)container).getDirector();
@@ -60,5 +60,6 @@ public class Manager extends ptolemy.actor.Manager {
 			}
 		}
 		super.resume();
+		_setState(ITERATING);
 	}
 }
