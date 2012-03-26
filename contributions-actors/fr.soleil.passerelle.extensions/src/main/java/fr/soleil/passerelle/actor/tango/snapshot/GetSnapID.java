@@ -10,11 +10,13 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
