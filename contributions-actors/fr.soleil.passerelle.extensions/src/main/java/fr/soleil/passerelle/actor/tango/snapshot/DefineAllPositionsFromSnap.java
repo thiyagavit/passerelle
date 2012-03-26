@@ -12,13 +12,13 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
+import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
-
-import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration;
@@ -102,6 +102,7 @@ public class DefineAllPositionsFromSnap extends Transformer {
 		final String[] result = getSnap.execute(String[].class, snapID);
 		for (int i = 0; i < result.length; i = i + 3) {
 		    final String attributeName = result[i];
+
 
 		    String equipmentDeviceName = null;
 		    Double snapValue = null;
