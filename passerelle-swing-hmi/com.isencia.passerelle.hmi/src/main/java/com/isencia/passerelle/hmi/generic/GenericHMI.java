@@ -1046,7 +1046,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 						 * getModelURL().toString())
 						 */) {
 							try {
-								refreshParamsForm(new URL(modelURL), null);
+								refreshParamsForm(new URI(modelURL), null);
 							} catch (final MalformedURLException e) {
 								e.printStackTrace();
 							} catch (final Exception e) {

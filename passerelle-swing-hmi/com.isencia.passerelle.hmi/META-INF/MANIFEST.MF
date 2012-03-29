@@ -29,4 +29,5 @@ Require-Bundle: com.isencia.passerelle.commons;bundle-version="7.0.0",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
- com.microstar;bundle-version="1.2.0"
+ com.microstar;bundle-version="1.2.0",
+ com.isencia.passerelle.domain.et;bundle-version="1.0.0"
