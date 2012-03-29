@@ -1148,14 +1148,15 @@ public abstract class HMIBase implements ChangeListener {
 	 * @throws Exception
 	 */
 	public Flow loadModel(final URL _modelURL, String modelKey) throws Exception {
-		Flow currentModelTmp = loadedModels.get(_modelURL);
+	  URI mdlURI = _modelURL.toURI();
+		Flow currentModelTmp = loadedModels.get(mdlURI);
 		if(currentModelTmp==null) {
 			currentModelTmp = ModelUtils.loadModel(_modelURL);
-			loadedModels.put(_modelURL.toURI(), currentModelTmp);
+			loadedModels.put(mdlURI, currentModelTmp);
 			modelKey = validateModel(currentModelTmp, modelKey);
 			setCurrentModel(currentModelTmp, _modelURL, modelKey, showModelGraph);
 		} else {
-			refreshParamsForm(_modelURL, modelKey);
+			refreshParamsForm(mdlURI, modelKey);
 		}
 		return currentModelTmp;
 	}
@@ -1178,13 +1179,13 @@ public abstract class HMIBase implements ChangeListener {
 		return toplevel;
 	}
 
-	protected void refreshParamsForm(final URL _modelURL, String modelKey) throws Exception {
+	protected void refreshParamsForm(final URI _modelURL, String modelKey) throws Exception {
 		if (loadedModels.containsKey(_modelURL)) {
 			final Flow currentModelTmp = loadedModels.get(_modelURL);
 			modelKey = validateModel(currentModelTmp, modelKey);
-			modelURL = _modelURL;
+			modelURL = _modelURL.toURL();
 			currentModelDef = hmiModelsDef.getModel(modelKey);
-			setCurrentModel(currentModelTmp, _modelURL, modelKey, false);
+			setCurrentModel(currentModelTmp, modelURL, modelKey, false);
 		}
 
 	}
