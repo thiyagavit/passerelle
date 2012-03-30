@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.Action;
@@ -49,8 +50,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Manager;
@@ -68,11 +71,15 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.util.MessageHandler;
 import ptolemy.util.StringUtilities;
+
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.diagnosis.actor.util.ServicesRegistry;
+import com.isencia.passerelle.diagnosis.impl.entities.EntityFactory;
+import com.isencia.passerelle.diagnosis.impl.entities.EntityManager;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.ext.ExecutionTracer;
@@ -109,6 +116,7 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowHandle;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
+import com.isencia.passerelle.project.repository.impl.filesystem.FileSystemBasedRepositoryService;
 import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -128,6 +136,10 @@ public abstract class HMIBase implements ChangeListener {
 	public static final String INIFILE_PATH_STRING = System.getProperty(HMI_INI_FILE_PROPNAME,"hmi.ini");
 	public static String MODELS_URL_STRING = System.getProperty(HMI_MODEL_URL_PROPNAME);
 	public static String HMI_RECENTMODELS_FILE_STRING = null;
+
+	public static String DIAGNOSIS_DATA_BASE_DIR_STRING;
+	public static String DIAGNOSIS_ENTITIES_DUMP_PATHNAME;
+	public static String DIAGNOSIS_ASSET_REPOS_PATHNAME;
 
 	public static final String EXECUTION_CONTROL_ATTR_NAME = "_executionControl";
 	public static final String USER_TRACER_ATTR_NAME = "_userTracer";
@@ -318,6 +330,23 @@ public abstract class HMIBase implements ChangeListener {
 		ExecutionTracerService.registerTracer(executionTracer);
 		// also save trace msgs in separate log file
 		ExecutionTracerService.registerTracer(new DefaultExecutionTracer());
+		
+		// set file-based asset repo for HMI executions of diagnostic seqs
+		DIAGNOSIS_DATA_BASE_DIR_STRING = System.getProperty(HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME,"C:/temp");
+		DIAGNOSIS_ENTITIES_DUMP_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING+"/passerelle-diagnosis-results";
+		DIAGNOSIS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING+"/passerelle-repository";
+
+		File diagAssetReposPath = new File(DIAGNOSIS_ASSET_REPOS_PATHNAME);
+		File diagEntitiesDumpPath = new File(DIAGNOSIS_ENTITIES_DUMP_PATHNAME);
+		if(!diagAssetReposPath.exists() || !diagEntitiesDumpPath.exists()) {
+			logger.warn("Paths for diagnostic asset repository and/or result dumps do not exist. :"
+					+ "\n\tasset repos :"+DIAGNOSIS_ASSET_REPOS_PATHNAME
+					+ "\n\tresults dump :"+DIAGNOSIS_ENTITIES_DUMP_PATHNAME
+					+ "\n\tDiagnostic processes will not work!");
+		}
+		ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
+		ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
+		ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
 	}
 
 	/**
@@ -441,8 +470,8 @@ public abstract class HMIBase implements ChangeListener {
 			if (showModelGraph == true) {
 				clearModelGraphs(modelURI);
 			}
-			loadedModels.remove(modelURL);
-			modelsChangedStatus.remove(modelURL);
+			loadedModels.remove(modelURI);
+			modelsChangedStatus.remove(modelURI);
 			try {
 				MoMLParser.purgeModelRecord(modelURL);
 			} catch (final Exception ex) {
