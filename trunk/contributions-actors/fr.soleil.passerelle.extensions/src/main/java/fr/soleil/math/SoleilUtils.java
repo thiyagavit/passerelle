@@ -27,7 +27,8 @@ public class SoleilUtils {
 	}
 
 	public static boolean checkDerivative(Collection<ResultItem> events,
-			double threshold, Actor actor) throws ProcessingException {
+			String operator, double threshold, Actor actor)
+			throws ProcessingException {
 		double[] x = new double[events.size()];
 		double[] y = new double[events.size()];
 		int i = 0;
@@ -49,7 +50,7 @@ public class SoleilUtils {
 		}
 		double[] derivative = Analysis.polynomialSplineDerivative(x, y);
 		for (double der : derivative) {
-			if (der > threshold) {
+			if (executeLogicalOperator(operator, der, threshold)) {
 				ExecutionTracerService.trace(actor, "derivative supo "
 						+ threshold);
 
@@ -58,5 +59,31 @@ public class SoleilUtils {
 		}
 
 		return true;
+
+	}
+
+	public static boolean checkDerivative(Collection<ResultItem> events,
+			double threshold, Actor actor) throws ProcessingException {
+		return checkDerivative(events, ">", threshold, actor);
+	}
+
+	public static boolean executeLogicalOperator(String operator, double n0,
+			double n1) {
+		if (operator.equals(">")) {
+			return n0 > n1;
+		} else if (operator.equals(">=")) {
+			return n0 >= n1;
+		} else if (operator.equals("<=")) {
+			return n0 <= n1;
+		} else if (operator.equals("<")) {
+			return n0 < n1;
+		} else if (operator.equals("!=")) {
+			return n0 != n1;
+		} else if (operator.equals("==")) {
+			return n0 == n1;
+		} else {
+			return false;
+		}
+
 	}
 }
