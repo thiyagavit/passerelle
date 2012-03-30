@@ -77,13 +77,14 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Settable;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
+
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.gui.IPasserelleComponent;
 import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory;
+import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory.ParameterEditorAuthorizer;
 import com.isencia.passerelle.actor.gui.IPasserelleQuery;
 import com.isencia.passerelle.actor.gui.PasserelleEmptyQuery;
 import com.isencia.passerelle.actor.gui.PasserelleQuery;
-import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory.ParameterEditorAuthorizer;
 import com.isencia.passerelle.actor.gui.PasserelleQuery.QueryLabelProvider;
 import com.isencia.passerelle.actor.gui.PasserelleQuery.RenameRequest;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
@@ -94,9 +95,9 @@ import com.isencia.passerelle.hmi.HMIMessages;
 import com.isencia.passerelle.hmi.ModelUtils;
 import com.isencia.passerelle.hmi.PopupUtil;
 import com.isencia.passerelle.hmi.definition.HMIDefinition;
+import com.isencia.passerelle.hmi.definition.HMIDefinition.LayoutPreferences;
 import com.isencia.passerelle.hmi.definition.Model;
 import com.isencia.passerelle.hmi.definition.ModelBundle;
-import com.isencia.passerelle.hmi.definition.HMIDefinition.LayoutPreferences;
 import com.isencia.passerelle.hmi.graph.LookInsideViewFactory;
 import com.isencia.passerelle.hmi.state.StateMachine;
 import com.isencia.passerelle.hmi.trace.TraceDialog;
@@ -104,6 +105,7 @@ import com.isencia.passerelle.hmi.trace.TraceVisualizer;
 import com.isencia.passerelle.hmi.util.VersionPrinter;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.util.EnvironmentUtils;
+
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
 
@@ -312,7 +314,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 			throw new IllegalArgumentException("Undefined model file for "+modelKey);
 		}
 //		try {
-			selectTab(_modelFile, modelGraphTabPanel);
+			selectTab(_modelFile.toURI(), modelGraphTabPanel);
 			return super.loadModel(_modelFile, modelKey);
 //		} catch (final Exception e) {
 			// Since the HMI must now be able to support multiple open models,
@@ -395,7 +397,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 			graphPanel.registerViewFactory(new LookInsideViewFactory(this, tabbedPane, tab, graphPanelEffigy));
 //			new EditionActions().addActions(graphPanel);
 
-			selectTab(getModelURL(), tabbedPane);
+			selectTab(getModelURL().toURI(), tabbedPane);
 			// StateMachine stuff
 			 StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, tab.getName(), graphPanel);
 			 StateMachine.getInstance().compile();
@@ -408,10 +410,10 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	/**
 	 * @param tab
 	 * @param tabbedPane
-	 * @param modelURL 
+	 * @param modelURI 
 	 */
-	protected boolean selectTab(final URL modelURL, final TabbedPanel tabbedPane) {
-		TitledTab tab = graphTabsMap.get(modelURL.toString());
+	protected boolean selectTab(final URI modelURI, final TabbedPanel tabbedPane) {
+		TitledTab tab = graphTabsMap.get(modelURI.toString());
 		if(tab!=null) {
 			tabbedPane.setSelectedTab(tab);
 			getModelGraphScrollPane().validate();
@@ -1102,13 +1104,17 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	}
 
 	protected void closeSelectedTab() {
-		Tab modelRootTab = graphTabsMap.get(getModelURL().toString());
+	  try {
+		Tab modelRootTab = graphTabsMap.get(getModelURL().toURI().toString());
 		Tab selectedTab = modelGraphTabPanel.getSelectedTab();
 		if(!modelRootTab.equals(selectedTab)) {
 			modelGraphTabPanel.removeTab(selectedTab);
 		} else {
 			close(getModelURL());
 		}
+	  } catch (URISyntaxException e) {
+	    logger.error("", e);
+	  }
 	}
 	
 	@Override
