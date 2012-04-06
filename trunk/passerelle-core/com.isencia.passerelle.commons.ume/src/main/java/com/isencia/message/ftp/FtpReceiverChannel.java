@@ -147,8 +147,6 @@ public class FtpReceiverChannel extends ReaderReceiverChannel {
 				throw new ChannelException("Error opening source file " + remote.getAbsolutePath() + " (file not found). Reply code: " + Integer.toString(reply));
 			}
 			setReader(new InputStreamReader(remoteFileStream,"UTF-8"));
-		} catch (FileNotFoundException e) {
-			throw new ChannelException("Error opening source file "+remote.getAbsolutePath()+" (file not found): "+e.getMessage());
 		} catch (IOException e) {
 			throw new ChannelException("Error opening source file "+remote.getAbsolutePath()+" : "+e.getMessage());
 		}
