@@ -17,6 +17,7 @@ package com.isencia.message.ftp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -140,7 +141,12 @@ public class FtpReceiverChannel extends ReaderReceiverChannel {
 		
 		
 		try {
-			setReader(new InputStreamReader(ftp.retrieveFileStream(remote.getPath()),"UTF-8"));
+			InputStream remoteFileStream = ftp.retrieveFileStream(remote.getPath());
+			if (remoteFileStream == null) {
+				int reply = ftp.getReplyCode();
+				throw new ChannelException("Error opening source file " + remote.getAbsolutePath() + " (file not found). Reply code: " + Integer.toString(reply));
+			}
+			setReader(new InputStreamReader(remoteFileStream,"UTF-8"));
 		} catch (FileNotFoundException e) {
 			throw new ChannelException("Error opening source file "+remote.getAbsolutePath()+" (file not found): "+e.getMessage());
 		} catch (IOException e) {
