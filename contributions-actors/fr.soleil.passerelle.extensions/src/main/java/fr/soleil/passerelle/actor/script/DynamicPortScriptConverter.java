@@ -55,14 +55,14 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
 
   private static final String JAVASCRIPT = "javascript";
   private static final String JYTHON = "jython";
-  // ~ Static variables/initializers ····································
+  // Static variables/initializers 
   public static final String PATH_PARAM = "Path";
   public static final String LANGUAGE_PARAM = "Language";
   public static final String CONTAINERNAME_PARAM = "Container name";
 
   private static Logger logger = LoggerFactory.getLogger(DynamicPortScriptConverter.class);
 
-  // ~ Instance variables ···············································
+  // Instance variables 
   // bsf managers
   protected List<BSFManager> bsfManagers = new ArrayList<BSFManager>();
 
@@ -80,7 +80,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
 
   protected String scriptPath = null;
 
-  // ~ Constructors ·····················································
+  // Constructors 
 
   /**
    * Construct an actor in the specified container with the specified name.
@@ -114,7 +114,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
         + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
   }
 
-  // ~ Methods ··························································
+  // Methods 
 
   /**
    * @param attribute The attribute that changed.
