@@ -294,10 +294,8 @@
 			<artifactId>passerelle-diagnosis-impl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
 		</dependency>
-		<!-- end diagnose dependencies -->
-
 	</dependencies>
 </project>
