@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>passerelle-super-pom</artifactId>
 		<groupId>fr.soleil.passerelle</groupId>
-		<version>12.2.1-SNAPSHOT</version>
+		<version>RELEASE</version>
 	</parent>
 
 	<groupId>fr.soleil.passerelle</groupId>
