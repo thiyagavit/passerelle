@@ -99,7 +99,7 @@
 
 	<properties>
 		<maven.test.skip>true </maven.test.skip>
-		<salsa.version>3.4.0</salsa.version>
+		<salsa.version>3.3.0</salsa.version>
 	</properties>
 
 	<dependencies>
