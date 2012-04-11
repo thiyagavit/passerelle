@@ -78,50 +78,50 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>hmi.definition</artifactId>
-			<version>7.0.0</version>
 		</dependency>
-
-<!-- 		begin of Temporary description -->
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>commons</artifactId>
-			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>commons.ume</artifactId>
-			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>actor</artifactId>
-			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>engine</artifactId>
-			<version>7.0.0</version>
 		</dependency>
-<!-- 		end of Temporary description -->
-
-
-		<!-- diagnose dependencies -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-diagnosis-actor</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-diagnosis-impl-filesystem</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-project-repository</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-project-repository-filesystem</artifactId> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+			<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>forms</artifactId>
+			<version>1.0.6</version>
+		</dependency>
+		
+				<!-- diagnose dependencies -->
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>diagnosis-actor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>diagnosis-impl-filesystem</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>project-repository-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>project-repository-impl-filesystem</artifactId>
+		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.drools</groupId> -->
 <!-- 			<artifactId>drools-api</artifactId> -->
@@ -147,17 +147,8 @@
 <!-- 			<artifactId>hibernate-annotations</artifactId> -->
 <!-- 		</dependency> -->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
-			<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>forms</artifactId>
-			<version>1.0.6</version>
 		</dependency>
 	</dependencies>
 </project>
