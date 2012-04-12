@@ -34,7 +34,7 @@
 	<build>
 		<plugins>
 			<plugin>
-<!-- 			Pour la construction du .sh -->
+				<!-- Pour la construction du .sh -->
 				<groupId>fr.soleil.maven.plugins</groupId>
 				<artifactId>maven-script-plugin</artifactId>
 				<executions>
@@ -98,13 +98,13 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>forms</artifactId>
 			<version>1.0.6</version>
 		</dependency>
-		
-				<!-- diagnose dependencies -->
+
+		<!-- diagnose dependencies -->
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>diagnosis-actor</artifactId>
@@ -115,36 +115,37 @@
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>diagnosis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>diagnosis-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>project-repository-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>project-repository-impl-filesystem</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.drools</groupId> -->
-<!-- 			<artifactId>drools-api</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.drools</groupId> -->
-<!-- 			<artifactId>drools-compiler</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.codehaus.janino</groupId> -->
-<!-- 			<artifactId>janino</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-diagnosis</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.isencia.passerelle</groupId> -->
-<!-- 			<artifactId>passerelle-diagnosis-impl</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.hibernate</groupId> -->
-<!-- 			<artifactId>hibernate-annotations</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.drools</groupId> -->
+		<!-- <artifactId>drools-api</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.drools</groupId> -->
+		<!-- <artifactId>drools-compiler</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.codehaus.janino</groupId> -->
+		<!-- <artifactId>janino</artifactId> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>org.hibernate</groupId> -->
+		<!-- <artifactId>hibernate-annotations</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
