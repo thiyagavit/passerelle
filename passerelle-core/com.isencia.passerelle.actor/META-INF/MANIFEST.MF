@@ -6,7 +6,10 @@ Bundle-Version: 8.0.0
 Bundle-Activator: com.isencia.passerelle.actor.activator.Activator
 Bundle-Vendor: isencia
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
-Import-Package: org.apache.commons.collections.map,
+Import-Package: javax.mail,
+ javax.mail.internet,
+ javax.activation,
+ org.apache.commons.collections.map,
  org.jdom;version="1.0.0",
  org.jdom.input;version="1.0.0",
  org.osgi.framework;version="1.3.0",
@@ -27,7 +30,6 @@ Import-Package: org.apache.commons.collections.map,
 Require-Bundle: com.isencia.passerelle.commons;bundle-version="7.0.0",
  com.isencia.passerelle.commons.ume;bundle-version="7.0.0",
  com.isencia.passerelle.engine;bundle-version="7.0.0",
- mail;bundle-version="1.4.0",
  org.apache.xerces;bundle-version="2.9.0",
  org.apache.xml.serializer;bundle-version="2.7.1"
 Export-Package: com.isencia.passerelle.actor.control,
