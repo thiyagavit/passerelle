@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.tango.utils.TangoUtil;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -19,7 +21,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoCommandActor;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.tango.util.TangoUtil;
+
 
 @SuppressWarnings("serial")
 public abstract class AArchivingExtractor extends ATangoCommandActor {
