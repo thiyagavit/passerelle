@@ -74,7 +74,7 @@ public class PopupUtil {
 
     pane.selectInitialValue();
     dialog.setLocationRelativeTo(parentComponent);
-    dialog.show();
+    dialog.setVisible(true);
 
     Object selectedValue = pane.getValue();
 
