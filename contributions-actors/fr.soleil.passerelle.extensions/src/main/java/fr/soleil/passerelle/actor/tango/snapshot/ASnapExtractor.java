@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.utils.TangoUtil;
 
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.expr.Parameter;
@@ -28,7 +29,6 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.tango.util.TangoUtil;
 import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")

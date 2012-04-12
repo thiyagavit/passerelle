@@ -1,10 +1,10 @@
 package fr.soleil.passerelle.actor.tango.snapshot;
 
 import java.net.URL;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tango.utils.TangoUtil;
 
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -29,7 +29,6 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
-import fr.soleil.tango.util.TangoUtil;
 import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
