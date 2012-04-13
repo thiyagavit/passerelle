@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>fr.soleil.passerelle</groupId>
-	<artifactId>soleil-actor</artifactId>
+	<artifactId>SoleilActors</artifactId>
 	<version>4.5.0</version>
 
 	<name>Passerelle Soleil</name>
