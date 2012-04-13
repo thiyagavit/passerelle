@@ -8,8 +8,8 @@
 		<version>RELEASE</version>
 	</parent>
 
-	<groupId>com.isencia.passerelle</groupId>
-	<artifactId>passerelle-HMI</artifactId>
+	<groupId>com.isencia.passerelle.gui</groupId>
+	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
 	<version>7.0.0</version>
 
