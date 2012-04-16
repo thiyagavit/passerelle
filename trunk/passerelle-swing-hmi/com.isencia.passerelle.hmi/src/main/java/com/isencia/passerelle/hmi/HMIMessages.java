@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * @author erwin.de.ley@isencia.be
  */
 public class HMIMessages {
-  public final static String BUNDLE_NAME = "com.isencia.passerelle.hmi.hmi-messages";//$NON-NLS-1$
+  public final static String BUNDLE_NAME = "com.isencia.passerelle.hmi.resources.hmi-messages";//$NON-NLS-1$
   public final static String ERROR_GENERIC = "hmi.error.generic"; //$NON-NLS-1$
   public final static String GRAPH_TITLE = "hmi.graph.title"; //$NON-NLS-1$
   public final static String INFO_EXIT = "hmi.info.exit"; //$NON-NLS-1$
