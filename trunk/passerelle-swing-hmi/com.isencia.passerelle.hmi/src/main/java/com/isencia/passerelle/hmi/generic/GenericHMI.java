@@ -177,21 +177,21 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	  
 		final URL modelURL = getModelURL();
 		if(modelURL != null) {
+		    
 		    try {
 			clearModelForms(modelURL.toURI());
 		    }catch (URISyntaxException ex) {
 			// We can safely ignore this since the modelURL is in compliance with RFC2396
 		    }
+		    
+		    if (getDialogHookComponent() != null) {
+	                  getDialogHookComponent().setTitle("Passerelle - " + modelURL);
+	                  modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
+                          parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
+                          parameterScrollPane.getParent().validate();
+                     }
 		}
-		if (getDialogHookComponent() != null) {
-			if (modelURL != null) {
-				getDialogHookComponent().setTitle("Passerelle - " + modelURL);
-				modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
 
-				parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
-				parameterScrollPane.getParent().validate();
-			}
-		}
 
 		if (getCurrentModel() != null) {
 			final LayoutPreferences layoutPrefs = hmiDef.getLayoutPrefs(getModelIdentifierForFilterDef(getCurrentModel()));
