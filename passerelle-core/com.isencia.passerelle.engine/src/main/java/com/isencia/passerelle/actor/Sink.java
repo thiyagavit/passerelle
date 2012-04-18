@@ -11,12 +11,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.Token;
@@ -36,187 +35,172 @@ import com.isencia.passerelle.message.MessageHelper;
 /**
  * Base class for all Passerelle sinks:
  * 
- * @version 	1.1
- * @author		erwin
+ * @version 1.1
+ * @author erwin
  */
 public abstract class Sink extends Actor {
-	private static Logger logger = LoggerFactory.getLogger(Sink.class);
+  private static Logger logger = LoggerFactory.getLogger(Sink.class);
 
-	/**
-	 * Holds the last received message
-	 */
-	protected ManagedMessage message = null;
-	
-	public Port input = null;
-	private PortHandler inputHandler = null;
+  /**
+   * Holds the last received message
+   */
+  protected ManagedMessage message = null;
 
-	private boolean passThrough = false;
-	public Parameter passThroughParam = null;
-	
-	public final static String PASSTHROUGH_PARAM = "PassThrough";
-	
+  public Port input = null;
+  private PortHandler inputHandler = null;
 
-	/**
-	 * Constructor for Sink.
-	 * @param container
-	 * @param name
-	 * @throws NameDuplicationException
-	 * @throws IllegalActionException
-	 */
-	public Sink(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
-		super(container, name);
+  private boolean passThrough = false;
+  public Parameter passThroughParam = null;
 
-		// Ports
-		input = PortFactory.getInstance().createInputPort(this, null);
+  public final static String PASSTHROUGH_PARAM = "PassThrough";
 
-		passThroughParam = new Parameter(this, "PassThrough", new BooleanToken(false));
-		passThroughParam.setTypeEquals(BaseType.BOOLEAN);
-		registerExpertParameter(passThroughParam);
-		
-		new CheckBoxStyle(passThroughParam, "style");
+  /**
+   * Constructor for Sink.
+   * 
+   * @param container
+   * @param name
+   * @throws NameDuplicationException
+   * @throws IllegalActionException
+   */
+  public Sink(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
+    super(container, name);
 
-		_attachText("_iconDescription", "<svg>\n" +
-                "<rect x=\"-20\" y=\"-20\" width=\"40\" " +
-                "height=\"40\" style=\"fill:green;stroke:green\"/>\n" +
-                "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " +
-                "style=\"stroke-width:1.0;stroke:white\"/>\n" +
-                "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " +
-                "style=\"stroke-width:1.0;stroke:white\"/>\n" +
-                "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " +
-                "style=\"stroke-width:1.0;stroke:black\"/>\n" +
-                "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " +
-                "style=\"stroke-width:1.0;stroke:black\"/>\n" +
-                "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " +
-                "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
-                "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " +
-                "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
-                
-                "<circle cx=\"0\" cy=\"0\" r=\"10\"" +
-                "style=\"fill:white;stroke-width:2.0\"/>\n" +
-                "<line x1=\"0\" y1=\"0\" x2=\"15\" y2=\"0\" " +
-                "style=\"stroke-width:2.0\"/>\n" +
-                "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" " +
-                "style=\"stroke-width:2.0\"/>\n" +
-                "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " +
-                "style=\"stroke-width:2.0\"/>\n" +
-                "</svg>\n");
-	}
+    // Ports
+    input = PortFactory.getInstance().createInputPort(this, null);
 
-	/**
-	 * Check whether the changed attribute corresponds to the "PassThrough"
-	 * parameter and if so, adjust the param's value.
-	 * 
-	 * @param The changed attribute
-	 */
-	public void attributeChanged(Attribute attribute) throws IllegalActionException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" :"+attribute);
+    passThroughParam = new Parameter(this, "PassThrough", new BooleanToken(false));
+    passThroughParam.setTypeEquals(BaseType.BOOLEAN);
+    registerExpertParameter(passThroughParam);
 
-		if (attribute == passThroughParam) {
-			setPassThrough(((BooleanToken) passThroughParam.getToken()).booleanValue());
-		} else
-			super.attributeChanged(attribute);
-			
-		if(logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
-	}
+    new CheckBoxStyle(passThroughParam, "style");
 
-	protected void doInitialize() throws InitializationException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
-			
-		if(input.getWidth()>0) {
-			inputHandler = new PortHandler(input);
-			inputHandler.start();
-		} else {
-			requestFinish();
-		}
-		
-		if(logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
+    _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" " + "height=\"40\" style=\"fill:green;stroke:green\"/>\n"
+        + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+        + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+        + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n" + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
+        + "style=\"stroke-width:1.0;stroke:black\"/>\n" + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+        + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
 
-	}
+        "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n" + "<line x1=\"0\" y1=\"0\" x2=\"15\" y2=\"0\" "
+        + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
+        + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
+  }
 
-	/**
-	 * Returns the passThrough.
-	 * @return boolean
-	 */
-	public boolean isPassThrough() {
-		return passThrough;
-	}
+  /**
+   * Check whether the changed attribute corresponds to the "PassThrough" parameter and if so, adjust the param's value.
+   * 
+   * @param The changed attribute
+   */
+  public void attributeChanged(Attribute attribute) throws IllegalActionException {
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " :" + attribute);
 
-	/**
-	 * Sets the passThrough.
-	 * @param passThrough The passThrough to set
-	 */
-	public void setPassThrough(boolean passThrough) {
-		this.passThrough= passThrough;
-	}
-	
-	protected boolean doPreFire() throws ProcessingException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doPreFire() - entry");
-		
-		Token token = inputHandler.getToken();
-		if (token != null) {
-			try {
-				message = MessageHelper.getMessageFromToken(token);
-			} catch (PasserelleException e) {
-						throw new ProcessingException("Error handling token", token, e);
-			}
-		} else {
-			message = null;
-		}
+    if (attribute == passThroughParam) {
+      setPassThrough(((BooleanToken) passThroughParam.getToken()).booleanValue());
+    } else
+      super.attributeChanged(attribute);
 
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doPreFire() - exit");
-		return super.doPreFire();
-	}
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
+  }
 
-	/**
-	 * Default and fully-functional implementation, relying on the
-	 * ISenderChannel instance to send out all messages received on the actor's
-	 * input port.
-	 * 
-	 * @throws ProcessingException
-	 */
-	final protected void doFire() throws ProcessingException {
-		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo());
-		}
-    
-		if (message != null) {
-			notifyStartingFireProcessing();
-			
-			try {
-				if (logger.isInfoEnabled()) {
-					logger.info(getInfo() + " - Sink generated message :" + message);
-				}
-				sendMessage(message);
-			} catch(ProcessingException e) {
-				throw e;
-			} finally {
-				notifyFinishedFireProcessing();
-			}
-		} else {
-			requestFinish();
-		}
-    
-		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo()+" - exit ");
-		}
-	}
-	
-	
-	protected String getExtendedInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  protected void doInitialize() throws InitializationException {
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
-	/**
-	 * 
-	 * @param outgoingMessage
-	 * @throws ProcessingException
-	 */
-	protected abstract void sendMessage(ManagedMessage outgoingMessage) throws ProcessingException;
+    if (input.getWidth() > 0) {
+      inputHandler = new PortHandler(input);
+      inputHandler.start();
+    } else {
+      requestFinish();
+    }
+
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
+
+  }
+
+  /**
+   * Returns the passThrough.
+   * 
+   * @return boolean
+   */
+  public boolean isPassThrough() {
+    return passThrough;
+  }
+
+  /**
+   * Sets the passThrough.
+   * 
+   * @param passThrough The passThrough to set
+   */
+  public void setPassThrough(boolean passThrough) {
+    this.passThrough = passThrough;
+  }
+
+  protected boolean doPreFire() throws ProcessingException {
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doPreFire() - entry");
+
+    boolean result = true;
+    Token token = inputHandler.getToken();
+    if (token == null) {
+      message = null;
+    } else if (!token.isNil()) {
+      try {
+        message = MessageHelper.getMessageFromToken(token);
+      } catch (PasserelleException e) {
+        throw new ProcessingException("Error handling token", token, e);
+      }
+    } else {
+      result = false;
+    }
+
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doPreFire() - exit");
+    return result && super.doPreFire();
+  }
+
+  /**
+   * Default and fully-functional implementation, relying on the ISenderChannel instance to send out all messages received on the actor's input port.
+   * 
+   * @throws ProcessingException
+   */
+  final protected void doFire() throws ProcessingException {
+    if (logger.isTraceEnabled()) {
+      logger.trace(getInfo());
+    }
+
+    if (message != null) {
+      notifyStartingFireProcessing();
+
+      try {
+        if (logger.isInfoEnabled()) {
+          logger.info(getInfo() + " - Sink generated message :" + message);
+        }
+        sendMessage(message);
+      } catch (ProcessingException e) {
+        throw e;
+      } finally {
+        notifyFinishedFireProcessing();
+      }
+    } else {
+      requestFinish();
+    }
+
+    if (logger.isTraceEnabled()) {
+      logger.trace(getInfo() + " - exit ");
+    }
+  }
+
+  protected String getExtendedInfo() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @param outgoingMessage
+   * @throws ProcessingException
+   */
+  protected abstract void sendMessage(ManagedMessage outgoingMessage) throws ProcessingException;
 }

@@ -17,6 +17,7 @@ package com.isencia.passerelle.actor.test;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
+import com.isencia.passerelle.actor.control.Trigger;
 import com.isencia.passerelle.actor.error.ErrorCatcher;
 import com.isencia.passerelle.actor.general.CommandExecutor;
 import com.isencia.passerelle.actor.general.Const;
@@ -47,6 +48,31 @@ public class ActorTest extends TestCase {
     Const source = new Const(flow, "Constant");
     DevNullActor sink = new DevNullActor(flow, "sink");
 
+    flow.connect(source, sink);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant.value", "Hello world");
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source, 1L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
+
+  /**
+   * A unit test for a plain HelloPasserelle model but with an additional Trigger for the Const.
+   * 
+   * @throws Exception
+   */
+  public void testHelloPasserelleWithTrigger() throws Exception {
+    flow.setDirector(new Director(flow, "director"));
+
+    Trigger trigger = new Trigger(flow, "trigger");
+    Const source = new Const(flow, "Constant");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+
+    flow.connect(trigger.output, source.trigger);
     flow.connect(source, sink);
 
     Map<String, String> props = new HashMap<String, String>();

@@ -171,6 +171,9 @@ public class CommandExecutor extends Actor {
       Token token = triggerHandler.getToken();
       if (token == null) {
         requestFinish();
+      } else if (token.isNil()) {
+        // a NIL token is not a trigger!
+        return;
       } else {
         try {
           msg = MessageHelper.getMessageFromToken(token);
@@ -199,7 +202,7 @@ public class CommandExecutor extends Actor {
         try {
           EnvCommandline commandline = new EnvCommandline(sourcePath[0]);
           commandline.setWorkingDirectory(System.getProperty("user.dir"));
-          
+
           getAuditLogger().info("Executing {}", commandline.toString());
 
           Object errorStreamLock = new Object();
@@ -209,20 +212,20 @@ public class CommandExecutor extends Actor {
           synchronized (errorStreamLock) {
             synchronized (outputStreamLock) {
               // any output message ?
-              RuntimeStreamReader outputStream = 
-                  new RuntimeStreamReader(outputStreamLock, process.getInputStream(), RuntimeStreamReader.Type.output, cmdOutListener);
+              RuntimeStreamReader outputStream = new RuntimeStreamReader(outputStreamLock, process.getInputStream(), RuntimeStreamReader.Type.output,
+                  cmdOutListener);
               // any error message ?
-              RuntimeStreamReader errorStream = 
-                  new RuntimeStreamReader(errorStreamLock, process.getErrorStream(), RuntimeStreamReader.Type.error, cmdErrListener);
+              RuntimeStreamReader errorStream = new RuntimeStreamReader(errorStreamLock, process.getErrorStream(), RuntimeStreamReader.Type.error,
+                  cmdErrListener);
               outputStream.start();
               errorStream.start();
               outputStreamLock.wait();
             }
             errorStreamLock.wait();
           }
-          
+
           int exitValue = process.waitFor();
-          if(exitValue!=0) {
+          if (exitValue != 0) {
             // this indicates an error exit from the executed command
             // then this actor generates an error msg with the exit value
             throw new ProcessingException("Exit : " + exitValue + " for command : " + sourcePath[0], msg, null);
@@ -245,7 +248,8 @@ public class CommandExecutor extends Actor {
     triggerConnected = trigger.getWidth() > 0;
 
     if (triggerConnected) {
-      if (logger.isDebugEnabled()) logger.debug(getInfo() + " - Trigger(s) connected");
+      if (logger.isDebugEnabled())
+        logger.debug(getInfo() + " - Trigger(s) connected");
       triggerHandler = new PortHandler(trigger);
       triggerHandler.start();
     }
@@ -271,17 +275,16 @@ public class CommandExecutor extends Actor {
     return defaultSourcePath;
   }
 
-
   /**
-   * Receives lines from the out or err stream
-   * from a running process.
+   * Receives lines from the out or err stream from a running process.
    */
   private class CommandOutputListener implements RuntimeStreamListener {
     private Port outputPort;
-    
+
     public CommandOutputListener(Port outputPort) {
       this.outputPort = outputPort;
     }
+
     public void acceptLine(String newLine) {
       ManagedMessage message = createMessage();
       try {
@@ -289,9 +292,9 @@ public class CommandExecutor extends Actor {
         sendOutputMsg(outputPort, message);
       } catch (MessageException e) {
         // should never happen...
-        logger.error("Error setting msg content for "+newLine, e);
+        logger.error("Error setting msg content for " + newLine, e);
       } catch (Exception e) {
-        logger.error("Error sending msg for "+newLine, e);
+        logger.error("Error sending msg for " + newLine, e);
       }
     }
   }

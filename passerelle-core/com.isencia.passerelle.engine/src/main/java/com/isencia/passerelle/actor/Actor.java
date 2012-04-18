@@ -358,7 +358,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       if (mustValidateInitialization()) {
         try {
           validateInitialization();
-          if (getAuditLogger().isDebugEnabled()) getAuditLogger().debug(getInfo() + " - (PRE)INITIALIZATION VALIDATED");
+          if (getAuditLogger().isDebugEnabled())
+            getAuditLogger().debug(getInfo() + " - (PRE)INITIALIZATION VALIDATED");
         } catch (ValidationException e) {
           getErrorControlStrategy().handleInitializationValidationException(this, e);
         }
@@ -414,10 +415,12 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       // Install handler on input port
       requestFinishHandler = new PortHandler(requestFinishPort, new PortListenerAdapter() {
         public void tokenReceived() {
-          getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
-          requestFinishHandler.getToken();
-          requestFinish();
-          getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
+          Token token = requestFinishHandler.getToken();
+          if (token != null && !token.isNil()) {
+            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
+            requestFinish();
+            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
+          }
         }
       });
       // Start handling the port
@@ -436,7 +439,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     // audit logging for state per actor is on debug
     // NDC is not yet active during initialize, so we
     // show complete getInfo().
-    if (getAuditLogger().isDebugEnabled()) getAuditLogger().debug(getInfo() + " - INITIALIZED");
+    if (getAuditLogger().isDebugEnabled())
+      getAuditLogger().debug(getInfo() + " - INITIALIZED");
 
     getLogger().trace("{} - initialize() - exit ", getInfo());
   }
@@ -523,7 +527,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     boolean wasNotPaused = !paused;
     try {
       paused = true;
-      if (wasNotPaused) doPauseFire();
+      if (wasNotPaused)
+        doPauseFire();
       return wasNotPaused;
     } catch (ClassCastException e) {
       return wasNotPaused;
@@ -556,7 +561,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     getLogger().trace("{} - resumeFire() - entry", getInfo());
     boolean wasPaused = paused;
     try {
-      if (wasPaused) doResumeFire();
+      if (wasPaused)
+        doResumeFire();
       paused = false;
       return wasPaused;
     } catch (ClassCastException e) {
@@ -874,8 +880,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return
    */
   final public Collection<Parameter> getConfigurableParameter(final Class<? extends Parameter> type) {
-    if (configurableParameters == null) return null;
-    if (configurableParameters.isEmpty()) return null;
+    if (configurableParameters == null)
+      return null;
+    if (configurableParameters.isEmpty())
+      return null;
 
     final Parameter[] params = getConfigurableParameters();
     final Collection<Parameter> ret = new HashSet<Parameter>(params.length);
@@ -895,9 +903,12 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return
    */
   final public Parameter getConfigurableParameter(final String name) {
-    if (name == null) return null;
-    if (configurableParameters == null) return null;
-    if (configurableParameters.isEmpty()) return null;
+    if (name == null)
+      return null;
+    if (configurableParameters == null)
+      return null;
+    if (configurableParameters.isEmpty())
+      return null;
     final Parameter[] params = getConfigurableParameters();
     for (int i = 0; i < params.length; i++) {
       if (name.equals(params[i].getName())) {
@@ -928,7 +939,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    */
   final protected void registerExpertParameter(Parameter newParameter) {
     if (newParameter != null && newParameter.getContainer().equals(this)) {
-      if (!expertParameters.contains(newParameter)) expertParameters.add(newParameter);
+      if (!expertParameters.contains(newParameter))
+        expertParameters.add(newParameter);
 
       newParameter.setVisibility(Settable.EXPERT);
     }
@@ -1062,7 +1074,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @throws NullPointerException when port or message are null
    */
   protected void sendOutputMsg(Port port, ManagedMessage message) throws ProcessingException, IllegalArgumentException {
-    if (port.getContainer() != this) throw new IllegalArgumentException("port " + port.getFullName() + " not defined in actor " + this.getFullName());
+    if (port.getContainer() != this)
+      throw new IllegalArgumentException("port " + port.getFullName() + " not defined in actor " + this.getFullName());
 
     try {
       Token token = new PasserelleToken(message);

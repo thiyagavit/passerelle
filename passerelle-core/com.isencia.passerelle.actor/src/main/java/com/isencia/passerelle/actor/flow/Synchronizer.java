@@ -37,13 +37,9 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 
 /**
- * An actor that synchronizes the messages on all input ports, and then sends
- * them onwards via the corresponding output ports. It has one fixed input port,
- * the syncInput port which is multi-channel. This allows to resolve bootstrap
- * issues for synchronized loops, e.g. combining the loop feedback msg and an
- * ordinary start-up trigger. Besides this port, it can have a configurable,
- * equal nr of extra input and output ports. The extra input ports are all
- * single-channel.
+ * An actor that synchronizes the messages on all input ports, and then sends them onwards via the corresponding output ports. It has one fixed input port, the
+ * syncInput port which is multi-channel. This allows to resolve bootstrap issues for synchronized loops, e.g. combining the loop feedback msg and an ordinary
+ * start-up trigger. Besides this port, it can have a configurable, equal nr of extra input and output ports. The extra input ports are all single-channel.
  * 
  * @author erwin
  */
@@ -75,9 +71,9 @@ public class Synchronizer extends Actor {
     super(container, name);
     syncInput = PortFactory.getInstance().createInputPort(this, "syncInput", null);
     // Create the lists to which the ports can be added
-    inputPorts = new ArrayList(5);
-    outputPorts = new ArrayList(5);
-    finishRequests = new ArrayList(5);
+    inputPorts = new ArrayList<Port>(5);
+    outputPorts = new ArrayList<Port>(5);
+    finishRequests = new ArrayList<Boolean>(5);
 
     // Create the parameters
     numberOfPorts = new Parameter(this, NUMBER_OF_PORTS, new IntToken(0));
@@ -114,7 +110,8 @@ public class Synchronizer extends Actor {
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
     for (int i = 0; i < finishRequests.size(); ++i) {
       finishRequests.set(i, Boolean.FALSE);
@@ -124,12 +121,14 @@ public class Synchronizer extends Actor {
       syncInputHandler.start();
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
 
   }
 
   protected void doFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doFire() - entry");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doFire() - entry");
 
     // just loop over all input ports
     // when we've passed all of them, this means
@@ -140,7 +139,7 @@ public class Synchronizer extends Actor {
     Token token = syncInputHandler.getToken();
     isFiring = true;
 
-    if (token != null) {
+    if (token != null && !token.isNil()) {
       if (logger.isDebugEnabled()) {
         logger.debug(getInfo() + " - doFire() - received msg on port " + syncInput.getName());
       }
@@ -153,10 +152,12 @@ public class Synchronizer extends Actor {
             ManagedMessage msg = MessageHelper.getMessage(inputPort);
             if (msg != null) {
               messages[i] = msg;
-              if (logger.isDebugEnabled()) logger.debug(getInfo() + " doFire() - received msg on port " + inputPort.getName());
+              if (logger.isDebugEnabled())
+                logger.debug(getInfo() + " doFire() - received msg on port " + inputPort.getName());
             } else {
               finishRequests.set(i, Boolean.TRUE);
-              if (logger.isDebugEnabled()) logger.debug(getInfo() + " doFire() - found exhausted port " + inputPort.getName());
+              if (logger.isDebugEnabled())
+                logger.debug(getInfo() + " doFire() - found exhausted port " + inputPort.getName());
             }
           } catch (PasserelleException e) {
             throw new ProcessingException("Error reading from port", inputPort, e);
@@ -179,7 +180,8 @@ public class Synchronizer extends Actor {
       requestFinish();
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doFire() - exit");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doFire() - exit");
   }
 
   protected String getAuditTrailMessage(ManagedMessage message, Port port) {

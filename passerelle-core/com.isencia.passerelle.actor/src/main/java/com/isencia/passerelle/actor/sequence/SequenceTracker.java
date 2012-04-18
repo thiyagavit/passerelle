@@ -38,10 +38,8 @@ import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 /**
  * Keeps track of all sequences for which messages pass through it:
  * <ul>
- * <li>each message in a sequence is maintained in cache until a feedback
- * message arrives via the <code>handled</code> input port for that message
- * <li>when a sequence has completely been handled, the tracker generates a
- * corresponding notification msg via its <code>seqFinished</code> output port.
+ * <li>each message in a sequence is maintained in cache until a feedback message arrives via the <code>handled</code> input port for that message
+ * <li>when a sequence has completely been handled, the tracker generates a corresponding notification msg via its <code>seqFinished</code> output port.
  * </ul>
  * 
  * @author erwin
@@ -77,7 +75,8 @@ public class SequenceTracker extends Transformer {
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doInitialize() - entry");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doInitialize() - entry");
 
     super.doInitialize();
     sequences.clear();
@@ -88,14 +87,16 @@ public class SequenceTracker extends Transformer {
         Token handledToken = handledHandler.getToken();
         try {
           ManagedMessage message = MessageHelper.getMessageFromToken(handledToken);
-          acceptHandledMessage(message);
+          if (message != null)
+            acceptHandledMessage(message);
         } catch (PasserelleException e) {
           logger.error(getInfo() + " error getting message from handled port", e);
         }
       }
 
       public void noMoreTokens() {
-        if (logger.isDebugEnabled()) logger.debug(getInfo() + " handled port exhausted");
+        if (logger.isDebugEnabled())
+          logger.debug(getInfo() + " handled port exhausted");
       }
 
     });
@@ -106,7 +107,8 @@ public class SequenceTracker extends Transformer {
       throw new InitializationException("handled port not connected", this, null);
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doInitialize() - exit");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doInitialize() - exit");
 
   }
 
@@ -155,7 +157,8 @@ public class SequenceTracker extends Transformer {
   }
 
   protected void doFire(ManagedMessage message) throws ProcessingException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doFire() - entry - message :" + message);
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doFire() - entry - message :" + message);
 
     try {
       if (message.isPartOfSequence()) {
@@ -172,7 +175,8 @@ public class SequenceTracker extends Transformer {
 
     sendOutputMsg(output, message);
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " doFire() - exit");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doFire() - exit");
 
   }
 

@@ -42,10 +42,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 public class Counter extends Transformer {
 
-	/**
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3712075950718358876L;
+  private static final long serialVersionUID = 3712075950718358876L;
 
   private static Logger logger = LoggerFactory.getLogger(Counter.class);
 
@@ -57,16 +57,13 @@ public class Counter extends Transformer {
   private boolean isReset = true;
 
   /**
-   * Construct a constant source with the given container and name. Create the
-   * <i>value</i> parameter, initialize its value to the default value of an
-   * IntToken with value 1.
+   * Construct a constant source with the given container and name. Create the <i>value</i> parameter, initialize its value to the default value of an IntToken
+   * with value 1.
    * 
    * @param container The container.
    * @param name The name of this actor.
-   * @exception IllegalActionException If the entity cannot be contained by the
-   *              proposed container.
-   * @exception NameDuplicationException If the container already has an actor
-   *              with this name.
+   * @exception IllegalActionException If the entity cannot be contained by the proposed container.
+   * @exception NameDuplicationException If the container already has an actor with this name.
    */
   public Counter(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
@@ -78,7 +75,8 @@ public class Counter extends Transformer {
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
     super.doInitialize();
     // If something connected to the reset port, install a handler
@@ -86,8 +84,9 @@ public class Counter extends Transformer {
       resetHandler = new PortHandler(reset, new PortListenerAdapter() {
         public void tokenReceived() {
           Token token = resetHandler.getToken();
-          if (logger.isDebugEnabled()) logger.debug(getInfo() + " - Reset Event received");
-          if (token != null) {
+          if (token != null && !token.isNil()) {
+            if (logger.isDebugEnabled())
+              logger.debug(getInfo() + " - Reset Event received");
             isReset = true;
           }
         }
@@ -98,7 +97,8 @@ public class Counter extends Transformer {
 
     setValue(getStartValue());
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   /**
@@ -106,7 +106,8 @@ public class Counter extends Transformer {
    * @exception IllegalActionException
    */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " :" + attribute);
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " :" + attribute);
 
     if (attribute == startValueParam) {
       LongToken valueToken = (LongToken) startValueParam.getToken();
@@ -117,11 +118,13 @@ public class Counter extends Transformer {
     } else
       super.attributeChanged(attribute);
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   protected void doFire(ManagedMessage message) throws ProcessingException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
     if (isReset) {
       setValue(getStartValue());
@@ -140,7 +143,8 @@ public class Counter extends Transformer {
       throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, newMsg, e);
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {

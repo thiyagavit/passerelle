@@ -41,34 +41,22 @@ import com.isencia.passerelle.message.MessageHelper;
 /**
  * DOCUMENT ME!
  * 
- * @version $Id: Switch.java,v 1.7 2006/02/15 16:34:48 erwin Exp $
  * @author Dirk Jacobs
  */
 public class Switch extends Actor {
-  // ~ Static variables/initializers
-  // __________________________________________________________________________________________________________________________
 
   private static Logger logger = LoggerFactory.getLogger(Switch.class);
 
-  // ~ Instance variables
-  // _____________________________________________________________________________________________________________________________________
 
   private List<Port> outputPorts = null;
   private PortHandler selectHandler = null;
 
-  // /////////////////////////////////////////////////////////////////
-  // // ports and parameters ////
   public Parameter numberOfOutputs = null;
   public Port input;
   public Port select = null;
 
-  // /////////////////////////////////////////////////////////////////
-  // // variables ////
   private int outputCount = 0;
   private int selected = 0;
-
-  // ~ Constructors
-  // ___________________________________________________________________________________________________________________________________________
 
   public Switch(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
@@ -92,9 +80,6 @@ public class Switch extends Actor {
         + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"-15\" y1=\"10\" x2=\"0\" y2=\"10\" " + "style=\"stroke-width:1.0;stroke:gray\"/>\n"
         + "<line x1=\"0\" y1=\"10\" x2=\"0\" y2=\"-5\" " + "style=\"stroke-width:1.0;stroke:gray\"/>\n" + "</svg>\n");
   }
-
-  // ~ Methods
-  // ________________________________________________________________________________________________________________________________________________
 
   /**
    * DOCUMENT ME!
@@ -191,7 +176,7 @@ public class Switch extends Actor {
 
     if (token == null) {
       requestFinish();
-    } else {
+    } else if(!token.isNil()){
       outNr = selected;
 
       if (selected < 0) {
@@ -226,18 +211,19 @@ public class Switch extends Actor {
       selectHandler = new PortHandler(select, new PortListenerAdapter() {
         public void tokenReceived() {
           Token selectToken = selectHandler.getToken();
-
-          try {
-            ManagedMessage msg = MessageHelper.getMessageFromToken(selectToken);
-            selected = ((Number) msg.getBodyContent()).intValue();
-          } catch (NumberFormatException e) {
-            // Do nothing. selected is unchanged
-          } catch (Exception e) {
-            // Do nothing. selected is unchanged
-            logger.error("", e);
+          if(selectToken!=null && !selectToken.isNil()) {
+            try {
+              ManagedMessage msg = MessageHelper.getMessageFromToken(selectToken);
+              selected = ((Number) msg.getBodyContent()).intValue();
+            } catch (NumberFormatException e) {
+              // Do nothing. selected is unchanged
+            } catch (Exception e) {
+              // Do nothing. selected is unchanged
+              logger.error("", e);
+            }
+  
+            logger.debug("Event received : " + selected);
           }
-
-          logger.debug("Event received : " + selected);
         }
       });
       selectHandler.start();
