@@ -80,7 +80,7 @@ public class PortHandler {
   // When this counter reaches 0 again, it means the handler
   // can stop.
   protected int channelCount = 0;
-  
+
   // flag if we're in a process domain, when it may be needed to launch channel handlers.
   private boolean inProcessDomain = true;
 
@@ -136,8 +136,7 @@ public class PortHandler {
   }
 
   /**
-   * Returns a message token received by this handler. 
-   * For process domains this method blocks until either:
+   * Returns a message token received by this handler. For process domains this method blocks until either:
    * <ul>
    * <li>a message has been received
    * <li>the message channels are all exhausted. In this case a null token is returned.
@@ -222,7 +221,7 @@ public class PortHandler {
    * @return flag indicating whether there are tokens in the message queue for this handler
    */
   protected boolean hasNoMoreTokens() {
-    synchronized(channelLock) {
+    synchronized (channelLock) {
       return (channelCount == 0) && queue.isEmpty();
     }
   }
@@ -261,7 +260,8 @@ public class PortHandler {
    * @return flag indicating whether extra handler threads must be used.
    */
   protected boolean mustUseHandlers() {
-    if (listener != null) return true;
+    if (listener != null)
+      return true;
 
     if (ioPort instanceof Port) {
       Port _p = (Port) ioPort;
@@ -334,15 +334,15 @@ public class PortHandler {
             LOGGER.debug(PortHandler.this.ioPort.getFullName() + " ChannelHandler." + channelIndex + " fetch() - got token : " + token);
           }
 
-          if (token != null) {
+          if (token == null) {
+            terminated = true;
+          } else if (!token.isNil()) {
             queue.offer(token);
             if (listener != null) {
               listener.tokenReceived();
             }
-          } else {
-            terminated = true;
           }
-        } else if(ioPort.isExhausted()) {
+        } else if (ioPort.isExhausted()) {
           terminated = true;
         }
 

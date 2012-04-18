@@ -11,12 +11,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.Token;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -35,135 +34,140 @@ import com.isencia.passerelle.message.MessageHelper;
  */
 public abstract class TriggeredSource extends Source {
 
-	private static Logger logger = LoggerFactory.getLogger(TriggeredSource.class);
+  private static Logger logger = LoggerFactory.getLogger(TriggeredSource.class);
 
-	public final static String TRIGGER_PORT = "trigger";
-	
-	public Port trigger = null;
-	private boolean triggerConnected = false;
-	private PortHandler triggerHandler = null;
+  public final static String TRIGGER_PORT = "trigger";
 
-	/**
-	 * Constructor for Source.
-	 * @param container
-	 * @param name
-	 * @throws NameDuplicationException
-	 * @throws IllegalActionException
-	 */
-	public TriggeredSource(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
-		super(container, name);
+  public Port trigger = null;
+  private boolean triggerConnected = false;
+  private PortHandler triggerHandler = null;
 
-		/** The trigger port. 
-		 */
-		trigger = PortFactory.getInstance().createInputPort(this, TRIGGER_PORT, null);
+  /**
+   * Constructor for Source.
+   * 
+   * @param container
+   * @param name
+   * @throws NameDuplicationException
+   * @throws IllegalActionException
+   */
+  public TriggeredSource(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
+    super(container, name);
 
-	}
+    /**
+     * The trigger port.
+     */
+    trigger = PortFactory.getInstance().createInputPort(this, TRIGGER_PORT, null);
 
-	protected void doInitialize() throws InitializationException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+  }
 
-		super.doInitialize();
+  protected void doInitialize() throws InitializationException {
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
-		triggerConnected = trigger.getWidth() > 0;
-		if (triggerConnected) {
-			if(logger.isDebugEnabled())
-				logger.debug(getInfo()+" - Trigger(s) connected");
-			triggerHandler = new PortHandler(trigger);
-			triggerHandler.start();
-		}
+    super.doInitialize();
 
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
+    triggerConnected = trigger.getWidth() > 0;
+    if (triggerConnected) {
+      if (logger.isDebugEnabled())
+        logger.debug(getInfo() + " - Trigger(s) connected");
+      triggerHandler = new PortHandler(trigger);
+      triggerHandler.start();
+    }
 
-	}
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
 
-	protected boolean doPreFire() throws ProcessingException {
-		boolean res = true;
+  }
 
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+  protected boolean doPreFire() throws ProcessingException {
+    boolean res = true;
 
-		if (mustWaitForTrigger()) {
-			waitForTrigger();
-			if( isFinishRequested() )
-				res = false;
-		}
-		if( res )
-			res = super.doPreFire();
-		
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit "+" :"+res);
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
-		return res;
-	}
+    if (isTriggerConnected() && mustWaitForTrigger()) {
+      ManagedMessage triggerMsg = waitForTrigger();
+      if (isFinishRequested() || (triggerMsg == null))
+        res = false;
+    }
+    if (res)
+      res = super.doPreFire();
 
-	protected boolean doPostFire() throws ProcessingException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doPostFire() - entry");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit " + " :" + res);
 
-		boolean res = !hasNoMoreMessages() || isTriggerConnected();
-        if(!res) {
-            // just to make sure base class knows that we're finished
-            requestFinish();
-        } else {
-			res = super.doPostFire();
-		}
-		
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doPostFire() - exit :"+res);
+    return res;
+  }
 
-		return res;
-	}
+  protected boolean doPostFire() throws ProcessingException {
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doPostFire() - entry");
 
-	/**
-	 * This method blocks until a trigger message has been received
-	 * on the trigger port.
-	 * @throws ProcessingException 
-	 *
-	 */
-	public void waitForTrigger() throws ProcessingException {
-		if (triggerConnected) {
-			if(logger.isDebugEnabled()) {
-				logger.debug(getInfo()+" - Waiting for trigger");
-			}
-			Token token = triggerHandler.getToken();
-			if( token==null) {
-                // no more triggers will arrive so let's call it quits
-				requestFinish();
-            } else {
-				try {
-					ManagedMessage message = MessageHelper.getMessageFromToken(token);
-					acceptTriggerMessage(message);
-				} catch (PasserelleException e) {
-					throw new ProcessingException("Error handling token", token, e);
-				}
-            }
-				
-			if(logger.isInfoEnabled()) {
-				logger.info(getInfo()+" - Trigger received");
-			}
-		}
-	}
+    boolean res = !hasNoMoreMessages() || isTriggerConnected();
+    if (!res) {
+      // just to make sure base class knows that we're finished
+      requestFinish();
+    } else {
+      res = super.doPostFire();
+    }
 
-	/**
-	 * Returns the triggerConnected.
-	 * @return boolean
-	 */
-	public boolean isTriggerConnected() {
-		return triggerConnected;
-	}
-	
-	/**
-	 * "callback"-method that can be overridden by TriggeredSource implementations,
-	 * if they want to act e.g. on the contents of a received trigger message.
-	 * 
-	 * @param triggerMsg
-	 */
-	protected void acceptTriggerMessage(ManagedMessage triggerMsg) {
-		
-	}
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " doPostFire() - exit :" + res);
 
-	protected abstract boolean mustWaitForTrigger();
-	
+    return res;
+  }
+
+  /**
+   * This method blocks until a trigger message has been received on the trigger port.
+   * 
+   * @throws ProcessingException
+   */
+  public final ManagedMessage waitForTrigger() throws ProcessingException {
+    if (triggerConnected) {
+      if (logger.isDebugEnabled()) {
+        logger.debug(getInfo() + " - Waiting for trigger");
+      }
+      Token token = triggerHandler.getToken();
+      if (token == null) {
+        // no more triggers will arrive so let's call it quits
+        requestFinish();
+        return null;
+      } else if (!token.isNil()) {
+        try {
+          ManagedMessage message = MessageHelper.getMessageFromToken(token);
+          acceptTriggerMessage(message);
+          if (logger.isInfoEnabled()) {
+            logger.info(getInfo() + " - Trigger received");
+          }
+          return message;
+        } catch (PasserelleException e) {
+          throw new ProcessingException("Error handling token", token, e);
+        }
+      } else {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the triggerConnected.
+   * 
+   * @return boolean
+   */
+  public boolean isTriggerConnected() {
+    return triggerConnected;
+  }
+
+  /**
+   * "callback"-method that can be overridden by TriggeredSource implementations, if they want to act e.g. on the contents of a received trigger message.
+   * 
+   * @param triggerMsg
+   */
+  protected void acceptTriggerMessage(ManagedMessage triggerMsg) {
+
+  }
+
+  protected abstract boolean mustWaitForTrigger();
+
 }

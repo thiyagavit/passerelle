@@ -86,7 +86,8 @@ public class Timer extends Actor {
   private PortHandler resetHandler = null;
 
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " :" + attribute);
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " :" + attribute);
 
     if (attribute == timeParameter) {
       time = ((IntToken) timeParameter.getToken()).intValue() * 1000;
@@ -94,11 +95,13 @@ public class Timer extends Actor {
       super.attributeChanged(attribute);
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
     super.doInitialize();
 
@@ -107,10 +110,11 @@ public class Timer extends Actor {
 
       setHandler = new PortHandler(setInputPort, new PortListenerAdapter() {
         public void tokenReceived() {
-          if (logger.isDebugEnabled()) logger.debug(getInfo() + " - Set Event received");
+          if (logger.isDebugEnabled())
+            logger.debug(getInfo() + " - Set Event received");
 
           Token token = setHandler.getToken();
-          if (token != null) {
+          if (token != null && !token.isNil()) {
             set = true;
             performNotify();
           }
@@ -126,9 +130,10 @@ public class Timer extends Actor {
       resetHandler = new PortHandler(resetInputPort, new PortListenerAdapter() {
         public void tokenReceived() {
           Token token = resetHandler.getToken();
-          if (logger.isDebugEnabled()) logger.debug(getInfo() + " - Reset Event received");
+          if (logger.isDebugEnabled())
+            logger.debug(getInfo() + " - Reset Event received");
 
-          if (token != null) {
+          if (token != null && !token.isNil()) {
             reset = true;
             performNotify();
           }
@@ -142,13 +147,16 @@ public class Timer extends Actor {
   }
 
   private synchronized void performNotify() {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
     notify();
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   private synchronized void performWait(int time) {
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " :" + time);
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " :" + time);
     try {
       if (time == -1)
         wait();
@@ -157,11 +165,13 @@ public class Timer extends Actor {
     } catch (InterruptedException e) {
       requestFinish();
     }
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   protected void doFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo());
 
     if (!setPresent) {
       performWait(time);
@@ -177,7 +187,8 @@ public class Timer extends Actor {
         performWait(-1);
       }
 
-      if (isFinishRequested()) return;
+      if (isFinishRequested())
+        return;
 
       isFiring = true;
       set = false;
@@ -202,7 +213,8 @@ public class Timer extends Actor {
       throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, message, e);
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    if (logger.isTraceEnabled())
+      logger.trace(getInfo() + " - exit ");
   }
 
   protected String getAuditTrailMessage(ManagedMessage message, Port port) {
