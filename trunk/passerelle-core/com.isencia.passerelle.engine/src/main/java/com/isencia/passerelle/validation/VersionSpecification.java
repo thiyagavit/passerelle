@@ -32,7 +32,7 @@ import java.util.List;
  * </ul>
  * </p>
  * 
- * @author delerw
+ * @author erwin
  */
 public class VersionSpecification implements Comparable<VersionSpecification> {
 
