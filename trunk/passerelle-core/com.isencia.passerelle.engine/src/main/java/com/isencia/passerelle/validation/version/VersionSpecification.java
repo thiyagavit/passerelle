@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package com.isencia.passerelle.validation;
+package com.isencia.passerelle.validation.version;
 
 import java.util.ArrayList;
 import java.util.Arrays;
