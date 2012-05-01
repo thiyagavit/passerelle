@@ -16,7 +16,6 @@
 package com.isencia.passerelle.validation.version;
 
 import com.isencia.passerelle.actor.ValidationException;
-import com.isencia.passerelle.validation.VersionSpecification;
 
 /**
  * Basic contract for validating the version of an element of a Passerelle model.
@@ -33,10 +32,10 @@ public interface ModelElementVersionValidationStrategy {
 
   /**
    * 
-   * @param versionedElement
+   * @param versionedElementClassName
    * @param versionToBeValidated
    * @throws ValidationException when the element's version does not match the
    * environment's requirements.
    */
-  void validate(String versionedElement, VersionSpecification versionToBeValidated) throws ValidationException;
+  void validate(String versionedElementClassName, VersionSpecification versionToBeValidated) throws ValidationException;
 }

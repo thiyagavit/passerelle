@@ -15,24 +15,32 @@
 
 package com.isencia.passerelle.validation;
 
-import com.isencia.passerelle.model.Flow;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import com.isencia.passerelle.actor.ValidationException;
 
 /**
- * This service provides a facade on a combination of different possible validation strategies on Passerelle models.
- * <p>
- * Currently, only a validation of actor versions is implemented. In the future more advanced validation logic can be added
- * e.g. on correct actor interconnectivity etc.
- * </p>
+ * A <code>ValidationContext</code> serves as a simple container to store validation information.
  * 
  * @author erwin
  *
- */
-public class ModelValidationService {
+ */    
+public class ValidationContext {
   
-  
-  
-  public void validate(Flow model, ValidationContext context) {
-    
-  }
+  private Collection<ValidationException> errors = new ArrayList<ValidationException>();
 
+  public void addError(ValidationException e) {
+    if(e!=null) {
+      errors.add(e);
+    }
+  }
+  
+  public Iterable<ValidationException> getErrors() {
+    return Collections.unmodifiableCollection(errors);
+  }
+  
+  public boolean isValid() {
+    return errors.isEmpty();
+  }
 }
