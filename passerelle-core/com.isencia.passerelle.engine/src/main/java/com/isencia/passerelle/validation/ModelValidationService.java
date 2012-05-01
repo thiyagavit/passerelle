@@ -11,28 +11,66 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.validation;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import ptolemy.kernel.attributes.VersionAttribute;
+import ptolemy.kernel.util.IllegalActionException;
+import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.validation.version.ActorMajorVersionValidator;
+import com.isencia.passerelle.validation.version.ModelElementVersionValidationStrategy;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 /**
  * This service provides a facade on a combination of different possible validation strategies on Passerelle models.
  * <p>
- * Currently, only a validation of actor versions is implemented. In the future more advanced validation logic can be added
- * e.g. on correct actor interconnectivity etc.
+ * Currently, only a validation of actor versions is implemented. In the future more advanced validation logic can be added e.g. on correct actor
+ * interconnectivity etc.
  * </p>
  * 
  * @author erwin
- *
  */
 public class ModelValidationService {
-  
-  
-  
-  public void validate(Flow model, ValidationContext context) {
-    
+
+  private final static ModelValidationService instance = new ModelValidationService();
+
+  private Set<ModelElementVersionValidationStrategy> versionValidationStrategies = new HashSet<ModelElementVersionValidationStrategy>();
+
+  private ModelValidationService() {
+    versionValidationStrategies.add(new ActorMajorVersionValidator());
   }
 
+  public static ModelValidationService getInstance() {
+    return instance;
+  }
+
+  public void validate(Flow model, ValidationContext context) {
+    List deepEntityList = model.deepEntityList();
+    for (Object e : deepEntityList) {
+      if (e instanceof Actor) {
+        Actor a = (Actor) e;
+        try {
+          VersionAttribute versionAttr = (VersionAttribute) a.getAttribute("_version", VersionAttribute.class);
+          if(versionAttr!=null) {
+            VersionSpecification versionToBeValidated = VersionSpecification.parse(versionAttr.getValueAsString());
+            for (ModelElementVersionValidationStrategy validationStrategy : versionValidationStrategies) {
+              try {
+                validationStrategy.validate(a.getClass().getName(), versionToBeValidated);
+              } catch (ValidationException e1) {
+                context.addError(a.getClass().getName(), e1);
+              }
+            }
+          }
+        } catch (IllegalActionException iae) {
+          context.addError(a.getClass().getName(), new ValidationException("Invalid _version attribute", e, iae));
+        }
+      }
+    }
+  }
 }

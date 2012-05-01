@@ -50,6 +50,14 @@ public class ActorVersionRegistry {
     return instance;
   }
   
+  public void clear() {
+    for(SortedSet<VersionSpecification> set : actorVersions.values()) {
+      set.clear();
+    }
+    
+    actorVersions.clear();
+  }
+  
   /**
    * 
    * @param actorClassName

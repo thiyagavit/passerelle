@@ -41,9 +41,12 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
         if (mostRecentVersion.getMajor()==versionToBeValidated.getMajor()) {
           // all's well 
         } else if(mostRecentVersion.getMajor()<versionToBeValidated.getMajor()) {
-          throw new ValidationException("No compatible version found", versionedElementClassName, null);
+          throw new ValidationException("Available version "+mostRecentVersion+" too old for required version "+versionToBeValidated, versionedElementClassName, null);
         } else {
-          // TODO need to check if any compatible version is available; for the moment only one version is available though!
+          // This means the runtime has a more recent major version than what's required for the element.
+          // This may also lead to incompatibilities.
+          // So need to check if any compatible version is available. 
+          // (remark : for the moment only one version is available though!)
           SortedSet<VersionSpecification> availableVersions = ActorVersionRegistry.getInstance().getAvailableVersions(versionedElementClassName);
           boolean foundCompatibleVersion = false;
           for (VersionSpecification availableVersionSpec : availableVersions) {
@@ -53,7 +56,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
             }
           }
           if(!foundCompatibleVersion) {
-            throw new ValidationException("No compatible version found", versionedElementClassName, null);
+            throw new ValidationException("Available version "+mostRecentVersion+" more recent than required version "+versionToBeValidated, versionedElementClassName, null);
           }
         }
       }
