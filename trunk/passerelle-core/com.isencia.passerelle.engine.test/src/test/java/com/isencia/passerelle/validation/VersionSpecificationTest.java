@@ -1,5 +1,6 @@
 package com.isencia.passerelle.validation;
 
+import com.isencia.passerelle.validation.version.VersionSpecification;
 import junit.framework.TestCase;
 
 public class VersionSpecificationTest extends TestCase {
