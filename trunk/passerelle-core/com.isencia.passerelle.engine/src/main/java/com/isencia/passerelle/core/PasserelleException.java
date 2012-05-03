@@ -78,11 +78,18 @@ public class PasserelleException extends Exception {
 		return severity;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Throwable#getMessage()
+	/**
+	 * @return a string with the full info about the exception, incl severity, context etc.
 	 */
 	public String getMessage() {
 		return getSeverity()+" - "+super.getMessage()+"\n - Context:"+getContext()+"\n - RootException:"+getRootException();
 	}
-
+	
+	/**
+	 * 
+	 * @return just the simple message, as passed in the exception's constructor
+	 */
+	public String getSimpleMessage() {
+	  return super.getMessage();
+	}
 }
