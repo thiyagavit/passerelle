@@ -18,6 +18,7 @@ package com.isencia.passerelle.validation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
 import com.isencia.passerelle.actor.ValidationException;
 
 /**
@@ -29,19 +30,14 @@ import com.isencia.passerelle.actor.ValidationException;
 public class ValidationContext {
   
   private Collection<ValidationException> errors = new ArrayList<ValidationException>();
-  private Collection<String> invalidElements = new ArrayList<String>();
 
   /**
    * 
-   * @param invalidElement the name (typically an actor class name) of a validated element
    * @param e the validation error that was found for the given element
    */
-  public void addError(String invalidElement, ValidationException e) {
+  public void addError(ValidationException e) {
     if(e!=null) {
       errors.add(e);
-    }
-    if(invalidElement!=null) {
-      invalidElements.add(invalidElement);
     }
   }
   
@@ -49,11 +45,7 @@ public class ValidationContext {
     return Collections.unmodifiableCollection(errors);
   }
   
-  public Collection<String> getInvalidElements() {
-    return Collections.unmodifiableCollection(invalidElements);
-  }
-  
   public boolean isValid() {
-    return errors.isEmpty() && invalidElements.isEmpty();
+    return errors.isEmpty();
   }
 }

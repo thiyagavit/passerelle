@@ -32,10 +32,10 @@ public interface ModelElementVersionValidationStrategy {
 
   /**
    * 
-   * @param versionedElementClassName
+   * @param versionedElement
    * @param versionToBeValidated
    * @throws ValidationException when the element's version does not match the
    * environment's requirements.
    */
-  void validate(String versionedElementClassName, VersionSpecification versionToBeValidated) throws ValidationException;
+  void validate(Object versionedElement, VersionSpecification versionToBeValidated) throws ValidationException;
 }

@@ -16,6 +16,7 @@
 package com.isencia.passerelle.validation.version;
 
 import java.util.SortedSet;
+
 import com.isencia.passerelle.actor.ValidationException;
 
 /**
@@ -31,8 +32,9 @@ import com.isencia.passerelle.actor.ValidationException;
  */
 public class ActorMajorVersionValidator implements ModelElementVersionValidationStrategy {
 
-  public void validate(String versionedElementClassName, VersionSpecification versionToBeValidated) throws ValidationException {
-    if(versionedElementClassName!=null && versionToBeValidated!=null) { 
+  public void validate(Object versionedElement, VersionSpecification versionToBeValidated) throws ValidationException {
+    if(versionedElement!=null && versionToBeValidated!=null) {
+      String versionedElementClassName = versionedElement.getClass().getName();
       // first check with the most recent version
       VersionSpecification mostRecentVersion = ActorVersionRegistry.getInstance().getMostRecentVersion(versionedElementClassName);
       if(mostRecentVersion==null) {
@@ -41,7 +43,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
         if (mostRecentVersion.getMajor()==versionToBeValidated.getMajor()) {
           // all's well 
         } else if(mostRecentVersion.getMajor()<versionToBeValidated.getMajor()) {
-          throw new ValidationException("Available version "+mostRecentVersion+" too old for required version "+versionToBeValidated, versionedElementClassName, null);
+          throw new ValidationException("Required version " + versionToBeValidated  + " -- Available version "+mostRecentVersion+" too old." , versionedElement, null);
         } else {
           // This means the runtime has a more recent major version than what's required for the element.
           // This may also lead to incompatibilities.
@@ -56,7 +58,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
             }
           }
           if(!foundCompatibleVersion) {
-            throw new ValidationException("Available version "+mostRecentVersion+" more recent than required version "+versionToBeValidated, versionedElementClassName, null);
+            throw new ValidationException("Required version " + versionToBeValidated  + " -- Available version "+mostRecentVersion+" more recent.", versionedElement, null);
           }
         }
       }

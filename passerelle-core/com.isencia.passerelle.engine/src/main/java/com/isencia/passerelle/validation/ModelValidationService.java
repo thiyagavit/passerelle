@@ -18,8 +18,10 @@ package com.isencia.passerelle.validation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import ptolemy.kernel.attributes.VersionAttribute;
 import ptolemy.kernel.util.IllegalActionException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.model.Flow;
@@ -61,14 +63,14 @@ public class ModelValidationService {
             VersionSpecification versionToBeValidated = VersionSpecification.parse(versionAttr.getValueAsString());
             for (ModelElementVersionValidationStrategy validationStrategy : versionValidationStrategies) {
               try {
-                validationStrategy.validate(a.getClass().getName(), versionToBeValidated);
+                validationStrategy.validate(a, versionToBeValidated);
               } catch (ValidationException e1) {
-                context.addError(a.getClass().getName(), e1);
+                context.addError(e1);
               }
             }
           }
         } catch (IllegalActionException iae) {
-          context.addError(a.getClass().getName(), new ValidationException("Invalid _version attribute", e, iae));
+          context.addError(new ValidationException("Invalid _version attribute", e, iae));
         }
       }
     }

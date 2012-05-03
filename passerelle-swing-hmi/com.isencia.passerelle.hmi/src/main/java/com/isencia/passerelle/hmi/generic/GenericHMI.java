@@ -79,6 +79,9 @@ import ptolemy.kernel.util.Settable;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.constants.IPropertyNames;
+import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.actor.gui.IPasserelleComponent;
 import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory;
 import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory.ParameterEditorAuthorizer;
@@ -90,6 +93,7 @@ import com.isencia.passerelle.actor.gui.PasserelleQuery.RenameRequest;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
 import com.isencia.passerelle.actor.gui.graph.EditPreferencesDialog;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
+import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
 import com.isencia.passerelle.hmi.ModelUtils;
@@ -105,6 +109,11 @@ import com.isencia.passerelle.hmi.trace.TraceVisualizer;
 import com.isencia.passerelle.hmi.util.VersionPrinter;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.util.EnvironmentUtils;
+import com.isencia.passerelle.util.ExecutionTracerService;
+import com.isencia.passerelle.validation.ModelValidationService;
+import com.isencia.passerelle.validation.ValidationContext;
+import com.isencia.passerelle.validation.version.ActorVersionRegistry;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
@@ -115,1054 +124,1073 @@ import diva.graph.GraphModel;
  * @author erwin.de.ley@isencia.be
  */
 public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, QueryLabelProvider {
-	private final static Logger logger = LoggerFactory.getLogger(GenericHMI.class);
+  private final static Logger logger = LoggerFactory.getLogger(GenericHMI.class);
 
-	public static final String HMI_DEF_PREFS_FILE_PROPNAME = "hmi.default.preferences.file";
-	private static String HMI_DEF_PREFS_FILE;
-    public static final String HMI_DEF_PREFS_PATH_PROPNAME = "hmi.default.preferences.path";
-    public static final String HMI_DEF_PREFS_FILE_DEFAULT = "hmi_filter_def.xml";
+  public static final String HMI_DEF_PREFS_FILE_PROPNAME = "hmi.default.preferences.file";
+  private static String HMI_DEF_PREFS_FILE;
+  public static final String HMI_DEF_PREFS_PATH_PROPNAME = "hmi.default.preferences.path";
+  public static final String HMI_DEF_PREFS_FILE_DEFAULT = "hmi_filter_def.xml";
+
+  private IPasserelleEditorPaneFactory editorPaneFactory;
+
+  private JMenuBar menuBar;
+
+  private JScrollPane parameterScrollPane;
+  private JScrollPane modelGraphScrollPane;
+  private JPanel paremeterFormPanel;
+  private TabWindow modelGraphTabWindow;
+  private TabbedPanel modelGraphTabPanel;
+
+  private JPanel tracePanel;
+
+  private JPanel configPanel;
+
+  private JLabel modelNameLabel;
+
+  private HMIDefinition hmiDef;
+
+  private int nrColumns = 1;
+  private final Map<String, TitledTab> graphTabsMap = new HashMap<String, TitledTab>();
+  private final Map<NamedObj, IPasserelleQuery> listQuery = new HashMap<NamedObj, IPasserelleQuery>();
+
+  /**
+   * Starts the Generic HMI with the default Models Definition bundle, and optionally with a graphical model editor.
+   * 
+   * @param showModelGraph
+   *          if true, also show the graphical model editor.
+   */
+  public GenericHMI(final boolean showModelForms, final boolean showModelGraph) {
+    super(GENERIC, showModelForms, showModelGraph);
+  }
+
+  @Override
+  public void init() {
+    super.init();
+    String defPrefsFileName = System.getProperty(HMI_DEF_PREFS_FILE_PROPNAME, HMI_DEF_PREFS_FILE_DEFAULT);
+    String defPrefsFilePath = System.getProperty(HMI_DEF_PREFS_PATH_PROPNAME);
+    if (defPrefsFilePath != null && defPrefsFilePath.length() > 0) {
+      HMI_DEF_PREFS_FILE = defPrefsFilePath + "/" + defPrefsFileName;
+    } else {
+      HMI_DEF_PREFS_FILE = EnvironmentUtils.getApplicationRootFolder() + "/" + IPropertyNames.APP_CFG_DEFAULT + "/" + defPrefsFileName;
+    }
+
+    hmiDef = HMIDefinition.parseHMIDefFile(HMI_DEF_PREFS_FILE);
     
-	private IPasserelleEditorPaneFactory editorPaneFactory;
+    ActorVersionRegistry.getInstance().addActorVersion(Const.class.getName(), VersionSpecification.parse("10.0.0"));
+  }
 
-	private JMenuBar menuBar;
+  @SuppressWarnings("unchecked")
+  @Override
+  protected void showModelForm(final String modelKey) {
+    if (!showModelForms) {
+      return;
+    }
 
-	private JScrollPane parameterScrollPane;
-	private JScrollPane modelGraphScrollPane;
-	private JPanel paremeterFormPanel;
-	private TabWindow modelGraphTabWindow;
-	private TabbedPanel modelGraphTabPanel;
+    final URL modelURL = getModelURL();
+    try {
+      clearModelForms(modelURL != null ? modelURL.toURI() : null);
+    } catch (URISyntaxException ex) {
+      // We can safely ignore this since the modelURL is in compliance with RFC2396
+    }
 
-	private JPanel tracePanel;
+    if (getDialogHookComponent() != null) {
+      if (modelURL != null) {
+        getDialogHookComponent().setTitle("Passerelle - " + modelURL);
+        modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
 
-	private JPanel configPanel;
+        parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
+        parameterScrollPane.getParent().validate();
+      }
+    }
 
-	private JLabel modelNameLabel;
+    if (getCurrentModel() != null) {
+      final LayoutPreferences layoutPrefs = hmiDef.getLayoutPrefs(getModelIdentifierForFilterDef(getCurrentModel()));
 
-	private HMIDefinition hmiDef;
+      if (layoutPrefs != null) {
+        nrColumns = layoutPrefs.getNrColumns();
+      }
+      // sizeAndPlaceFrame();
 
-	private int nrColumns = 1;
-	private final Map<String, TitledTab> graphTabsMap = new HashMap<String, TitledTab>();
-	private final Map<NamedObj, IPasserelleQuery> listQuery = new HashMap<NamedObj, IPasserelleQuery>();
+      getConfigPanel().setLayout(new GridLayout(1, nrColumns));
+      final JPanel[] boxes = new JPanel[nrColumns];
+      for (int i = 0; i < nrColumns; ++i) {
+        boxes[i] = new JPanel(new VerticalLayout());
 
-	/**
-	 * Starts the Generic HMI with the default Models Definition bundle,
-	 * and optionally with a graphical model editor.
-	 * 
-	 * @param showModelGraph if true, also show the graphical model editor.
-	 */
-	public GenericHMI(final boolean showModelForms,final boolean showModelGraph) {
-		super(GENERIC, showModelForms, showModelGraph);
-	}
-	
-	@Override
-	public void init() {
-		super.init();
-        String defPrefsFileName = System.getProperty(HMI_DEF_PREFS_FILE_PROPNAME,HMI_DEF_PREFS_FILE_DEFAULT);
-        String defPrefsFilePath = System.getProperty(HMI_DEF_PREFS_PATH_PROPNAME);
-        if(defPrefsFilePath != null && defPrefsFilePath.length() > 0 ){
-              HMI_DEF_PREFS_FILE = defPrefsFilePath + "/" + defPrefsFileName;
-        }else {
-              HMI_DEF_PREFS_FILE = EnvironmentUtils.getApplicationRootFolder()+"/"+ IPropertyNames.APP_CFG_DEFAULT+"/"+defPrefsFileName;
+        configPanel.add(boxes[i]);
+      }
+      final List entities = getCurrentModel().entityList();
+      if (entities != null) {
+        final Vector<JPanel> actorPanels = new Vector<JPanel>();
+        // render model
+        if (layoutPrefs == null || layoutPrefs.getActorNames() == null || layoutPrefs.getActorNames().size() == 0) {
+
+          // render model for model parameters
+          renderModelComponent(false, getCurrentModel(), boxes[0]);
+
+          // render model for director
+          if (getCurrentModel().getDirector() != null) {
+            final JPanel b = new JPanel(new VerticalLayout());
+            final boolean added = renderModelComponent(false, getCurrentModel().getDirector(), b);
+            if (added) {
+              actorPanels.add(b);
+            }
+          }
+
+          // build the vector of panels with only visible actors
+          for (int i = 0; i < entities.size(); ++i) {
+            final NamedObj e = (NamedObj) entities.get(i);
+            final JPanel b = new JPanel(new VerticalLayout());
+            // JPanel b = boxes[(i+1) / nrEntriesPerColumn];
+            // Box b = boxes[(i+1) / nrEntriesPerColumn];
+            final boolean added = renderModelComponent(true, e, b);
+            if (added) {
+              actorPanels.add(b);
+            }
+          }
+        } else {// an actor order has been defined
+          final List<String> actorNames = layoutPrefs.getActorNames();
+          boolean modelParamsRendered = false;
+          for (final String actorName : actorNames) {
+            final Entity e = getCurrentModel().getEntity(actorName);
+            final Attribute param = getCurrentModel().getAttribute(actorName);
+            if (getCurrentModel().getDirector().getName().equals(actorName)) {
+              // render model for director
+              if (getCurrentModel().getDirector() != null) {
+                final JPanel b = new JPanel(new VerticalLayout());
+                final boolean added = renderModelComponent(false, getCurrentModel().getDirector(), b);
+                if (added) {
+                  actorPanels.add(b);
+                }
+              }
+            } else if (e != null) {
+              // render model actors
+              final JPanel b = new JPanel(new VerticalLayout());
+              final boolean added = renderModelComponent(true, e, b);
+              if (added) {
+                actorPanels.add(b);
+              }
+            } else if (param != null) {
+              // render model for model parameters
+              if (!modelParamsRendered) {
+                // since all model' params are rendered at the
+                // same time
+                // and it is possible to have several params in
+                // the layoutPrefs, make sure that is called
+                // only once
+                final JPanel b = new JPanel(new VerticalLayout());
+                final boolean added = renderModelComponent(false, getCurrentModel(), b);
+                if (added) {
+                  actorPanels.add(b);
+                }
+                modelParamsRendered = true;
+              }
+            } else {
+              // it's an invalid layoutPrefs definition, e.g.
+              // defined for another model
+              // with same name or...
+              layoutPrefs.getActorNames().clear();
+              showModelForm(modelKey);
+              break;
+            }
+          }
         }
-		
-		hmiDef = HMIDefinition.parseHMIDefFile(HMI_DEF_PREFS_FILE);
-	}
+        // display actors in fonction of layout prefs.
+        final int nrEntriesPerColumn = actorPanels.size() / nrColumns;
+        final int more = actorPanels.size() % nrColumns;
+        final Iterator it = actorPanels.iterator();
+        for (int i = 0; i < nrColumns; i++) {
+          final JPanel column = boxes[i];
+          if (i < more) {
+            if (it.hasNext()) {
+              final JPanel actor = (JPanel) it.next();
+              column.add(actor);
+            }
+          }
+          for (int j = 0; j < nrEntriesPerColumn; j++) {
+            if (it.hasNext()) {
+              final JPanel actor = (JPanel) it.next();
+              column.add(actor);
+            }
+          }
+        }
+      }
+      paremeterFormPanel.add("Center", configPanel);
+      parameterScrollPane.validate();
+    }
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void showModelForm(final String modelKey) {
-	  if(!showModelForms) {
-	    return;
-	  }
-	  
-		final URL modelURL = getModelURL();
-		try {
-			clearModelForms(modelURL!=null?modelURL.toURI():null);
-		} catch (URISyntaxException ex) {
-			// We can safely ignore this since the modelURL is in compliance with RFC2396
-		}
+  @Override
+  public Flow loadModel(final URL _modelFile, final String modelKey) throws Exception {
+    if (_modelFile == null) {
+      throw new IllegalArgumentException("Undefined model file for " + modelKey);
+    }
+    selectTab(_modelFile.toURI(), modelGraphTabPanel);
+    Flow loadedModel = super.loadModel(_modelFile, modelKey);
 
-		if (getDialogHookComponent() != null) {
-			if (modelURL != null) {
-				getDialogHookComponent().setTitle("Passerelle - " + modelURL);
-				modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
+    boolean needToValidateModels = true;
+//    Token validateModelsToken = PtolemyPreferences.preferenceValueLocal(loadedModel, "_validateModels");
+//    if (validateModelsToken != null && validateModelsToken instanceof BooleanToken) {
+//      needToValidateModels = ((BooleanToken) validateModelsToken).booleanValue();
+//    }
 
-				parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
-				parameterScrollPane.getParent().validate();
-			}
-		}
+    if (needToValidateModels) {
+      ValidationContext validationContext = new ValidationContext();
+      ModelValidationService.getInstance().validate(loadedModel, validationContext);
+      if (!validationContext.isValid()) {
+        for (ValidationException e : validationContext.getErrors()) {
+          Object obj = e.getContext();
+          String validationErrorMsg = e.getSimpleMessage();
 
-		if (getCurrentModel() != null) {
-			final LayoutPreferences layoutPrefs = hmiDef.getLayoutPrefs(getModelIdentifierForFilterDef(getCurrentModel()));
+          if (obj instanceof Actor) {
+            ExecutionTracerService.trace((Actor) obj, "WARNING : "+validationErrorMsg);
+          } else if (obj instanceof Director) {
+            ExecutionTracerService.trace((Director) obj, "WARNING : "+validationErrorMsg);
+          } else {
+            // TODO maybe show a pop-up with error info?
+          }
+        }
+      }
+    }
+    return loadedModel;
+  }
 
-			if (layoutPrefs != null) {
-				nrColumns = layoutPrefs.getNrColumns();
-			}
-			// sizeAndPlaceFrame();
-
-			getConfigPanel().setLayout(new GridLayout(1, nrColumns));
-			final JPanel[] boxes = new JPanel[nrColumns];
-			for (int i = 0; i < nrColumns; ++i) {
-				boxes[i] = new JPanel(new VerticalLayout());
-
-				configPanel.add(boxes[i]);
-			}
-			final List entities = getCurrentModel().entityList();
-			if (entities != null) {
-				final Vector<JPanel> actorPanels = new Vector<JPanel>();
-				// render model
-				if (layoutPrefs == null || layoutPrefs.getActorNames() == null || layoutPrefs.getActorNames().size() == 0) {
-
-					// render model for model parameters
-					renderModelComponent(false, getCurrentModel(), boxes[0]);
-
-					// render model for director
-					if (getCurrentModel().getDirector() != null) {
-						final JPanel b = new JPanel(new VerticalLayout());
-						final boolean added = renderModelComponent(false, getCurrentModel().getDirector(), b);
-						if (added) {
-							actorPanels.add(b);
-						}
-					}
-
-					// build the vector of panels with only visible actors
-					for (int i = 0; i < entities.size(); ++i) {
-						final NamedObj e = (NamedObj) entities.get(i);
-						final JPanel b = new JPanel(new VerticalLayout());
-						// JPanel b = boxes[(i+1) / nrEntriesPerColumn];
-						// Box b = boxes[(i+1) / nrEntriesPerColumn];
-						final boolean added = renderModelComponent(true, e, b);
-						if (added) {
-							actorPanels.add(b);
-						}
-					}
-				} else {// an actor order has been defined
-					final List<String> actorNames = layoutPrefs.getActorNames();
-					boolean modelParamsRendered = false;
-					for (final String actorName : actorNames) {
-						final Entity e = getCurrentModel().getEntity(actorName);
-						final Attribute param = getCurrentModel().getAttribute(actorName);
-						if (getCurrentModel().getDirector().getName().equals(actorName)) {
-							// render model for director
-							if (getCurrentModel().getDirector() != null) {
-								final JPanel b = new JPanel(new VerticalLayout());
-								final boolean added = renderModelComponent(false, getCurrentModel().getDirector(), b);
-								if (added) {
-									actorPanels.add(b);
-								}
-							}
-						} else if (e != null) {
-							// render model actors
-							final JPanel b = new JPanel(new VerticalLayout());
-							final boolean added = renderModelComponent(true, e, b);
-							if (added) {
-								actorPanels.add(b);
-							}
-						} else if (param != null) {
-							// render model for model parameters
-							if (!modelParamsRendered) {
-								// since all model' params are rendered at the
-								// same time
-								// and it is possible to have several params in
-								// the layoutPrefs, make sure that is called
-								// only once
-								final JPanel b = new JPanel(new VerticalLayout());
-								final boolean added = renderModelComponent(false, getCurrentModel(), b);
-								if (added) {
-									actorPanels.add(b);
-								}
-								modelParamsRendered = true;
-							}
-						} else {
-							// it's an invalid layoutPrefs definition, e.g.
-							// defined for another model
-							// with same name or...
-							layoutPrefs.getActorNames().clear();
-							showModelForm(modelKey);
-							break;
-						}
-					}
-				}
-				// display actors in fonction of layout prefs.
-				final int nrEntriesPerColumn = actorPanels.size() / nrColumns;
-				final int more = actorPanels.size() % nrColumns;
-				final Iterator it = actorPanels.iterator();
-				for (int i = 0; i < nrColumns; i++) {
-					final JPanel column = boxes[i];
-					if (i < more) {
-						if (it.hasNext()) {
-							final JPanel actor = (JPanel) it.next();
-							column.add(actor);
-						}
-					}
-					for (int j = 0; j < nrEntriesPerColumn; j++) {
-						if (it.hasNext()) {
-							final JPanel actor = (JPanel) it.next();
-							column.add(actor);
-						}
-					}
-				}
-			}
-			paremeterFormPanel.add("Center", configPanel);
-			parameterScrollPane.validate();
-		}
-	}
-
-	@Override
-	public Flow loadModel(final URL _modelFile, final String modelKey) throws Exception {
-		if(_modelFile==null) {
-			throw new IllegalArgumentException("Undefined model file for "+modelKey);
-		}
-//		try {
-			selectTab(_modelFile.toURI(), modelGraphTabPanel);
-			return super.loadModel(_modelFile, modelKey);
-//		} catch (final Exception e) {
-			// Since the HMI must now be able to support multiple open models,
-			// this cleanup and warning is no longer allowed as it would crush any cfg panels for an already-open model.
-//			clearModelForms(_modelFile);
-//			modelNameLabel = new JLabel(_modelFile + " not found or is not a moml file", JLabel.CENTER);
-//			modelNameLabel.setForeground(Color.RED);
-//			parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
-//			throw e;
-//		}
-	}
-
-	@Override
-	public boolean hasChangeImpact(final ChangeRequest change) {
-		boolean hasImpact = super.hasChangeImpact(change);
-		if (change.getDescription() != null) {
-			if (change instanceof RenameRequest) {
-//				showModelForm(null);
-				RenameRequest _ch = (RenameRequest) change;
-				String oldName = (_ch.getContext().getFullName()+"."+_ch.getOldName()).substring(1);
-				String newName = (_ch.getContext().getFullName()+"."+_ch.getNewName()).substring(1);
-				((LookInsideViewFactory)graphPanel.getViewFactory()).renameView(oldName, newName);
-			}
-			final String[] importantChanges = new String[] { "entity", "property", "deleteEntity", "deleteProperty", "class" };
-			for (final String changeType : importantChanges) {
-				if (change.getDescription().contains(changeType)) {
-					hasImpact=true;
+  @Override
+  public boolean hasChangeImpact(final ChangeRequest change) {
+    boolean hasImpact = super.hasChangeImpact(change);
+    if (change.getDescription() != null) {
+      if (change instanceof RenameRequest) {
+        // showModelForm(null);
+        RenameRequest _ch = (RenameRequest) change;
+        String oldName = (_ch.getContext().getFullName() + "." + _ch.getOldName()).substring(1);
+        String newName = (_ch.getContext().getFullName() + "." + _ch.getNewName()).substring(1);
+        ((LookInsideViewFactory) graphPanel.getViewFactory()).renameView(oldName, newName);
+      }
+      final String[] importantChanges = new String[] { "entity", "property", "deleteEntity", "deleteProperty", "class" };
+      for (final String changeType : importantChanges) {
+        if (change.getDescription().contains(changeType)) {
+          hasImpact = true;
           break;
-				}
-			}
-		}
-		return hasImpact;
-	}
+        }
+      }
+    }
+    return hasImpact;
+  }
 
-	@Override
+  @Override
   public void setChanged(URL modelURL) {
     super.setChanged(modelURL);
     if (graphTabsMap != null && getModelURL() != null) {
       // graphTabsMap.get(this.getModelURL().toString()).setText(
       // getCurrentModel().getName() + " - ***");
       graphTabsMap.get(getModelURL().toString()).setIcon(
-          new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-              getClass().getResource("/com/isencia/passerelle/hmi/resources/star.png"))));
+          new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/com/isencia/passerelle/hmi/resources/star.png"))));
     }
   }
 
   @Override
-	public void setSaved(URI modelURI) {
-		super.setSaved(modelURI);
-		if (modelURI != null) {
-			if (graphTabsMap.get(modelURI.toString()) != null) {
-				final TitledTab tab = graphTabsMap.get(modelURI.toString());
-				tab.setIcon(null);
-				// tab.setText(getCurrentModel().getName());
-			}
-		}
-	};
+  public void setSaved(URI modelURI) {
+    super.setSaved(modelURI);
+    if (modelURI != null) {
+      if (graphTabsMap.get(modelURI.toString()) != null) {
+        final TitledTab tab = graphTabsMap.get(modelURI.toString());
+        tab.setIcon(null);
+        // tab.setText(getCurrentModel().getName());
+      }
+    }
+  };
 
-	@Override
-	protected void showModelGraph(final String modelKey) {
-		// clearModelGraphs();
-		try {
-			if (graphPanelEffigy == null) {
-				graphPanelEffigy = new PtolemyEffigy(getPtolemyConfiguration(), modelKey);
-			}
-			graphPanel = new ModelGraphPanel(getCurrentModel(), graphPanelEffigy);
-			// TODO BEWARE : animation now happens in the actor
-			// thread and blocks for a second!!
-			graphPanel.setAnimationDelay(1000);
+  @Override
+  protected void showModelGraph(final String modelKey) {
+    // clearModelGraphs();
+    try {
+      if (graphPanelEffigy == null) {
+        graphPanelEffigy = new PtolemyEffigy(getPtolemyConfiguration(), modelKey);
+      }
+      graphPanel = new ModelGraphPanel(getCurrentModel(), graphPanelEffigy);
+      // TODO BEWARE : animation now happens in the actor
+      // thread and blocks for a second!!
+      graphPanel.setAnimationDelay(1000);
 
-			final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
+      final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
 
-			graphTabsMap.put(getModelURL().toString(), tab);
-			// mainGraphTab.getWindowProperties().setCloseEnabled(true);
-			tab.setName(getModelURL().toString());
-			tab.setToolTipText(getModelURL().toString());
-			
-			final TabbedPanel tabbedPane = getModelGraphPanel();
-			tabbedPane.addTab(tab);
-			graphPanel.registerViewFactory(new LookInsideViewFactory(this, tabbedPane, tab, graphPanelEffigy));
-//			new EditionActions().addActions(graphPanel);
+      graphTabsMap.put(getModelURL().toString(), tab);
+      // mainGraphTab.getWindowProperties().setCloseEnabled(true);
+      tab.setName(getModelURL().toString());
+      tab.setToolTipText(getModelURL().toString());
 
-			selectTab(getModelURL().toURI(), tabbedPane);
-			// StateMachine stuff
-			 StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, tab.getName(), graphPanel);
-			 StateMachine.getInstance().compile();
+      final TabbedPanel tabbedPane = getModelGraphPanel();
+      tabbedPane.addTab(tab);
+      graphPanel.registerViewFactory(new LookInsideViewFactory(this, tabbedPane, tab, graphPanelEffigy));
+      // new EditionActions().addActions(graphPanel);
 
-		} catch (final Throwable t) {
-			logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
-		}
-	}
+      selectTab(getModelURL().toURI(), tabbedPane);
+      // StateMachine stuff
+      StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, tab.getName(), graphPanel);
+      StateMachine.getInstance().compile();
 
-	/**
-	 * @param tab
-	 * @param tabbedPane
-	 * @param modelURI 
-	 */
-	protected boolean selectTab(final URI modelURI, final TabbedPanel tabbedPane) {
-		TitledTab tab = graphTabsMap.get(modelURI.toString());
-		if(tab!=null) {
-			tabbedPane.setSelectedTab(tab);
-			getModelGraphScrollPane().validate();
-			return true;
-		} else {
-			return false;
-		}
-	}
+    } catch (final Throwable t) {
+      logger.error(HMIMessages.getString(HMIMessages.ERROR_GENERIC), t);
+    }
+  }
 
-	@Override
-	protected void clearModelGraphs(URI modelURI) {
-		// if (graphTabsMap.containsKey(this.getModelURL().toString())) {
-		// final View view =
-		// graphTabsMap.get(this.getModelURL().toString());
-		// view.close();
-		Tab tabToClear = graphTabsMap.get(modelURI.toString());
-		if(tabToClear!=null)
-			modelGraphTabPanel.removeTab(tabToClear);
-	}
+  /**
+   * @param tab
+   * @param tabbedPane
+   * @param modelURI
+   */
+  protected boolean selectTab(final URI modelURI, final TabbedPanel tabbedPane) {
+    TitledTab tab = graphTabsMap.get(modelURI.toString());
+    if (tab != null) {
+      tabbedPane.setSelectedTab(tab);
+      getModelGraphScrollPane().validate();
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-	/**
-	 * @param nObj
-	 * @param panel
-	 * @return true if a form was effectively rendered, i.e. when at least 1
-	 *         parameter was available
-	 * @throws IllegalActionException
-	 */
-	protected boolean renderModelComponent(final boolean deep, final NamedObj nObj, final JPanel panel) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("renderModelComponent() - Entity " + nObj.getFullName()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		Attribute cfgAttr = nObj.getAttribute("__not_configurable");
-		if(cfgAttr!=null) {
-			// cfg panel for this entity should not be shown
-			return false;
-		}
-		if (nObj instanceof CompositeActor && deep) {
-			return renderCompositeModelComponent((CompositeActor) nObj, panel);
-		} else {
-			renderModelComponentAnnotations(nObj, panel);
-			final IPasserelleEditorPaneFactory epf = getEditorPaneFactoryForComponent(nObj);
-			Component component = null;
+  @Override
+  protected void clearModelGraphs(URI modelURI) {
+    // if (graphTabsMap.containsKey(this.getModelURL().toString())) {
+    // final View view =
+    // graphTabsMap.get(this.getModelURL().toString());
+    // view.close();
+    Tab tabToClear = graphTabsMap.get(modelURI.toString());
+    if (tabToClear != null)
+      modelGraphTabPanel.removeTab(tabToClear);
+  }
 
-			// XXX keep queries in a map to resolve memory leak
-			IPasserelleQuery passerelleQuery = null;
-			if (listQuery.containsKey(nObj)) {
-				passerelleQuery = listQuery.get(nObj);
-			} else {
-				passerelleQuery = epf.createEditorPaneWithAuthorizer(nObj, this, this);
-				if (!passerelleQuery.hasAutoSync()) {
-					try {
-						final Set<ParameterToWidgetBinder> queryBindings = passerelleQuery.getParameterBindings();
-						for (final ParameterToWidgetBinder parameterToWidgetBinder : queryBindings) {
-							hmiFields.put(parameterToWidgetBinder.getBoundParameter().getFullName(), parameterToWidgetBinder);
-						}
-					} catch (final Exception exception) {
-						throw new RuntimeException("Error creating bindings for passerelleQuery", exception);
-					}
-				}
-				listQuery.put(nObj, passerelleQuery);
-			}
+  /**
+   * @param nObj
+   * @param panel
+   * @return true if a form was effectively rendered, i.e. when at least 1 parameter was available
+   * @throws IllegalActionException
+   */
+  protected boolean renderModelComponent(final boolean deep, final NamedObj nObj, final JPanel panel) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("renderModelComponent() - Entity " + nObj.getFullName()); //$NON-NLS-1$ //$NON-NLS-2$
+    }
 
-			final IPasserelleComponent passerelleComponent = passerelleQuery.getPasserelleComponent();
-			if (!(passerelleComponent instanceof Component)) {
-				return false;
-			}
+    Attribute cfgAttr = nObj.getAttribute("__not_configurable");
+    if (cfgAttr != null) {
+      // cfg panel for this entity should not be shown
+      return false;
+    }
+    if (nObj instanceof CompositeActor && deep) {
+      return renderCompositeModelComponent((CompositeActor) nObj, panel);
+    } else {
+      renderModelComponentAnnotations(nObj, panel);
+      final IPasserelleEditorPaneFactory epf = getEditorPaneFactoryForComponent(nObj);
+      Component component = null;
 
-			component = (Component) passerelleComponent;
-			if (component != null && !(component instanceof PasserelleEmptyQuery)) {
-				final String name = ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), nObj);
-				component.setName(name);
-				final JPanel globalPanel = new JPanel(new BorderLayout());
+      // XXX keep queries in a map to resolve memory leak
+      IPasserelleQuery passerelleQuery = null;
+      if (listQuery.containsKey(nObj)) {
+        passerelleQuery = listQuery.get(nObj);
+      } else {
+        passerelleQuery = epf.createEditorPaneWithAuthorizer(nObj, this, this);
+        if (!passerelleQuery.hasAutoSync()) {
+          try {
+            final Set<ParameterToWidgetBinder> queryBindings = passerelleQuery.getParameterBindings();
+            for (final ParameterToWidgetBinder parameterToWidgetBinder : queryBindings) {
+              hmiFields.put(parameterToWidgetBinder.getBoundParameter().getFullName(), parameterToWidgetBinder);
+            }
+          } catch (final Exception exception) {
+            throw new RuntimeException("Error creating bindings for passerelleQuery", exception);
+          }
+        }
+        listQuery.put(nObj, passerelleQuery);
+      }
 
-				// Panel for title
-				final JPanel titlePanel = createTitlePanel(name);
+      final IPasserelleComponent passerelleComponent = passerelleQuery.getPasserelleComponent();
+      if (!(passerelleComponent instanceof Component)) {
+        return false;
+      }
 
-				// Add a nice background to panels
-				panel.setName(name + " " + panel);
-				titlePanel.setBackground(panel.getBackground());
-				((JComponent) component).setBackground(panel.getBackground());
-				// Border
-				final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
-				final TitledBorder border = BorderFactory.createTitledBorder(loweredbevel/*
-																						 * ,name
-																						 */);
-				globalPanel.setBorder(border);
+      component = (Component) passerelleComponent;
+      if (component != null && !(component instanceof PasserelleEmptyQuery)) {
+        final String name = ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), nObj);
+        component.setName(name);
+        final JPanel globalPanel = new JPanel(new BorderLayout());
 
-				globalPanel.add(titlePanel, BorderLayout.NORTH);
-				globalPanel.add(component, BorderLayout.CENTER);
-				panel.add(globalPanel);
+        // Panel for title
+        final JPanel titlePanel = createTitlePanel(name);
 
-				// StateMachine stuff
-				 StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, name, component);
-				 StateMachine.getInstance().compile();
-				return true;
-			}
-			return false;
-		}
-	}
+        // Add a nice background to panels
+        panel.setName(name + " " + panel);
+        titlePanel.setBackground(panel.getBackground());
+        ((JComponent) component).setBackground(panel.getBackground());
+        // Border
+        final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+        final TitledBorder border = BorderFactory.createTitledBorder(loweredbevel/*
+                                                                                  * ,name
+                                                                                  */);
+        globalPanel.setBorder(border);
 
-	protected JPanel createTitlePanel(final String name) {
-		final JPanel result = new JPanel(new BorderLayout());
-		result.setName("result");
-		final ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/com/isencia/passerelle/hmi/resources/param.gif")));
-		final JLabel startLabel = new JLabel(icon);
-		result.add(startLabel, BorderLayout.LINE_START);
+        globalPanel.add(titlePanel, BorderLayout.NORTH);
+        globalPanel.add(component, BorderLayout.CENTER);
+        panel.add(globalPanel);
 
-		final JLabel nameLabel = new JLabel(name);
-		final Font f = nameLabel.getFont();
-		nameLabel.setFont(new Font(f.getName(), f.getStyle(), f.getSize() + 2));
-		nameLabel.setForeground(new Color(49, 106, 196));
-		result.add(nameLabel);
+        // StateMachine stuff
+        StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, name, component);
+        StateMachine.getInstance().compile();
+        return true;
+      }
+      return false;
+    }
+  }
 
-		return result;
-	}
+  protected JPanel createTitlePanel(final String name) {
+    final JPanel result = new JPanel(new BorderLayout());
+    result.setName("result");
+    final ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/com/isencia/passerelle/hmi/resources/param.gif")));
+    final JLabel startLabel = new JLabel(icon);
+    result.add(startLabel, BorderLayout.LINE_START);
 
-	protected IPasserelleEditorPaneFactory getEditorPaneFactoryForComponent(final NamedObj e) {
-		IPasserelleEditorPaneFactory epf = null;
-		try {
-			epf = (IPasserelleEditorPaneFactory) e.getAttribute("_editorPaneFactory", IPasserelleEditorPaneFactory.class);
-		} catch (final IllegalActionException e1) {
-		}
+    final JLabel nameLabel = new JLabel(name);
+    final Font f = nameLabel.getFont();
+    nameLabel.setFont(new Font(f.getName(), f.getStyle(), f.getSize() + 2));
+    nameLabel.setForeground(new Color(49, 106, 196));
+    result.add(nameLabel);
 
-		epf = epf != null ? epf : editorPaneFactory;
-		return epf;
-	}
+    return result;
+  }
 
-	/**
-	 * @param e
-	 * @param b
-	 * @return true if a form was effectively rendered, i.e. when at least 1
-	 *         parameter was available
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean renderCompositeModelComponent(final CompositeActor e, final JPanel b) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("renderCompositeModelComponent() - Entity " + e.getFullName()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+  protected IPasserelleEditorPaneFactory getEditorPaneFactoryForComponent(final NamedObj e) {
+    IPasserelleEditorPaneFactory epf = null;
+    try {
+      epf = (IPasserelleEditorPaneFactory) e.getAttribute("_editorPaneFactory", IPasserelleEditorPaneFactory.class);
+    } catch (final IllegalActionException e1) {
+    }
 
-		final IPasserelleEditorPaneFactory epf = getEditorPaneFactoryForComponent(e);
-		final IPasserelleQuery pQuery = epf.createEditorPaneWithAuthorizer(e, this, this);
-		final JComponent c = (JComponent) pQuery.getPasserelleComponent();
+    epf = epf != null ? epf : editorPaneFactory;
+    return epf;
+  }
 
-		if (pQuery != null) {
-			boolean nonEmptyForm = !(pQuery instanceof PasserelleEmptyQuery);
-			// remove the default message in an empty query
-			if (!nonEmptyForm) {
-				((PasserelleEmptyQuery) pQuery).setText("");
-			} else if (!pQuery.hasAutoSync()) {
-				try {
-					final Set<ParameterToWidgetBinder> queryBindings = pQuery.getParameterBindings();
-					for (final ParameterToWidgetBinder parameterToWidgetBinder : queryBindings) {
-						hmiFields.put(parameterToWidgetBinder.getBoundParameter().getFullName(), parameterToWidgetBinder);
-					}
-				} catch (final Exception exception) {
-					throw new RuntimeException("Error creating bindings for passerelleQuery", exception);
-				}
-			}
+  /**
+   * @param e
+   * @param b
+   * @return true if a form was effectively rendered, i.e. when at least 1 parameter was available
+   */
+  @SuppressWarnings("unchecked")
+  protected boolean renderCompositeModelComponent(final CompositeActor e, final JPanel b) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("renderCompositeModelComponent() - Entity " + e.getFullName()); //$NON-NLS-1$ //$NON-NLS-2$
+    }
 
-			final String name = ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), e);
-			final List subActors = e.entityList();
-			// TODO: && changed by || because was not displaying parameters for
-			// composite
-			// still a problem of display with multiactor
-			if (pQuery instanceof PasserelleQuery || !subActors.isEmpty()) {
-				final JPanel compositeBox = createCompositePanel(b, c, name);
-				renderModelComponentAnnotations(e, compositeBox);
-				for (final Iterator<NamedObj> subActorItr = subActors.iterator(); subActorItr.hasNext();) {
-					final NamedObj subActor = subActorItr.next();
-					nonEmptyForm |= renderModelComponent(true, subActor, compositeBox);
-				}
-				if (nonEmptyForm) {
-					b.add(compositeBox);
-					// StateMachine.getInstance().registerActionForState(
-					// StateMachine.MODEL_OPEN, name, c);
-					// StateMachine.getInstance().compile();
-				}
-				return nonEmptyForm;
-			} else if (!(pQuery instanceof PasserelleEmptyQuery)) {
-				// System.out.println("else name" + name);
-				c.setName(name);
-				c.setBorder(BorderFactory.createTitledBorder(name));
-				b.add(c);
-				// StateMachine.getInstance().registerActionForState(
-				// StateMachine.MODEL_OPEN, name, c);
-				// StateMachine.getInstance().compile();
-				return true;
-			}
-		}
-		// System.out.println("renderComposite - out");
-		return false;
-	}
+    final IPasserelleEditorPaneFactory epf = getEditorPaneFactoryForComponent(e);
+    final IPasserelleQuery pQuery = epf.createEditorPaneWithAuthorizer(e, this, this);
+    final JComponent c = (JComponent) pQuery.getPasserelleComponent();
 
-	protected JPanel createCompositePanel(final JPanel b, final JComponent c, final String name) {
-		final JPanel compositeBox = new JPanel(new VerticalLayout(5));
-		compositeBox.setName("compositeBox");
-		int r = b.getBackground().getRed() - 20;
-		if (r < 1) {
-			r = 0;
-		}
-		if (r > 254) {
-			r = 255;
-		}
-		int g = b.getBackground().getGreen() - 20;
-		if (g < 1) {
-			g = 0;
-		}
-		if (g > 254) {
-			g = 255;
-		}
-		int bl = b.getBackground().getBlue() - 20;
-		if (bl < 1) {
-			bl = 0;
-		}
-		if (bl > 254) {
-			bl = 255;
-		}
+    if (pQuery != null) {
+      boolean nonEmptyForm = !(pQuery instanceof PasserelleEmptyQuery);
+      // remove the default message in an empty query
+      if (!nonEmptyForm) {
+        ((PasserelleEmptyQuery) pQuery).setText("");
+      } else if (!pQuery.hasAutoSync()) {
+        try {
+          final Set<ParameterToWidgetBinder> queryBindings = pQuery.getParameterBindings();
+          for (final ParameterToWidgetBinder parameterToWidgetBinder : queryBindings) {
+            hmiFields.put(parameterToWidgetBinder.getBoundParameter().getFullName(), parameterToWidgetBinder);
+          }
+        } catch (final Exception exception) {
+          throw new RuntimeException("Error creating bindings for passerelleQuery", exception);
+        }
+      }
 
-		compositeBox.setBackground(new Color(r, g, bl));
-		final JPanel title = new JPanel(new BorderLayout());
-		title.setName("title");
-		title.setBackground(new Color(r, g, bl));
-		/*
-		 * ImageIcon icon = new ImageIcon( Toolkit .getDefaultToolkit()
-		 * .getImage( (getClass()
-		 * .getResource("/com/isencia/passerelle/hmi/resources/composite.gif"
-		 * )))); JLabel lab = new JLabel(icon);
-		 * 
-		 * title.add(lab, BorderLayout.LINE_START);
-		 */
-		final JLabel lab2 = new JLabel(name);
-		final Font f = lab2.getFont();
-		lab2.setFont(new Font(f.getName(), f.getStyle(), f.getSize() + 6));
-		lab2.setForeground(new Color(49, 106, 196));
-		title.add(lab2);
-		compositeBox.add(title);
-		final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
-		final TitledBorder border = BorderFactory.createTitledBorder(loweredbevel);
+      final String name = ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), e);
+      final List subActors = e.entityList();
+      // TODO: && changed by || because was not displaying parameters for
+      // composite
+      // still a problem of display with multiactor
+      if (pQuery instanceof PasserelleQuery || !subActors.isEmpty()) {
+        final JPanel compositeBox = createCompositePanel(b, c, name);
+        renderModelComponentAnnotations(e, compositeBox);
+        for (final Iterator<NamedObj> subActorItr = subActors.iterator(); subActorItr.hasNext();) {
+          final NamedObj subActor = subActorItr.next();
+          nonEmptyForm |= renderModelComponent(true, subActor, compositeBox);
+        }
+        if (nonEmptyForm) {
+          b.add(compositeBox);
+          // StateMachine.getInstance().registerActionForState(
+          // StateMachine.MODEL_OPEN, name, c);
+          // StateMachine.getInstance().compile();
+        }
+        return nonEmptyForm;
+      } else if (!(pQuery instanceof PasserelleEmptyQuery)) {
+        // System.out.println("else name" + name);
+        c.setName(name);
+        c.setBorder(BorderFactory.createTitledBorder(name));
+        b.add(c);
+        // StateMachine.getInstance().registerActionForState(
+        // StateMachine.MODEL_OPEN, name, c);
+        // StateMachine.getInstance().compile();
+        return true;
+      }
+    }
+    // System.out.println("renderComposite - out");
+    return false;
+  }
 
-		compositeBox.setBorder(border);
-		compositeBox.setName(name);
-		c.setBackground(new Color(r, g, bl));
-		compositeBox.add(c);
-		return compositeBox;
-	}
+  protected JPanel createCompositePanel(final JPanel b, final JComponent c, final String name) {
+    final JPanel compositeBox = new JPanel(new VerticalLayout(5));
+    compositeBox.setName("compositeBox");
+    int r = b.getBackground().getRed() - 20;
+    if (r < 1) {
+      r = 0;
+    }
+    if (r > 254) {
+      r = 255;
+    }
+    int g = b.getBackground().getGreen() - 20;
+    if (g < 1) {
+      g = 0;
+    }
+    if (g > 254) {
+      g = 255;
+    }
+    int bl = b.getBackground().getBlue() - 20;
+    if (bl < 1) {
+      bl = 0;
+    }
+    if (bl > 254) {
+      bl = 255;
+    }
 
-	@SuppressWarnings("unchecked")
-	protected void renderModelComponentAnnotations(final NamedObj e, final JPanel b) {
-		final List<TextAttribute> annotations = e.attributeList(TextAttribute.class);
-		if (!annotations.isEmpty()) {
-			final Box annotationsBox = new Box(BoxLayout.Y_AXIS);
-			// annotationsBox.setBorder(BorderFactory.createTitledBorder("Info"));
-			for (final TextAttribute textAttribute : annotations) {
+    compositeBox.setBackground(new Color(r, g, bl));
+    final JPanel title = new JPanel(new BorderLayout());
+    title.setName("title");
+    title.setBackground(new Color(r, g, bl));
+    /*
+     * ImageIcon icon = new ImageIcon( Toolkit .getDefaultToolkit() .getImage( (getClass()
+     * .getResource("/com/isencia/passerelle/hmi/resources/composite.gif" )))); JLabel lab = new JLabel(icon);
+     * 
+     * title.add(lab, BorderLayout.LINE_START);
+     */
+    final JLabel lab2 = new JLabel(name);
+    final Font f = lab2.getFont();
+    lab2.setFont(new Font(f.getName(), f.getStyle(), f.getSize() + 6));
+    lab2.setForeground(new Color(49, 106, 196));
+    title.add(lab2);
+    compositeBox.add(title);
+    final Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+    final TitledBorder border = BorderFactory.createTitledBorder(loweredbevel);
 
-				if (isAnnotionAuthorizedForEditor(textAttribute)) {
-					final Box subBox = new Box(BoxLayout.Y_AXIS);
+    compositeBox.setBorder(border);
+    compositeBox.setName(name);
+    c.setBackground(new Color(r, g, bl));
+    compositeBox.add(c);
+    return compositeBox;
+  }
 
-					// subBox.setBorder(BorderFactory.createTitledBorder(textAttribute.getName()));
-					final String[] annotationLines = textAttribute.text.getExpression().split("\n");
+  @SuppressWarnings("unchecked")
+  protected void renderModelComponentAnnotations(final NamedObj e, final JPanel b) {
+    final List<TextAttribute> annotations = e.attributeList(TextAttribute.class);
+    if (!annotations.isEmpty()) {
+      final Box annotationsBox = new Box(BoxLayout.Y_AXIS);
+      // annotationsBox.setBorder(BorderFactory.createTitledBorder("Info"));
+      for (final TextAttribute textAttribute : annotations) {
 
-					for (final String annotationLine : annotationLines) {
-						final JLabel lab = new JLabel(annotationLine);
-						textAttribute.fontFamily.getExpression();
-						int bold = 0;
-						if (textAttribute.bold.getExpression().compareTo("true") == 0) {
-							bold = Font.BOLD;
-						}
-						int italic = 0;
-						if (textAttribute.italic.getExpression().compareTo("true") == 0) {
-							italic = Font.ITALIC;
-						}
-						final int textSize = Integer.valueOf(textAttribute.textSize.getExpression());
-						final Font font = new Font(textAttribute.fontFamily.getExpression(), bold | italic, textSize);
-						lab.setFont(font);
-						final String colorString = textAttribute.textColor.getExpression();
-						final String sub = colorString.substring(1, colorString.lastIndexOf("}"));
-						final String[] rgba = sub.split(",");
-						final float r = Float.valueOf(rgba[0]);
-						final float g = Float.valueOf(rgba[1]);
-						final float bl = Float.valueOf(rgba[2]);
-						final float a = Float.valueOf(rgba[3]);
-						final Color color = new Color(r, g, bl, a);
-						lab.setForeground(color);
-						subBox.add(lab);
-					}
-					annotationsBox.add(subBox);
-				}
-			}
-			b.add(annotationsBox);
-		}
-	}
+        if (isAnnotionAuthorizedForEditor(textAttribute)) {
+          final Box subBox = new Box(BoxLayout.Y_AXIS);
 
-	@Override
-	protected void clearModelForms(URI modelURI) {
-		clearPanel(getConfigPanel());
-		listQuery.clear();
+          // subBox.setBorder(BorderFactory.createTitledBorder(textAttribute.getName()));
+          final String[] annotationLines = textAttribute.text.getExpression().split("\n");
 
-		if (getDialogHookComponent() != null) {
-			getDialogHookComponent().setTitle("Passerelle");
-		}
-		if(parameterScrollPane!=null) {
-  		if (modelNameLabel != null) {
-  			parameterScrollPane.getParent().remove(modelNameLabel);
-  		}
-  		parameterScrollPane.getParent().validate();
-		}
-		// getConfigPanel().validate();
-	}
+          for (final String annotationLine : annotationLines) {
+            final JLabel lab = new JLabel(annotationLine);
+            textAttribute.fontFamily.getExpression();
+            int bold = 0;
+            if (textAttribute.bold.getExpression().compareTo("true") == 0) {
+              bold = Font.BOLD;
+            }
+            int italic = 0;
+            if (textAttribute.italic.getExpression().compareTo("true") == 0) {
+              italic = Font.ITALIC;
+            }
+            final int textSize = Integer.valueOf(textAttribute.textSize.getExpression());
+            final Font font = new Font(textAttribute.fontFamily.getExpression(), bold | italic, textSize);
+            lab.setFont(font);
+            final String colorString = textAttribute.textColor.getExpression();
+            final String sub = colorString.substring(1, colorString.lastIndexOf("}"));
+            final String[] rgba = sub.split(",");
+            final float r = Float.valueOf(rgba[0]);
+            final float g = Float.valueOf(rgba[1]);
+            final float bl = Float.valueOf(rgba[2]);
+            final float a = Float.valueOf(rgba[3]);
+            final Color color = new Color(r, g, bl, a);
+            lab.setForeground(color);
+            subBox.add(lab);
+          }
+          annotationsBox.add(subBox);
+        }
+      }
+      b.add(annotationsBox);
+    }
+  }
 
-	protected void clearPanel(final JComponent panel) {
-		// System.out.println("->");
-		final Component[] comp = panel.getComponents();
+  @Override
+  protected void clearModelForms(URI modelURI) {
+    clearPanel(getConfigPanel());
+    listQuery.clear();
 
-		for (final Component element : comp) {
-			// System.out.println(element);
-			if (element instanceof JComponent) {
-				// do not remove IPasserelleQuery since a reference is kept by
-				// the actor
-				if (element instanceof IPasserelleQuery) {
-					if(element instanceof CloseListener) {
-						((CloseListener)element).windowClosed(null, null);
-					}
-				} else {
-					clearPanel((JComponent) element);
-					// System.out.println("REMOVE " + element.getClass());
-					((JComponent) element).removeAll();
-					((JComponent) element).removeNotify();
-				}
-			}
-		}
-		// System.out.println("REMOVE PANEL " + panel.getClass());
-		panel.removeAll();
-		panel.removeNotify();
-		// System.out.println("<-");
-	}
+    if (getDialogHookComponent() != null) {
+      getDialogHookComponent().setTitle("Passerelle");
+    }
+    if (parameterScrollPane != null) {
+      if (modelNameLabel != null) {
+        parameterScrollPane.getParent().remove(modelNameLabel);
+      }
+      parameterScrollPane.getParent().validate();
+    }
+    // getConfigPanel().validate();
+  }
 
-	private class AboutBoxOpener implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			String versionInfo = VersionPrinter.getProjectVersionInfo();
-			JOptionPane.showMessageDialog(getDialogHookComponent(), versionInfo, "About", JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
+  protected void clearPanel(final JComponent panel) {
+    // System.out.println("->");
+    final Component[] comp = panel.getComponents();
 
-	private class ParameterFilterOpener implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			if (getCurrentModel() != null) {
-				final ParameterFilterDialog dialog = new ParameterFilterDialog(getDialogHookComponent(), getCurrentModel(), hmiDef);
-				dialog.setVisible(true);
-				final HMIDefinition filterSettingsFromDialog = dialog.getModelParameterFilterConfig();
-				if (filterSettingsFromDialog != null) {
-					hmiDef = filterSettingsFromDialog;
-					saveAndApplySettings();
-					showModelForm(null);
-				}
-			} else {
-				JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
+    for (final Component element : comp) {
+      // System.out.println(element);
+      if (element instanceof JComponent) {
+        // do not remove IPasserelleQuery since a reference is kept by
+        // the actor
+        if (element instanceof IPasserelleQuery) {
+          if (element instanceof CloseListener) {
+            ((CloseListener) element).windowClosed(null, null);
+          }
+        } else {
+          clearPanel((JComponent) element);
+          // System.out.println("REMOVE " + element.getClass());
+          ((JComponent) element).removeAll();
+          ((JComponent) element).removeNotify();
+        }
+      }
+    }
+    // System.out.println("REMOVE PANEL " + panel.getClass());
+    panel.removeAll();
+    panel.removeNotify();
+    // System.out.println("<-");
+  }
 
-	private class ActorOrderOpener implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			if (getCurrentModel() != null) {
-				final ActorOrderDialog dialog = new ActorOrderDialog(getDialogHookComponent(), getCurrentModel(), hmiDef);
-				dialog.setVisible(true);
-				final HMIDefinition filterSettingsFromDialog = dialog.getModelParameterFilterConfig();
-				if (filterSettingsFromDialog != null) {
-					hmiDef = filterSettingsFromDialog;
-					saveAndApplySettings();
-				}
-			} else {
-				JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
+  private class AboutBoxOpener implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      String versionInfo = VersionPrinter.getProjectVersionInfo();
+      JOptionPane.showMessageDialog(getDialogHookComponent(), versionInfo, "About", JOptionPane.INFORMATION_MESSAGE);
+    }
+  }
 
-	private class ColumnCountDialogOpener implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			final Integer chosenNrColumns = (Integer) JOptionPane.showInputDialog(getDialogHookComponent(), "Please enter nr of desired columns", "Layout",
-					JOptionPane.QUESTION_MESSAGE, null, new Object[] { new Integer(1), new Integer(2), new Integer(3) }, new Integer(nrColumns));
-			if (chosenNrColumns != null) {
-				nrColumns = chosenNrColumns.intValue();
-			}
-			LayoutPreferences layoutPrefs = hmiDef.getLayoutPrefs(getModelIdentifierForFilterDef(getCurrentModel()));
-			if (layoutPrefs == null) {
-				layoutPrefs = new LayoutPreferences(nrColumns);
-				hmiDef.addModelLayout(getModelIdentifierForFilterDef(getCurrentModel()), layoutPrefs);
-			} else {
-				layoutPrefs.setNrColumns(nrColumns);
-			}
-			saveAndApplySettings();
-		}
-	}
-	
-	private class GraphPreferencesOpener implements ActionListener {
-		public void actionPerformed(final ActionEvent e) {
-			EditPreferencesDialog dialog = new EditPreferencesDialog(getDialogHookComponent(), getPtolemyConfiguration());
+  private class ParameterFilterOpener implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      if (getCurrentModel() != null) {
+        final ParameterFilterDialog dialog = new ParameterFilterDialog(getDialogHookComponent(), getCurrentModel(), hmiDef);
+        dialog.setVisible(true);
+        final HMIDefinition filterSettingsFromDialog = dialog.getModelParameterFilterConfig();
+        if (filterSettingsFromDialog != null) {
+          hmiDef = filterSettingsFromDialog;
+          saveAndApplySettings();
+          showModelForm(null);
+        }
+      } else {
+        JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
+      }
+    }
+  }
 
-			try {
-				int tabCount = modelGraphTabPanel.getTabCount();
-				for(int i=0; i<tabCount; ++i) {
-					Tab tab = modelGraphTabPanel.getTabAt(i);
-//				}
-//				for(Tab tab : graphTabsMap.values()) {
-					if(tab.getContentComponent() instanceof ModelGraphPanel) {
-						ModelGraphPanel _gp = (ModelGraphPanel)tab.getContentComponent();
-						GraphModel graphModel = _gp.getJGraph().getGraphPane().getGraphController().getGraphModel();
-				        graphModel.dispatchGraphEvent(new GraphEvent(this, GraphEvent.STRUCTURE_CHANGED, graphModel.getRoot()));
-					}
-				}
-			} catch (Exception ex) {
-				logger.error("Error applying preference changes to open model", ex);
-			}
-		}
-	}
+  private class ActorOrderOpener implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      if (getCurrentModel() != null) {
+        final ActorOrderDialog dialog = new ActorOrderDialog(getDialogHookComponent(), getCurrentModel(), hmiDef);
+        dialog.setVisible(true);
+        final HMIDefinition filterSettingsFromDialog = dialog.getModelParameterFilterConfig();
+        if (filterSettingsFromDialog != null) {
+          hmiDef = filterSettingsFromDialog;
+          saveAndApplySettings();
+        }
+      } else {
+        JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
+      }
+    }
+  }
 
+  private class ColumnCountDialogOpener implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      final Integer chosenNrColumns = (Integer) JOptionPane.showInputDialog(getDialogHookComponent(), "Please enter nr of desired columns", "Layout",
+          JOptionPane.QUESTION_MESSAGE, null, new Object[] { new Integer(1), new Integer(2), new Integer(3) }, new Integer(nrColumns));
+      if (chosenNrColumns != null) {
+        nrColumns = chosenNrColumns.intValue();
+      }
+      LayoutPreferences layoutPrefs = hmiDef.getLayoutPrefs(getModelIdentifierForFilterDef(getCurrentModel()));
+      if (layoutPrefs == null) {
+        layoutPrefs = new LayoutPreferences(nrColumns);
+        hmiDef.addModelLayout(getModelIdentifierForFilterDef(getCurrentModel()), layoutPrefs);
+      } else {
+        layoutPrefs.setNrColumns(nrColumns);
+      }
+      saveAndApplySettings();
+    }
+  }
 
-	private void saveAndApplySettings() {
-		final String def = ModelBundle.generateDef(hmiDef);
-		Writer defWriter = null;
-		try {
-			defWriter = new FileWriter(HMI_DEF_PREFS_FILE);
-			defWriter.write(def);
-		} catch (final IOException e1) {
-			logger.error("Error saving filter def",e1);
-			PopupUtil.showError(getDialogHookComponent(), "impossible to save filter", e1.getMessage());
-		} finally {
-			if (defWriter != null) {
-				try {
-					defWriter.close();
-				} catch (final Exception e1) {
-				}
-			}
-		}
-		// refresh current form
-		showModelForm(null);
-	}
+  private class GraphPreferencesOpener implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      EditPreferencesDialog dialog = new EditPreferencesDialog(getDialogHookComponent(), getPtolemyConfiguration());
 
-	public boolean isAnnotionAuthorizedForEditor(final TextAttribute p) {
-		// CHeck if parameter is present in the filter configuration
-		if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
-			// we've got no usefull filter info
-			return true;
-		}
-		final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
-		final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), p));
-		return alias != null;
-	}
+      try {
+        int tabCount = modelGraphTabPanel.getTabCount();
+        for (int i = 0; i < tabCount; ++i) {
+          Tab tab = modelGraphTabPanel.getTabAt(i);
+          // }
+          // for(Tab tab : graphTabsMap.values()) {
+          if (tab.getContentComponent() instanceof ModelGraphPanel) {
+            ModelGraphPanel _gp = (ModelGraphPanel) tab.getContentComponent();
+            GraphModel graphModel = _gp.getJGraph().getGraphPane().getGraphController().getGraphModel();
+            graphModel.dispatchGraphEvent(new GraphEvent(this, GraphEvent.STRUCTURE_CHANGED, graphModel.getRoot()));
+          }
+        }
+      } catch (Exception ex) {
+        logger.error("Error applying preference changes to open model", ex);
+      }
+    }
+  }
 
-	public boolean allowRename() {
-		return false;
-	}
+  private void saveAndApplySettings() {
+    final String def = ModelBundle.generateDef(hmiDef);
+    Writer defWriter = null;
+    try {
+      defWriter = new FileWriter(HMI_DEF_PREFS_FILE);
+      defWriter.write(def);
+    } catch (final IOException e1) {
+      logger.error("Error saving filter def", e1);
+      PopupUtil.showError(getDialogHookComponent(), "impossible to save filter", e1.getMessage());
+    } finally {
+      if (defWriter != null) {
+        try {
+          defWriter.close();
+        } catch (final Exception e1) {
+        }
+      }
+    }
+    // refresh current form
+    showModelForm(null);
+  }
 
-	public boolean isAuthorizedForEditor(final Settable p) {
-		// CHeck if parameter is present in the filter configuration
-		if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
-			// we've got no usefull filter info
-			return true;
-		}
-		final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
-		final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), p));
-		return alias != null;
-	}
+  public boolean isAnnotionAuthorizedForEditor(final TextAttribute p) {
+    // CHeck if parameter is present in the filter configuration
+    if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
+      // we've got no usefull filter info
+      return true;
+    }
+    final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
+    final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), p));
+    return alias != null;
+  }
 
-	/**
-	 * Overridable method to influence
-	 * @return
-	 */
-	protected String getModelIdentifierForFilterDef(Flow model) {
-		return model.getDisplayName();
-	}
+  public boolean allowRename() {
+    return false;
+  }
 
-	public String getLabelFor(final Settable settable) {
-		// CHeck if parameter is present in the filter configuration
-		if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
-			// we've got no usefull filter info
-			return settable.getName();
-		}
-		final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
-		final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), settable));
-		return alias != null ? alias : settable.getFullName();
-	}
+  public boolean isAuthorizedForEditor(final Settable p) {
+    // CHeck if parameter is present in the filter configuration
+    if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
+      // we've got no usefull filter info
+      return true;
+    }
+    final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
+    final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), p));
+    return alias != null;
+  }
 
-	public HMIDefinition getHmiDef() {
-		return hmiDef;
-	}
+  /**
+   * Overridable method to influence
+   * 
+   * @return
+   */
+  protected String getModelIdentifierForFilterDef(Flow model) {
+    return model.getDisplayName();
+  }
 
-	public void addPrefsMenu(final JMenuBar menuBar) {
-	  // prefs are about form editor and graph editor, so only need to create this menu when one of those editors is enabled
-	  if(showModelForms||showModelGraph) {
-  		final JMenu prefsMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_PREFS));
-  		prefsMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_PREFS + HMIMessages.KEY).charAt(0));
-  		
-  		if(showModelForms) {
-    		final JMenuItem layoutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_LAYOUT), HMIMessages.getString(
-    				HMIMessages.MENU_LAYOUT + HMIMessages.KEY).charAt(0));
-    		layoutMenuItem.addActionListener(new ColumnCountDialogOpener());
-    		prefsMenu.add(layoutMenuItem);
-    		final JMenuItem actorOrderMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ACTOR_ORDER), HMIMessages.getString(
-    				HMIMessages.MENU_ACTOR_ORDER + HMIMessages.KEY).charAt(0));
-    		actorOrderMenuItem.addActionListener(new ActorOrderOpener());
-    		prefsMenu.add(actorOrderMenuItem);
-    		final JMenuItem paramFilterMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_PARAM_VISIBILITY), HMIMessages.getString(
-    				HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
-    		paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
-    		prefsMenu.add(paramFilterMenuItem);
-    		
-    		prefsMenu.add(new JSeparator());
+  public String getLabelFor(final Settable settable) {
+    // CHeck if parameter is present in the filter configuration
+    if (hmiDef == null || getCurrentModel() == null || hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel())) == null) {
+      // we've got no usefull filter info
+      return settable.getName();
+    }
+    final Model filterDefForCurrentModel = hmiDef.getModel(getModelIdentifierForFilterDef(getCurrentModel()));
+    final String alias = filterDefForCurrentModel.getFieldMapping().getValueForKey(ModelUtils.getFullNameButWithoutModelName(getCurrentModel(), settable));
+    return alias != null ? alias : settable.getFullName();
+  }
+
+  public HMIDefinition getHmiDef() {
+    return hmiDef;
+  }
+
+  public void addPrefsMenu(final JMenuBar menuBar) {
+    // prefs are about form editor and graph editor, so only need to create this menu when one of those editors is
+    // enabled
+    if (showModelForms || showModelGraph) {
+      final JMenu prefsMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_PREFS));
+      prefsMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_PREFS + HMIMessages.KEY).charAt(0));
+
+      if (showModelForms) {
+        final JMenuItem layoutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_LAYOUT), HMIMessages.getString(
+            HMIMessages.MENU_LAYOUT + HMIMessages.KEY).charAt(0));
+        layoutMenuItem.addActionListener(new ColumnCountDialogOpener());
+        prefsMenu.add(layoutMenuItem);
+        final JMenuItem actorOrderMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ACTOR_ORDER), HMIMessages.getString(
+            HMIMessages.MENU_ACTOR_ORDER + HMIMessages.KEY).charAt(0));
+        actorOrderMenuItem.addActionListener(new ActorOrderOpener());
+        prefsMenu.add(actorOrderMenuItem);
+        final JMenuItem paramFilterMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_PARAM_VISIBILITY), HMIMessages.getString(
+            HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
+        paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
+        prefsMenu.add(paramFilterMenuItem);
+
+        prefsMenu.add(new JSeparator());
         StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, layoutMenuItem);
         StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, actorOrderMenuItem);
         StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, paramFilterMenuItem);
-  		}
+      }
 
-  		if(showModelGraph) {
-    		final JMenuItem graphPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_GRAPH_PREFERENCES), HMIMessages.getString(
-    				HMIMessages.MENU_GRAPH_PREFERENCES + HMIMessages.KEY).charAt(0));
-    		graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
-    		prefsMenu.add(graphPrefsMenuItem);
-  		}
-  		menuBar.add(prefsMenu);
-  
-	  }
-	}
-	public void addHelpMenu(final JMenuBar menuBar) {
-		final JMenu helpMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_HELP));
-		helpMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_HELP + HMIMessages.KEY).charAt(0));
-		final JMenuItem aboutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ABOUT), 
-				HMIMessages.getString(HMIMessages.MENU_ABOUT + HMIMessages.KEY).charAt(0));
-		aboutMenuItem.addActionListener(new AboutBoxOpener());
-		helpMenu.add(aboutMenuItem);
-		menuBar.add(helpMenu);
-	}
-	public JMenuBar getMenuBar() {
-		if (menuBar == null) {
-			final Set<String> hideItemsSet = new HashSet<String>();
-			// hideItemsSet.add(HMIMessages.MENU_TEMPLATES);
-			hideItemsSet.add(HMIMessages.MENU_TRACING);
-			menuBar = createDefaultMenu(null, hideItemsSet);
+      if (showModelGraph) {
+        final JMenuItem graphPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_GRAPH_PREFERENCES), HMIMessages.getString(
+            HMIMessages.MENU_GRAPH_PREFERENCES + HMIMessages.KEY).charAt(0));
+        graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
+        prefsMenu.add(graphPrefsMenuItem);
+      }
+      menuBar.add(prefsMenu);
 
-			addPrefsMenu(menuBar);
-			addHelpMenu(menuBar);
-			StateMachine.getInstance().compile();
-			StateMachine.getInstance().transitionTo(StateMachine.READY);
-		}
-		return menuBar;
-	}
+    }
+  }
 
-	public JScrollPane getParameterScrollPane() {
-		if (parameterScrollPane == null) {
-			parameterScrollPane = new JScrollPane(getParameterFormPanel());
-			paremeterFormPanel.setName("parameters scroll");
-		}
-		return parameterScrollPane;
-	}
+  public void addHelpMenu(final JMenuBar menuBar) {
+    final JMenu helpMenu = new JMenu(HMIMessages.getString(HMIMessages.MENU_HELP));
+    helpMenu.setMnemonic(HMIMessages.getString(HMIMessages.MENU_HELP + HMIMessages.KEY).charAt(0));
+    final JMenuItem aboutMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_ABOUT), HMIMessages
+        .getString(HMIMessages.MENU_ABOUT + HMIMessages.KEY).charAt(0));
+    aboutMenuItem.addActionListener(new AboutBoxOpener());
+    helpMenu.add(aboutMenuItem);
+    menuBar.add(helpMenu);
+  }
 
-	public JPanel getParameterFormPanel() {
-		if (paremeterFormPanel == null) {
-			paremeterFormPanel = new JPanel(new BorderLayout());
-			paremeterFormPanel.setName("parameters panel");
-		}
-		return paremeterFormPanel;
-	}
+  public JMenuBar getMenuBar() {
+    if (menuBar == null) {
+      final Set<String> hideItemsSet = new HashSet<String>();
+      // hideItemsSet.add(HMIMessages.MENU_TEMPLATES);
+      hideItemsSet.add(HMIMessages.MENU_TRACING);
+      menuBar = createDefaultMenu(null, hideItemsSet);
 
-	public JScrollPane getModelGraphScrollPane() {
-		if (modelGraphScrollPane == null) {
-			modelGraphScrollPane = new JScrollPane(getModelGraphWindow());
-			modelGraphScrollPane.setName("modelGraphScrollPane");
-		}
-		return modelGraphScrollPane;
-	}
+      addPrefsMenu(menuBar);
+      addHelpMenu(menuBar);
+      StateMachine.getInstance().compile();
+      StateMachine.getInstance().transitionTo(StateMachine.READY);
+    }
+    return menuBar;
+  }
 
-	public JPanel getConfigPanel() {
-		if (configPanel == null) {
-			configPanel = new JPanel(/* new GridLayout(1, nrColumns) */);
-			configPanel.setName("configPanel");
-		}
-		return configPanel;
-	}
+  public JScrollPane getParameterScrollPane() {
+    if (parameterScrollPane == null) {
+      parameterScrollPane = new JScrollPane(getParameterFormPanel());
+      paremeterFormPanel.setName("parameters scroll");
+    }
+    return parameterScrollPane;
+  }
 
-	public TabWindow getModelGraphWindow() {
-		if (modelGraphTabWindow == null) {
-			modelGraphTabWindow = new TabWindow();
-			modelGraphTabWindow.add(getModelGraphPanel());
-		}
+  public JPanel getParameterFormPanel() {
+    if (paremeterFormPanel == null) {
+      paremeterFormPanel = new JPanel(new BorderLayout());
+      paremeterFormPanel.setName("parameters panel");
+    }
+    return paremeterFormPanel;
+  }
 
-		return modelGraphTabWindow;
-	}
+  public JScrollPane getModelGraphScrollPane() {
+    if (modelGraphScrollPane == null) {
+      modelGraphScrollPane = new JScrollPane(getModelGraphWindow());
+      modelGraphScrollPane.setName("modelGraphScrollPane");
+    }
+    return modelGraphScrollPane;
+  }
 
-	public TabbedPanel getModelGraphPanel() {
-		if (modelGraphTabPanel == null) {
+  public JPanel getConfigPanel() {
+    if (configPanel == null) {
+      configPanel = new JPanel(/* new GridLayout(1, nrColumns) */);
+      configPanel.setName("configPanel");
+    }
+    return configPanel;
+  }
 
-			final JButton closeButton = new JButton(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-					getClass().getResource("/com/isencia/passerelle/hmi/resources/close.png"))));
-			closeButton.setMaximumSize(new Dimension(16, 16));
-			closeButton.setFocusPainted(false);
-			closeButton.setBorderPainted(false);
-			closeButton.setContentAreaFilled(false);
+  public TabWindow getModelGraphWindow() {
+    if (modelGraphTabWindow == null) {
+      modelGraphTabWindow = new TabWindow();
+      modelGraphTabWindow.add(getModelGraphPanel());
+    }
 
-			modelGraphTabPanel = new TabbedPanel();
-			modelGraphTabPanel.getProperties().setTabLayoutPolicy(TabLayoutPolicy.COMPRESSION);
-			modelGraphTabPanel.getProperties().getTabAreaComponentsProperties().setStretchEnabled(true);
-			modelGraphTabPanel.setTabAreaComponents(new JComponent[] { closeButton });
-			modelGraphTabPanel.getProperties().setTabDropDownListVisiblePolicy(TabDropDownListVisiblePolicy.MORE_THAN_ONE_TAB);
-			closeButton.addActionListener(new ActionListener() {
-				public void actionPerformed(final ActionEvent e) {
-					closeSelectedTab();
-				}
-			});
+    return modelGraphTabWindow;
+  }
 
-			modelGraphTabPanel.addTabListener(new TabListener() {
+  public TabbedPanel getModelGraphPanel() {
+    if (modelGraphTabPanel == null) {
 
-				public void tabSelected(final TabStateChangedEvent event) {
-					// refresh the parameters panel upon the selected model
-					// graph
-					updateParamsPanel(modelGraphTabPanel.getSelectedTab());
+      final JButton closeButton = new JButton(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
+          getClass().getResource("/com/isencia/passerelle/hmi/resources/close.png"))));
+      closeButton.setMaximumSize(new Dimension(16, 16));
+      closeButton.setFocusPainted(false);
+      closeButton.setBorderPainted(false);
+      closeButton.setContentAreaFilled(false);
 
-				}
+      modelGraphTabPanel = new TabbedPanel();
+      modelGraphTabPanel.getProperties().setTabLayoutPolicy(TabLayoutPolicy.COMPRESSION);
+      modelGraphTabPanel.getProperties().getTabAreaComponentsProperties().setStretchEnabled(true);
+      modelGraphTabPanel.setTabAreaComponents(new JComponent[] { closeButton });
+      modelGraphTabPanel.getProperties().setTabDropDownListVisiblePolicy(TabDropDownListVisiblePolicy.MORE_THAN_ONE_TAB);
+      closeButton.addActionListener(new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+          closeSelectedTab();
+        }
+      });
 
-				public void tabRemoved(final TabRemovedEvent event) {
-					// refresh the parameters panel upon the selected model
-					// graph
-					updateParamsPanel(modelGraphTabPanel.getSelectedTab());
-				}
+      modelGraphTabPanel.addTabListener(new TabListener() {
 
-				private void updateParamsPanel(final Tab tab) {
-					if (tab != null) {
-						final String modelURL = tab.getName();
-						if (modelURL != null
-						/*
-						 * && !modelURL.toString().equals(
-						 * getModelURL().toString())
-						 */) {
-							try {
-								refreshParamsForm(new URI(modelURL), null);
-							} catch (final MalformedURLException e) {
-								e.printStackTrace();
-							} catch (final Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
+        public void tabSelected(final TabStateChangedEvent event) {
+          // refresh the parameters panel upon the selected model
+          // graph
+          updateParamsPanel(modelGraphTabPanel.getSelectedTab());
 
-				public void tabMoved(final TabEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabRemoved(final TabRemovedEvent event) {
+          // refresh the parameters panel upon the selected model
+          // graph
+          updateParamsPanel(modelGraphTabPanel.getSelectedTab());
+        }
 
-				public void tabHighlighted(final TabStateChangedEvent event) {
-					// TODO Auto-generated method stub
+        private void updateParamsPanel(final Tab tab) {
+          if (tab != null) {
+            final String modelURL = tab.getName();
+            if (modelURL != null
+            /*
+             * && !modelURL.toString().equals( getModelURL().toString())
+             */) {
+              try {
+                refreshParamsForm(new URI(modelURL), null);
+              } catch (final MalformedURLException e) {
+                e.printStackTrace();
+              } catch (final Exception e) {
+                e.printStackTrace();
+              }
+            }
+          }
+        }
 
-				}
+        public void tabMoved(final TabEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabDropped(final TabDragEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabHighlighted(final TabStateChangedEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabDragged(final TabDragEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabDropped(final TabDragEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabDragAborted(final TabEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabDragged(final TabDragEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabDeselected(final TabStateChangedEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabDragAborted(final TabEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabDehighlighted(final TabStateChangedEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
+        public void tabDeselected(final TabStateChangedEvent event) {
+          // TODO Auto-generated method stub
 
-				public void tabAdded(final TabEvent event) {
-					// TODO Auto-generated method stub
+        }
 
-				}
-			});
+        public void tabDehighlighted(final TabStateChangedEvent event) {
+          // TODO Auto-generated method stub
 
-		}
-		return modelGraphTabPanel;
-	}
+        }
 
-	protected void closeSelectedTab() {
-	  try {
-		Tab modelRootTab = graphTabsMap.get(getModelURL().toURI().toString());
-		Tab selectedTab = modelGraphTabPanel.getSelectedTab();
-		if(!modelRootTab.equals(selectedTab)) {
-			modelGraphTabPanel.removeTab(selectedTab);
-		} else {
-			close(getModelURL());
-		}
-	  } catch (URISyntaxException e) {
-	    logger.error("", e);
-	  }
-	}
-	
-	@Override
-	public void close(URL modelURL) {
-		super.close(modelURL);
-		if (getModelGraphPanel().getTabCount() == 0) {
-			StateMachine.getInstance().transitionTo(StateMachine.READY);
-		}
-	}
+        public void tabAdded(final TabEvent event) {
+          // TODO Auto-generated method stub
 
-	public JPanel getTracePanel() {
-		if (tracePanel == null) {
-			final TraceVisualizer traceComponent = getTraceComponent();
-			final TraceDialog traceDialog = (TraceDialog) traceComponent;
+        }
+      });
 
-			tracePanel = new JPanel(new BorderLayout());
-			tracePanel.setName("tracePanel");
-			tracePanel.add("Center", traceDialog.getContentPane());
-		}
-		return tracePanel;
-	}
+    }
+    return modelGraphTabPanel;
+  }
 
-	public Frame getDialogHookComponent() {
-		final JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parameterScrollPane);
-		return parentFrame;
-	}
+  protected void closeSelectedTab() {
+    try {
+      Tab modelRootTab = graphTabsMap.get(getModelURL().toURI().toString());
+      Tab selectedTab = modelGraphTabPanel.getSelectedTab();
+      if (!modelRootTab.equals(selectedTab)) {
+        modelGraphTabPanel.removeTab(selectedTab);
+      } else {
+        close(getModelURL());
+      }
+    } catch (URISyntaxException e) {
+      logger.error("", e);
+    }
+  }
 
-	public void doExitApplication() {
-		// Save HMI def with list of predefined and/or recently opened models
-		if(HMIBase.HMI_RECENTMODELS_FILE_STRING!=null) {
-	        String def =ModelBundle.generateDef(getHmiModelsDef());
-	        Writer defWriter=null;
-	        try {
-	            defWriter = new FileWriter(HMIBase.HMI_RECENTMODELS_FILE_STRING);
-	            defWriter.write(def);
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        } finally {
-	            if(defWriter!=null) try {defWriter.close();} catch (Exception e) {}
-	        }
-		}
-	}
+  @Override
+  public void close(URL modelURL) {
+    super.close(modelURL);
+    if (getModelGraphPanel().getTabCount() == 0) {
+      StateMachine.getInstance().transitionTo(StateMachine.READY);
+    }
+  }
 
-	public IPasserelleEditorPaneFactory getEditorPaneFactory() {
-		return editorPaneFactory;
-	}
+  public JPanel getTracePanel() {
+    if (tracePanel == null) {
+      final TraceVisualizer traceComponent = getTraceComponent();
+      final TraceDialog traceDialog = (TraceDialog) traceComponent;
 
-	public void setEditorPaneFactory(final IPasserelleEditorPaneFactory editorPaneFactory) {
-		this.editorPaneFactory = editorPaneFactory;
-	}
+      tracePanel = new JPanel(new BorderLayout());
+      tracePanel.setName("tracePanel");
+      tracePanel.add("Center", traceDialog.getContentPane());
+    }
+    return tracePanel;
+  }
+
+  public Frame getDialogHookComponent() {
+    final JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parameterScrollPane);
+    return parentFrame;
+  }
+
+  public void doExitApplication() {
+    // Save HMI def with list of predefined and/or recently opened models
+    if (HMIBase.HMI_RECENTMODELS_FILE_STRING != null) {
+      String def = ModelBundle.generateDef(getHmiModelsDef());
+      Writer defWriter = null;
+      try {
+        defWriter = new FileWriter(HMIBase.HMI_RECENTMODELS_FILE_STRING);
+        defWriter.write(def);
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        if (defWriter != null)
+          try {
+            defWriter.close();
+          } catch (Exception e) {
+          }
+      }
+    }
+  }
+
+  public IPasserelleEditorPaneFactory getEditorPaneFactory() {
+    return editorPaneFactory;
+  }
+
+  public void setEditorPaneFactory(final IPasserelleEditorPaneFactory editorPaneFactory) {
+    this.editorPaneFactory = editorPaneFactory;
+  }
 }

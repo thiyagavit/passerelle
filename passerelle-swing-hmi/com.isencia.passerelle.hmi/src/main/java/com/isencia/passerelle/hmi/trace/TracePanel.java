@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -46,6 +47,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -53,6 +55,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.search.SearchFactory;
+
 import com.isencia.passerelle.hmi.PopupUtil;
 import com.isencia.passerelle.hmi.util.MyTableModel;
 
@@ -105,7 +108,11 @@ public class TracePanel extends JPanel {
     final ColorHighlighter errorHighlight = new ColorHighlighter(HighlightPredicate.ALWAYS, new Color(1f, 0.2f, 0.2f, 1f), null);
     final HighlightPredicate error = new SearchPredicate(Pattern.compile("Error|error|ERROR|- desc:|- origin:|- reason:|- severity:"));
     errorHighlight.setHighlightPredicate(error);
+    final ColorHighlighter warningHighlight = new ColorHighlighter(HighlightPredicate.ALWAYS, new Color(1f,0.8f, 0f, 1f), null);
+    final HighlightPredicate warning = new SearchPredicate(Pattern.compile("Warning|warning|WARNING"));
+    warningHighlight.setHighlightPredicate(warning);
     getTraceTable().addHighlighter(errorHighlight);
+    getTraceTable().addHighlighter(warningHighlight);
 
     setSize(400, 200);
   }
