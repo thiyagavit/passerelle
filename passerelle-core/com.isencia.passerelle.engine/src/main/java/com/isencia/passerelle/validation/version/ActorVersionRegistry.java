@@ -17,10 +17,18 @@ package com.isencia.passerelle.validation.version;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.attributes.VersionAttribute;
+import ptolemy.kernel.util.NamedObj;
 
 /**
  * The central registry where version specs can be maintained for actor implementations.
@@ -32,6 +40,8 @@ import java.util.TreeSet;
  *
  */
 public class ActorVersionRegistry {
+  
+  private final static Logger LOGGER = LoggerFactory.getLogger(ActorVersionRegistry.class);
   
   private Map<String, SortedSet<VersionSpecification>> actorVersions = new HashMap<String, SortedSet<VersionSpecification>>();
 
@@ -93,14 +103,36 @@ public class ActorVersionRegistry {
    * 
    * @param actorClassName
    * @param version
-   * @return true if the registry did not yet contain the given version for the given actorName
+   * @return true if the given version was effectively set for the given actor.
+   * false if any of the given arguments is null or the version was already set for the given actor
    */
   public boolean addActorVersion(String actorClassName, VersionSpecification version) {
-    SortedSet<VersionSpecification> versionSet = actorVersions.get(actorClassName);
-    if(versionSet==null) {
-      versionSet = new TreeSet<VersionSpecification>();
-      actorVersions.put(actorClassName, versionSet);
+    if(actorClassName!=null && version!=null) {
+      SortedSet<VersionSpecification> versionSet = actorVersions.get(actorClassName);
+      if(versionSet==null) {
+        versionSet = new TreeSet<VersionSpecification>();
+        actorVersions.put(actorClassName, versionSet);
+      }
+      return versionSet.add(version);
+    } else {
+      return false;
     }
-    return versionSet.add(version);
+  }
+
+  public void registerActorVersionsFromLibrary(CompositeEntity actorLibrary) {
+    if(actorLibrary!=null) {
+      List libraryElements = actorLibrary.deepEntityList();
+      for(Object e : libraryElements) {
+        if(e instanceof NamedObj) {
+          NamedObj no = (NamedObj)e;
+          try {
+            VersionAttribute vAttr = (VersionAttribute) no.getAttribute("_version", VersionAttribute.class);
+            addActorVersion(e.getClass().getName(), VersionSpecification.parse(vAttr.getValueAsString()));
+          } catch (Exception ex) {
+            LOGGER.warn("Invalid version specification for "+no.getFullName(), ex);
+          }
+        }
+      }
+    }
   }
 }

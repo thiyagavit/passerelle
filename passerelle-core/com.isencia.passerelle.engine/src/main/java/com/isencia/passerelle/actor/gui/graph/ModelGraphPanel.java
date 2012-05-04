@@ -113,6 +113,7 @@ import ptolemy.vergil.tree.EntityTreeModel;
 import ptolemy.vergil.tree.PTree;
 import ptolemy.vergil.tree.PTreeMenuCreator;
 import ptolemy.vergil.tree.VisibleTreeModel;
+
 import com.isencia.passerelle.actor.gui.GetDocumentationAction;
 import com.isencia.passerelle.actor.gui.LibraryManager;
 import com.isencia.passerelle.actor.gui.graph.EditorGraphController.ViewFactory;
@@ -124,6 +125,8 @@ import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.ErrorPort;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.util.EnvironmentUtils;
+import com.isencia.passerelle.validation.version.ActorVersionRegistry;
+
 import diva.canvas.CanvasComponent;
 import diva.canvas.CanvasUtilities;
 import diva.canvas.Figure;
@@ -444,7 +447,13 @@ public class ModelGraphPanel extends JPanel implements ClipboardOwner, ChangeLis
 			// See if there is a default library in the configuration.
 			_topLibrary = _createDefaultLibrary(getModel().workspace());
 		}
-
+		// We take the actor library as the source for actor versions as they
+		// are available in the current "design tool/environment", 
+		// for which this ModelGraphPanel is being constructed.
+		// If version validation is "switched on", Passerelle's Swing HMI will
+		// validate actor versions when opening existing/old models.
+		ActorVersionRegistry.getInstance().registerActorVersionsFromLibrary(_topLibrary);
+		
 		_libraryModel = new VisibleTreeModel(_topLibrary);
 		_library = new PTree(_libraryModel);
 		_library.setRootVisible(false);
