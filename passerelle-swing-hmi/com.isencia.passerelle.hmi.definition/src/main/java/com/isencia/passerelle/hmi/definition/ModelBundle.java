@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -102,6 +103,19 @@ public class ModelBundle implements Serializable {
   }
 
   public void addModel(String modelKey, Model newModel) {
+    Model prevOne = getRecentModels().get(modelKey);
+    if(prevOne!=null && prevOne != newModel) {
+      // need to generate an indexed name
+      int i = 2;
+      while(true) {
+        String newModelKey = modelKey + "("+ (i++) +")";
+        Model _m = getRecentModels().get(newModelKey); 
+        if(_m==null || _m.getMomlPath().equals(newModel.getMomlPath())) {
+          modelKey = newModelKey;
+          break;
+        }
+      }
+    }
     getRecentModels().put(modelKey, newModel);
     getRecentModelsList().remove(modelKey);
     getRecentModelsList().add(0, modelKey);
