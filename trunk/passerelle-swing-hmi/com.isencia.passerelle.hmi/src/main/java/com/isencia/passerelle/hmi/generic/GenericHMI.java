@@ -69,6 +69,9 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.gui.PtolemyEffigy;
+import ptolemy.actor.gui.PtolemyPreferences;
+import ptolemy.data.BooleanToken;
+import ptolemy.data.Token;
 import ptolemy.gui.CloseListener;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.Attribute;
@@ -81,7 +84,6 @@ import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ValidationException;
-import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.actor.gui.IPasserelleComponent;
 import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory;
 import com.isencia.passerelle.actor.gui.IPasserelleEditorPaneFactory.ParameterEditorAuthorizer;
@@ -112,8 +114,6 @@ import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.validation.ModelValidationService;
 import com.isencia.passerelle.validation.ValidationContext;
-import com.isencia.passerelle.validation.version.ActorVersionRegistry;
-import com.isencia.passerelle.validation.version.VersionSpecification;
 
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
@@ -175,8 +175,6 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     }
 
     hmiDef = HMIDefinition.parseHMIDefFile(HMI_DEF_PREFS_FILE);
-    
-    ActorVersionRegistry.getInstance().addActorVersion(Const.class.getName(), VersionSpecification.parse("10.0.0"));
   }
 
   @SuppressWarnings("unchecked")
@@ -324,30 +322,31 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     if (_modelFile == null) {
       throw new IllegalArgumentException("Undefined model file for " + modelKey);
     }
-    selectTab(_modelFile.toURI(), modelGraphTabPanel);
+    boolean modelAlreadyLoaded = selectTab(_modelFile.toURI(), modelGraphTabPanel);
     Flow loadedModel = super.loadModel(_modelFile, modelKey);
 
-    boolean needToValidateModels = true;
-//    Token validateModelsToken = PtolemyPreferences.preferenceValueLocal(loadedModel, "_validateModels");
-//    if (validateModelsToken != null && validateModelsToken instanceof BooleanToken) {
-//      needToValidateModels = ((BooleanToken) validateModelsToken).booleanValue();
-//    }
-
-    if (needToValidateModels) {
-      ValidationContext validationContext = new ValidationContext();
-      ModelValidationService.getInstance().validate(loadedModel, validationContext);
-      if (!validationContext.isValid()) {
-        for (ValidationException e : validationContext.getErrors()) {
-          Object obj = e.getContext();
-          String validationErrorMsg = e.getSimpleMessage();
-
-          if (obj instanceof Actor) {
-            ExecutionTracerService.trace((Actor) obj, "WARNING : "+validationErrorMsg);
-          } else if (obj instanceof Director) {
-            ExecutionTracerService.trace((Director) obj, "WARNING : "+validationErrorMsg);
-          } else {
-            // TODO maybe show a pop-up with error info?
+    if(!modelAlreadyLoaded) {
+      boolean needToValidateModels = true;
+      Token validateModelsToken = PtolemyPreferences.preferenceValueLocal(loadedModel, "_validateModels");
+      if (validateModelsToken != null && validateModelsToken instanceof BooleanToken) {
+        needToValidateModels = ((BooleanToken) validateModelsToken).booleanValue();
+      }
+  
+      if (needToValidateModels) {
+        ValidationContext validationContext = new ValidationContext();
+        ModelValidationService.getInstance().validate(loadedModel, validationContext);
+        if (!validationContext.isValid()) {
+          for (ValidationException e : validationContext.getErrors()) {
+            Object obj = e.getContext();
+            String validationErrorMsg = e.getSimpleMessage();
+  
+            if (obj instanceof Actor) {
+              ExecutionTracerService.trace((Actor) obj, "WARNING : "+validationErrorMsg);
+            } else if (obj instanceof Director) {
+              ExecutionTracerService.trace((Director) obj, "WARNING : "+validationErrorMsg);
+            }
           }
+          PopupUtil.showWarning(getDialogHookComponent(), "warning.flow.validationError");
         }
       }
     }
@@ -411,7 +410,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
       // thread and blocks for a second!!
       graphPanel.setAnimationDelay(1000);
 
-      final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
+//      final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
+      final TitledTab tab = new TitledTab(modelKey, null, graphPanel, null);
 
       graphTabsMap.put(getModelURL().toString(), tab);
       // mainGraphTab.getWindowProperties().setCloseEnabled(true);
@@ -455,9 +455,12 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     // final View view =
     // graphTabsMap.get(this.getModelURL().toString());
     // view.close();
-    Tab tabToClear = graphTabsMap.get(modelURI.toString());
-    if (tabToClear != null)
+    String modelTabKey = modelURI.toString();
+    Tab tabToClear = graphTabsMap.get(modelTabKey);
+    if (tabToClear != null) {
       modelGraphTabPanel.removeTab(tabToClear);
+      graphTabsMap.remove(modelTabKey);
+    }
   }
 
   /**
