@@ -104,7 +104,7 @@ public class ModelValidationServiceTest extends TestCase {
     ModelValidationService.getInstance().validate(flow, context );
     
     assertFalse("Actors with newer major versions as registered, should be validated NOK", context.isValid());
-    assertTrue("Const actor should be marked with invalid version", context.getInvalidElements().contains(Const.class.getName()));
+    assertTrue("Const actor should be marked with invalid version", !context.getErrors(constActor).isEmpty());
   }
   
   public void testMajorVersionTooLow() throws Exception {
@@ -120,7 +120,7 @@ public class ModelValidationServiceTest extends TestCase {
     ModelValidationService.getInstance().validate(flow, context );
     
     assertFalse("Actors with newer major versions as registered, should be validated NOK", context.isValid());
-    assertTrue("MockWorker actor should be marked with invalid version", context.getInvalidElements().contains(MockWorker.class.getName()));
+    assertTrue("MockWorker actor should be marked with invalid version",  !context.getErrors(workerActor).isEmpty());
   }
   
 
