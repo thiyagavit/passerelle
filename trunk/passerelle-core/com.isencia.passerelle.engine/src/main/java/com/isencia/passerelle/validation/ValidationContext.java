@@ -18,7 +18,7 @@ package com.isencia.passerelle.validation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
+import java.util.HashSet;
 import com.isencia.passerelle.actor.ValidationException;
 
 /**
@@ -33,19 +33,45 @@ public class ValidationContext {
 
   /**
    * 
-   * @param e the validation error that was found for the given element
+   * @param e the validation error that was found. 
+   * It contains the validated element as its exception's context.
+   * @see ValidationException 
    */
   public void addError(ValidationException e) {
     if(e!=null) {
       errors.add(e);
     }
   }
-  
+
+  /**
+   * 
+   * @return all validation errors that have been determined during a validation check for this context
+   */
   public Collection<ValidationException> getErrors() {
     return Collections.unmodifiableCollection(errors);
   }
+
+  /**
+   * 
+   * @param validatedElement
+   * @return all validation errors found for the given model element, during a validation check for this context
+   */
+  public Collection<ValidationException> getErrors(Object validatedElement) {
+    Collection<ValidationException> result = new HashSet<ValidationException>();
+    for(ValidationException ex : errors) {
+      if(ex.getContext().equals(validatedElement)) {
+        result.add(ex);
+      }
+    }
+    return result;
+  }
   
+  /**
+   * 
+   * @return true if no validation errors were found in this context; false otherwise
+   */
   public boolean isValid() {
     return errors.isEmpty();
   }
+  
 }
