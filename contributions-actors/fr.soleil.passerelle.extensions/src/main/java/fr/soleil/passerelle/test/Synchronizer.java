@@ -22,6 +22,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -206,7 +207,7 @@ public class Synchronizer extends Actor {
 		isFiring = false;
 		final Token token = syncInputHandler.getToken();
 		isFiring = true;
-		if (token != null) {
+		if (token != null && token != Token.NIL) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(getInfo() + " - doFire() - received msg on port "
 						+ syncInput.getName());

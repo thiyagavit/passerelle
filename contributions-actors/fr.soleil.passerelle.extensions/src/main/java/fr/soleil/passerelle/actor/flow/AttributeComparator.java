@@ -37,6 +37,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -50,6 +51,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonNature;
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonType;
 
@@ -147,7 +149,7 @@ public class AttributeComparator extends Actor {
 				public void tokenReceived() {
 					// System.out.println("leftHandler.tokenReceived() ");
 					Token token = leftHandler.getToken();
-					if (token != null) {
+					if (token != null && token != Token.NIL) {
 						try {
 							ManagedMessage message = MessageHelper
 									.getMessageFromToken(token);
