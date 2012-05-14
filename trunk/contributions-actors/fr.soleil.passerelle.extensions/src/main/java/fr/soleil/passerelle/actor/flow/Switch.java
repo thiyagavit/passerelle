@@ -23,6 +23,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -34,6 +35,7 @@ import com.isencia.passerelle.core.PortListenerAdapter;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.PortUtilities;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
@@ -296,20 +298,20 @@ public class Switch extends Actor {
 				public void tokenReceived() {
 					final Token selectToken = selectHandler.getToken();
 					try {
-						final ManagedMessage msg = MessageHelper
-								.getMessageFromToken(selectToken);
-						// force conversion even if input is not an int
-						final String val = (String) PasserelleUtil
-								.getInputValue(msg);
-						selected = Double.valueOf(val).intValue();
+						final ManagedMessage msg = MessageHelper.getMessageFromToken(selectToken);
+						if(msg!=null) {
+              // force conversion even if input is not an int
+		          selectedReceived = true;
+              final String val = (String) PasserelleUtil.getInputValue(msg);
+              selected = Double.valueOf(val).intValue();
+              logger.debug("Event received : " + selected);
+						}
 					} catch (final NumberFormatException e) {
 						e.printStackTrace();
 					} catch (final Exception e) {
 						e.printStackTrace();
 						logger.error("", e);
 					}
-					selectedReceived = true;
-					logger.debug("Event received : " + selected);
 				}
 
 				@Override

@@ -14,6 +14,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.InternalErrorException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -24,6 +25,7 @@ import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
+
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
@@ -175,13 +177,15 @@ public class MathFunction extends Actor {
 
     double input1 = 0;
     final Token token = firstOperandHandler.getToken();
-    if (token != null) {
+    if (token != null && token != Token.NIL) {
       input1 = getDoubleFromMessage(token);
       double input2 = 1.0;
       if (_function == _MODULO) {
         if (secondOperand != null) {
           final Token tokenSec = secondOperandHandler.getToken();
-          input2 = getDoubleFromMessage(tokenSec);
+          if(tokenSec!=null && token != Token.NIL) {
+            input2 = getDoubleFromMessage(tokenSec);
+          }
         }
       }
       final ManagedMessage resultMsg = createMessage();
@@ -209,7 +213,6 @@ public class MathFunction extends Actor {
    * @throws
    */
   private double getDoubleFromMessage(final Token token) throws ProcessingException {
-
     double result = 0;
     ManagedMessage message;
     Object input = null;
@@ -222,9 +225,7 @@ public class MathFunction extends Actor {
         result = Double.parseDouble(((TangoAttribute) input).readAsString("", ""));
       } else {
         result = Double.parseDouble(input.toString());
-
       }
-
     } catch (final NumberFormatException e) {
       throw new ProcessingException("Input type not supported", input, e);
     } catch (final PasserelleException e) {

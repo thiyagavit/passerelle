@@ -42,6 +42,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.StringAttribute;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -54,6 +55,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -191,7 +193,7 @@ public class ForLoop extends Actor {
 						public void tokenReceived() {
 							// System.out.println("leftHandler.tokenReceived() ");
 							final Token token = handledPortHandler.getToken();
-							if (token != null) {
+							if (token != null && token != Token.NIL) {
 								handleReceived = true;
 								// System.out.println("left received");
 

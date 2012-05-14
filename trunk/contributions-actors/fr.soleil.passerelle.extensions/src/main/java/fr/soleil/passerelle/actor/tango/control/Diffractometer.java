@@ -8,6 +8,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.Actor;
@@ -24,6 +25,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceAttribute;
@@ -114,7 +116,7 @@ public class Diffractometer extends Actor {
 						public void tokenReceived() {
 							// System.out.println("hCoordinateHandler.tokenReceived() ");
 							final Token token = hCoordinateHandler.getToken();
-							if (token != null) {
+							if (token != null && token != Token.NIL) {
 								try {
 									final ManagedMessage message = MessageHelper
 											.getMessageFromToken(token);
@@ -157,7 +159,7 @@ public class Diffractometer extends Actor {
 						public void tokenReceived() {
 							// System.out.println("kCoordinateHandler.tokenReceived() ");
 							final Token token = kCoordinateHandler.getToken();
-							if (token != null) {
+							if (token != null && token != Token.NIL) {
 								try {
 									final ManagedMessage message = MessageHelper
 											.getMessageFromToken(token);
@@ -200,7 +202,7 @@ public class Diffractometer extends Actor {
 						public void tokenReceived() {
 							// System.out.println("lCoordinateHandler.tokenReceived() ");
 							final Token token = lCoordinateHandler.getToken();
-							if (token != null) {
+							if (token != null && token != Token.NIL) {
 								try {
 									final ManagedMessage message = MessageHelper
 											.getMessageFromToken(token);

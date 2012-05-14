@@ -12,6 +12,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.StringAttribute;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
@@ -22,6 +23,7 @@ import com.isencia.passerelle.core.PortListener;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonNature;
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonType;
 import fr.soleil.passerelle.util.PasserelleUtil;
@@ -115,7 +117,7 @@ public class DoWhileLoop extends Transformer {
 				public void tokenReceived() {
 					logger.debug("leftHandler.tokenReceived() ");
 					final Token token = leftHandler.getToken();
-					if (token != null) {
+					if (token != null && token != Token.NIL) {
 						try {
 							final ManagedMessage message = MessageHelper
 									.getMessageFromToken(token);
