@@ -177,7 +177,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 	  
 		final URL modelURL = getModelURL();
 		try {
-			clearModelForms(modelURL.toURI());
+			clearModelForms(modelURL!=null?modelURL.toURI():null);
 		} catch (URISyntaxException ex) {
 			// We can safely ignore this since the modelURL is in compliance with RFC2396
 		}
