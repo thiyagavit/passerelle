@@ -243,6 +243,7 @@ public class StringsAdder extends Actor {
       logger.trace(getInfo() + " doInitialize() - entry");
     }
     inputValues.clear();
+    inputsHandlers.clear();
     finishRequested = false;
     for (int i = 0; i < inputsPorts.size(); i++) {
       final Port port = inputsPorts.get(i);
