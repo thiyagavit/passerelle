@@ -364,7 +364,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         String newName = (_ch.getContext().getFullName() + "." + _ch.getNewName()).substring(1);
         ((LookInsideViewFactory) graphPanel.getViewFactory()).renameView(oldName, newName);
       }
-      final String[] importantChanges = new String[] { "entity", "property", "deleteEntity", "deleteProperty", "class" };
+      final String[] importantChanges = new String[] { "entity", "property", "relation", "link", "unlink", "deleteRelation", "deleteEntity", "deleteProperty", "class" };
       for (final String changeType : importantChanges) {
         if (change.getDescription().contains(changeType)) {
           hasImpact = true;
