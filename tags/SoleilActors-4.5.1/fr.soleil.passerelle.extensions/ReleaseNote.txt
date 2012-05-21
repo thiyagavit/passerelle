@@ -1,0 +1,9 @@
+The goal of this file is to described with are the actors modifications.
+
+---------------------------------------------
+V 4.4.9.Snapshot 2012-02-09 
+---------------------------------------------
+- AttributeImageCalculation: minor change
+- GroupedCommand: raised a ProcessingExceptionWithLog
+- KeyValueListMemorizer: addition 
+- GroupedAttributeWriter : TangoGroupCommand interface has changed
