@@ -47,7 +47,7 @@ public class ModelExecutor extends Actor {
 
   private PortHandler triggerHandler = null;
   // private FileParameter modelParameter;
-  private String modelsPaths;
+  private String modelsPaths = null;
   public Port trigger = null;
   public Port outputTrigger = null;
   private boolean triggerConnected = false;
@@ -62,7 +62,7 @@ public class ModelExecutor extends Actor {
 
     trigger = PortFactory.getInstance().createInputPort(this, "models names", null);
     outputTrigger = PortFactory.getInstance().createOutputPort(this, "trigger");
-    modelsPaths = null;
+  
     _attachText("_iconDescription", "<svg>\n"
         + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
         + "height=\"40\" style=\"fill:lightgrey;stroke:lightgrey\"/>\n"
@@ -180,7 +180,7 @@ public class ModelExecutor extends Actor {
       }
     }
 
-    if (!isFinishRequested()) {
+    if (!isFinishRequested() && modelsPaths != null) {
 
       modelPath = modelsPaths.split(",");
 
