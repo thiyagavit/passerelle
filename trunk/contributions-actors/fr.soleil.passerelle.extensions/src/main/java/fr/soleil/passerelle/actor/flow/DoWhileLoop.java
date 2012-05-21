@@ -150,7 +150,8 @@ public class DoWhileLoop extends Transformer {
 			throws ProcessingException {
 
 		boolean continu = true;
-
+		
+		ExecutionTracerService.trace(this, "Start while");
 		sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
 
 		while (continu && !isFinishRequested()) {
