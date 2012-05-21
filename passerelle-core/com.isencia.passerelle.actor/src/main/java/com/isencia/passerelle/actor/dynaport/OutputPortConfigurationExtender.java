@@ -35,7 +35,16 @@ public class OutputPortConfigurationExtender extends OutputPortBuilder implement
 
   private static final String OUTPUT_PORTNAMES = "Output port names (comma-separated)";
   public StringParameter outputPortNamesParameter = null;
-  
+  /**
+   * @param container
+   * @param name
+   * @param singleport
+   * @throws IllegalActionException
+   * @throws NameDuplicationException
+   */
+  public OutputPortConfigurationExtender(Entity container, String name,boolean singleport) throws IllegalActionException, NameDuplicationException {
+	  super(container, name,singleport);
+  }
   /**
    * @param container
    * @param name
