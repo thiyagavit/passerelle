@@ -99,7 +99,6 @@
 
 	<properties>
 		<maven.test.skip>true </maven.test.skip>
-		<salsa.version>3.3.0</salsa.version>
 	</properties>
 
 	<dependencies>
@@ -154,17 +153,14 @@
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
-			<version>${salsa.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaLocal</artifactId>
-			<version>${salsa.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaEntity</artifactId>
-			<version>${salsa.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
