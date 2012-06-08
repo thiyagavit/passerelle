@@ -40,7 +40,7 @@ public class LibraryBuilderTrial extends TestCase {
 	
 	public void testWriteClassFile() throws Exception {
 		TypedCompositeActor toplevel = new TypedCompositeActor();
-		Const constActor = new Const(toplevel,"hello there");
+		new Const(toplevel,"hello there");
 		toplevel.setClassDefinition(true);
 
 		File constFile = new File("C:/temp/const.moml");
