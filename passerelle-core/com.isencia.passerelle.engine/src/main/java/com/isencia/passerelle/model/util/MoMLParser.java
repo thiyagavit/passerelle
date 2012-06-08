@@ -83,6 +83,8 @@ import ptolemy.util.ClassUtilities;
 import ptolemy.util.MessageHandler;
 import ptolemy.util.StringUtilities;
 
+import com.isencia.passerelle.ext.ClassLoadingStrategy;
+import com.isencia.passerelle.ext.impl.SimpleClassLoadingStrategy;
 import com.isencia.passerelle.model.Flow;
 import com.microstar.xml.XmlException;
 import com.microstar.xml.XmlParser;
@@ -223,6 +225,12 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
         }
 
         _workspace = workspace;
+        _classLoader = getClass().getClassLoader();
+        if(_defaultClassLoadingStrategy==null) {
+          _classLoadingStrategy = new SimpleClassLoadingStrategy(_classLoader);
+        } else {
+          _classLoadingStrategy = _defaultClassLoadingStrategy;
+        }
     }
 
     /** Construct a parser that creates entities in the specified workspace.
@@ -236,6 +244,11 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     public MoMLParser(Workspace workspace, ClassLoader loader) {
         this(workspace);
         _classLoader = loader;
+        if(_defaultClassLoadingStrategy==null) {
+          _classLoadingStrategy = new SimpleClassLoadingStrategy(_classLoader);
+        } else {
+          _classLoadingStrategy = _defaultClassLoadingStrategy;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -1738,6 +1751,10 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
         _originalContext = context;
     }
 
+    public static void setClassLoadingStrategy(ClassLoadingStrategy classLoadingStrategy) {
+      _defaultClassLoadingStrategy = classLoadingStrategy;
+    }
+    
     /** Set the error handler to handle parsing errors.
      *  Note that this method is static. The specified error handler
      *  will handle all errors for any instance of this class.
@@ -5232,16 +5249,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     }
 
     protected Class loadClass(String className) throws ClassNotFoundException {
-      Class newClass=null;
-      try {
-        newClass = Class.forName(className, true, _classLoader);
-      } catch(Exception e) {
-        // if className not found and it starts with "be.", 
-        // try it for alias starting with "com."
-        className = className.replace("be.isencia", "com.isencia");
-        newClass = Class.forName(className, true, _classLoader);
-      }
-      return newClass;
+      return _classLoadingStrategy.loadClass(className);
     }
 
     /** Return true if the link between the specified port and
@@ -6465,7 +6473,10 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     private URL _base;
 
     // The class loader that will be used to instantiate objects.
-    private ClassLoader _classLoader = getClass().getClassLoader();
+    private ClassLoader _classLoader;
+    
+    private ClassLoadingStrategy _classLoadingStrategy;
+    private static ClassLoadingStrategy _defaultClassLoadingStrategy;
 
     // Count of configure tags so that they can nest.
     private int _configureNesting = 0;
