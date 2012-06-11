@@ -14,9 +14,13 @@
  */
 package com.isencia.passerelle.actor.test;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
+import org.eclipse.osgi.framework.console.CommandInterpreter;
+import org.eclipse.osgi.framework.console.CommandProvider;
 import com.isencia.passerelle.actor.control.Trigger;
 import com.isencia.passerelle.actor.error.ErrorCatcher;
 import com.isencia.passerelle.actor.general.CommandExecutor;
@@ -140,5 +144,15 @@ public class ActorTest extends TestCase {
     .assertFlow(flow);
     
     assertTrue("Wrong exit code", cmdExitErrorSink.poll().getBodyContentAsString().contains("Exit : 13"));
+  }
+
+  public void testReadMoml() throws Exception {
+    Reader in = new InputStreamReader(getClass().getResourceAsStream("/test.xml"));
+    Flow f = FlowManager.readMoml(in);
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("constant1.value", "howdy madurodam");
+    props.put("console1.Chop output at #chars", "200");
+    flowMgr.executeBlockingLocally(f,props);
+    System.out.println("Finished");
   }
 }
