@@ -5249,7 +5249,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     }
 
     protected Class loadClass(String className) throws ClassNotFoundException {
-      return _classLoadingStrategy.loadClass(className);
+      return _classLoadingStrategy.loadJavaClass(className, null);
     }
 
     /** Return true if the link between the specified port and
