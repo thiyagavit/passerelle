@@ -15,9 +15,22 @@
 
 package com.isencia.passerelle.ext.impl;
 
+import ptolemy.kernel.CompositeEntity;
 import com.isencia.passerelle.ext.ClassLoadingStrategy;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 /**
+ * As the name says... a simple strategy implementation providing a bridge 
+ * between the <code>ClassLoadingStrategy</code> approach and 
+ * the usage of a plain <code>ClassLoader</code>, for loading Java classes.
+ * <br/>
+ * REMARK : It does not support loading actor-oriented classes! 
+ * <p>
+ * The only special thing is an alias lookup for class names starting with "be.isencia"
+ * to look for matching "com.isencia" classes. This is to be able to load old (pre-v7)
+ * Passerelle models.
+ * </p>
+ * 
  * @author delerw
  *
  */
@@ -43,7 +56,7 @@ public class SimpleClassLoadingStrategy implements ClassLoadingStrategy {
   }
 
   @SuppressWarnings("rawtypes")
-  public Class loadClass(String className) throws ClassNotFoundException {
+  public Class loadJavaClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
     Class newClass=null;
     try {
       newClass = Class.forName(className, true, classLoader);
@@ -54,5 +67,9 @@ public class SimpleClassLoadingStrategy implements ClassLoadingStrategy {
       newClass = Class.forName(className, true, classLoader);
     }
     return newClass;
+  }
+
+  public CompositeEntity loadActorOrientedClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
+    throw new ClassNotFoundException();
   }
 }

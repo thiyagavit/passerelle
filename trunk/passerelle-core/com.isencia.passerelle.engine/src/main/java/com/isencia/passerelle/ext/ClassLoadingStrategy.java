@@ -15,11 +15,15 @@
 
 package com.isencia.passerelle.ext;
 
+import com.isencia.passerelle.validation.version.VersionSpecification;
+import ptolemy.kernel.CompositeEntity;
+
 /**
  * Strategy to be able to switch class loading (especially for actors and other model entities),
  * depending on the Passerelle runtime environment.
  * <p>
- * In a "plain" Java SE runtime, a default implementation would use simple <code>Class.forName()</code> or similar.
+ * In a "plain" Java SE runtime, a default implementation would use simple <code>Class.forName()</code> 
+ * (for Java classes) or local file-lookup (for actor-oriented classes) or similar.
  * In an OSGi-based runtime, more advanced options can be implemented to allow dynamic actor class updates, version management etc.
  * </p>
  * @author erwin
@@ -30,10 +34,20 @@ public interface ClassLoadingStrategy {
   /**
    * 
    * @param className
+   * @param versionSpec
    * @return the Class for the given name
    * @throws ClassNotFoundException
    */
   @SuppressWarnings("rawtypes")
-  Class loadClass(String className) throws ClassNotFoundException;
+  Class loadJavaClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException;
+  
+  /**
+   * 
+   * @param className
+   * @param versionSpec
+   * @return
+   * @throws ClassNotFoundException
+   */
+  CompositeEntity loadActorOrientedClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException;
   
 }
