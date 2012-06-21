@@ -1,0 +1,28 @@
+#Passerelle offers a number of error handling features, targeting both developers and modelers.
+
+= Introduction =
+
+
+
+
+= Details =
+
+== Model error handling ==
+
+When an actor encounters an error in its processing, the resulting behaviour depends on the error's Severity.
+
+Fatal errors by default cause the model execution to stop.
+
+The default behaviour for non-fatal errors is to send an error message on the error output port.
+
+When the error output port is not connected, the error is delivered to the model Director.
+
+This one checks if there are any registered implementations of com.isencia.passerelle.ext.ErrorCollector, and delivers the error to them.
+
+The com.isencia.passerelle.actor.error.ErrorObserver actor can be added to a model to centralize all error collection. It unwraps any received error and sends out the contained ManagedMessage, if this has been set as the error context. In this way, custom error handling continuations can be designed into the model itself.
+
+Work is ongoing to add filtering/selection options for ErrorObservers, so more fine-grained error handling can be modeled, depending on the type of error.
+
+== Actor error handling ==
+
+com.isencia.passerelle.ext.ErrorControlStrategy
