@@ -19,6 +19,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
 import com.isencia.passerelle.ext.ActorOrientedClassProvider;
 import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.ext.TypeConverterProvider;
@@ -46,9 +47,9 @@ public class Activator implements BundleActivator {
     classLoadingStrategy = new OSGiClassLoadingStrategy(new SimpleClassLoadingStrategy());
     MoMLParser.setClassLoadingStrategy(classLoadingStrategy);
     
-		mecpSvcTracker = new ServiceTracker(context, ModelElementClassProvider.class, createClassProviderSvcTrackerCustomizer());
+		mecpSvcTracker = new ServiceTracker(context, ModelElementClassProvider.class.getName(), createClassProviderSvcTrackerCustomizer());
 		mecpSvcTracker.open();
-		aocpSvcTracker = new ServiceTracker(context, ActorOrientedClassProvider.class, createClassProviderSvcTrackerCustomizer());
+		aocpSvcTracker = new ServiceTracker(context, ActorOrientedClassProvider.class.getName(), createClassProviderSvcTrackerCustomizer());
 		aocpSvcTracker.open();
 
 	}
