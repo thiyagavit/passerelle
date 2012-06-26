@@ -26,20 +26,14 @@ import com.isencia.passerelle.testsupport.actor.DevNullActor;
 import com.isencia.passerelle.testsupport.actor.MockWorker;
 
 public class ActorApiTest extends TestCase {
-  private Flow flow;
-  private FlowManager flowMgr;
-
-  protected void setUp() throws Exception {
-    flow = new Flow("unit test",null);
-    flowMgr = new FlowManager();
-  }
-
   /**
    * A unit test for a plain HelloPasserelle model.
    * 
    * @throws Exception
    */
   public void testHelloPasserelle() throws Exception {
+    Flow flow = new Flow("testHelloPasserelle",null);
+    FlowManager flowMgr = new FlowManager();
     flow.setDirector(new Director(flow,"director"));
     
     Const source = new Const(flow,"Constant");
@@ -58,6 +52,8 @@ public class ActorApiTest extends TestCase {
   }
   
   public void testFlowWithValidationErrorAndValidation() throws Exception {
+    Flow flow = new Flow("testFlowWithValidationErrorAndValidation",null);
+    FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
     director.validateInitializationParam.setExpression("true");
     flow.setDirector(director);
@@ -100,6 +96,8 @@ public class ActorApiTest extends TestCase {
   }
 
   public void testFlowWithValidationErrorButNoValidation() throws Exception {
+    Flow flow = new Flow("testFlowWithValidationErrorButNoValidation",null);
+    FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
     director.validateInitializationParam.setExpression("false");
     flow.setDirector(director);
@@ -144,6 +142,8 @@ public class ActorApiTest extends TestCase {
   }
 
   public void testFlowWithoutValidationError() throws Exception {
+    Flow flow = new Flow("testFlowWithoutValidationError",null);
+    FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
     director.validateInitializationParam.setExpression("true");
     flow.setDirector(director);

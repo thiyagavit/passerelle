@@ -3461,8 +3461,15 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
         
         // EDL : also consider uploaded actor classes (via Passerelle MomlParserFactory)
         ComponentEntity reference = getActorClass(className);
+        if(reference==null) {
+          try {
+            reference = _classLoadingStrategy.loadActorOrientedClass(className, null);
+          } catch (Exception e) {
+            // ignore here, just means we need to look further to find the moml class
+          }
+        }
         if(reference!=null) {
-        	return reference;
+          return reference;
         }
         
         if (source == null) {
