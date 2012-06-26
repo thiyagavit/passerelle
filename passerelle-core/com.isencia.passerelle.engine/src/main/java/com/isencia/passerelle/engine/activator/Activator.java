@@ -37,6 +37,8 @@ public class Activator implements BundleActivator {
 	private ServiceTracker mecpSvcTracker;
   private ServiceTracker aocpSvcTracker;
   
+  private BundleActivator testFragmentActivator;
+  
   private OSGiClassLoadingStrategy classLoadingStrategy;
 
 	public void start(BundleContext context) throws Exception {
@@ -52,9 +54,20 @@ public class Activator implements BundleActivator {
 		aocpSvcTracker = new ServiceTracker(context, ActorOrientedClassProvider.class.getName(), createClassProviderSvcTrackerCustomizer());
 		aocpSvcTracker.open();
 
+    try {
+      Class<? extends BundleActivator> svcTester = (Class<? extends BundleActivator>) Class.forName("com.isencia.passerelle.engine.activator.TestFragmentActivator");
+      testFragmentActivator = svcTester.newInstance();
+      testFragmentActivator.start(context);
+    } catch (ClassNotFoundException e) {
+      // ignore, means the test fragment is not present...
+      // it's a dirty way to find out, but don't know how to discover fragment contribution in a better way...
+    }
 	}
 
 	public void stop(BundleContext context) throws Exception {
+    if(testFragmentActivator!=null) {
+      testFragmentActivator.stop(context);
+    }
     MoMLParser.setClassLoadingStrategy(new SimpleClassLoadingStrategy());
 		typeCvtSvcTracker.close();
 		mecpSvcTracker.close();
