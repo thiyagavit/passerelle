@@ -2,12 +2,18 @@
 
 = Introduction =
 
+Passerelle models can be executed in different settings, both with possibilities for user interactions via a UI 
+and in fully-automated runtimes without the possibility/need for user interactions.
+In some use-cases, such as scientific workflows, the actual number of runs per time is limited, but the processing done per run may be complex and long.
+In other cases, many tens of thousands of runs are done per day.
 
+In all these cases, there is a need for deterministic error processing.
 
+Below, the different error handling features of Passerelle are presented, in the context of model executions.
+We look at what happens when one or more actors encounter an error, as the actors are the central elements to implement all logic in Passerelle models.
+"Hardcore" technical errors within the engine itself are outside of the scope of this documentation.
 
-= Details =
-
-== Error handling within the model ==
+= Error handling within the model =
 
 When an actor encounters an error in its processing, the resulting behaviour depends on the error's Severity:
   * Fatal errors by default cause the model execution to stop abruptly.
@@ -19,43 +25,44 @@ These options for non-fatal errors are somewhat similar to the distinction betwe
 with explicit error handling close to the source of the error (the case with connected error port), 
 versus "uncaught" errors being propagated to the top-level in the call-stack, or model hierarchy in this case.
 
-=== Continuation via the actor's error output port ===
+== Continuation via the actor's error output port ==
 This requires that the error port is actually connected to something.
 If the modeler chooses this option, the actor's error output port can be connected 
 to a `com.isencia.passerelle.actor.error.ErrorCatcher` actor, that is able to "unwrap" the error message and then forward the contained "original" message.
-The ErrorCatcher actor can then be connected to a specific error-continuation logic within the model.
+The `ErrorCatcher` actor can then be connected to a specific error-continuation logic within the model.
 In special cases, when the error can just be ignored, the `com.isencia.passerelle.actor.general.DevNullActor` can come in handy.
 
 A simple use-case could be to catch an error, and then send an email with the failed message, as illustrated below.
 
 http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/Model_ErrorCatcher.jpg
 
-=== Error propagation via the Director ===
+== Error propagation via the Director ==
 When the error-handling is delegated to the Director, this one will check the model for the presence of `com.isencia.passerelle.ext.ErrorCollector` instances.
 If there are some, the error is delivered to them and its processing can continue from there.
 `com.isencia.passerelle.actor.error.ErrorObserver` actors are typically used in this way.
 Their usage allows to have one-or-more central error handling solutions within a model, that can be triggered
 whenever an error occurs in any of the model actors, without needing to connect all actors' error output ports to it.
 
-In this model, the ErrorObserver is used to gather any error that can occur during the model execution, and simply puts the request
+In this model, the `ErrorObserver` is used to gather any error that can occur during the model execution, and simply puts the request
 that is being processed in an error status.
-I.c.o. an error in the final part of the sequence, to prevent endless loops with the ErrorObserver, a DevNull is connected to the error ports.
+I.c.o. an error in the final part of the sequence, to prevent endless loops with the `ErrorObserver`, a `DevNull` is connected to the error ports.
 
 http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/Model_ErrorObserver_DevNull.jpg
 
-Besides the ErrorObserver actor, that can be added by the modelers, ErrorCollector implementations can also be registered by the runtime/engine, 
+Besides the `ErrorObserver` actor, that can be added by the modelers, `ErrorCollector` implementations can also be registered by the runtime/engine, 
 e.g. to log "uncaught" errors in dedicated views or store them in a DB etc.
 
   For the "techies" : a submodel corresponds to an instance of `ptolemy.kernel.CompositeEntity`. 
   Model elements can be of different kinds, but for our purposes we consider either Actors or `ptolemy.kernel.util.Attribute`s.
-  The runtime can dynamically add "Mixin"-implementations of ErrorCollector and Attribute to a CompositeEntity and thus to a (sub)model. 
+  The runtime can dynamically add "Mixin"-implementations of `ErrorCollector` and `Attribute` to a `CompositeEntity` and thus to a (sub)model. 
   
-Currently, all ErrorCollectors in a model are treated "as equals". 
+*For the near future*
+Currently, all `ErrorCollector`s in a model are treated "as equals". 
 With the next Passerelle core version (v8.2), this will change to having an error collection "scope" per model/submodel level.
-When the error port is not connected, the errors of an actor in a submodel will first be delivered to the ErrorCollector(s) present in the submodel.
-Also, work is ongoing to add filtering/selection options for ErrorObservers, so more fine-grained error handling can be modeled, depending on the type of error.
+When the error port is not connected, the errors of an actor in a submodel will first be delivered to the `ErrorCollector`(s) present in the submodel.
+Also, work is ongoing to add filtering/selection options for `ErrorObserver`s, so more fine-grained error handling can be modeled, depending on the type of error.
+When an error can not be delivered to a matching submodel's `ErrorObServer` it will be propagated upwards in the model hierarchy.
 
-
-== Actor error handling ==
+= Actor error handling =
 
 com.isencia.passerelle.ext.ErrorControlStrategy
