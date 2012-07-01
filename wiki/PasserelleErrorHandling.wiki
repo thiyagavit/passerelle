@@ -15,6 +15,20 @@ We look at what happens when one or more actors encounter an error, as the actor
 
 = Error handling within the model =
 
+== At model startup ==
+When a model is launched, several steps need to be taken before it is fully operational :
+  * Parse the model definition, from the xml/moml file
+  * Construct all contained entities, their relations, configuration parameters etc
+  * Invoke the `preInitialize` and `initialize` methods on all actors. 
+    This is also where Passerelle adds validation steps.
+  
+When errors are encountered in these initial steps, the model execution will be impossible or will automatically stop.
+If the execution happens within a UI-application, the user will typically be notified about such errors via pop-ups or log viewers.
+
+== During model execution ==
+When the actor initializations are done, the model is fully in "processing" mode.
+The exact logic to go from initialization to processing depends on the type of Director that is used, but can be ignored for our purposes here.
+
 When an actor encounters an error in its processing, the resulting behaviour depends on the error's Severity:
   * Fatal errors by default cause the model execution to stop abruptly.
   * For non-fatal errors, modelers can include specific error-handling logic inside the models :
@@ -25,7 +39,7 @@ These options for non-fatal errors are somewhat similar to the distinction betwe
 with explicit error handling close to the source of the error (the case with connected error port), 
 versus "uncaught" errors being propagated to the top-level in the call-stack, or model hierarchy in this case.
 
-== Continuation via the actor's error output port ==
+=== Continuation via the actor's error output port ===
 This requires that the error port is actually connected to something.
 If the modeler chooses this option, the actor's error output port can be connected 
 to a `com.isencia.passerelle.actor.error.ErrorCatcher` actor, that is able to "unwrap" the error message and then forward the contained "original" message.
@@ -36,7 +50,7 @@ A simple use-case could be to catch an error, and then send an email with the fa
 
 http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/Model_ErrorCatcher.jpg
 
-== Error propagation via the Director ==
+=== Error propagation via the Director ===
 When the error-handling is delegated to the Director, this one will check the model for the presence of `com.isencia.passerelle.ext.ErrorCollector` instances.
 If there are some, the error is delivered to them and its processing can continue from there.
 `com.isencia.passerelle.actor.error.ErrorObserver` actors are typically used in this way.
@@ -64,5 +78,77 @@ Also, work is ongoing to add filtering/selection options for `ErrorObserver`s, s
 When an error can not be delivered to a matching submodel's `ErrorObServer` it will be propagated upwards in the model hierarchy.
 
 = Actor error handling =
+== Actor template methods and error control strategy ==
+The possibilities described above are the default behaviour of Passerelle, and are provided by the default implementation of 
+a `com.isencia.passerelle.ext.ErrorControlStrategy`, namely `com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy`.
 
-com.isencia.passerelle.ext.ErrorControlStrategy
+Through the common actor base class `com.isencia.passerelle.actor.Actor`, all actor life-cycle methods have been made final 
+to implement the template method pattern. The resulting `do...()` methods, to be implemented/overridden by actor implementations, 
+all have a dedicated checked exception that can be thrown, all subclasses of `com.isencia.passerelle.core.PasserelleException`.
+
+{{{
+// ...
+public abstract class Actor extends TypedAtomicActor implements IMessageCreator {
+//...
+  /**
+   * Template method implementation for preinitialize().
+   * 
+   * @throws InitializationException
+   * @see ptolemy.actor.AtomicActor#preinitialize()
+   */
+  protected void doPreInitialize() throws InitializationException {
+  }
+//...
+  /**
+   * Template method implementation for prefire(). Method that can be overriden to implement precondition checking for the fire() loop. By default, returns
+   * true. If the method returns true, the actor's fire() method will be called. If the method returns false, preFire() will be called again repetitively till
+   * it returns true. So it's important that for "false" results there is some blocking/waiting mechanism implemented to avoid wild looping!
+   * 
+   * @return flag indicating whether the actor is ready for fire()
+   * @see ptolemy.actor.AtomicActor#prefire()
+   */
+  protected boolean doPreFire() throws ProcessingException {
+    return true;
+  }
+//...
+  /**
+   * Template method implementation for wrapup().
+   * 
+   * @throws TerminationException
+   * @see ptolemy.actor.AtomicActor#wrapup()
+   */
+  protected void doWrapUp() throws TerminationException {
+  }
+//...
+}
+}}}
+
+Inside the wrapping methods, these exceptions are caught and passed to the actor's error control strategy.
+
+For example :
+
+{{{
+//...
+  final public void wrapup() throws IllegalActionException {
+    getLogger().trace("{} - wrapup() - entry", getInfo());
+
+    try {
+      doWrapUp();
+    } catch (TerminationException e) {
+      getErrorControlStrategy().handleTerminationException(this, e);
+    }
+//...
+  }
+//...
+}}}
+
+For the main actor iteration methods (preFire, fire, postFire), also `java.lang.RuntimeException`s are delegated to the error control strategy.
+These are by default handled as fatal, i.e. will cause the model execution to be aborted.
+
+== Actor development conventions ==
+
+- wrap all exceptions in the defined checked exception types
+- put the last received message as exception context
+- put error codes in the exception's message (pending the arrival of a formal errorcode field for `PasserelleException`s)
+
+
