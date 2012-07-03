@@ -34,7 +34,7 @@ public interface ResultBlock extends Serializable, Identifiable, AttributeHolder
 
   String getType();
 
-  boolean addItem(ResultItem<?> item);
+  ResultItem<?> putItem(ResultItem<?> item);
 
   /**
    * @return all the ResultItems

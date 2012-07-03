@@ -27,7 +27,7 @@ public interface AttributeHolder {
   
   Attribute getAttribute(String name);
   
-  boolean setAttribute(Attribute property);
+  Attribute putAttribute(Attribute attribute);
   
   Iterator<String> getAttributeNames();
   

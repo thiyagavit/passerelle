@@ -111,7 +111,7 @@ public interface Context extends Identifiable, Serializable {
   /**
    * @return The context's duration (in milliseconds)
    */
-  Long getDuration();
+  Long getDurationInMillis();
 
 	// methods to support fork/join
 	void join(Context other);
