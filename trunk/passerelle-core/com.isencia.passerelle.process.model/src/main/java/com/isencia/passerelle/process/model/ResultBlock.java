@@ -15,16 +15,17 @@
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * 
  * @author erwin
  *
  */
-public interface ResultBlock extends Serializable, Identifiable, AttributeHolder {
+public interface ResultBlock extends Serializable, Identifiable, AttributeHolder, Coloured {
 
   /**
    * @return the creation timestamp of the request
@@ -33,35 +34,23 @@ public interface ResultBlock extends Serializable, Identifiable, AttributeHolder
 
   String getType();
 
-  boolean addItem(ResultItem item);
+  boolean addItem(ResultItem<?> item);
 
   /**
-   * @return all the ResultItems with their natural order
+   * @return all the ResultItems
    */
-  Set<ResultItem> getAllItems();
+  Collection<ResultItem<?>> getAllItems();
 
   /**
    * @param comparator
    * @return all the ResultItems, ordered by the comparator
    */
-  Set<ResultItem> getAllItems(Comparator<ResultItem> comparator);
+  SortedSet<ResultItem<?>> getAllItems(Comparator<ResultItem<?>> comparator);
 
   /**
    * @param name
-   * @return all the ResultItems, with the given name, in their natural order
+   * @return the ResultItem with the given name
    */
-  Set<ResultItem> getItemsForName(String name);
-
-  /**
-   * @param name
-   * @return all the ResultItems, with the given name, ordered by the comparator
-   */
-  Set<ResultItem> getItemsForName(String name, Comparator<ResultItem> comparator);
-
-  /**
-   * @param name
-   * @return a single distinct ResultItem for the given name. If multiple ResultItems are present with the given name, just returns one of them.
-   */
-  ResultItem getDistinctItemForName(String name);
+  ResultItem<?> getItemForName(String name);
 
 }

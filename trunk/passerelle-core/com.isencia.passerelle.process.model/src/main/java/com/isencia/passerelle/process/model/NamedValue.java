@@ -21,10 +21,12 @@ import java.io.Serializable;
  * @author erwin
  *
  */
-public interface NamedValue extends Serializable {
+public interface NamedValue<V> extends Serializable {
 	
 	String getName();
 	
-	String getValue();
+	V getValue();
+	
+	String getValueAsString();
 
 }

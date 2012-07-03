@@ -16,7 +16,6 @@
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author erwin
