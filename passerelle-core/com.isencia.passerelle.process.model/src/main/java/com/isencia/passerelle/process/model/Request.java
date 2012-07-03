@@ -16,15 +16,36 @@
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author erwin
  */
 public interface Request extends Serializable, Identifiable, AttributeHolder {
 
-  /**
-   * @return the <code>Case</code> to which this <code>Request</code> is related.
-   */
-  Case getCase();
+	/**
+	 * @return the <code>Case</code> to which this <code>Request</code> is
+	 *         related.
+	 */
+	Case getCase();
 
+	/**
+	 * 
+	 * @return
+	 */
+	String getCorrelationId();
+
+	/**
+	 * @return the type of request, which typically determines the flow that must
+	 *         be executed to handle it.
+	 */
+	String getType();
+
+	/**
+	 * 
+	 * @return the context containing all current status info about
+	 * the lifecycle of the request processing, tasks that were executed,
+	 * results obtained etc.
+	 */
+	Context getProcessingContext();
 }
