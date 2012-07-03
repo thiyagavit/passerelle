@@ -12,15 +12,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 package com.isencia.passerelle.process.model;
 
-/**
- * @author erwin
- *
- */
-public interface ResultItem extends NamedValue, Identifiable, AttributeHolder {
-	
-	String getUnit();
 
+/**
+ * @author delerw
+ */
+public interface ContextEvent extends Event, Comparable<ContextEvent> {
+
+  /**
+   * 
+   * @return the associated context
+   */
+  Context getContext();
 }

@@ -16,7 +16,7 @@
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * @author erwin
@@ -33,12 +33,12 @@ public interface Case extends Serializable, Identifiable {
    * @return an optional key that can be used to refer to an associated (business) entity, or can serve as a simple readable key,
    * to refer to this <code>Case</code>.
    */
-  String getReferenceKey();
+  String getExternalReference();
   
   /**
    * 
-   * @return the set of all <code>Request</code>s that are related to this case.
+   * @return the <code>Request</code>s that are related to processing this case.
    */
-  Set<Request> getRelatedRequests();
+  Collection<Request> getRequests();
 
 }

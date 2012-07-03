@@ -22,5 +22,9 @@ import java.io.Serializable;
  *
  */
 public interface NamedValue extends Serializable {
+	
+	String getName();
+	
+	String getValue();
 
 }

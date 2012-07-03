@@ -15,35 +15,106 @@
 
 package com.isencia.passerelle.process.model;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 
 /**
  * @author erwin
  *
  */
-public interface Context extends LifeCycleEntity {
-	/**
-	 * 
-	 * @return for unfinished decisions, this returns an estimation
-	 * of the expected remaining waiting time, before the processing will be complete.
-	 */
-	Integer getExpectedWaitingTime();
-	/**
-	 * <p>
-	 * The status code is a 2-digit code, used to represent all kinds of
-	 * detailed states.
-	 * </p>
-	 * <p>
-	 * Besides this property, one can also check <code>getRequest().getStatus()</code>
-	 * to see, on a less-detailed level, whether the request's processing is finished, 
-	 * has resulted in errors etc.
-	 * </p>
-	 * @return a 2-digit status code.
-	 */
-	String getStatusCode();
-	/**
-	 * 
-	 * @return an optional description of the above status
-	 */
-	String getStatusMsg();
+public interface Context extends Identifiable, Serializable {
 	
+  /**
+   * @return current status of this context
+   */
+  Status getStatus();
+  
+  void setStatus(Status status);
+
+	/**
+	 * 
+	 * @return the request of which this context maintains the lifecycle info/status/results/...
+	 */
+	Request getRequest();
+	
+	/**
+	 * Add a task that is being (has been) executed during the processing for this context.
+	 * @param task
+	 */
+	void addTask(Task task);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	List<Task> getTasks();
+	
+	void addEvent(ContextEvent e);
+
+	/**
+   * @return the list of all events that have happened in this context's lifecycle up-to "now"
+   */
+  List<ContextEvent> getEvents();
+  
+  /**
+   * Store some named entry in the context.
+   * This is a context-wide storage, not linked to a specific task
+   * or its results.
+   * 
+   * @param name
+   * @param value
+   */
+  void putEntry(String name, Serializable value);
+  
+  Serializable getEntryValue(String name);
+  
+  Iterator<String> getEntryNames();
+  
+	/**
+	 * Retrieve the first item found with the given name in the context
+	 * and in all linked task results.
+	 * <p>
+	 * Implementations should typically some prioritized lookup process
+	 * in the complete Context structure. For example :
+	 * <ul>
+	 * <li>Check first in the context entries </li>
+   * <li>Then in the result items of all task results, searching from most recent to oldest </li>
+   * <li>Then, if still not found, check in the originally received request parameters </li>
+	 * </ul>
+	 * </p>
+	 * @param name
+	 * @return
+	 */
+	String lookupValue(String name);
+
+
+  /**
+   * Is the task still processing or not
+   * 
+   * @return
+   */
+  boolean isFinished();
+
+	/**
+	 * @return the creation date of the request
+	 */
+	Date getCreationTS();
+
+  /**
+   * @return the end time stamp
+   */
+  Date getEndTS();
+
+  /**
+   * @return The context's duration (in milliseconds)
+   */
+  Long getDuration();
+
+	// methods to support fork/join
+	void join(Context other);
+	Context fork();
+	boolean isForkedContext();
 }
