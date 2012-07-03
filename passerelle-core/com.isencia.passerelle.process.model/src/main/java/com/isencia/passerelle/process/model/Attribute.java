@@ -19,6 +19,6 @@ package com.isencia.passerelle.process.model;
  * @author erwin
  *
  */
-public interface Attribute extends NamedValue, Identifiable {
+public interface Attribute extends NamedValue<String>, Identifiable {
 
 }

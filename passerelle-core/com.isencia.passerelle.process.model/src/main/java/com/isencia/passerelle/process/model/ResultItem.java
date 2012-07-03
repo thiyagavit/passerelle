@@ -19,8 +19,12 @@ package com.isencia.passerelle.process.model;
  * @author erwin
  *
  */
-public interface ResultItem extends NamedValue, Identifiable, AttributeHolder {
+public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
 	
 	String getUnit();
+	
+	String getDataType();
+	
+	ResultBlock getResultBlock();
 
 }
