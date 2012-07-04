@@ -74,4 +74,7 @@ public class CaseImpl implements Case {
 		return Collections.unmodifiableCollection(requests);
 	}
 
+	public void addRequest(Request request) {
+		this.requests.add(request);
+	}
 }

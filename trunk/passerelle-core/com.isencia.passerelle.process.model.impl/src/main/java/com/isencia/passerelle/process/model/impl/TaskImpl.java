@@ -43,6 +43,8 @@ public class TaskImpl extends RequestImpl implements Task {
 		super(processingContext, type);
 		this.parentContext = (ContextImpl)parentContext;
 		this.owner = owner;
+		
+		this.parentContext.addTask(this);
 	}
 	
 	public Context getParentContext() {
