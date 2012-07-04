@@ -30,12 +30,13 @@ import com.isencia.passerelle.process.model.ResultItem;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_RESULTITEM")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
 public abstract class ResultItemImpl<V> implements ResultItem<V> {
+
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,22 +48,23 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
-	
+
 	@Column(name = "NAME", nullable = false, unique = false, updatable = false)
 	private String name;
 
 	@Column(name = "VALUE", nullable = false, unique = false, updatable = false)
 	protected String value;
-	
+
 	@Column(name = "UNIT", nullable = true, unique = false, updatable = false)
 	private String unit;
-	
+
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
 	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter methods	
+	// here to ensure jpa implementations like EclipseLink will generate setter
+	// methods
 	@ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
@@ -72,63 +74,84 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 
 	public ResultItemImpl() {
 	}
-	
+
 	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit) {
-		this.resultBlock = (ResultBlockImpl)resultBlock;
+		this.resultBlock = (ResultBlockImpl) resultBlock;
 		this.name = name;
 		this.unit = unit;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
 	public Long getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.NamedValue#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
 	 */
 	public String getValueAsString() {
 		return value;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java
+	 * .lang.String)
 	 */
 	public Attribute getAttribute(String name) {
 		return attributes.get(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com.isencia.passerelle.process.model.Attribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com
+	 * .isencia.passerelle.process.model.Attribute)
 	 */
 	public Attribute putAttribute(Attribute attribute) {
 		return attributes.put(attribute.getName(), attribute);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
 	 */
 	public Iterator<String> getAttributeNames() {
 		return attributes.keySet().iterator();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributes()
 	 */
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Coloured#getColour()
 	 */
 	public String getColour() {
@@ -138,19 +161,26 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 	public void setColour(String colour) {
 		this.colour = colour;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultItem#getUnit()
 	 */
 	public String getUnit() {
 		return unit;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultItem#getResultBlock()
 	 */
 	public ResultBlock getResultBlock() {
 		return resultBlock;
 	}
 
+	public void setValue(String value) {
+		this.value = value;
+	}
 }
