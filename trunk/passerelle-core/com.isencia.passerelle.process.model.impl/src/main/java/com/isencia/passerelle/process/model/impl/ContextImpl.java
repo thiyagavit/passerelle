@@ -107,6 +107,8 @@ public class ContextImpl implements Context {
 		this.status = Status.CREATED;
 		this.creationTS = new Date();
 		this.request = request;
+		
+		this.events.add(new ContextEventImpl(this, this.status.name()));
 	}
 	
 	/* (non-Javadoc)
