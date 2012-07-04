@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -27,6 +29,7 @@ import com.isencia.passerelle.process.model.Request;
 public class RequestAttributeImpl implements Attribute, Comparable<RequestAttributeImpl> {
 
 	private static final long serialVersionUID = 1L;
+	private static final int MAX_CHAR_SIZE = 4000;
 
 	@Id
 	@Column(name = "ID")
@@ -36,17 +39,34 @@ public class RequestAttributeImpl implements Attribute, Comparable<RequestAttrib
 	@Version
 	private int version;
 	
-	@Column(name = "NAME")
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false)
 	private String name;
 	
-	@Column(name = "VALUE")
+	@Column(name = "VALUE", nullable = false, unique = false, updatable = false)
 	private String value;
 	
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
+	private ClobItem clobItem;
+
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = RequestImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "REQUEST_ID")
 	private RequestImpl request;
+	
+	public RequestAttributeImpl() {
+	}
+	
+	public RequestAttributeImpl(Request request, String name, String value) {
+		this.request = (RequestImpl)request;
+		this.name = name;
+		if (value != null && value.length() > MAX_CHAR_SIZE) {
+			this.clobItem = new ClobItem(value);
+		} else {
+			this.value = value;
+		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
@@ -66,13 +86,17 @@ public class RequestAttributeImpl implements Attribute, Comparable<RequestAttrib
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
 	 */
 	public String getValue() {
-		return value;
+		return getValueAsString();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
 	 */
 	public String getValueAsString() {
+		if (clobItem != null) {
+			return clobItem.getValue();
+		}
+
 		return value;
 	}
 
