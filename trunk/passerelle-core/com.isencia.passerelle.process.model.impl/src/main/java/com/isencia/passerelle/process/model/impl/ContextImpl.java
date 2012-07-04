@@ -18,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -52,9 +51,6 @@ public class ContextImpl implements Context {
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Allow jpa to version our entity
-	 */
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
@@ -104,6 +100,9 @@ public class ContextImpl implements Context {
 	@Transient
 	private ReentrantLock lock = new ReentrantLock();
 
+	public ContextImpl() {
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */

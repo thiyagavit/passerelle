@@ -34,6 +34,9 @@ public class TaskImpl extends RequestImpl implements Task {
 	@Column(name = "OWNER")
 	private String owner;
 
+	public TaskImpl() {
+	}
+	
 	public Context getParentContext() {
 		return parentContext;
 	}
