@@ -40,6 +40,12 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 	public ResultItemAttributeImpl() {
 	}
 	
+	public ResultItemAttributeImpl(ResultItem<?> resultItem, String name, String value) {
+		super(name, value);
+		this.resultItem = (ResultItemImpl<?>)resultItem;
+		
+		this.resultItem.putAttribute(this);
+	}
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */

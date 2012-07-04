@@ -40,6 +40,12 @@ public class ResultBlockAttributeImpl extends AttributeImpl implements Comparabl
 	public ResultBlockAttributeImpl() {
 	}
 	
+	public ResultBlockAttributeImpl(ResultBlock resultBlock, String name, String value) {
+		super(name, value);
+		this.resultBlock = (ResultBlockImpl)resultBlock;
+		
+		this.resultBlock.putAttribute(this);
+	}
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
