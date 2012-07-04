@@ -62,7 +62,8 @@ public class RequestImpl implements Request {
 	@Column(name = "TYPE", nullable = false, unique = false, updatable = false)
 	private String type;
 
-	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = CascadeType.ALL)
+	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = {
+		CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
 	private Context processingContext;
 
 	public RequestImpl() {
