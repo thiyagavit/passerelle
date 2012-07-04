@@ -82,7 +82,8 @@ public class ExecutionTracerService {
 	public static void trace(Actor source, String message) {
 		try {
 			ExecutionTracer tracer2 = (ExecutionTracer) source.getDirector().getAttribute("_userTracer");
-			tracer2.trace(source, message);
+			if (tracer2 != null)
+				tracer2.trace(source, message);
 		} catch (Throwable t) {
 			// t.printStackTrace();
 		}
