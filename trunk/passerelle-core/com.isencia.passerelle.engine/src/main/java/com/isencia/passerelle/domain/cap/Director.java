@@ -251,9 +251,12 @@ public class Director extends ProcessDirector {
 			
 		if (attribute == propsFileParameter) {
 			try {
-				String propsPath = propsFileParameter.asFile().getPath();
-				propsFile = new File(propsPath);
-				logger.debug("System Properties file changed to : " + propsPath);
+				File asFile = propsFileParameter.asFile();
+				if (asFile != null) {
+					String propsPath = asFile.getPath();
+					propsFile = new File(propsPath);
+					logger.debug("System Properties file changed to : " + propsPath);
+				}
 			} catch (NullPointerException e) {
 				// Ignore. Means that path is not a valid URL.
 			}
