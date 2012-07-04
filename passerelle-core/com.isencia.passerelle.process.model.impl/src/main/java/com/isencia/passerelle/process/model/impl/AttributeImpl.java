@@ -71,4 +71,7 @@ public abstract class AttributeImpl implements Attribute {
 		return value;
 	}
 
+	public void setValue(String value) {
+		this.value = value;
+	}
 }

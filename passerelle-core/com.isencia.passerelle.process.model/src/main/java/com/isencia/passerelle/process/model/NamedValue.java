@@ -27,6 +27,8 @@ public interface NamedValue<V> extends Serializable {
 	
 	V getValue();
 	
+	void setValue(String value);
+	
 	String getValueAsString();
 
 }
