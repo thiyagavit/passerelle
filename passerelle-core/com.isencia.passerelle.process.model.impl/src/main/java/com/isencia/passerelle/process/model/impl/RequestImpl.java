@@ -62,6 +62,9 @@ public class RequestImpl implements Request {
 	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = CascadeType.ALL)
 	private Context context;
 
+	public RequestImpl() {
+	}
+	
 	public Long getId() {
 		return id;
 	}

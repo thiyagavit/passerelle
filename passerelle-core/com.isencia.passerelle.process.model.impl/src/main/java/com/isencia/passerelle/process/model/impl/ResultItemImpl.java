@@ -3,9 +3,6 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,6 +11,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,67 +22,64 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
-import com.isencia.passerelle.process.model.Task;
 
 /**
  * @author "puidir"
  *
  */
 @Entity
-@Table(name = "PAS_RESULTBLOCK")
-public class ResultBlockImpl implements ResultBlock {
+@Table(name = "PAS_RESULTITEM")
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+public abstract class ResultItemImpl<V> implements ResultItem<V> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "ID")
 	@Id
-	@GeneratedValue(generator = "pas_resultblock")
+	@GeneratedValue(generator = "pas_resultitem")
 	private Long id;
 
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
-
-	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter methods	
-	@ManyToOne(targetEntity = TaskImpl.class, optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "TASK_ID")
-	private TaskImpl task;
 	
-	@OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@Column(name = "NAME")
+	private String name;
+
+	@Column(name = "VALUE")
+	protected String value;
+	
+	@Column(name = "UNIT")
+	private String unit;
+	
+	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+
+	@ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "RESULTBLOCK_ID")
+	private ResultBlockImpl resultBlock;
 
 	@Column(name = "COLOUR", nullable = true)
 	private String colour;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATION_TS", updatable = false)
-	private Date creationTS;
-
-	@Column(name = "TYPE", updatable = false)
-	private String type;
-
-	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "RESULTBLOCK_ID")
-	@MapKey(name = "name")
-	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
-
-	public ResultBlockImpl() {
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
 	public Long getId() {
 		return id;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.isencia.passerelle.process.model.NamedValue#getName()
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/* (non-Javadoc)
@@ -122,41 +118,17 @@ public class ResultBlockImpl implements ResultBlock {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getCreationTS()
+	 * @see com.isencia.passerelle.process.model.ResultItem#getUnit()
 	 */
-	public Date getCreationTS() {
-		return creationTS;
+	public String getUnit() {
+		return unit;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getType()
+	 * @see com.isencia.passerelle.process.model.ResultItem#getResultBlock()
 	 */
-	public String getType() {
-		return type;
+	public ResultBlock getResultBlock() {
+		return resultBlock;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#addItem(com.isencia.passerelle.process.model.ResultItem)
-	 */
-	public ResultItem<?> putItem(ResultItem<?> item) {
-		return resultItems.put(item.getName(), item);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getAllItems()
-	 */
-	public Collection<ResultItem<?>> getAllItems() {
-		return Collections.unmodifiableCollection(resultItems.values());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getItemForName(java.lang.String)
-	 */
-	public ResultItem<?> getItemForName(String name) {
-		return resultItems.get(name);
-	}
-
-	public Task getTask() {
-		return task;
-	}
 }
