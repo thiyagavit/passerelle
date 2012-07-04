@@ -11,11 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 
-import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 
 /**
@@ -24,7 +22,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
  */
 @Entity
 @Table(name = "PAS_RESULTBLOCKATTRIBUTE")
-public class ResultBlockAttributeImpl implements Attribute, Comparable<ResultBlockAttributeImpl> {
+public class ResultBlockAttributeImpl extends AttributeImpl implements Comparable<ResultBlockAttributeImpl> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,20 +31,15 @@ public class ResultBlockAttributeImpl implements Attribute, Comparable<ResultBlo
 	@GeneratedValue(generator = "pas_resultblockattribute")
 	private Long id;
 	
-	@Version
-	private int version;
-	
-	@Column(name = "NAME")
-	private String name;
-	
-	@Column(name = "VALUE")
-	private String value;
-	
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
+	
+	public ResultBlockAttributeImpl() {
+		super();
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
@@ -55,27 +48,6 @@ public class ResultBlockAttributeImpl implements Attribute, Comparable<ResultBlo
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
-	 */
-	public String getValue() {
-		return value;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
-	 */
-	public String getValueAsString() {
-		return value;
-	}
-	
 	public ResultBlock getResultBlock() {
 		return resultBlock;
 	}

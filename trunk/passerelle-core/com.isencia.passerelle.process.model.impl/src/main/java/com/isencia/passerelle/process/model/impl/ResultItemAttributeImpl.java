@@ -11,11 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 
-import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultItem;
 
 /**
@@ -24,7 +22,7 @@ import com.isencia.passerelle.process.model.ResultItem;
  */
 @Entity
 @Table(name = "PAS_RESULTITEMATTRIBUTE")
-public class ResultItemAttributeImpl implements Attribute, Comparable<ResultItemAttributeImpl> {
+public class ResultItemAttributeImpl extends AttributeImpl implements Comparable<ResultItemAttributeImpl> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,20 +31,15 @@ public class ResultItemAttributeImpl implements Attribute, Comparable<ResultItem
 	@GeneratedValue(generator = "pas_resultitemattribute")
 	private Long id;
 	
-	@Version
-	private int version;
-	
-	@Column(name = "NAME")
-	private String name;
-	
-	@Column(name = "VALUE")
-	private String value;
-	
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ResultItemImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTITEM_ID")
 	private ResultItemImpl<?> resultItem;
+	
+	public ResultItemAttributeImpl() {
+		super();
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
@@ -55,27 +48,6 @@ public class ResultItemAttributeImpl implements Attribute, Comparable<ResultItem
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
-	 */
-	public String getValue() {
-		return value;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
-	 */
-	public String getValueAsString() {
-		return value;
-	}
-	
 	public ResultItem<?> getResultItem() {
 		return resultItem;
 	}
