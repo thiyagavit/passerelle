@@ -69,13 +69,13 @@ public class RequestImpl implements Request {
 	public RequestImpl() {
 	}
 
-	public RequestImpl(Context processingContext, String type) {
-		this.processingContext = processingContext;
+	public RequestImpl(String type) {
+		this.processingContext = new ContextImpl(this);
 		this.type = type;
 	}
 	
-	public RequestImpl(Context processingContext, String type, Case requestCase) {
-		this(processingContext, type);
+	public RequestImpl(String type, Case requestCase) {
+		this(type);
 		this.requestCase = (CaseImpl)requestCase;
 		
 		this.requestCase.addRequest(this);
