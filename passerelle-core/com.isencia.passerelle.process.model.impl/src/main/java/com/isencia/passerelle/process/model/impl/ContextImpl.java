@@ -101,12 +101,11 @@ public class ContextImpl implements Context {
 	private ReentrantLock lock = new ReentrantLock();
 
 	public ContextImpl() {
-		this.status = Status.CREATED;
-		this.creationTS = new Date();
 	}
 	
 	public ContextImpl(Request request) {
-		this();
+		this.status = Status.CREATED;
+		this.creationTS = new Date();
 		this.request = request;
 	}
 	
