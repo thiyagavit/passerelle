@@ -24,6 +24,8 @@ public class TaskImpl extends RequestImpl implements Task {
 
 	private static final long serialVersionUID = 1L;
 
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ContextImpl.class, optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "PARENT_CONTEXT_ID", nullable = false, updatable = true)
 	private ContextImpl parentContext;
@@ -31,10 +33,16 @@ public class TaskImpl extends RequestImpl implements Task {
 	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<ResultBlock> resultBlocks = new HashSet<ResultBlock>();
 
-	@Column(name = "OWNER")
+	@Column(name = "OWNER", nullable = false, unique = false, updatable = false)
 	private String owner;
 
 	public TaskImpl() {
+	}
+	
+	public TaskImpl(Context processingContext, Context parentContext, String type, String owner) {
+		super(processingContext, type);
+		this.parentContext = (ContextImpl)parentContext;
+		this.owner = owner;
 	}
 	
 	public Context getParentContext() {

@@ -36,8 +36,8 @@ public class RequestImpl implements Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ID")
 	@Id
+	@Column(name = "ID", nullable = false, unique = true, updatable = false)
 	@GeneratedValue(generator = "pas_request")
 	private Long id;
 
@@ -49,20 +49,33 @@ public class RequestImpl implements Request {
 	@MapKey(name = "name")
 	private Map<String, Attribute> requestAttributes = new HashMap<String, Attribute>();
 	
-	@ManyToOne(targetEntity = CaseImpl.class, fetch = FetchType.LAZY)
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods
+	// Remark: Cannot use optional = false here since we made TaskImpl extend from RequestImpl
+	@ManyToOne(targetEntity = CaseImpl.class, optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "CASE_ID")
-	private Case requestCase;
+	private CaseImpl requestCase;
 	
-	@Column(name = "CORRELATION_ID")
+	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true)
 	private String correlationId;
 
-	@Column(name = "TYPE")
+	@Column(name = "TYPE", nullable = false, unique = false, updatable = false)
 	private String type;
 
 	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = CascadeType.ALL)
-	private Context context;
+	private Context processingContext;
 
 	public RequestImpl() {
+	}
+
+	public RequestImpl(Context processingContext, String type) {
+		this.processingContext = processingContext;
+		this.type = type;
+	}
+	
+	public RequestImpl(Context processingContext, String type, Case requestCase) {
+		this(processingContext, type);
+		this.requestCase = (CaseImpl)requestCase;
 	}
 	
 	public Long getId() {
@@ -93,12 +106,16 @@ public class RequestImpl implements Request {
 		return correlationId;
 	}
 
+	public void setCorrelationId(String correlationId) {
+		this.correlationId = correlationId;
+	}
+	
 	public String getType() {
 		return type;
 	}
 
 	public Context getProcessingContext() {
-		return context;
+		return processingContext;
 	}
 
 }

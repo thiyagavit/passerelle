@@ -32,8 +32,8 @@ public class ContextEventImpl implements ContextEvent {
 
 	private static final long serialVersionUID = 1L;
 	
-	@Column(name = "ID")
 	@Id
+	@Column(name = "ID", nullable = false, unique = true, updatable = false)
 	@GeneratedValue(generator = "pas_contextevent")
 	private Long id;
 
@@ -41,20 +41,36 @@ public class ContextEventImpl implements ContextEvent {
 	@Version
 	private int version;
 	
-	@Column(name = "TOPIC")
+	@Column(name = "TOPIC", nullable = false, unique = false, updatable = false)
 	private String topic;
 	
-	@Column(name = "MESSAGE")
+	@Column(name = "MESSAGE", nullable = true, unique = false, updatable = false)
 	private String message;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATION_TS", updatable = false)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ContextImpl.class, optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "CONTEXT_ID", nullable = true, updatable = true)
 	private ContextImpl context;
 
+	public ContextEventImpl() {
+	}
+	
+	public ContextEventImpl(Context context, String topic) {
+		this.creationTS = new Date();
+		this.context = (ContextImpl)context;
+		this.topic = topic;
+	}
+	
+	public ContextEventImpl(Context context, String topic, String message) {
+		this(context, topic);
+		this.message = message;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */

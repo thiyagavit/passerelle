@@ -42,6 +42,8 @@ public class ResultItemAttributeImpl implements Attribute, Comparable<ResultItem
 	@Column(name = "VALUE")
 	private String value;
 	
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ResultItemImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTITEM_ID")
 	private ResultItemImpl<?> resultItem;
