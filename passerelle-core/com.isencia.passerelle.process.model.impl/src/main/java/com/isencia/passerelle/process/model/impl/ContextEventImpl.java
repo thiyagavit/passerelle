@@ -64,6 +64,8 @@ public class ContextEventImpl implements ContextEvent {
 		this.creationTS = new Date();
 		this.context = (ContextImpl)context;
 		this.topic = topic;
+
+		this.context.addEvent(this);
 	}
 	
 	public ContextEventImpl(Context context, String topic, String message) {

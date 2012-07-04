@@ -83,6 +83,8 @@ public class ResultBlockImpl implements ResultBlock {
 		this.creationTS = new Date();
 		this.task = (TaskImpl)task;
 		this.type = type;
+		
+		this.task.addResultBlock(this);
 	}
 	
 	/* (non-Javadoc)

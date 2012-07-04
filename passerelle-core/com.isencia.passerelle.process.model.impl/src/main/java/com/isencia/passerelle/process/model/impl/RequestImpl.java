@@ -77,6 +77,8 @@ public class RequestImpl implements Request {
 	public RequestImpl(Context processingContext, String type, Case requestCase) {
 		this(processingContext, type);
 		this.requestCase = (CaseImpl)requestCase;
+		
+		this.requestCase.addRequest(this);
 	}
 	
 	public Long getId() {

@@ -43,6 +43,8 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	public RequestAttributeImpl(Request request, String name, String value) {
 		super(name, value);
 		this.request = (RequestImpl)request;
+		
+		this.request.putAttribute(this);
 	}
 	
 	/* (non-Javadoc)
