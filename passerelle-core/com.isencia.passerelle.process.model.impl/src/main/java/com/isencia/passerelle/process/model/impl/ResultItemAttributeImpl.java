@@ -44,7 +44,7 @@ public class ResultItemAttributeImpl implements Attribute, Comparable<ResultItem
 	
 	@ManyToOne(targetEntity = ResultItemImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTITEM_ID")
-	private ResultItemImpl resultItem;
+	private ResultItemImpl<?> resultItem;
 	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
