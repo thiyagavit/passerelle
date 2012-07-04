@@ -38,7 +38,6 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 	private ResultItemImpl<?> resultItem;
 	
 	public ResultItemAttributeImpl() {
-		super();
 	}
 	
 	/* (non-Javadoc)

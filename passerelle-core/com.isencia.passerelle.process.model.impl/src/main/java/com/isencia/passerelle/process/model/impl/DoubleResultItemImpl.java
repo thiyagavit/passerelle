@@ -16,6 +16,9 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 
 	private static final long serialVersionUID = 1L;
 
+	public DoubleResultItemImpl() {
+	}
+	
 	public DoubleResultItemImpl(ResultBlock resultBlock, String name, String unit, Double value) {
 		super(resultBlock, name, unit);
 		this.value = Double.toString(value);

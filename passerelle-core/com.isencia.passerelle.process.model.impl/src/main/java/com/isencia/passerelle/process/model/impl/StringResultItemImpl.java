@@ -25,6 +25,9 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
 	private ClobItem clobItem;
 	
+	public StringResultItemImpl() {
+	}
+	
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String unit, String value) {
 		super(resultBlock, name, unit);
 		if (value != null && value.length() > MAX_CHAR_SIZE) {
