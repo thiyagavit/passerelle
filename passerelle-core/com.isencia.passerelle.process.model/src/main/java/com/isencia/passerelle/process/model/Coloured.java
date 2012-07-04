@@ -10,5 +10,7 @@ package com.isencia.passerelle.process.model;
 public interface Coloured {
 	
 	String getColour();
+	
+	void setColour(String colour);
 
 }
