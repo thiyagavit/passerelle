@@ -38,7 +38,6 @@ public class ResultBlockAttributeImpl extends AttributeImpl implements Comparabl
 	private ResultBlockImpl resultBlock;
 	
 	public ResultBlockAttributeImpl() {
-		super();
 	}
 	
 	/* (non-Javadoc)

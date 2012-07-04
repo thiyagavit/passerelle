@@ -38,7 +38,6 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	private RequestImpl request;
 	
 	public RequestAttributeImpl() {
-		super();
 	}
 	
 	public RequestAttributeImpl(Request request, String name, String value) {
