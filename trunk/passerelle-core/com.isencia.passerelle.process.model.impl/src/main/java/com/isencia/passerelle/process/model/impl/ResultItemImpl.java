@@ -39,8 +39,8 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ID")
 	@Id
+	@Column(name = "ID", nullable = false, unique = true, updatable = false)
 	@GeneratedValue(generator = "pas_resultitem")
 	private Long id;
 
@@ -48,26 +48,37 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 	@Version
 	private int version;
 	
-	@Column(name = "NAME")
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false)
 	private String name;
 
-	@Column(name = "VALUE")
+	@Column(name = "VALUE", nullable = false, unique = false, updatable = false)
 	protected String value;
 	
-	@Column(name = "UNIT")
+	@Column(name = "UNIT", nullable = true, unique = false, updatable = false)
 	private String unit;
 	
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
 
-	@Column(name = "COLOUR", nullable = true)
+	@Column(name = "COLOUR", nullable = true, unique = false, updatable = true)
 	private String colour;
 
+	public ResultItemImpl() {
+	}
+	
+	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit) {
+		this.resultBlock = (ResultBlockImpl)resultBlock;
+		this.name = name;
+		this.unit = unit;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
@@ -80,6 +91,13 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
+	 */
+	public String getValueAsString() {
+		return value;
 	}
 
 	/* (non-Javadoc)
@@ -117,6 +135,10 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 		return colour;
 	}
 
+	public void setColour(String colour) {
+		this.colour = colour;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.ResultItem#getUnit()
 	 */

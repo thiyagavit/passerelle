@@ -42,6 +42,8 @@ public class RequestAttributeImpl implements Attribute, Comparable<RequestAttrib
 	@Column(name = "VALUE")
 	private String value;
 	
+	// Remark: need to use the implementation class instead of the interface
+	// here to ensure jpa implementations like EclipseLink will generate setter methods	
 	@ManyToOne(targetEntity = RequestImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "REQUEST_ID")
 	private RequestImpl request;

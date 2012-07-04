@@ -42,8 +42,8 @@ public class ResultBlockImpl implements ResultBlock {
 
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "ID")
 	@Id
+	@Column(name = "ID", nullable = false, unique = true, updatable = false)
 	@GeneratedValue(generator = "pas_resultblock")
 	private Long id;
 
@@ -61,14 +61,14 @@ public class ResultBlockImpl implements ResultBlock {
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
-	@Column(name = "COLOUR", nullable = true)
+	@Column(name = "COLOUR", nullable = true, unique = false, updatable = true)
 	private String colour;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATION_TS", updatable = false)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
-	@Column(name = "TYPE", updatable = false)
+	@Column(name = "TYPE", nullable = false, unique = false, updatable = false)
 	private String type;
 
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -77,6 +77,12 @@ public class ResultBlockImpl implements ResultBlock {
 	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
 
 	public ResultBlockImpl() {
+	}
+	
+	public ResultBlockImpl(Task task, String type) {
+		this.creationTS = new Date();
+		this.task = (TaskImpl)task;
+		this.type = type;
 	}
 	
 	/* (non-Javadoc)
@@ -121,6 +127,10 @@ public class ResultBlockImpl implements ResultBlock {
 		return colour;
 	}
 
+	public void setColour(String colour) {
+		this.colour = colour;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.isencia.passerelle.process.model.ResultBlock#getCreationTS()
 	 */

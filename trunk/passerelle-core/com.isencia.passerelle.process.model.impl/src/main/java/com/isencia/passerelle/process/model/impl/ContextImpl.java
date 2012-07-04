@@ -51,16 +51,16 @@ public class ContextImpl implements Context {
 
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@Column(name = "ID", nullable = false, unique = true, updatable = false)
+	@GeneratedValue(generator = "pas_context")
+	private Long id;
+	
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
 	
-	@Id
-	@Column(name = "ID")
-	@GeneratedValue(generator = "pas_context")
-	private Long id;
-	
-	@Column(name = "STATUS")
+	@Column(name = "STATUS", nullable = false, unique = false, updatable = true)
 	@Enumerated
 	private Status status;
 	
@@ -80,11 +80,11 @@ public class ContextImpl implements Context {
 	private Map<String, Serializable> entries = new HashMap<String, Serializable>();
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATION_TS", updatable = false)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "END_TS")
+	@Column(name = "END_TS", nullable = true, unique = false, updatable = true)
 	private Date endTS;
 
 	// join/fork support
@@ -101,6 +101,13 @@ public class ContextImpl implements Context {
 	private ReentrantLock lock = new ReentrantLock();
 
 	public ContextImpl() {
+		this.status = Status.CREATED;
+		this.creationTS = new Date();
+	}
+	
+	public ContextImpl(Request request) {
+		this();
+		this.request = request;
 	}
 	
 	/* (non-Javadoc)

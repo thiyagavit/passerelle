@@ -5,6 +5,8 @@ package com.isencia.passerelle.process.model.impl;
 
 import javax.persistence.DiscriminatorValue;
 
+import com.isencia.passerelle.process.model.ResultBlock;
+
 /**
  * @author "puidir"
  *
@@ -14,8 +16,13 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 
 	private static final long serialVersionUID = 1L;
 
-	public DoubleResultItemImpl(Double value) {
+	public DoubleResultItemImpl(ResultBlock resultBlock, String name, String unit, Double value) {
+		super(resultBlock, name, unit);
 		this.value = Double.toString(value);
+	}
+	
+	public DoubleResultItemImpl(ResultBlock resultBlock, String name, Double value) {
+		this(resultBlock, name, null, value);
 	}
 	
 	/* (non-Javadoc)
@@ -30,13 +37,6 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 	 */
 	public Double getValue() {
 		return Double.parseDouble(value);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
-	 */
-	public String getValueAsString() {
-		return value;
 	}
 
 }
