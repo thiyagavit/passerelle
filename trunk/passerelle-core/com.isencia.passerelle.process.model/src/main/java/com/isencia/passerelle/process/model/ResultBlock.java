@@ -16,9 +16,7 @@ package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.SortedSet;
 
 /**
  * 
@@ -40,12 +38,6 @@ public interface ResultBlock extends Serializable, Identifiable, AttributeHolder
    * @return all the ResultItems
    */
   Collection<ResultItem<?>> getAllItems();
-
-  /**
-   * @param comparator
-   * @return all the ResultItems, ordered by the comparator
-   */
-  SortedSet<ResultItem<?>> getAllItems(Comparator<ResultItem<?>> comparator);
 
   /**
    * @param name
