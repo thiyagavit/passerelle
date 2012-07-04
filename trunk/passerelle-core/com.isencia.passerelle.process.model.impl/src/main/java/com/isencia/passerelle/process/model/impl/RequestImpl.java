@@ -74,11 +74,21 @@ public class RequestImpl implements Request {
 		this.type = type;
 	}
 	
+	public RequestImpl(String type, String correlationId) {
+		this(type);
+		this.correlationId = correlationId;
+	}
+	
 	public RequestImpl(String type, Case requestCase) {
 		this(type);
 		this.requestCase = (CaseImpl)requestCase;
 		
 		this.requestCase.addRequest(this);
+	}
+	
+	public RequestImpl(String type, Case requestCase, String correlationId) {
+		this(type, requestCase);
+		this.correlationId = correlationId;
 	}
 	
 	public Long getId() {
