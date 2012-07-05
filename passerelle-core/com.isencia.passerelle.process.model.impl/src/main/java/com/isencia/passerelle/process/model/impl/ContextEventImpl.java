@@ -73,52 +73,31 @@ public class ContextEventImpl implements ContextEvent {
 		this.message = message;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
 	public Long getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Event#getTopic()
-	 */
 	public String getTopic() {
 		return topic;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Event#getMessage()
-	 */
 	public String getMessage() {
 		return message;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Event#getCreationTS()
-	 */
 	public Date getCreationTS() {
 		return creationTS;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Event#getDuration()
-	 */
 	public Long getDuration() {
 		// Irrelevant
 		return 0L;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ContextEvent#getContext()
-	 */
 	public Context getContext() {
 		return context;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	public int compareTo(ContextEvent rhs) {
 		ContextEventImpl rhsImpl = (ContextEventImpl)rhs;
 		return new CompareToBuilder()
