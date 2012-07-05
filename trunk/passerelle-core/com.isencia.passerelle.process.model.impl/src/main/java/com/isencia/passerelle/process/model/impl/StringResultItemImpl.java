@@ -3,6 +3,8 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.FetchType;
@@ -13,7 +15,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @DiscriminatorValue("STRING_RESULT")
 public class StringResultItemImpl extends ResultItemImpl<String> {
@@ -24,35 +26,39 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
 	private ClobItem clobItem;
-	
+
 	public StringResultItemImpl() {
 	}
-	
-	public StringResultItemImpl(ResultBlock resultBlock, String name, String unit, String value) {
-		super(resultBlock, name, unit);
+
+	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
+		super(resultBlock, name, null, creationTS);
 		if (value != null && value.length() > MAX_CHAR_SIZE) {
 			this.clobItem = new ClobItem(value);
 		} else {
 			this.value = value;
 		}
 	}
-	
+
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
-		this(resultBlock, name, null, value);
+		this(resultBlock, name, value, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
 	 */
 	public String getValue() {
 		if (clobItem != null) {
 			return clobItem.getValue();
 		}
-		
+
 		return value;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
 	 */
 	public String getDataType() {

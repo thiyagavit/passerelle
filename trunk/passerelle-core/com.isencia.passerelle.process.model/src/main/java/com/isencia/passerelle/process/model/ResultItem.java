@@ -15,6 +15,8 @@
 
 package com.isencia.passerelle.process.model;
 
+import java.util.Date;
+
 /**
  * @author erwin
  *
@@ -26,5 +28,7 @@ public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHol
 	String getDataType();
 	
 	ResultBlock getResultBlock();
+	
+	Date getCreationTS();
 
 }
