@@ -25,4 +25,9 @@ public interface ContextEvent extends Event, Identifiable, Comparable<ContextEve
    * @return the associated context
    */
   Context getContext();
+  
+  /**
+   * @return the event message, typically empty except for ERROR events, where error info is then stored in here.
+   */
+  String getMessage();
 }
