@@ -22,6 +22,17 @@ import java.io.Serializable;
  */
 public interface Request extends Serializable, Identifiable, AttributeHolder {
 
+	static final String _ID = "id";
+	static final String _ATTRIBUTES = "attributes";
+	static final String _CASE = "case";
+	static final String _CORRELATIONID = "correlationId";
+	static final String _TYPE = "type";
+	static final String _CONTEXT = "processingContext";
+	static final String _REFERENCE = "case.id";
+	static final String _TASKS = "processingContext.tasks";
+	static final String _EVENTS = "processingContext.events";
+
+	
 	/**
 	 * @return the <code>Case</code> to which this <code>Request</code> is
 	 *         related.
