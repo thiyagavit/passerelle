@@ -130,6 +130,12 @@ public class ContextImpl implements Context {
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
+		
+		// Mark the end of processing
+		if (status == Status.FINISHED || status == Status.CANCELLED || status == Status.ERROR || status == Status.TIMEOUT) {
+			endTS = new Date();
+		}
+		
 		// TODO: should notify status listeners
 	}
 
