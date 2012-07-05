@@ -54,27 +54,18 @@ public class CaseImpl implements Case {
 	public CaseImpl() {
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
+	public CaseImpl(String externalReference) {
+		this.externalReference = externalReference;
+	}
+	
 	public Long getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Case#getExternalReference()
-	 */
 	public String getExternalReference() {
 		return externalReference;
 	}
 
-	public void setExternalReference(String externalReference) {
-		this.externalReference = externalReference;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Case#getRequests()
-	 */
 	public Collection<Request> getRequests() {
 		return Collections.unmodifiableCollection(requests);
 	}
