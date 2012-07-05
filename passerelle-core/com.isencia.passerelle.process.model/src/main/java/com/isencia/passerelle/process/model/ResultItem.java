@@ -23,12 +23,19 @@ import java.util.Date;
  */
 public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
 	
+  /**
+   * This can indicate the timestamp when the result item was created inside a Passerelle process,
+   * but can also indicate a historical timestamp, e.g. when the result item represents a measurement
+   * result obtained from an external system, containing its own timestamp.
+   * 
+   * @return the creation timestamp of the item
+   */
+  Date getCreationTS();
+  
 	String getUnit();
 	
 	String getDataType();
 	
 	ResultBlock getResultBlock();
-	
-	Date getCreationTS();
 
 }

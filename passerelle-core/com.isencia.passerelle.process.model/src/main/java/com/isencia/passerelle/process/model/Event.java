@@ -39,11 +39,6 @@ public interface Event extends Serializable {
   String getTopic();
 
   /**
-   * @return the event message, typically empty except for ERROR events, where error info is then stored in here.
-   */
-  String getMessage();
-
-  /**
    * @return the creation timestamp of the event
    */
   Date getCreationTS();
