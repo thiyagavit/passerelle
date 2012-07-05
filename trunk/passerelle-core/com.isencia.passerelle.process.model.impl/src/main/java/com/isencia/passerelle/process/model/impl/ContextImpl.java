@@ -100,6 +100,13 @@ public class ContextImpl implements Context {
 	@Transient
 	private ReentrantLock lock = new ReentrantLock();
 
+  public static final String _ID = "id";
+  public static final String _STATUS = "status";
+  public static final String _REQUEST = "request";
+  public static final String _REQUEST_ID = "request.id";
+  public static final String _TASKS = "tasks";
+  public static final String _EVENTS = "events";
+
 	public ContextImpl() {
 	}
 	
@@ -119,15 +126,21 @@ public class ContextImpl implements Context {
 		return status;
 	}
 
-	public void setStatus(Status status) {
-		this.status = status;
-		
-		// Mark the end of processing
-		if (status == Status.FINISHED || status == Status.CANCELLED || status == Status.ERROR || status == Status.TIMEOUT) {
-			endTS = new Date();
+	public boolean setStatus(Status status) {
+		if(this.status!=null && this.status.isFinalStatus()) {
+			return false;
+		} else {
+			this.status = status;
+			
+			// Mark the end of processing
+			if (status.isFinalStatus()) {
+				endTS = new Date();
+			}
+			
+			// TODO: should notify status listeners
+			
+			return true;
 		}
-		
-		// TODO: should notify status listeners
 	}
 
 	public Request getRequest() {

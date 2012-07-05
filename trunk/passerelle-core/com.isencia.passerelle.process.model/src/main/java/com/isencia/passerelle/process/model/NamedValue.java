@@ -18,18 +18,33 @@ package com.isencia.passerelle.process.model;
 import java.io.Serializable;
 
 /**
+ * A generic container for named values, where values can be of any Serializable type.
+ * <p>
+ * Many types of elements in the Passerelle process domain model are basically name/value-pairs.
+ * E.g. request attributes, result items etc.
+ * </p>
+ * 
  * @author erwin
  * 
  */
-public interface NamedValue<V> extends Serializable {
+public interface NamedValue<V extends Serializable> extends Serializable {
 
-  static final String _NAME = "name";
-  static final String _VALUE = "valueAsString";
-
+	/**
+	 * 
+	 * @return the name
+	 */
   String getName();
 
+  /**
+   * 
+   * @return the value in its "raw" type/format
+   */
   V getValue();
 
+  /**
+   * 
+   * @return the value in a String-representation
+   */
   String getValueAsString();
 
 }

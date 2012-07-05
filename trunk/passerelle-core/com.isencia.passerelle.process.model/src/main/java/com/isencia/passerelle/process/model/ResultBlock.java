@@ -19,16 +19,13 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
+ * A simple container for <code>ResultItem</code>s, that can be given a "type" identifier.
  * 
  * @author erwin
  * 
  */
 public interface ResultBlock extends Serializable, Identifiable, AttributeHolder, Coloured {
 
-  static final String _CREATION_TS = "creationTS";
-  static final String _TYPE = "type";
-  static final String _RESULT_ITEMS = "allItems";
-  
   /**
    * @return the creation timestamp of the resultblock
    */

@@ -15,19 +15,20 @@
 
 package com.isencia.passerelle.process.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * A <code>ResultItem</code> represents a significant data item that is worth maintaining/storing/analysing/showing,
+ * e.g. an individual measurement result or data element obtained from a user-filled form etc.
+ * <p>
+ * It can be enriched in later processing with <code>Attribute</code>s, can be <code>Coloured</code> etc.
+ * </p>
  * @author erwin
  *
  */
-public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
+public interface ResultItem<V extends Serializable> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
 
-  static final String _CREATION_TS = "creationTS";
-  static final String _UNIT = "unit";
-  static final String _DATA_TYPE = "dataType";
-  static final String _RESULT_BLOCK = "resultBlock";
-  
   /**
    * This can indicate the timestamp when the result item was created inside a Passerelle process,
    * but can also indicate a historical timestamp, e.g. when the result item represents a measurement
@@ -37,10 +38,24 @@ public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHol
    */
   Date getCreationTS();
   
+  /**
+   * 
+   * @return an identifier of the physical unit (if any) for the contained value.
+   * By preference, this should correspond to some standard units system like SI etc.
+   */
 	String getUnit();
 	
+	/**
+	 * 
+	 * @return a textual name of the contained data type, that should be consistent with
+	 * the actual type of the specified generic V.
+	 */
 	String getDataType();
 	
+	/**
+	 * 
+	 * @return the parent result block to which this item belongs.
+	 */
 	ResultBlock getResultBlock();
 
 }

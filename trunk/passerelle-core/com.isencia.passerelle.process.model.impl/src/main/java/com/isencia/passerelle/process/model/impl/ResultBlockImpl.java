@@ -76,6 +76,12 @@ public class ResultBlockImpl implements ResultBlock {
 	@MapKey(name = "name")
 	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
 
+  public static final String _ID = "id";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _TYPE = "type";
+  public static final String _RESULT_ITEMS = "allItems";
+  public static final String _COLOUR = "colour";
+ 
 	public ResultBlockImpl() {
 	}
 	

@@ -34,10 +34,6 @@ import java.util.Date;
  */
 public interface Event extends Serializable {
 
-  static final String _TOPIC = "topic";
-  static final String _CREATION_TS = "creationTS";
-  static final String _DURATION = "duration";
-
   /**
    * @return the event's topic
    */

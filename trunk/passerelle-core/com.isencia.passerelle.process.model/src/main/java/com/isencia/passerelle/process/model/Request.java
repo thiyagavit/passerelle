@@ -18,18 +18,17 @@ package com.isencia.passerelle.process.model;
 import java.io.Serializable;
 
 /**
+ * A <code>Request</code> instance is an (almost) immutable container for the original data received from an initiator, 
+ * for which work is performed in a Passerelle process.
+ * <p>
+ * All status changes, task results etc are maintained in an associated processing <code>Context</code>.
+ * For specific needs, Passerelle processes are allowed to add extra <code>Attribute</code>s.
+ * <br/>
+ * But the originally received data can not be tampered with...
+ * </p>
  * @author erwin
  */
 public interface Request extends Serializable, Identifiable, AttributeHolder {
-
-  static final String _ATTRIBUTES = "attributes";
-  static final String _CASE = "case";
-  static final String _CORRELATIONID = "correlationId";
-  static final String _TYPE = "type";
-  static final String _CONTEXT = "processingContext";
-  static final String _REFERENCE = "case.id";
-  static final String _TASKS = "processingContext.tasks";
-  static final String _EVENTS = "processingContext.events";
 
   /**
    * @return the <code>Case</code> to which this <code>Request</code> is related.
@@ -37,8 +36,11 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
   Case getCase();
 
   /**
+   * A correlation ID can be specified by the request initiator. 
+   * Passerelle will then ensure that in any notifications, acknowledgements or other kinds of feedback, the correlation ID will be available.
+   * This can be used by external systems to facilitate correlating their original requests to a Passerelle runtime, with later asynchronous responses.
    * 
-   * @return
+   * @return the correlation Id that was received from the request initiator.
    */
   String getCorrelationId();
 

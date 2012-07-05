@@ -46,6 +46,11 @@ public class CaseImpl implements Case {
 	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Request> requests = new ArrayList<Request>();
 	
+  public static final String _ID = "id";
+  public static final String _REFERENCE = "id";
+  public static final String _EXTERNAL_REFERENCE = "externalReference";
+	
+
 	public CaseImpl() {
 	}
 	

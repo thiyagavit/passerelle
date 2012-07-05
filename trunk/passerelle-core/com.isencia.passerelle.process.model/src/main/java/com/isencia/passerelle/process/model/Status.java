@@ -15,10 +15,16 @@
 package com.isencia.passerelle.process.model;
 
 
-
+/**
+ * Enumerator of all possible states of a <code>Request</code>'s <code>Context</code>.
+ * 
+ * @author erwin
+ *
+ */
 public enum Status {
+	// these are transient states
 	CREATED,STARTED,PROCESSING,PAUSED,
-	
+	// these are final states
 	FINISHED,CANCELLED,TIMEOUT,ERROR;
 	
 	public boolean isFinalStatus() {

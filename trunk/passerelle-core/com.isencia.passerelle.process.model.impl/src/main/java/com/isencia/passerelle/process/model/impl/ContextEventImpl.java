@@ -62,6 +62,13 @@ public class ContextEventImpl implements ContextEvent {
 	@JoinColumn(name = "CONTEXT_ID", nullable = true, updatable = true)
 	private ContextImpl context;
 
+  public static final String _ID = "id";
+  public static final String _TOPIC = "topic";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _DURATION = "duration";
+  public static final String _CONTEXT = "context";
+  public static final String _MESSAGE = "message";
+
 	public ContextEventImpl() {
 	}
 	

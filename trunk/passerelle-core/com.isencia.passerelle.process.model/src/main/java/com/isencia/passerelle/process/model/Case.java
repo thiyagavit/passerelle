@@ -19,14 +19,29 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
+ * A <code>Case</code> is the parent object of any <code>Request</code> being processed in a Passerelle flow.
+ * <p>
+ * The Passerelle process domain model describes the execution of workflow(s) in the context of a certain "situation" or "driver",
+ * where the situation is represented by a <code>Case</code>-instance.
+ * <br/>
+ * As several activities may be triggered in Passerelle, related to the same driver or situation, a <code>Case</code> can also be seen
+ * as a grouping of one-or-more <code>Request</code>s and their processing results.
+ * </p>
+ * <p> 
+ * Through the <code>Case.getExternalReference()</code>, the processing context can (optionally) be related to an external entity that could
+ * be the driver of the work.
+ * </p>
+ * <p>
+ * E.g. for a customer-support system, the <code>Case</code> could be related to a customer complaint or an order. 
+ * The resolution of the complaint, or the execution and delivery of the ordered goods could be controlled by the execution of one-or-more
+ * flows, each triggered by specific <code>Request</code>s.
+ * </p>
+ * 
  * @author erwin
  *
  */
 public interface Case extends Serializable, Identifiable {
   
-  static final String _REFERENCE = "id";
-  static final String _EXTERNAL_REFERENCE = "externalReference";
-	
   /**
    * A case can be linked to an external/business entity, e.g. a trouble ticket or a business order etc.
    * The (optional) <code>referenceKey</code> can refer to this external entity.

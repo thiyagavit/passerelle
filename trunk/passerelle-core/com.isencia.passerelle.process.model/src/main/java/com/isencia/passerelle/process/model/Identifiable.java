@@ -16,12 +16,13 @@
 package com.isencia.passerelle.process.model;
 
 /**
+ * Base interface for all things that are identifiable with a unique primary key,
+ * with a non-business-key, i.e. a simple generated number or so.
+ * 
  * @author erwin
  * 
  */
 public interface Identifiable {
-
-  static final String _ID = "Id";
 
   /**
    * @return the PK

@@ -66,6 +66,16 @@ public class RequestImpl implements Request {
 		CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
 	private Context processingContext;
 
+  public static final String _ID = "id";
+  public static final String _ATTRIBUTES = "attributes";
+  public static final String _CASE = "case";
+  public static final String _CORRELATIONID = "correlationId";
+  public static final String _TYPE = "type";
+  public static final String _CONTEXT = "processingContext";
+  public static final String _REFERENCE = "case.id";
+  public static final String _TASKS = "processingContext.tasks";
+  public static final String _EVENTS = "processingContext.events";
+
 	public RequestImpl() {
 	}
 
