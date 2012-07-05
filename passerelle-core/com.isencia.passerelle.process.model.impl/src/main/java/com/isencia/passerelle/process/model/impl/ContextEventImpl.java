@@ -6,6 +6,9 @@ package com.isencia.passerelle.process.model.impl;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,7 +30,9 @@ import com.isencia.passerelle.process.model.ContextEvent;
  *
  */
 @Entity
-@Table(name = "PAS_CONTEXTEVENT")
+@Table(name = "PAS_EVENT")
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("CONTEXTEVENT")
 public class ContextEventImpl implements ContextEvent {
 
 	private static final long serialVersionUID = 1L;

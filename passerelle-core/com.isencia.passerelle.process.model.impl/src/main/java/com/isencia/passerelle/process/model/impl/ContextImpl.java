@@ -111,23 +111,14 @@ public class ContextImpl implements Context {
 		this.events.add(new ContextEventImpl(this, this.status.name()));
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
 	public Long getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getStatus()
-	 */
 	public Status getStatus() {
 		return status;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#setStatus(com.isencia.passerelle.process.model.Status)
-	 */
 	public void setStatus(Status status) {
 		this.status = status;
 		
@@ -139,66 +130,39 @@ public class ContextImpl implements Context {
 		// TODO: should notify status listeners
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getRequest()
-	 */
 	public Request getRequest() {
 		return request;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#addTask(com.isencia.passerelle.process.model.Task)
-	 */
 	public void addTask(Task task) {
 		this.tasks.add(task);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getTasks()
-	 */
 	public List<Task> getTasks() {
 		return Collections.unmodifiableList(tasks);
 		// TODO: does not take into account any 'transientContexts' yet
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#addEvent(com.isencia.passerelle.process.model.ContextEvent)
-	 */
 	public void addEvent(ContextEvent event) {
 		events.add(event);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getEvents()
-	 */
 	public List<ContextEvent> getEvents() {
 		return Collections.unmodifiableList(events);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#putEntry(java.lang.String, java.io.Serializable)
-	 */
 	public void putEntry(String name, Serializable value) {
 		entries.put(name, value);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getEntryValue(java.lang.String)
-	 */
 	public Serializable getEntryValue(String name) {
 		return entries.get(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getEntryNames()
-	 */
 	public Iterator<String> getEntryNames() {
 		return entries.keySet().iterator();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#lookupValue(java.lang.String)
-	 */
 	public String lookupValue(String name) {
 
 		String result = null;
@@ -235,30 +199,18 @@ public class ContextImpl implements Context {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#isFinished()
-	 */
 	public boolean isFinished() {
-		return (status == Status.FINISHED || status == Status.TIMEOUT || status == Status.CANCELLED || status == Status.ERROR);
+		return status.isFinalStatus();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getCreationTS()
-	 */
 	public Date getCreationTS() {
 		return creationTS;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getEndTS()
-	 */
 	public Date getEndTS() {
 		return endTS;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#getDuration()
-	 */
 	public Long getDurationInMillis() {
 		if (creationTS != null && endTS != null) {
 			return endTS.getTime() - creationTS.getTime();

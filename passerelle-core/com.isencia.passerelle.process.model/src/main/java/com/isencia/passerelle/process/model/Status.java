@@ -20,4 +20,8 @@ public enum Status {
 	CREATED,STARTED,PROCESSING,PAUSED,
 	
 	FINISHED,CANCELLED,TIMEOUT,ERROR;
+	
+	public boolean isFinalStatus() {
+		return this.compareTo(FINISHED)>=0;
+	}
 }
