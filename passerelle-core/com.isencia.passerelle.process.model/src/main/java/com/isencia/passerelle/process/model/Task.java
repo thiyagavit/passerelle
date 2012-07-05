@@ -18,31 +18,32 @@ import java.util.Collection;
 
 /**
  * A Task is a kind of internal request, to execute one step in a process.
- * 
+ * <p>
  * Contrary to a plain Request, which is just a plain container for storing the info
  * which triggered the process, Tasks (may) have associated results represented in blocks of key/value items.
- * 
+ * </p>
  * @author delerw
  *
  */
 public interface Task extends Request {
 
-  static final String _PARENT_CONTEXT = "parentContext";
-  static final String _OWNER = "owner";
-  static final String _RESULTBLOCKS = "resultBlocks";
   /**
    * 
-   * @return
+   * @return the <code>Context</code> of the parent request of this task
    */
 	Context getParentContext();
 	
 	/**
+	 * In Passerelle systems this is typically the full name of an actor in a model that's being executed.
 	 * 
-	 * @return
+	 * @return a unique identifier of the task owner, i.e. the party or system component
+	 * responsible for the execution of this task. 
+	 * 
 	 */
 	String getOwner();
 	
 	/**
+	 * Add a result block to this task.
 	 * 
 	 * @param block
 	 * @return true if the block was added successfully

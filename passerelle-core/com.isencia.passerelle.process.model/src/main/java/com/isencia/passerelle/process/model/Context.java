@@ -22,23 +22,35 @@ import java.util.List;
 
 
 /**
+ * A <code>Context</code> maintains all status information and executed work for a certain <code>Request</code>.
+ * <p>
+ * Besides these main responsibilities, it also offers a storage for named "context entries".
+ * This storage can be used to maintain context-wide data, i.e. that can be shared across tasks etc.
+ * <br/>
+ * Remark that this is typically a transient storage, whereas the "main" elements like <code>Task</code>s
+ * and their <code>ResultBlock</code>s, <code>Attribute</code>s etc are often persisted.
+ * </p>
  * @author erwin
  *
  */
 public interface Context extends Identifiable, Serializable {
-	
-	static final String _STATUS = "status";
-	static final String _REQUEST = "request";
-	static final String _REQUEST_ID = "request.id";
-	static final String _TASKS = "tasks";
-	static final String _EVENTS = "events";
 	
   /**
    * @return current status of this context
    */
   Status getStatus();
   
-  void setStatus(Status status);
+  /**
+   * Set the new status of the context.
+   * There is currently no formally enforced state transition model.
+   * The only assumption is that once a <code>Context</code> has been set to a "final" state
+   * (cfr <code>Status.isFinalStatus()</code>) the setter will fail if any more state change is attempted.
+   * 
+   * @param status
+   * @return true if the state was successfully set, false if not
+   * @see Status
+   */
+  boolean setStatus(Status status);
 
 	/**
 	 * 
@@ -54,10 +66,14 @@ public interface Context extends Identifiable, Serializable {
 	
 	/**
 	 * 
-	 * @return
+	 * @return a read-only list of all associated tasks
 	 */
 	List<Task> getTasks();
 	
+	/**
+	 * 
+	 * @param e
+	 */
 	void addEvent(ContextEvent e);
 
 	/**
@@ -75,8 +91,17 @@ public interface Context extends Identifiable, Serializable {
    */
   void putEntry(String name, Serializable value);
   
+  /**
+   * 
+   * @param name
+   * @return the entry stored under the given name in the context, or null if not present.
+   */
   Serializable getEntryValue(String name);
   
+  /**
+   * 
+   * @return the names of all stored context entries
+   */
   Iterator<String> getEntryNames();
   
 	/**
@@ -98,7 +123,7 @@ public interface Context extends Identifiable, Serializable {
 
 
   /**
-   * Is the task still processing or not
+   * Is the request still processing or not
    * 
    * @return
    */
@@ -115,12 +140,30 @@ public interface Context extends Identifiable, Serializable {
   Date getEndTS();
 
   /**
-   * @return The context's duration (in milliseconds)
+   * @return The context's duration (in milliseconds). 
+   * It is assumed that this returns the time since the creationTS and until the endTS for finished contexts.
+   * For non-finished contexts, this should return null.
    */
   Long getDurationInMillis();
 
 	// methods to support fork/join
-	void join(Context other);
+  /**
+   * To reliably support fork/join semantics in Passerelle flows, forked flow branches should work in isolation of each other,
+   * until the join. This can be achieved by sending individual forked <code>Context</code>s across each branch.
+   * 
+   * @return a forked context
+   */
 	Context fork();
+	
+	/**
+	 * 
+	 * @param other
+	 */
+	void join(Context other);
+	
+	/**
+	 * 
+	 * @return an indicator whether this is a forked context or a "root" context, i.e. outside of any fork/join scope.
+	 */
 	boolean isForkedContext();
 }

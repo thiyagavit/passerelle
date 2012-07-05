@@ -34,6 +34,9 @@ public class ClobItem implements Identifiable {
 	@Lob
 	private String value;
 	
+  public static final String _ID = "id";
+  public static final String _VALUE = "value";
+
 	public ClobItem() {	
 	}
 	

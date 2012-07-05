@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +39,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Entity
 @Table(name = "PAS_RESULTITEM")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
-public abstract class ResultItemImpl<V> implements ResultItem<V> {
+public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -77,6 +78,15 @@ public abstract class ResultItemImpl<V> implements ResultItem<V> {
 	@Column(name = "COLOUR", nullable = true, unique = false, updatable = true)
 	private String colour;
 
+  public static final String _ID = "id";
+  public static final String _NAME = "name";
+  public static final String _VALUE = "valueAsString";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _UNIT = "unit";
+  public static final String _DATA_TYPE = "dataType";
+  public static final String _RESULT_BLOCK = "resultBlock";
+  public static final String _COLOUR = "colour";
+  
 	public ResultItemImpl() {
 	}
 	

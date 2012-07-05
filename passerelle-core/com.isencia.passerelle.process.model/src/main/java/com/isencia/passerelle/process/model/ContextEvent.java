@@ -16,12 +16,15 @@ package com.isencia.passerelle.process.model;
 
 
 /**
+ * Interface for <code>Event</code>s associated to <code>Context</code>s.
+ * <p>
+ * These can correspond to state transitions, or to arbitrary actions for which
+ * someone thought it was important to notify listeners and/or store execution traces.
+ * </p>
+ * 
  * @author delerw
  */
 public interface ContextEvent extends Event, Identifiable, Comparable<ContextEvent> {
-
-	static final String _CONTEXT = "context";
-  static final String _MESSAGE = "message";
 
   /**
    * 

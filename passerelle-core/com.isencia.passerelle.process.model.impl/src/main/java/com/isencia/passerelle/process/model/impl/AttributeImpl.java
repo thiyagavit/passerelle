@@ -34,6 +34,10 @@ public abstract class AttributeImpl implements Attribute {
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
 	private ClobItem clobItem;
 
+  public static final String _ID = "id";
+  public static final String _NAME = "name";
+  public static final String _VALUE = "valueAsString";
+
 	protected AttributeImpl() {
 	}
 	

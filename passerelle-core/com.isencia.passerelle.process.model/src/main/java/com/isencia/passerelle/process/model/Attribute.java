@@ -16,6 +16,9 @@
 package com.isencia.passerelle.process.model;
 
 /**
+ * Attributes are identifiable name/value pairs.
+ * They are typically associated with parent entities like requests or tasks etc.
+ * 
  * @author erwin
  *
  */
