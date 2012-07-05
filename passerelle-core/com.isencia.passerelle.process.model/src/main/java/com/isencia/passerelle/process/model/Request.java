@@ -22,40 +22,34 @@ import java.io.Serializable;
  */
 public interface Request extends Serializable, Identifiable, AttributeHolder {
 
-	static final String _ID = "id";
-	static final String _ATTRIBUTES = "attributes";
-	static final String _CASE = "case";
-	static final String _CORRELATIONID = "correlationId";
-	static final String _TYPE = "type";
-	static final String _CONTEXT = "processingContext";
-	static final String _REFERENCE = "case.id";
-	static final String _TASKS = "processingContext.tasks";
-	static final String _EVENTS = "processingContext.events";
+  static final String _ATTRIBUTES = "attributes";
+  static final String _CASE = "case";
+  static final String _CORRELATIONID = "correlationId";
+  static final String _TYPE = "type";
+  static final String _CONTEXT = "processingContext";
+  static final String _REFERENCE = "case.id";
+  static final String _TASKS = "processingContext.tasks";
+  static final String _EVENTS = "processingContext.events";
 
-	
-	/**
-	 * @return the <code>Case</code> to which this <code>Request</code> is
-	 *         related.
-	 */
-	Case getCase();
+  /**
+   * @return the <code>Case</code> to which this <code>Request</code> is related.
+   */
+  Case getCase();
 
-	/**
-	 * 
-	 * @return
-	 */
-	String getCorrelationId();
+  /**
+   * 
+   * @return
+   */
+  String getCorrelationId();
 
-	/**
-	 * @return the type of request, which typically determines the flow that must
-	 *         be executed to handle it.
-	 */
-	String getType();
+  /**
+   * @return the type of request, which typically determines the flow that must be executed to handle it.
+   */
+  String getType();
 
-	/**
-	 * 
-	 * @return the context containing all current status info about
-	 * the lifecycle of the request processing, tasks that were executed,
-	 * results obtained etc.
-	 */
-	Context getProcessingContext();
+  /**
+   * 
+   * @return the context containing all current status info about the lifecycle of the request processing, tasks that were executed, results obtained etc.
+   */
+  Context getProcessingContext();
 }

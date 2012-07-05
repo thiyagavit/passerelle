@@ -24,6 +24,9 @@ import java.util.Collection;
  */
 public interface Case extends Serializable, Identifiable {
   
+  static final String _REFERENCE = "id";
+  static final String _EXTERNAL_REFERENCE = "externalReference";
+	
   /**
    * A case can be linked to an external/business entity, e.g. a trouble ticket or a business order etc.
    * The (optional) <code>referenceKey</code> can refer to this external entity.

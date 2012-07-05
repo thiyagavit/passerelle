@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
@@ -21,17 +21,30 @@ import java.util.Date;
 /**
  * 
  * @author erwin
- *
+ * 
  */
 public interface ResultBlock extends Serializable, Identifiable, AttributeHolder, Coloured {
 
+  static final String _CREATION_TS = "creationTS";
+  static final String _TYPE = "type";
+  static final String _RESULT_ITEMS = "allItems";
+  
   /**
-   * @return the creation timestamp of the request
+   * @return the creation timestamp of the resultblock
    */
   Date getCreationTS();
 
+  /**
+   * 
+   * @return The resultblock type
+   */
   String getType();
 
+  /**
+   * Add a result item
+   * @param item
+   * @return
+   */
   ResultItem<?> putItem(ResultItem<?> item);
 
   /**
