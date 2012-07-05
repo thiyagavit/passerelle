@@ -22,7 +22,12 @@ import java.util.Date;
  *
  */
 public interface ResultItem<V> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
-	
+
+  static final String _CREATION_TS = "creationTS";
+  static final String _UNIT = "unit";
+  static final String _DATA_TYPE = "dataType";
+  static final String _RESULT_BLOCK = "resultBlock";
+  
   /**
    * This can indicate the timestamp when the result item was created inside a Passerelle process,
    * but can also indicate a historical timestamp, e.g. when the result item represents a measurement

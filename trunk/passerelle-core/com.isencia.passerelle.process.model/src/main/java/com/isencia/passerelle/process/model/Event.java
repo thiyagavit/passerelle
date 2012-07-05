@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
@@ -33,6 +33,11 @@ import java.util.Date;
  * @author delerw
  */
 public interface Event extends Serializable {
+
+  static final String _TOPIC = "topic";
+  static final String _CREATION_TS = "creationTS";
+  static final String _DURATION = "duration";
+
   /**
    * @return the event's topic
    */
@@ -50,4 +55,4 @@ public interface Event extends Serializable {
    * @return the duration in ms
    */
   Long getDuration();
- }
+}

@@ -20,6 +20,9 @@ package com.isencia.passerelle.process.model;
  */
 public interface ContextEvent extends Event, Identifiable, Comparable<ContextEvent> {
 
+	static final String _CONTEXT = "context";
+  static final String _MESSAGE = "message";
+
   /**
    * 
    * @return the associated context

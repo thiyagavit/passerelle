@@ -27,6 +27,9 @@ import java.util.Collection;
  */
 public interface Task extends Request {
 
+  static final String _PARENT_CONTEXT = "parentContext";
+  static final String _OWNER = "owner";
+  static final String _RESULTBLOCKS = "resultBlocks";
   /**
    * 
    * @return

@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.process.model;
 
@@ -19,14 +19,17 @@ import java.io.Serializable;
 
 /**
  * @author erwin
- *
+ * 
  */
 public interface NamedValue<V> extends Serializable {
-	
-	String getName();
-	
-	V getValue();
-	
-	String getValueAsString();
+
+  static final String _NAME = "name";
+  static final String _VALUE = "valueAsString";
+
+  String getName();
+
+  V getValue();
+
+  String getValueAsString();
 
 }

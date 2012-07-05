@@ -27,6 +27,12 @@ import java.util.List;
  */
 public interface Context extends Identifiable, Serializable {
 	
+	static final String _STATUS = "status";
+	static final String _REQUEST = "request";
+	static final String _REQUEST_ID = "request.id";
+	static final String _TASKS = "tasks";
+	static final String _EVENTS = "events";
+	
   /**
    * @return current status of this context
    */
