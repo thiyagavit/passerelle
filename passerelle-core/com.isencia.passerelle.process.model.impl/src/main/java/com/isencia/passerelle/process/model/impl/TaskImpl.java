@@ -38,7 +38,7 @@ public class TaskImpl extends RequestImpl implements Task {
 
   public static final String _PARENT_CONTEXT = "parentContext";
   public static final String _OWNER = "owner";
-  public static final String _RESULTBLOCKS = "resultBlocks";
+  public static final String _RESULT_BLOCKS = "resultBlocks";
   
 	public TaskImpl() {
 	}

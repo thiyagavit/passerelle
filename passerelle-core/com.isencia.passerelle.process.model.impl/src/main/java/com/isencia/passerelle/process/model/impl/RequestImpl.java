@@ -69,7 +69,7 @@ public class RequestImpl implements Request {
   public static final String _ID = "id";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _CASE = "case";
-  public static final String _CORRELATIONID = "correlationId";
+  public static final String _CORRELATION_ID = "correlationId";
   public static final String _TYPE = "type";
   public static final String _CONTEXT = "processingContext";
   public static final String _REFERENCE = "case.id";
