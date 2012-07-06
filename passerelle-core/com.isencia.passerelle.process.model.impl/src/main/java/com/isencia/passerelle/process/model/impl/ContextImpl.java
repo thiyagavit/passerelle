@@ -106,6 +106,9 @@ public class ContextImpl implements Context {
   public static final String _REQUEST_ID = "request.id";
   public static final String _TASKS = "tasks";
   public static final String _EVENTS = "events";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _END_TS = "creationTS";
+  public static final String _DURATION = "durationInMillis";
 
 	public ContextImpl() {
 	}

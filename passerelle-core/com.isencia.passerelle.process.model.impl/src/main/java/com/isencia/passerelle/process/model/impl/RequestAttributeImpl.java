@@ -37,6 +37,8 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	@JoinColumn(name = "REQUEST_ID")
 	private RequestImpl request;
 	
+  public static final String _REQUEST = "request";
+
 	public RequestAttributeImpl() {
 	}
 	

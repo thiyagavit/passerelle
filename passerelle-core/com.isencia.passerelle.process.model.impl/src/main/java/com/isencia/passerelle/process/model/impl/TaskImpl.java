@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,6 +15,7 @@ import javax.persistence.OneToMany;
 
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
+import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
 
 @Entity
@@ -33,30 +33,22 @@ public class TaskImpl extends RequestImpl implements Task {
 	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<ResultBlock> resultBlocks = new HashSet<ResultBlock>();
 
-	@Column(name = "OWNER", nullable = false, unique = false, updatable = false)
-	private String owner;
-
   public static final String _PARENT_CONTEXT = "parentContext";
-  public static final String _OWNER = "owner";
   public static final String _RESULT_BLOCKS = "resultBlocks";
+  public static final String _RESULT_ITEMS = "resultItems";
   
 	public TaskImpl() {
 	}
 	
 	public TaskImpl(Context parentContext, String type, String owner) {
-		super(type);
+		super(type, owner);
 		this.parentContext = (ContextImpl)parentContext;
-		this.owner = owner;
 		
 		this.parentContext.addTask(this);
 	}
 	
 	public Context getParentContext() {
 		return parentContext;
-	}
-
-	public String getOwner() {
-		return owner;
 	}
 
 	public boolean addResultBlock(ResultBlock block) {
@@ -67,4 +59,13 @@ public class TaskImpl extends RequestImpl implements Task {
 		return Collections.unmodifiableSet(resultBlocks);
 	}
 
+	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock.task")
+	public Set<ResultItem> getResultItems() {
+		Set<ResultItem> items = new HashSet<ResultItem>();
+		Collection<ResultBlock> blocks = getResultBlocks();
+		for (ResultBlock block : blocks) {
+	    items.addAll(block.getAllItems());
+    }
+		return items;
+	}
 }

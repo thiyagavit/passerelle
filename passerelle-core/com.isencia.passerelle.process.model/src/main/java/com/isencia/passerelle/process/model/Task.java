@@ -34,15 +34,6 @@ public interface Task extends Request {
 	Context getParentContext();
 	
 	/**
-	 * In Passerelle systems this is typically the full name of an actor in a model that's being executed.
-	 * 
-	 * @return a unique identifier of the task owner, i.e. the party or system component
-	 * responsible for the execution of this task. 
-	 * 
-	 */
-	String getOwner();
-	
-	/**
 	 * Add a result block to this task.
 	 * 
 	 * @param block
