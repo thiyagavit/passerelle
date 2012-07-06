@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -61,7 +62,7 @@ public class ContextImpl implements Context {
 	private int version;
 	
 	@Column(name = "STATUS", nullable = false, unique = false, updatable = true)
-	@Enumerated
+	@Enumerated(value = EnumType.STRING)
 	private Status status;
 	
 	@OneToOne(targetEntity = RequestImpl.class, optional = false, cascade = CascadeType.ALL)
