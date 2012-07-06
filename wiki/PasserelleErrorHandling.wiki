@@ -146,9 +146,66 @@ For the main actor iteration methods (preFire, fire, postFire), also `java.lang.
 These are by default handled as fatal, i.e. will cause the model execution to be aborted.
 
 == Actor development conventions ==
+An actor developer should take into account following conventions, related to error handling :
+  * wrap all "expected" exceptions in the checked exception types defined by the Actor API
+  * put the last received message as exception context
+  * put error codes in the exception's message (pending the arrival of a formal error-code field for `PasserelleException`s)
+These will be discussed in some more detail, below.
 
-- wrap all exceptions in the defined checked exception types
-- put the last received message as exception context
-- put error codes in the exception's message (pending the arrival of a formal errorcode field for `PasserelleException`s)
+=== Wrapping in the actor API's defined exceptions ===
+With the `com.isencia.passerelle.actor.v5.Actor` API, actor developers mostly need to be concerned about the actor's constructor and the implementation of
+the `process()` method, significantly simplifying the development work compared to directly implementing the old/native `com.isencia.passerelle.actor.Actor`.
 
+When developing the actor's `process` method, it is good practice to wrap the code in a `try / catch` structure, catching all expected exceptions 
+(both checked and non-fatal runtime ones), and to wrap them in an instance of `com.isencia.passerelle.actor.ProcessingException`.
+
+I.e. : checked exceptions should in general not be "eaten". `RuntimeException`s linked to the received message can also be wrapped in 
+non-fatal `ProcessingExceptions`, when they are related to specific message conditions.  
+Fatal RuntimExceptions like out-of-memory, class loading errors or others that are linked to global application issues, and not to the specific received message, should of course not be wrapped.
+
+=== Put the last received message as exception context ===
+Most actors process data per individual message. For those, it is good practice to put the current message as context of the created exception.
+
+Also for actors that work on multiple concurrently received messages, it is a good idea to designate one of them as the VIM (very important message), 
+and to put that one as the exception's context.
+
+The current error-handling-support in Passerelle enables a modeler to provide alternative flow continuations (cfr. first part of this document).
+It is quite easy to perform some recovery logic for failed "single-message-processing" actors, i.e. to have fully automated and functionally complete workflow continuations.
+(if there such alternatives exist of course). 
+
+On the other hand, for "multi-message-processing", there is currently no support to transparently try recovery or continuation. 
+But passing the `VIM` to the error catcher and the consecutive flow should at least allow to implement relevant error tracing or escalation actions.
+
+=== Put error codes in the exception's message ===
+In the near future, more advanced error handling actors will be generalized from existing project-specific actors and will be open-sourced. 
+They will support fine-grained error scopes and error filtering.
+One of the filtering options will be based on error codes.
+
+Besides the filtering-support, using error codes is good practice anyway, e.g. to facilitate automated monitoring on your application log files etc.
+
+=== Example ===
+A simple example from the `com.isencia.passerelle.actor.examples.HelloPasserelle` actor, illustrating all these conventions :
+
+{{{
+  @Override
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    // Get the message received on the input port, from the request.
+    ManagedMessage receivedMsg = request.getMessage(input);
+    try {
+      // We know the message will contain a String in its body.
+      String receivedText = receivedMsg.getBodyContentAsString();
+      // Get the configured value for the changed text.
+      String changedText = changedTextParameter.getExpression();
+      // Create a new outgoing msg, "caused by" the received input msg
+      ManagedMessage outputMsg = createMessageFromCauses(receivedMsg);
+      outputMsg.setBodyContentPlainText("Changed ["+receivedText+"] to ["+changedText+"]");
+      // Set the outgoing msg to be sent on the output port
+      response.addOutputMessage(output, outputMsg);
+    } catch (Exception e) {
+      // When something failed, throw a ProcessingException which will be handled as needed
+      // by Passerelle's default error handling mechanisms.
+      throw new ProcessingException("[PASS-EX-1234] - Failed to transform the received text", receivedMsg, e);
+    }
+  }
+}}}
 
