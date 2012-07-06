@@ -19,12 +19,12 @@ import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.edm.engine.api.service.ServicesRegistry;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
  * <p>
@@ -153,7 +153,7 @@ public class Fork extends DynamicNamedOutputPortsActor {
     	msg.addCauseID(branchedCtx.getId());
     	branches.add(branchedCtx);
     }
-    mergedCtxt = ServicesRegistry.getInstance().getDiagnosisEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
+    mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
     
     msg.setBodyContent(mergedCtxt, ManagedMessage.objectContentType);
     return msg;
