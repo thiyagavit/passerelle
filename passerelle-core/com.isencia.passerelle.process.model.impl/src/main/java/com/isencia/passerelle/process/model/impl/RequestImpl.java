@@ -44,20 +44,18 @@ public class RequestImpl implements Request {
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
-
+	
 	@OneToMany(targetEntity = RequestAttributeImpl.class, mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, Attribute> requestAttributes = new HashMap<String, Attribute>();
-
+	
 	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter
-	// methods
-	// Remark: Cannot use optional = false here since we made TaskImpl extend
-	// from RequestImpl
+	// here to ensure jpa implementations like EclipseLink will generate setter methods
+	// Remark: Cannot use optional = false here since we made TaskImpl extend from RequestImpl
 	@ManyToOne(targetEntity = CaseImpl.class, optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "CASE_ID")
 	private CaseImpl requestCase;
-
+	
 	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true)
 	private String correlationId;
 
@@ -65,62 +63,62 @@ public class RequestImpl implements Request {
 	private String type;
 
 	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = {
-			CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
+  CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
 	private Context processingContext;
 
 	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false)
 	private String initiator;
+	
+  @Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true)
+  private String executor;
+  
+  @SuppressWarnings("unused")
+  @Column(name = "DTYPE", updatable = false)
+  private String discriminator;
 
-	@Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true)
-	private String executor;
-
-	@SuppressWarnings("unused")
-	@Column(name = "DTYPE", updatable = false)
-	private String discriminator;
-
-	public static final String _DISCRIMINATOR = "discriminator";
-	public static final String _INITIATOR = "initiator";
-	public static final String _EXECUTOR = "executor";
-	public static final String _ID = "id";
-	public static final String _ATTRIBUTES = "attributes";
-	public static final String _CASE = "case";
-	public static final String _CORRELATION_ID = "correlationId";
-	public static final String _TYPE = "type";
-	public static final String _CONTEXT = "processingContext";
-	public static final String _REFERENCE = "case.id";
-	public static final String _TASKS = "processingContext.tasks";
-	public static final String _EVENTS = "processingContext.events";
-	public static final String _CREATION_TS = "processingContext.creationTS";
-	public static final String _END_TS = "processingContext.endTS";
-	public static final String _STATUS = "processingContext.status";
-	public static final String _DURATION = "processingContext.durationInMillis";
+  public static final String _DISCRIMINATOR = "discriminator";
+  public static final String _INITIATOR = "initiator";
+  public static final String _EXECUTOR = "executor";
+  public static final String _ID = "id";
+  public static final String _ATTRIBUTES = "attributes";
+  public static final String _CASE = "case";
+  public static final String _CORRELATION_ID = "correlationId";
+  public static final String _TYPE = "type";
+  public static final String _CONTEXT = "processingContext";
+  public static final String _REFERENCE = "case.id";
+  public static final String _TASKS = "processingContext.tasks";
+  public static final String _EVENTS = "processingContext.events";
+  public static final String _CREATION_TS = "processingContext.creationTS";
+  public static final String _END_TS = "processingContext.endTS";
+  public static final String _STATUS = "processingContext.status";
+  public static final String _DURATION = "processingContext.durationInMillis";
 
 	public RequestImpl() {
 	}
 
-	public RequestImpl(String type, String initiator) {
+	public RequestImpl(String initiator, String type) {
 		this.initiator = initiator;
 		this.processingContext = new ContextImpl(this);
 		this.type = type;
 	}
-
-	public RequestImpl(String type, String initiator, String correlationId) {
-		this(type, initiator);
+	
+	public RequestImpl(String initiator, String type, String correlationId) {
+		this(initiator, type);
 		this.correlationId = correlationId;
 	}
-
-	public RequestImpl(Case requestCase, String type, String initiator) {
-		this(type, initiator);
-		this.requestCase = (CaseImpl) requestCase;
-
+	
+	public RequestImpl(Case requestCase, String initiator, String type) {
+		this(initiator, type);
+		this.requestCase = (CaseImpl)requestCase;
+		
 		this.requestCase.addRequest(this);
 	}
-
-	public RequestImpl(Case requestCase, String type, String initiator, String correlationId) {
-		this(requestCase, type, initiator);
+	
+	public RequestImpl(Case requestCase, String initiator, String type, String correlationId) {
+		this(requestCase, initiator, type);
 		this.correlationId = correlationId;
 	}
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -129,20 +127,18 @@ public class RequestImpl implements Request {
 		return initiator;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.Request#getExecutor()
-	 */
-	public String getExecutor() {
-		return executor;
-	}
+	/* (non-Javadoc)
+   * @see com.isencia.passerelle.process.model.Request#getExecutor()
+   */
+  public String getExecutor() {
+    return executor;
+  }
+  
+  public void setExecutor(String executor) {
+    this.executor = executor;
+  }
 
-	public void setExecutor(String executor) {
-		this.executor = executor;
-	}
-
-	public Attribute getAttribute(String name) {
+  public Attribute getAttribute(String name) {
 		return requestAttributes.get(name);
 	}
 
@@ -169,7 +165,7 @@ public class RequestImpl implements Request {
 	public void setCorrelationId(String correlationId) {
 		this.correlationId = correlationId;
 	}
-
+	
 	public String getType() {
 		return type;
 	}

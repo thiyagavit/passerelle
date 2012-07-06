@@ -40,8 +40,8 @@ public class TaskImpl extends RequestImpl implements Task {
 	public TaskImpl() {
 	}
 	
-	public TaskImpl(Context parentContext, String type, String owner) {
-		super(type, owner);
+	public TaskImpl(Context parentContext, String initiator, String type) {
+		super(initiator, type);
 		this.parentContext = (ContextImpl)parentContext;
 		
 		this.parentContext.addTask(this);
