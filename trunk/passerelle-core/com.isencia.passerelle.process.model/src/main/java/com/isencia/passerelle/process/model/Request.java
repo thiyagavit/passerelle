@@ -35,6 +35,13 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
    */
   Case getCase();
 
+	/**
+	 * @return a unique identifier of the request owner, i.e. the party or system component
+	 * responsible for the execution of this request. 
+	 * 
+	 */
+	String getOwner();
+	
   /**
    * A correlation ID can be specified by the request initiator. 
    * Passerelle will then ensure that in any notifications, acknowledgements or other kinds of feedback, the correlation ID will be available.

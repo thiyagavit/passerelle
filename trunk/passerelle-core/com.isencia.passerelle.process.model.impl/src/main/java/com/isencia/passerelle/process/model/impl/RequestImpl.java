@@ -66,6 +66,10 @@ public class RequestImpl implements Request {
 		CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
 	private Context processingContext;
 
+	@Column(name = "OWNER", nullable = false, unique = false, updatable = false)
+	private String owner;
+
+  public static final String _OWNER = "owner";
   public static final String _ID = "id";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _CASE = "case";
@@ -75,34 +79,43 @@ public class RequestImpl implements Request {
   public static final String _REFERENCE = "case.id";
   public static final String _TASKS = "processingContext.tasks";
   public static final String _EVENTS = "processingContext.events";
+  public static final String _CREATION_TS = "processingContext.creationTS";
+  public static final String _END_TS = "processingContext.endTS";
+  public static final String _STATUS = "processingContext.status";
+  public static final String _DURATION = "processingContext.durationInMillis";
 
 	public RequestImpl() {
 	}
 
-	public RequestImpl(String type) {
+	public RequestImpl(String type, String owner) {
+		this.owner = owner;
 		this.processingContext = new ContextImpl(this);
 		this.type = type;
 	}
 	
-	public RequestImpl(String type, String correlationId) {
-		this(type);
+	public RequestImpl(String type, String owner, String correlationId) {
+		this(type, owner);
 		this.correlationId = correlationId;
 	}
 	
-	public RequestImpl(String type, Case requestCase) {
-		this(type);
+	public RequestImpl(Case requestCase, String type, String owner) {
+		this(type, owner);
 		this.requestCase = (CaseImpl)requestCase;
 		
 		this.requestCase.addRequest(this);
 	}
 	
-	public RequestImpl(String type, Case requestCase, String correlationId) {
-		this(type, requestCase);
+	public RequestImpl(Case requestCase, String type, String owner, String correlationId) {
+		this(requestCase, type, owner);
 		this.correlationId = correlationId;
 	}
 	
 	public Long getId() {
 		return id;
+	}
+
+	public String getOwner() {
+		return owner;
 	}
 
 	public Attribute getAttribute(String name) {
