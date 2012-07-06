@@ -66,10 +66,14 @@ public class RequestImpl implements Request {
 		CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH})
 	private Context processingContext;
 
-	@Column(name = "OWNER", nullable = false, unique = false, updatable = false)
-	private String owner;
-
-  public static final String _OWNER = "owner";
+	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false)
+	private String initiator;
+	
+  @Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true)
+  private String executor;
+  
+  public static final String _INITIATOR = "initiator";
+  public static final String _EXECUTOR = "executor";
   public static final String _ID = "id";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _CASE = "case";
@@ -87,26 +91,26 @@ public class RequestImpl implements Request {
 	public RequestImpl() {
 	}
 
-	public RequestImpl(String type, String owner) {
-		this.owner = owner;
+	public RequestImpl(String type, String initiator) {
+		this.initiator = initiator;
 		this.processingContext = new ContextImpl(this);
 		this.type = type;
 	}
 	
-	public RequestImpl(String type, String owner, String correlationId) {
-		this(type, owner);
+	public RequestImpl(String type, String initiator, String correlationId) {
+		this(type, initiator);
 		this.correlationId = correlationId;
 	}
 	
-	public RequestImpl(Case requestCase, String type, String owner) {
-		this(type, owner);
+	public RequestImpl(Case requestCase, String type, String initiator) {
+		this(type, initiator);
 		this.requestCase = (CaseImpl)requestCase;
 		
 		this.requestCase.addRequest(this);
 	}
 	
-	public RequestImpl(Case requestCase, String type, String owner, String correlationId) {
-		this(requestCase, type, owner);
+	public RequestImpl(Case requestCase, String type, String initiator, String correlationId) {
+		this(requestCase, type, initiator);
 		this.correlationId = correlationId;
 	}
 	
@@ -114,11 +118,22 @@ public class RequestImpl implements Request {
 		return id;
 	}
 
-	public String getOwner() {
-		return owner;
+	public String getInitiator() {
+		return initiator;
 	}
 
-	public Attribute getAttribute(String name) {
+	/* (non-Javadoc)
+   * @see com.isencia.passerelle.process.model.Request#getExecutor()
+   */
+  public String getExecutor() {
+    return executor;
+  }
+  
+  public void setExecutor(String executor) {
+    this.executor = executor;
+  }
+
+  public Attribute getAttribute(String name) {
 		return requestAttributes.get(name);
 	}
 
