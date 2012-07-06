@@ -16,6 +16,7 @@ package com.isencia.passerelle.validation.version;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -106,7 +107,13 @@ public class VersionSpecification implements Comparable<VersionSpecification> {
     if(versionIds.length==3) {
       versionSpec =  new VersionSpecification(major, minor, micro);
     } else {
-      versionSpec =  new VersionSpecification(major, minor, micro, Arrays.copyOfRange(versionIds, 3, versionIds.length));
+      // This is for JDK 1.6 onwards, but JDK 1.5 compliance is still needed, so we need to hack a sub-array logic here
+//      versionSpec =  new VersionSpecification(major, minor, micro, Arrays.copyOfRange(versionIds, 3, versionIds.length));
+      Collection<String> tail = new ArrayList<String>();
+      for(int i=3;i<versionIds.length;++i) {
+        tail.add(versionIds[i]);
+      }
+      versionSpec =  new VersionSpecification(major, minor, micro, tail.toArray(new String[versionIds.length-3]));
     }
     versionSpec.versionString = version;
     return versionSpec;
