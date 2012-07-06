@@ -8,6 +8,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: com.isencia.passerelle.process.model;bundle-version="1.0.0",
  javax.persistence;bundle-version="2.0.1"
 Import-Package: org.apache.commons.lang.builder;version="2.4.0"
-Bundle-Activator: com.isencia.passerelle.process.model.Activator.Activator
 Export-Package: com.isencia.passerelle.process.model.impl
 DynamicImport-Package: *
