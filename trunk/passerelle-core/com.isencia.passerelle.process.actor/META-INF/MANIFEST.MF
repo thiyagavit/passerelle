@@ -7,12 +7,10 @@ Bundle-Activator: com.isencia.passerelle.process.actor.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
-Import-Package: com.isencia.edm.service.result.reader,
- com.isencia.passerelle.edm.common.exception,
- com.isencia.passerelle.edm.request.service,
- com.isencia.passerelle.edm.request.service.proxy,
+Import-Package: 
  com.isencia.passerelle.process.model,
- com.isencia.passerelle.project.repository.api,
+ com.isencia.passerelle.process.model.factory,
+ com.isencia.passerelle.process.model.service,
  javax.mail,
  javax.mail.internet,
  org.apache.commons.lang;version="2.4.0",
@@ -26,9 +24,7 @@ Require-Bundle: ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
  com.isencia.passerelle.actor;bundle-version="7.0.0",
- com.isencia.passerelle.engine;bundle-version="7.0.0",
- com.isencia.passerelle.edm.engine.api;bundle-version="1.0.0",
- com.isencia.passerelle.edm.actor.common;bundle-version="1.0.0"
+ com.isencia.passerelle.engine;bundle-version="7.0.0"
 Export-Package: com.isencia.passerelle.process.actor.flow,
  com.isencia.passerelle.process.actor.trial
 DynamicImport-Package: *
