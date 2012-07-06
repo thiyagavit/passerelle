@@ -5,8 +5,10 @@ package com.isencia.passerelle.process.model.impl;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
@@ -16,6 +18,8 @@ import com.isencia.passerelle.process.model.Attribute;
  * @author "puidir"
  *
  */
+
+@MappedSuperclass
 public abstract class AttributeImpl implements Attribute {
 
 	private static final long serialVersionUID = 1L;
