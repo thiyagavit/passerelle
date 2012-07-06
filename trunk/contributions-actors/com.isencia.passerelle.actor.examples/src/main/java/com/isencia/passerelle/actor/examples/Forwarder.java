@@ -48,7 +48,7 @@ public class Forwarder extends Actor {
       ManagedMessage outputMsg = MessageFactory.getInstance().createCausedCopyMessage(receivedMsg);
       response.addOutputMessage(output, outputMsg);
     } catch (MessageException e) {
-      throw new ProcessingException("Failed to create & send output msg", receivedMsg, e);
+      throw new ProcessingException("[PASS-EX-1111] - Failed to create & send output msg", receivedMsg, e);
     }
   }
 }

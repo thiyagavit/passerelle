@@ -93,7 +93,7 @@ public class DelayWithExecutionTrace extends Actor {
       } catch (InterruptedException e) {
         // do nothing, means someone wants us to stop
       } catch (Exception e) {
-        throw new ProcessingException("Error in delay processing", this, e);
+        throw new ProcessingException("[PASS-EX-1111] - Error in delay processing", this, e);
       }
 
       try {
@@ -106,7 +106,7 @@ public class DelayWithExecutionTrace extends Actor {
           response.addOutputMessage(output, msg);
         }
       } catch (IllegalArgumentException e) {
-        throw new ProcessingException("Error in output sending", msg, e);
+        throw new ProcessingException("[PASS-EX-1111] - Error in output sending", msg, e);
       }
     }
   }
