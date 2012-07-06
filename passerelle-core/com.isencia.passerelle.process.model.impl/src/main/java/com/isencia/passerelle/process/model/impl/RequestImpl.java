@@ -78,7 +78,7 @@ public class RequestImpl implements Request {
 	@Column(name = "DTYPE", updatable = false)
 	private String discriminator;
 
-	public static final String __DISCRIMINATOR = "discriminator";
+	public static final String _DISCRIMINATOR = "discriminator";
 	public static final String _INITIATOR = "initiator";
 	public static final String _EXECUTOR = "executor";
 	public static final String _ID = "id";
