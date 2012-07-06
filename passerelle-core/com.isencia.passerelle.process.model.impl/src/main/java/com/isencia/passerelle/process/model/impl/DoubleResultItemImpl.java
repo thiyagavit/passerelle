@@ -32,7 +32,7 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 	 * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
 	 */
 	public String getDataType() {
-		return "Double";
+		return DataTypes.DOUBLE;
 	}
 
 	/* (non-Javadoc)
