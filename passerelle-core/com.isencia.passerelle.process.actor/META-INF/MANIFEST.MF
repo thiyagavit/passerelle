@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle actors and tools for Diagnosis solutions
 Bundle-SymbolicName: com.isencia.passerelle.process.actor
 Bundle-Version: 8.0.0
-Bundle-Activator: com.isencia.passerelle.process.actor.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
@@ -27,7 +26,5 @@ Require-Bundle: ptolemy.core;bundle-version="7.0.1",
  com.isencia.passerelle.engine;bundle-version="7.0.0"
 Export-Package: com.isencia.passerelle.process.actor.flow,
  com.isencia.passerelle.process.actor.trial
-DynamicImport-Package: *
-Bundle-ClassPath: drools/,
- .
+
 
