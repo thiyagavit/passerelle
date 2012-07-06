@@ -36,11 +36,24 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
   Case getCase();
 
 	/**
-	 * @return a unique identifier of the request owner, i.e. the party or system component
-	 * responsible for the execution of this request. 
+	 * @return a unique identifier of the request initiator, i.e. the party or system component
+	 * responsible for the initiation of this request. 
 	 * 
 	 */
-	String getOwner();
+	String getInitiator();
+	
+  /**
+   * @return a unique identifier of the request executor, i.e. the party or system component
+   * responsible for the handling of this request. 
+   * 
+   */
+	String getExecutor();
+	
+	/**
+	 * 
+	 * @param executor
+	 */
+	void setExecutor(String executor);
 	
   /**
    * A correlation ID can be specified by the request initiator. 
