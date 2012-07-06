@@ -71,7 +71,7 @@ public class TextSource extends Actor {
         requestFinish();
       }
     } catch (Exception e) {
-      throw new ProcessingException("Error creating output msg", this, e);
+      throw new ProcessingException("[PASS-EX-1111] - Error creating output msg", this, e);
     }
   }
 }

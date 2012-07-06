@@ -117,7 +117,7 @@ public abstract class Filter extends Actor {
     } catch (ProcessingException e) {
       throw e;
     } catch (Exception e) {
-      throw new ProcessingException("Error matching filter for "+getFullName(), inputMsg, e);
+      throw new ProcessingException("[PASS-EX-1100] - Error matching filter for "+getFullName(), inputMsg, e);
     }
   }
   
