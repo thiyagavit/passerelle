@@ -39,7 +39,8 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Entity
 @Table(name = "PAS_RESULTITEM")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
-public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
+public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
+
 
 	private static final long serialVersionUID = 1L;
 
@@ -67,7 +68,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
-	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+	private Map<String, AttributeImpl> attributes = new HashMap<String, AttributeImpl>();
 
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter methods	
@@ -133,7 +134,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	}
 
 	public Attribute putAttribute(Attribute attribute) {
-		return attributes.put(attribute.getName(), attribute);
+		return attributes.put(attribute.getName(),(AttributeImpl) attribute);
 	}
 
 	public Iterator<String> getAttributeNames() {
@@ -158,5 +159,15 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 
 	public ResultBlock getResultBlock() {
 		return resultBlock;
+	}
+
+	public V getValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getDataType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
