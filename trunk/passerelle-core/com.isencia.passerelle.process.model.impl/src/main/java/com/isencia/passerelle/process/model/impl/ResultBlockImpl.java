@@ -61,7 +61,7 @@ public class ResultBlockImpl implements ResultBlock {
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
-	@Column(name = "COLOUR", nullable = true, unique = false, updatable = true)
+	@Column(name = "COLOR", nullable = true, unique = false, updatable = true)
 	private String colour;
 
 	@Temporal(TemporalType.TIMESTAMP)

@@ -75,7 +75,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
 
-	@Column(name = "COLOUR", nullable = true, unique = false, updatable = true)
+	@Column(name = "COLOR", nullable = true, unique = false, updatable = true)
 	private String colour;
 
   public static final String _ID = "id";
