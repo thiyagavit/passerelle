@@ -25,7 +25,7 @@ public enum Status {
 	// these are transient states
 	CREATED,STARTED,PROCESSING,PAUSED,
 	// these are final states
-	FINISHED,CANCELLED,TIMEOUT,ERROR;
+	FINISHED,CANCELLED,TIMEOUT,ERROR,PENDING,INTERRUPTED;
 	
 	public boolean isFinalStatus() {
 		return this.compareTo(FINISHED)>=0;

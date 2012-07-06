@@ -62,7 +62,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 	 * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
 	 */
 	public String getDataType() {
-		return "String";
+		return DataTypes.STRING;
 	}
 
 }
