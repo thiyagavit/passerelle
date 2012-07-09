@@ -60,8 +60,8 @@ public class TaskImpl extends RequestImpl implements Task {
 	}
 
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock.task")
-	public Set<ResultItem> getResultItems() {
-		Set<ResultItem> items = new HashSet<ResultItem>();
+	public Set<ResultItem<?>> getResultItems() {
+		Set<ResultItem<?>> items = new HashSet<ResultItem<?>>();
 		Collection<ResultBlock> blocks = getResultBlocks();
 		for (ResultBlock block : blocks) {
 	    items.addAll(block.getAllItems());
