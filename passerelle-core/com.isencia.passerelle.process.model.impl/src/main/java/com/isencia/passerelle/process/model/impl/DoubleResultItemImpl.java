@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.impl;
 
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 import com.isencia.passerelle.process.model.ResultBlock;
 
@@ -11,6 +12,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
  * @author "puidir"
  *
  */
+@Entity
 @DiscriminatorValue("DOUBLE_RESULT")
 public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 
