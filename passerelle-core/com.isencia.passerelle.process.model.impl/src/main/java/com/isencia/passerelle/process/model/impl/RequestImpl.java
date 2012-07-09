@@ -119,6 +119,12 @@ public class RequestImpl implements Request {
 		this.correlationId = correlationId;
 	}
 	
+	public RequestImpl(Case requestCase, String initiator, String type, String correlationId, String executor) {
+		this(requestCase, initiator, type);
+		this.correlationId = correlationId;
+		this.executor = executor;
+	}
+	
 	public Long getId() {
 		return id;
 	}
