@@ -31,7 +31,7 @@ import com.isencia.passerelle.process.model.Request;
 @Entity
 @Table(name = "PAS_CASE")
 @DiscriminatorValue("DECISION_CASE")
-@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 public class CaseImpl implements Case {
 
 	private static final long serialVersionUID = 1L;
