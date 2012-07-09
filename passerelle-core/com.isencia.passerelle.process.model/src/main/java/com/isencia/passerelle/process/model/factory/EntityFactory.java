@@ -37,7 +37,7 @@ public interface EntityFactory {
    * @param type
    * @param correlationId
    */
-  Request createRequest(Case requestCase, String initiator, String type, String correlationId);
+  Request createRequest(Case requestCase, String initiator,String executor, String type, String correlationId);
 
   Task createTask(Context parentContext, String initiator, String type);
 
