@@ -38,7 +38,7 @@ import com.isencia.passerelle.process.model.ResultItem;
  */
 @Entity
 @Table(name = "PAS_RESULTITEM")
-@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
 
@@ -57,13 +57,13 @@ public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 	@Column(name = "CREATION_TS", nullable = true, unique = false, updatable = false)
 	private Date creationTS;
 
-	@Column(name = "NAME", nullable = false, unique = false, updatable = false)
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 512)
 	private String name;
 
-	@Column(name = "VALUE", nullable = false, unique = false, updatable = false)
+	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = 4000)
 	protected String value;
 	
-	@Column(name = "UNIT", nullable = true, unique = false, updatable = false)
+	@Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 512)
 	private String unit;
 	
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -76,7 +76,7 @@ public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
 
-	@Column(name = "COLOR", nullable = true, unique = false, updatable = true)
+	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 40)
 	private String colour;
 
   public static final String _ID = "id";
