@@ -162,12 +162,12 @@ public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 	}
 
 	public V getValue() {
-		// TODO Auto-generated method stub
+		// FIXME: this class used to be abstract so we didn't have empty implementations here
 		return null;
 	}
 
 	public String getDataType() {
-		// TODO Auto-generated method stub
+    // FIXME: this class used to be abstract so we didn't have empty implementations here
 		return null;
 	}
 }
