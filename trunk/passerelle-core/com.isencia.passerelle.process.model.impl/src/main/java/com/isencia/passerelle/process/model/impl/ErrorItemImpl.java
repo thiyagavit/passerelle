@@ -11,7 +11,7 @@ import com.isencia.passerelle.process.model.ErrorItem;
  */
 public class ErrorItemImpl implements ErrorItem {
 
-  // FIXME: needs implementation
+  // FIXME: needs implementation + table
   
   public ErrorItemImpl() {
   }

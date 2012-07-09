@@ -27,10 +27,10 @@ public abstract class AttributeImpl implements Attribute {
 	@Version
 	protected int version;
 	
-	@Column(name = "NAME", nullable = false, unique = false, updatable = false)
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 512)
 	private String name;
 	
-	@Column(name = "VALUE", nullable = false, unique = false, updatable = false)
+	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = 4000)
 	private String value;
 	
 	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
