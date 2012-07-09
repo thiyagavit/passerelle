@@ -7,6 +7,7 @@ import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -17,6 +18,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
  * @author "puidir"
  * 
  */
+@Entity
 @DiscriminatorValue("STRING_RESULT")
 public class StringResultItemImpl extends ResultItemImpl<String> {
 
