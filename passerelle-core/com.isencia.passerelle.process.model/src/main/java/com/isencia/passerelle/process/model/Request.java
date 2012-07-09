@@ -50,6 +50,12 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
 	String getExecutor();
 	
 	/**
+	 * @return a unique identifier of the request category
+	 * 
+	 */
+	String getCategory();
+	
+	/**
 	 * 
 	 * @param executor
 	 */
