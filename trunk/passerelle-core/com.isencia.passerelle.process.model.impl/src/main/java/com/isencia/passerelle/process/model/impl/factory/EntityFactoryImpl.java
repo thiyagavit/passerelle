@@ -43,8 +43,8 @@ public class EntityFactoryImpl implements EntityFactory {
   /* (non-Javadoc)
    * @see com.isencia.passerelle.process.model.factory.EntityFactory#createRequest(com.isencia.passerelle.process.model.Case, java.lang.String, java.lang.String)
    */
-  public Request createRequest(Case requestCase,String initiator,String executor, String type, String correlationId) {
-    return new RequestImpl(requestCase, initiator, type, correlationId,executor);
+  public Request createRequest(Case requestCase,String initiator,String category, String type, String correlationId) {
+    return new RequestImpl(requestCase, initiator, type, correlationId,category);
   }
 
   /* (non-Javadoc)
