@@ -31,7 +31,7 @@ import com.isencia.passerelle.process.model.ContextEvent;
  */
 @Entity
 @Table(name = "PAS_EVENT")
-@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 @DiscriminatorValue("CONTEXTEVENT")
 public class ContextEventImpl implements ContextEvent {
 
@@ -46,10 +46,10 @@ public class ContextEventImpl implements ContextEvent {
 	@Version
 	private int version;
 	
-	@Column(name = "TOPIC", nullable = false, unique = false, updatable = false)
+	@Column(name = "TOPIC", nullable = false, unique = false, updatable = false, length = 255)
 	private String topic;
 	
-	@Column(name = "MESSAGE", nullable = true, unique = false, updatable = false)
+	@Column(name = "MESSAGE", nullable = true, unique = false, updatable = false, length = 4000)
 	private String message;
 	
 	@Temporal(TemporalType.TIMESTAMP)
