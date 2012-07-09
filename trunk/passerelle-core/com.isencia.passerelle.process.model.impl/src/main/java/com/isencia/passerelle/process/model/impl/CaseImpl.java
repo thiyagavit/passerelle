@@ -10,6 +10,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,6 +30,8 @@ import com.isencia.passerelle.process.model.Request;
  */
 @Entity
 @Table(name = "PAS_CASE")
+@DiscriminatorValue("DECISION_CASE")
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
 public class CaseImpl implements Case {
 
 	private static final long serialVersionUID = 1L;
@@ -40,7 +45,7 @@ public class CaseImpl implements Case {
 	@Version
 	private int version;
 
-	@Column(name = "EXTERNAL_REF", nullable = true, unique = false, updatable = true)
+	@Column(name = "EXTERNAL_REF", nullable = true, unique = false, updatable = true, length = 50)
 	private String externalReference;
 	
 	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
