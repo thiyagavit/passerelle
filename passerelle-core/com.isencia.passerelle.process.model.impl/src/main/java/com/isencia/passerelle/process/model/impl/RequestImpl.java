@@ -30,7 +30,7 @@ import com.isencia.passerelle.process.model.Request;
 
 @Entity
 @Table(name = "PAS_REQUEST")
-@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 @DiscriminatorValue("REQUEST")
 public class RequestImpl implements Request {
 
@@ -56,20 +56,20 @@ public class RequestImpl implements Request {
 	@JoinColumn(name = "CASE_ID")
 	private CaseImpl requestCase;
 	
-	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true)
+	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true, length = 1024)
 	private String correlationId;
 
-	@Column(name = "TYPE", nullable = false, unique = false, updatable = false)
+	@Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 255)
 	private String type;
 
 	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = {
   CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
 	private Context processingContext;
 
-	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false)
+	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 255)
 	private String initiator;
 	
-  @Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true)
+  @Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true, length = 255)
   private String executor;
   
   @SuppressWarnings("unused")
