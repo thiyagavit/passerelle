@@ -18,6 +18,13 @@ import com.isencia.passerelle.process.model.Task;
 public interface EntityManager {
 
   /**
+   * Persist a Case that is still transient
+   * @param caze
+   * @return
+   */
+  Case persistCase(Case caze);
+  
+  /**
    * Persist a request that is still transient.
    * 
    * @param request
