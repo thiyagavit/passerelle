@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.isencia.passerelle.process.model.Activator2;
+package com.isencia.passerelle.process.model.activator;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
