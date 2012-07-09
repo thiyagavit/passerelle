@@ -119,7 +119,7 @@ public class ContextImpl implements Context {
 		this.creationTS = new Date();
 		this.request = request;
 		
-		this.events.add(new ContextEventImpl(this, this.status.name()));
+		new ContextEventImpl(this, this.status.name());
 	}
 	
 	public Long getId() {

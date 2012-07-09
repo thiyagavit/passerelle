@@ -41,7 +41,6 @@ import com.isencia.passerelle.process.model.ResultItem;
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
