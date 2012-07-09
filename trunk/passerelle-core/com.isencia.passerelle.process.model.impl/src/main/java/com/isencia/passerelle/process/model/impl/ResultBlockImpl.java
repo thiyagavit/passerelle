@@ -61,14 +61,14 @@ public class ResultBlockImpl implements ResultBlock {
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
-	@Column(name = "COLOR", nullable = true, unique = false, updatable = true)
+	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 40)
 	private String colour;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
-	@Column(name = "TYPE", nullable = false, unique = false, updatable = false)
+	@Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 512)
 	private String type;
 
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
