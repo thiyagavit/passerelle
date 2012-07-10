@@ -88,7 +88,6 @@ public class RequestImpl implements Request {
 	public static final String _EXECUTOR = "executor";
 	public static final String _ID = "id";
 	public static final String _ATTRIBUTES = "attributes";
-	public static final String _REQUEST_ATTRIBUTES = "requestAttributes";
 	public static final String _CASE = "case";
 	public static final String _CORRELATION_ID = "correlationId";
 	public static final String _TYPE = "type";
@@ -174,19 +173,9 @@ public class RequestImpl implements Request {
 	public Iterator<String> getAttributeNames() {
 		return requestAttributes.keySet().iterator();
 	}
-
+	@OneToMany(mappedBy = "request", targetEntity = RequestAttributeImpl.class)
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(requestAttributes.values());
-	}
-
-	@OneToMany(mappedBy = "request")
-	public Set<RequestAttributeImpl> getRequestAttributes() {
-		HashSet<RequestAttributeImpl> attributeImpls = new HashSet<RequestAttributeImpl>();
-		Collection<Attribute> values = requestAttributes.values();
-		for (Attribute attribute : values) {
-			attributeImpls.add((RequestAttributeImpl) attribute);
-		}
-		return attributeImpls;
 	}
 
 	public Case getCase() {
