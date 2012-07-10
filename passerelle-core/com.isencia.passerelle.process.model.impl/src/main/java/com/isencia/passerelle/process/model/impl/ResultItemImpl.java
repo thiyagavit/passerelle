@@ -19,6 +19,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
@@ -39,7 +41,8 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Entity
 @Table(name = "PAS_RESULTITEM")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
-public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -158,15 +161,5 @@ public class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
 	public ResultBlock getResultBlock() {
 		return resultBlock;
-	}
-
-	public V getValue() {
-		// FIXME: this class used to be abstract so we didn't have empty implementations here
-		return null;
-	}
-
-	public String getDataType() {
-    // FIXME: this class used to be abstract so we didn't have empty implementations here
-		return null;
 	}
 }
