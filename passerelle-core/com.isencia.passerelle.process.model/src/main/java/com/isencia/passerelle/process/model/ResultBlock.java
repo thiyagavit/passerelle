@@ -54,5 +54,10 @@ public interface ResultBlock extends Serializable, Identifiable, AttributeHolder
    * @return the ResultItem with the given name
    */
   ResultItem<?> getItemForName(String name);
+  
+  /**
+   * @return parent Task
+   */
+  Task getTask();
 
 }
