@@ -44,6 +44,13 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
+	public String getType() {
+		if (getResultBlock() == null){
+			return null;
+		}
+		return getResultBlock().getType();
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id

@@ -57,5 +57,11 @@ public interface ResultItem<V extends Serializable> extends NamedValue<V>, Ident
 	 * @return the parent result block to which this item belongs.
 	 */
 	ResultBlock getResultBlock();
+	
+	/**
+	 * 
+	 * @return the type of the parent result block to which this item belongs.When not result block found nul will be returned.
+	 */
+	String getType();
 
 }
