@@ -32,22 +32,22 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 	public StringResultItemImpl() {
 	}
 
-	  public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
-		    super(resultBlock, name, unit, creationTS);
-		    if (value != null && value.length() > MAX_CHAR_SIZE) {
+	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
+		super(resultBlock, name, unit, creationTS);
+		if (value != null && value.length() > MAX_CHAR_SIZE) {
 		      this.clobItem = new ClobItem(value);
 		    } else {
 		      this.value = value;
 		    }
-		  }
+		}
 		  
-			public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
-				this(resultBlock, name, value, null, creationTS);
-			}
+	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
+		this(resultBlock, name, value, null, creationTS);
+	}
 
-			public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
-				this(resultBlock, name, value, null);
-			}
+	public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
+		this(resultBlock, name, value, null);
+	}
 
 	/*
 	 * (non-Javadoc)
