@@ -75,7 +75,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 512)
 	private String name;
 
-	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = 4000)
+	@Column(name = "VALUE", nullable = true, unique = false, updatable = false, length = 4000)
 	protected String value;
 	
 	@Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 512)
