@@ -46,6 +46,10 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
 
+	public String getScope() {
+		return getType();
+	}
+
 	public String getType() {
 		if (getResultBlock() == null){
 			return null;
