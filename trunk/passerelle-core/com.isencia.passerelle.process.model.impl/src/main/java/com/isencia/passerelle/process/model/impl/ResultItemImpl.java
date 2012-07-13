@@ -113,8 +113,8 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 		this.resultBlock = (ResultBlockImpl)resultBlock;
 		this.name = name;
 		this.unit = unit;
-		
-		this.resultBlock.putItem(this);
+		if (this.resultBlock != null)		
+			this.resultBlock.putItem(this);
 	}
 	
 	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit, Date creationTS) {
@@ -123,8 +123,8 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 		this.resultBlock = (ResultBlockImpl)resultBlock;
 		this.name = name;
 		this.unit = unit;
-		
-		this.resultBlock.putItem(this);
+		if (this.resultBlock != null)
+			this.resultBlock.putItem(this);
 	}
 	
 	public Long getId() {
