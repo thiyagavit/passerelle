@@ -24,6 +24,8 @@ import com.isencia.passerelle.process.model.Request;
 @Table(name = "PAS_REQUESTATTRIBUTE")
 public class RequestAttributeImpl extends AttributeImpl implements Comparable<RequestAttributeImpl> {
 
+	public static final String REQUEST = "request";
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -70,6 +72,10 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 		return new CompareToBuilder()
 			.append(id, rhs.id)
 			.append(version, rhs.version).toComparison();
+	}
+
+	public String getScope() {
+		return REQUEST;
 	}
 	
 	

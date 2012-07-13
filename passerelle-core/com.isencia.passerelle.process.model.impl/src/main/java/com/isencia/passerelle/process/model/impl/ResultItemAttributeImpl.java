@@ -24,6 +24,8 @@ import com.isencia.passerelle.process.model.ResultItem;
 @Table(name = "PAS_RESULTITEMATTRIBUTE")
 public class ResultItemAttributeImpl extends AttributeImpl implements Comparable<ResultItemAttributeImpl> {
 
+	public static final String SCOPE_RESULT_ITEM = "resultitem";
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -66,5 +68,8 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 			.append(version, rhs.version).toComparison();
 	}
 	
-	
+
+	public String getScope() {
+		return SCOPE_RESULT_ITEM;
+	}
 }

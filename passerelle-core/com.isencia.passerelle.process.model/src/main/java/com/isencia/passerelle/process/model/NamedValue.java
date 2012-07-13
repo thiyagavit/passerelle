@@ -46,5 +46,10 @@ public interface NamedValue<V extends Serializable> extends Serializable {
    * @return the value in a String-representation
    */
   String getValueAsString();
+  /**
+   * 
+   * @return the scope in a String-representation
+   */
+  String getScope();
 
 }
