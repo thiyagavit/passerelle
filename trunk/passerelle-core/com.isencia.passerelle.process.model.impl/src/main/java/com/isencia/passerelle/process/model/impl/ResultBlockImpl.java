@@ -189,14 +189,14 @@ public class ResultBlockImpl implements ResultBlock {
 	}
 
 	public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("Resultblock [id=");
-    builder.append(id);
-    if (type != null) {
-      builder.append(", type=");
-      builder.append(type);
+      StringBuilder builder = new StringBuilder();
+      builder.append("Resultblock [id=");
+      builder.append(id);
+      if (type != null) {
+        builder.append(", type=");
+        builder.append(type);
+      }
+      builder.append("]");
+      return builder.toString();
     }
-    builder.append("]");
-    return builder.toString();
-  }
 }
