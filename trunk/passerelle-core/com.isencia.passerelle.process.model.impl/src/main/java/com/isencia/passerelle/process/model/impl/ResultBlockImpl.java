@@ -32,6 +32,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -185,4 +187,16 @@ public class ResultBlockImpl implements ResultBlock {
 	public Task getTask() {
 		return task;
 	}
+
+	public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Resultblock [id=");
+    builder.append(id);
+    if (type != null) {
+      builder.append(", type=");
+      builder.append(type);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 }
