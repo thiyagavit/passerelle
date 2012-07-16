@@ -34,12 +34,8 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
 		super(resultBlock, name, unit, creationTS);
-		if (value != null && value.length() > MAX_CHAR_SIZE) {
-		      this.clobItem = new ClobItem(value);
-		    } else {
-		      this.value = value;
-		    }
-		}
+		setValue(value);
+  }
 		  
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
 		this(resultBlock, name, value, null, creationTS);
@@ -62,16 +58,20 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 		return value;
 	}
 
-	/*
+  public void setValue(String value) {
+    if (value != null && value.length() > MAX_CHAR_SIZE) {
+      this.clobItem = new ClobItem(value);
+    } else {
+      this.value = value;
+    }
+  }
+
+  /*
 	 * (non-Javadoc)
 	 * 
 	 * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
 	 */
 	public String getDataType() {
 		return DataTypes.STRING;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 }
