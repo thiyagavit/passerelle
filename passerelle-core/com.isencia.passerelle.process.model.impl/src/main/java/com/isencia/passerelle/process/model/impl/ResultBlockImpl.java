@@ -229,7 +229,7 @@ public class ResultBlockImpl implements ResultBlock {
 			builder.append(type);
 		}
 		if (colour != null) {
-			builder.append(" colour: ");
+			builder.append(", colour=");
 			builder.append(getColour());
 		}
 		builder.append("]");
