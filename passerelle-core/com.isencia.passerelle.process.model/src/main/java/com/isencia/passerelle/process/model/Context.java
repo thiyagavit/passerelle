@@ -59,22 +59,10 @@ public interface Context extends Identifiable, Serializable {
 	Request getRequest();
 	
 	/**
-	 * Add a task that is being (has been) executed during the processing for this context.
-	 * @param task
-	 */
-	void addTask(Task task);
-	
-	/**
 	 * 
 	 * @return a read-only list of all associated tasks
 	 */
 	List<Task> getTasks();
-	
-	/**
-	 * 
-	 * @param e
-	 */
-	void addEvent(ContextEvent e);
 
 	/**
    * @return the list of all events that have happened in this context's lifecycle up-to "now"

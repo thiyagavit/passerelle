@@ -151,16 +151,15 @@ public class ContextImpl implements Context {
 		return request;
 	}
 
-	public void addTask(Task task) {
+	void addTask(Task task) {
 		this.tasks.add(task);
 	}
 
 	public List<Task> getTasks() {
 		return Collections.unmodifiableList(tasks);
-		// TODO: does not take into account any 'transientContexts' yet
 	}
 
-	public void addEvent(ContextEvent event) {
+	void addEvent(ContextEvent event) {
 		events.add(event);
 	}
 
