@@ -41,7 +41,7 @@ import com.isencia.passerelle.process.model.Task;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_RESULTBLOCK")
@@ -62,11 +62,12 @@ public class ResultBlockImpl implements ResultBlock {
 	private int version;
 
 	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter methods	
+	// here to ensure jpa implementations like EclipseLink will generate setter
+	// methods
 	@ManyToOne(targetEntity = TaskImpl.class, optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "TASK_ID")
 	private TaskImpl task;
-	
+
 	@OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
@@ -86,59 +87,76 @@ public class ResultBlockImpl implements ResultBlock {
 	@MapKey(name = "name")
 	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
 
-  public static final String _ID = "id";
-  public static final String _CREATION_TS = "creationTS";
-  public static final String _TYPE = "type";
-  public static final String _RESULT_ITEMS = "allItems";
-  public static final String _COLOUR = "colour";
- 
+	public static final String _ID = "id";
+	public static final String _CREATION_TS = "creationTS";
+	public static final String _TYPE = "type";
+	public static final String _RESULT_ITEMS = "allItems";
+	public static final String _COLOUR = "colour";
+
 	public ResultBlockImpl() {
 	}
-	
+
 	public ResultBlockImpl(Task task, String type) {
 		this.creationTS = new Date();
-		this.task = (TaskImpl)task;
+		this.task = (TaskImpl) task;
 		this.type = type;
-		
+
 		this.task.addResultBlock(this);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
 	public Long getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java
+	 * .lang.String)
 	 */
 	public Attribute getAttribute(String name) {
 		return attributes.get(name);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com.isencia.passerelle.process.model.Attribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com
+	 * .isencia.passerelle.process.model.Attribute)
 	 */
 	public Attribute putAttribute(Attribute attribute) {
 		return attributes.put(attribute.getName(), attribute);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
 	 */
 	public Iterator<String> getAttributeNames() {
 		return attributes.keySet().iterator();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributes()
 	 */
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Coloured#getColour()
 	 */
 	public String getColour() {
@@ -148,37 +166,51 @@ public class ResultBlockImpl implements ResultBlock {
 	public void setColour(String colour) {
 		this.colour = colour;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultBlock#getCreationTS()
 	 */
 	public Date getCreationTS() {
 		return creationTS;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultBlock#getType()
 	 */
 	public String getType() {
 		return type;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#addItem(com.isencia.passerelle.process.model.ResultItem)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.ResultBlock#addItem(com.isencia.
+	 * passerelle.process.model.ResultItem)
 	 */
 	public ResultItem<?> putItem(ResultItem<?> item) {
 		return resultItems.put(item.getName(), item);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.ResultBlock#getAllItems()
 	 */
 	public Collection<ResultItem<?>> getAllItems() {
 		return Collections.unmodifiableCollection(resultItems.values());
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getItemForName(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.ResultBlock#getItemForName(java.
+	 * lang.String)
 	 */
 	public ResultItem<?> getItemForName(String name) {
 		return resultItems.get(name);
@@ -189,14 +221,18 @@ public class ResultBlockImpl implements ResultBlock {
 	}
 
 	public String toString() {
-      StringBuilder builder = new StringBuilder();
-      builder.append("Resultblock [id=");
-      builder.append(id);
-      if (type != null) {
-        builder.append(", type=");
-        builder.append(type);
-      }
-      builder.append("]");
-      return builder.toString();
-    }
+		StringBuilder builder = new StringBuilder();
+		builder.append("Resultblock [id=");
+		builder.append(id);
+		if (type != null) {
+			builder.append(", type=");
+			builder.append(type);
+		}
+		if (colour != null) {
+			builder.append(" colour: ");
+			builder.append(getColour());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 }
