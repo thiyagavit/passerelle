@@ -32,15 +32,7 @@ public interface Task extends Request {
    * @return the <code>Context</code> of the parent request of this task
    */
 	Context getParentContext();
-	
-	/**
-	 * Add a result block to this task.
-	 * 
-	 * @param block
-	 * @return true if the block was added successfully
-	 */
-	boolean addResultBlock(ResultBlock block);
-	
+		
 	/**
 	 * @return the results that have been gathered by this task
 	 */
