@@ -179,7 +179,7 @@ public class ContextImpl implements Context {
 		return entries.keySet().iterator();
 	}
 	
-	public String lookupValue(String name) {
+	public String lookupValue(String dataType, String name) {
 
 		String result = null;
 		
@@ -197,10 +197,12 @@ public class ContextImpl implements Context {
 				
 				Collection<ResultBlock> blocks = task.getResultBlocks();
 				for (ResultBlock block : blocks) {
-					ResultItem<?> item = block.getItemForName(name);
-					if (item != null) {
-						result = item.getValueAsString();
-						break;
+					if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+						ResultItem<?> item = block.getItemForName(name);
+						if (item != null) {
+							result = item.getValueAsString();
+							break;
+						}
 					}
 				}
 			}
@@ -215,6 +217,10 @@ public class ContextImpl implements Context {
 		return result;
 	}
 
+	public String lookupValue(String name) {
+		return lookupValue(null, name);
+	}
+	
 	public boolean isFinished() {
 		return status.isFinalStatus();
 	}
