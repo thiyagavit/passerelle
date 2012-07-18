@@ -31,18 +31,22 @@ public class StringResultItemImpl extends ResultItemImpl<String> {
 
 	public StringResultItemImpl() {
 	}
-
+	
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
-		super(resultBlock, name, unit, creationTS);
+		this(resultBlock, name, value,unit, creationTS,null);
+ }
+	
+	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS,Integer level) {
+		super(resultBlock, name, unit, creationTS,level);
 		setValue(value);
   }
 		  
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
-		this(resultBlock, name, value, null, creationTS);
+		this(resultBlock, name, value, null, creationTS,null);
 	}
 
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
-		this(resultBlock, name, value, null);
+		this(resultBlock, name, value, new Date());
 	}
 
 	/*

@@ -37,7 +37,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_RESULTITEM")
@@ -51,7 +51,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	}
 
 	public String getType() {
-		if (getResultBlock() == null){
+		if (getResultBlock() == null) {
 			return null;
 		}
 		return getResultBlock().getType();
@@ -67,7 +67,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATION_TS", nullable = true, unique = false, updatable = false)
 	private Date creationTS;
@@ -77,16 +77,17 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 
 	@Column(name = "VALUE", nullable = true, unique = false, updatable = false, length = 4000)
 	protected String value;
-	
+
 	@Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 512)
 	private String unit;
-	
+
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
 	private Map<String, AttributeImpl> attributes = new HashMap<String, AttributeImpl>();
 
 	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter methods	
+	// here to ensure jpa implementations like EclipseLink will generate setter
+	// methods
 	@ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
@@ -94,46 +95,48 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 40)
 	private String colour;
 
-  public static final String _ID = "id";
-  public static final String _NAME = "name";
-  public static final String _VALUE = "valueAsString";
-  public static final String _CREATION_TS = "creationTS";
-  public static final String _UNIT = "unit";
-  public static final String _DATA_TYPE = "dataType";
-  public static final String _RESULT_BLOCK = "resultBlock";
+	@Column(name = "DETAILLEVEL", nullable = true, unique = false, updatable = true)
+	private Integer level;
+
+	public static final String _ID = "id";
+	public static final String _NAME = "name";
+	public static final String _VALUE = "valueAsString";
+	public static final String _CREATION_TS = "creationTS";
+	public static final String _UNIT = "unit";
+	public static final String _DATA_TYPE = "dataType";
+	public static final String _RESULT_BLOCK = "resultBlock";
 	public static final String _RESULT_BLOCK_TYPE = "resultBlock.type";
-  public static final String _COLOUR = "colour";
-  
+	public static final String _COLOUR = "colour";
+
 	public ResultItemImpl() {
 	}
-	
+
 	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit) {
-		this.creationTS = new Date();
-		
-		this.resultBlock = (ResultBlockImpl)resultBlock;
-		this.name = name;
-		this.unit = unit;
-		if (this.resultBlock != null)		
-			this.resultBlock.putItem(this);
+		this(resultBlock, name, unit, new Date(), null);
 	}
-	
-	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit, Date creationTS) {
+
+	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit, Integer level) {
+		this(resultBlock, name, unit, new Date(), level);
+	}
+
+	protected ResultItemImpl(ResultBlock resultBlock, String name, String unit, Date creationTS, Integer level) {
 		this.creationTS = creationTS;
-		
-		this.resultBlock = (ResultBlockImpl)resultBlock;
+		this.resultBlock = (ResultBlockImpl) resultBlock;
 		this.name = name;
 		this.unit = unit;
+		this.level = level;
+
 		if (this.resultBlock != null)
 			this.resultBlock.putItem(this);
+
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
 
 	public Date getCreationTS() {
-		return creationTS!=null ? creationTS : 
-			(resultBlock!=null ? resultBlock.getCreationTS() : null);
+		return creationTS != null ? creationTS : (resultBlock != null ? resultBlock.getCreationTS() : null);
 	}
 
 	public String getName() {
@@ -149,7 +152,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	}
 
 	public Attribute putAttribute(Attribute attribute) {
-		return attributes.put(attribute.getName(),(AttributeImpl) attribute);
+		return attributes.put(attribute.getName(), (AttributeImpl) attribute);
 	}
 
 	public Iterator<String> getAttributeNames() {
@@ -167,12 +170,16 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	public void setColour(String colour) {
 		this.colour = colour;
 	}
-	
+
 	public String getUnit() {
 		return unit;
 	}
 
 	public ResultBlock getResultBlock() {
 		return resultBlock;
+	}
+
+	public Integer getLevel() {
+		return level;
 	}
 }

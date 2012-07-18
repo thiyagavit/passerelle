@@ -92,6 +92,13 @@ public class EntityFactoryImpl implements EntityFactory {
   public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit) {
     return new StringResultItemImpl(resultBlock, name, value, unit, null);
   }
+  
+  /* (non-Javadoc)
+   * @see com.isencia.passerelle.process.model.factory.EntityFactory#createResultItem(com.isencia.passerelle.process.model.ResultBlock, java.lang.String, java.lang.String, java.lang.String)
+   */
+  public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit,Integer level) {
+	  return new StringResultItemImpl(resultBlock, name, value, unit, null,level);
+  }
 
   /* (non-Javadoc)
    * @see com.isencia.passerelle.process.model.factory.EntityFactory#createErrorItem(com.isencia.passerelle.process.model.ResultBlock, com.isencia.passerelle.process.model.ErrorItem.Severity, com.isencia.passerelle.process.model.ErrorItem.Category, java.lang.String, java.lang.String, java.lang.String)
