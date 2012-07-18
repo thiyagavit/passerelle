@@ -109,6 +109,14 @@ public interface Context extends Identifiable, Serializable {
 	 */
 	String lookupValue(String name);
 
+	/**
+	 * Retrieve the first item found with the given name in the context and in all linked task result, 
+	 * limited to result block with the given data type
+	 * @param dataType
+	 * @param name
+	 * @return
+	 */
+	String lookupValue(String dataType, String name);
 
   /**
    * Is the request still processing or not
