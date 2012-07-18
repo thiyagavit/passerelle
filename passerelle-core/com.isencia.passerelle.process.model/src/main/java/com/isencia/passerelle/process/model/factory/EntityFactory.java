@@ -49,6 +49,8 @@ public interface EntityFactory {
 
   ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit);
 
+  ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit,Integer level);
+  
   ErrorItem createErrorItem(ResultBlock resultBlock, Severity severity, Category category, String code, String shortDescription, String description);
 
 }
