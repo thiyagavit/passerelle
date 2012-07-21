@@ -162,7 +162,7 @@ public class ContextImpl implements Context {
 			synchronized (tasks) {
 				// Remark: not using indexOf to allow Task implementations to have their own equals()
 				for (int taskIndex = 0; taskIndex < tasks.size(); taskIndex++) {
-					if (tasks.get(taskIndex).getId().equals(task.getId())) {
+					if (task.getId().equals(tasks.get(taskIndex).getId())) {
 						tasks.set(taskIndex, task);
 						return;
 					}
