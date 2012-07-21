@@ -151,6 +151,26 @@ public class ContextImpl implements Context {
 		return request;
 	}
 
+	/**
+	 * Replace an existing task with one that is more up-to-date.
+	 * 
+	 * @param task The more up-to-date version of the task
+	 */
+	public void reattachTask(Task task) {
+		// Check if we simply need to reattach the task
+		if (task.getId() != null) {
+			synchronized (tasks) {
+				// Remark: not using indexOf to allow Task implementations to have their own equals()
+				for (int taskIndex = 0; taskIndex < tasks.size(); taskIndex++) {
+					if (tasks.get(taskIndex).getId().equals(task.getId())) {
+						tasks.set(taskIndex, task);
+						return;
+					}
+				}
+			}
+		}
+	}
+
 	void addTask(Task task) {
 		this.tasks.add(task);
 	}
