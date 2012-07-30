@@ -1,0 +1,87 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="simpleLoop" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{200, 105}">
+        </property>
+    </property>
+    <entity name="Trigger" class="be.isencia.passerelle.actor.control.Trigger">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{135, 275}">
+        </property>
+    </entity>
+    <entity name="SimpleLoop" class="fr.soleil.passerelle.actor.flow.SimpleLoop">
+        <property name="Number of Loops" class="ptolemy.data.expr.StringParameter" value="4">
+        </property>
+        <property name="Use Values List" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Values List (separated by commas)" class="ptolemy.data.expr.StringParameter" value="1,2,3">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{375.0, 285.0}">
+        </property>
+    </entity>
+    <entity name="Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[565.0, 295.0]">
+        </property>
+    </entity>
+    <entity name="Tracer_2" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[470.0, 470.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_4" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="Trigger.output" relation="relation"/>
+    <link port="SimpleLoop.trigger (start loop)" relation="relation"/>
+    <link port="SimpleLoop.handled" relation="relation_4"/>
+    <link port="SimpleLoop.end loop trigger" relation="relation_2"/>
+    <link port="SimpleLoop.output value" relation="relation_3"/>
+    <link port="SimpleLoop.output value" relation="relation_4"/>
+    <link port="Tracer.input" relation="relation_2"/>
+    <link port="Tracer_2.input" relation="relation_3"/>
+</entity>

@@ -1,0 +1,101 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="DoWhileLoop" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[90.0, 65.0]">
+        </property>
+    </property>
+    <entity name="Trigger" class="be.isencia.passerelle.actor.control.Trigger">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[60.0, 280.0]">
+        </property>
+    </entity>
+    <entity name="DoWhileLoop" class="fr.soleil.passerelle.actor.flow.DoWhileLoop">
+        <property name="comparison" class="ptolemy.data.expr.StringParameter" value="!=">
+            <property name="style" class="ptolemy.actor.gui.style.ChoiceStyle">
+                <property name="gt" class="ptolemy.kernel.util.StringAttribute" value="&gt;">
+                </property>
+                <property name="ge" class="ptolemy.kernel.util.StringAttribute" value="&gt;=">
+                </property>
+                <property name="lt" class="ptolemy.kernel.util.StringAttribute" value="&lt;">
+                </property>
+                <property name="le" class="ptolemy.kernel.util.StringAttribute" value="&lt;=">
+                </property>
+                <property name="eq" class="ptolemy.kernel.util.StringAttribute" value="==">
+                </property>
+                <property name="ne" class="ptolemy.kernel.util.StringAttribute" value="!=">
+                </property>
+            </property>
+        </property>
+        <property name="Rigth Value" class="ptolemy.data.expr.StringParameter" value="aaa">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[285.0, 265.0]">
+        </property>
+    </entity>
+    <entity name="ValuesListGenerator" class="fr.soleil.passerelle.actor.flow.ValuesListGenerator">
+        <property name="Values List (sep by commas)" class="ptolemy.data.expr.StringParameter" value="bbb,ccc,ddd,aaa">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{265.0, 480.0}">
+        </property>
+    </entity>
+    <entity name="Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[460.0, 275.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_4" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="Trigger.output" relation="relation"/>
+    <link port="DoWhileLoop.start" relation="relation"/>
+    <link port="DoWhileLoop.finished" relation="relation_4"/>
+    <link port="DoWhileLoop.left value" relation="relation_3"/>
+    <link port="DoWhileLoop.continue" relation="relation_2"/>
+    <link port="ValuesListGenerator.Trigger" relation="relation_2"/>
+    <link port="ValuesListGenerator.Value" relation="relation_3"/>
+    <link port="Tracer.input" relation="relation_4"/>
+</entity>
