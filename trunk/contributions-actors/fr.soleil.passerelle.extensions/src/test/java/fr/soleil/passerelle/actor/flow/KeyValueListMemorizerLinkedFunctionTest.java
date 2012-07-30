@@ -2,8 +2,6 @@ package fr.soleil.passerelle.actor.flow;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,21 +9,19 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
-
-import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.MomlRule;
 
 @RunWith(Parameterized.class)
 public class KeyValueListMemorizerLinkedFunctionTest {
 
-    private final FlowManager flowMgr;
-    private final Flow topLevel;
+    @Rule
+    public final MomlRule moml = new MomlRule("/sequences/DualKeyValue.moml");
 
     // parameters values
     private final Map<String, String> props;
@@ -65,13 +61,15 @@ public class KeyValueListMemorizerLinkedFunctionTest {
     // "Line-List1                : 7-List1",//
     // "Location-List1            : P1-B-01-List1",//
     // "Sample Information-List1  :",//
-    // "Method Name-List1         : D:\\AGILENT\\METHODS\\USERS\\AUTOSAMPLER_SEQUENCE-List1" };
+    // "Method Name-List1         : D:\\AGILENT\\METHODS\\USERS\\AUTOSAMPLER_SEQUENCE-List1"
+    // };
     //
     // private static final String[] expectedOutputValue2 = {
     // "Line-List2                : 7-List2",//
     // "Location-List2            : P1-B-01-List2",//
     // "Sample Information-List2  :",//
-    // "Method Name-List2         : D:\\AGILENT\\METHODS\\USERS\\AUTOSAMPLER_SEQUENCE-List2" };
+    // "Method Name-List2         : D:\\AGILENT\\METHODS\\USERS\\AUTOSAMPLER_SEQUENCE-List2"
+    // };
 
     @Parameters
     public static List<Object[]> getParametres() {
@@ -122,7 +120,8 @@ public class KeyValueListMemorizerLinkedFunctionTest {
                         "3",
                         "Line-List1;Sample Information-List1",// filtered Key1
                         "",
-                        new String[] { "Line-List1", "Sample Information-List1" },// expected key1
+                        new String[] { "Line-List1", "Sample Information-List1" },// expected
+                                                                                  // key1
 
                         new String[] { "Line-List2", "Location-List2", "Sample Information-List2",
                                 "Method Name-List2" },// expected key2
@@ -132,16 +131,20 @@ public class KeyValueListMemorizerLinkedFunctionTest {
                         new String[] { "7-List2", "P1-B-01-List2", "",
                                 "D:\\AGILENT\\METHODS\\USERS\\AUTOSAMPLER_SEQUENCE-List2" } }, // values2
                 {
-                        // test filtered keys 1 and Key2 with space between keys and separator
+                        // test filtered keys 1 and Key2 with space between keys
+                        // and separator
                         "0",// position value 1
                         "1",
                         "1",// endLoop1
                         "1",
-                        ";Line-List1;\nSample Information-List1",// filtered Key1
+                        ";Line-List1;\nSample Information-List1",// filtered
+                                                                 // Key1
                         " Location-List2 ;; Method Name-List2 ",
-                        new String[] { "Line-List1", "Sample Information-List1" },// expected key1
+                        new String[] { "Line-List1", "Sample Information-List1" },// expected
+                                                                                  // key1
 
-                        new String[] { "Location-List2", "Method Name-List2" },// expected key2
+                        new String[] { "Location-List2", "Method Name-List2" },// expected
+                                                                               // key2
 
                         new String[] { "7-List1", "" },// values1
 
@@ -162,15 +165,7 @@ public class KeyValueListMemorizerLinkedFunctionTest {
         this.expectedValueList1 = exceptedValueList1;
         this.exceptedValueList2 = exceptedValueList2;
 
-        // Load sequence
-        final Reader in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/DualKeyValue.moml"));
-        flowMgr = new FlowManager();
-        topLevel = FlowManager.readMoml(in);
-        final BasicDirector dir = new BasicDirector(topLevel, "Dir");
-        topLevel.setDirector(dir);
-
-        // add listener to catch outputValue, key and value port message
+        // create list which will received messages sent by actors
         outputValueList1 = new ArrayBlockingQueue<String>(EXPECTED_OUTPUT_VALUE1.length, true);
         outputValueList2 = new ArrayBlockingQueue<String>(EXPECTED_OUTPUT_VALUE2.length, true);
         keyMessagesList1 = new ArrayBlockingQueue<String>(exceptedKeyList1.length, true);
@@ -178,18 +173,8 @@ public class KeyValueListMemorizerLinkedFunctionTest {
         keyMessagesList2 = new ArrayBlockingQueue<String>(exceptedKeyList2.length, true);
         valueMessagesList2 = new ArrayBlockingQueue<String>(exceptedValueList2.length, true);
 
-        KeyValueListMemorizerSuiteCase.addOutputValueMessageListenerToActor(topLevel,
-                "MemorizeList1", outputValueList1);
-        KeyValueListMemorizerSuiteCase.addOutputValueMessageListenerToActor(topLevel,
-                "MemorizeList2", outputValueList2);
-        KeyValueListMemorizerSuiteCase.addKeyValueMessageListenerToActor(topLevel, "outputList1",
-                keyMessagesList1, valueMessagesList1);
-        KeyValueListMemorizerSuiteCase.addKeyValueMessageListenerToActor(topLevel, "outputList2",
-                keyMessagesList2, valueMessagesList2);
-
         // Set parameters of actors
         props = new HashMap<String, String>();
-
         props.put("gotoList1." + KeyValueListMemorizer.POSITION_VALUE_LABEL, gotoPosList1);
         props.put("gotoList2." + KeyValueListMemorizer.POSITION_VALUE_LABEL, gotoPosList2);
         props.put("ForLoopList1.End Value", endLoop1);
@@ -200,8 +185,17 @@ public class KeyValueListMemorizerLinkedFunctionTest {
 
     @Test
     public void testKeysValuesAreCorrect() throws Exception {
+        moml.addMessageReceiver("MemorizeList1", "output", outputValueList1);
+        moml.addMessageReceiver("MemorizeList2", "output", outputValueList2);
+
+        moml.addMessageReceiver("outputList1", "key", keyMessagesList1);
+        moml.addMessageReceiver("outputList1", "value", valueMessagesList1);
+
+        moml.addMessageReceiver("outputList2", "key", keyMessagesList2);
+        moml.addMessageReceiver("outputList2", "value", valueMessagesList2);
+
         // run sequence
-        flowMgr.executeBlockingErrorLocally(topLevel, props);
+        moml.executeBlockingErrorLocally(props);
 
         assertKeyValueMessageAreCorrect(keyMessagesList1, expectedKeyList1, valueMessagesList1,
                 expectedValueList1);
@@ -214,11 +208,16 @@ public class KeyValueListMemorizerLinkedFunctionTest {
     /**
      * check key and value port message are corrects
      * 
-     * @param keys ArrayBlockingQueue which contains all message from key port
-     * @param expectedKeys the expecting message of key port
-     * @param values ArrayBlockingQueue which contains all message from value port
-     * @param expectedValues the expecting message of value port
-     * @throws InterruptedException if the extraction of an element of the list takes more than 1
+     * @param keys
+     *            ArrayBlockingQueue which contains all message from key port
+     * @param expectedKeys
+     *            the expecting message of key port
+     * @param values
+     *            ArrayBlockingQueue which contains all message from value port
+     * @param expectedValues
+     *            the expecting message of value port
+     * @throws InterruptedException
+     *             if the extraction of an element of the list takes more than 1
      *             second
      */
     private void assertKeyValueMessageAreCorrect(final ArrayBlockingQueue<String> keys,
@@ -234,13 +233,12 @@ public class KeyValueListMemorizerLinkedFunctionTest {
         int i = 0;
         while (!keys.isEmpty()) {
             // assert key is correct
-            assertEquals(expectedKeys[i], KeyValueListMemorizerSuiteCase.extractBodyContent(keys
-                    .poll(1, TimeUnit.SECONDS)));
+            assertEquals(expectedKeys[i],
+                    MomlRule.extractBodyContent(keys.poll(1, TimeUnit.SECONDS)));
 
             // assert value is correct
             assertEquals(expectedValues[i++],
-                    KeyValueListMemorizerSuiteCase.extractBodyContent(values.poll(1,
-                            TimeUnit.SECONDS)));
+                    MomlRule.extractBodyContent(values.poll(1, TimeUnit.SECONDS)));
         }
     }
 }
