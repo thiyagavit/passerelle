@@ -233,12 +233,10 @@ public class KeyValueListMemorizerLinkedFunctionTest {
         int i = 0;
         while (!keys.isEmpty()) {
             // assert key is correct
-            assertEquals(expectedKeys[i],
-                    MomlRule.extractBodyContent(keys.poll(1, TimeUnit.SECONDS)));
+            assertEquals(expectedKeys[i], keys.poll(1, TimeUnit.SECONDS));
 
             // assert value is correct
-            assertEquals(expectedValues[i++],
-                    MomlRule.extractBodyContent(values.poll(1, TimeUnit.SECONDS)));
+            assertEquals(expectedValues[i++], values.poll(1, TimeUnit.SECONDS));
         }
     }
 }

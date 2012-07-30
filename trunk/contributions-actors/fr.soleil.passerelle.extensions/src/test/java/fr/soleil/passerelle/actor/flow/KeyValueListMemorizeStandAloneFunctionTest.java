@@ -123,9 +123,8 @@ public final class KeyValueListMemorizeStandAloneFunctionTest {
             valueMessagesList1.poll(1, TimeUnit.SECONDS);
         }
 
-        Assert.assertEquals("", MomlRule.extractBodyContent(keyMessagesList1.poll()));
-
-        Assert.assertEquals("", MomlRule.extractBodyContent(valueMessagesList1.poll()));
+        assertThat(keyMessagesList1.poll()).isEmpty();
+        assertThat(valueMessagesList1.poll()).isEmpty();
     }
 
     /**

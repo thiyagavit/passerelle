@@ -48,7 +48,7 @@ public class DelayTest {
         final long end = System.currentTimeMillis();
 
         assertThat(end - start).isGreaterThanOrEqualTo(3000).isLessThan(4000);
-        assertThat(MomlRule.extractBodyContent(outputReceiver.poll())).isEqualTo("azerty");
+        assertThat(outputReceiver.poll()).isEqualTo("azerty");
 
     }
 
@@ -70,7 +70,7 @@ public class DelayTest {
         final long end = System.currentTimeMillis();
 
         assertThat(end - start).isGreaterThanOrEqualTo(2000).isLessThan(3000);
-        assertThat(MomlRule.extractBodyContent(outputReceiver.poll())).isEqualTo("2.0");
+        assertThat(outputReceiver.poll()).isEqualTo("2.0");
     }
 
     @Test
