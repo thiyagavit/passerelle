@@ -19,7 +19,7 @@ import com.isencia.passerelle.model.FlowManager;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoDs.Except;
-import fr.soleil.passerelle.FlowHelperForTests;
+import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 import fr.soleil.tangounit.device.Device;
 import fr.soleil.tangounit.junit.TangoUnitTest;
 

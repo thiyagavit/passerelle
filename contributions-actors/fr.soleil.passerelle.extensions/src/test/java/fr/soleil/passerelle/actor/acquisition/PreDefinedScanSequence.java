@@ -18,7 +18,7 @@ import ptolemy.kernel.ComponentEntity;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.model.Flow;
 
-import fr.soleil.passerelle.FlowHelperForTests;
+import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 import fr.soleil.tangounit.junit.TangoUnitTest;
 
 @RunWith(Parameterized.class)
