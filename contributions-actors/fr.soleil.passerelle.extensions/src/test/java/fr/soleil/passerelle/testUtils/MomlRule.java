@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.junit.rules.ExternalResource;
 
@@ -38,7 +36,6 @@ public class MomlRule extends ExternalResource {
     // TODO USE AN COPY OF TOPLEVEL TO BE ABLE TO USE CLASS RULE
     private Flow original;
     private Flow copy;
-    public static final Pattern PATTERN = Pattern.compile("<Body>.*</Body>");
 
     public MomlRule(final String sequenceName) {
         this.sequenceName = sequenceName;
@@ -101,24 +98,5 @@ public class MomlRule extends ExternalResource {
         // change this to copy.getEntity(actorName);
         original.getEntity(actorName).getPort(portName)
                 .addDebugListener(new MessageListener(receiver));
-    }
-
-    /**
-     * A message is in XML format and contains lot of informations. This
-     * function extract the body content (ie key or value )of the message
-     * 
-     * @param fullMessage
-     *            Passerelle message formated in xml
-     * @return the key or the value contain in message
-     */
-    public static String extractBodyContent(final String fullMessage) {
-        final Matcher matcher = MomlRule.PATTERN.matcher(fullMessage);
-        String content = "";
-        if (matcher.find()) {
-            content = matcher.group();
-            content = content.subSequence(6, content.length() - 7).toString();
-        }
-
-        return content;
     }
 }

@@ -160,11 +160,11 @@ public class AttributeComparatorTest {
             assertThat(trueTriggerReceiver.size()).isEqualTo(1);
             assertThat(falseTriggerReceiver.size()).isEqualTo(0);
             // TODO message is always the same need to test it ?
-            assertThat(MomlRule.extractBodyContent(trueTriggerReceiver.poll())).isEqualTo("true");
+            assertThat(trueTriggerReceiver.poll()).isEqualTo("true");
         } else {
             assertThat(trueTriggerReceiver.size()).isEqualTo(0);
             assertThat(falseTriggerReceiver.size()).isEqualTo(1);
-            assertThat(MomlRule.extractBodyContent(falseTriggerReceiver.poll())).isEqualTo("true");
+            assertThat(falseTriggerReceiver.poll()).isEqualTo("true");
         }
     }
 }
