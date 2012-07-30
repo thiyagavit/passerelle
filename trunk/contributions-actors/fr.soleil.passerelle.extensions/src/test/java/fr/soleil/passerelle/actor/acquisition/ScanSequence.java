@@ -23,11 +23,11 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 
-import fr.soleil.passerelle.FlowHelperForTests;
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
 import fr.soleil.passerelle.actor.tango.recording.EndRecording;
 import fr.soleil.passerelle.actor.tango.recording.StartRecording;
 import fr.soleil.passerelle.domain.RecordingDirector;
+import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 
 @RunWith(Parameterized.class)
 public class ScanSequence {

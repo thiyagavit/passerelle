@@ -13,9 +13,9 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.FlowHelperForTests;
 import fr.soleil.passerelle.actor.acquisition.CCDSequence;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 import fr.soleil.tangounit.device.Device;
 import fr.soleil.tangounit.junit.TangoUnitTest;
 

@@ -13,7 +13,7 @@ import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.passerelle.FlowHelperForTests;
+import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 import fr.soleil.tangounit.junit.TangoUnitTest;
 
 public class WriteSequence extends TangoUnitTest {
