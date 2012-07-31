@@ -164,13 +164,13 @@
             class="ptolemy.actor.TypedIOPort"
             group="com.isencia.passerelle.actor.actorgroup.utilities"
             icon="icons/input.png"
-            name="Input port">
+            name="Input">
       </actor>
       <actor id="ptolemy.actor.outputport"
             class="ptolemy.actor.TypedIOPort"
             group="com.isencia.passerelle.actor.actorgroup.utilities"
             icon="icons/output.png"
-            name="Output port">
+            name="Output">
       </actor>
       <actor id="ptolemy.actor.vertex"
             class="ptolemy.moml.Vertex"
