@@ -8,37 +8,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import ptolemy.kernel.util.IllegalActionException;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 @RunWith(Parameterized.class)
 public class AttributeComparatorTest {
 
-    private static final String ACTOR_NAME = "Comparator1";
     @Rule
     public final MomlRule moml = new MomlRule("/sequences/AttributeComparator.moml");
 
-    // // TODO put this in another TestCase
-    // @Test(expected = NumberFormatException.class)
-    // public void should_throw_exception_if_tolerance_is_not_a_number() throws
-    // IllegalActionException {
-    // final AttributeComparator actor = (AttributeComparator)
-    // moml.getEntity(ACTOR_NAME);
-    //
-    // actor.toleranceParam.setToken("azerty");
-    // actor.attributeChanged(actor.toleranceParam);
-    // }
-
+    private static final String ACTOR_NAME = "Comparator1";
     private final String rightValue;
     private final String comparison;
     private final String leftValue;
     private final String tolerence;
     private final boolean expectedMessage;
+
+    // TODO put this in another TestCase
+    @Ignore
+    @Test(expected = NumberFormatException.class)
+    public void should_throw_exception_if_tolerance_is_not_a_number() throws IllegalActionException {
+        final AttributeComparator actor = (AttributeComparator) moml.getEntity(ACTOR_NAME);
+
+        actor.toleranceParam.setToken("azerty");
+        actor.attributeChanged(actor.toleranceParam);
+    }
 
     @Parameters
     public static List<Object[]> getParametres() {

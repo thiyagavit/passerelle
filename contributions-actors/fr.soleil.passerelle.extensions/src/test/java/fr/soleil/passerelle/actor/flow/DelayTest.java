@@ -17,10 +17,10 @@ import com.isencia.passerelle.core.PasserelleException;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class DelayTest {
-
-    private static final String ACTOR_NAME = "Delay1";
     @Rule
     public MomlRule moml = new MomlRule("/sequences/Delay.moml");
+
+    private static final String ACTOR_NAME = "Delay1";
 
     @Test(expected = NumberFormatException.class)
     public void should_throw_expection_if_time_is_a_string() throws IllegalActionException {
