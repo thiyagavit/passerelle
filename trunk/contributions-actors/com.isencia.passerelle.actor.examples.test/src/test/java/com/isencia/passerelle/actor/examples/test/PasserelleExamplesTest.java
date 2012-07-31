@@ -14,6 +14,8 @@
 */
 package com.isencia.passerelle.actor.examples.test;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
@@ -298,4 +300,13 @@ public class PasserelleExamplesTest extends TestCase {
     ;
   }
 
+  public void testReadMoml() throws Exception {
+    Reader in = new InputStreamReader(getClass().getResourceAsStream("/test.xml"));
+    Flow f = FlowManager.readMoml(in);
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("constant1.value", "\"howdy madurodam\"");
+    props.put("console1.Chop output at #chars", "200");
+    flowMgr.executeBlockingLocally(f,props);
+    System.out.println("Finished");
+  }
 }
