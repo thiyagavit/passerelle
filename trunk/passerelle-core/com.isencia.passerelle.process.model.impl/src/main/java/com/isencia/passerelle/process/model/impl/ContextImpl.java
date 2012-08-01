@@ -41,10 +41,11 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_CONTEXT")
@@ -56,34 +57,34 @@ public class ContextImpl implements Context {
 	@Column(name = "ID", nullable = false, unique = true, updatable = false)
 	@GeneratedValue(generator = "pas_context")
 	private Long id;
-	
+
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
-	
+
 	@Column(name = "STATUS", nullable = false, unique = false, updatable = true, length = 128)
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
-	
+
 	@OneToOne(targetEntity = RequestImpl.class, optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "REQUEST_ID", unique = true, nullable = false)
 	private Request request;
-	
+
 	@OneToMany(targetEntity = TaskImpl.class, mappedBy = "parentContext", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy("id")
 	private List<Task> tasks = new ArrayList<Task>();
-	
+
 	@OneToMany(targetEntity = ContextEventImpl.class, mappedBy = "context", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy("creationTS")
 	private List<ContextEvent> events = new ArrayList<ContextEvent>();
-	
+
 	@Transient
 	private Map<String, Serializable> entries = new HashMap<String, Serializable>();
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "END_TS", nullable = true, unique = false, updatable = true)
 	private Date endTS;
@@ -91,7 +92,7 @@ public class ContextImpl implements Context {
 	// join/fork support
 	@Transient
 	private Stack<Integer> taskCursorStack = new Stack<Integer>();
-	
+
 	@Transient
 	private Stack<Integer> eventCursorStack = new Stack<Integer>();
 
@@ -101,27 +102,27 @@ public class ContextImpl implements Context {
 	@Transient
 	private ReentrantLock lock = new ReentrantLock();
 
-  public static final String _ID = "id";
-  public static final String _STATUS = "status";
-  public static final String _REQUEST = "request";
-  public static final String _REQUEST_ID = "request.id";
-  public static final String _TASKS = "tasks";
-  public static final String _EVENTS = "events";
-  public static final String _CREATION_TS = "creationTS";
-  public static final String _END_TS = "creationTS";
-  public static final String _DURATION = "durationInMillis";
+	public static final String _ID = "id";
+	public static final String _STATUS = "status";
+	public static final String _REQUEST = "request";
+	public static final String _REQUEST_ID = "request.id";
+	public static final String _TASKS = "tasks";
+	public static final String _EVENTS = "events";
+	public static final String _CREATION_TS = "creationTS";
+	public static final String _END_TS = "creationTS";
+	public static final String _DURATION = "durationInMillis";
 
 	public ContextImpl() {
 	}
-	
+
 	public ContextImpl(Request request) {
 		this.status = Status.CREATED;
 		this.creationTS = new Date();
 		this.request = request;
-		
+
 		new ContextEventImpl(this, this.status.name());
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -131,18 +132,18 @@ public class ContextImpl implements Context {
 	}
 
 	public boolean setStatus(Status status) {
-		if(this.status!=null && this.status.isFinalStatus()) {
+		if (this.status != null && this.status.isFinalStatus()) {
 			return false;
 		} else {
 			this.status = status;
-			
+
 			// Mark the end of processing
 			if (status.isFinalStatus()) {
 				endTS = new Date();
 			}
-			
+
 			// TODO: should notify status listeners
-			
+
 			return true;
 		}
 	}
@@ -154,13 +155,15 @@ public class ContextImpl implements Context {
 	/**
 	 * Replace an existing task with one that is more up-to-date.
 	 * 
-	 * @param task The more up-to-date version of the task
+	 * @param task
+	 *            The more up-to-date version of the task
 	 */
 	public void reattachTask(Task task) {
 		// Check if we simply need to reattach the task
 		if (task.getId() != null) {
 			synchronized (tasks) {
-				// Remark: not using indexOf to allow Task implementations to have their own equals()
+				// Remark: not using indexOf to allow Task implementations to
+				// have their own equals()
 				for (int taskIndex = 0; taskIndex < tasks.size(); taskIndex++) {
 					if (task.getId().equals(tasks.get(taskIndex).getId())) {
 						tasks.set(taskIndex, task);
@@ -198,11 +201,11 @@ public class ContextImpl implements Context {
 	public Iterator<String> getEntryNames() {
 		return entries.keySet().iterator();
 	}
-	
+
 	public String lookupValue(String dataType, String name) {
 
 		String result = null;
-		
+
 		// first check in the context entries, these have highest priority
 		Object contextEntry = getEntryValue(name);
 		if (contextEntry != null) {
@@ -214,7 +217,7 @@ public class ContextImpl implements Context {
 			List<Task> tasks = getTasks();
 			for (int taskIdx = tasks.size() - 1; taskIdx >= 0 && result == null; taskIdx--) {
 				Task task = tasks.get(taskIdx);
-				
+
 				Collection<ResultBlock> blocks = task.getResultBlocks();
 				for (ResultBlock block : blocks) {
 					if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
@@ -226,21 +229,38 @@ public class ContextImpl implements Context {
 					}
 				}
 			}
-			
+
 			// if still nothing found, check in the original request
 			if (result == null && getRequest() != null) {
 				NamedValue<?> reqAttribute = getRequest().getAttribute(name);
 				result = reqAttribute != null ? reqAttribute.getValueAsString() : null;
 			}
+
+			// if still nothin found, check in the historical data
+			if (result == null) {
+				List<ResultBlock> historicalBlocks = ServiceRegistry.getInstance().getHistoricalDataProvider()
+						.getResultBlocks(this);
+				if (historicalBlocks != null) {
+					for (ResultBlock block : historicalBlocks) {
+						if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+							ResultItem<?> item = block.getItemForName(name);
+							if (item != null) {
+								result = item.getValueAsString();
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
-		
+
 		return result;
 	}
 
 	public String lookupValue(String name) {
 		return lookupValue(null, name);
 	}
-	
+
 	public boolean isFinished() {
 		return status.isFinalStatus();
 	}
@@ -257,7 +277,7 @@ public class ContextImpl implements Context {
 		if (creationTS != null && endTS != null) {
 			return endTS.getTime() - creationTS.getTime();
 		}
-		
+
 		// Not finished or not started yet
 		return null;
 	}
@@ -302,14 +322,18 @@ public class ContextImpl implements Context {
 		eventCursorStack.push(events.size());
 	}
 
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Context#join(com.isencia.passerelle.process.model.Context)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.isencia.passerelle.process.model.Context#join(com.isencia.passerelle
+	 * .process.model.Context)
 	 */
 	public void join(Context other) {
-		ContextImpl contextToMerge = (ContextImpl)other;
+		ContextImpl contextToMerge = (ContextImpl) other;
 		try {
 			lock.lock();
-			
+
 			// add new tasks obtained from the related branch
 			int taskCursorIndex = contextToMerge.popTaskCursorIndex();
 			List<Task> tasks = contextToMerge.getTasks();
@@ -326,16 +350,18 @@ public class ContextImpl implements Context {
 					getEvents().add(events.get(r));
 				}
 			}
-			
+
 			// merge context entries
 			entries.putAll(contextToMerge.entries);
-			
+
 		} finally {
 			lock.unlock();
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Context#fork()
 	 */
 	public Context fork() {
@@ -359,7 +385,9 @@ public class ContextImpl implements Context {
 		return copy;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Context#isForkedContext()
 	 */
 	public boolean isForkedContext() {

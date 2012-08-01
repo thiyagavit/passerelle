@@ -26,7 +26,7 @@ import com.isencia.passerelle.process.model.Request;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_CASE")
@@ -47,22 +47,21 @@ public class CaseImpl implements Case {
 
 	@Column(name = "EXTERNAL_REF", nullable = true, unique = false, updatable = true, length = 50)
 	private String externalReference;
-	
+
 	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Request> requests = new ArrayList<Request>();
-	
-  public static final String _ID = "id";
-  public static final String _REFERENCE = "id";
-  public static final String _EXTERNAL_REFERENCE = "externalReference";
-	
+
+	public static final String _ID = "id";
+	public static final String _REFERENCE = "id";
+	public static final String _EXTERNAL_REFERENCE = "externalReference";
 
 	public CaseImpl() {
 	}
-	
+
 	public CaseImpl(String externalReference) {
 		this.externalReference = externalReference;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -76,6 +75,11 @@ public class CaseImpl implements Case {
 	}
 
 	public void addRequest(Request request) {
-		this.requests.add(request);
+		try {
+			this.requests.add(request);
+		} catch (Exception e) {
+
+		}
+
 	}
 }

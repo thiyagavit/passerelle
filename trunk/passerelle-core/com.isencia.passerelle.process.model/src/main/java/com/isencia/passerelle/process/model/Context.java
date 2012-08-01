@@ -162,4 +162,5 @@ public interface Context extends Identifiable, Serializable {
 	 * @return an indicator whether this is a forked context or a "root" context, i.e. outside of any fork/join scope.
 	 */
 	boolean isForkedContext();
+	
 }
