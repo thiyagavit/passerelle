@@ -75,11 +75,11 @@ public class CaseImpl implements Case {
 	}
 
 	public void addRequest(Request request) {
-		try {
+//		try {
 			this.requests.add(request);
-		} catch (Exception e) {
-
-		}
+//		} catch (Exception e) {
+//
+//		}
 
 	}
 }
