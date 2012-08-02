@@ -1041,9 +1041,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @throws IllegalActionException
    */
   final public void sendErrorMessage(PasserelleException exception) throws IllegalActionException {
-    if (getLogger().isInfoEnabled()) {
-      getLogger().info(getInfo() + " sendErrorMessage() - generating error msg for exception", exception);
-    }
+    getLogger().debug("{} sendErrorMessage() - generating error msg for exception {}", getInfo(), exception);
     if (errorPort.getWidth() > 0) {
       ManagedMessage errorMessage = createErrorMessage(exception);
       Token errorToken = new PasserelleToken(errorMessage);
