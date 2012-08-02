@@ -107,6 +107,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	public static final String _RESULT_BLOCK = "resultBlock";
 	public static final String _RESULT_BLOCK_TYPE = "resultBlock.type";
 	public static final String _COLOUR = "colour";
+	public static final String _DISCRIMINATOR = "discriminator";
 
 	public ResultItemImpl() {
 	}
@@ -182,4 +183,8 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	public Integer getLevel() {
 		return level;
 	}
+	
+	@SuppressWarnings("unused")
+	@Column(name = "DTYPE", updatable = false)
+	private String discriminator;
 }
