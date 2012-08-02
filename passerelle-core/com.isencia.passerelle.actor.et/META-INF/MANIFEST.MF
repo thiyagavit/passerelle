@@ -6,7 +6,7 @@ Bundle-Version: 8.0.0.qualifier
 Bundle-Activator: com.isencia.passerelle.actor.et.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
+Eclipse-RegisterBuddy: ptolemy.core
 Import-Package: com.isencia.passerelle.domain.et,
  org.osgi.framework;version="1.3.0",
  org.slf4j,

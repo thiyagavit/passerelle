@@ -21,10 +21,24 @@ package com.isencia.passerelle.domain.et;
  * @author delerw
  *
  */
-public interface EventHandler<E extends Event> {
+public interface EventHandler {
   
   void initialize();
+  
+  /**
+   * 
+   * @param event
+   * @return true if the handler is made for handling the given event type; false if not
+   */
   boolean canHandle(Event event);
-  void handle(E event) throws Exception;
+  
+  /**
+   * 
+   * @param event
+   * @throws Exception
+   * @return true if the event was effectively handled; false if not (e.g. because the actor that should be fired because
+   * of the given event was aleady busy with another one)
+   */
+  boolean handle(Event event) throws Exception;
 
 }

@@ -41,8 +41,10 @@ public interface EventDispatcher {
    * 
    * @param timeOut (ms)
    * @return true if an event was dispatched, false if no event was pending during the given timeout
+   * 
+   * @throws InterruptedException
    */
-  boolean dispatch(long timeOut);
+  boolean dispatch(long timeOut) throws InterruptedException;
   
   /**
    * Initiate a nice shutdown, i.e. allow all pending events to be processed first,

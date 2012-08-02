@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.domain.et.impl;
 
@@ -32,93 +32,117 @@ import com.isencia.passerelle.domain.et.EventHandler;
 import com.isencia.passerelle.domain.et.EventRefusedException;
 
 /**
- * A basic implementation of an event dispatcher, based on a BlockingQueue 
- * and a method for dispatching the oldest queued event.
- * The method must be invoked by some external component (e.g. the model director).
+ * A basic implementation of an event dispatcher, based on a BlockingQueue and a method for dispatching the oldest queued event. The method must be invoked by
+ * some external component (e.g. the model director).
  * 
  * @author delerw
  */
 public class SimpleEventDispatcher implements EventDispatcher, EventDispatchReporter {
-  
+
   private final static Logger LOGGER = LoggerFactory.getLogger(SimpleEventDispatcher.class);
-  
+
   private String name;
-  
+
   private BlockingQueue<Event> eventQ = new LinkedBlockingQueue<Event>();
   private List<Event> eventHistory = new LinkedList<Event>();
   private List<Event> unhandledEvents = new LinkedList<Event>();
   private List<EventError> eventErrors = new LinkedList<EventError>();
-  
-  private EventHandler<? extends Event> eventHandlers[];
+
+  private EventHandler eventHandlers[];
 
   // state variables for managing the shutdown sequence
-  private boolean active = true;
-  private boolean forcedShutdown = false;
+  private volatile boolean active = true;
+  private volatile boolean forcedShutdown = false;
 
-  public SimpleEventDispatcher(String name, EventHandler<? extends Event>... handlers) {
-    this.name=name;
-    eventHandlers=handlers;
+  public SimpleEventDispatcher(String name, EventHandler... handlers) {
+    this.name = name;
+    eventHandlers = handlers;
+
+    getLogger().info("Created " + this);
   }
-  
+
   public String getName() {
     return name;
   }
 
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+
   public void initialize() {
-    for (EventHandler<? extends Event> evtHandler : eventHandlers) {
+    clearEvents();
+    active = true;
+    forcedShutdown = false;
+    for (EventHandler evtHandler : eventHandlers) {
       evtHandler.initialize();
     }
+    getLogger().info("Initialized " + this);
   }
-  
+
+  protected int getPendingEventCount() {
+    return eventQ.size();
+  }
+
   public void accept(Event e) throws EventRefusedException {
+    if (!active) {
+      throw new EventRefusedException(e, "Dispatcher inactive", this, new IllegalStateException());
+    }
     try {
       eventQ.put(e);
     } catch (Exception e1) {
-      throw new EventRefusedException(e, "Error accepting event", null, e1);
+      throw new EventRefusedException(e, "Error accepting event", this, e1);
     }
   }
 
-  public boolean dispatch(long timeOut) {
+  public boolean dispatch(long timeOut) throws InterruptedException {
+    if (forcedShutdown) {
+      throw new IllegalStateException("Dispatcher forced to shutdown");
+    }
     boolean eventDispatched = false;
     Event event = null;
     try {
       event = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
-      if(event!=null) {
-        eventHistory.add(0, event);
+      if (event != null) {
         for (EventHandler evtHandler : eventHandlers) {
           try {
-            if(evtHandler.canHandle(event)) {
-              evtHandler.handle(event);
-              eventDispatched = true;
-              break;
+            if (evtHandler.canHandle(event)) {
+              if (evtHandler.handle(event)) {
+                eventDispatched = true;
+                break;
+              } else {
+                // add event to Q again for later retry
+                eventQ.add(event);
+              }
             }
           } catch (Exception e) {
-            eventErrors.add(0,new EventError(event, e));
+            eventErrors.add(0, new EventError(event, e));
           }
         }
       }
-    } catch (InterruptedException e) {
-      LOGGER.error("Event dispatch was interrupted",e);
     } finally {
-      if(!eventDispatched && event!=null) {
-        unhandledEvents.add(0, event);
+      if (event != null) {
+        if (eventDispatched) {
+          eventHistory.add(0, event);
+        } else {
+          unhandledEvents.add(0, event);
+        }
       }
     }
     return eventDispatched;
   }
-  
+
   public List<Event> getEventHistory() {
     return eventHistory;
   }
-  
+
   public List<Event> getUnhandledEvents() {
     return unhandledEvents;
   }
-  
+
   public List<EventError> getEventErrors() {
     return eventErrors;
   }
-  
+
   public void clearEvents() {
     eventHistory.clear();
     unhandledEvents.clear();
@@ -126,19 +150,28 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
   }
 
   public void shutdown() {
-    active=false;
+    active = false;
+    getLogger().info("Shutdown " + this);
   }
 
   public List<Event> shutdownNow() {
+    getLogger().info("shutdownNow " + this);
     shutdown();
+    forcedShutdown = true;
     List<Event> pendingEvents = new ArrayList<Event>(eventQ);
+    getLogger().info("shutdownNow " + this + " found " + pendingEvents.size() + " pending events");
     return Collections.unmodifiableList(pendingEvents);
   }
 
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-    if(active)
+    if (active)
       return false;
     // TODO do something here to block till all events have been processed
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getName() + " [name=" + name + ", active=" + active + "]";
   }
 }

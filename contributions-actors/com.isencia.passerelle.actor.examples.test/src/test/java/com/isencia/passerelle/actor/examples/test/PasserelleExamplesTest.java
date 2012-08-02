@@ -32,6 +32,7 @@ import com.isencia.passerelle.actor.general.TracerConsole;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
+import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
@@ -131,7 +132,8 @@ public class PasserelleExamplesTest extends TestCase {
    */
   public void testHelloPasserelle() throws Exception {
     // ETDirector is for the new event-driven execution domain
-    flow.setDirector(new ETDirector(flow,"director"));
+    ETDirector director = new ETDirector(flow,"director");
+    flow.setDirector(director);
     
     Const constant = new Const(flow,"Constant");
     HelloPasserelle helloHello = new HelloPasserelle(flow, "HelloHello");
@@ -143,10 +145,16 @@ public class PasserelleExamplesTest extends TestCase {
     // set remaining cfg params as map passed for execution
     // params are referenced via their name as specified in the actor code
     Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "2");
+    props.put("director.Dispatch timeout(ms)", "1000");
     props.put("Constant.value", "Hello world");
     props.put("HelloHello.Changed text", "Hello Passerelle");
     // run it till the finish
     flowMgr.executeBlockingLocally(flow,props);
+    
+//    for(Event event : director.getEventHistory()) {
+//      System.out.println(event);
+//    }
     
     // now check if all went as expected
     new FlowStatisticsAssertion()
@@ -241,36 +249,52 @@ public class PasserelleExamplesTest extends TestCase {
       .assertFlow(flow);
   }
   
-  public void testChainedDelaysET() throws Exception {
-    flow.setDirector(new ETDirector(flow,"director"));
-    
-    TextSource src = new TextSource(flow, "src");
-    DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
-    DelayWithExecutionTrace delay2 = new DelayWithExecutionTrace(flow, "delay2");
-    DelayWithExecutionTrace delay3 = new DelayWithExecutionTrace(flow, "delay3");
-    MessageHistoryStack sink = new MessageHistoryStack(flow, "sink");
-
-    flow.connect(src, delay1);
-    flow.connect(delay1, delay2);
-    flow.connect(delay2, delay3);
-    flow.connect(delay3, sink);
-    
+  /**
+   * This test illustrates the chaining of each delay when only 1 work thread
+   * is available to execute all work steps. 
+   * The total model execution time thus becomes of the order of 3*(3+3+3),
+   * i.e. each of the 3 src msg needs to pass through 3 consecutive work steps, each one taking 3s.
+   */
+  public void testChainedDelaysET1Thread() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
-    props.put("src.values", "pol,pel,pingo");
-    props.put("delay1.time(s)", "3");
-    props.put("delay2.time(s)", "3");
-    props.put("delay3.time(s)", "3");
-
-    flowMgr.executeBlockingLocally(flow,props);
-    
-    new FlowStatisticsAssertion()
-    .expectMsgReceiptCount(sink, 3L)
-    .assertFlow(flow)
-    ;
+    __testChainedDelays(new ETDirector(flow,"director"), props);
   }
   
+  /**
+   * This test illustrates the chaining of each delay when only 1 work thread
+   * is available to execute all work steps. 
+   * The total model execution time thus becomes of the order of 3*(3+3+3),
+   * i.e. each of the 3 src msg needs to pass through 3 consecutive work steps, each one taking 3s.
+   */
+  public void testChainedDelaysET2Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "2");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    __testChainedDelays(new ETDirector(flow,"director"), props);
+  }
+  
+  public void testChainedDelaysET3Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "3");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    ETDirector d = new ETDirector(flow,"director");
+    __testChainedDelays(d, props);
+    for (Event event : d.getEventHistory()) {
+      System.out.println(event);
+    }
+  }
+  
+  /**
+   * This test illustrates the "factory chain" advantage of the PN domain,
+   * where each actor has its own thread.
+   * This leads to all 3 "worker" actors (the delays) to be able to work (spend time) concurrently.
+   */
   public void testChainedDelaysPN() throws Exception {
-    flow.setDirector(new Director(flow,"director"));
+    __testChainedDelays(new Director(flow,"director"), new HashMap<String, String>());
+  }
+
+  public void __testChainedDelays(ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
+    flow.setDirector(d);
     
     TextSource src = new TextSource(flow, "src");
     DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
@@ -291,11 +315,142 @@ public class PasserelleExamplesTest extends TestCase {
     props.put("delay1.Buffer time (ms)", "10");
     props.put("delay2.Buffer time (ms)", "10");
     props.put("delay3.Buffer time (ms)", "10");
+    props.putAll(paramOverrides);
     
     flowMgr.executeBlockingLocally(flow,props);
     
     new FlowStatisticsAssertion()
     .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow)
+    ;
+  }
+
+  public void testConcurrentInputsOnDelayET3Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "3");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    ETDirector d = new ETDirector(flow,"director");
+    __testConcurrentInputsOnDelay(d, props);
+    for (Event event : d.getEventHistory()) {
+      System.out.println(event);
+    }
+  }
+  
+  public void testConcurrentInputsOnDelayET4Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "4");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    ETDirector d = new ETDirector(flow,"director");
+    __testConcurrentInputsOnDelay(d, props);
+    for (Event event : d.getEventHistory()) {
+      System.out.println(event);
+    }
+  }
+  
+  public void testConcurrentInputsOnDelayPN() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    __testConcurrentInputsOnDelay(new Director(flow,"director"), props);
+  }
+  
+  public void __testConcurrentInputsOnDelay(ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
+    flow.setDirector(d);
+    
+    TextSource src1 = new TextSource(flow, "src1");
+    TextSource src2 = new TextSource(flow, "src2");
+    TextSource src3 = new TextSource(flow, "src3");
+    DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
+    DelayWithExecutionTrace delay2 = new DelayWithExecutionTrace(flow, "delay2");
+    DelayWithExecutionTrace delay3 = new DelayWithExecutionTrace(flow, "delay3");
+    MessageHistoryStack sink = new MessageHistoryStack(flow, "sink");
+
+    flow.connect(src1, delay1);
+    flow.connect(src2, delay1);
+    flow.connect(src3, delay1);
+    flow.connect(delay1, delay2);
+    flow.connect(delay2, delay3);
+    flow.connect(delay3, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src1.values", "pol");
+    props.put("src2.values", "pel");
+    props.put("src3.values", "pingo");
+    props.put("delay1.time(s)", "3");
+    props.put("delay2.time(s)", "3");
+    props.put("delay3.time(s)", "3");
+    props.put("delay1.Buffer time (ms)", "10");
+    props.put("delay2.Buffer time (ms)", "10");
+    props.put("delay3.Buffer time (ms)", "10");
+    props.putAll(paramOverrides);
+    
+    flowMgr.executeBlockingLocally(flow,props);
+
+    new FlowStatisticsAssertion()
+    .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow)
+    ;
+  }
+
+  /**
+   * A more chaotic delay model, with two parallel branches with delay actors,
+   * ending up in their own sinks.
+   */
+  public void testChainedAndParallelDelaysPN() throws Exception {
+    __testChainedAndParallelDelays(new Director(flow,"director"), new HashMap<String, String>());
+  }
+
+  public void testChainedAndParallelDelaysET3Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "3");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    __testChainedAndParallelDelays(new ETDirector(flow,"director"), props);
+  }
+  
+  public void testChainedAndParallelDelaysET5Threads() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "5");
+    props.put("director.Dispatch timeout(ms)", "1000");
+    __testChainedAndParallelDelays(new ETDirector(flow,"director"), props);
+  }
+
+  public void __testChainedAndParallelDelays(ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
+    flow.setDirector(d);
+    
+    TextSource src = new TextSource(flow, "src");
+    DelayWithExecutionTrace delay1 = new DelayWithExecutionTrace(flow, "delay1");
+    DelayWithExecutionTrace delay_branch1_1 = new DelayWithExecutionTrace(flow, "delay1_1");
+    DelayWithExecutionTrace delay_branch1_2 = new DelayWithExecutionTrace(flow, "delay1_2");
+    DelayWithExecutionTrace delay_branch2_1 = new DelayWithExecutionTrace(flow, "delay2_1");
+    DelayWithExecutionTrace delay_branch2_2 = new DelayWithExecutionTrace(flow, "delay2_2");
+    MessageHistoryStack sink1 = new MessageHistoryStack(flow, "sink1");
+    MessageHistoryStack sink2 = new MessageHistoryStack(flow, "sink2");
+
+    flow.connect(src, delay1);
+    flow.connect(delay1, delay_branch1_1);
+    flow.connect(delay1, delay_branch2_1);
+    flow.connect(delay_branch1_1, delay_branch1_2);
+    flow.connect(delay_branch2_1, delay_branch2_2);
+    flow.connect(delay_branch1_2, sink1);
+    flow.connect(delay_branch2_2, sink2);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src.values", "pol,pel,pingo");
+    props.put("delay1.time(s)", "3");
+    props.put("delay1_1.time(s)", "3");
+    props.put("delay1_2.time(s)", "3");
+    props.put("delay2_1.time(s)", "3");
+    props.put("delay2_2.time(s)", "3");
+    props.put("delay1.Buffer time (ms)", "10");
+    props.put("delay1_1.Buffer time (ms)", "10");
+    props.put("delay1_2.Buffer time (ms)", "10");
+    props.put("delay2_1.Buffer time (ms)", "10");
+    props.put("delay2_2.Buffer time (ms)", "10");
+    props.putAll(paramOverrides);
+    
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgReceiptCount(sink1, 3L)
+    .expectMsgReceiptCount(sink2, 3L)
     .assertFlow(flow)
     ;
   }

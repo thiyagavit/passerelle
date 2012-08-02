@@ -11,58 +11,87 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.domain.et.impl;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.domain.et.Event;
+import com.isencia.passerelle.domain.et.EventHandler;
 
 /**
- * A basic implementation of an event dispatcher, based on a BlockingQueue 
- * and a single thread for dispatching queued events. Should become configurable for multiple threads as well.
- * 
- * NOT YET READY FOR USE! 
- * Still need to define behaviour ico multiple threads, with external control on when to initiate shutdown/wrapup.
+ * A basic implementation of an event dispatcher, based on a BlockingQueue and a single thread for dispatching queued events. Should become configurable for
+ * multiple threads as well. NOT YET READY FOR USE! Still need to define behaviour ico multiple threads, with external control on when to initiate
+ * shutdown/wrapup.
  * 
  * @author delerw
  */
 public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
-  
+
   private final static Logger LOGGER = LoggerFactory.getLogger(ThreadPoolEventDispatcher.class);
-  
-  // 1-thread executor for the eventQSink
+
+  // theadpool for the eventQSinks
   private ExecutorService queueDepletionExecutor;
 
-  public ThreadPoolEventDispatcher(String name) {
-    super(name);
-    
-    queueDepletionExecutor = Executors.newSingleThreadExecutor();
-    try {
-      queueDepletionExecutor.execute(new EventQueueSink());
-    } catch (RejectedExecutionException e) {
-      // should not happen
-      LOGGER.error("Failure to launch queueDepletionExecutor",e);
-    }
+  public ThreadPoolEventDispatcher(String name, int threadCount, EventHandler... handlers) {
+    super(name, handlers);
+
+    queueDepletionExecutor = Executors.newFixedThreadPool(threadCount);
   }
-  
-  private class EventQueueSink implements Runnable {
-    public void run() {
-      LOGGER.info("Starting EventQueueSink for EventHandler {}", getName());
-      try {
-        boolean result = true;
-        while(result) {
-          // watch out this 1s is quite low (e.g. for backend calls)
-          result = dispatch(1000);
+
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+
+  @Override
+  public boolean dispatch(long timeOut) throws InterruptedException {
+    int evtCount = getPendingEventCount();
+    boolean hasDispatchedSomething = false;
+    if (evtCount > 0) {
+      CompletionService<Boolean> execComplSvc = new ExecutorCompletionService<Boolean>(queueDepletionExecutor);
+      for (int i = 0; i < evtCount; ++i) {
+        execComplSvc.submit(new EventQueueSink(timeOut));
+      }
+      for (int i = 0; i < evtCount; ++i) {
+        try {
+          // Watch out! Order of the RHS is important.
+          // The ...get() must come first as we want to ensure that we wait for ALL tasks to have completed.
+          // If it would be at the end, the Java logical expression evaluation would no longer execute it once
+          // the hasDispatchedSomething has become true!
+          hasDispatchedSomething = execComplSvc.take().get() || hasDispatchedSomething;
+        } catch (ExecutionException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
         }
-      } catch (Exception e) {
-        // TODO add callback to Director, to make it aware of interrupted EventDispatcher
-        LOGGER.error("EventQueueSink loop interrupted for EventHandler {}",getName(), e);
+      }
+    }
+    getLogger().debug(this + " hasDispatchedSomething " + hasDispatchedSomething);
+    return hasDispatchedSomething;
+  }
+
+  private class EventQueueSink implements Callable<Boolean> {
+    private long timeout;
+
+    public EventQueueSink(long timeout) {
+      this.timeout = timeout;
+    }
+
+    public Boolean call() throws Exception {
+      String name = getName() + " - " + Thread.currentThread().getName();
+      getLogger().debug("Starting EventQueueSink {}", name);
+      try {
+        boolean hasDispatchedSomething = ThreadPoolEventDispatcher.super.dispatch(1000);
+        getLogger().debug(name + " hasDispatchedSomething " + hasDispatchedSomething);
+        return hasDispatchedSomething;
       } finally {
-        LOGGER.info("Terminating EventQueueSink for EventHandler {}", getName());
+        getLogger().debug("Terminating EventQueueSink {}", name);
       }
     }
   }

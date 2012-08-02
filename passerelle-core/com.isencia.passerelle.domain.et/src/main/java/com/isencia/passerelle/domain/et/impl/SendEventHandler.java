@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.domain.et.impl;
 
@@ -20,53 +20,39 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
-import com.isencia.passerelle.domain.et.EventHandler;
 import com.isencia.passerelle.domain.et.SendEvent;
 
 /**
- * This handler figures out the Actor for which the SendEvent is meant,
- * and tries out a fire() iteration.
+ * This handler figures out the Actor for which the SendEvent is meant, and tries out a fire() iteration.
  * <p>
  * The normal Ptolemy/Passerelle iteration semantics are assumed to be valid :
  * <ul>
- * <li>preFire() is invoked. If it returns false, the iteration is not continued.
- * If it returns true, the actor is ready to be fired.</li>
+ * <li>preFire() is invoked. If it returns false, the iteration is not continued. If it returns true, the actor is ready to be fired.</li>
  * <li>fire() is invoked after preFire() returned true.</li>
  * <li>postFire() is invoked. If it returns false, this actor can be wrapped up.</li>
  * </ul>
  * </p>
+ * 
  * @author delerw
- *
  */
-public class SendEventHandler implements EventHandler<SendEvent> {
+public class SendEventHandler extends AbstractEventHandler {
   private final static Logger LOGGER = LoggerFactory.getLogger(SendEventHandler.class);
-  
-  private ETDirector director;
-  
+
   public SendEventHandler(ETDirector director) {
-    this.director = director;
+    super(director);
   }
-  public void initialize() {
-  }
+
   public boolean canHandle(Event event) {
     return (event instanceof SendEvent);
   }
-  public void handle(SendEvent event) throws Exception {
-    Actor actor = (Actor) event.getReceivingPort().getContainer();
-    
-    if(!director.isActorInactive(actor)) {
-      LOGGER.debug("Handling SendEvent - iterating {}.",actor.getName());
-      if(actor.prefire()) {
-        actor.fire();
-        
-        if(!actor.postfire()) {
-          // actor requests to never be fired again,
-          // so mark it as wrapping up
-          director.notifyActorInactive(actor);
-        }
-      } 
-    } else {
-      LOGGER.debug("Handling SendEvent but actor {} is inactive.", actor.getName());
-    }
+
+  protected Actor getDestinationActorFromEvent(Event event) {
+    Actor actor = (Actor) ((SendEvent)event).getReceivingPort().getContainer();
+    return actor;
+  }
+
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
   }
 }
