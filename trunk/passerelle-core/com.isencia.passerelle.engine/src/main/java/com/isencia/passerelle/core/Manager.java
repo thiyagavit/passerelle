@@ -14,12 +14,12 @@
 */
 package com.isencia.passerelle.core;
 
-import com.isencia.passerelle.domain.ProcessDirector;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.ext.PausableResumable;
 
 /**
  * Manager implementation with Passerelle extensions
@@ -43,8 +43,8 @@ public class Manager extends ptolemy.actor.Manager {
 //		NamedObj container = getContainer();
 //		if(container instanceof CompositeActor) {
 //			Director director = ((CompositeActor)container).getDirector();
-//			if(director instanceof ProcessDirector) {
-//				((ProcessDirector)director).pauseAllActors();
+//			if(director instanceof PausableResumable) {
+//				((PausableResumable)director).pauseAllActors();
 //			}
 //		}
 	}
@@ -55,8 +55,8 @@ public class Manager extends ptolemy.actor.Manager {
 		NamedObj container = getContainer();
 		if(container instanceof CompositeActor) {
 			Director director = ((CompositeActor)container).getDirector();
-			if(director instanceof ProcessDirector) {
-				((ProcessDirector)director).resumeAllActors();
+			if(director instanceof PausableResumable) {
+				((PausableResumable)director).resumeAllActors();
 			}
 		}
 		super.resume();
