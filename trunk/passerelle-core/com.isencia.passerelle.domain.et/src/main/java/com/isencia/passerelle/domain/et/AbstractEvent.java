@@ -31,6 +31,6 @@ abstract class AbstractEvent implements Event {
 
   @Override
   public String toString() {
-    return toString(new SimpleDateFormat());
+    return toString(new SimpleDateFormat("dd/MM/yy HH:mm:ss.SSS"));
   }
 }
