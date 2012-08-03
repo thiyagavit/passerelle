@@ -4,7 +4,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -12,15 +11,14 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Manager;
 import ptolemy.kernel.util.Workspace;
 import ptolemy.moml.MoMLParser;
-
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
+import com.isencia.passerelle.ext.impl.DefaultDirectorAdapter;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 import com.isencia.passerelle.workbench.model.utils.SubModelUtils;
@@ -128,8 +126,12 @@ public class ModelRunner implements IApplication {
 					compositeActor.setManager(manager);
 					
 					// Errors
-					final Director director = (Director)compositeActor.getDirector();
-					director.addErrorCollector(new ErrorCollector() {
+					final ptolemy.actor.Director director = compositeActor.getDirector();
+					DirectorAdapter directorAdapter = (DirectorAdapter) director.getAttribute(DirectorAdapter.DEFAULT_ADAPTER_NAME, DirectorAdapter.class);
+					if(directorAdapter==null) {
+					  directorAdapter = new DefaultDirectorAdapter(compositeActor, DirectorAdapter.DEFAULT_ADAPTER_NAME);
+					}
+					directorAdapter.addErrorCollector(new ErrorCollector() {
 						@Override
 						public void acceptError(PasserelleException e) {
 							exceptions.add(e);
