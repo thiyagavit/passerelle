@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
+import com.isencia.passerelle.domain.et.FireEvent;
 import com.isencia.passerelle.domain.et.SendEvent;
 
 /**
@@ -35,15 +36,19 @@ import com.isencia.passerelle.domain.et.SendEvent;
  * 
  * @author delerw
  */
-public class SendEventHandler extends AbstractEventHandler {
+public class SendEventHandler extends AbstractActorEventHandler {
   private final static Logger LOGGER = LoggerFactory.getLogger(SendEventHandler.class);
 
   public SendEventHandler(ETDirector director) {
     super(director);
   }
 
-  public boolean canHandle(Event event) {
-    return (event instanceof SendEvent);
+  public HandleType canHandleAs(Event event) {
+    if (event instanceof SendEvent) {
+      return HandleType.EFFECT;
+    } else {
+      return HandleType.SKIP;
+    }
   }
 
   protected Actor getDestinationActorFromEvent(Event event) {

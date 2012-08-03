@@ -35,15 +35,19 @@ import com.isencia.passerelle.domain.et.FireEvent;
  * 
  * @author delerw
  */
-public class FireEventHandler extends AbstractEventHandler {
+public class FireEventHandler extends AbstractActorEventHandler {
   private final static Logger LOGGER = LoggerFactory.getLogger(FireEventHandler.class);
 
   public FireEventHandler(ETDirector director) {
     super(director);
   }
 
-  public boolean canHandle(Event event) {
-    return (event instanceof FireEvent);
+  public HandleType canHandleAs(Event event) {
+    if (event instanceof FireEvent) {
+      return HandleType.EFFECT;
+    } else {
+      return HandleType.SKIP;
+    }
   }
 
   @Override

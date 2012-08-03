@@ -105,6 +105,6 @@ public class SendEvent extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return "SendEvent [timeStamp=" + dateFormat.format(getTimestamp()) + ", receivingPort=" + receivingPort.getFullName() + "]";
+    return dateFormat.format(getTimestamp()) + " SendEvent [receivingPort=" + receivingPort.getFullName() + "]";
   }
 }

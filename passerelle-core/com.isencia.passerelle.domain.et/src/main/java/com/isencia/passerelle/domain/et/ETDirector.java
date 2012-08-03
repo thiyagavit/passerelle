@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.domain.et;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,25 +24,33 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
+import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
 import ptolemy.actor.Receiver;
+import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.actor.util.Time;
+import ptolemy.data.BooleanToken;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.director.DirectorUtils;
+import com.isencia.passerelle.director.PasserelleDirector;
+import com.isencia.passerelle.domain.et.FlowExecutionEvent.FlowExecutionEventType;
 import com.isencia.passerelle.domain.et.impl.ETReceiver;
 import com.isencia.passerelle.domain.et.impl.FireEventHandler;
+import com.isencia.passerelle.domain.et.impl.FlowEventHandler;
 import com.isencia.passerelle.domain.et.impl.SendEventHandler;
 import com.isencia.passerelle.domain.et.impl.SimpleEventDispatcher;
 import com.isencia.passerelle.domain.et.impl.ThreadPoolEventDispatcher;
+import com.isencia.passerelle.ext.DirectorAdapter;
 
 /**
  * @author delerw
  */
 @SuppressWarnings("serial")
-public class ETDirector extends Director implements EventDispatchReporter {
+public class ETDirector extends Director implements EventDispatchReporter, PasserelleDirector {
   private final static Logger LOGGER = LoggerFactory.getLogger(ETDirector.class);
 
   // not sure yet if this is a good idea or not,
@@ -70,6 +79,8 @@ public class ETDirector extends Director implements EventDispatchReporter {
   public Parameter dispatchThreadsParameter;
   public Parameter dispatchTimeoutParameter;
 
+  public Parameter dumpEventsParameter;
+
   /**
    * @param container
    * @param name
@@ -81,6 +92,58 @@ public class ETDirector extends Director implements EventDispatchReporter {
 
     dispatchThreadsParameter = new Parameter(this, "Nr of dispatch threads", new IntToken(1));
     dispatchTimeoutParameter = new Parameter(this, "Dispatch timeout(ms)", new IntToken(1000));
+    
+    dumpEventsParameter = new Parameter(this, "Dump eventlog after run", BooleanToken.FALSE);
+    new CheckBoxStyle(dumpEventsParameter, "check");
+    
+    _attachText(
+        "_iconDescription",
+        "<svg>\n"
+          + "<polygon points=\"-20,0 -10,-18 10,-18 20,0 10,18 -10,18\" "
+          + "style=\"fill:red;stroke:red\"/>\n"
+          + "<line x1=\"-9.5\" y1=\"17\" x2=\"-19\" y2=\"0\" "
+          + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+          + "<line x1=\"-19\" y1=\"0\" x2=\"-9.5\" y2=\"-17\" "
+          + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+          + "<line x1=\"-9\" y1=\"-17\" x2=\"9\" y2=\"-17\" "
+          + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+          + "<line x1=\"10\" y1=\"-17.5\" x2=\"20\" y2=\"0\" "
+          + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+          + "<line x1=\"20\" y1=\"0\" x2=\"10\" y2=\"17.5\" "
+          + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+          + "<line x1=\"10\" y1=\"17.5\" x2=\"-10\" y2=\"17.5\" "
+          + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+          + "<line x1=\"11\" y1=\"-15\" x2=\"19\" y2=\"0\" "
+          + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+          + "<line x1=\"19\" y1=\"0\" x2=\"11\" y2=\"16\" "
+          + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+          + "<line x1=\"10\" y1=\"17\" x2=\"-9\" y2=\"17\" "
+          + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+          + 
+
+      // director stand
+      "<line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"10\" "
+        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+        + "<line x1=\"-6\" y1=\"10\" x2=\"6\" y2=\"10\" "
+        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+        + "<polygon points=\"-8,0 -6,-8 8,-8 6,0\" "
+        + "style=\"fill:lightgrey\"/>\n"
+        + 
+
+      //magic wand
+      "<line x1=\"5\" y1=\"-15\" x2=\"15\" y2=\"-5\" "
+        + "style=\"stroke-width:2.0;stroke:black\"/>\n"
+        + "<line x1=\"5\" y1=\"-15\" x2=\"6\" y2=\"-14\" "
+        + "style=\"stroke-width:2.0;stroke:white\"/>\n"
+        + 
+      // sparkles
+      "<circle cx=\"12\" cy=\"-16\" r=\"1\""
+        + "style=\"fill:black;stroke:white\"/>\n"
+        + "<circle cx=\"16\" cy=\"-16\" r=\"1\""
+        + "style=\"fill:black;stroke:white\"/>\n"
+        + "<circle cx=\"14\" cy=\"-14\" r=\"1\""
+        + "style=\"fill:black;stroke:white\"/>\n"
+        + "</svg>\n");
   }
 
   @SuppressWarnings("unchecked")
@@ -89,10 +152,18 @@ public class ETDirector extends Director implements EventDispatchReporter {
     super.preinitialize();
 
     int threadCount = ((IntToken) dispatchThreadsParameter.getToken()).intValue();
+    
+    List<EventHandler> eventHandlers = new ArrayList<EventHandler>();
+    eventHandlers.add(new SendEventHandler(this));
+    eventHandlers.add(new FireEventHandler(this));
+    eventHandlers.add(new FlowEventHandler(this));
+    // add any extra configured handlers
+    eventHandlers.addAll(attributeList(EventHandler.class));
+    
     if (threadCount > 1) {
-      dispatcher = new ThreadPoolEventDispatcher(getFullName(), threadCount, new SendEventHandler(this), new FireEventHandler(this));
+      dispatcher = new ThreadPoolEventDispatcher(getFullName(), threadCount, eventHandlers.toArray(new EventHandler[eventHandlers.size()]));
     } else {
-      dispatcher = new SimpleEventDispatcher(getFullName(), new SendEventHandler(this), new FireEventHandler(this));
+      dispatcher = new SimpleEventDispatcher(getFullName(), eventHandlers.toArray(new EventHandler[eventHandlers.size()]));
     }
     dispatcher.initialize();
     dispatchReporter = (EventDispatchReporter) dispatcher;
@@ -103,6 +174,11 @@ public class ETDirector extends Director implements EventDispatchReporter {
 
   @Override
   public void initialize() throws IllegalActionException {
+    try {
+      enqueueEvent(new FlowExecutionEvent((CompositeActor) getContainer(), FlowExecutionEventType.START));
+    } catch (EventRefusedException e) {
+      LOGGER.warn("Internal status error - refused flow start event",e);
+    }
     super.initialize();
   }
 
@@ -128,7 +204,25 @@ public class ETDirector extends Director implements EventDispatchReporter {
 
   @Override
   public void wrapup() throws IllegalActionException {
+    try {
+      enqueueEvent(new FlowExecutionEvent((CompositeActor) getContainer(), FlowExecutionEventType.FINISH));
+      // TODO a bit annoying this explicit dispatch call, but as fire-loop is done we need to repeat it one last time here; isn't there a better way???
+      dispatcher.dispatch(10);
+    } catch (EventRefusedException e) {
+      LOGGER.warn("Internal status error - refused flow finish event",e);
+    } catch (InterruptedException e) {
+      LOGGER.warn("Internal status error - interrupted flow finish event",e);
+    }
     super.wrapup();
+    
+    if(((BooleanToken)dumpEventsParameter.getToken()).booleanValue()) {
+      StringBuilder eventLog = new StringBuilder();
+      for (Event event : getEventHistory()) {
+        eventLog.append(event+"\n");
+      }
+      LOGGER.info("{} - event log :\n{}",getFullName(),eventLog.toString());
+    }
+
     dispatcher.shutdown();
   }
 
@@ -163,26 +257,26 @@ public class ETDirector extends Director implements EventDispatchReporter {
 
   public void notifyActorIteratingForEvent(Actor actor, Event event) {
     Event _e = busyIteratingActors.get(actor);
-    if(_e==null) {
+    if (_e == null) {
       busyIteratingActors.put(actor, event);
-    } else if (_e==event) {
+    } else if (_e == event) {
       // do nothing, already registered
     } else {
-      throw new IllegalArgumentException("Actor " + actor.getFullName() + " iterating other event " + _e + " i.o. given event "+event);
+      throw new IllegalArgumentException("Actor " + actor.getFullName() + " iterating other event " + _e + " i.o. given event " + event);
     }
   }
 
   public void notifyActorDoneIteratingForEvent(Actor actor, Event event) {
     Event _e = busyIteratingActors.get(actor);
-    if(event==_e) {
+    if (event == _e) {
       busyIteratingActors.remove(actor);
     } else {
-      throw new IllegalArgumentException("Actor " + actor.getFullName() + " iterating other event " + _e + " i.o. given event "+event);
+      throw new IllegalArgumentException("Actor " + actor.getFullName() + " iterating other event " + _e + " i.o. given event " + event);
     }
   }
-  
+
   public boolean isActorIterating(Actor actor) {
-    return busyIteratingActors.get(actor)!=null;
+    return busyIteratingActors.get(actor) != null;
   }
 
   public void notifyActorStartedTask(Actor actor, Object task) {
@@ -229,5 +323,9 @@ public class ETDirector extends Director implements EventDispatchReporter {
 
   public void clearEvents() {
     dispatchReporter.clearEvents();
+  }
+
+  public DirectorAdapter getAdapter(String adapterName) throws IllegalActionException {
+    return DirectorUtils.getAdapter(this, adapterName);
   }
 }
