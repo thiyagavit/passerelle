@@ -1,7 +1,7 @@
 package fr.soleil.passerelle.actor.flow;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.fail;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,14 +77,13 @@ public class DelayTest {
     public void should_throw_expection_if_input_is_string_and_porDelay_is_true() {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");
-        props.put("Constant.value", "azerty");
+        props.put("Constant.value", "1.3");
         props.put(ACTOR_NAME + ".time(s)", "4.0");
         props.put(ACTOR_NAME + ".take delay from port", "true");
 
         try {
             moml.executeBlockingErrorLocally(props);
-            fail("an excpetion should be thrown if take delay from port is true and the value send on port is not a string");
-
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final PasserelleException e) {
             assertThat(e).hasMessageContaining("azerty");
         }

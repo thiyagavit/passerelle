@@ -1,7 +1,7 @@
 package fr.soleil.passerelle.actor.flow;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.fail;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,7 +86,7 @@ public class MessageMemoriserTest {
 
         try {
             moml.executeBlockingErrorLocally(props);
-            fail("should throw exception if message can not be found");
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
 
         } catch (final PasserelleException e) {
             assertThat(e).hasMessageContaining("memorized message not found");
