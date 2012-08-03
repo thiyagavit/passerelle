@@ -36,7 +36,7 @@ import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
@@ -153,8 +153,8 @@ public class ActorAttributesView extends ViewPart implements
 					if (parameterList == null) return new Parameter[] {};
 					final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
 					
-					final Director director = actor instanceof Actor
-					                        ? (Director)((Actor)actor).getDirector()
+					final DirectorAdapter director = actor instanceof Actor
+					                        ? ((Actor)actor).getDirectorAdapter()
 					                        : null;
 					if (actor instanceof Actor)
 						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
