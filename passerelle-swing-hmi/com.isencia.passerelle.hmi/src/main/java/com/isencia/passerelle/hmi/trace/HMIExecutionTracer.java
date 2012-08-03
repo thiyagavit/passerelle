@@ -32,7 +32,7 @@ public class HMIExecutionTracer implements ExecutionTracer {
   public void trace(final Actor actor, final String message) {
     tracedialog.trace(actor, message);
     try {
-      DynamicStepExecutionControlStrategy execCtrl = (DynamicStepExecutionControlStrategy) ((Director) actor.getDirector()).getExecutionControlStrategy();
+      DynamicStepExecutionControlStrategy execCtrl = (DynamicStepExecutionControlStrategy) actor.getDirectorAdapter().getExecutionControlStrategy();
 
       execCtrl.stopStep();
 

@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.Action;
@@ -50,10 +49,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Manager;
@@ -71,7 +68,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.util.MessageHandler;
 import ptolemy.util.StringUtilities;
-
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
@@ -80,7 +76,9 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.diagnosis.actor.util.ServicesRegistry;
 import com.isencia.passerelle.diagnosis.impl.entities.EntityFactory;
 import com.isencia.passerelle.diagnosis.impl.entities.EntityManager;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.ext.FiringEventListener;
@@ -207,7 +205,6 @@ public abstract class HMIBase implements ChangeListener {
   private boolean changeImpactEnabled = true;
 
   /**
-   * 
    * @param mode
    * @param hmiModelsDef
    * @param showModelGraph
@@ -219,7 +216,6 @@ public abstract class HMIBase implements ChangeListener {
   // }
 
   /**
-   * 
    * @param mode
    * @param cfgDefPath
    * @param showModelGraph
@@ -351,16 +347,13 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * Given the name of a file or a URL, convert it to a URL. This first attempts to do that directly by invoking a URL
-   * constructor. If that fails, then it tries to interpret the spec as a file name on the local file system. If that
-   * fails, then it tries to interpret the spec as a resource accessible to the classloader, which uses the classpath to
-   * find the resource. If that fails, then it throws an exception. The specification can give a file name relative to
+   * Given the name of a file or a URL, convert it to a URL. This first attempts to do that directly by invoking a URL constructor. If that fails, then it tries
+   * to interpret the spec as a file name on the local file system. If that fails, then it tries to interpret the spec as a resource accessible to the
+   * classloader, which uses the classpath to find the resource. If that fails, then it throws an exception. The specification can give a file name relative to
    * current working directory, or the directory in which this application is started up.
    * 
-   * @param spec
-   *          The specification.
-   * @exception IOException
-   *              If it cannot convert the specification to a URL.
+   * @param spec The specification.
+   * @exception IOException If it cannot convert the specification to a URL.
    */
   public static URL specToURL(final String spec) throws IOException {
     try {
@@ -409,8 +402,8 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * If it's a structural change, we need to adapt the cfg forms. Any graphical views should be model change listeners
-   * already, and will probably be the origin of the change anyway...
+   * If it's a structural change, we need to adapt the cfg forms. Any graphical views should be model change listeners already, and will probably be the origin
+   * of the change anyway...
    * 
    * @throws URISyntaxException
    */
@@ -478,8 +471,8 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * CHecks if the flow loaded OK, to exclude errors when trying to save a "crippled" model i.e. one that only loaded
-   * partially when some actors are not on the HMI classpath etc.
+   * CHecks if the flow loaded OK, to exclude errors when trying to save a "crippled" model i.e. one that only loaded partially when some actors are not on the
+   * HMI classpath etc.
    * 
    * @param model
    * @return
@@ -536,8 +529,8 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * Should be invoked before exiting the application. It checks if there are any unsaved changes... When there are
-   * unsaved changes, the user is warned, by default by a pop-up dialog.
+   * Should be invoked before exiting the application. It checks if there are any unsaved changes... When there are unsaved changes, the user is warned, by
+   * default by a pop-up dialog.
    * 
    * @return true if all's OK, i.e. the close/exit can be done, false if it can not be done.
    */
@@ -552,8 +545,7 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * Should be invoked before closing an open model. When there are unsaved changes, the user is warned, by default by a
-   * pop-up dialog.
+   * Should be invoked before closing an open model. When there are unsaved changes, the user is warned, by default by a pop-up dialog.
    * 
    * @return true if all's OK, i.e. the close/exit can be done, false if it can not be done.
    */
@@ -798,7 +790,6 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * 
    * @param modelsSubMenu
    * @return
    */
@@ -928,10 +919,8 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * Method that can be overridden if execution trace messages need to be displayed in a custom component.
-   * 
-   * Default implementation uses a TraceDialog, that wraps a TracePanel. The component should implement the
-   * TraceVisualizer interface.
+   * Method that can be overridden if execution trace messages need to be displayed in a custom component. Default implementation uses a TraceDialog, that wraps
+   * a TracePanel. The component should implement the TraceVisualizer interface.
    * 
    * @return the chosen TraceVisualizer UI implementation
    */
@@ -1074,8 +1063,7 @@ public abstract class HMIBase implements ChangeListener {
   public abstract Frame getDialogHookComponent();
 
   /**
-   * Must be implemented to show the general frame of the HMI, without actual forms/fields for specific models in it
-   * yet.
+   * Must be implemented to show the general frame of the HMI, without actual forms/fields for specific models in it yet.
    * 
    * @param title
    * @return some component we can use for locating pop-ups etc
@@ -1087,11 +1075,12 @@ public abstract class HMIBase implements ChangeListener {
 
   public void launchModel(final Flow model, final ModelExecutor executor, final boolean blocking, final boolean updateState) {
     try {
-      final Director director = (Director) model.getDirector();
+      final ptolemy.actor.Director director = model.getDirector();
+      DirectorAdapter directorAdapter = DirectorUtils.getAdapter(director,null);
       if (interactiveErrorControl) {
-        director.setErrorControlStrategy(new AskTheUserErrorControlStrategy(this, executor), true);
+        directorAdapter.setErrorControlStrategy(new AskTheUserErrorControlStrategy(this, executor), true);
       } else {
-        director.setErrorControlStrategy(new DefaultActorErrorControlStrategy(), false);
+        directorAdapter.setErrorControlStrategy(new DefaultActorErrorControlStrategy(), false);
       }
 
       // we enforce a suspend/resume control
@@ -1107,9 +1096,9 @@ public abstract class HMIBase implements ChangeListener {
         executor.createExecutionControlStrategy(director, HMIBase.EXECUTION_CONTROL_ATTR_NAME);
       }
 
-      director.removeAllErrorCollectors();
+      directorAdapter.removeAllErrorCollectors();
       final ModelExecutionListener executionListener = createExecutionListener();
-      director.addErrorCollector(executionListener);
+      directorAdapter.addErrorCollector(executionListener);
 
       animationEventListener = setModelAnimation(model, animateModelExecution, animationEventListener);
 
@@ -1200,7 +1189,6 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * 
    * @param mappingKey
    * @param uiWidget
    * @param binder
@@ -1279,23 +1267,23 @@ public abstract class HMIBase implements ChangeListener {
       hmiFields.clear();
     } else {
       modelKey = validateModel(model, modelKey);
-//      if (modelURL==null || !modelURL.equals(_modelURL)) {
-        modelURL = _modelURL;
-        currentModelDef = hmiModelsDef.getModel(modelKey);
-        if (currentModelDef == null || !currentModelDef.getMomlPath().equals(_modelURL)) {
-          currentModelDef = new Model(_modelURL, new FieldMapping());
-        }
-        hmiModelsDef.addModel(modelKey, currentModelDef);
-        recreateModelsMenu(modelsSubMenu);
-  
-        if (currentModel != null) {
-          currentModel.removeChangeListener(this);
-        }
-        currentModel = model;
-        if (currentModel != null) {
-          currentModel.addChangeListener(this);
-        }
-//      }
+      // if (modelURL==null || !modelURL.equals(_modelURL)) {
+      modelURL = _modelURL;
+      currentModelDef = hmiModelsDef.getModel(modelKey);
+      if (currentModelDef == null || !currentModelDef.getMomlPath().equals(_modelURL)) {
+        currentModelDef = new Model(_modelURL, new FieldMapping());
+      }
+      hmiModelsDef.addModel(modelKey, currentModelDef);
+      recreateModelsMenu(modelsSubMenu);
+
+      if (currentModel != null) {
+        currentModel.removeChangeListener(this);
+      }
+      currentModel = model;
+      if (currentModel != null) {
+        currentModel.addChangeListener(this);
+      }
+      // }
       hmiFields.clear();
       if (loadGraphPanel) {
         showModelGraph(modelKey);
@@ -1315,21 +1303,19 @@ public abstract class HMIBase implements ChangeListener {
    * By default, this uses an AnimationEventListener that will animate the graphical view of the model being executed.
    * 
    * @param model
-   * @param animateModelExecution
-   *          if true, some kind of animation should be provided
-   * @param currentListener
-   *          the current animation listener that was set, e.g. for a previous model execution
+   * @param animateModelExecution if true, some kind of animation should be provided
+   * @param currentListener the current animation listener that was set, e.g. for a previous model execution
    * @return the listener that was effectively set if animation is needed, or null if no animation is set
    */
   protected AnimationEventListener setModelAnimation(final Flow model, final boolean animateModelExecution, AnimationEventListener currentListener) {
-    final Director director = (Director) model.getDirector();
+    final DirectorAdapter directoradapter = DirectorUtils.getAdapter(model.getDirector(), null);
     if (animateModelExecution) {
       if (currentListener == null) {
         currentListener = createAnimationListener();
       }
-      director.registerFiringEventListener(currentListener);
+      directoradapter.registerFiringEventListener(currentListener);
     } else {
-      director.removeFiringEventListener(animationEventListener);
+      directoradapter.removeFiringEventListener(animationEventListener);
       currentListener = null;
     }
     return currentListener;
@@ -1356,8 +1342,7 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   /**
-   * Must fill the form/field contents of the HMI corresponding to what's needed to configure models corresponding to
-   * the given key.
+   * Must fill the form/field contents of the HMI corresponding to what's needed to configure models corresponding to the given key.
    * 
    * @param modelKey
    */
@@ -1404,7 +1389,7 @@ public abstract class HMIBase implements ChangeListener {
     if (StateMachine.MODEL_DEBUGGING.equals(StateMachine.getInstance().getCurrentState())) {
       // in stepping mode, we first must go to plain execution mode,
       // to allow the manager.stop() to reach all actors!
-      ((DynamicStepExecutionControlStrategy) getDirector().getExecutionControlStrategy()).resume();
+      ((DynamicStepExecutionControlStrategy) DirectorUtils.getAdapter(getDirector(), null).getExecutionControlStrategy()).resume();
     }
     try {
       // wait at most 10s for the complete model stop
@@ -1557,7 +1542,6 @@ public abstract class HMIBase implements ChangeListener {
    * TODO : determine when/how to invoke the stopPolling()...
    * 
    * @author delerw
-   * 
    */
   public class RemoteExecutionTracePoller implements Runnable {
     private Map<Flow, Long> lastTraceIds = new HashMap<Flow, Long>();
