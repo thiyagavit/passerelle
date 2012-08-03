@@ -71,7 +71,10 @@ public class CaseImpl implements Case {
 	}
 
 	public Collection<Request> getRequests() {
-		return Collections.unmodifiableCollection(requests);
+		// This avoids concurrent modifications
+		List<Request> requestCopies = new ArrayList<Request>();
+		requestCopies.addAll(requests);
+		return requestCopies;
 	}
 
 	public void addRequest(Request request) {
