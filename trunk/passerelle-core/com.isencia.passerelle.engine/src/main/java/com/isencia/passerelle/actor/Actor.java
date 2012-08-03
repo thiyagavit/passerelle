@@ -47,10 +47,10 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListenerAdapter;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.domain.cap.BlockingQueueReceiver;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
-import com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
@@ -171,12 +171,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   private boolean finishRequested = false;
 
   /**
-   * Flag indicating that the actor is used in a model that is executing in mock mode. In order to improve testability, some actor implementations may contain
-   * alternative behaviour for mock executions, e.g. to allow off-line testing of models containing actors that normally connect to networked resources etc.
-   */
-  private boolean mockMode = false;
-
-  /**
    * Flag indicating that the actor is in a paused state, as a consequence of a pause() call. In this state, its iteration cycle has been halted, and will only
    * continue after a resume() has been done.
    */
@@ -286,6 +280,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     actorMsgHeaders.put(ManagedMessage.SystemHeader.HEADER_SOURCE_REF, getFullName());
 
     statistics = new ActorStatistics(this);
+  }
+
+  public DirectorAdapter getDirectorAdapter() {
+    return DirectorUtils.getAdapter(getDirector(), null);
   }
 
   /**
@@ -401,14 +399,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     super.initialize();
     paused = false;
     finishRequested = false;
-    mockMode = false;
-    try {
-      mockMode = ((Director) getDirector()).isMockMode();
-    } catch (ClassCastException ex) {
-      // means the actor is used without a Passerelle Director
-      // ignore this. Only consequence is that we'll never use
-      // test mode
-    }
 
     if (requestFinishPort.getWidth() > 0) {
       // If at least 1 channel is connected to the port
@@ -452,13 +442,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @see validateInitialization()
    * @see initialize()
    * @return
+   * @throws IllegalActionException
    */
-  protected boolean mustValidateInitialization() {
-    try {
-      return ((Director) getDirector()).mustValidateInitialization();
-    } catch (ClassCastException e) {
-      return true;
-    }
+  protected boolean mustValidateInitialization() throws IllegalActionException {
+    return getDirectorAdapter().mustValidateInitialization();
   }
 
   /**
@@ -640,7 +627,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
       if (!isFinishRequested()) {
         try {
-          if (!mockMode)
+          if (!isMockMode())
             doFire();
           else
             doMockFire();
@@ -862,7 +849,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return a flag indicating whether this actor is executing in a model that is launched in mock/test-mode
    */
   final public boolean isMockMode() {
-    return mockMode;
+    return getDirectorAdapter().isMockMode();
   }
 
   /**
@@ -957,19 +944,16 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     return LOGGER;
   }
 
-  final protected ErrorControlStrategy getErrorControlStrategy() {
+  final protected ErrorControlStrategy getErrorControlStrategy() throws IllegalActionException {
     if (errorControlStrategy != null) {
       return errorControlStrategy;
     } else {
-      try {
-        ErrorControlStrategy result = ((Director) getDirector()).getErrorControlStrategy();
-        return result;
-      } catch (ClassCastException e) {
-        // it's not a Passerelle Director, so revert to default behaviour
-        errorControlStrategy = new DefaultActorErrorControlStrategy();
-        return errorControlStrategy;
-      }
+      return getDirectorAdapter().getErrorControlStrategy();
     }
+  }
+  
+  final protected void setErrorControlStrategy(ErrorControlStrategy errorControlStrategy) {
+    this.errorControlStrategy = errorControlStrategy;
   }
 
   /**
@@ -1048,16 +1032,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       errorPort.broadcast(errorToken);
     } else {
       // notify our director about the problem
-      try {
-        ((Director) getDirector()).reportError(exception);
-      } catch (ClassCastException ex) {
-        // means the actor is used without a Passerelle Director
-        // just log this. Only consequence is that we'll never receive
-        // any error messages via acceptError
-        getLogger().error(getInfo() + " sendErrorMessage() - used without Passerelle Director!!, so automated error collecting does NOT work !!");
-        getLogger().error(getInfo() + " sendErrorMessage() - received exception", exception);
-      }
-
+      getDirectorAdapter().reportError(exception);
     }
   }
 

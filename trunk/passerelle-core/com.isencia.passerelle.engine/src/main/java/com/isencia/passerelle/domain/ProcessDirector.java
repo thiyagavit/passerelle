@@ -20,24 +20,15 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
-import ptolemy.actor.FiringEvent;
 import ptolemy.actor.process.CompositeProcessDirector;
-import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.director.DirectorUtils;
+import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.ext.DirectorAdapter;
-import com.isencia.passerelle.ext.ErrorCollector;
-import com.isencia.passerelle.ext.ErrorControlStrategy;
-import com.isencia.passerelle.ext.ExecutionControlStrategy;
-import com.isencia.passerelle.ext.ExecutionPrePostProcessor;
-import com.isencia.passerelle.ext.FiringEventListener;
 import com.isencia.passerelle.ext.PausableResumable;
-import com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy;
-import com.isencia.passerelle.ext.impl.DefaultExecutionControlStrategy;
-import com.isencia.passerelle.ext.impl.DefaultExecutionPrePostProcessor;
 
 /**
  * Besides the std Ptolemy director stuff, and creation of Passerelle's ProcessThreads, this director adds support for :
@@ -49,37 +40,13 @@ import com.isencia.passerelle.ext.impl.DefaultExecutionPrePostProcessor;
  * 
  * @author erwin
  */
-public abstract class ProcessDirector extends CompositeProcessDirector implements ExecutionControlStrategy, DirectorAdapter, PausableResumable {
+public abstract class ProcessDirector extends CompositeProcessDirector implements PausableResumable, PasserelleDirector {
   private static Logger logger = LoggerFactory.getLogger(ProcessDirector.class);
-
-  /**
-   * The collection of parameters that are meant to be available to a model configurer tool. The actor's parameters that are not in this collection are not
-   * meant to be configurable, but are only meant to be used during model assembly (in addition to the public ones).
-   */
-  private Collection<Parameter> configurableParameters = new HashSet<Parameter>();
-
-  /**
-   * The collection of listeners for FiringEvents. If the collection is empty, no events are generated. If non-empty, inside the ProcessThread.run(), lots of
-   * events are generated for each transition in the iteration of an actor.
-   */
-  private Collection<FiringEventListener> firingEventListeners = new HashSet<FiringEventListener>();
-
-  /**
-   * The collection of error collectors, to which the Director forwards any reported errors. If the collection is empty, reported errors are logged.
-   */
-  private Collection<ErrorCollector> errorCollectors = new HashSet<ErrorCollector>();
-
-  private DefaultExecutionControlStrategy execCtrlStrategy = new DefaultExecutionControlStrategy();
-  private ExecutionPrePostProcessor execPrePostProcessor = new DefaultExecutionPrePostProcessor();
-
-  private ErrorControlStrategy errorCtrlStrategy = new DefaultActorErrorControlStrategy();
-  // flag to allow
-  private boolean enforcedErrorCtrlStrategy;
 
   // annoyingly need to maintaina copy here of the activeThreads in the Ptolemy ProcessDirector baseclass,
   // as it is not reachable from subclasses....
   private Collection<ProcessThread> myThreads = new HashSet<ProcessThread>();
-
+  
   /**
 	 * 
 	 */
@@ -102,6 +69,20 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
    */
   public ProcessDirector(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
+  }
+  
+  /**
+   * Return the configured DirectorAdapter for the given name.
+   * If name is null or <code>DirectorAdapter.DEFAULT_ADAPTER_NAME</code>, and no adapter is present yet,
+   * the default instance is lazily created and returned.
+   * For other names, the specific adapter for that name is searched.
+   * If none is found, null is returned.
+   * @param adapterName
+   * @return
+   * @throws IllegalActionException 
+   */
+  public DirectorAdapter getAdapter(String adapterName) throws IllegalActionException {
+    return DirectorUtils.getAdapter(this, adapterName);
   }
 
   @Override
@@ -130,56 +111,9 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
     return myThreads;
   }
 
-  public Parameter[] getConfigurableParameters() {
-    return (Parameter[]) configurableParameters.toArray(new Parameter[0]);
-  }
-
-  public void registerConfigurableParameter(Parameter newParameter) {
-    if (newParameter != null && !configurableParameters.contains(newParameter) && newParameter.getContainer().equals(this)) {
-      configurableParameters.add(newParameter);
-    }
-  }
-
-  public void registerFiringEventListener(FiringEventListener listener) {
-    if (listener != null)
-      firingEventListeners.add(listener);
-  }
-
-  public boolean removeFiringEventListener(FiringEventListener listener) {
-    return firingEventListeners.remove(listener);
-  }
-
-  public boolean hasFiringEventListeners() {
-    return !firingEventListeners.isEmpty();
-  }
-
-  public void notifyFiringEventListeners(FiringEvent event) {
-    if (event != null && event.getDirector().equals(this)) {
-      for (Iterator<FiringEventListener> listenerItr = firingEventListeners.iterator(); listenerItr.hasNext();) {
-        FiringEventListener listener = listenerItr.next();
-        listener.onEvent(event);
-      }
-    }
-  }
-
   @Override
   protected ptolemy.actor.process.ProcessThread _newProcessThread(Actor actor, ptolemy.actor.process.ProcessDirector director) throws IllegalActionException {
     return new ProcessThread(actor, (ProcessDirector) director);
-  }
-
-  /**
-   * Facade method, used by actor fire-iteration logic to determine whether they can continue or should wait a bit... The Director's ExecutionControlStrategy
-   * handles this request.
-   * 
-   * @param actor
-   * @return an object identifying the current permission for the actor to do 1 iteration.
-   */
-  public synchronized IterationPermission requestNextIteration(Actor actor) {
-    return execCtrlStrategy.requestNextIteration(actor);
-  }
-
-  public void iterationFinished(Actor actor, IterationPermission itPerm) {
-    execCtrlStrategy.iterationFinished(actor, itPerm);
   }
 
   /**
@@ -203,88 +137,10 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
     _stopFireRequested = false;
   }
 
-  public void setExecutionControlStrategy(ExecutionControlStrategy execCtrlStrategy) {
-    this.execCtrlStrategy.setDelegate(execCtrlStrategy);
-  }
-
-  public ExecutionControlStrategy getExecutionControlStrategy() {
-    return execCtrlStrategy.getDelegate();
-  }
-
-  public ErrorControlStrategy getErrorControlStrategy() {
-    return errorCtrlStrategy;
-  }
-
-  public void setErrorControlStrategy(ErrorControlStrategy errorCtrlStrategy, boolean enforceThisOne) {
-    if (enforceThisOne || !this.enforcedErrorCtrlStrategy) {
-      this.errorCtrlStrategy = errorCtrlStrategy;
-      this.enforcedErrorCtrlStrategy = enforceThisOne;
-    }
-  }
-
-  public void setExecutionPrePostProcessor(ExecutionPrePostProcessor execPrePostProcessor) {
-    this.execPrePostProcessor = execPrePostProcessor;
-  }
-
-  public ExecutionPrePostProcessor getExecutionPrePostProcessor() {
-    return execPrePostProcessor;
-  }
-
-  public void addErrorCollector(ErrorCollector errCollector) {
-    if (logger.isTraceEnabled())
-      logger.trace("addErrorCollector() - Adding error collector " + errCollector);
-
-    if (errCollector != null) {
-      errorCollectors.add(errCollector);
-    }
-
-    if (logger.isTraceEnabled())
-      logger.trace("addErrorCollector() - exit");
-  }
-
-  public boolean removeErrorCollector(ErrorCollector errCollector) {
-    if (logger.isTraceEnabled())
-      logger.trace("removeErrorCollector() - entry - Removing error collector " + errCollector);
-    boolean res = false;
-    if (errCollector != null) {
-      res = errorCollectors.remove(errCollector);
-    }
-    if (logger.isTraceEnabled())
-      logger.trace("removeErrorCollector() - exit :" + res);
-    return res;
-  }
-
-  public void removeAllErrorCollectors() {
-    if (logger.isTraceEnabled())
-      logger.trace("removeAllErrorCollectors() - entry - Removing all error collectors");
-    errorCollectors.clear();
-    if (logger.isTraceEnabled())
-      logger.trace("removeAllErrorCollectors() - exit");
-  }
-
-  public void reportError(PasserelleException e) {
-    if (logger.isTraceEnabled())
-      logger.trace("reportError() - entry - Reporting error :" + e);
-
-    if (!errorCollectors.isEmpty()) {
-      for (Iterator<ErrorCollector> errCollItr = errorCollectors.iterator(); errCollItr.hasNext();) {
-        ErrorCollector element = errCollItr.next();
-        element.acceptError(e);
-        if (logger.isDebugEnabled())
-          logger.debug("Reported error to " + element);
-      }
-    } else {
-      logger.error("reportError() - no errorCollectors but received exception", e);
-    }
-
-    if (logger.isTraceEnabled())
-      logger.trace("reportError() - exit");
-  }
-
   public void initialize() throws IllegalActionException {
     if (logger.isTraceEnabled())
       logger.trace(getName() + " initialize() - entry");
-    getExecutionPrePostProcessor().preProcess();
+    getAdapter(null).getExecutionPrePostProcessor().preProcess();
     super.initialize();
     if (logger.isTraceEnabled())
       logger.trace(getName() + " initialize() - exit");
@@ -293,7 +149,7 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
   public void wrapup() throws IllegalActionException {
     if (logger.isTraceEnabled())
       logger.trace(getName() + " wrapup() - entry");
-    getExecutionPrePostProcessor().postProcess();
+    getAdapter(null).getExecutionPrePostProcessor().postProcess();
     super.wrapup();
     if (logger.isTraceEnabled())
       logger.trace(getName() + " wrapup() - exit");
@@ -302,7 +158,12 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
   public void terminate() {
     if (logger.isTraceEnabled())
       logger.trace(getName() + " terminate() - entry");
-    getExecutionPrePostProcessor().postProcess();
+    try {
+      getAdapter(null).getExecutionPrePostProcessor().postProcess();
+    } catch (IllegalActionException e) {
+      // should never happen
+      logger.error("Internal error - inconsistent attributes for director "+this.getFullName(), e);
+    }
     super.terminate();
     if (logger.isTraceEnabled())
       logger.trace(getName() + " terminate() - exit");

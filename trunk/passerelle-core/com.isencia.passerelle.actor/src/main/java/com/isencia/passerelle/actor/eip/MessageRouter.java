@@ -19,7 +19,6 @@ import java.util.Collection;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.dynaport.OutputPortConfigurationExtender;
 import com.isencia.passerelle.actor.v5.Actor;

@@ -57,9 +57,10 @@ public class MailMessageToMessageConverter implements IMessageInterceptor {
 
       logger.debug("Creating new MessageContainer");
 
-      Enumeration hdrEnum = mailMessage.getAllHeaders();
+      @SuppressWarnings("unchecked")
+      Enumeration<Header> hdrEnum = mailMessage.getAllHeaders();
       while (hdrEnum.hasMoreElements()) {
-        Header header = (Header) hdrEnum.nextElement();
+        Header header = hdrEnum.nextElement();
         logger.debug("Name : " + header.getName() + ", Value : " + header.getValue());
         container.addBodyHeader(header.getName(), header.getValue());
       }

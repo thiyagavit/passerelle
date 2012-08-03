@@ -70,17 +70,9 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   private boolean enforcedErrorCtrlStrategy;
 
   public Parameter mockModeParam = null;
-  public final static String MOCKMODE_PARAM = "Mock Mode";
-
   public Parameter expertModeParam = null;
-  public final static String EXPERTMODE_PARAM = "Expert Modeler";
-
   public Parameter validateInitializationParam = null;
-  public final static String VALIDATE_INITIALIZATION_PARAM = "Validate Initialization";
-
   public Parameter validateIterationParam = null;
-  public final static String VALIDATE_ITERATION_PARAM = "Validate Iteration";
-
   /**
    * @param container
    * @param name

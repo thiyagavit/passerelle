@@ -90,7 +90,6 @@ public abstract class DynamicNamedInputPortsActor extends Actor {
   /**
    * @return Returns the inputPorts.
    */
-  @SuppressWarnings("unchecked")
   public List<Port> getInputPorts() {
     // in order to avoid cloning issues
     // when we would maintain the list of dynamically cfg-ed

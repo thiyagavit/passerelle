@@ -46,6 +46,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.ProcessThread;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.engine.activator.Activator;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.ext.ExecutionControlStrategy;
 import com.isencia.passerelle.ext.impl.SuspendResumeExecutionControlStrategy;
@@ -506,9 +507,9 @@ public class FlowManager {
 			Manager manager = new Manager(flow.workspace(), flow.getName());
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
-			com.isencia.passerelle.domain.cap.Director dir = (com.isencia.passerelle.domain.cap.Director) flow.getDirector();
-			dir.removeAllErrorCollectors();
-			dir.addErrorCollector(executionListener);
+			DirectorAdapter dirAdapter = flow.getDirectorAdapter();
+			dirAdapter.removeAllErrorCollectors();
+			dirAdapter.addErrorCollector(executionListener);
 			manager.addExecutionListener(executionListener);
 			manager.execute();
     } catch (Exception e) {
@@ -978,7 +979,7 @@ public class FlowManager {
 			mgr.resume();
 
 			try {
-				ExecutionControlStrategy execCtrlStrategy = ((Director)flow.getDirector()).getExecutionControlStrategy();
+				ExecutionControlStrategy execCtrlStrategy = flow.getDirectorAdapter().getExecutionControlStrategy();
 				if(execCtrlStrategy instanceof SuspendResumeExecutionControlStrategy) {
 					((SuspendResumeExecutionControlStrategy) execCtrlStrategy).resume();
 				}

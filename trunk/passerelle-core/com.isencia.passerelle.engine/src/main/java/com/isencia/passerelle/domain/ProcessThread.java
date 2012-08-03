@@ -26,6 +26,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.executor.ExecutionContext;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.util.LoggerManager;
 
 /**
@@ -50,10 +51,12 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
   /**
    * @param actor
    * @param director
+   * @throws IllegalActionException 
    */
-  public ProcessThread(Actor actor, ProcessDirector director) {
+  public ProcessThread(Actor actor, ProcessDirector director) throws IllegalActionException {
     super(actor, director);
     _director = director;
+    _directorAdapter = director.getAdapter(null);
     _manager = actor.getManager();
 
     if (actor != null) {
@@ -124,7 +127,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
           // container is checked for null to detect the
           // deletion of the actor from the topology.
           if (((Entity) getActor()).getContainer() != null) {
-            if (_director.hasFiringEventListeners()) {
+            if (_directorAdapter.hasFiringEventListeners()) {
               iterate = doActorIterationWithEvents(workspace);
             } else {
               iterate = doActorIterationWithoutEvents(workspace);
@@ -258,19 +261,19 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
    */
   private boolean doActorIterationWithEvents(Workspace workspace) throws IllegalActionException {
     boolean iterate = true;
-    _director.notifyFiringEventListeners(firingEventCache[0]);
-    _director.notifyFiringEventListeners(firingEventCache[1]);
+    _directorAdapter.notifyFiringEventListeners(firingEventCache[0]);
+    _directorAdapter.notifyFiringEventListeners(firingEventCache[1]);
     boolean preFireOK = getActor().prefire();
-    _director.notifyFiringEventListeners(firingEventCache[2]);
+    _directorAdapter.notifyFiringEventListeners(firingEventCache[2]);
     if (preFireOK) {
       checkIfPaused(workspace);
-      _director.notifyFiringEventListeners(firingEventCache[3]);
+      _directorAdapter.notifyFiringEventListeners(firingEventCache[3]);
       getActor().fire();
-      _director.notifyFiringEventListeners(firingEventCache[4]);
-      _director.notifyFiringEventListeners(firingEventCache[5]);
+      _directorAdapter.notifyFiringEventListeners(firingEventCache[4]);
+      _directorAdapter.notifyFiringEventListeners(firingEventCache[5]);
       iterate = getActor().postfire();
-      _director.notifyFiringEventListeners(firingEventCache[6]);
-      _director.notifyFiringEventListeners(firingEventCache[7]);
+      _directorAdapter.notifyFiringEventListeners(firingEventCache[6]);
+      _directorAdapter.notifyFiringEventListeners(firingEventCache[7]);
     }
     return iterate;
   }
@@ -279,6 +282,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
   // // private variables ////
 
   private ProcessDirector _director;
+  private DirectorAdapter _directorAdapter;
   private Manager _manager;
 
   // a simple cache for all event types, so we don't need to construct new

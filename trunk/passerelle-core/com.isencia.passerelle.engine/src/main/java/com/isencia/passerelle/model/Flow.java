@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
@@ -36,6 +35,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.InternalErrorException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.ext.DirectorAdapter;
 
 /**
  * A Flow represents an assembly of interconnected Passerelle actors,
@@ -259,6 +259,10 @@ public class Flow extends TypedCompositeActor {
 				}
 			}
 		}
+	}
+	
+	public DirectorAdapter getDirectorAdapter() throws IllegalActionException {
+      return (DirectorAdapter) getDirector().getAttribute(DirectorAdapter.DEFAULT_ADAPTER_NAME, DirectorAdapter.class);
 	}
 
 	/**

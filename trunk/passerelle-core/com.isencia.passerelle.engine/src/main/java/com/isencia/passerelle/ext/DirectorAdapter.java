@@ -30,6 +30,13 @@ import com.isencia.passerelle.ext.FiringEventListener;
  * @author erwin
  */
 public interface DirectorAdapter {
+  
+  public static final String MOCKMODE_PARAM = "Mock Mode";
+  public static final String EXPERTMODE_PARAM = "Expert Modeler";
+  public static final String VALIDATE_INITIALIZATION_PARAM = "Validate Initialization";
+  public static final String VALIDATE_ITERATION_PARAM = "Validate Iteration";
+  String DEFAULT_ADAPTER_NAME = "__directorAdapter";
+      
   void addErrorCollector(ErrorCollector errCollector);
 
   boolean removeErrorCollector(ErrorCollector errCollector);

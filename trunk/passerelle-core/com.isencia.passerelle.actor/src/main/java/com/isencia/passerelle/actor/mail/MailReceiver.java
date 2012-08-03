@@ -51,11 +51,11 @@ public class MailReceiver extends TriggeredChannelSource {
   private final static String[] countTypeChoices = new String[] { "All", "Unread", "New" };
   private final static String[] contentTypeChoices = new String[] { "Text", "HTML", "All" };
 
-  private final static List protocols = Arrays.asList(protocolChoices);
-  private final static List msgTypes = Arrays.asList(msgTypeChoices);
-  private final static List msgStructs = Arrays.asList(msgStructChoices);
-  private final static List countTypes = Arrays.asList(countTypeChoices);
-  private final static List contentTypes = Arrays.asList(contentTypeChoices);
+  private final static List<String> protocols = Arrays.asList(protocolChoices);
+  private final static List<String> msgTypes = Arrays.asList(msgTypeChoices);
+  private final static List<String> msgStructs = Arrays.asList(msgStructChoices);
+  private final static List<String> countTypes = Arrays.asList(countTypeChoices);
+  private final static List<String> contentTypes = Arrays.asList(contentTypeChoices);
 
   public final static int MESSAGETYPE_MESSAGE = 0;
   public final static int MESSAGETYPE_COUNT = 1;
