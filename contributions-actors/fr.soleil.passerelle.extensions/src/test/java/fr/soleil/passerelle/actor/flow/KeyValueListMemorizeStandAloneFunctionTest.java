@@ -1,7 +1,7 @@
 package fr.soleil.passerelle.actor.flow;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -74,7 +74,7 @@ public final class KeyValueListMemorizeStandAloneFunctionTest {
             // execute sequence
             moml.executeBlockingErrorLocally(props);
 
-            fail("exception was not thrown");
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final PasserelleException e) {
             // we dont do assertThat(e.getMessage()).matches(GOTO_REGEX) because
             // the error message contains others informations(par of the stack
@@ -91,7 +91,7 @@ public final class KeyValueListMemorizeStandAloneFunctionTest {
             props.put("ForLoopList1.End Value", "100");
             // execute sequence
             moml.executeBlockingErrorLocally(props);
-            fail("expection should be thrown if the number of itteretion is too big");
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final PasserelleException e) {
             final Pattern pattern = Pattern.compile(TOO_MANY_ITT_REGEX);
             assertThat(pattern.matcher(e.getMessage()).find()).isTrue();
@@ -146,7 +146,7 @@ public final class KeyValueListMemorizeStandAloneFunctionTest {
             props.put("Choice1.value", "1");
             // execute sequence
             moml.executeBlockingErrorLocally(props);
-            fail("cleanning list does not works");
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final PasserelleException e) {
             final Pattern pattern = Pattern.compile(CLEAR_LIST_REGEX);
             assertThat(pattern.matcher(e.getMessage()).find()).isTrue();

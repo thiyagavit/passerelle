@@ -19,7 +19,7 @@ public class MessageAssemblerTest {
     public MomlRule moml = new MomlRule("/sequences/MessageAssembler.moml");
 
     @Test
-    public void should_assemble_messag() throws PasserelleException {
+    public void should_assemble_message() throws PasserelleException {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("ForLoopMemorize1.Start Value", "0");
         props.put("ForLoopMemorize1.End Value", "2");
