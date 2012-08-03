@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle HMI
 Bundle-SymbolicName: com.isencia.passerelle.hmi
-Bundle-Version: 8.1.0
+Bundle-Version: 8.2.0
 Bundle-Activator: com.isencia.passerelle.hmi.activator.Activator
 Bundle-Vendor: isencia
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -26,12 +26,12 @@ Bundle-ClassPath: .,
  lib/swing-worker-1.1.jar,
  lib/swingx-1.6.jar
 Require-Bundle: com.isencia.passerelle.commons;bundle-version="7.0.0",
- com.isencia.passerelle.actor;bundle-version="7.0.0",
- com.isencia.passerelle.engine;bundle-version="8.1.0",
+ com.isencia.passerelle.actor;bundle-version="8.2.0",
+ com.isencia.passerelle.engine;bundle-version="8.2.0",
  com.isencia.passerelle.hmi.definition;bundle-version="8.1.0",
  diva;bundle-version="7.0.1",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
  com.microstar;bundle-version="1.2.0",
- com.isencia.passerelle.project.repository.impl.filesystem;bundle-version="7.0.0"
+ com.isencia.passerelle.project.repository.impl.filesystem;bundle-version="8.1.0"

@@ -127,7 +127,9 @@ public class ActorVersionRegistry {
           NamedObj no = (NamedObj)e;
           try {
             VersionAttribute vAttr = (VersionAttribute) no.getAttribute("_version", VersionAttribute.class);
-            addActorVersion(e.getClass().getName(), VersionSpecification.parse(vAttr.getValueAsString()));
+            if(vAttr!=null) {
+              addActorVersion(e.getClass().getName(), VersionSpecification.parse(vAttr.getValueAsString()));
+            }
           } catch (Exception ex) {
             LOGGER.warn("Invalid version specification for "+no.getFullName(), ex);
           }

@@ -13,11 +13,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ExecutionControlStrategy;
 
 /**
@@ -44,7 +45,7 @@ public class DynamicStepExecutionControlStrategy extends Attribute implements Ex
 
   public DynamicStepExecutionControlStrategy(final Director container, final String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-    container.setExecutionControlStrategy(this);
+    DirectorUtils.getAdapter(container, null).setExecutionControlStrategy(this);
     // this kind of attribute is only for usage inside a IDE or HMI and
     // these will add it everytime it's needed
     // so we must make sure it's not saved into the model's moml

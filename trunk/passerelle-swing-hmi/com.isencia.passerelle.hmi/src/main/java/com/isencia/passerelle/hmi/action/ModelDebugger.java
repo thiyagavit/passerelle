@@ -10,9 +10,9 @@ package com.isencia.passerelle.hmi.action;
 import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ExecutionControlStrategy;
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
@@ -42,8 +42,7 @@ public class ModelDebugger extends ModelExecutor {
   }
 
   @Override
-  public ExecutionControlStrategy createExecutionControlStrategy(final Director director, final String name) throws IllegalActionException,
-      NameDuplicationException {
+  public ExecutionControlStrategy createExecutionControlStrategy(final Director director, final String name) throws IllegalActionException, NameDuplicationException {
     return new DynamicStepExecutionControlStrategy(director, name);
   }
 

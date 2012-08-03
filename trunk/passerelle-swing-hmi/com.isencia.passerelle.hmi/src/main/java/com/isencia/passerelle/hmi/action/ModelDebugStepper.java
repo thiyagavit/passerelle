@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
 import com.isencia.passerelle.hmi.util.DynamicStepExecutionControlStrategy;
@@ -34,7 +35,7 @@ public class ModelDebugStepper extends AbstractAction {
     }
 
     try {
-      ((DynamicStepExecutionControlStrategy) getHMI().getDirector().getExecutionControlStrategy()).step();
+      ((DynamicStepExecutionControlStrategy) DirectorUtils.getAdapter(getHMI().getDirector(), null).getExecutionControlStrategy()).step();
     } catch (final Exception ex) {
       getLogger().error("Received step event, but model not configured correctly", ex);
     }
