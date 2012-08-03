@@ -19,8 +19,6 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
-import org.eclipse.osgi.framework.console.CommandInterpreter;
-import org.eclipse.osgi.framework.console.CommandProvider;
 import com.isencia.passerelle.actor.control.Trigger;
 import com.isencia.passerelle.actor.error.ErrorCatcher;
 import com.isencia.passerelle.actor.general.CommandExecutor;

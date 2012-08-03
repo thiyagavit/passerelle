@@ -79,7 +79,6 @@ public class InputPortBuilder extends Attribute {
    * Modifying the list contents has no impact on the ports that
    * are actually present on the containing entity.
    */
-  @SuppressWarnings("unchecked")
   public List<Port> getInputPorts() {
     // in order to avoid cloning issues
     // when we would maintain the list of dynamically cfg-ed

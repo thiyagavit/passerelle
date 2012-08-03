@@ -182,8 +182,8 @@ public class MessagesToArrayConverter extends Transformer {
     }
     if (!msgQueue.isEmpty()) {
       ManagedMessage resultMsg = createMessage();
-      List msgBodies = new ArrayList();
-      for (Iterator iter = msgQueue.iterator(); iter.hasNext();) {
+      List<Object> msgBodies = new ArrayList<Object>();
+      for (Iterator<ManagedMessage> iter = msgQueue.iterator(); iter.hasNext();) {
         ManagedMessage msg = (ManagedMessage) iter.next();
         resultMsg.addCauseID(msg.getID());
         msgBodies.add(msg.getBodyContent());

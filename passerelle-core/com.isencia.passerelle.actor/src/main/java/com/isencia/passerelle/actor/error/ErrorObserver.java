@@ -21,7 +21,6 @@ import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
@@ -33,8 +32,7 @@ import com.isencia.passerelle.message.MessageException;
  * <ul>
  * <li>log the exception
  * <li>send out the exception msg via errorText output
- * <li>if the error context is a ManagedMessage, send it out via the
- * messageInError output
+ * <li>if the error context is a ManagedMessage, send it out via the messageInError output
  * </ul>
  * </p>
  * 
@@ -42,25 +40,22 @@ import com.isencia.passerelle.message.MessageException;
  */
 public class ErrorObserver extends Actor implements ErrorCollector {
 
-  private final static Logger logger = LoggerFactory.getLogger(ErrorObserver.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ErrorObserver.class);
 
   private BlockingQueue<PasserelleException> errors = new LinkedBlockingQueue<PasserelleException>();
 
   /**
-   * For each received exception/error, the error is sent out in a new Passerelle ManagedMessage
-   * via this output port.
+   * For each received exception/error, the error is sent out in a new Passerelle ManagedMessage via this output port.
    */
   public Port errorOutput;
-  
+
   /**
-   * For each received exception/error, the error text message is sent out via
-   * this output port.
+   * For each received exception/error, the error text message is sent out via this output port.
    */
   public Port errorTextOutput;
 
   /**
-   * For each received exception/error, if the error context is a
-   * ManagedMessage, send it out via the messageInError output
+   * For each received exception/error, if the error context is a ManagedMessage, send it out via the messageInError output
    */
   public Port messageInErrorOutput;
 
@@ -87,17 +82,7 @@ public class ErrorObserver extends Actor implements ErrorCollector {
   @Override
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
-
-    try {
-      ((Director) getDirector()).addErrorCollector(this);
-    } catch (ClassCastException e) {
-      // means the actor is used without a Passerelle Director
-      // just log this. Only consequence is that we'll never receive
-      // any error messages via acceptError
-      getLogger().info(getInfo() + " - used without Passerelle Director!!");
-    } catch (Exception e) {
-      getLogger().error("Unexpected error while trying to register as error collector", e);
-    }
+    getDirectorAdapter().addErrorCollector(this);
   }
 
   @Override
@@ -159,10 +144,7 @@ public class ErrorObserver extends Actor implements ErrorCollector {
 
   @Override
   protected void doWrapUp() throws TerminationException {
-    try {
-      ((Director) getDirector()).removeErrorCollector(this);
-    } catch (ClassCastException e) {
-    }
+    getDirectorAdapter().removeErrorCollector(this);
     try {
       drainErrorsQueueTo(null);
     } catch (Exception e) {
@@ -174,6 +156,6 @@ public class ErrorObserver extends Actor implements ErrorCollector {
 
   @Override
   protected Logger getLogger() {
-    return logger;
+    return LOGGER;
   }
 }

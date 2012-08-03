@@ -387,7 +387,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor {
    */
   protected boolean mustValidateIteration() {
     try {
-      return ((Director) getDirector()).mustValidateIteration();
+      return getDirectorAdapter().mustValidateIteration();
     } catch (ClassCastException e) {
       return false;
     }

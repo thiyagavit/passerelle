@@ -42,7 +42,7 @@ import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 public class SequenceToArrayConverter extends Transformer {
   private static Logger logger = LoggerFactory.getLogger(SequenceToArrayConverter.class);
 
-  private Map sequences = new HashMap();
+  private Map<Long, SequenceTrace> sequences = new HashMap<Long, SequenceTrace>();
 
   /**
    * @param container
@@ -81,7 +81,7 @@ public class SequenceToArrayConverter extends Transformer {
           ManagedMessage[] msgsInSeq = seqTrace.getMessagesInSequence();
           resultMsg = createMessage();
 
-          List msgBodies = new ArrayList();
+          List<Object> msgBodies = new ArrayList<Object>();
           for (int i = 0; i < msgsInSeq.length; i++) {
             ManagedMessage msg = msgsInSeq[i];
             resultMsg.addCauseID(msg.getID());

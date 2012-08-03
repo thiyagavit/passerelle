@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
 import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
@@ -55,7 +56,6 @@ public class ActorApiTest extends TestCase {
     Flow flow = new Flow("testFlowWithValidationErrorAndValidation",null);
     FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
-    director.validateInitializationParam.setExpression("true");
     flow.setDirector(director);
     
     Const source = new Const(flow,"Constant");
@@ -76,6 +76,7 @@ public class ActorApiTest extends TestCase {
     
     Map<String, String> props = new HashMap<String, String>();
     props.put("Constant.value", "Hello world");
+    props.put("director."+DirectorAdapter.VALIDATE_INITIALIZATION_PARAM, "true");
     props.put("validationError.Must generate validation error", "true");
     props.put("validationError.Validation error message", "something's wrong here");
     try {
@@ -99,7 +100,6 @@ public class ActorApiTest extends TestCase {
     Flow flow = new Flow("testFlowWithValidationErrorButNoValidation",null);
     FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
-    director.validateInitializationParam.setExpression("false");
     flow.setDirector(director);
     
     Const source = new Const(flow,"Constant");
@@ -120,6 +120,7 @@ public class ActorApiTest extends TestCase {
     
     Map<String, String> props = new HashMap<String, String>();
     props.put("Constant.value", "Hello world");
+    props.put("director."+DirectorAdapter.VALIDATE_INITIALIZATION_PARAM, "false");
     props.put("validationError.Must generate validation error", "true");
     props.put("validationError.Validation error message", "something's wrong here");
     try {
@@ -145,7 +146,6 @@ public class ActorApiTest extends TestCase {
     Flow flow = new Flow("testFlowWithoutValidationError",null);
     FlowManager flowMgr = new FlowManager();
     Director director = new Director(flow,"director");
-    director.validateInitializationParam.setExpression("true");
     flow.setDirector(director);
     
     Const source = new Const(flow,"Constant");
@@ -166,6 +166,7 @@ public class ActorApiTest extends TestCase {
     
     Map<String, String> props = new HashMap<String, String>();
     props.put("Constant.value", "Hello world");
+    props.put("director."+DirectorAdapter.VALIDATE_INITIALIZATION_PARAM, "true");
     props.put("validationError.Must generate validation error", "false");
     props.put("validationError.Validation error message", "something's wrong here");
     flowMgr.executeBlockingLocally(flow,props);

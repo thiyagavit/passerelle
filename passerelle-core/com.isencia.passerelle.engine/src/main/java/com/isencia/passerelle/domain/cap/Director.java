@@ -22,29 +22,23 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.actor.InitializationException;
-import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.domain.ProcessDirector;
-import com.isencia.passerelle.util.SchedulerUtils;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Receiver;
-import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.actor.util.FIFOQueue;
-import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.FileParameter;
-import ptolemy.data.expr.Parameter;
-import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.actor.InitializationException;
+import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.domain.ProcessDirector;
+import com.isencia.passerelle.util.SchedulerUtils;
 
 /**
  * The standard Passerelle director. Besides the std Ptolemy director stuff,
@@ -66,23 +60,6 @@ public class Director extends ProcessDirector {
 	public FileParameter propsFileParameter;
 	public final static String PROPSFILE_PARAM = "Properties File";
 	
-	private boolean mockMode = false;
-	public Parameter mockModeParam = null;
-	public final static String MOCKMODE_PARAM = "Mock Mode";
-
-	private boolean expertMode = false;
-	public Parameter expertModeParam = null;
-	public final static String EXPERTMODE_PARAM = "Expert Modeler";
-
-	private boolean validateInitialization = false;
-	public Parameter validateInitializationParam = null;
-	public final static String VALIDATE_INITIALIZATION_PARAM = "Validate Initialization";
-
-	private boolean validateIteration = false;
-	public Parameter validateIterationParam = null;
-	public final static String VALIDATE_ITERATION_PARAM = "Validate Iteration";
-
-
 	private Scheduler scheduler = null;
 
 	private Collection<BlockingQueueReceiver> managedReceivers = new HashSet<BlockingQueueReceiver>();
@@ -112,27 +89,8 @@ public class Director extends ProcessDirector {
 		throws IllegalActionException, NameDuplicationException {
 		super(workspace);
 		propsFileParameter = new FileParameter(this, PROPSFILE_PARAM);
-		registerConfigurableParameter(propsFileParameter);
-		
-		mockModeParam = new Parameter(this,MOCKMODE_PARAM, new BooleanToken(false));
-		mockModeParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(mockModeParam, "style");
-		registerConfigurableParameter(mockModeParam);
-		
-		expertModeParam = new Parameter(this,EXPERTMODE_PARAM, new BooleanToken(false));
-		expertModeParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(expertModeParam, "style");
-		registerConfigurableParameter(expertModeParam);
-		
-		validateInitializationParam = new Parameter(this,VALIDATE_INITIALIZATION_PARAM, new BooleanToken(true));
-		validateInitializationParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(validateInitializationParam, "style");
-		registerConfigurableParameter(validateInitializationParam);
-
-		validateIterationParam = new Parameter(this,VALIDATE_ITERATION_PARAM, new BooleanToken(false));
-		validateIterationParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(validateIterationParam, "style");
-		registerConfigurableParameter(validateIterationParam);
+		// to trigger the creation of our default adapter
+		getAdapter(null);
 	}
 
 	/** Construct a director in the given container with the given name.
@@ -156,28 +114,10 @@ public class Director extends ProcessDirector {
 		super(container, name);
 		
 		propsFileParameter = new FileParameter(this, PROPSFILE_PARAM);
-		registerConfigurableParameter(propsFileParameter);
-		
-		mockModeParam = new Parameter(this,MOCKMODE_PARAM, new BooleanToken(false));
-		mockModeParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(mockModeParam, "style");
-		registerConfigurableParameter(mockModeParam);
-		
-		expertModeParam = new Parameter(this,EXPERTMODE_PARAM, new BooleanToken(false));
-		expertModeParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(expertModeParam, "style");
-		registerConfigurableParameter(expertModeParam);
-		
-		validateInitializationParam = new Parameter(this,VALIDATE_INITIALIZATION_PARAM, new BooleanToken(true));
-		validateInitializationParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(validateInitializationParam, "style");
-		registerConfigurableParameter(validateInitializationParam);
 
-		validateIterationParam = new Parameter(this,VALIDATE_ITERATION_PARAM, new BooleanToken(false));
-		validateIterationParam.setTypeEquals(BaseType.BOOLEAN);
-		new CheckBoxStyle(validateIterationParam, "style");
-		registerConfigurableParameter(validateIterationParam);
-
+    // to trigger the creation of our default adapter
+    getAdapter(null);
+    
 		_attachText(
 			"_iconDescription",
 			"<svg>\n"
@@ -260,18 +200,6 @@ public class Director extends ProcessDirector {
 			} catch (NullPointerException e) {
 				// Ignore. Means that path is not a valid URL.
 			}
-		} else if (attribute == mockModeParam) {
-			mockMode = ((BooleanToken) mockModeParam.getToken()).booleanValue();
-			logger.debug("Test mode set to : " + mockMode);
-		} else if (attribute == expertModeParam) {
-			expertMode = ((BooleanToken) expertModeParam.getToken()).booleanValue();
-			logger.debug("Expert mode set to : " + expertMode);
-		} else if (attribute == validateInitializationParam) {
-			validateInitialization = ((BooleanToken) validateInitializationParam.getToken()).booleanValue();
-			logger.debug("Initialization validation set to : " + validateInitialization);
-		} else if (attribute == validateIterationParam) {
-			validateIteration = ((BooleanToken) validateIterationParam.getToken()).booleanValue();
-			logger.debug("Iteration validation set to : " + validateIteration);
 		} else 
 			super.attributeChanged(attribute);
 
@@ -424,36 +352,4 @@ public class Director extends ProcessDirector {
 		}
 		return scheduler;
 	}
-	
-
-	/**
-	 * @return Returns the mockMode.
-	 */
-	public boolean isMockMode() {
-		return mockMode;
-	}
-
-	/**
-	 * @return Returns the expertMode.
-	 */
-	public boolean isExpertMode() {
-		return expertMode;
-	}
-	
-	/**
-	 * 
-	 * @return whether each actor should do a validation of its initialization
-	 */
-	public boolean mustValidateInitialization() {
-		return validateInitialization;
-	}
-
-	/**
-	 * 
-	 * @return whether each iteration of each actor should do a validation
-	 */
-	public boolean mustValidateIteration() {
-		return validateIteration;
-	}
-
 }

@@ -30,7 +30,6 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListener;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
@@ -45,9 +44,9 @@ import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
  * @author erwin
  */
 public class SequenceTracker extends Transformer {
-  private static Logger logger = LoggerFactory.getLogger(SequenceTracker.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(SequenceTracker.class);
 
-  private Map sequences = new HashMap();
+  private Map<Long, SequenceTrace> sequences = new HashMap<Long, SequenceTrace>();
   // flag to catch race conditions between threads of handled and input message
   // processing
   private boolean seqFinishedMsgPending = false;
@@ -75,8 +74,8 @@ public class SequenceTracker extends Transformer {
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doInitialize() - entry");
+    if (LOGGER.isTraceEnabled())
+      LOGGER.trace(getInfo() + " doInitialize() - entry");
 
     super.doInitialize();
     sequences.clear();
@@ -90,13 +89,13 @@ public class SequenceTracker extends Transformer {
           if (message != null)
             acceptHandledMessage(message);
         } catch (PasserelleException e) {
-          logger.error(getInfo() + " error getting message from handled port", e);
+          LOGGER.error(getInfo() + " error getting message from handled port", e);
         }
       }
 
       public void noMoreTokens() {
-        if (logger.isDebugEnabled())
-          logger.debug(getInfo() + " handled port exhausted");
+        if (LOGGER.isDebugEnabled())
+          LOGGER.debug(getInfo() + " handled port exhausted");
       }
 
     });
@@ -107,8 +106,8 @@ public class SequenceTracker extends Transformer {
       throw new InitializationException("handled port not connected", this, null);
     }
 
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doInitialize() - exit");
+    if (LOGGER.isTraceEnabled())
+      LOGGER.trace(getInfo() + " doInitialize() - exit");
 
   }
 
@@ -120,15 +119,7 @@ public class SequenceTracker extends Transformer {
     SequenceTrace seqTrace = (SequenceTrace) sequences.get(message.getSequenceID());
     if (seqTrace == null) {
       // notify our director about the problem
-      try {
-        ((Director) getDirector()).reportError(new ProcessingException("Received message feedback for unknown sequence " + message.getSequenceID(), message,
-            null));
-      } catch (ClassCastException ex) {
-        // means the actor is used without a Passerelle Director
-        // just log this. Only consequence is that we'll never receive
-        // any error messages via acceptError
-        logger.info(getInfo() + " - used without Passerelle Director!!, so automated error collecting does NOT work !!");
-      }
+      getDirectorAdapter().reportError(new ProcessingException("Received message feedback for unknown sequence " + message.getSequenceID(), message, null));
     } else {
       seqTrace.messageHandled(message);
       boolean seqCompletelyFinished = seqTrace.isHandled();
@@ -146,7 +137,7 @@ public class SequenceTracker extends Transformer {
             sendErrorMessage(e);
           } catch (IllegalActionException e1) {
             // can't do much more...
-            logger.error("", e1);
+            LOGGER.error("", e1);
           }
         } finally {
           seqFinishedMsgPending = false;
@@ -157,8 +148,8 @@ public class SequenceTracker extends Transformer {
   }
 
   protected void doFire(ManagedMessage message) throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doFire() - entry - message :" + message);
+    if (LOGGER.isTraceEnabled())
+      LOGGER.trace(getInfo() + " doFire() - entry - message :" + message);
 
     try {
       if (message.isPartOfSequence()) {
@@ -175,8 +166,8 @@ public class SequenceTracker extends Transformer {
 
     sendOutputMsg(output, message);
 
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doFire() - exit");
+    if (LOGGER.isTraceEnabled())
+      LOGGER.trace(getInfo() + " doFire() - exit");
 
   }
 
