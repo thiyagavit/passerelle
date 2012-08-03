@@ -24,25 +24,25 @@ import com.isencia.passerelle.domain.et.EventHandler;
 /**
  * @author delerw
  */
-public abstract class AbstractEventHandler implements EventHandler {
+public abstract class AbstractActorEventHandler implements EventHandler {
   private ETDirector director;
 
-  public AbstractEventHandler(ETDirector director) {
+  public AbstractActorEventHandler(ETDirector director) {
     this.director = director;
   }
 
   public void initialize() {
   }
 
-  public boolean handle(Event event) throws Exception {
+  public HandleResult handle(Event event) throws Exception {
     Actor actor = getDestinationActorFromEvent(event);
     synchronized (actor) {
       if (director.isActorIterating(actor)) {
         getLogger().debug("Skipping {} - Actor {} is busy.", event, actor.getName());
-        return false;
+        return HandleResult.RETRY;
       } else if (director.isActorInactive(actor)) {
         getLogger().debug("Skipping {} - Actor {} is inactive.", event, actor.getName());
-        return false;
+        return HandleResult.SKIPPED;
       } else {
         director.notifyActorIteratingForEvent(actor, event);
       }
@@ -55,7 +55,7 @@ public abstract class AbstractEventHandler implements EventHandler {
           director.notifyActorInactive(actor);
         }
       }
-      return true;
+      return HandleResult.DONE;
     } finally {
       director.notifyActorDoneIteratingForEvent(actor, event);
     }

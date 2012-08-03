@@ -7,10 +7,9 @@
  */
 package com.isencia.passerelle.hmi.trace;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
+import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.hmi.util.DynamicStepExecutionControlStrategy;
 
@@ -21,7 +20,6 @@ import com.isencia.passerelle.hmi.util.DynamicStepExecutionControlStrategy;
  * @author erwin.de.ley@isencia.be
  */
 public class HMIExecutionTracer implements ExecutionTracer {
-  private final static Logger traceLogger = LoggerFactory.getLogger("trace");
 
   private final ExecutionTracer tracedialog;
 
@@ -32,7 +30,7 @@ public class HMIExecutionTracer implements ExecutionTracer {
   public void trace(final Actor actor, final String message) {
     tracedialog.trace(actor, message);
     try {
-      DynamicStepExecutionControlStrategy execCtrl = (DynamicStepExecutionControlStrategy) actor.getDirectorAdapter().getExecutionControlStrategy();
+      DynamicStepExecutionControlStrategy execCtrl = (DynamicStepExecutionControlStrategy) DirectorUtils.getAdapter(actor.getDirector(), null).getExecutionControlStrategy();
 
       execCtrl.stopStep();
 

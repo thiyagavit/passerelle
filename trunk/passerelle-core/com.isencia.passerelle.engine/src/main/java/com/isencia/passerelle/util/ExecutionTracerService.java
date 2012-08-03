@@ -17,8 +17,8 @@ package com.isencia.passerelle.util;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
+import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.ext.impl.DefaultExecutionTracer;
 

@@ -17,13 +17,12 @@ package com.isencia.passerelle.ext.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import com.isencia.passerelle.actor.Actor;
+import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.domain.ProcessThread;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.util.ExecutionTracerService;
-
-import ptolemy.kernel.util.NamedObj;
 
 /**
  * Default implementation of an execution tracer, which just logs the traces to
@@ -45,7 +44,7 @@ public class DefaultExecutionTracer implements ExecutionTracer {
 	private final static Logger logger = LoggerFactory.getLogger("trace");
 
 	public void trace(Actor source, String message) {
-		MDC.put(ProcessThread.ACTOR_MDC_NAME, getFullNameButWithoutModelName(source));
+		MDC.put(ProcessThread.ACTOR_MDC_NAME, getFullNameButWithoutModelName((NamedObj) source));
 		logger.info(message);
 	}
 

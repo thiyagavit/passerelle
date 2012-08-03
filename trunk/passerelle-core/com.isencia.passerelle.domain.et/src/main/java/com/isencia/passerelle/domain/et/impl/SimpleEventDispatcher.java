@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.domain.et.Event;
@@ -29,6 +30,8 @@ import com.isencia.passerelle.domain.et.EventDispatchReporter;
 import com.isencia.passerelle.domain.et.EventDispatcher;
 import com.isencia.passerelle.domain.et.EventError;
 import com.isencia.passerelle.domain.et.EventHandler;
+import com.isencia.passerelle.domain.et.EventHandler.HandleResult;
+import com.isencia.passerelle.domain.et.EventHandler.HandleType;
 import com.isencia.passerelle.domain.et.EventRefusedException;
 
 /**
@@ -43,6 +46,11 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   private String name;
 
+  private static class EventEntry {
+    Event event;
+    boolean retry;
+  }
+  
   private BlockingQueue<Event> eventQ = new LinkedBlockingQueue<Event>();
   private List<Event> eventHistory = new LinkedList<Event>();
   private List<Event> unhandledEvents = new LinkedList<Event>();
@@ -103,15 +111,22 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     try {
       event = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
       if (event != null) {
+        boolean eventEffected = false;
         for (EventHandler evtHandler : eventHandlers) {
           try {
-            if (evtHandler.canHandle(event)) {
-              if (evtHandler.handle(event)) {
+            HandleType handleType = evtHandler.canHandleAs(event);
+            if (HandleType.SKIP.equals(handleType)
+                || (eventEffected && HandleType.EFFECT.equals(handleType)) ) {
+              continue;
+            } else {
+              HandleResult result = evtHandler.handle(event);
+              if (HandleResult.DONE.equals(result)) {
                 eventDispatched = true;
-                break;
-              } else {
-                // add event to Q again for later retry
+                eventEffected = HandleType.EFFECT.equals(handleType);
+              } else if (!eventEffected && HandleResult.RETRY.equals(result)){
+                // interrupt current handling loop and add event to Q again for later retry
                 eventQ.add(event);
+                break;
               }
             }
           } catch (Exception e) {

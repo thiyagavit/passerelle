@@ -14,8 +14,8 @@
 */
 package com.isencia.passerelle.ext;
 
-import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
+import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
 
 public interface ExecutionTracer {
     

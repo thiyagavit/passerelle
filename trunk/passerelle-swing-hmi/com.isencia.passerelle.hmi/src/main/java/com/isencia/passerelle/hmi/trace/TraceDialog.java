@@ -11,9 +11,9 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import javax.swing.JDialog;
+import ptolemy.actor.Actor;
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
 
 /**
  * @todo Class Comment
@@ -45,7 +45,7 @@ public class TraceDialog extends JDialog implements TraceVisualizer {
   }
 
   public void trace(Actor source, String message) {
-    tracePanel.addTraceMessage(getFullNameButWithoutModelName(source), message);
+    tracePanel.addTraceMessage(getFullNameButWithoutModelName((NamedObj)source), message);
   }
 
   public void trace(Director source, String message) {

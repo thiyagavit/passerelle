@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.domain.et;
 
 import java.text.DateFormat;
@@ -21,7 +21,7 @@ import ptolemy.actor.Actor;
 public class FireEvent extends AbstractEvent {
 
   private Actor target;
-  
+
   public FireEvent(Actor target) {
     this(target, new Date());
   }
@@ -36,8 +36,6 @@ public class FireEvent extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return "FireEvent [timeStamp=" + dateFormat.format(getTimestamp()) 
-      + ", target=" + target.getFullName() 
-      + "]";
+    return dateFormat.format(getTimestamp()) + " FireEvent [target=" + target.getFullName() + "]";
   }
 }

@@ -16,29 +16,47 @@
 package com.isencia.passerelle.domain.et;
 
 /**
- * Contract for concrete event handlers, dedicated for one type of Event.
+ * Contract for concrete event handlers.
  *  
  * @author delerw
  *
  */
 public interface EventHandler {
   
+  enum HandleType {
+    // indicates that the handler does not want to handle the event
+    SKIP,
+    // indicates that the handler has no (side)-effects, i.e. the event can freely be offered to other handlers after its processing here
+    FUNCTIONAL, 
+    // indicates that the handler has (side)-effects, and the event should only be offered to remaining FUNCTIONAL handlers
+    EFFECT;
+  }
+  
+  enum HandleResult {
+    // means the handler has successfully handled the event
+    DONE,
+    // means that the handler was not able to handle the event for whatever reason, and is OK with this
+    SKIPPED,
+    // means that the handler was currently not able to handle the event for whatever reason, but would like to retry later
+    // a retry loop will only be done when the event was not yet handled by a previous handler with EFFECT type...
+    RETRY;
+  }
+  
   void initialize();
   
   /**
    * 
    * @param event
-   * @return true if the handler is made for handling the given event type; false if not
+   * @return
    */
-  boolean canHandle(Event event);
+  HandleType canHandleAs(Event event);
   
   /**
    * 
    * @param event
    * @throws Exception
-   * @return true if the event was effectively handled; false if not (e.g. because the actor that should be fired because
-   * of the given event was aleady busy with another one)
+   * @return 
    */
-  boolean handle(Event event) throws Exception;
+  HandleResult handle(Event event) throws Exception;
 
 }
