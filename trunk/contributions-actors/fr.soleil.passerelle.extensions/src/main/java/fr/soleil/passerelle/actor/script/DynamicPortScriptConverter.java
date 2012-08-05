@@ -234,7 +234,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
       while (allInputContexts.hasNext()) {
         MessageInputContext messageInputContext = (MessageInputContext) allInputContexts.next();
         if (!messageInputContext.isProcessed()) {
-          int portIndex = messageInputContext.getPortIndex();
+          int portIndex = getPortIndex(messageInputContext);
           ManagedMessage msg = messageInputContext.getMsg();
           MessageFlowElement input = new MessageFlowElement(new MessageFlowElement.MessageAndPort(portIndex, msg), getNrOutputPorts());
           BSFManager mgr = bsfManagers.get(portIndex);
@@ -256,4 +256,14 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
       logger.trace(getInfo() + " process() - exit");
     }
   }
+
+  // TODO : remove this once Soleil upgrades to Passerelle 8.2.
+  // the method is present on the DynamicPortsActor in there, as well.
+  protected int getPortIndex(final MessageInputContext messageInputContext) {
+    String portName = messageInputContext.getPortName();
+    String portIndexStr = portName.substring("input".length());
+    int portIndex = Integer.parseInt(portIndexStr);
+    return portIndex;
+  }
+
 }
