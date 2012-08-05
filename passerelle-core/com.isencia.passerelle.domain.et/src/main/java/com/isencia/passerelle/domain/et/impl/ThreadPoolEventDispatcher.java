@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventHandler;
 
 /**
@@ -87,7 +86,7 @@ public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
       String name = getName() + " - " + Thread.currentThread().getName();
       getLogger().debug("Starting EventQueueSink {}", name);
       try {
-        boolean hasDispatchedSomething = ThreadPoolEventDispatcher.super.dispatch(1000);
+        boolean hasDispatchedSomething = ThreadPoolEventDispatcher.super.dispatch(timeout);
         getLogger().debug(name + " hasDispatchedSomething " + hasDispatchedSomething);
         return hasDispatchedSomething;
       } finally {

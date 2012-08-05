@@ -16,13 +16,11 @@
 package com.isencia.passerelle.domain.et.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.domain.et.Event;
@@ -49,9 +47,13 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
   private static class EventEntry {
     Event event;
     boolean retry;
+    public EventEntry(Event event) {
+      this.event = event;
+      this.retry = false;
+    }
   }
   
-  private BlockingQueue<Event> eventQ = new LinkedBlockingQueue<Event>();
+  private BlockingQueue<EventEntry> eventQ = new LinkedBlockingQueue<EventEntry>();
   private List<Event> eventHistory = new LinkedList<Event>();
   private List<Event> unhandledEvents = new LinkedList<Event>();
   private List<EventError> eventErrors = new LinkedList<EventError>();
@@ -96,7 +98,7 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
       throw new EventRefusedException(e, "Dispatcher inactive", this, new IllegalStateException());
     }
     try {
-      eventQ.put(e);
+      eventQ.put(new EventEntry(e));
     } catch (Exception e1) {
       throw new EventRefusedException(e, "Error accepting event", this, e1);
     }
@@ -107,25 +109,28 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
       throw new IllegalStateException("Dispatcher forced to shutdown");
     }
     boolean eventDispatched = false;
+    EventEntry eventEntry = null;
     Event event = null;
     try {
-      event = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
-      if (event != null) {
+      eventEntry = eventQ.poll(timeOut, TimeUnit.MILLISECONDS);
+      if (eventEntry != null) {
+        event = eventEntry.event;
         boolean eventEffected = false;
         for (EventHandler evtHandler : eventHandlers) {
           try {
-            HandleType handleType = evtHandler.canHandleAs(event);
+            HandleType handleType = evtHandler.canHandleAs(event, eventEntry.retry);
             if (HandleType.SKIP.equals(handleType)
                 || (eventEffected && HandleType.EFFECT.equals(handleType)) ) {
               continue;
             } else {
-              HandleResult result = evtHandler.handle(event);
+              HandleResult result = evtHandler.handle(event, eventEntry.retry);
               if (HandleResult.DONE.equals(result)) {
                 eventDispatched = true;
                 eventEffected = HandleType.EFFECT.equals(handleType);
               } else if (!eventEffected && HandleResult.RETRY.equals(result)){
                 // interrupt current handling loop and add event to Q again for later retry
-                eventQ.add(event);
+                eventEntry.retry=true;
+                eventQ.add(eventEntry);
                 break;
               }
             }
@@ -173,9 +178,13 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     getLogger().info("shutdownNow " + this);
     shutdown();
     forcedShutdown = true;
-    List<Event> pendingEvents = new ArrayList<Event>(eventQ);
-    getLogger().info("shutdownNow " + this + " found " + pendingEvents.size() + " pending events");
-    return Collections.unmodifiableList(pendingEvents);
+    List<EventEntry> pendingEventEntries = new ArrayList<EventEntry>(eventQ);
+    getLogger().info("shutdownNow " + this + " found " + pendingEventEntries.size() + " pending events");
+    List<Event> pendingEvents = new ArrayList<Event>();
+    for (EventEntry eventEntry : pendingEventEntries) {
+      pendingEvents.add(eventEntry.event);
+    }
+    return pendingEvents;
   }
 
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {

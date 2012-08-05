@@ -35,7 +35,7 @@ public class FlowEventHandler implements EventHandler {
     this.director=director;
   }
 
-  public HandleType canHandleAs(Event event) {
+  public HandleType canHandleAs(Event event, boolean isRetry) {
     if (event instanceof FlowExecutionEvent) {
       return HandleType.FUNCTIONAL;
     } else {
@@ -46,7 +46,7 @@ public class FlowEventHandler implements EventHandler {
   public void initialize() {
   }
 
-  public HandleResult handle(Event event) throws Exception {
+  public HandleResult handle(Event event, boolean isRetry) throws Exception {
     FlowExecutionEvent fee = (FlowExecutionEvent) event;
     ExecutionTracerService.trace(director, fee.getEventType()+" - "+fee.getTarget().getFullName());
     return HandleResult.DONE;

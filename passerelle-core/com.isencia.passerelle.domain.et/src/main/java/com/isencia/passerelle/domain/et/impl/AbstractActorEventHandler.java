@@ -34,7 +34,7 @@ public abstract class AbstractActorEventHandler implements EventHandler {
   public void initialize() {
   }
 
-  public HandleResult handle(Event event) throws Exception {
+  public HandleResult handle(Event event, boolean isRetry) throws Exception {
     Actor actor = getDestinationActorFromEvent(event);
     synchronized (actor) {
       if (director.isActorIterating(actor)) {

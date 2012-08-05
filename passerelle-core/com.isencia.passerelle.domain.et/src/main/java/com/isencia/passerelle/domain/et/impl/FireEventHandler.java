@@ -42,7 +42,7 @@ public class FireEventHandler extends AbstractActorEventHandler {
     super(director);
   }
 
-  public HandleType canHandleAs(Event event) {
+  public HandleType canHandleAs(Event event, boolean isRetry) {
     if (event instanceof FireEvent) {
       return HandleType.EFFECT;
     } else {
