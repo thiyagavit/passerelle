@@ -400,6 +400,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     paused = false;
     finishRequested = false;
 
+    // TODO see how we can avoid starting a PortHandler when outside of Process domains
     if (requestFinishPort.getWidth() > 0) {
       // If at least 1 channel is connected to the port
       // Install handler on input port
