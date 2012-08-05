@@ -11,6 +11,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.message.MessageInputContext;
 
 @SuppressWarnings("serial")
 public abstract class DynamicPortsActor extends
@@ -301,5 +302,12 @@ public abstract class DynamicPortsActor extends
 	public void setExpectedContentType(final Class expectedContentType) {
 		this.expectedContentType = expectedContentType;
 	}
+
+  protected int getPortIndex(final MessageInputContext messageInputContext) {
+    String portName = messageInputContext.getPortName();
+    String portIndexStr = portName.substring("input".length());
+    int portIndex = Integer.parseInt(portIndexStr);
+    return portIndex;
+  }
 
 }

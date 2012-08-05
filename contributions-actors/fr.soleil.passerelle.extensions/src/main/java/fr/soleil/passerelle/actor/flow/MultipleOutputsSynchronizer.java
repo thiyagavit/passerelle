@@ -152,8 +152,8 @@ public class MultipleOutputsSynchronizer extends DynamicPortsActor {
 		final MessageInputContext messageInputContext = allInputContexts.next();
 		if (!messageInputContext.isProcessed()) {
 		    final ManagedMessage msg = messageInputContext.getMsg();
-		    final Port outputPort = getOutputPorts()
-			    .get(messageInputContext.getPortIndex());
+        int portIndex = getPortIndex(messageInputContext);
+		    final Port outputPort = getOutputPorts().get(portIndex);
 		    response.addOutputMessage(outputPort, msg);
 		}
 	    }

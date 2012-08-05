@@ -362,7 +362,8 @@ public class Expression extends DynamicPortsActor {
 			final MessageInputContext messageInputContext = allInputContexts.next();
 			if (!messageInputContext.isProcessed()) {
 				final ManagedMessage msg = messageInputContext.getMsg();
-				final Token expressionToken = extractPtolemyToken(msg, messageInputContext.getPortIndex());
+	      int portIndex = getPortIndex(messageInputContext);
+				final Token expressionToken = extractPtolemyToken(msg, portIndex);
 
 				if (expressionToken != null) {
 					if (!(expressionToken instanceof MatrixToken)) {
@@ -464,7 +465,7 @@ public class Expression extends DynamicPortsActor {
 
 	}
 
-	@Override
+  @Override
 	protected DynamicPortType getPortConfiguration() {
 		return DynamicPortType.ONLY_INPUTS;
 	}
