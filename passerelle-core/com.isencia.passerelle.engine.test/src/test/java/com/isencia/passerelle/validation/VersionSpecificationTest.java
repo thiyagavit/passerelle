@@ -14,76 +14,100 @@
 */
 package com.isencia.passerelle.validation;
 
-import com.isencia.passerelle.validation.version.VersionSpecification;
 import junit.framework.TestCase;
+import com.isencia.passerelle.validation.version.CodeVersionSpecification;
+import com.isencia.passerelle.validation.version.ThreeDigitVersionSpecification;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 public class VersionSpecificationTest extends TestCase {
 
-  public void testParseAndToString() {
+  public void testParseAndToString3Digit() {
     String VERSION_SPEC = "1.2.3_hello-world";
     VersionSpecification version = VersionSpecification.parse(VERSION_SPEC);
     assertNotNull("Version should parse correctly and be not-null",version);
+    assertTrue("Version should parse as 3-digit version",(version instanceof ThreeDigitVersionSpecification));
     assertEquals("Version should have original string specification", VERSION_SPEC, version.toString());
   }
 
-  public void testParseAndMajor() {
-    String VERSION_SPEC = "1.2.3_hello-world";
+  public void testParseAndToStringCode() {
+    String VERSION_SPEC = "hello-world";
     VersionSpecification version = VersionSpecification.parse(VERSION_SPEC);
+    assertNotNull("Version should parse correctly and be not-null",version);
+    assertTrue("Version should parse as code version",(version instanceof CodeVersionSpecification));
+    assertEquals("Version should have original string specification", VERSION_SPEC, version.toString());
+  }
+
+  public void testParseAndMajor3Digit() {
+    String VERSION_SPEC = "1.2.3_hello-world";
+    ThreeDigitVersionSpecification version = (ThreeDigitVersionSpecification) VersionSpecification.parse(VERSION_SPEC);
     assertEquals("Version major not correctly parsed", 1, version.getMajor());
   }
 
-  public void testParseAndMinor() {
+  public void testParseAndMinor3Digit() {
     String VERSION_SPEC = "1.2.3_hello-world";
-    VersionSpecification version = VersionSpecification.parse(VERSION_SPEC);
+    ThreeDigitVersionSpecification version = (ThreeDigitVersionSpecification) VersionSpecification.parse(VERSION_SPEC);
     assertEquals("Version minor not correctly parsed", 2, version.getMinor());
   }
 
-  public void testParseAndMicro() {
+  public void testParseAndMicro3Digit() {
     String VERSION_SPEC = "1.2.3_hello-world";
-    VersionSpecification version = VersionSpecification.parse(VERSION_SPEC);
+    ThreeDigitVersionSpecification version = (ThreeDigitVersionSpecification) VersionSpecification.parse(VERSION_SPEC);
     assertEquals("Version micro not correctly parsed", 3, version.getMicro());
   }
 
-  public void testEquality() {
+  public void testEquality3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("1.2.3_hello-world");
     
     assertEquals(version1, version2);
   }
 
-  public void testNotEqual() {
+  public void testEqualityCode() {
+    VersionSpecification version1 = VersionSpecification.parse("hello-world");
+    VersionSpecification version2 = VersionSpecification.parse("hello-world");
+    
+    assertEquals(version1, version2);
+  }
+
+  public void testNotEqual3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("2.2.3");
     
     assertFalse("1.2.3_hello-world should not be equal to 2.2.3", version1.equals(version2));
   }
 
-  public void testCompareMajorDiff() {
+  public void testCompareMajorDiff3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("2.2.3");
     
     assertTrue("1.2.3_hello-world must be smaller than 2.2.3", version1.compareTo(version2)<0);
   }
 
-  public void testCompareMinorDiff() {
+  public void testCompareMinorDiff3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("1.3.3");
     
     assertTrue("1.2.3_hello-world must be smaller than 1.3.3", version1.compareTo(version2)<0);
   }
 
-  public void testCompareMicroDiff() {
+  public void testCompareMicroDiff3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("1.2.4");
     
     assertTrue("1.2.3_hello-world must be smaller than 1.2.4", version1.compareTo(version2)<0);
   }
 
-  public void testCompareQualifierDiff() {
+  public void testCompareQualifierDiff3Digit() {
     VersionSpecification version1 = VersionSpecification.parse("1.2.3_hello-world");
     VersionSpecification version2 = VersionSpecification.parse("1.2.3_hello-world2");
     
     assertTrue("1.2.3_hello-world must be smaller than 1.2.3_hello-world2", version1.compareTo(version2)<0);
   }
 
+  public void testCompareCodeDiff() {
+    VersionSpecification version1 = VersionSpecification.parse("hello-world");
+    VersionSpecification version2 = VersionSpecification.parse("hello-world2");
+    
+    assertTrue("hello-world must be smaller than hello-world2", version1.compareTo(version2)<0);
+  }
 }

@@ -15,11 +15,7 @@
 package com.isencia.passerelle.validation.version;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A simple implementation of a version specification, based on a merge of OSGi-conventions and Ptolemy (which in turn seems to be based on JNLP).
@@ -35,177 +31,50 @@ import java.util.List;
  * 
  * @author erwin
  */
-public class VersionSpecification implements Comparable<VersionSpecification> {
+public abstract class VersionSpecification {
 
-  private int major;
-  private int minor;
-  private int micro;
-  private List<String> qualifiers = new ArrayList<String>();
-  
-  private String versionString;
+  protected String versionString;
 
   /**
-   * @param major
-   * @param minor
-   * @param micro
-   * @param qualifiers
-   */
-  public VersionSpecification(int major, int minor, int micro, String... qualifiers) {
-    this.major = major;
-    this.minor = minor;
-    this.micro = micro;
-    if(qualifiers!=null) {
-      Collections.addAll(this.qualifiers, qualifiers);
-    }
-  }
-  
-  public int getMajor() {
-    return major;
-  }
-
-  public int getMinor() {
-    return minor;
-  }
-
-  public int getMicro() {
-    return micro;
-  }
-
-  public Iterator<String> getQualifiers() {
-    return qualifiers.iterator();
-  }
-
-  /**
-   * Parses the given version String, using '.' , '-' , '_' as potential delimiters.
-   * The first 3 version ids are mandatory and should be integer numbers.
-   * Extra (optional) trailing ids can be textual.
-   * Spaces are not allowed in a version string.
-   * 
-   * E.g. "1.2_3-hello.world" is a valid version identifier.
+   * Parses the given version String, using '.' , '-' , '_' as potential delimiters. The first 3 version ids are mandatory and should be integer numbers. Extra
+   * (optional) trailing ids can be textual. Spaces are not allowed in a version string. E.g. "1.2_3-hello.world" is a valid version identifier.
    * 
    * @param version
    * @return
-   * 
    * @throws IllegalArgumentException
    * @throws NumberFormatException
    */
   public static VersionSpecification parse(String version) {
-    if(version.indexOf(' ') != -1) {
-      throw new IllegalArgumentException("Version can not contain spaces <"+version+">");
-    }
-    
-    String[] versionIds = version.split("[\\.\\-_]");
-    
-    if(versionIds.length<3) {
-      throw new IllegalArgumentException("Version must contain at least major, minor and micro identifiers <"+version+">");
-    }
-    
-    int major = Integer.parseInt(versionIds[0]);
-    int minor = Integer.parseInt(versionIds[1]);
-    int micro = Integer.parseInt(versionIds[2]);
     VersionSpecification versionSpec = null;
-    if(versionIds.length==3) {
-      versionSpec =  new VersionSpecification(major, minor, micro);
+
+    String[] versionIds = version.split("[\\.\\-_]");
+
+    if (versionIds.length < 3) {
+      versionSpec = new CodeVersionSpecification(version);
     } else {
-      // This is for JDK 1.6 onwards, but JDK 1.5 compliance is still needed, so we need to hack a sub-array logic here
-//      versionSpec =  new VersionSpecification(major, minor, micro, Arrays.copyOfRange(versionIds, 3, versionIds.length));
-      Collection<String> tail = new ArrayList<String>();
-      for(int i=3;i<versionIds.length;++i) {
-        tail.add(versionIds[i]);
+      if (version.indexOf(' ') != -1) {
+        throw new IllegalArgumentException("3-digit Version can not contain spaces <" + version + ">");
       }
-      versionSpec =  new VersionSpecification(major, minor, micro, tail.toArray(new String[versionIds.length-3]));
+
+      int major = Integer.parseInt(versionIds[0]);
+      int minor = Integer.parseInt(versionIds[1]);
+      int micro = Integer.parseInt(versionIds[2]);
+      if (versionIds.length == 3) {
+        versionSpec = new ThreeDigitVersionSpecification(major, minor, micro);
+      } else {
+        // This is for JDK 1.6 onwards, but JDK 1.5 compliance is still needed, so we need to hack a sub-array logic here
+        // versionSpec = new VersionSpecification(major, minor, micro, Arrays.copyOfRange(versionIds, 3, versionIds.length));
+        Collection<String> tail = new ArrayList<String>();
+        for (int i = 3; i < versionIds.length; ++i) {
+          tail.add(versionIds[i]);
+        }
+        versionSpec = new ThreeDigitVersionSpecification(major, minor, micro, tail.toArray(new String[versionIds.length - 3]));
+      }
+      versionSpec.versionString = version;
     }
-    versionSpec.versionString = version;
     return versionSpec;
   }
 
-  public int compareTo(VersionSpecification other) {
-    if (other == this)
-      return 0;
-    int result = major - other.major;
-    if (result != 0)
-      return result;
-    result = minor - other.minor;
-    if (result != 0)
-      return result;
-    result = micro - other.micro;
-    if (result != 0)
-      return result;
-    else if(qualifiers.size()>0) {
-      if(other.qualifiers.size()>0) {
-        int maxQualifierCount = Math.max(qualifiers.size(), other.qualifiers.size());
-        for(int i=0;i<maxQualifierCount;++i) {
-          String myQualifier = "";
-          String otherQualifier = "";
-          if(i<qualifiers.size()) {
-            myQualifier = qualifiers.get(i);
-          }
-          if(i<other.qualifiers.size()) {
-            otherQualifier = other.qualifiers.get(i);
-          }
-          int cmp = myQualifier.compareTo(otherQualifier);
-          if(cmp>0) {
-            return 1;
-          } else if (cmp<0) {
-            return -1;
-          }
-        }
-        return 0;
-      } else {
-        return 1;
-      }
-    } else if (other.qualifiers.size()>0) {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
+  public abstract int compareTo(VersionSpecification version2);
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + major;
-    result = prime * result + micro;
-    result = prime * result + minor;
-    result = prime * result + qualifiers.hashCode();
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    VersionSpecification other = (VersionSpecification) obj;
-    if (major != other.major)
-      return false;
-    if (micro != other.micro)
-      return false;
-    if (minor != other.minor)
-      return false;
-    if (!qualifiers.equals(other.qualifiers))
-      return false;
-    return true;
-  }
-
-  /**
-   * Produces a string representation that is itself valid again to be parsed
-   * as a VersionSpecification.
-   */
-  @Override
-  public String toString() {
-    if(versionString==null) {
-      StringBuilder versionStrBldr = new StringBuilder(major + "." + minor + "." + micro);
-      for (String qualifier : qualifiers) {
-        versionStrBldr.append("-"+qualifier);
-      }
-      versionString = versionStrBldr.toString();
-    }
-    
-    return versionString;
-  }
 }
