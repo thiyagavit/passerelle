@@ -29,6 +29,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortMode;
+import com.isencia.passerelle.message.MessageInputContext;
 
 /**
  * Remark : for these kinds of actors, it is not allowed to modify the names of
@@ -273,4 +274,12 @@ public abstract class DynamicPortsActor extends Actor {
   protected PortMode getPortModeForNewInputPort(String portName) {
     return PortMode.PUSH;
   }
+  
+  protected int getPortIndex(final MessageInputContext messageInputContext) {
+    String portName = messageInputContext.getPortName();
+    String portIndexStr = portName.substring("input".length());
+    int portIndex = Integer.parseInt(portIndexStr);
+    return portIndex;
+  }
+
 }
