@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
-import com.isencia.passerelle.domain.et.FireEvent;
 import com.isencia.passerelle.domain.et.SendEvent;
 
 /**
@@ -43,7 +42,7 @@ public class SendEventHandler extends AbstractActorEventHandler {
     super(director);
   }
 
-  public HandleType canHandleAs(Event event) {
+  public HandleType canHandleAs(Event event, boolean isRetry) {
     if (event instanceof SendEvent) {
       return HandleType.EFFECT;
     } else {
