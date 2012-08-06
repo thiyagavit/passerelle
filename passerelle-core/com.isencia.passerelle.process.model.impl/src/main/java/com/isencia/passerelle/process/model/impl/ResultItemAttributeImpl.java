@@ -18,7 +18,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 @Entity
 @Table(name = "PAS_RESULTITEMATTRIBUTE")
@@ -32,23 +32,28 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 	@Column(name = "ID")
 	@GeneratedValue(generator = "pas_resultitemattribute")
 	private Long id;
-	
+
 	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter methods	
+	// here to ensure jpa implementations like EclipseLink will generate setter
+	// methods
 	@ManyToOne(targetEntity = ResultItemImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESULTITEM_ID")
 	private ResultItemImpl<?> resultItem;
-	
+
 	public ResultItemAttributeImpl() {
 	}
-	
+
 	public ResultItemAttributeImpl(ResultItem<?> resultItem, String name, String value) {
 		super(name, value);
-		this.resultItem = (ResultItemImpl<?>)resultItem;
-		
-		this.resultItem.putAttribute(this);
+		if (resultItem instanceof ResultItemImpl<?>) {
+			this.resultItem = (ResultItemImpl<?>) resultItem;
+		}
+		resultItem.putAttribute(this);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
 	 */
 	public Long getId() {
@@ -59,15 +64,14 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 		return resultItem;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(ResultItemAttributeImpl rhs) {
-		return new CompareToBuilder()
-			.append(id, rhs.id)
-			.append(version, rhs.version).toComparison();
+		return new CompareToBuilder().append(id, rhs.id).append(version, rhs.version).toComparison();
 	}
-	
 
 	public String getScope() {
 		return SCOPE_RESULT_ITEM;
