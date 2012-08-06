@@ -26,7 +26,6 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 
 public class AsynchDelayedForwarder extends Actor {
@@ -43,13 +42,17 @@ public class AsynchDelayedForwarder extends Actor {
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage receivedMsg = request.getMessage(input);
+    try {
+      ((ETDirector)getDirector()).getAdapter(null).notifyActorStartedTask(this, receivedMsg);
+    } catch (IllegalActionException e) {
+      throw new ProcessingException("Failed to notify director", receivedMsg, e);
+    }
     // Create a new outgoing msg, "caused by" the received input msg
     // and for the rest a complete copy of the received msg
     try {
       ManagedMessage outputMsg = MessageFactory.getInstance().createCausedCopyMessage(receivedMsg);
-      ((ETDirector)getDirector()).notifyActorStartedTask(this, outputMsg);
       new Thread(new DelayedSender(outputMsg)).start();
-    } catch (MessageException e) {
+    } catch (Exception e) {
       throw new ProcessingException("Failed to create & send output msg", receivedMsg, e);
     }
   }
@@ -71,7 +74,13 @@ public class AsynchDelayedForwarder extends Actor {
       } catch (Exception e) {
         e.printStackTrace();
       }
-      ((ETDirector)getDirector()).notifyActorFinishedTask(AsynchDelayedForwarder.this, outputMsg);
+      
+      try {
+        ((ETDirector)getDirector()).getAdapter(null).notifyActorFinishedTask(AsynchDelayedForwarder.this, outputMsg);
+      } catch (Exception e) {
+        getLogger().error("Failed to notify director", e);
+      }
+
     }
   }
 }

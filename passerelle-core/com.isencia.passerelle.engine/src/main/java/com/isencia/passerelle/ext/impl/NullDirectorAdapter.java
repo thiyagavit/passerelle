@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.ext.impl;
 
+import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.data.expr.Parameter;
 import com.isencia.passerelle.core.PasserelleException;
@@ -122,4 +123,16 @@ public class NullDirectorAdapter implements DirectorAdapter {
   public void notifyFiringEventListeners(FiringEvent event) {
   }
 
+  public void notifyActorStartedTask(Actor actor, Object task) {
+  }
+
+  public void notifyActorFinishedTask(Actor actor, Object task) throws IllegalArgumentException {
+  }
+
+  public void clearBusyTaskActors() {
+  }
+
+  public boolean hasBusyTaskActors() {
+    return false;
+  }
 }

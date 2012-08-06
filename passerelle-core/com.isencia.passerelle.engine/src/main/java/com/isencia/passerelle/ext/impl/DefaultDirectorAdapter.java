@@ -18,10 +18,11 @@ package com.isencia.passerelle.ext.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.actor.CompositeActor;
-import ptolemy.actor.Director;
+import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
@@ -73,6 +74,17 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   public Parameter expertModeParam = null;
   public Parameter validateInitializationParam = null;
   public Parameter validateIterationParam = null;
+
+  // Need some collection to maintain info about busy tasks
+  // i.e. for slow actions done by actors.
+  // Seems interesting to store a tuple {actor, taskHandle, startTime}.
+  // Probably through a dedicated Event type?
+  // In models with loops or request-trains (e.g. DARE), a same actor could
+  // be handling several tasks concurrently.
+  // The taskHandle could be used to link to any domain-specific task entity.
+  // The startTime could be used for internal CEP, timeout mgmt etc.
+  private Map<Object, Actor> busyTaskActors = new ConcurrentHashMap<Object, Actor>();
+
   /**
    * @param container
    * @param name
@@ -224,4 +236,35 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     }
   }
 
+  public void clearBusyTaskActors() {
+    busyTaskActors.clear();
+  }
+  
+  public boolean hasBusyTaskActors() {
+   return busyTaskActors.size()>0; 
+  }
+  
+  public void notifyActorStartedTask(Actor actor, Object task) {
+    if(task==null) {
+      // no task differentiation possible, so just use the actor itself as key
+      task = actor;
+    }
+    busyTaskActors.put(task, actor);
+    // TODO : could be interesting to generate events for this?
+    // enqueueEvent(new TaskStartedEvent(task, actor));
+  }
+
+  public void notifyActorFinishedTask(Actor actor, Object task) throws IllegalArgumentException {
+    if(task==null) {
+      // no task differentiation possible, so just use the actor itself as key
+      task = actor;
+    }
+    if (actor == busyTaskActors.get(task)) {
+      busyTaskActors.remove(task);
+    } else {
+      throw new IllegalArgumentException("Task " + task + "not found for actor " + actor.getFullName());
+    }
+    // TODO : could be interesting to generate events for this?
+    // enqueueEvent(new TaskFinishedEvent(task, actor));
+  }
 }

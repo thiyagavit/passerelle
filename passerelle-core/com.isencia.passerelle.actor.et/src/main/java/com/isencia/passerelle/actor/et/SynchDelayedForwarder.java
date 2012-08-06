@@ -43,7 +43,11 @@ public class SynchDelayedForwarder extends Actor {
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage receivedMsg = request.getMessage(input);
-    ((ETDirector)getDirector()).notifyActorStartedTask(this, receivedMsg);
+    try {
+      ((ETDirector)getDirector()).getAdapter(null).notifyActorStartedTask(this, receivedMsg);
+    } catch (IllegalActionException e) {
+      throw new ProcessingException("Failed to notify director", receivedMsg, e);
+    }
     // Create a new outgoing msg, "caused by" the received input msg
     // and for the rest a complete copy of the received msg
     try {
@@ -57,6 +61,10 @@ public class SynchDelayedForwarder extends Actor {
     } catch (MessageException e) {
       throw new ProcessingException("Failed to create & send output msg", receivedMsg, e);
     }
-    ((ETDirector)getDirector()).notifyActorFinishedTask(this, receivedMsg);
+    try {
+      ((ETDirector)getDirector()).getAdapter(null).notifyActorFinishedTask(this, receivedMsg);
+    } catch (Exception e) {
+      throw new ProcessingException("Failed to notify director", receivedMsg, e);
+    }
   }
 }
