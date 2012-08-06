@@ -41,6 +41,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
@@ -238,15 +239,18 @@ public class ContextImpl implements Context {
 
 			// if still nothin found, check in the historical data
 			if (result == null) {
-				List<ResultBlock> historicalBlocks = ServiceRegistry.getInstance().getHistoricalDataProvider()
-						.getResultBlocks(this);
-				if (historicalBlocks != null) {
-					for (ResultBlock block : historicalBlocks) {
-						if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
-							ResultItem<?> item = block.getItemForName(name);
-							if (item != null) {
-								result = item.getValueAsString();
-								break;
+				HistoricalDataProvider historicalDataProvider = ServiceRegistry.getInstance()
+						.getHistoricalDataProvider();
+				if (historicalDataProvider != null) {
+					List<ResultBlock> historicalBlocks = historicalDataProvider.getResultBlocks(this);
+					if (historicalBlocks != null) {
+						for (ResultBlock block : historicalBlocks) {
+							if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+								ResultItem<?> item = block.getItemForName(name);
+								if (item != null) {
+									result = item.getValueAsString();
+									break;
+								}
 							}
 						}
 					}
