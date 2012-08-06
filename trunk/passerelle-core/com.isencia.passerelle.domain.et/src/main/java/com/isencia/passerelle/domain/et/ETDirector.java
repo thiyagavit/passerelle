@@ -64,15 +64,6 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
   private boolean notDone = true;
   private Set<Actor> inactiveActors = new HashSet<Actor>();
 
-  // Need some collection to maintain info about busy tasks
-  // i.e. for slow actions done by actors.
-  // Seems interesting to store a tuple {actor, taskHandle, startTime}.
-  // Probably through a dedicated Event type?
-  // In models with loops or request-trains (e.g. DARE), a same actor could
-  // be handling several tasks concurrently.
-  // The taskHandle could be used to link to any domain-specific task entity.
-  // The startTime could be used for internal CEP, timeout mgmt etc.
-  private Map<Object, Actor> busyTaskActors = new ConcurrentHashMap<Object, Actor>();
   // Map maintaining which actors are currently iterating, and for which triggering event
   private Map<Actor, Event> busyIteratingActors = new ConcurrentHashMap<Actor, Event>();
 
@@ -169,7 +160,7 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
     dispatchReporter = (EventDispatchReporter) dispatcher;
     notDone = true;
     inactiveActors.clear();
-    busyTaskActors.clear();
+    getAdapter(null).clearBusyTaskActors();
   }
 
   @Override
@@ -191,7 +182,7 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
   public synchronized void fire() throws IllegalActionException {
     try {
       int timeout = ((IntToken) dispatchTimeoutParameter.getToken()).intValue();
-      notDone = dispatcher.dispatch(timeout) || (busyTaskActors.size() > 0);
+      notDone = dispatcher.dispatch(timeout) || getAdapter(null).hasBusyTaskActors();
     } catch (Exception e) {
       throw new IllegalActionException(this, e, "Error during dispatching of events");
     }
@@ -277,27 +268,6 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
 
   public boolean isActorIterating(Actor actor) {
     return busyIteratingActors.get(actor) != null;
-  }
-
-  public void notifyActorStartedTask(Actor actor, Object task) {
-    busyTaskActors.put(task, actor);
-    // TODO : could be interesting to generate events for this?
-    // enqueueEvent(new TaskStartedEvent(task, actor));
-  }
-
-  /**
-   * @param actor
-   * @param task
-   * @throws IllegalStateException when the given task is not registered as busy for the given actor.
-   */
-  public void notifyActorFinishedTask(Actor actor, Object task) throws IllegalStateException {
-    if (actor == busyTaskActors.get(task)) {
-      busyTaskActors.remove(task);
-    } else {
-      throw new IllegalArgumentException("Task " + task + "not found for actor " + actor.getFullName());
-    }
-    // TODO : could be interesting to generate events for this?
-    // enqueueEvent(new TaskFinishedEvent(task, actor));
   }
 
   public void notifyActorInactive(Actor actor) {

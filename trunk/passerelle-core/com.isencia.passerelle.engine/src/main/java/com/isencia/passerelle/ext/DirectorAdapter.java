@@ -14,6 +14,7 @@
  */
 package com.isencia.passerelle.ext;
 
+import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.data.expr.Parameter;
 import com.isencia.passerelle.core.PasserelleException;
@@ -91,6 +92,34 @@ public interface DirectorAdapter {
    * @param newParameter
    */
   void registerConfigurableParameter(Parameter newParameter);
+  
+  /**
+   * 
+   */
+  void clearBusyTaskActors();
+  
+  /**
+   * 
+   * @return
+   */
+  boolean hasBusyTaskActors();
+  
+  /**
+   * Actors should call this method in the beginning of their actual fire/process work,
+   * (optionally) passing some task object that can serve as key to identify the unit-of-work that they're executing.
+   * If task is null here, it should also be passed as null in <code>notifyActorFinishedTask</code>.
+   * 
+   * @param actor
+   * @param task
+   */
+  void notifyActorStartedTask(Actor actor, Object task);
+
+  /**
+   * @param actor
+   * @param task
+   * @throws IllegalArgumentException when the given task is not registered as busy for the given actor.
+   */
+  void notifyActorFinishedTask(Actor actor, Object task) throws IllegalArgumentException;
 
   /**
    * Register a listener that will be notified of ALL actor iteration transitions.
