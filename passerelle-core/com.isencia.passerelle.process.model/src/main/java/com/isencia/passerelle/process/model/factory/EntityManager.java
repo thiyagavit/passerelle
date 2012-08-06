@@ -9,6 +9,7 @@ import java.util.List;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 
 /**
@@ -43,6 +44,7 @@ public interface EntityManager {
    */
   Context persistContext(Context context);
   
+  
   /**
    * Persist updates in an existing context entity 
    * or in its contained properties
@@ -51,6 +53,7 @@ public interface EntityManager {
    * @return
    */
   Context mergeContext(Context context);
+  Context mergeContext(Context context,boolean hasChangedBlocks);
   
   /**
    * Merge two or more branched contexts
