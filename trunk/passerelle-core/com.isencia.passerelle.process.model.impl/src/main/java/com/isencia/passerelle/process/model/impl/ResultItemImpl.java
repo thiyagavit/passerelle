@@ -108,6 +108,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	public static final String _RESULT_BLOCK_TYPE = "resultBlock.type";
 	public static final String _COLOUR = "colour";
 	public static final String _DISCRIMINATOR = "discriminator";
+	public static final String _ATTRIBUTES = "attributes";
 
 	public ResultItemImpl() {
 	}
@@ -126,7 +127,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 		this.name = name;
 		this.unit = unit;
 		this.level = level;
-
+		// TODO when resultblock is null then the TransientResultItemImpl should be used
 		if (this.resultBlock != null)
 			this.resultBlock.putItem(this);
 
@@ -159,7 +160,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	public Iterator<String> getAttributeNames() {
 		return attributes.keySet().iterator();
 	}
-
+	@OneToMany(mappedBy = "resultItem", targetEntity = ResultItemAttributeImpl.class)
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}

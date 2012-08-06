@@ -32,8 +32,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -92,6 +90,8 @@ public class ResultBlockImpl implements ResultBlock {
 	public static final String _TYPE = "type";
 	public static final String _RESULT_ITEMS = "allItems";
 	public static final String _COLOUR = "colour";
+	public static final String _ATTRIBUTES = "attributes";
+	public static final String _DISCRIMINATOR = "discriminator";
 
 	public ResultBlockImpl() {
 	}
@@ -150,6 +150,7 @@ public class ResultBlockImpl implements ResultBlock {
 	 * 
 	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributes()
 	 */
+	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}
@@ -204,6 +205,11 @@ public class ResultBlockImpl implements ResultBlock {
 	public Collection<ResultItem<?>> getAllItems() {
 		return Collections.unmodifiableCollection(resultItems.values());
 	}
+	
+	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
+	public Set<ResultItem> getResultItems() {
+		return new HashSet<ResultItem>(resultItems.values());
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -235,4 +241,8 @@ public class ResultBlockImpl implements ResultBlock {
 		builder.append("]");
 		return builder.toString();
 	}
+	@SuppressWarnings("unused")
+	@Column(name = "DTYPE", updatable = false)
+	private String discriminator;
+
 }

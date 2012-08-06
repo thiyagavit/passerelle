@@ -58,13 +58,23 @@ public class TaskImpl extends RequestImpl implements Task {
 	}
 
 	public Collection<ResultBlock> getResultBlocks() {
-		return Collections.unmodifiableSet(resultBlocks);
+		// TODO this was unmodifiable set but this gave difficulties for sherpa when used to show resultBlocks
+		return resultBlocks;
 	}
 
-	// this is a utitlity getter for sherpa	
+	// this is a utitlity getter for sherpa
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock.task")
 	public Set<ResultItem> getResultItems() {
 
+		return null;
+	}
+
+	public ResultBlock getResultBlock(String type) {
+		for (ResultBlock block : resultBlocks) {
+			if (type.equals(block.getType())) {
+				return block;
+			}
+		}
 		return null;
 	}
 }

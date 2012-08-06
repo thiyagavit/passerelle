@@ -37,4 +37,6 @@ public interface Task extends Request {
 	 * @return the results that have been gathered by this task
 	 */
 	Collection<ResultBlock> getResultBlocks();
+	
+	ResultBlock getResultBlock(String type);
 }
