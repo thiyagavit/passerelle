@@ -32,6 +32,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -205,7 +208,7 @@ public class ResultBlockImpl implements ResultBlock {
 	public Collection<ResultItem<?>> getAllItems() {
 		return Collections.unmodifiableCollection(resultItems.values());
 	}
-	
+
 	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
 	public Set<ResultItem> getResultItems() {
 		return new HashSet<ResultItem>(resultItems.values());
@@ -241,8 +244,22 @@ public class ResultBlockImpl implements ResultBlock {
 		builder.append("]");
 		return builder.toString();
 	}
+
 	@SuppressWarnings("unused")
 	@Column(name = "DTYPE", updatable = false)
 	private String discriminator;
 
+	@SuppressWarnings("all")
+	public int hashCode() {
+		return new HashCodeBuilder(31, 71).append(id).append(type).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		if (!(arg0 instanceof ResultBlockImpl)) {
+			return false;
+		}
+		ResultBlockImpl rhs = (ResultBlockImpl) arg0;
+		return new EqualsBuilder().append(this.id, rhs.id).append(this.type, rhs.type).isEquals();
+	}
 }

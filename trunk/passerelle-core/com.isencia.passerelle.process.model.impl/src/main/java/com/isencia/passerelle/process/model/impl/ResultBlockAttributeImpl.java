@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.isencia.passerelle.process.model.ResultBlock;
 
@@ -70,6 +72,21 @@ public class ResultBlockAttributeImpl extends AttributeImpl implements Comparabl
 
 	public String getScope() {
 		return SCOPE_RESULTBLOCK;
+	}
+	
+	@SuppressWarnings("all")
+	public int hashCode() {
+		return new HashCodeBuilder(31, 71).append(id).append(getName()).append(getValueAsString()).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		if (!(arg0 instanceof ResultBlockAttributeImpl)) {
+			return false;
+		}
+		ResultBlockAttributeImpl rhs = (ResultBlockAttributeImpl) arg0;
+		return new EqualsBuilder().append(this.id, rhs.id).append(this.getName(), rhs.getName())
+				.append(this.getValueAsString(), rhs.getValueAsString()).isEquals();
 	}
 	
 }

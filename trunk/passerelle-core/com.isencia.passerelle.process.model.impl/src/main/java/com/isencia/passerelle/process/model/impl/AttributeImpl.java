@@ -11,6 +11,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.isencia.passerelle.process.model.Attribute;
 
 /**
@@ -77,4 +80,5 @@ public abstract class AttributeImpl implements Attribute {
 
 		return value;
 	}
+	
 }

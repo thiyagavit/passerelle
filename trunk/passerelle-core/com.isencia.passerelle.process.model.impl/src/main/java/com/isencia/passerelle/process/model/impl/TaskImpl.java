@@ -1,8 +1,6 @@
 package com.isencia.passerelle.process.model.impl;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +11,9 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
@@ -58,7 +59,8 @@ public class TaskImpl extends RequestImpl implements Task {
 	}
 
 	public Collection<ResultBlock> getResultBlocks() {
-		// TODO this was unmodifiable set but this gave difficulties for sherpa when used to show resultBlocks
+		// TODO this was unmodifiable set but this gave difficulties for sherpa
+		// when used to show resultBlocks
 		return resultBlocks;
 	}
 
@@ -76,5 +78,19 @@ public class TaskImpl extends RequestImpl implements Task {
 			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("all")
+	public int hashCode() {
+		return new HashCodeBuilder(31, 71).append(getId()).append(getType()).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		if (!(arg0 instanceof TaskImpl)) {
+			return false;
+		}
+		TaskImpl rhs = (TaskImpl) arg0;
+		return new EqualsBuilder().append(this.getId(), rhs.getId()).append(this.getType(), rhs.getType()).isEquals();
 	}
 }
