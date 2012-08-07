@@ -31,6 +31,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -188,4 +191,22 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@SuppressWarnings("unused")
 	@Column(name = "DTYPE", updatable = false)
 	private String discriminator;
+	
+	@SuppressWarnings("all")
+	public int hashCode() {
+		return new HashCodeBuilder(31, 71).append(id).append(name).append(unit)
+				.append(value).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		if (!(arg0 instanceof ResultItemImpl)) {
+			return false;
+		}
+		ResultItemImpl rhs = (ResultItemImpl) arg0;
+		return new EqualsBuilder().append(this.id, rhs.id).append(this.name,
+				rhs.name).append(this.unit, rhs.unit).append(this.value,
+				rhs.value).isEquals();
+	}
+
 }
