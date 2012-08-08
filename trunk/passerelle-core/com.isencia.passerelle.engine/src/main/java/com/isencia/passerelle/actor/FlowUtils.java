@@ -4,15 +4,15 @@ import ptolemy.kernel.util.NamedObj;
 
 public class FlowUtils {
 
-//	public static final String TRANSLATION_ID = "translationId";
-	
+	// public static final String TRANSLATION_ID = "translationId";
+
 	public static String generateTranslationKey(NamedObj actor, String key) {
-		if (actor == null){
+		if (actor == null) {
 			return null;
 		}
 
 		StringBuffer sb = new StringBuffer(getFullNameWithoutFlow(actor));
-		
+
 		if (key != null) {
 			sb.append(".");
 			sb.append(key);
@@ -21,9 +21,8 @@ public class FlowUtils {
 
 	}
 
-	
 	public static final String FLOW_SEPARATOR = "#sep";
-	
+
 	public static String extractFlowName(NamedObj actor) {
 		String fullName = actor.getFullName();
 
@@ -33,18 +32,23 @@ public class FlowUtils {
 		return actor.toplevel().getName();
 	}
 
-
-	public static String generateUniqueFlowName(String name) {
+	public static String generateUniqueFlowName(String name, long uniqueIndex) {
 		StringBuffer sb = new StringBuffer(name);
 		sb.append(FLOW_SEPARATOR);
 		sb.append(System.currentTimeMillis());
 		return sb.toString();
 	}
 
+	public static String generateUniqueFlowName(String name) {
+
+		return generateUniqueFlowName(name, System.currentTimeMillis());
+	}
+
 	public static String getFullNameWithoutFlow(NamedObj no) {
 		NamedObj container = no.toplevel();
 		return no.getFullName().substring(container.getName().length() + 1);
 	}
+
 	public static String getOriginalFullName(NamedObj no) {
 		String fullNameWithoutFlow = getFullNameWithoutFlow(no);
 		StringBuffer sb = new StringBuffer(extractFlowName(no));
