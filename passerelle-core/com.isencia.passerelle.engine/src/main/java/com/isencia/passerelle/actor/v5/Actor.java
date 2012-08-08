@@ -357,6 +357,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       }
       currentProcessResponse = new ProcessResponse(ctxt, currentProcessRequest);
       try {
+        getDirectorAdapter().notifyActorStartedTask(this, currentProcessRequest);
         notifyStartingFireProcessing();
         process(ctxt, currentProcessRequest, currentProcessResponse);
       } finally {
@@ -372,13 +373,18 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   protected boolean doPostFire() throws ProcessingException {
     getLogger().trace("{} - doPostFire() - entry", getFullName());
 
-    if (currentProcessResponse != null && ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(currentProcessResponse.getContext(), currentProcessResponse.getRequest()))) {
+    if (currentProcessResponse != null
+        && ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(currentProcessResponse.getContext(), currentProcessResponse.getRequest()))) {
       processFinished(currentProcessResponse.getContext(), currentProcessResponse.getRequest(), currentProcessResponse);
     }
 
     currentProcessResponse = null;
 
     boolean result = super.doPostFire();
+    if (!result) {
+      // check if we don't have asynch work ongoing
+      result = getDirectorAdapter().isActorBusy(this);
+    }
     if (result) {
       // create new proc req for next iteration
       iterationCount++;
@@ -540,6 +546,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       } catch (IllegalActionException e1) {
         getLogger().error("Error handling exception ", e);
       }
+    } finally {
+      getDirectorAdapter().notifyActorFinishedTask(this, response.getRequest());
     }
   }
 

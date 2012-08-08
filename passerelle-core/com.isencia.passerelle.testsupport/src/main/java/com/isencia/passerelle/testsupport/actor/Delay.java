@@ -22,24 +22,24 @@ import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 
 /**
+ * Simple actor for testing, that mocks some work for each incoming msg,
+ * by blocking for a configurable delay and then just forwarding the received msg.
+ * 
  * @author erwin
  */
-public class Delay extends Actor {
+public class Delay extends Forwarder {
   private final static Logger LOGGER = LoggerFactory.getLogger(Delay.class);
 
   public Parameter timeParameter = null;
-  public Port input;
-  public Port output;
+  
+  private boolean fireInterrupted;
 
   /**
    * Construct an actor with the given container and name.
@@ -52,9 +52,6 @@ public class Delay extends Actor {
   public Delay(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
 
-    input = PortFactory.getInstance().createInputPort(this, null);
-    output = PortFactory.getInstance().createOutputPort(this);
-
     timeParameter = new Parameter(this, "time(s)", new IntToken(1));
     timeParameter.setTypeEquals(BaseType.INT);
     registerConfigurableParameter(timeParameter);
@@ -62,16 +59,13 @@ public class Delay extends Actor {
 
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    // The code below is for the case where we configure the input port as PUSH.
-    // Then it is possible that multiple msgs are received in one iteration.
-    // When the input port is in PULL mode, there will always only be one received msg.
-    ManagedMessage msg = request.getMessage(input);
-    int time = Integer.parseInt(timeParameter.getExpression());
+    fireInterrupted = false;
     try {
+      int time = ((IntToken)timeParameter.getToken()).intValue();
       if (time > 0) {
         for (int i = 0; i < time; ++i) {
           Thread.sleep(1000);
-          if (isFinishRequested()) {
+          if (isFinishRequested() || fireInterrupted) {
             break;
           }
         }
@@ -82,9 +76,21 @@ public class Delay extends Actor {
       throw new ProcessingException("[PASS-EX-1111] - Error in delay processing", this, e);
     }
 
-    response.addOutputMessage(output, msg);
+    super.process(ctxt, request, response);
   }
 
+  @Override
+  protected void doInitialize() throws InitializationException {
+    super.doInitialize();
+    fireInterrupted = false;
+  }
+  
+  @Override
+  protected void doStopFire() {
+    super.doStopFire();
+    fireInterrupted = true;
+  }
+  
   @Override
   public Logger getLogger() {
     return LOGGER;

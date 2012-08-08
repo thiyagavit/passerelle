@@ -70,6 +70,10 @@ public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
           e.printStackTrace();
         }
       }
+    } else {
+      // block the calling thread until an event has arrived, or timeout is passed
+      // if an event arrives, it will also be processed in the calling thread...
+      super.dispatch(timeOut);
     }
     getLogger().debug(this + " hasDispatchedSomething " + hasDispatchedSomething);
     return hasDispatchedSomething;

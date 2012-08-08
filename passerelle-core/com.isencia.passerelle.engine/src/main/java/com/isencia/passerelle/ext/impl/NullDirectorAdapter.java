@@ -135,4 +135,8 @@ public class NullDirectorAdapter implements DirectorAdapter {
   public boolean hasBusyTaskActors() {
     return false;
   }
+  
+  public boolean isActorBusy(Actor actor) {
+    return false;
+  }
 }

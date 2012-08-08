@@ -36,6 +36,8 @@ import com.isencia.passerelle.message.ManagedMessage;
  * by blocking for a configurable time.
  * 
  * @author erwin
+ * 
+ * @deprecated Just use the Delay actor that has similar functionality.
  *
  */
 public class MockWorker extends Actor {
