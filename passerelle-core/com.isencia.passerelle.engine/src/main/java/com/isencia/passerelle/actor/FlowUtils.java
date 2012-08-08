@@ -32,7 +32,7 @@ public class FlowUtils {
 		return actor.toplevel().getName();
 	}
 
-	public static String generateUniqueFlowName(String name, long uniqueIndex) {
+	public static String generateUniqueFlowName(String name, String uniqueIndex) {
 		StringBuffer sb = new StringBuffer(name);
 		sb.append(FLOW_SEPARATOR);
 		sb.append(System.currentTimeMillis());
@@ -41,7 +41,7 @@ public class FlowUtils {
 
 	public static String generateUniqueFlowName(String name) {
 
-		return generateUniqueFlowName(name, System.currentTimeMillis());
+		return generateUniqueFlowName(name, Long.toString(System.currentTimeMillis()));
 	}
 
 	public static String getFullNameWithoutFlow(NamedObj no) {
