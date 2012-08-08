@@ -45,7 +45,6 @@ import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortMode;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageException;
@@ -93,6 +92,14 @@ import com.isencia.passerelle.message.MessageProvider;
 @SuppressWarnings("serial")
 public abstract class Actor extends com.isencia.passerelle.actor.Actor implements MessageBuffer {
   private final static Logger LOGGER = LoggerFactory.getLogger(Actor.class);
+
+  /**
+   * Identifies whether the actor will process a given ProcessRequest synchronously (all work done when the <code>process()</code> method returns) or
+   * asynchronously (work done in background and will probably take longer than the return of the <code>process()</code> method invocation).
+   */
+  public enum ProcessingMode {
+    SYNCHRONOUS, ASYNCHRONOUS;
+  }
 
   // Just a counter for the fire cycles.
   // We're using this to be able to show for each input msg on which fire cycle it arrived.
@@ -316,7 +323,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         addPushedMessages(currentProcessRequest);
       }
       readyToFire = currentProcessRequest.hasSomethingToProcess();
-      
+
       // when all ports are exhausted, we can stop this actor
       if (!readyToFire && areAllInputsFinished() && !hasPushedMessages()) {
         requestFinish();
@@ -348,7 +355,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           }
         }
       }
-      currentProcessResponse = new ProcessResponse(currentProcessRequest);
+      currentProcessResponse = new ProcessResponse(ctxt, currentProcessRequest);
       try {
         notifyStartingFireProcessing();
         process(ctxt, currentProcessRequest, currentProcessResponse);
@@ -364,50 +371,21 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   @Override
   protected boolean doPostFire() throws ProcessingException {
     getLogger().trace("{} - doPostFire() - entry", getFullName());
-    
-    if (currentProcessResponse != null) {
-      // Mark the contexts as processed.
-      // Not sure if this is still relevant for v5 actors,
-      // as even PUSHed messages are assumed to be handled once, in the iteration when they are offered to process().
-      Iterator<MessageInputContext> allInputContexts = currentProcessRequest.getAllInputContexts();
-      while (allInputContexts.hasNext()) {
-        MessageInputContext msgInputCtxt = allInputContexts.next();
-        msgInputCtxt.setProcessed(true);
-      }
 
-      // and now send out the results
-      MessageOutputContext[] outputs = currentProcessResponse.getOutputs();
-      if (outputs != null) {
-        for (MessageOutputContext output : outputs) {
-          sendOutputMsg(output.getPort(), output.getMessage());
-        }
-      }
-      outputs = currentProcessResponse.getOutputsInSequence();
-      if (outputs != null && outputs.length > 0) {
-        Long seqID = MessageFactory.getInstance().createSequenceID();
-        for (int i = 0; i < outputs.length; i++) {
-          MessageOutputContext context = outputs[i];
-          boolean isLastMsg = (i == (outputs.length - 1));
-          try {
-            ManagedMessage msgInSeq = MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
-            sendOutputMsg(context.getPort(), msgInSeq);
-          } catch (MessageException e) {
-            throw new ProcessingException("Error creating output sequence msg for msg " + context.getMessage().getID(), context.getMessage(), e);
-          }
-        }
-      }
+    if (currentProcessResponse != null && ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(currentProcessResponse.getContext(), currentProcessResponse.getRequest()))) {
+      processFinished(currentProcessResponse.getContext(), currentProcessResponse.getRequest(), currentProcessResponse);
     }
 
     currentProcessResponse = null;
-    
+
     boolean result = super.doPostFire();
     if (result) {
       // create new proc req for next iteration
       iterationCount++;
       currentProcessRequest = new ProcessRequest();
       currentProcessRequest.setIterationCount(iterationCount);
-      
-      if(isSource) {
+
+      if (isSource) {
         // we need to request our own next firing iteration
         try {
           getDirector().fireAtCurrentTime(this);
@@ -437,9 +415,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         // so refuse the task
         throw new ProcessingException("Msg Queue lock overcharged...", this, null);
       }
-//      while (!isFinishRequested() && !areAllInputsFinished() && pushedMessages.isEmpty()) {
-//        msgQNonEmpty.await(100, TimeUnit.MILLISECONDS);
-//      }
+      // while (!isFinishRequested() && !areAllInputsFinished() && pushedMessages.isEmpty()) {
+      // msgQNonEmpty.await(100, TimeUnit.MILLISECONDS);
+      // }
 
       while (!pushedMessages.isEmpty()) {
         req.addInputContext(pushedMessages.poll());
@@ -477,7 +455,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
     return result;
   }
-  
+
   /**
    * @return true when all input ports are exhausted
    */
@@ -491,12 +469,79 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
+   * Overridable method to indicate whether the given request will be processed synchronously or asynchronously. Default implementation indicates synchronous
+   * processing for all requests.
+   * <p>
+   * Actors that have asynchronous processing, should combine returning <code>ProcessingMode.ASYNCHRONOUS</code> here, with invoking
+   * <code>processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response)</code> when the work is done for a given request.
+   * </p>
+   * 
    * @param ctxt
    * @param request
-   * @param response
+   * @return whether the given request will be processed synchronously or asynchronously.
+   */
+  protected ProcessingMode getProcessingMode(ActorContext ctxt, ProcessRequest request) {
+    return ProcessingMode.SYNCHRONOUS;
+  }
+
+  /**
+   * @param ctxt the context in which the request must be processed
+   * @param request the request that must be processed
+   * @param response after processing this should contain the output messages that the actor should send, or a ProcessingException if some error was encountered
+   *          during processing. (However, normally, for synchronous processing, exceptions will just be thrown.)
    * @throws ProcessingException
    */
   protected abstract void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException;
+
+  /**
+   * @param ctxt the context in which the request was processed
+   * @param request the request that was processed
+   * @param response contains the output messages that the actor should send, or a ProcessingException if some error was encountered during processing.
+   */
+  protected void processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response) {
+    try {
+      if (response.getException() == null) {
+        // Mark the contexts as processed.
+        // Not sure if this is still relevant for v5 actors,
+        // as even PUSHed messages are assumed to be handled once, in the iteration when they are offered to process().
+        Iterator<MessageInputContext> allInputContexts = request.getAllInputContexts();
+        while (allInputContexts.hasNext()) {
+          MessageInputContext msgInputCtxt = allInputContexts.next();
+          msgInputCtxt.setProcessed(true);
+        }
+
+        // and now send out the results
+        MessageOutputContext[] outputs = response.getOutputs();
+        if (outputs != null) {
+          for (MessageOutputContext output : outputs) {
+            sendOutputMsg(output.getPort(), output.getMessage());
+          }
+        }
+        outputs = response.getOutputsInSequence();
+        if (outputs != null && outputs.length > 0) {
+          Long seqID = MessageFactory.getInstance().createSequenceID();
+          for (int i = 0; i < outputs.length; i++) {
+            MessageOutputContext context = outputs[i];
+            boolean isLastMsg = (i == (outputs.length - 1));
+            try {
+              ManagedMessage msgInSeq = MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
+              sendOutputMsg(context.getPort(), msgInSeq);
+            } catch (MessageException e) {
+              throw new ProcessingException("Error creating output sequence msg for msg " + context.getMessage().getID(), context.getMessage(), e);
+            }
+          }
+        }
+      } else {
+        throw response.getException();
+      }
+    } catch (ProcessingException e) {
+      try {
+        getErrorControlStrategy().handleFireException(this, e);
+      } catch (IllegalActionException e1) {
+        getLogger().error("Error handling exception ", e);
+      }
+    }
+  }
 
   /**
    * <p>
