@@ -105,6 +105,13 @@ public interface DirectorAdapter {
   boolean hasBusyTaskActors();
   
   /**
+   * 
+   * @param actor
+   * @return
+   */
+  boolean isActorBusy(Actor actor);
+  
+  /**
    * Actors should call this method in the beginning of their actual fire/process work,
    * (optionally) passing some task object that can serve as key to identify the unit-of-work that they're executing.
    * If task is null here, it should also be passed as null in <code>notifyActorFinishedTask</code>.

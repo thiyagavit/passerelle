@@ -15,8 +15,6 @@
 package com.isencia.passerelle.testsupport.actor;
 
 import java.util.concurrent.LinkedBlockingDeque;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
@@ -25,7 +23,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.TerminationException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
@@ -44,8 +41,6 @@ import com.isencia.passerelle.message.ManagedMessage;
  * @author erwin
  */
 public class MessageHistoryStack extends Actor {
-
-  private final static Logger logger = LoggerFactory.getLogger(MessageHistoryStack.class);
 
   public Port input;
   public Parameter historySizeParameter;

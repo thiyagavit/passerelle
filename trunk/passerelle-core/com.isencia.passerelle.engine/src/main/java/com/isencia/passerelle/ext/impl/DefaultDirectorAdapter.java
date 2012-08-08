@@ -244,6 +244,10 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
    return busyTaskActors.size()>0; 
   }
   
+  public boolean isActorBusy(Actor actor) {
+    return busyTaskActors.values().contains(actor);
+  }
+  
   public void notifyActorStartedTask(Actor actor, Object task) {
     if(task==null) {
       // no task differentiation possible, so just use the actor itself as key
