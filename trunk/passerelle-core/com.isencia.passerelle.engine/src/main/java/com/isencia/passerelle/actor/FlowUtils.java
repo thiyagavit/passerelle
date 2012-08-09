@@ -4,22 +4,6 @@ import ptolemy.kernel.util.NamedObj;
 
 public class FlowUtils {
 
-	// public static final String TRANSLATION_ID = "translationId";
-
-	public static String generateTranslationKey(NamedObj actor, String key) {
-		if (actor == null) {
-			return null;
-		}
-
-		StringBuffer sb = new StringBuffer(getFullNameWithoutFlow(actor));
-
-		if (key != null) {
-			sb.append(".");
-			sb.append(key);
-		}
-		return sb.substring(1);
-
-	}
 
 	public static final String FLOW_SEPARATOR = "#sep";
 
