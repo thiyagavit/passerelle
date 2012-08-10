@@ -30,7 +30,7 @@ import com.isencia.passerelle.process.model.Request;
  */
 @Entity
 @Table(name = "PAS_CASE")
-@DiscriminatorValue("DECISION_CASE")
+@DiscriminatorValue("CASE")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
 public class CaseImpl implements Case {
 
