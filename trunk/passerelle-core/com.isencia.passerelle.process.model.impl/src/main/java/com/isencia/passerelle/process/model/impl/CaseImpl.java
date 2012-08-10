@@ -5,7 +5,6 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -17,6 +16,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -30,8 +31,9 @@ import com.isencia.passerelle.process.model.Request;
  */
 @Entity
 @Table(name = "PAS_CASE")
-@DiscriminatorValue("CASE")
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
+@DiscriminatorValue("CASE")
 public class CaseImpl implements Case {
 
 	private static final long serialVersionUID = 1L;
