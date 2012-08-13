@@ -146,6 +146,10 @@ public class RequestImpl implements Request {
 		return id;
 	}
 
+	public Date getCreationTS() {
+		return creationTS;
+	}
+
 	public String getInitiator() {
 		return initiator;
 	}

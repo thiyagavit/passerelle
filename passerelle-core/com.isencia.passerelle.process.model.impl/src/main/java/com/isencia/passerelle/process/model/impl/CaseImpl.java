@@ -5,6 +5,7 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -20,6 +21,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Case;
@@ -43,6 +46,10 @@ public class CaseImpl implements Case {
 	@GeneratedValue(generator = "pas_case")
 	private Long id;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
+	private Date creationTS;
+
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
@@ -58,14 +65,20 @@ public class CaseImpl implements Case {
 	public static final String _EXTERNAL_REFERENCE = "externalReference";
 
 	public CaseImpl() {
+		this.creationTS = new Date();
 	}
 
 	public CaseImpl(String externalReference) {
+		this.creationTS = new Date();
 		this.externalReference = externalReference;
 	}
 
 	public Long getId() {
 		return id;
+	}
+
+	public Date getCreationTS() {
+		return creationTS;
 	}
 
 	public String getExternalReference() {
