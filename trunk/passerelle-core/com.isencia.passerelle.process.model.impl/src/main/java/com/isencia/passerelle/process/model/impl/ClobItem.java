@@ -3,12 +3,16 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Identifiable;
@@ -26,6 +30,10 @@ public class ClobItem implements Identifiable {
 	@GeneratedValue(generator = "pas_clobitem")
 	private Long id;
 	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
+	private Date creationTS;
+
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
@@ -41,6 +49,7 @@ public class ClobItem implements Identifiable {
 	}
 	
 	public ClobItem(String value) {
+		this.creationTS = new Date();
 		this.value = value;
 	}
 	
@@ -49,6 +58,10 @@ public class ClobItem implements Identifiable {
 	 */
 	public Long getId() {
 		return id;
+	}
+
+	public Date getCreationTS() {
+		return creationTS;
 	}
 
 	/**
