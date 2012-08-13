@@ -1,5 +1,6 @@
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +24,8 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Attribute;
@@ -47,6 +50,10 @@ public class RequestImpl implements Request {
 	@SuppressWarnings("unused")
 	@Version
 	private int version;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
+	private Date creationTS;
 
 	@OneToMany(targetEntity = RequestAttributeImpl.class, mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@MapKey(name = "name")
@@ -106,6 +113,7 @@ public class RequestImpl implements Request {
 	}
 
 	public RequestImpl(String initiator, String type) {
+		this.creationTS = new Date();
 		this.initiator = initiator;
 		this.processingContext = new ContextImpl(this);
 		this.type = type;
