@@ -19,6 +19,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ErrorItemImpl;
+import com.isencia.passerelle.process.model.impl.MainRequestImpl;
 import com.isencia.passerelle.process.model.impl.RequestAttributeImpl;
 import com.isencia.passerelle.process.model.impl.RequestImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockAttributeImpl;
@@ -53,7 +54,7 @@ public class EntityFactoryImpl implements EntityFactory {
 	 * java.lang.String)
 	 */
 	public Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId) {
-		return new RequestImpl(requestCase, initiator, type, correlationId, category);
+		return new MainRequestImpl(requestCase, initiator, type, correlationId, category);
 	}
 
 	/*
