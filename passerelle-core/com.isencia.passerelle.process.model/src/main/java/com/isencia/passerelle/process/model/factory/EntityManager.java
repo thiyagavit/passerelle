@@ -128,5 +128,10 @@ public interface EntityManager {
    * @return
    */
   List<Request> getRequestsForCase(Long caseId, Long excludedRequestId);
+  /**
+   * @param requestedReferenceId
+   * @return
+   */
+  List<Request> getRequestsForCase(Request currentRequest);
 
 }
