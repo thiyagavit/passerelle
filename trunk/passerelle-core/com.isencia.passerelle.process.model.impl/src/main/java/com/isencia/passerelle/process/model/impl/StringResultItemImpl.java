@@ -39,7 +39,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS,
 			Integer level) {
-		super(resultBlock, name, unit, creationTS, level);
+		super(resultBlock, name, unit, creationTS == null ? new Date() : creationTS, level);
 		setValue(value);
 	}
 
