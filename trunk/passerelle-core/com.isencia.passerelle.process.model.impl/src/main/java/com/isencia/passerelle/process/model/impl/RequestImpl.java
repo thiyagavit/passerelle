@@ -101,7 +101,7 @@ public class RequestImpl implements Request {
 	public static final String _TYPE = "type";
 	public static final String _CATEGORY = "category";
 	public static final String _CONTEXT = "processingContext";
-	public static final String _REFERENCE = "case.id";
+	public static final String _REFERENCE = "requestCase.id";
 	public static final String _TASKS = "processingContext.tasks";
 	public static final String _EVENTS = "processingContext.events";
 	public static final String _CREATION_TS = "processingContext.creationTS";
