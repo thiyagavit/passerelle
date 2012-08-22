@@ -24,7 +24,6 @@ import com.isencia.passerelle.process.model.ResultBlock;
 public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable {
 
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_CHAR_SIZE = 4000;
 
 	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)

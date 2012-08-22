@@ -63,7 +63,7 @@ public class ContextImpl implements Context {
 	@Version
 	private int version;
 
-	@Column(name = "STATUS", nullable = false, unique = false, updatable = true, length = 128)
+	@Column(name = "STATUS", nullable = false, unique = false, updatable = true, length = 50)
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
 

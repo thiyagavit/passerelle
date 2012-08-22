@@ -15,9 +15,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.isencia.passerelle.process.model.Attribute;
 
 /**
@@ -29,7 +26,7 @@ import com.isencia.passerelle.process.model.Attribute;
 public abstract class AttributeImpl implements Attribute {
 
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_CHAR_SIZE = 4000;
+	private static final int MAX_CHAR_SIZE = 250;
 
 	@Version
 	protected int version;
@@ -38,10 +35,10 @@ public abstract class AttributeImpl implements Attribute {
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
-	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 512)
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 250)
 	private String name;
 	
-	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = 4000)
+	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = MAX_CHAR_SIZE)
 	private String value;
 	
 	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)

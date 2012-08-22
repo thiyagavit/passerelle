@@ -49,7 +49,7 @@ public class ContextEventImpl implements ContextEvent {
 	@Column(name = "TOPIC", nullable = false, unique = false, updatable = false, length = 255)
 	private String topic;
 	
-	@Column(name = "MESSAGE", nullable = true, unique = false, updatable = false)
+	@Column(name = "MESSAGE", nullable = true, unique = false, updatable = false, length = 2000)
 	private String message;
 	
 	@Temporal(TemporalType.TIMESTAMP)

@@ -68,23 +68,23 @@ public class RequestImpl implements Request {
 	@JoinColumn(name = "CASE_ID")
 	private CaseImpl requestCase;
 
-	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true, length = 1024)
+	@Column(name = "CORRELATION_ID", nullable = true, unique = false, updatable = true, length = 250)
 	private String correlationId;
 
-	@Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 255)
+	@Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
 	private String type;
 
 	@OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = {
 			CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
 	private Context processingContext;
 
-	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 255)
+	@Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 250)
 	private String initiator;
 
-	@Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true, length = 255)
+	@Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true, length = 250)
 	private String executor;
 
-	@Column(name = "CATEGORY", nullable = true, unique = false, updatable = true, length = 255)
+	@Column(name = "CATEGORY", nullable = true, unique = false, updatable = true, length = 250)
 	private String category;
 
 	@SuppressWarnings("unused")
