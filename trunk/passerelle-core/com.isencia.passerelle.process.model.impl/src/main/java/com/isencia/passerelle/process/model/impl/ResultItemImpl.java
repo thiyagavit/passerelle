@@ -48,6 +48,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 @DiscriminatorValue("RESULT")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
+  protected static final int MAX_CHAR_SIZE = 500;
 
 	public String getScope() {
 		return getType();
@@ -75,13 +76,13 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@Column(name = "CREATION_TS", nullable = true, unique = false, updatable = false)
 	private Date creationTS;
 
-	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 512)
+	@Column(name = "NAME", nullable = false, unique = false, updatable = false, length = 300)
 	private String name;
 
-	@Column(name = "VALUE", nullable = true, unique = false, updatable = false, length = 4000)
+	@Column(name = "VALUE", nullable = true, unique = false, updatable = false, length = MAX_CHAR_SIZE)
 	protected String value;
 
-	@Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 512)
+	@Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 20)
 	private String unit;
 
 	@OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -95,7 +96,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	@JoinColumn(name = "RESULTBLOCK_ID")
 	private ResultBlockImpl resultBlock;
 
-	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 40)
+	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
 	private String colour;
 
 	@Column(name = "DETAILLEVEL", nullable = true, unique = false, updatable = true)
