@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
@@ -80,8 +81,9 @@ public class ContextImpl implements Context {
   @OrderBy("creationTS")
   private List<ContextEvent> events = new ArrayList<ContextEvent>();
 
+  @SuppressWarnings("unchecked")
   @Transient
-  private Map<String, Serializable> entries = new HashMap<String, Serializable>();
+  private Map<String, Serializable> entries = new CaseInsensitiveMap();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
