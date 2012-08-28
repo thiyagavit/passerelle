@@ -3,13 +3,13 @@
  */
 package com.isencia.passerelle.process.model.factory;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 
 /**
@@ -134,4 +134,10 @@ public interface EntityManager {
    */
   List<Request> getRequestsForCase(Request currentRequest);
 
+  /**
+   * Helper method to ensure a refresh of the given entity
+   * @param entity
+   * @return
+   */
+  <T extends Serializable>  T refresh(T entity);
 }
