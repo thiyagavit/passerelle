@@ -133,6 +133,11 @@ public interface EntityManager {
    * @return
    */
   List<Request> getRequestsForCase(Request currentRequest);
+  /**
+   * @param requestedReferenceId
+   * @return
+   */
+  List<Task> getTasksForContext(Context context);
 
   /**
    * Helper method to ensure a refresh of the given entity
