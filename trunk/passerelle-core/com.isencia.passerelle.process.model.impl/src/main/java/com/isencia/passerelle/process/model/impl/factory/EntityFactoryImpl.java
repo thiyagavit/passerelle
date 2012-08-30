@@ -9,19 +9,21 @@ import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.ErrorItem.Category;
 import com.isencia.passerelle.process.model.ErrorItem.Severity;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
+import com.isencia.passerelle.process.model.impl.ContextEventImpl;
 import com.isencia.passerelle.process.model.impl.ErrorItemImpl;
 import com.isencia.passerelle.process.model.impl.MainRequestImpl;
 import com.isencia.passerelle.process.model.impl.RequestAttributeImpl;
-import com.isencia.passerelle.process.model.impl.RequestImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockAttributeImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.ResultItemAttributeImpl;
@@ -169,5 +171,12 @@ public class EntityFactoryImpl implements EntityFactory {
 		}
 		return item;
 	}
+
+  /* (non-Javadoc)
+   * @see com.isencia.passerelle.process.model.factory.EntityFactory#createEvent(com.isencia.passerelle.process.model.Context, com.isencia.passerelle.process.model.Status, java.lang.String)
+   */
+  public ContextEvent createContextEvent(Context context, Status status, String message) {
+    return new ContextEventImpl(context, status.name(), message);
+  }
 
 }
