@@ -9,12 +9,14 @@ import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.ErrorItem.Category;
 import com.isencia.passerelle.process.model.ErrorItem.Severity;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 
 /**
@@ -53,4 +55,5 @@ public interface EntityFactory {
   
   ErrorItem createErrorItem(ResultBlock resultBlock, Severity severity, Category category, String code, String shortDescription, String description);
 
+  ContextEvent createContextEvent(Context context, Status status, String message);
 }
