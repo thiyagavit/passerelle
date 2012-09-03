@@ -78,7 +78,14 @@ public interface Context extends Identifiable, Serializable {
    * @param value
    */
   void putEntry(String name, Serializable value);
-  
+
+  /**
+   * Remove the entry with the given name
+   * @param name
+   * @return the entry that was present for the given name (or null if none was there)
+   */
+  Serializable removeEntry(String name);
+
   /**
    * 
    * @param name

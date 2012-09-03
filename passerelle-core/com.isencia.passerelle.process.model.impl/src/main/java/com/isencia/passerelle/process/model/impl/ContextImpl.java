@@ -198,6 +198,10 @@ public class ContextImpl implements Context {
     entries.put(name, value);
   }
 
+  public Serializable removeEntry(String name) {
+    return entries.remove(name);
+  }
+
   public Serializable getEntryValue(String name) {
     return entries.get(name);
   }

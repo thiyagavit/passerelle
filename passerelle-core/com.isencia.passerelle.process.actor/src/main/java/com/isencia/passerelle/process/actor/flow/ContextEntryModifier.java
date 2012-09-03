@@ -17,6 +17,8 @@ package com.isencia.passerelle.process.actor.flow;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringUtils;
+
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -46,7 +48,8 @@ import com.isencia.passerelle.process.model.Context;
  * <p>
  * <ul>
  * <li>Set : set a new entry or overwrite an existing with same scope&name</li>
- * <li>Remove : remove an existing entry; do nothing if it is not found</li>
+ * <li>Remove : remove an existing entry; do nothing if it is not found.
+ * <br/>A remove with only a scope and no entry name will remove the complete scope in one shot.</li>
  * </ul>
  * </p>
  */
@@ -97,11 +100,7 @@ public class ContextEntryModifier extends Actor {
     try {
       Mode m = Mode.valueOf(mode);
     } catch (IllegalArgumentException e) {
-      throw new ValidationException("Invalide mode " + mode, this, null);
-    }
-    String entryName = entryNameParameter.getExpression().trim();
-    if (entryName.length() == 0) {
-      throw new ValidationException("Undefined entry name", this, null);
+      throw new ValidationException("Invalid mode " + mode, this, null);
     }
   }
 
@@ -159,7 +158,13 @@ public class ContextEntryModifier extends Actor {
       break;
     case Remove:
       if (scopeMap != null) {
-        scopeMap.remove(entryName);
+        if(StringUtils.isEmpty(entryName)) {
+          // it's a remove for the complete scope
+          diagnosisContext.removeEntry(scopeStr);
+        } else {
+          // it's a remove for one specific entry
+          scopeMap.remove(entryName);
+        }
       }
       break;
     }
@@ -172,8 +177,7 @@ public class ContextEntryModifier extends Actor {
       diagnosisContext.putEntry(entryName, entryValue);
       break;
     case Remove:
-      // TODO add a real remove method on Context and use that one here
-      diagnosisContext.putEntry(entryName, null);
+      diagnosisContext.removeEntry(entryName);
       break;
     }
   }
