@@ -16,15 +16,21 @@ package com.isencia.passerelle.domain.et.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import junit.framework.TestCase;
+import ptolemy.actor.Manager;
+import ptolemy.actor.Manager.State;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import junit.framework.TestCase;
+import com.isencia.passerelle.actor.control.Stop;
+import com.isencia.passerelle.actor.error.ErrorObserver;
+import com.isencia.passerelle.actor.general.DevNullActor;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.model.FlowNotExecutingException;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.testsupport.actor.Const;
@@ -380,6 +386,73 @@ public class EtDomainModelExecutionsTest extends TestCase {
     // now check if all went as expected
     new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(sink, 0L).expectActorIterationCount(excGenerator, 1L).assertFlow(flow);
   }
+
+  /**
+   * A unit test for a plain model with Error Observer
+   * This model should never stop by itself.
+   * 
+   * @throws Exception
+   */
+  public void testFlowWithErrorObserver() throws Exception {
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    Const source = new Const(flow, "Constant");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    ErrorObserver errObs = new ErrorObserver(flow, "errObs");
+    
+    flow.connect(source, sink);
+    flow.connect(errObs.messageInErrorOutput, sink.input);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant.value", "Hello world");
+    // launch the flow in a background thread
+    flowMgr.execute(flow, props);
+    // now wait a while
+    Thread.sleep(5000);
+    // the flow will still be running
+    try {
+      State state = flowMgr.getLocalExecutionState(flow);
+      assertEquals("Flow must still be iterating", Manager.ITERATING, state);
+      flowMgr.stopExecution(flow, 1000);
+      
+      new FlowStatisticsAssertion()
+      .expectMsgSentCount(source, 1L)
+      .expectMsgReceiptCount(sink, 1L)
+      .assertFlow(flow);
+    } catch (FlowNotExecutingException e) {
+      // hmmm weird...
+      fail("Flow must still be iterating");
+    }
+
+  }
+
+  /**
+   * A unit test for a plain model with Error Observer
+   * 
+   * @throws Exception
+   */
+  public void testFlowWithErrorObserverAndStop() throws Exception {
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    Const source = new Const(flow, "Constant");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    ErrorObserver errObs = new ErrorObserver(flow, "errObs");
+    Stop stop = new Stop(flow, "stop");
+    
+    flow.connect(source, sink);
+    flow.connect(errObs.messageInErrorOutput, sink.input);
+    flow.connect(sink.hasFiredPort, stop.input);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant.value", "Hello world");
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source, 1L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
+
 
   // utility for whenever we would like to get the moml from a java-coded flow
 //  private void writeFlow(Flow flow) {
