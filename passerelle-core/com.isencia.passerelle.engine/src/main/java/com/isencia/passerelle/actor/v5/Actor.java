@@ -235,12 +235,10 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       }
     }
 
-    if (isSource) {
-      try {
-        getDirector().fireAtCurrentTime(this);
-      } catch (IllegalActionException e) {
-        throw new InitializationException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
-      }
+    try {
+      triggerFirstIteration();
+    } catch (IllegalActionException e) {
+      throw new InitializationException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
     }
 
     getLogger().trace("{} - doInitialize() - exit", getFullName());
@@ -391,18 +389,39 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       currentProcessRequest = new ProcessRequest();
       currentProcessRequest.setIterationCount(iterationCount);
 
-      if (isSource) {
-        // we need to request our own next firing iteration
-        try {
-          getDirector().fireAtCurrentTime(this);
-        } catch (IllegalActionException e) {
-          throw new ProcessingException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
-        }
+      try {
+        triggerNextIteration();
+      } catch (IllegalActionException e) {
+        throw new ProcessingException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
       }
     }
 
     getLogger().trace("{} - doPostFire() - exit : {}", getFullName(), result);
     return result;
+  }
+
+  /**
+   * Overridable method that triggers a first iteration, from inside the actor initialization. Default implementation calls
+   * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input ports)
+   * 
+   * @throws IllegalActionException
+   */
+  protected void triggerFirstIteration() throws IllegalActionException {
+    if (isSource) {
+      getDirector().fireAtCurrentTime(this);
+    }
+  }
+
+  /**
+   * Overridable method that triggers a next iteration, after each actor's previous iteration. Default implementation calls
+   * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input ports)
+   * 
+   * @throws IllegalActionException
+   */
+  protected void triggerNextIteration() throws IllegalActionException {
+    if (isSource) {
+      getDirector().fireAtCurrentTime(this);
+    }
   }
 
   /**

@@ -408,21 +408,16 @@ public class EtDomainModelExecutionsTest extends TestCase {
     // launch the flow in a background thread
     flowMgr.execute(flow, props);
     // now wait a while
-    Thread.sleep(5000);
-    // the flow will still be running
+    Thread.sleep(1000);
     try {
       State state = flowMgr.getLocalExecutionState(flow);
-      assertEquals("Flow must still be iterating", Manager.ITERATING, state);
-      flowMgr.stopExecution(flow, 1000);
-      
-      new FlowStatisticsAssertion()
-      .expectMsgSentCount(source, 1L)
-      .expectMsgReceiptCount(sink, 1L)
-      .assertFlow(flow);
+      assertEquals("Flow must be stopped", Manager.IDLE, state);
     } catch (FlowNotExecutingException e) {
-      // hmmm weird...
-      fail("Flow must still be iterating");
     }
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source, 1L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
 
   }
 
