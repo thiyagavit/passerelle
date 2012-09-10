@@ -191,8 +191,8 @@ public class SharedParameter extends Parameter implements Initializable {
      */
     public Object clone(Workspace workspace) throws CloneNotSupportedException {
         SharedParameter newObject = (SharedParameter) super.clone(workspace);
-        SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
-        registry.register(newObject);
+//        SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
+//        registry.register(newObject);
         return newObject;
     }
 
@@ -393,18 +393,18 @@ public class SharedParameter extends Parameter implements Initializable {
      *  @exception NameDuplicationException If there is already an
      *       attribute with the same name in the container.
      */
-    public void setName(String name) throws IllegalActionException,
-            NameDuplicationException {
-        if (name != null && !name.equals(getName())) {
-            SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
-            // Unregister under previous name.
-            if (getName() != null && !getName().equals("")) {
-                registry.unregister(this);
-            }
-            super.setName(name);
-            registry.register(this);
-        }
-    }
+//    public void setName(String name) throws IllegalActionException,
+//            NameDuplicationException {
+//        if (name != null && !name.equals(getName())) {
+////            SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
+////            // Unregister under previous name.
+////            if (getName() != null && !getName().equals("")) {
+////                registry.unregister(this);
+////            }
+//            super.setName(name);
+//            registry.register(this);
+//        }
+//    }
 
     /** Override the base class to also set the expression of shared
      *  parameters.
@@ -497,25 +497,25 @@ public class SharedParameter extends Parameter implements Initializable {
             try {
                 workspace().getReadAccess();
                 _sharedParameterSet = new HashSet<SharedParameter>();
-                _sharedParameterSetVersion = workspace().getVersion();
-                NamedObj root = getRoot();
-                if (root != null) {
-                    SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
-                    for (WeakReference<SharedParameter> reference : registry
-                            .getSharedParametersWithName(getName())) {
-                        if (reference != null) {
-                            SharedParameter parameter = reference.get();
-                            if (parameter != null) {
-                                // Have a candidate. See if the roots match and if
-                                // the container classes match.
-                                if (parameter.getRoot() == root
-                                        && parameter._containerClass == _containerClass) {
-                                    _sharedParameterSet.add(parameter);
-                                }
-                            }
-                        }
-                    }
-                }
+//                _sharedParameterSetVersion = workspace().getVersion();
+//                NamedObj root = getRoot();
+//                if (root != null) {
+//                    SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
+//                    for (WeakReference<SharedParameter> reference : registry
+//                            .getSharedParametersWithName(getName())) {
+//                        if (reference != null) {
+//                            SharedParameter parameter = reference.get();
+//                            if (parameter != null) {
+//                                // Have a candidate. See if the roots match and if
+//                                // the container classes match.
+//                                if (parameter.getRoot() == root
+//                                        && parameter._containerClass == _containerClass) {
+//                                    _sharedParameterSet.add(parameter);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             } finally {
                 workspace().doneReading();
             }
@@ -621,27 +621,27 @@ public class SharedParameter extends Parameter implements Initializable {
                 workspace().getReadAccess();
                 _sharedParameter = null;
                 _sharedParameterVersion = workspace().getVersion();
-                NamedObj root = getRoot();
-                if (root != null) {
-                    SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
-                    for (WeakReference<SharedParameter> reference : registry
-                            .getSharedParametersWithName(getName())) {
-                        if (reference != null) {
-                            SharedParameter parameter = reference.get();
-                            if (parameter != null) {
-                                // Have a candidate. See if the roots match and if
-                                // the container classes match.
-                                if (parameter != this
-                                        && parameter.getRoot() == root
-                                        && parameter._containerClass == _containerClass) {
-                                    _sharedParameter = parameter;
-                                    // Successful match. No need to search further.
-                                    return _sharedParameter;
-                                }
-                            }
-                        }
-                    }
-                }
+//                NamedObj root = getRoot();
+//                if (root != null) {
+//                    SharedParameterRegistry registry = _getSharedParameterRegistry(workspace());
+//                    for (WeakReference<SharedParameter> reference : registry
+//                            .getSharedParametersWithName(getName())) {
+//                        if (reference != null) {
+//                            SharedParameter parameter = reference.get();
+//                            if (parameter != null) {
+//                                // Have a candidate. See if the roots match and if
+//                                // the container classes match.
+//                                if (parameter != this
+//                                        && parameter.getRoot() == root
+//                                        && parameter._containerClass == _containerClass) {
+//                                    _sharedParameter = parameter;
+//                                    // Successful match. No need to search further.
+//                                    return _sharedParameter;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             } finally {
                 workspace().doneReading();
             }
@@ -651,15 +651,15 @@ public class SharedParameter extends Parameter implements Initializable {
 
     /** Return the shared parameter registry associated with this workspace.
      */
-    private static synchronized SharedParameterRegistry _getSharedParameterRegistry(
-            Workspace workspace) {
-        SharedParameterRegistry result = _REGISTRY.get(workspace);
-        if (result == null) {
-            result = new SharedParameterRegistry();
-            _REGISTRY.put(workspace, result);
-        }
-        return result;
-    }
+//    private static synchronized SharedParameterRegistry _getSharedParameterRegistry(
+//            Workspace workspace) {
+//        SharedParameterRegistry result = _REGISTRY.get(workspace);
+//        if (result == null) {
+//            result = new SharedParameterRegistry();
+//            _REGISTRY.put(workspace, result);
+//        }
+//        return result;
+//    }
 
     ///////////////////////////////////////////////////////////////////
     ////                         private variables                 ////
@@ -697,7 +697,7 @@ public class SharedParameter extends Parameter implements Initializable {
     private long _sharedParameterSetVersion = -1L;
 
     /** Registry by workspace. */
-    private static HashMap<Workspace, SharedParameterRegistry> _REGISTRY = new HashMap<Workspace, SharedParameterRegistry>();
+//    private static HashMap<Workspace, SharedParameterRegistry> _REGISTRY = new HashMap<Workspace, SharedParameterRegistry>();
 
     /** Indicator to suppress propagation. */
     private boolean _suppressingPropagation = false;
