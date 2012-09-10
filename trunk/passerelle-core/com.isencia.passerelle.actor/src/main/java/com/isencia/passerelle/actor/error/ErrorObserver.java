@@ -130,15 +130,27 @@ public class ErrorObserver extends Actor implements ErrorCollector {
       }
     }
   }
+  
+  @Override
+  protected void triggerFirstIteration() throws IllegalActionException {
+    // no unconditional triggering here, dude!
+  }
+  @Override
+  protected void triggerNextIteration() throws IllegalActionException {
+    // no unconditional triggering here, dude!
+  }
 
   public void acceptError(PasserelleException e) {
     try {
       errors.put(e);
-      getLogger().error("Error reported ", e);
+      super.triggerNextIteration();
     } catch (InterruptedException e1) {
       // should not happen,
       // or if it does only when terminating the model execution
       getLogger().error("Receipt interrupted for ", e);
+    } catch (IllegalActionException e2) {
+      getLogger().error("Failed to trigger next iteration ", e2);
+      getLogger().error("Error received ", e);
     }
   }
 
