@@ -79,6 +79,15 @@ import com.isencia.passerelle.model.util.RESTFacade;
  */
 public class FlowManager {
 
+  private static FlowManager defaultFlowManager;
+
+  public static FlowManager getDefault() {
+    if (defaultFlowManager == null) {
+      defaultFlowManager = new FlowManager();
+    }
+    return defaultFlowManager;
+  }
+  
 	protected class ModelExecutionListener implements ExecutionListener, ErrorCollector {
 		private Throwable throwable;
 
