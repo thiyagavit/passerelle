@@ -19,7 +19,7 @@ public class FlowUtils {
 	public static String generateUniqueFlowName(String name, String uniqueIndex) {
 		StringBuffer sb = new StringBuffer(name);
 		sb.append(FLOW_SEPARATOR);
-		sb.append(System.currentTimeMillis());
+		sb.append(uniqueIndex);
 		return sb.toString();
 	}
 
