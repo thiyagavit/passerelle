@@ -70,6 +70,12 @@ public interface Context extends Identifiable, Serializable {
   List<ContextEvent> getEvents();
   
   /**
+   * 
+   * @return the list of errors that happened during the processing of the associated request
+   */
+  List<ErrorItem> getErrors();
+  
+  /**
    * Store some named entry in the context.
    * This is a context-wide storage, not linked to a specific task
    * or its results.
