@@ -36,7 +36,9 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
+import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.NamedValue;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
@@ -105,6 +107,9 @@ public class ContextImpl implements Context {
 
   @Transient
   private ReentrantLock lock = new ReentrantLock();
+
+  @Transient
+  private List<ErrorItem> errorItems;
 
   public static final String _ID = "id";
   public static final String _STATUS = "status";
@@ -188,6 +193,9 @@ public class ContextImpl implements Context {
 
   void addEvent(ContextEvent event) {
     events.add(event);
+    if(event instanceof ContextErrorEvent) {
+      _getErrors().add(((ContextErrorEvent)event).getErrorItem());
+    }
   }
 
   public List<ContextEvent> getEvents() {
@@ -402,13 +410,25 @@ public class ContextImpl implements Context {
     return copy;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.isencia.passerelle.process.model.Context#isForkedContext()
-   */
   public boolean isForkedContext() {
     return transientBranch;
+  }
+
+  public List<ErrorItem> getErrors() {
+    errorItems = _getErrors();
+    return Collections.unmodifiableList(errorItems);
+  }
+
+  private List<ErrorItem> _getErrors() {
+    if(errorItems==null) {
+      errorItems = new ArrayList<ErrorItem>();
+      for(ContextEvent event : events) {
+        if(event instanceof ContextErrorEvent) {
+          errorItems.add(((ContextErrorEvent)event).getErrorItem());
+        }
+      }
+    }
+    return errorItems;
   }
 
 }

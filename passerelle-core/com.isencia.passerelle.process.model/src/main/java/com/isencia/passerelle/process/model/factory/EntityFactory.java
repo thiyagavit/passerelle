@@ -9,6 +9,7 @@ import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.ErrorItem.Category;
@@ -53,7 +54,8 @@ public interface EntityFactory {
 
   ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit,Integer level);
   
-  ErrorItem createErrorItem(ResultBlock resultBlock, Severity severity, Category category, String code, String shortDescription, String description);
+  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description);
+  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause);
 
   ContextEvent createContextEvent(Context context, Status status, String message);
 }
