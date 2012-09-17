@@ -16,17 +16,33 @@ package com.isencia.passerelle.domain.et;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
-abstract class AbstractEvent implements Event {
+public abstract class AbstractEvent implements Event {
+  
+  private static volatile AtomicLong idCounter = new AtomicLong(0);
 
   private Date timeStamp;
+  private long id;
   
   protected AbstractEvent(Date timeStamp) {
     this.timeStamp = timeStamp;
+    this.id = idCounter.incrementAndGet();
   }
+
+  /**
+   * 
+   * @return a new Event with copied info, but new timestamp
+   */
+  public abstract Event copy();
+  
 
   public Date getTimestamp() {
     return timeStamp;
+  }
+  
+  protected long getId() {
+    return id;
   }
 
   @Override

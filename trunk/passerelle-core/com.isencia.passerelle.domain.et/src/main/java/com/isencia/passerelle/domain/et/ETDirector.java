@@ -50,7 +50,12 @@ import com.isencia.passerelle.ext.DirectorAdapter;
  * @author delerw
  */
 @SuppressWarnings("serial")
-public class ETDirector extends Director implements EventDispatchReporter, PasserelleDirector {
+public class ETDirector extends Director implements PasserelleDirector {
+
+  public static final String KEEP_EVENT_HISTORY_PARAMNAME = "Keep event history";
+  public static final String DISPATCH_TIMEOUT_PARAMNAME = "Dispatch timeout(ms)";
+  public static final String NR_OF_DISPATCH_THREADS_PARAMNAME = "Nr of dispatch threads";
+
   private final static Logger LOGGER = LoggerFactory.getLogger(ETDirector.class);
 
   // not sure yet if this is a good idea or not,
@@ -70,7 +75,7 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
   public Parameter dispatchThreadsParameter;
   public Parameter dispatchTimeoutParameter;
 
-  public Parameter dumpEventsParameter;
+  public Parameter eventHistoryParameter;
 
   /**
    * @param container
@@ -81,11 +86,11 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
   public ETDirector(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
 
-    dispatchThreadsParameter = new Parameter(this, "Nr of dispatch threads", new IntToken(1));
-    dispatchTimeoutParameter = new Parameter(this, "Dispatch timeout(ms)", new IntToken(1000));
+    dispatchThreadsParameter = new Parameter(this, NR_OF_DISPATCH_THREADS_PARAMNAME, new IntToken(1));
+    dispatchTimeoutParameter = new Parameter(this, DISPATCH_TIMEOUT_PARAMNAME, new IntToken(1000));
     
-    dumpEventsParameter = new Parameter(this, "Dump eventlog after run", BooleanToken.FALSE);
-    new CheckBoxStyle(dumpEventsParameter, "check");
+    eventHistoryParameter = new Parameter(this, KEEP_EVENT_HISTORY_PARAMNAME, BooleanToken.FALSE);
+    new CheckBoxStyle(eventHistoryParameter, "check");
     
     _attachText(
         "_iconDescription",
@@ -143,7 +148,8 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
     super.preinitialize();
 
     int threadCount = ((IntToken) dispatchThreadsParameter.getToken()).intValue();
-    
+    boolean needEventLog = ((BooleanToken)eventHistoryParameter.getToken()).booleanValue();
+
     List<EventHandler> eventHandlers = new ArrayList<EventHandler>();
     eventHandlers.add(new SendEventHandler(this));
     eventHandlers.add(new FireEventHandler(this));
@@ -158,6 +164,7 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
     }
     dispatcher.initialize();
     dispatchReporter = (EventDispatchReporter) dispatcher;
+    dispatchReporter.enableEventHistory(needEventLog);
     notDone = true;
     inactiveActors.clear();
     getAdapter(null).clearBusyTaskActors();
@@ -182,7 +189,11 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
   public synchronized void fire() throws IllegalActionException {
     try {
       int timeout = ((IntToken) dispatchTimeoutParameter.getToken()).intValue();
-      notDone = dispatcher.dispatch(timeout) || getAdapter(null).hasBusyTaskActors();
+      // The order is important here, although maybe optimistic to rely on it
+      // asynch actors may notify that their work is finished right after the dispatch() returned.
+      // In which case they would most probably have added new events in the dispatch Q, but one microsecond too late to be noticed in the dispatch itself.
+      // So the final hasWork check should still see these events then.
+      notDone = dispatcher.dispatch(timeout) || getAdapter(null).hasBusyTaskActors() || dispatcher.hasWork();
     } catch (Exception e) {
       throw new IllegalActionException(this, e, "Error during dispatching of events");
     }
@@ -190,7 +201,15 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
 
   @Override
   public boolean postfire() throws IllegalActionException {
-    return notDone && super.postfire();
+    if(!notDone) {
+      LOGGER.info("Director done");
+      return false;
+    }
+    if(!super.postfire()) {
+      LOGGER.info("Director super.postFire() false");
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -206,14 +225,6 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
     }
     super.wrapup();
     
-    if(((BooleanToken)dumpEventsParameter.getToken()).booleanValue()) {
-      StringBuilder eventLog = new StringBuilder();
-      for (Event event : getEventHistory()) {
-        eventLog.append(event+"\n");
-      }
-      LOGGER.info("{} - event log :\n{}",getFullName(),eventLog.toString());
-    }
-
     dispatcher.shutdown();
   }
 
@@ -285,6 +296,10 @@ public class ETDirector extends Director implements EventDispatchReporter, Passe
 
   public List<Event> getUnhandledEvents() {
     return dispatchReporter.getUnhandledEvents();
+  }
+
+  public List<Event> getPendingEvents() {
+    return dispatchReporter.getPendingEvents();
   }
 
   public List<EventError> getEventErrors() {

@@ -27,7 +27,7 @@ public interface Event extends Serializable {
 
   /**
    * 
-   * @return
+   * @return the timestamp when the event was created
    */
   Date getTimestamp();
   

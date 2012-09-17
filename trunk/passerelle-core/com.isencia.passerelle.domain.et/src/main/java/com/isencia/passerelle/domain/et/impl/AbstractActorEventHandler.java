@@ -38,10 +38,10 @@ public abstract class AbstractActorEventHandler implements EventHandler {
     Actor actor = getDestinationActorFromEvent(event);
     synchronized (actor) {
       if (director.isActorIterating(actor)) {
-        getLogger().debug("Skipping {} - Actor {} is busy.", event, actor.getName());
+        getLogger().info("Skipping {} - Actor {} is busy.", event, actor.getName());
         return HandleResult.RETRY;
       } else if (director.isActorInactive(actor)) {
-        getLogger().debug("Skipping {} - Actor {} is inactive.", event, actor.getName());
+        getLogger().info("Skipping {} - Actor {} is inactive.", event, actor.getName());
         return HandleResult.SKIPPED;
       } else {
         director.notifyActorIteratingForEvent(actor, event);
@@ -49,11 +49,16 @@ public abstract class AbstractActorEventHandler implements EventHandler {
     }
     try {
       getLogger().debug("Handling {} - iterating Actor {}.", event, actor.getName());
+      boolean fired=false;
       if (actor.prefire()) {
         actor.fire();
+        fired=true;
         if (!actor.postfire()) {
           director.notifyActorInactive(actor);
         }
+      }
+      if(!fired) {
+        getLogger().error("Did not fire for "+event);
       }
       return HandleResult.DONE;
     } finally {

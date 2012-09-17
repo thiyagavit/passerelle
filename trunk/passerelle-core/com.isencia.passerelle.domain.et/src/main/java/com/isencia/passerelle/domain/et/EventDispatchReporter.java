@@ -32,6 +32,18 @@ import java.util.List;
 public interface EventDispatchReporter {
   
   /**
+   * 
+   * @param enable true if the reporter should maintain a full event history.
+   */
+  void enableEventHistory(boolean enable);
+  
+  
+  /**
+   * @return the list of all events that are still pending for execution
+   */
+  List<Event> getPendingEvents();
+  
+  /**
    * @return a list of all events, most recent first.
    */
   List<Event> getEventHistory();

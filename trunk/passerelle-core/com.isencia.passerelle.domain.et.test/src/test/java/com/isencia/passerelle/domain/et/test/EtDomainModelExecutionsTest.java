@@ -28,6 +28,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
+import com.isencia.passerelle.domain.et.EventError;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.FlowNotExecutingException;
@@ -117,16 +118,21 @@ public class EtDomainModelExecutionsTest extends TestCase {
    * This test illustrates the chaining of each delay when only 1 work thread is available to execute all work steps. The total model execution time thus
    * becomes of the order of 3*(3+3+3), i.e. each of the 3 src msg needs to pass through 3 consecutive work steps, each one taking 3s.
    */
-  public void testChainedDelaysET1Thread() throws Exception {
+  public void testChainedDelaysET1ThreadWithEventHistory() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
-    __testChainedDelays(false, new ETDirector(flow, "director"), props);
+    props.put("director."+ETDirector.KEEP_EVENT_HISTORY_PARAMNAME, "true");
+    ETDirector d = new ETDirector(flow, "director");
+    __testChainedDelays(false, d, props);
+    assertFalse("Director must maintain event history", d.getEventHistory().isEmpty());
   }
 
-  public void testChainedDelaysET2Threads() throws Exception {
+  public void testChainedDelaysET2ThreadsWithoutEventHistory() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
     props.put("director.Nr of dispatch threads", "2");
     props.put("director.Dispatch timeout(ms)", "250");
-    __testChainedDelays(false, new ETDirector(flow, "director"), props);
+    ETDirector d = new ETDirector(flow, "director");
+    __testChainedDelays(false, d, props);
+    assertTrue("Director must NOT maintain event history", d.getEventHistory().isEmpty());
   }
 
   public void testChainedDelaysET3Threads() throws Exception {
@@ -204,9 +210,6 @@ public class EtDomainModelExecutionsTest extends TestCase {
     props.put("director.Dispatch timeout(ms)", "250");
     ETDirector d = new ETDirector(flow, "director");
     __testConcurrentInputsOnDelay(false, d, props);
-    for (Event event : d.getEventHistory()) {
-      System.out.println(event);
-    }
   }
 
   public void testConcurrentInputsOnDelayET4Threads() throws Exception {
@@ -215,20 +218,51 @@ public class EtDomainModelExecutionsTest extends TestCase {
     props.put("director.Dispatch timeout(ms)", "250");
     ETDirector d = new ETDirector(flow, "director");
     __testConcurrentInputsOnDelay(false, d, props);
-    for (Event event : d.getEventHistory()) {
-      System.out.println(event);
-    }
   }
 
+  public void test300Times_ConcurrentInputsOnAsynchDelayET3Threads() throws Exception {
+    int errCount=0;
+    for (int i = 0; i < 300; i++) {
+      flow = new Flow("EtDomainModelExecutionsTest", null);
+      ETDirector d = null;
+      try {
+      Map<String, String> props = new HashMap<String, String>();
+      props.put("director."+ETDirector.NR_OF_DISPATCH_THREADS_PARAMNAME, "6");
+      props.put("director."+ETDirector.DISPATCH_TIMEOUT_PARAMNAME, "250");
+      props.put("director."+ETDirector.KEEP_EVENT_HISTORY_PARAMNAME, "true");
+      d = new ETDirector(flow, "director");
+      __testConcurrentInputsOnDelay(true, d, props);
+      } catch (Error e) {
+        errCount++;
+        System.err.println(e.getMessage());
+        System.err.println("Event History");
+        for(Event evt : d.getEventHistory()) {
+          System.err.println(evt);
+        }
+        System.err.println("Event Errors");
+        for(EventError evtErr : d.getEventErrors()) {
+          System.err.println(evtErr);
+        }
+        System.err.println("Unhandled Events");
+        for(Event evt : d.getUnhandledEvents()) {
+          System.err.println(evt);
+        }
+        System.err.println("Pending Events");
+        for(Event evt : d.getPendingEvents()) {
+          System.err.println(evt);
+        }
+      }
+    }
+    
+    System.out.println(errCount+" errors on 100");
+  }
+  
   public void testConcurrentInputsOnAsynchDelayET3Threads() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
-    props.put("director.Nr of dispatch threads", "3");
-    props.put("director.Dispatch timeout(ms)", "250");
+    props.put("director."+ETDirector.NR_OF_DISPATCH_THREADS_PARAMNAME, "3");
+    props.put("director."+ETDirector.DISPATCH_TIMEOUT_PARAMNAME, "250");
     ETDirector d = new ETDirector(flow, "director");
     __testConcurrentInputsOnDelay(true, d, props);
-    for (Event event : d.getEventHistory()) {
-      System.out.println(event);
-    }
   }
 
   public void testConcurrentInputsOnAsynchDelayET4Threads() throws Exception {
@@ -237,9 +271,6 @@ public class EtDomainModelExecutionsTest extends TestCase {
     props.put("director.Dispatch timeout(ms)", "250");
     ETDirector d = new ETDirector(flow, "director");
     __testConcurrentInputsOnDelay(true, d, props);
-    for (Event event : d.getEventHistory()) {
-      System.out.println(event);
-    }
   }
 
   public void testConcurrentInputsOnDelayPN() throws Exception {
@@ -271,9 +302,9 @@ public class EtDomainModelExecutionsTest extends TestCase {
     flow.connect(delay3, sink);
 
     Map<String, String> props = new HashMap<String, String>();
-    props.put("src1.values", "pol");
-    props.put("src2.values", "pel");
-    props.put("src3.values", "pingo");
+    props.put("src1.values", "pol1,pol2,pol3");
+    props.put("src2.values", "pel1,pel2,pel3");
+    props.put("src3.values", "pingo1,pingo2,pingo3");
     props.put("delay1.time(s)", "1");
     props.put("delay2.time(s)", "1");
     props.put("delay3.time(s)", "1");
@@ -284,7 +315,7 @@ public class EtDomainModelExecutionsTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 3L).assertFlow(flow);
+    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 9L).assertFlow(flow);
   }
 
   /**
@@ -408,7 +439,7 @@ public class EtDomainModelExecutionsTest extends TestCase {
     // launch the flow in a background thread
     flowMgr.execute(flow, props);
     // now wait a while
-    Thread.sleep(1000);
+    Thread.sleep(3000);
     try {
       State state = flowMgr.getLocalExecutionState(flow);
       assertEquals("Flow must be stopped", Manager.IDLE, state);

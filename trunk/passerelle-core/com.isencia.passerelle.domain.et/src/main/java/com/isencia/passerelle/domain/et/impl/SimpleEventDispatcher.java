@@ -23,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.domain.et.AbstractEvent;
 import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventDispatchReporter;
 import com.isencia.passerelle.domain.et.EventDispatcher;
@@ -60,6 +61,11 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   private EventHandler eventHandlers[];
 
+  // Flag to indicate whether the dispatcher should maintain a full history of all processed events.
+  // Remark that this is only relevant for the "normal" history.
+  // Unhandled events and errors are always kept around for consultation.
+  private boolean keepHistory;
+  
   // state variables for managing the shutdown sequence
   private volatile boolean active = true;
   private volatile boolean forcedShutdown = false;
@@ -71,6 +77,10 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     getLogger().info("Created " + this);
   }
 
+  public void enableEventHistory(boolean enable) {
+    this.keepHistory = enable;
+  }
+  
   public String getName() {
     return name;
   }
@@ -104,11 +114,16 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     }
   }
 
+  public boolean hasWork() {
+    return !eventQ.isEmpty();
+  }
+  
   public boolean dispatch(long timeOut) throws InterruptedException {
     if (forcedShutdown) {
       throw new IllegalStateException("Dispatcher forced to shutdown");
     }
-    boolean eventDispatched = false;
+    boolean possiblyMoreWork = false;
+    boolean eventHandled = false;
     EventEntry eventEntry = null;
     Event event = null;
     try {
@@ -125,12 +140,15 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
             } else {
               HandleResult result = evtHandler.handle(event, eventEntry.retry);
               if (HandleResult.DONE.equals(result)) {
-                eventDispatched = true;
+                eventHandled = true;
+                possiblyMoreWork = true;
                 eventEffected = HandleType.EFFECT.equals(handleType);
               } else if (!eventEffected && HandleResult.RETRY.equals(result)){
                 // interrupt current handling loop and add event to Q again for later retry
-                eventEntry.retry=true;
-                eventQ.add(eventEntry);
+                possiblyMoreWork = true;
+                EventEntry newEventEntry = new EventEntry(((AbstractEvent)event).copy());
+                newEventEntry.retry=true;
+                eventQ.add(newEventEntry);
                 break;
               }
             }
@@ -141,14 +159,16 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
       }
     } finally {
       if (event != null) {
-        if (eventDispatched) {
-          eventHistory.add(0, event);
+        if (eventHandled) {
+          if(keepHistory) {
+            eventHistory.add(0, event);
+          }
         } else {
           unhandledEvents.add(0, event);
         }
       }
     }
-    return eventDispatched;
+    return possiblyMoreWork;
   }
 
   public List<Event> getEventHistory() {
@@ -157,6 +177,14 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   public List<Event> getUnhandledEvents() {
     return unhandledEvents;
+  }
+  
+  public List<Event> getPendingEvents() {
+    List<Event> result = new ArrayList<Event>();
+    for(EventEntry ee : eventQ) {
+      result.add(ee.event);
+    }
+    return result;
   }
 
   public List<EventError> getEventErrors() {
