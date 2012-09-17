@@ -71,7 +71,8 @@ public interface Context extends Identifiable, Serializable {
   
   /**
    * 
-   * @return the list of errors that happened during the processing of the associated request
+   * @return the list of errors that happened during the processing of the associated request.
+   * This also includes the errors for any subtask executed in the this context.
    */
   List<ErrorItem> getErrors();
   
