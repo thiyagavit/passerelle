@@ -415,8 +415,12 @@ public class ContextImpl implements Context {
   }
 
   public List<ErrorItem> getErrors() {
-    errorItems = _getErrors();
-    return Collections.unmodifiableList(errorItems);
+    List<ErrorItem> allErrors = new ArrayList<ErrorItem>();
+    allErrors.addAll(_getErrors());
+    for(Task task : tasks) {
+      allErrors.addAll(task.getProcessingContext().getErrors());
+    }
+    return allErrors;
   }
 
   private List<ErrorItem> _getErrors() {
