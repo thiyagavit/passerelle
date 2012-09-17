@@ -52,6 +52,7 @@ import com.isencia.passerelle.ext.ExecutionControlStrategy;
 import com.isencia.passerelle.ext.impl.SuspendResumeExecutionControlStrategy;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.model.util.RESTFacade;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 
 
@@ -354,12 +355,34 @@ public class FlowManager {
 	 * @throws Exception
 	 */
 	public static Flow readMoml(Reader in, ClassLoader classLoader) throws Exception {
-		final MoMLParser parser = new MoMLParser(null, classLoader);
-		final Flow toplevel = (Flow) parser.parse(null, in);
-		final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), null);
-		toplevel.setHandle(handle);
-		return toplevel;
+		return readMoml(in, null, classLoader);
 	}
+
+	/**
+   * Read the Flow in MOML format from the given Reader, with given default version specification 
+   * and using the given ClassLoader to instantiate actors etc.
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p>
+	 * 
+	 * @param in
+	 * @param versionSpec
+	 * @param classLoader
+	 * @return
+	 * @throws Exception
+	 */
+  public static Flow readMoml(Reader in, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
+    final MoMLParser parser = new MoMLParser(null, versionSpec, classLoader);
+    final Flow toplevel = (Flow) parser.parse(null, in);
+    final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), null);
+    toplevel.setHandle(handle);
+    return toplevel;
+  }
 
 	/**
 	 * Read the Flow in MOML format from the given URL.
@@ -405,7 +428,6 @@ public class FlowManager {
 			if (restFacade == null) {
 				initRESTFacade();
 			}
-
 			FlowHandle flowHandle = restFacade.getRemoteFlowHandle(xmlFile);
 			return buildFlowFromHandle(flowHandle);
 		} else {

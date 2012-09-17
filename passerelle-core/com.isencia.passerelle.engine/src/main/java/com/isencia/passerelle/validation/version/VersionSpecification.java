@@ -18,26 +18,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * A simple implementation of a version specification, based on a merge of OSGi-conventions and Ptolemy (which in turn seems to be based on JNLP).
+ * Abstract base class for version specifications. 
+ * Most important thing for a version specification is that it can be compared to another one.
  * <p>
- * Concretely, this means :
- * <ul>
- * <li>Reuse concept of numeric (int) major.minor.micro version number with optional trailing string-based qualifier</li>
- * <li>Don't care about the concrete concatenated format, possible delimiters etc. (i.e. do not enforce the usage of "."-separated version formatting)</li>
- * <li>Allow an arbitrary count of qualifiers</li>
- * <li>Compare qualifiers using plain text-compare</li>
- * </ul>
+ * Versions can currently be specified in two formats : a simple 3-digit spec (+ qualifiers) or a code/tag.
  * </p>
  * 
  * @author erwin
  */
-public abstract class VersionSpecification {
+public abstract class VersionSpecification implements Comparable<VersionSpecification> {
 
   protected String versionString;
 
   /**
-   * Parses the given version String, using '.' , '-' , '_' as potential delimiters. The first 3 version ids are mandatory and should be integer numbers. Extra
-   * (optional) trailing ids can be textual. Spaces are not allowed in a version string. E.g. "1.2_3-hello.world" is a valid version identifier.
+   * Parses the given version String, using '.' , '-' , '_' as potential delimiters. 
+   * <p>
+   * For 3-digit version spec, the first 3 version ids are mandatory and should be integer numbers. Extra
+   * (optional) trailing ids can be textual. Spaces are not allowed in a version string. 
+   * E.g. "1.2_3-hello.world" is a valid version identifier.
+   * </p>
+   * <p>
+   * If the received version string does not match this format, it is assumed to be a code/tag.
+   * </p>
    * 
    * @param version
    * @return
@@ -74,7 +76,4 @@ public abstract class VersionSpecification {
     }
     return versionSpec;
   }
-
-  public abstract int compareTo(VersionSpecification version2);
-
 }
