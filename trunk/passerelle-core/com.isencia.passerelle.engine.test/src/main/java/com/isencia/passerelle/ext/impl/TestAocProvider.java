@@ -47,11 +47,14 @@ public class TestAocProvider implements ActorOrientedClassProvider {
 
   public CompositeEntity getActorOrientedClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
 
+    if(versionSpec!=null) {
+      className = className+"_"+versionSpec;
+    }
     try {
-      URL submodelResource = this.getClass().getResource("/"+className+".xml");
+      URL submodelResource = this.getClass().getResource(className+".xml");
       if(submodelResource==null) {
         // try with .moml extension
-        submodelResource = this.getClass().getResource("/"+className+".moml");
+        submodelResource = this.getClass().getResource(className+".moml");
       }
       if(submodelResource==null) {
         throw new ClassNotFoundException("Could not find "+className);

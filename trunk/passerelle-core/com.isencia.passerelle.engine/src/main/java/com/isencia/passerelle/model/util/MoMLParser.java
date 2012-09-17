@@ -162,6 +162,7 @@ import com.microstar.xml.XmlParser;
  * @Pt.AcceptedRating Red (johnr)
  */
 public class MoMLParser extends ptolemy.moml.MoMLParser {
+
   /**
    * Construct a parser that creates a new workspace into which to put the entities created by the parse() method.
    */
@@ -203,7 +204,9 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
    */
   public MoMLParser(Workspace workspace, ClassLoader loader) {
     this(workspace);
-    _classLoader = loader;
+    if(loader!=null) {
+      _classLoader = loader;
+    }
     if (_defaultClassLoadingStrategy == null) {
       _classLoadingStrategy = new SimpleClassLoadingStrategy(_classLoader);
     } else {
@@ -211,6 +214,10 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     }
   }
 
+  public MoMLParser(Workspace workspace, VersionSpecification defaultVersionSpec, ClassLoader loader) {
+    this(workspace, loader);
+    this._defaultVersionSpec = defaultVersionSpec;
+  }
   // /////////////////////////////////////////////////////////////////
   // // public methods ////
   // FIXME: For all propagations, there
@@ -3175,7 +3182,8 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
     ComponentEntity reference = getActorClass(className);
     if (reference == null) {
       try {
-        reference = _classLoadingStrategy.loadActorOrientedClass(className, versionSpec);
+        VersionSpecification _vSpec = versionSpec!=null ? versionSpec : _defaultVersionSpec;
+        reference = _classLoadingStrategy.loadActorOrientedClass(className, _vSpec);
       } catch (Exception e) {
         // ignore here, just means we need to look further to find the moml class
       }
@@ -4798,7 +4806,11 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
   }
 
   protected Class loadClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
-    return _classLoadingStrategy.loadJavaClass(className, versionSpec);
+    // If no specific version info was in the model's MOML, and a default version spec was set, we need to use that one.
+    // This is especially important for submodels based on actor-oriented-classes, where we want to maintain some consistency
+    // between a related "group" of MOMLs (the parent models and their submodels).
+    VersionSpecification _vSpec = versionSpec!=null ? versionSpec : _defaultVersionSpec;
+    return _classLoadingStrategy.loadJavaClass(className, _vSpec);
   }
 
   /**
@@ -5869,6 +5881,8 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
 
   private ClassLoadingStrategy _classLoadingStrategy;
   private static ClassLoadingStrategy _defaultClassLoadingStrategy;
+
+  private VersionSpecification _defaultVersionSpec;
 
   // Count of configure tags so that they can nest.
   private int _configureNesting = 0;
