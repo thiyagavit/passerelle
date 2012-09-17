@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.domain.et.impl;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -23,12 +24,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventHandler;
 
 /**
- * A basic implementation of an event dispatcher, based on a BlockingQueue and a single thread for dispatching queued events. Should become configurable for
- * multiple threads as well. NOT YET READY FOR USE! Still need to define behaviour ico multiple threads, with external control on when to initiate
- * shutdown/wrapup.
  * 
  * @author delerw
  */
@@ -47,6 +46,18 @@ public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
 
   protected Logger getLogger() {
     return LOGGER;
+  }
+  
+  @Override
+  public void shutdown() {
+    queueDepletionExecutor.shutdown();
+    super.shutdown();
+  }
+  
+  @Override
+  public List<Event> shutdownNow() {
+    queueDepletionExecutor.shutdownNow();
+    return super.shutdownNow();
   }
 
   @Override
@@ -88,13 +99,13 @@ public class ThreadPoolEventDispatcher extends SimpleEventDispatcher {
 
     public Boolean call() throws Exception {
       String name = getName() + " - " + Thread.currentThread().getName();
-      getLogger().debug("Starting EventQueueSink {}", name);
+      getLogger().trace("Starting dispatch {}", name);
       try {
         boolean hasDispatchedSomething = ThreadPoolEventDispatcher.super.dispatch(timeout);
         getLogger().debug(name + " hasDispatchedSomething " + hasDispatchedSomething);
         return hasDispatchedSomething;
       } finally {
-        getLogger().debug("Terminating EventQueueSink {}", name);
+        getLogger().trace("Finished dispatch {}", name);
       }
     }
   }

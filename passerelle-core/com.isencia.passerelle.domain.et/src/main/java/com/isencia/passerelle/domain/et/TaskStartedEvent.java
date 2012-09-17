@@ -37,6 +37,10 @@ public class TaskStartedEvent<T> extends AbstractEvent {
     this.task = task;
     this.taskOwner = taskOwner;
   }
+
+  public TaskStartedEvent<T> copy() {
+    return new TaskStartedEvent<T>(task, taskOwner);
+  }
   
   public Actor getTaskOwner() {
     return taskOwner;
@@ -47,9 +51,7 @@ public class TaskStartedEvent<T> extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return "TaskStartedEvent [timeStamp=" + dateFormat.format(getTimestamp()) 
-        + ", taskOwner=" + taskOwner.getFullName() 
-        + ", task=" + task 
-        + "]";
+    return dateFormat.format(getTimestamp()) + " " + getId() + "TaskStartedEvent [taskOwner=" + taskOwner.getFullName() 
+        + ", task=" + task + "]";
   }
 }

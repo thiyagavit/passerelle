@@ -18,6 +18,7 @@ package com.isencia.passerelle.domain.et;
 import java.text.DateFormat;
 import java.util.Date;
 import ptolemy.data.Token;
+import com.isencia.passerelle.core.PasserelleToken;
 import com.isencia.passerelle.core.Port;
 
 /**
@@ -47,7 +48,11 @@ public class SendEvent extends AbstractEvent {
     this.sendingPort = sendingPort;
     this.receivingPort = receivingPort;
   }
-
+  
+  public SendEvent copy() {
+    return new SendEvent(token, sendingPort, receivingPort);
+  }
+  
   /**
    * 
    * @return the port that has sent the message to the receiving port
@@ -105,6 +110,13 @@ public class SendEvent extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return dateFormat.format(getTimestamp()) + " SendEvent [receivingPort=" + receivingPort.getFullName() + "]";
+    String msg="";
+    try {
+      msg = ((PasserelleToken)token).getMessage().getBodyContentAsString();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return dateFormat.format(getTimestamp()) + " " + getId() + " SendEvent [receivingPort=" + receivingPort.getFullName() + " msg="+msg+"]";
   }
 }

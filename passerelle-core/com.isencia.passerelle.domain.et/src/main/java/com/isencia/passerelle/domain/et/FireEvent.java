@@ -31,11 +31,15 @@ public class FireEvent extends AbstractEvent {
     this.target = target;
   }
 
+  public FireEvent copy() {
+    return new FireEvent(target);
+  }
+  
   public Actor getTarget() {
     return target;
   }
 
   public String toString(DateFormat dateFormat) {
-    return dateFormat.format(getTimestamp()) + " FireEvent [target=" + target.getFullName() + "]";
+    return dateFormat.format(getTimestamp()) + " " + getId() + " FireEvent [target=" + target.getFullName() + "]";
   }
 }
