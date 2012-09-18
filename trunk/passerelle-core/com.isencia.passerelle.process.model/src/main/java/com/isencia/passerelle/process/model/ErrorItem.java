@@ -13,9 +13,9 @@ package com.isencia.passerelle.process.model;
 public interface ErrorItem {
 
   public enum Severity {
-    WARNING, ERROR, FATAL;
+    INFO, WARNING, ERROR, FATAL;
   }
-
+  
   public enum Category {
     FUNCTIONAL, TECHNICAL;
   }

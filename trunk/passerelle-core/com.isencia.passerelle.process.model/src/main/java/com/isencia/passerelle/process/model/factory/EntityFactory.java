@@ -17,7 +17,6 @@ import com.isencia.passerelle.process.model.ErrorItem.Severity;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
-import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 
 /**
