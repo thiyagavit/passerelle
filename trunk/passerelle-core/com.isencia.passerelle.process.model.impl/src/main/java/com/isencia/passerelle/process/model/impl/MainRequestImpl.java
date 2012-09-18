@@ -9,6 +9,8 @@ import com.isencia.passerelle.process.model.Case;
 @DiscriminatorValue("MAINREQUEST")
 public class MainRequestImpl extends RequestImpl {
 
+  private static final long serialVersionUID = 1L;
+
   public MainRequestImpl() {
     super();
   }
