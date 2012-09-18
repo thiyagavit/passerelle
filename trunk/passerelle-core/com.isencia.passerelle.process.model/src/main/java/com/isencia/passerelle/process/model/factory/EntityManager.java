@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
 
@@ -139,6 +140,12 @@ public interface EntityManager {
    */
   List<Task> getTasksForContext(Context context);
 
+  /**
+   * @param requestId
+   * @return
+   */
+  List<ErrorItem> getErrorsForRequest(Long requestId);
+  
   /**
    * Helper method to ensure a refresh of the given entity
    * @param entity
