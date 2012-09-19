@@ -95,7 +95,8 @@ public interface EntityManager {
    * @return
    */
   Task getTask(Long taskId);
-
+  Task getTask(Long taskId, boolean bypassCache);
+  
   /**
    * Get the latest persisted version of a Context
    * 
@@ -103,6 +104,7 @@ public interface EntityManager {
    * @return Latest version of the Context
    */
   Context getContext(Context context);
+  Context getContext(Context context, boolean bypassCache);
   
   /**
    * Retrieve the first Request with the given correlation identifier
