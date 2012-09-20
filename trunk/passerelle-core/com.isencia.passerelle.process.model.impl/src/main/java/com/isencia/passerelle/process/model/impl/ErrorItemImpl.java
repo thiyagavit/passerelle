@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 
 import com.isencia.passerelle.process.model.ErrorItem;
@@ -12,7 +13,8 @@ import com.isencia.passerelle.process.model.ErrorItem;
  * @author "puidir"
  * 
  */
-public class ErrorItemImpl implements ErrorItem {
+public class ErrorItemImpl implements ErrorItem, Serializable {
+  private static final long serialVersionUID = -6470343890215671989L;
 
   private Category category;
   private Severity severity;
