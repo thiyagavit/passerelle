@@ -10,6 +10,7 @@ public interface HistoricalDataProvider {
 
 	String ALLOW_HISTORICAL_DATA = "com.isencia.passerelle.process.model.allow.historical.data";
 	String RECENT_ONLY = "com.isencia.passerelle.process.model.recent.only";
+	String ALLOWED_REQUEST_TYPES = "com.isencia.passerelle.process.model.allowed.requesttypes";
 	String ALLOWED_TASK_TYPES = "com.isencia.passerelle.process.model.allowed.tasketypes";
 	String ALLOWED_DATA_TYPES = "com.isencia.passerelle.process.model.allowed.datatypes";
 	String INCLUDE_REQUEST_ATTRIBUTES = "com.isencia.passerelle.process.model.include.request.attributes";
@@ -19,6 +20,8 @@ public interface HistoricalDataProvider {
 	void setRecentOnly(Context context, boolean value);
 
 	void setAllowedTaskTypes(Context context, String[] value);
+	
+	void setAllowedRequestTypes(Context context, String[] value);
 
 	void setAllowedDataTypes(Context context, String[] value);
 
@@ -27,4 +30,6 @@ public interface HistoricalDataProvider {
 	List<ResultBlock> getResultBlocks(Context context);
 
 	List<Attribute> getRequestAttributes(Context context);
+	
+	void reset(Context context);
 }
