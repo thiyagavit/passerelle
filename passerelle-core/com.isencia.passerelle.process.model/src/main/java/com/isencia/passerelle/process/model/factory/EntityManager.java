@@ -11,6 +11,7 @@ import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 
 /**
@@ -45,6 +46,7 @@ public interface EntityManager {
    */
   Context persistContext(Context context);
   
+  ResultBlock mergeResultBlock(ResultBlock block);
   
   /**
    * Persist updates in an existing context entity 
@@ -54,7 +56,7 @@ public interface EntityManager {
    * @return
    */
   Context mergeContext(Context context);
-  Context mergeContext(Context context,boolean hasChangedBlocks);
+
   
   /**
    * Merge two or more branched contexts
@@ -127,15 +129,21 @@ public interface EntityManager {
    */
   List<Task> getTasksForCase(Long caseId, Long excludedRequestId);
   /**
-   * @param requestedReferenceId
+   * @param caseId
+   * @param requestId to exclude
    * @return
    */
   List<Request> getRequestsForCase(Long caseId, Long excludedRequestId);
   /**
+   * @param request
+   * @return
+   */
+  List<Request> getRequestsForCase(Request requestToExclude);
+  /**
    * @param requestedReferenceId
    * @return
    */
-  List<Request> getRequestsForCase(Request currentRequest);
+  List<Request> getRequestsForCase(Request requestToExclude, Collection<String> requestTypes);
   /**
    * @param requestedReferenceId
    * @return
@@ -154,4 +162,11 @@ public interface EntityManager {
    * @return
    */
   <T extends Serializable>  T refresh(T entity);
+  
+  /**
+   * @param requestedReferenceId
+   * @return
+   */
+  List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, Collection<Long> resultBlockIds,
+      Collection<String> taskTypes, Collection<String> resultBlockTypes);
 }
