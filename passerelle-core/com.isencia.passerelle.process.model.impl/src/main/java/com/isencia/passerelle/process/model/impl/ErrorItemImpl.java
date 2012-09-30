@@ -6,6 +6,8 @@ package com.isencia.passerelle.process.model.impl;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.isencia.passerelle.process.model.ErrorItem;
 
@@ -19,22 +21,29 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
   private Category category;
   private Severity severity;
   private String code;
+  private Set<String> relatedDataTypes = new TreeSet<String>();
   // limited to length 100
   private String shortDescription;
   // limited to length 1000
   private String description;
 
   /**
+   * 
    * @param severity
    * @param category
    * @param code
+   * @param shortDescription
    * @param description
+   * @param relatedDataTypes
    */
-  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, String description) {
+  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     super();
     this.severity = severity;
     this.category = category;
     this.code = code;
+    if(relatedDataTypes!=null) {
+      this.relatedDataTypes.addAll(relatedDataTypes);
+    }
     setShortDescription(shortDescription);
     setDescription(description);
   }
@@ -48,13 +57,18 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
    * @param severity
    * @param category
    * @param code
+   * @param shortDescription
    * @param cause
+   * @param relatedDataTypes
    */
-  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, Throwable cause) {
+  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     super();
     this.severity = severity;
     this.category = category;
     this.code = code;
+    if(relatedDataTypes!=null) {
+      this.relatedDataTypes.addAll(relatedDataTypes);
+    }
     setShortDescription(shortDescription);
     setDescription(buildDescription(cause));
   }
@@ -72,6 +86,10 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
 
   public String getCode() {
     return code;
+  }
+  
+  public Set<String> getRelatedDataTypes() {
+    return relatedDataTypes;
   }
 
   public String getShortDescription() {
@@ -123,7 +141,6 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
         result = this.code.compareTo(o.getCode());
       }
     }
-
     return result;
   }
 
@@ -133,6 +150,7 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     int result = 1;
     result = prime * result + ((category == null) ? 0 : category.hashCode());
     result = prime * result + ((code == null) ? 0 : code.hashCode());
+    result = prime * result + ((relatedDataTypes == null) ? 0 : relatedDataTypes.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
     result = prime * result + ((severity == null) ? 0 : severity.hashCode());
     return result;
@@ -157,6 +175,11 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
         return false;
     } else if (!code.equals(other.code))
       return false;
+    if (relatedDataTypes == null) {
+      if (other.relatedDataTypes != null)
+        return false;
+    } else if (!relatedDataTypes.equals(other.relatedDataTypes))
+      return false;
     if (description == null) {
       if (other.description != null)
         return false;
@@ -179,6 +202,8 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     builder.append(category);
     builder.append(", code=");
     builder.append(code);
+    builder.append(", relatedDataTypes=");
+    builder.append(relatedDataTypes);
     builder.append(", short description=");
     builder.append(shortDescription);
     builder.append(", description=");

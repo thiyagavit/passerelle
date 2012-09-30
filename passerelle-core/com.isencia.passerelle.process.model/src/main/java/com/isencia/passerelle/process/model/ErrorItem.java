@@ -3,6 +3,9 @@
  */
 package com.isencia.passerelle.process.model;
 
+import java.util.Set;
+
+
 /**
  * Maintains all info related to an error that occurred during 
  * the processing of a request/task.
@@ -31,10 +34,16 @@ public interface ErrorItem {
   Category getCategory();
 
   /**
-   * @return a formatted error code identifying the error type of this item, e.g. DAR-1234
+   * @return a formatted error code identifying the error type of this item, e.g. PASS-1234
    */
   String getCode();
 
+  /**
+   * 
+   * @return the data type to which this item is related
+   */
+  Set<String> getRelatedDataTypes();
+  
   /**
    * @return short description, e.g. Missing data, Timed out
    */
