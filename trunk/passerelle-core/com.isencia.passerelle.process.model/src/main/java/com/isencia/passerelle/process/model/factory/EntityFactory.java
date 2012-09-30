@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.factory;
 
 import java.util.Date;
+import java.util.Set;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
@@ -53,12 +54,12 @@ public interface EntityFactory {
 
   ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit,Integer level);
   
-  ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, Throwable cause);
-  ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, String description);
+  ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
+  ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
   
   ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem);
-  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description);
-  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause);
+  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
+  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
 
   ContextEvent createContextEvent(Context context, String topic, String message);
 }

@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.impl.factory;
 
 import java.util.Date;
+import java.util.Set;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
@@ -21,6 +22,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextEventImpl;
+import com.isencia.passerelle.process.model.impl.ErrorItemImpl;
 import com.isencia.passerelle.process.model.impl.MainRequestImpl;
 import com.isencia.passerelle.process.model.impl.RequestAttributeImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockAttributeImpl;
@@ -90,19 +92,19 @@ public class EntityFactoryImpl implements EntityFactory {
     throw new UnsupportedOperationException();
   }
 
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
-  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, Throwable cause) {
-    throw new UnsupportedOperationException();
+  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
+    return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
   }
 
-  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, String description) {
-    throw new UnsupportedOperationException();
+  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
+    return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
   }
 }
