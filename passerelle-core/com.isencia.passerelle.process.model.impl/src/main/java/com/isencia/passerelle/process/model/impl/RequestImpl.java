@@ -28,6 +28,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.apache.commons.collections.map.CaseInsensitiveMap;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
@@ -180,7 +182,13 @@ public class RequestImpl implements Request {
   }
 
   public Attribute getAttribute(String name) {
-    return requestAttributes.get(name);
+    // Remark: can't use a CaseInsensitiveMap here because of lazy loading
+    for (String attrName : requestAttributes.keySet()) {
+      if (attrName.equalsIgnoreCase(name)) {
+        return requestAttributes.get(attrName);
+      }
+    }
+    return null;
   }
 
   public Attribute putAttribute(Attribute attribute) {

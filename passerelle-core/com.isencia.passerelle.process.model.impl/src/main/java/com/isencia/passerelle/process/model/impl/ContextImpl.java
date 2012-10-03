@@ -226,10 +226,8 @@ public class ContextImpl implements Context {
     
     String result = null;
 
-    String key = name.toUpperCase();
-    
     // first check in the context entries, these have highest priority
-    Object contextEntry = getEntryValue(key);
+    Object contextEntry = getEntryValue(name);
     if (contextEntry != null) {
       // need to force this into a string somehow
       result = contextEntry.toString();
@@ -243,7 +241,7 @@ public class ContextImpl implements Context {
         Collection<ResultBlock> blocks = task.getResultBlocks();
         for (ResultBlock block : blocks) {
           if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
-            ResultItem<?> item = block.getItemForName(key);
+            ResultItem<?> item = block.getItemForName(name);
             if (item != null) {
               result = item.getValueAsString();
               break;
@@ -254,7 +252,7 @@ public class ContextImpl implements Context {
 
       // if still nothing found, check in the original request
       if (result == null && getRequest() != null) {
-        NamedValue<?> reqAttribute = getRequest().getAttribute(key);
+        NamedValue<?> reqAttribute = getRequest().getAttribute(name);
         result = reqAttribute != null ? reqAttribute.getValueAsString() : null;
       }
 
@@ -265,7 +263,7 @@ public class ContextImpl implements Context {
           List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
           if (historicalRequestAttributes != null) {
             for (Attribute attribute : historicalRequestAttributes) {
-              if (attribute.getName().equals(key)) {
+              if (attribute.getName().equalsIgnoreCase(name)) {
                 result = attribute.getValueAsString();
                 break;
               }
@@ -277,7 +275,7 @@ public class ContextImpl implements Context {
             if (historicalBlocks != null) {
               for (ResultBlock block : historicalBlocks) {
                 if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
-                  ResultItem<?> item = block.getItemForName(key);
+                  ResultItem<?> item = block.getItemForName(name);
                   if (item != null) {
                     result = item.getValueAsString();
                     break;
