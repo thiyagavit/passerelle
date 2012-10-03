@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.actor.activator;
 
@@ -21,12 +21,18 @@ import com.isencia.passerelle.validation.version.VersionSpecification;
 
 /**
  * @author delerw
- *
+ * 
  */
 public class ActorProvider implements ModelElementClassProvider {
 
-  public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
-    return (Class<? extends NamedObj>) this.getClass().getClassLoader().loadClass(className);
-  }
+	public Class<? extends NamedObj> getClass(String className,
+			VersionSpecification versionSpec) throws ClassNotFoundException {
+		if (className.startsWith("be.isencia")) {
+			return (Class<? extends NamedObj>) Class.forName(className.replace(
+					"be.isencia", "com.isencia"));
+		}
+		return (Class<? extends NamedObj>) this.getClass().getClassLoader()
+				.loadClass(className);
+	}
 
 }
