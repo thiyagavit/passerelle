@@ -63,6 +63,10 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 		return value;
 	}
 
+	public String getValueAsString() {
+		return getValue();
+	}
+
 	public void setValue(String value) {
 		if (value != null && value.length() > MAX_CHAR_SIZE) {
 			this.clobItem = new ClobItem(value);
