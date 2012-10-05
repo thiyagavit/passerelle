@@ -17,7 +17,14 @@ public class FlowUtils {
 	}
 
 	public static String generateUniqueFlowName(String name, String uniqueIndex) {
-		StringBuffer sb = new StringBuffer(name);
+		String fullName = null;
+		if (name.contains(FLOW_SEPARATOR)) {
+		  fullName =  name.split(FLOW_SEPARATOR)[0];
+    }else{
+      fullName = name;
+    }
+	  
+	  StringBuffer sb = new StringBuffer(fullName);
 		sb.append(FLOW_SEPARATOR);
 		sb.append(uniqueIndex);
 		return sb.toString();
