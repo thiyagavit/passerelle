@@ -138,6 +138,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 				configuration.addSystemProperty("com.isencia.jmx.service.port");
 				// TODO Find an alternative way to maintain a "editor/session" key
 				configuration.addSystemProperty("com.isencia.require.file.source");
+				configuration.addSystemProperty("workflow.logback.configurationFile");
 				// DO NOT CHANGE THIS. IF THESE PROPERTIES ARE NOT PASSED TO THE WORKFLOW,
 				// IT DOES NOT WORK, THE JMX SERVICE WILL BE BROKEN
 				DebugUITools.launch(configuration, ILaunchManager.RUN_MODE);
