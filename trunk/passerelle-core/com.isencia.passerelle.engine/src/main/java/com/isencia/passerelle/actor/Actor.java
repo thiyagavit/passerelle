@@ -1132,8 +1132,12 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     // A dirty way to determine that we're in a PN-like domain,
     // where we need to add "active" PortHandlers with threads per input channel.
     // In event-driven domains, we don't need multithreaded PortHandlers...
-    boolean needActiveHandlers = (getDirector() instanceof ProcessDirector);
+    boolean needActiveHandlers = isInProcessDomain();
     return new PortHandler(p,needActiveHandlers);
+  }
+
+  final protected boolean isInProcessDomain() {
+    return getDirector() instanceof ProcessDirector;
   }
   
   final protected PortHandler createPortHandler(Port p, PortListener portListener) {
