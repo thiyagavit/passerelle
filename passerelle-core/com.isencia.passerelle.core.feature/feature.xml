@@ -450,14 +450,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="com.isencia.passerelle.actor"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.actor.conf"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -465,28 +465,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="com.isencia.passerelle.commons"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.commons.ume"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.defaulttypeconverterprovider"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.engine"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
