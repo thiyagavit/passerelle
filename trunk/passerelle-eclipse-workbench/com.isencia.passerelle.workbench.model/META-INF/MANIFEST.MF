@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Model Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.workbench.model;singleton:=true
-Bundle-Version: 8.2.0
+Bundle-Version: 8.2.1
 Bundle-Activator: com.isencia.passerelle.workbench.model.activator.Activator
 Bundle-Vendor: ISENCIA
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0",

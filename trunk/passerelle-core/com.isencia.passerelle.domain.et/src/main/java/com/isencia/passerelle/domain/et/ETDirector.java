@@ -202,11 +202,9 @@ public class ETDirector extends Director implements PasserelleDirector {
   @Override
   public boolean postfire() throws IllegalActionException {
     if(!notDone) {
-      LOGGER.info("Director done");
       return false;
     }
     if(!super.postfire()) {
-      LOGGER.info("Director super.postFire() false");
       return false;
     }
     return true;

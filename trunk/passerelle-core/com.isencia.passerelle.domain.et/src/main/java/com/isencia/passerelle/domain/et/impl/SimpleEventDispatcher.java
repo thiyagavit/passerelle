@@ -74,7 +74,7 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     this.name = name;
     eventHandlers = handlers;
 
-    getLogger().info("Created " + this);
+    getLogger().debug("Created {}", this);
   }
 
   public void enableEventHistory(boolean enable) {
@@ -96,7 +96,7 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
     for (EventHandler evtHandler : eventHandlers) {
       evtHandler.initialize();
     }
-    getLogger().info("Initialized " + this);
+    getLogger().debug("Initialized {}", this);
   }
 
   protected int getPendingEventCount() {
@@ -199,15 +199,15 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   public void shutdown() {
     active = false;
-    getLogger().info("Shutdown " + this);
+    getLogger().debug("Shutdown {}", this);
   }
 
   public List<Event> shutdownNow() {
-    getLogger().info("shutdownNow " + this);
+    getLogger().debug("shutdownNow {}", this);
     shutdown();
     forcedShutdown = true;
     List<EventEntry> pendingEventEntries = new ArrayList<EventEntry>(eventQ);
-    getLogger().info("shutdownNow " + this + " found " + pendingEventEntries.size() + " pending events");
+    getLogger().info("shutdownNow {} found {} pending events", this, pendingEventEntries.size());
     List<Event> pendingEvents = new ArrayList<Event>();
     for (EventEntry eventEntry : pendingEventEntries) {
       pendingEvents.add(eventEntry.event);

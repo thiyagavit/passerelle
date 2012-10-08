@@ -382,7 +382,7 @@ public class LibraryManager {
     }
     File file = new File(EnvironmentUtils.getUserFolder() + File.separator + entityAsClass.getName() + ".moml");
     if (_confirmFile(file)) {
-      if (logger.isInfoEnabled()) logger.info("Exporting actor " + entityAsClass.getFullName() + " to " + file.getPath());
+      logger.debug("Exporting actor {} to {}", entityAsClass.getFullName(), file.getPath());
 
       // Make sure the entity name saved matches the file name.
       String name = entityAsClass.getName();
@@ -435,7 +435,7 @@ public class LibraryManager {
       // Record the selected directory.
       EnvironmentUtils.setLastSelectedDirectory(fileDialog.getCurrentDirectory());
 
-      if (logger.isInfoEnabled()) logger.info("Exporting actor " + entity.getFullName() + " to " + file.getPath());
+      logger.debug("Exporting actor {} to {}", entity.getFullName(), file.getPath());
 
       FileWriter fileWriter = new FileWriter(file);
 

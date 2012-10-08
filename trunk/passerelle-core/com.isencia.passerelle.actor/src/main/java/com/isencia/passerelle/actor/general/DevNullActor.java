@@ -84,7 +84,7 @@ public class DevNullActor extends Actor {
     try {
       if (((BooleanToken) logReceivedMessages.getToken()).booleanValue()) {
         ManagedMessage msg = request.getMessage(input);
-        logger.info("Discarding msg " + msg);
+        logger.info("Discarding msg {}", msg);
       }
     } catch (IllegalActionException e) {
       logger.error("Error reading parameter value", e);

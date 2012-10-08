@@ -136,9 +136,7 @@ public abstract class TriggeredSource extends Source {
         try {
           ManagedMessage message = MessageHelper.getMessageFromToken(token);
           acceptTriggerMessage(message);
-          if (logger.isInfoEnabled()) {
-            logger.info(getInfo() + " - Trigger received");
-          }
+          logger.debug("{} - Trigger received",getInfo());
           return message;
         } catch (PasserelleException e) {
           throw new ProcessingException("Error handling token", token, e);

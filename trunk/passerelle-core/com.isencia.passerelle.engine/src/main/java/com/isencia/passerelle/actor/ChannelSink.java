@@ -154,9 +154,7 @@ public abstract class ChannelSink extends Sink {
             if (!getChannel().isOpen()) {
                 openChannel(getChannel());
 
-                if (logger.isInfoEnabled()) {
-                    logger.info(getInfo() + " - Opened :" + getChannel());
-                }
+               logger.debug("{} - Opened : {}",getInfo(),getChannel());
             }
         } catch (ChannelException e) {
             throw new ProcessingException(PasserelleException.Severity.FATAL,"Sender channel for " + getInfo() + " not opened correctly.",getChannel(),e);
@@ -179,9 +177,7 @@ public abstract class ChannelSink extends Sink {
         try {
             closeChannel(getChannel());
 
-            if (logger.isInfoEnabled()) {
-                logger.info(getInfo() + " - Closed :" + getChannel());
-            }
+            logger.debug("{} - Closed : {}",getInfo(),getChannel());
         } catch (ChannelException e) {
             throw new TerminationException(getInfo() + " - Error closing channel.",getChannel(), e);
         }
