@@ -108,7 +108,7 @@ public class Timer extends Actor {
     // If something connected to the set port, install a handler
     if (setInputPort.getWidth() > 0) {
 
-      setHandler = new PortHandler(setInputPort, new PortListenerAdapter() {
+      setHandler = createPortHandler(setInputPort, new PortListenerAdapter() {
         public void tokenReceived() {
           if (logger.isDebugEnabled())
             logger.debug(getInfo() + " - Set Event received");
@@ -127,7 +127,7 @@ public class Timer extends Actor {
     }
     // If something connected to the reset port, install a handler
     if (resetInputPort.getWidth() > 0) {
-      resetHandler = new PortHandler(resetInputPort, new PortListenerAdapter() {
+      resetHandler = createPortHandler(resetInputPort, new PortListenerAdapter() {
         public void tokenReceived() {
           Token token = resetHandler.getToken();
           if (logger.isDebugEnabled())

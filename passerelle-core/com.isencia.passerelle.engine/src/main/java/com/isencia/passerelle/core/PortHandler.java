@@ -88,11 +88,33 @@ public class PortHandler {
    * @param ioPort
    */
   public PortHandler(Port ioPort) {
-    this(ioPort, null);
+    this.ioPort = ioPort;
+    channelCount = getWidth();
+    queue = new LinkedBlockingQueue<Token>();
+    Nameable actor = ioPort.getContainer();
+    if (actor != null) {
+      actorInfo = ((NamedObj) actor).getFullName();
+    }
   }
 
+  /**
+   * 
+   * @param ioPort
+   * @param inProcessDomain
+   */
   public PortHandler(Port ioPort, boolean inProcessDomain) {
-    this(ioPort, null);
+    this(ioPort);
+    this.inProcessDomain = inProcessDomain;
+  }
+
+  /**
+   * 
+   * @param ioPort
+   * @param listener
+   * @param inProcessDomain
+   */
+  public PortHandler(Port ioPort, PortListener listener, boolean inProcessDomain) {
+    this(ioPort, listener);
     this.inProcessDomain = inProcessDomain;
   }
 
@@ -103,15 +125,8 @@ public class PortHandler {
    * @param listener an object interested in receiving messages from the handler in push mode
    */
   public PortHandler(Port ioPort, PortListener listener) {
-    this.ioPort = ioPort;
+    this(ioPort);
     this.listener = listener;
-
-    channelCount = getWidth();
-    queue = new LinkedBlockingQueue<Token>();
-    Nameable actor = ioPort.getContainer();
-    if (actor != null) {
-      actorInfo = ((NamedObj) actor).getFullName();
-    }
   }
 
   /**

@@ -208,7 +208,7 @@ public class Switch extends Actor {
     super.doInitialize();
 
     if (select.getWidth() > 0) {
-      selectHandler = new PortHandler(select, new PortListenerAdapter() {
+      selectHandler = createPortHandler(select, new PortListenerAdapter() {
         public void tokenReceived() {
           Token selectToken = selectHandler.getToken();
           if(selectToken!=null && !selectToken.isNil()) {

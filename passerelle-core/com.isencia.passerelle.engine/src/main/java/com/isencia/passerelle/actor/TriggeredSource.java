@@ -70,7 +70,7 @@ public abstract class TriggeredSource extends Source {
     if (triggerConnected) {
       if (logger.isDebugEnabled())
         logger.debug(getInfo() + " - Trigger(s) connected");
-      triggerHandler = new PortHandler(trigger);
+      triggerHandler = createPortHandler(trigger);
       triggerHandler.start();
     }
 

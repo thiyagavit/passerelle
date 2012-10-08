@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.TypedAtomicActor;
+import ptolemy.actor.process.ProcessDirector;
 import ptolemy.actor.process.TerminateProcessException;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
@@ -46,6 +47,7 @@ import com.isencia.passerelle.core.PasserelleToken;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
+import com.isencia.passerelle.core.PortListener;
 import com.isencia.passerelle.core.PortListenerAdapter;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.domain.cap.BlockingQueueReceiver;
@@ -404,7 +406,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     if (requestFinishPort.getWidth() > 0) {
       // If at least 1 channel is connected to the port
       // Install handler on input port
-      requestFinishHandler = new PortHandler(requestFinishPort, new PortListenerAdapter() {
+      requestFinishHandler = createPortHandler(requestFinishPort, new PortListenerAdapter() {
         public void tokenReceived() {
           Token token = requestFinishHandler.getToken();
           if (token != null && !token.isNil()) {
@@ -1118,5 +1120,25 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
     actor.statistics = new ActorStatistics(actor);
     return actor;
+  }
+
+  /**
+   * Overridable method to construct customizable port handlers, that will be registered on each push-input-port.
+   * 
+   * @param p
+   * @return new PortHandler
+   */
+  protected PortHandler createPortHandler(Port p) {
+    // A dirty way to determine that we're in a PN-like domain,
+    // where we need to add "active" PortHandlers with threads per input channel.
+    // In event-driven domains, we don't need multithreaded PortHandlers...
+    boolean needActiveHandlers = (getDirector() instanceof ProcessDirector);
+    return new PortHandler(p,needActiveHandlers);
+  }
+  
+  final protected PortHandler createPortHandler(Port p, PortListener portListener) {
+    PortHandler pH = createPortHandler(p);
+    pH.setListener(portListener);
+    return pH;
   }
 }

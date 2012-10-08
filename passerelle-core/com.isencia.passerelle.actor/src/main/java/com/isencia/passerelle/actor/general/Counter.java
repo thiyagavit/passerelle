@@ -81,7 +81,7 @@ public class Counter extends Transformer {
     super.doInitialize();
     // If something connected to the reset port, install a handler
     if (reset.getWidth() > 0) {
-      resetHandler = new PortHandler(reset, new PortListenerAdapter() {
+      resetHandler = createPortHandler(reset, new PortListenerAdapter() {
         public void tokenReceived() {
           Token token = resetHandler.getToken();
           if (token != null && !token.isNil()) {

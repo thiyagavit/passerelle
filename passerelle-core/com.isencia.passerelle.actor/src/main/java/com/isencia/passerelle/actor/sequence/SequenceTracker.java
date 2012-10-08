@@ -81,7 +81,7 @@ public class SequenceTracker extends Transformer {
     sequences.clear();
     seqFinishedMsgPending = false;
 
-    handledHandler = new PortHandler(handled, new PortListener() {
+    handledHandler = createPortHandler(handled, new PortListener() {
       public void tokenReceived() {
         Token handledToken = handledHandler.getToken();
         try {

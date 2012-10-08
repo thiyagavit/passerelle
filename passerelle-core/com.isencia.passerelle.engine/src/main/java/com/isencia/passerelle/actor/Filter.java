@@ -99,7 +99,7 @@ public abstract class Filter extends Actor {
 
     super.doInitialize();
     if (input.getWidth() > 0) {
-      inputHandler = new PortHandler(input);
+      inputHandler = createPortHandler(input);
       inputHandler.start();
     } else {
       requestFinish();

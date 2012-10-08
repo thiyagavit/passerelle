@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.isencia.passerelle.testsupport;bundle-version="8.0.0"
 Import-Package: com.isencia.passerelle.actor;version="7.0.0",
  com.isencia.passerelle.actor.control,
+ com.isencia.passerelle.actor.convert,
  com.isencia.passerelle.actor.dynaport,
  com.isencia.passerelle.actor.error,
  com.isencia.passerelle.actor.general,
