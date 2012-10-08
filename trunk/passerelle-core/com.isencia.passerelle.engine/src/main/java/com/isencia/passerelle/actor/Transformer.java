@@ -87,7 +87,7 @@ public abstract class Transformer extends Actor {
     if (logger.isTraceEnabled())
       logger.trace(getInfo());
 
-    inputHandler = new PortHandler(input);
+    inputHandler = createPortHandler(input);
     if (input.getWidth() > 0) {
       inputHandler.start();
     }

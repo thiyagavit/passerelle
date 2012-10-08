@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.actor.process.ProcessDirector;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.data.expr.Parameter;
@@ -210,16 +209,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     currentProcessRequest.setIterationCount(++iterationCount);
     currentProcessResponse = null;
 
-    // A dirty way to determine that we're in a PN-like domain,
-    // where we need to add "active" PortHandlers with threads per input channel.
-    // In event-driven domains, we don't need multithreaded PortHandlers...
-    boolean needActiveHandlers = (getDirector() instanceof ProcessDirector);
-
     List<Port> inputPortList = this.inputPortList();
     for (Port _p : inputPortList) {
       if (_p.isInput() && !(_p instanceof ControlPort)) {
         if (PortMode.PULL.equals(_p.getMode())) {
-          blockingInputHandlers.add(new PortHandler(_p, needActiveHandlers));
+          blockingInputHandlers.add(createPortHandler(_p));
           blockingInputFinishRequests.put(_p, Boolean.FALSE);
         }
         isSource = false;
@@ -242,16 +236,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
 
     getLogger().trace("{} - doInitialize() - exit", getFullName());
-  }
-
-  /**
-   * Overridable method to construct customizable port handlers, that will be registered on each push-input-port.
-   * 
-   * @param p
-   * @return new PortHandler
-   */
-  protected PortHandler createPortHandler(Port p) {
-    return new PortHandler(p);
   }
 
   @Override

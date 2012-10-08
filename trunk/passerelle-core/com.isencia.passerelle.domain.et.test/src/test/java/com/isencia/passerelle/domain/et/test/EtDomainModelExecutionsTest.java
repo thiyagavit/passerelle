@@ -22,13 +22,12 @@ import ptolemy.actor.Manager.State;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.control.Stop;
+import com.isencia.passerelle.actor.convert.HeaderModifier;
 import com.isencia.passerelle.actor.error.ErrorObserver;
 import com.isencia.passerelle.actor.general.DevNullActor;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
-import com.isencia.passerelle.domain.et.Event;
-import com.isencia.passerelle.domain.et.EventError;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.FlowNotExecutingException;
@@ -220,41 +219,76 @@ public class EtDomainModelExecutionsTest extends TestCase {
     __testConcurrentInputsOnDelay(false, d, props);
   }
 
-  public void test300Times_ConcurrentInputsOnAsynchDelayET3Threads() throws Exception {
-    int errCount=0;
-    for (int i = 0; i < 300; i++) {
-      flow = new Flow("EtDomainModelExecutionsTest", null);
-      ETDirector d = null;
-      try {
-      Map<String, String> props = new HashMap<String, String>();
-      props.put("director."+ETDirector.NR_OF_DISPATCH_THREADS_PARAMNAME, "6");
-      props.put("director."+ETDirector.DISPATCH_TIMEOUT_PARAMNAME, "250");
-      props.put("director."+ETDirector.KEEP_EVENT_HISTORY_PARAMNAME, "true");
-      d = new ETDirector(flow, "director");
-      __testConcurrentInputsOnDelay(true, d, props);
-      } catch (Error e) {
-        errCount++;
-        System.err.println(e.getMessage());
-        System.err.println("Event History");
-        for(Event evt : d.getEventHistory()) {
-          System.err.println(evt);
-        }
-        System.err.println("Event Errors");
-        for(EventError evtErr : d.getEventErrors()) {
-          System.err.println(evtErr);
-        }
-        System.err.println("Unhandled Events");
-        for(Event evt : d.getUnhandledEvents()) {
-          System.err.println(evt);
-        }
-        System.err.println("Pending Events");
-        for(Event evt : d.getPendingEvents()) {
-          System.err.println(evt);
-        }
-      }
-    }
-    
-    System.out.println(errCount+" errors on 100");
+//  public void test300Times_ConcurrentInputsOnAsynchDelayET3Threads() throws Exception {
+//    int errCount=0;
+//    for (int i = 0; i < 300; i++) {
+//      flow = new Flow("EtDomainModelExecutionsTest", null);
+//      ETDirector d = null;
+//      try {
+//      Map<String, String> props = new HashMap<String, String>();
+//      props.put("director."+ETDirector.NR_OF_DISPATCH_THREADS_PARAMNAME, "6");
+//      props.put("director."+ETDirector.DISPATCH_TIMEOUT_PARAMNAME, "250");
+//      props.put("director."+ETDirector.KEEP_EVENT_HISTORY_PARAMNAME, "true");
+//      d = new ETDirector(flow, "director");
+//      __testConcurrentInputsOnDelay(true, d, props);
+//      } catch (Error e) {
+//        errCount++;
+//        System.err.println(e.getMessage());
+//        System.err.println("Event History");
+//        for(Event evt : d.getEventHistory()) {
+//          System.err.println(evt);
+//        }
+//        System.err.println("Event Errors");
+//        for(EventError evtErr : d.getEventErrors()) {
+//          System.err.println(evtErr);
+//        }
+//        System.err.println("Unhandled Events");
+//        for(Event evt : d.getUnhandledEvents()) {
+//          System.err.println(evt);
+//        }
+//        System.err.println("Pending Events");
+//        for(Event evt : d.getPendingEvents()) {
+//          System.err.println(evt);
+//        }
+//      }
+//    }
+//    
+//    System.out.println(errCount+" errors on 100");
+//  }
+  public void testConcurrentInputsOnHeaderModifier() throws Exception {
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    Actor src1 = new TextSource(flow, "src1");
+    Actor src2 = new TextSource(flow, "src2");
+    Actor src3 = new TextSource(flow, "src3");
+    HeaderModifier hdrModif1 = new HeaderModifier(flow, "hdrModif1");
+    HeaderModifier hdrModif2 = new HeaderModifier(flow, "hdrModif2");
+    HeaderModifier hdrModif3 = new HeaderModifier(flow, "hdrModif3");
+    Actor sink = new MessageHistoryStack(flow, "sink");
+
+    flow.connect(src1, hdrModif1);
+    flow.connect(src2, hdrModif1);
+    flow.connect(src3, hdrModif1);
+    flow.connect(hdrModif1, hdrModif2);
+    flow.connect(hdrModif2, hdrModif3);
+    flow.connect(hdrModif3, sink);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src1.values", "pol1,pol2,pol3");
+    props.put("src2.values", "pel1,pel2,pel3");
+    props.put("src3.values", "pingo1,pingo2,pingo3");
+    props.put("hdrModif1.mode", "Add");
+    props.put("hdrModif2.mode", "Modify");
+    props.put("hdrModif3.mode", "Remove");
+    props.put("hdrModif1.header name", "Hello");
+    props.put("hdrModif1.header value", "world");
+    props.put("hdrModif2.header name", "Hello");
+    props.put("hdrModif2.header value", "moon");
+    props.put("hdrModif3.header name", "Hello");
+
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 9L).assertFlow(flow);
   }
   
   public void testConcurrentInputsOnAsynchDelayET3Threads() throws Exception {

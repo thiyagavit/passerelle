@@ -109,7 +109,7 @@ public abstract class Sink extends Actor {
       logger.trace(getInfo());
 
     if (input.getWidth() > 0) {
-      inputHandler = new PortHandler(input);
+      inputHandler = createPortHandler(input);
       inputHandler.start();
     } else {
       requestFinish();

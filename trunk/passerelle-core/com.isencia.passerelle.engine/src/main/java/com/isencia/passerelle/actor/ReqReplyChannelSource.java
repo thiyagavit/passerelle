@@ -131,7 +131,7 @@ public abstract class ReqReplyChannelSource extends Source {
     super.doInitialize();
 
     if (replyPort.getWidth() > 0) {
-      replyHandler = new PortHandler(replyPort, new PortListenerAdapter() {
+      replyHandler = createPortHandler(replyPort, new PortListenerAdapter() {
         public void tokenReceived() {
           if (logger.isTraceEnabled()) {
             logger.trace(getInfo() + " - inputHandler.tokenReceived() - entry");

@@ -116,7 +116,7 @@ public class Synchronizer extends Actor {
     for (int i = 0; i < finishRequests.size(); ++i) {
       finishRequests.set(i, Boolean.FALSE);
     }
-    syncInputHandler = new PortHandler(syncInput);
+    syncInputHandler = createPortHandler(syncInput);
     if (syncInput.getWidth() > 0) {
       syncInputHandler.start();
     }

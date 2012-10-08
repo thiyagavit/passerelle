@@ -78,7 +78,7 @@ public class MessagesToArrayConverter extends Transformer {
     if (triggerConnected) {
       if (logger.isDebugEnabled()) logger.debug(getInfo() + " - Trigger(s) connected");
 
-      triggerHandler = new PortHandler(trigger, new PortListener() {
+      triggerHandler = createPortHandler(trigger, new PortListener() {
         public void tokenReceived() {
           if (logger.isTraceEnabled()) {
             logger.trace(getInfo() + " tokenReceived() - entry - received trigger");

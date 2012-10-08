@@ -23,17 +23,20 @@ import ptolemy.actor.Manager;
 import ptolemy.actor.Manager.State;
 import com.isencia.passerelle.actor.control.Stop;
 import com.isencia.passerelle.actor.control.Trigger;
+import com.isencia.passerelle.actor.convert.HeaderModifier;
 import com.isencia.passerelle.actor.error.ErrorCatcher;
 import com.isencia.passerelle.actor.error.ErrorObserver;
 import com.isencia.passerelle.actor.general.CommandExecutor;
 import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.actor.general.DevNullActor;
+import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.FlowNotExecutingException;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
+import com.isencia.passerelle.testsupport.actor.TextSource;
 
 public class ActorTest extends TestCase {
   private Flow flow;
@@ -132,6 +135,42 @@ public class ActorTest extends TestCase {
     .expectMsgSentCount(source, 1L)
     .expectMsgReceiptCount(sink, 1L)
     .assertFlow(flow);
+  }
+
+  public void testConcurrentInputsOnHeaderModifier() throws Exception {
+    flow.setDirector(new Director(flow, "director"));
+
+    Actor src1 = new TextSource(flow, "src1");
+    Actor src2 = new TextSource(flow, "src2");
+    Actor src3 = new TextSource(flow, "src3");
+    HeaderModifier hdrModif1 = new HeaderModifier(flow, "hdrModif1");
+    HeaderModifier hdrModif2 = new HeaderModifier(flow, "hdrModif2");
+    HeaderModifier hdrModif3 = new HeaderModifier(flow, "hdrModif3");
+    Actor sink = new MessageHistoryStack(flow, "sink");
+
+    flow.connect(src1, hdrModif1);
+    flow.connect(src2, hdrModif1);
+    flow.connect(src3, hdrModif1);
+    flow.connect(hdrModif1, hdrModif2);
+    flow.connect(hdrModif2, hdrModif3);
+    flow.connect(hdrModif3, sink);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src1.values", "pol1,pol2,pol3");
+    props.put("src2.values", "pel1,pel2,pel3");
+    props.put("src3.values", "pingo1,pingo2,pingo3");
+    props.put("hdrModif1.mode", "Add");
+    props.put("hdrModif2.mode", "Modify");
+    props.put("hdrModif3.mode", "Remove");
+    props.put("hdrModif1.header name", "Hello");
+    props.put("hdrModif1.header value", "world");
+    props.put("hdrModif2.header name", "Hello");
+    props.put("hdrModif2.header value", "moon");
+    props.put("hdrModif3.header name", "Hello");
+
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 9L).assertFlow(flow);
   }
 
   /**
