@@ -185,9 +185,7 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
       if (!getChannel().isOpen()) {
         openChannel(getChannel());
 
-        if (logger.isInfoEnabled()) {
-          logger.info(getInfo() + " - Opened :" + getChannel());
-        }
+        logger.debug("{} - Opened : {}",getInfo(),getChannel());
       }
       if (res) res = super.doPreFire();
 
@@ -232,9 +230,7 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
     try {
       closeChannel(getChannel());
 
-      if (logger.isInfoEnabled()) {
-        logger.info(getInfo() + " - Closed :" + getChannel());
-      }
+      logger.debug("{} - Closed : {}",getInfo(),getChannel());
     } catch (ChannelException e) {
       throw new TerminationException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
     }

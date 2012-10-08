@@ -164,13 +164,8 @@ public abstract class Filter extends Actor {
             throw new ProcessingException(getInfo() + " - doFire() generated exception during sending to output OK port " + e, message, e);
           }
 
-          if (logger.isInfoEnabled()) {
-            logger.info(getInfo() + " - Sent message OK :" + token);
-          }
-
-          if (getAuditLogger().isInfoEnabled()) {
-            getAuditLogger().info("Sent message OK");
-          }
+          logger.debug("{} - Sent message OK  {}:", getInfo(), token);
+          getAuditLogger().debug("Sent message OK");
         } else {
           try {
             outputNotOk.broadcast(token);
@@ -178,12 +173,8 @@ public abstract class Filter extends Actor {
             throw new ProcessingException(getInfo() + " - doFire() generated exception during sending to output NOT OK port " + e, message, e);
           }
 
-          if (logger.isInfoEnabled()) {
-            logger.info(getInfo() + " - Sent message NOT OK :" + token);
-          }
-          if (getAuditLogger().isInfoEnabled()) {
-            getAuditLogger().info("Sent message NOT OK");
-          }
+          logger.debug("{} - Sent message NOT OK  {}:", getInfo(), token);
+          getAuditLogger().debug("Sent message NOT OK");
         }
       } finally {
         notifyFinishedFireProcessing();

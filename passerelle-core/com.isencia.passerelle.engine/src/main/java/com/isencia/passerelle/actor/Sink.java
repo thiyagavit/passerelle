@@ -175,9 +175,7 @@ public abstract class Sink extends Actor {
       notifyStartingFireProcessing();
 
       try {
-        if (logger.isInfoEnabled()) {
-          logger.info(getInfo() + " - Sink generated message :" + message);
-        }
+        logger.debug("{} - Sink generated message : {}", getInfo(), message);
         sendMessage(message);
       } catch (ProcessingException e) {
         throw e;

@@ -296,7 +296,7 @@ public class PortHandler {
       try {
         LoggerManager.pushMDC(ProcessThread.ACTOR_MDC_NAME, actorInfo);
 
-        LOGGER.info("{} - ChannelHandler.{} - run() - entry", PortHandler.this.ioPort.getFullName(), channelIndex);
+        LOGGER.debug("{} - ChannelHandler.{} - run() - entry", PortHandler.this.ioPort.getFullName(), channelIndex);
 
         while (!terminated) {
           fetch();
@@ -314,7 +314,7 @@ public class PortHandler {
           }
         }
 
-        LOGGER.info("{} - ChannelHandler.{} - run() - exit", PortHandler.this.ioPort.getFullName(), channelIndex);
+        LOGGER.debug("{} - ChannelHandler.{} - run() - exit", PortHandler.this.ioPort.getFullName(), channelIndex);
       } catch (Throwable t) {
         LOGGER.error(PortHandler.this.ioPort.getFullName() + " - Error in ChannelHandler", t);
         throw new RuntimeException(t);

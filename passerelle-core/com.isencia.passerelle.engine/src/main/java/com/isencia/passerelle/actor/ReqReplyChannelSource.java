@@ -140,9 +140,7 @@ public abstract class ReqReplyChannelSource extends Source {
           if (token != null && !token.isNil()) {
             try {
               ManagedMessage message = MessageHelper.getMessageFromToken(token);
-              if (logger.isInfoEnabled()) {
-                logger.info(getInfo() + " - received reply msg :" + message);
-              }
+              logger.debug("{} - received reply msg : {}", getInfo(), message);
               try {
                 getChannel().sendResponse(message, message.getCorrelationID());
               } catch (ChannelException e) {
@@ -229,9 +227,7 @@ public abstract class ReqReplyChannelSource extends Source {
       if (!getChannel().isOpen()) {
         openChannel(getChannel());
 
-        if (logger.isInfoEnabled()) {
-          logger.info(getInfo() + " - Opened :" + getChannel());
-        }
+        logger.debug("{} - Opened : {}",getInfo(),getChannel());
       }
     } catch (ChannelException e) {
       throw new ProcessingException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not opened correctly.", getChannel(), e);
@@ -276,9 +272,7 @@ public abstract class ReqReplyChannelSource extends Source {
     try {
       closeChannel(getChannel());
 
-      if (logger.isInfoEnabled()) {
-        logger.info(getInfo() + " - Closed :" + getChannel());
-      }
+      logger.debug("{} - Closed : {}",getInfo(),getChannel());
     } catch (ChannelException e) {
       throw new TerminationException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
     }

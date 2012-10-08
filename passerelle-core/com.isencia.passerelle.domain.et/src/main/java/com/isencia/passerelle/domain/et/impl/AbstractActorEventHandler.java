@@ -38,10 +38,10 @@ public abstract class AbstractActorEventHandler implements EventHandler {
     Actor actor = getDestinationActorFromEvent(event);
     synchronized (actor) {
       if (director.isActorIterating(actor)) {
-        getLogger().info("Skipping {} - Actor {} is busy.", event, actor.getName());
+        getLogger().debug("Skipping {} - Actor {} is busy.", event, actor.getName());
         return HandleResult.RETRY;
       } else if (director.isActorInactive(actor)) {
-        getLogger().info("Skipping {} - Actor {} is inactive.", event, actor.getName());
+        getLogger().debug("Skipping {} - Actor {} is inactive.", event, actor.getName());
         return HandleResult.SKIPPED;
       } else {
         director.notifyActorIteratingForEvent(actor, event);

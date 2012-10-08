@@ -95,9 +95,7 @@ public class FtpFileWriter extends FtpWriter {
 
       this.getChannel().sendMessage(message);
 
-      if (logger.isInfoEnabled()) {
-        logger.info(getInfo() + " - Sent message :" + message);
-      }
+      logger.debug("{} - Sent message : {}",getInfo(),message);
     } catch (InterruptedException e) {
       // do nothing, just means we've got to stop
     } catch (Exception e) {

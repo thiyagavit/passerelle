@@ -317,9 +317,7 @@ public class QuartzScheduler extends Actor {
     try {
       message = (ManagedMessage) queue.get();
     } catch (EmptyQueueException e) {
-      if (logger.isInfoEnabled()) {
-        logger.info(getInfo() + " - No more triggers");
-      }
+      logger.debug("{} - No more triggers",getInfo());
       requestFinish();
     } catch (Exception e) {
       throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, message, e);

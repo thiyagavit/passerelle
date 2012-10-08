@@ -789,7 +789,7 @@ public class Port extends TypedIOPort {
   public void requestFinish() {
     logger.trace("requestFinish() - entry");
     
-    logger.info("Finishing port " + this.getFullName());
+    logger.debug("Finishing port {}", this.getFullName());
     operationalSourcePorts.clear();
     
     Receiver[][] myLocalReceivers = getReceivers();

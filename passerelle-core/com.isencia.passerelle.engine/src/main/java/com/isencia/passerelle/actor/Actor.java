@@ -836,7 +836,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    */
   final public void requestFinish() {
     finishRequested = true;
-    getLogger().info(getInfo() + " FINISH REQUESTED !!");
+    getLogger().debug("{} FINISH REQUESTED !!", getInfo());
   }
 
   /**
@@ -952,7 +952,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       return getDirectorAdapter().getErrorControlStrategy();
     }
   }
-  
+
   final protected void setErrorControlStrategy(ErrorControlStrategy errorControlStrategy) {
     this.errorControlStrategy = errorControlStrategy;
   }
@@ -1058,15 +1058,17 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
         getLogger().debug("{} - sendOutputMsg() - Message {} sent on port {}", new Object[] { getInfo(), message.getID(), port.getDisplayName() });
       }
 
-      String auditDetail = null;
-      try {
-        auditDetail = getAuditTrailMessage(message, port);
-      } catch (Exception e) {
-        // simple hack to log a default msg anyway
-        auditDetail = getInfo() + " sent message " + message.getID() + " on port " + port.getDisplayName();
-      }
-      if (auditDetail != null && getAuditLogger().isInfoEnabled()) {
-        getAuditLogger().info(auditDetail);
+      if (getAuditLogger().isDebugEnabled()) {
+        String auditDetail = null;
+        try {
+          auditDetail = getAuditTrailMessage(message, port);
+        } catch (Exception e) {
+          // simple hack to log a default msg anyway
+          auditDetail = getInfo() + " sent message " + message.getID() + " on port " + port.getDisplayName();
+        }
+        if (auditDetail != null) {
+          getAuditLogger().debug(auditDetail);
+        }
       }
 
     } catch (Exception e) {
