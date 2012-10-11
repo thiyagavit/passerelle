@@ -77,7 +77,7 @@ public class DelayTest {
     public void should_throw_expection_if_input_is_string_and_porDelay_is_true() {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");
-        props.put("Constant.value", "1.3");
+        props.put("Constant.value", "azerty");
         props.put(ACTOR_NAME + ".time(s)", "4.0");
         props.put(ACTOR_NAME + ".take delay from port", "true");
 
