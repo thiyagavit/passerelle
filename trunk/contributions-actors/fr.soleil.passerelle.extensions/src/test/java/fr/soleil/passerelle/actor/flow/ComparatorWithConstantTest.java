@@ -157,13 +157,13 @@ public class ComparatorWithConstantTest {
         moml.executeBlockingErrorLocally(props);
 
         if (expectedMessage) {
-            assertThat(trueTriggerReceiver.size()).isEqualTo(1);
-            assertThat(falseTriggerReceiver.size()).isEqualTo(0);
+            assertThat(trueTriggerReceiver).hasSize(1);
+            assertThat(falseTriggerReceiver).hasSize(0);
             // TODO message is always the same need to test it ?
             assertThat(trueTriggerReceiver.poll()).isEqualTo("true");
         } else {
-            assertThat(trueTriggerReceiver.size()).isEqualTo(0);
-            assertThat(falseTriggerReceiver.size()).isEqualTo(1);
+            assertThat(trueTriggerReceiver).hasSize(0);
+            assertThat(falseTriggerReceiver).hasSize(1);
             assertThat(falseTriggerReceiver.poll()).isEqualTo("true");
         }
     }
