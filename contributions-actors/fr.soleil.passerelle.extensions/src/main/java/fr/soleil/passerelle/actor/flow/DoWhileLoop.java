@@ -31,230 +31,223 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class DoWhileLoop extends Transformer {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(DoWhileLoop.class);
+    public static final String RIGTH_VALUE_PARAM_NAME = "Rigth Value";
+    public static final String COMPARISON_PARAM_NAME = "comparison";
 
-	public Parameter comparisonParam;
+    public static final String OUTPUT_PORT_NAME = "finished";
+    public static final String CONTINUE_PORT_NAME = "continue";
 
-	private ComparisonNature comparison;
-	String comparisonName;
-	public Parameter valueParam;
+    private final static Logger logger = LoggerFactory.getLogger(DoWhileLoop.class);
 
-	private String rightValue = "0";
+    public Parameter comparisonParam;
 
-	public Port leftValuePort;
-	private PortHandler leftHandler = null;
-	public Port continuing;
+    private ComparisonNature comparison;
+    String comparisonName;
+    public Parameter valueParam;
 
-	boolean firstLoop;
+    private String rightValue = "0";
 
-	private String leftValueS = "";
-	boolean valueReceived = false;
+    public Port leftValuePort;
+    private PortHandler leftHandler = null;
+    public Port continuing;
 
-	public DoWhileLoop(final CompositeEntity container, final String name)
-			throws NameDuplicationException, IllegalActionException {
+    boolean firstLoop;
 
-		super(container, name);
+    private String leftValueS = "";
+    boolean valueReceived = false;
 
-		comparisonParam = new StringParameter(this, "comparison");
-		comparisonParam.setExpression("==");
+    public DoWhileLoop(final CompositeEntity container, final String name)
+            throws NameDuplicationException, IllegalActionException {
 
-		valueParam = new StringParameter(this, "Rigth Value");
-		valueParam.setExpression(rightValue);
+        super(container, name);
 
-		input.setName("start");
-		leftValuePort = PortFactory.getInstance().createInputPort(this,
-				"left value", String.class);
-		input.setMultiport(false);
+        comparisonParam = new StringParameter(this, COMPARISON_PARAM_NAME);
+        comparisonParam.setExpression("==");
 
-		output.setName("finished");
-		continuing = PortFactory.getInstance().createOutputPort(this,
-				"continue");
+        valueParam = new StringParameter(this, RIGTH_VALUE_PARAM_NAME);
+        valueParam.setExpression(rightValue);
 
-		final StringAttribute leftValuePortCardinal = new StringAttribute(
-				leftValuePort, "_cardinal");
-		leftValuePortCardinal.setExpression("SOUTH");
+        input.setName("start");
+        leftValuePort = PortFactory.getInstance().createInputPort(this, "left value", String.class);
+        input.setMultiport(false);
 
-		final StringAttribute continuingCardinal = new StringAttribute(
-				continuing, "_cardinal");
-		continuingCardinal.setExpression("SOUTH");
+        output.setName(OUTPUT_PORT_NAME);
+        continuing = PortFactory.getInstance().createOutputPort(this, CONTINUE_PORT_NAME);
 
-		_attachText("_iconDescription", "<svg>\n"
-				+ "<rect x=\"-25\" y=\"-25\" width=\"50\" "
-				+ "height=\"50\" style=\"fill:pink;stroke:pink\"/>\n"
-				+ "<line x1=\"-24\" y1=\"-24\" x2=\"24\" y2=\"-24\" "
-				+ "style=\"stroke-width:1.0;stroke:white\"/>\n"
-				+ "<line x1=\"-24\" y1=\"-24\" x2=\"-24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:white\"/>\n"
-				+ "<line x1=\"25\" y1=\"-24\" x2=\"25\" y2=\"25\" "
-				+ "style=\"stroke-width:1.0;stroke:black\"/>\n"
-				+ "<line x1=\"-24\" y1=\"25\" x2=\"25\" y2=\"25\" "
-				+ "style=\"stroke-width:1.0;stroke:black\"/>\n"
-				+ "<line x1=\"24\" y1=\"-23\" x2=\"24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-				+ "<line x1=\"-23\" y1=\"24\" x2=\"24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
+        final StringAttribute leftValuePortCardinal = new StringAttribute(leftValuePort,
+                "_cardinal");
+        leftValuePortCardinal.setExpression("SOUTH");
 
-				"<circle cx=\"0\" cy=\"0\" r=\"10\""
-				+ "style=\"fill:white;stroke-width:2.0\"/>\n" +
+        final StringAttribute continuingCardinal = new StringAttribute(continuing, "_cardinal");
+        continuingCardinal.setExpression("SOUTH");
 
-				"<line x1=\"10\" y1=\"0\" x2=\"7\" y2=\"-3\" "
-				+ "style=\"stroke-width:2.0\"/>\n"
-				+ "<line x1=\"10\" y1=\"0\" x2=\"13\" y2=\"-3\" "
-				+ "style=\"stroke-width:2.0\"/>\n" +
+        _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-25\" y=\"-25\" width=\"50\" "
+                + "height=\"50\" style=\"fill:pink;stroke:pink\"/>\n"
+                + "<line x1=\"-24\" y1=\"-24\" x2=\"24\" y2=\"-24\" "
+                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-24\" y1=\"-24\" x2=\"-24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"25\" y1=\"-24\" x2=\"25\" y2=\"25\" "
+                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-24\" y1=\"25\" x2=\"25\" y2=\"25\" "
+                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"24\" y1=\"-23\" x2=\"24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-23\" y1=\"24\" x2=\"24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
 
-				"</svg>\n");
-	}
+                "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n" +
 
-	@Override
-	protected void doInitialize() throws InitializationException {
+                "<line x1=\"10\" y1=\"0\" x2=\"7\" y2=\"-3\" " + "style=\"stroke-width:2.0\"/>\n"
+                + "<line x1=\"10\" y1=\"0\" x2=\"13\" y2=\"-3\" "
+                + "style=\"stroke-width:2.0\"/>\n" +
 
-		valueReceived = false;
-		leftValueS = "";
-		// If something connected to the set port, install a handler
-		if (leftValuePort.getWidth() > 0) {
-			leftHandler = new PortHandler(leftValuePort, new PortListener() {
-				public void tokenReceived() {
-					logger.debug("leftHandler.tokenReceived() ");
-					final Token token = leftHandler.getToken();
-					if (token != null && token != Token.NIL) {
-						try {
-							final ManagedMessage message = MessageHelper
-									.getMessageFromToken(token);
-							leftValueS = (String) message.getBodyContent();
-							valueReceived = true;
-						} catch (final Exception e) {
-							e.printStackTrace();
-						}
-					} else {
-						leftValueS = null;
-					}
+                "</svg>\n");
+    }
 
-				}
+    @Override
+    protected void doInitialize() throws InitializationException {
 
-				public void noMoreTokens() {
-					requestFinish();
-				}
-			});
-			if (leftHandler != null) {
-				leftHandler.start();
-			}
-		}
-		firstLoop = true;
-		super.doInitialize();
+        valueReceived = false;
+        leftValueS = "";
+        // If something connected to the set port, install a handler
+        if (leftValuePort.getWidth() > 0) {
+            leftHandler = new PortHandler(leftValuePort, new PortListener() {
+                @Override
+                public void tokenReceived() {
+                    logger.debug("leftHandler.tokenReceived() ");
+                    final Token token = leftHandler.getToken();
+                    if (token != null && token != Token.NIL) {
+                        try {
+                            final ManagedMessage message = MessageHelper.getMessageFromToken(token);
+                            leftValueS = (String) message.getBodyContent();
+                            valueReceived = true;
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        leftValueS = null;
+                    }
 
-	}
+                }
 
-	@Override
-	protected void doFire(final ManagedMessage message)
-			throws ProcessingException {
+                @Override
+                public void noMoreTokens() {
+                    requestFinish();
+                }
+            });
+            if (leftHandler != null) {
+                leftHandler.start();
+            }
+        }
+        firstLoop = true;
+        super.doInitialize();
 
-		boolean continu = true;
-		
-		ExecutionTracerService.trace(this, "Start while");
-		sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
+    }
 
-		while (continu && !isFinishRequested()) {
-			while (!valueReceived && !isFinishRequested()) {
-				// System.out.println("waiting ...");
-				try {
-					Thread.sleep(100);
-				} catch (final InterruptedException e) {
-				}
-			}
-			if (valueReceived) {
-				valueReceived = false;
-				if (isFinishRequested()) {
-					logger.debug("break");
-					break;
-				}
+    @Override
+    protected void doFire(final ManagedMessage message) throws ProcessingException {
 
-				double rightValueD = 0;
-				double leftValueD = 0;
-				final ComparisonType compType = ComparatorHelper
-						.getComparisonType(leftValueS, rightValue);
-				// 0=string, 1= boolean, 2= double
-				switch (compType) {
-				case DOUBLE:
-					leftValueD = Double.parseDouble(leftValueS);
-					rightValueD = Double.parseDouble(rightValue);
-					break;
-				case BOOLEAN:
-					if (Boolean.parseBoolean(leftValueS)) {
-						leftValueD = 1;
-					} else {
-						leftValueD = 0;
-					}
-					if (Boolean.parseBoolean(rightValue)) {
-						rightValueD = 1;
-					} else {
-						rightValueD = 0;
-					}
-					break;
-				}
+        boolean continu = true;
 
-				if (compType == ComparisonType.STRING) {
-					continu = ComparatorHelper.compareString(leftValueS,
-							rightValue, comparison);
-					ExecutionTracerService.trace(this, "comparison "
-							+ leftValueS + " " + comparisonName + " "
-							+ rightValue + " is " + continu);
-				} else {
-					continu = ComparatorHelper.compareDouble(leftValueD,
-							rightValueD, comparison);
-					ExecutionTracerService.trace(this, "comparison "
-							+ leftValueD + " " + comparisonName + rightValueD
-							+ " is " + continu);
-				}
-			} else {
-				continu = false;
-			}
-			if (continu) {
-				sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
-			}
-		} // End while
-		if (isFinishRequested()) {
-			ExecutionTracerService.trace(this, "Finish requested");
-		} else {
-			ExecutionTracerService.trace(this, "End while");
-			sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-		}
-	}
+        ExecutionTracerService.trace(this, "Start while");
+        sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
 
-	@Override
-	public void attributeChanged(final Attribute attribute)
-			throws IllegalActionException {
+        while (continu && !isFinishRequested()) {
+            while (!valueReceived && !isFinishRequested()) {
+                // System.out.println("waiting ...");
+                try {
+                    Thread.sleep(100);
+                } catch (final InterruptedException e) {
+                }
+            }
+            if (valueReceived) {
+                valueReceived = false;
+                if (isFinishRequested()) {
+                    logger.debug("break");
+                    break;
+                }
 
-		if (attribute == comparisonParam) {
-			comparisonName = comparisonParam.getExpression().trim();
-			if (comparisonName.equals(">")) {
-				comparison = ComparisonNature.GT;
-			} else if (comparisonName.equals(">=")) {
-				comparison = ComparisonNature.GE;
-			} else if (comparisonName.equals("<")) {
-				comparison = ComparisonNature.LT;
-			} else if (comparisonName.equals("<=")) {
-				comparison = ComparisonNature.LE;
-			} else if (comparisonName.equals("==")) {
-				comparison = ComparisonNature.EQ;
-			} else if (comparisonName.equals("!=")) {
-				comparison = ComparisonNature.NE;
-			} else {
-				throw new IllegalActionException(this,
-						"Unrecognized comparison: " + comparisonName);
-			}
-		} else if (attribute == valueParam) {
-			rightValue = ((StringToken) valueParam.getToken()).stringValue();
-		} else {
+                double rightValueD = 0;
+                double leftValueD = 0;
+                final ComparisonType compType = ComparatorHelper.getComparisonType(leftValueS,
+                        rightValue);
+                // 0=string, 1= boolean, 2= double
+                switch (compType) {
+                case DOUBLE:
+                    leftValueD = Double.parseDouble(leftValueS);
+                    rightValueD = Double.parseDouble(rightValue);
+                    break;
+                case BOOLEAN:
+                    if (Boolean.parseBoolean(leftValueS)) {
+                        leftValueD = 1;
+                    } else {
+                        leftValueD = 0;
+                    }
+                    if (Boolean.parseBoolean(rightValue)) {
+                        rightValueD = 1;
+                    } else {
+                        rightValueD = 0;
+                    }
+                    break;
+                }
 
-			super.attributeChanged(attribute);
-		}
+                if (compType == ComparisonType.STRING) {
+                    continu = ComparatorHelper.compareString(leftValueS, rightValue, comparison);
+                    ExecutionTracerService.trace(this, "comparison " + leftValueS + " "
+                            + comparisonName + " " + rightValue + " is " + continu);
+                } else {
+                    continu = ComparatorHelper.compareDouble(leftValueD, rightValueD, comparison);
+                    ExecutionTracerService.trace(this, "comparison " + leftValueD + " "
+                            + comparisonName + rightValueD + " is " + continu);
+                }
+            } else {
+                continu = false;
+            }
+            if (continu) {
+                sendOutputMsg(continuing, PasserelleUtil.createTriggerMessage());
+            }
+        } // End while
+        if (isFinishRequested()) {
+            ExecutionTracerService.trace(this, "Finish requested");
+        } else {
+            ExecutionTracerService.trace(this, "End while");
+            sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
+        }
+    }
 
-	}
+    @Override
+    public void attributeChanged(final Attribute attribute) throws IllegalActionException {
 
-	@Override
-	protected String getExtendedInfo() {
-		return this.getName();
-	}
+        if (attribute == comparisonParam) {
+            comparisonName = comparisonParam.getExpression().trim();
+            if (comparisonName.equals(">")) {
+                comparison = ComparisonNature.GT;
+            } else if (comparisonName.equals(">=")) {
+                comparison = ComparisonNature.GE;
+            } else if (comparisonName.equals("<")) {
+                comparison = ComparisonNature.LT;
+            } else if (comparisonName.equals("<=")) {
+                comparison = ComparisonNature.LE;
+            } else if (comparisonName.equals("==")) {
+                comparison = ComparisonNature.EQ;
+            } else if (comparisonName.equals("!=")) {
+                comparison = ComparisonNature.NE;
+            } else {
+                throw new IllegalActionException(this, "Unrecognized comparison: " + comparisonName);
+            }
+        } else if (attribute == valueParam) {
+            rightValue = ((StringToken) valueParam.getToken()).stringValue();
+        } else {
+
+            super.attributeChanged(attribute);
+        }
+
+    }
+
+    @Override
+    protected String getExtendedInfo() {
+        return this.getName();
+    }
 
 }
