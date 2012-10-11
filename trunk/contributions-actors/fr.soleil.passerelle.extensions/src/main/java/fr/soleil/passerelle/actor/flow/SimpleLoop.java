@@ -1,24 +1,23 @@
-/*	Synchrotron Soleil
- *
- *   File          :  SimpleLoop.java
- *
- *   Project       :  soleil
- *
- *   Description   :
- *
- *   Author        :  ABEILLE
- *
- *   Original      :  8 janv. 07
- *
- *   Revision:  					Author:
- *   Date: 							State:
- *
- *   Log: SimpleLoop.java,v
- *
+/*
+ * Synchrotron Soleil
+ * 
+ * File : SimpleLoop.java
+ * 
+ * Project : soleil
+ * 
+ * Description :
+ * 
+ * Author : ABEILLE
+ * 
+ * Original : 8 janv. 07
+ * 
+ * Revision: Author: Date: State:
+ * 
+ * Log: SimpleLoop.java,v
  */
 /*
  * Created on 8 janv. 07
- *
+ * 
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
@@ -38,6 +37,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.StringAttribute;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -53,296 +53,276 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 @SuppressWarnings("serial")
 public class SimpleLoop extends Actor {
 
-	private final static Logger logger = LoggerFactory.getLogger(SimpleLoop.class);
+    public static final String END_LOOP_PORT_NAME = "end loop trigger";
+    public static final String OUTPUT_PORT_NAME = "output value";
 
-	// input ports
-	public Port triggerPort;
-	public Port handledPort;
+    private final static Logger logger = LoggerFactory.getLogger(SimpleLoop.class);
 
-	private boolean triggerPortExhausted = false;
-	private boolean handledPortExhausted = false;
+    // input ports
+    public Port triggerPort;
+    public Port handledPort;
 
-	// output ports
-	public Port outputPort;
-	public Port endLoopPort;
+    private boolean triggerPortExhausted = false;
+    private boolean handledPortExhausted = false;
 
-	// Parameter
-	public Parameter useValuesListParam;
-	Boolean useValuesList;
+    // output ports
+    public Port outputPort;
+    public Port endLoopPort;
 
-	public Parameter valuesListParam;
-	Double[] valuesList;
+    // Parameter
+    public Parameter useValuesListParam;
+    Boolean useValuesList;
 
-	public Parameter loopNumberParam;
-	Integer loopNumber;
+    public Parameter valuesListParam;
+    Double[] valuesList;
 
-	// double currentValue = 0;
-	int currentIndex = 0;
+    public Parameter loopNumberParam;
+    Integer loopNumber;
 
-	/**
-	 * @param container
-	 * @param name
-	 * @throws ptolemy.kernel.util.IllegalActionException
-	 * @throws ptolemy.kernel.util.NameDuplicationException
-	 */
-	public SimpleLoop(final CompositeEntity container, final String name)
-			throws IllegalActionException, NameDuplicationException {
+    // double currentValue = 0;
+    int currentIndex = 0;
 
-		super(container, name);
+    /**
+     * @param container
+     * @param name
+     * @throws ptolemy.kernel.util.IllegalActionException
+     * @throws ptolemy.kernel.util.NameDuplicationException
+     */
+    public SimpleLoop(final CompositeEntity container, final String name)
+            throws IllegalActionException, NameDuplicationException {
 
-		triggerPort = PortFactory.getInstance().createInputPort(this,
-				"trigger (start loop)", null);
-		triggerPort.setMultiport(false);
-		handledPort = PortFactory.getInstance().createInputPort(this,
-				"handled", null);
-		handledPort.setMultiport(false);
-		endLoopPort = PortFactory.getInstance().createOutputPort(this,
-				"end loop trigger");
-		outputPort = PortFactory.getInstance().createOutputPort(this,
-				"output value");
+        super(container, name);
 
-		loopNumberParam = new StringParameter(this, "Number of Loops");
-		loopNumberParam.setExpression("2");
+        triggerPort = PortFactory.getInstance().createInputPort(this, "trigger (start loop)", null);
+        triggerPort.setMultiport(false);
+        handledPort = PortFactory.getInstance().createInputPort(this, "handled", null);
+        handledPort.setMultiport(false);
+        endLoopPort = PortFactory.getInstance().createOutputPort(this, END_LOOP_PORT_NAME);
+        outputPort = PortFactory.getInstance().createOutputPort(this, OUTPUT_PORT_NAME);
 
-		useValuesListParam = new Parameter(this, "Use Values List",
-				new BooleanToken(false));
-		useValuesListParam.setTypeEquals(BaseType.BOOLEAN);
+        loopNumberParam = new StringParameter(this, "Number of Loops");
+        loopNumberParam.setExpression("2");
 
-		valuesListParam = new StringParameter(this,
-				"Values List (separated by commas)");
-		valuesListParam.setExpression("1,3,5,10");
+        useValuesListParam = new Parameter(this, "Use Values List", new BooleanToken(false));
+        useValuesListParam.setTypeEquals(BaseType.BOOLEAN);
 
-		final StringAttribute outputPortCardinal = new StringAttribute(
-				outputPort, "_cardinal");
-		outputPortCardinal.setExpression("SOUTH");
+        valuesListParam = new StringParameter(this, "Values List (separated by commas)");
+        valuesListParam.setExpression("1,3,5,10");
 
-		final StringAttribute handledPortCardinal = new StringAttribute(
-				handledPort, "_cardinal");
-		handledPortCardinal.setExpression("SOUTH");
+        final StringAttribute outputPortCardinal = new StringAttribute(outputPort, "_cardinal");
+        outputPortCardinal.setExpression("SOUTH");
 
-		_attachText("_iconDescription", "<svg>\n"
-				+ "<rect x=\"-25\" y=\"-25\" width=\"50\" "
-				+ "height=\"50\" style=\"fill:pink;stroke:pink\"/>\n"
-				+ "<line x1=\"-24\" y1=\"-24\" x2=\"24\" y2=\"-24\" "
-				+ "style=\"stroke-width:1.0;stroke:white\"/>\n"
-				+ "<line x1=\"-24\" y1=\"-24\" x2=\"-24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:white\"/>\n"
-				+ "<line x1=\"25\" y1=\"-24\" x2=\"25\" y2=\"25\" "
-				+ "style=\"stroke-width:1.0;stroke:black\"/>\n"
-				+ "<line x1=\"-24\" y1=\"25\" x2=\"25\" y2=\"25\" "
-				+ "style=\"stroke-width:1.0;stroke:black\"/>\n"
-				+ "<line x1=\"24\" y1=\"-23\" x2=\"24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-				+ "<line x1=\"-23\" y1=\"24\" x2=\"24\" y2=\"24\" "
-				+ "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
+        final StringAttribute handledPortCardinal = new StringAttribute(handledPort, "_cardinal");
+        handledPortCardinal.setExpression("SOUTH");
 
-				"<circle cx=\"0\" cy=\"0\" r=\"10\""
-				+ "style=\"fill:white;stroke-width:2.0\"/>\n" +
+        _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-25\" y=\"-25\" width=\"50\" "
+                + "height=\"50\" style=\"fill:pink;stroke:pink\"/>\n"
+                + "<line x1=\"-24\" y1=\"-24\" x2=\"24\" y2=\"-24\" "
+                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-24\" y1=\"-24\" x2=\"-24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"25\" y1=\"-24\" x2=\"25\" y2=\"25\" "
+                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-24\" y1=\"25\" x2=\"25\" y2=\"25\" "
+                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"24\" y1=\"-23\" x2=\"24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-23\" y1=\"24\" x2=\"24\" y2=\"24\" "
+                + "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
 
-				"<line x1=\"10\" y1=\"0\" x2=\"7\" y2=\"-3\" "
-				+ "style=\"stroke-width:2.0\"/>\n"
-				+ "<line x1=\"10\" y1=\"0\" x2=\"13\" y2=\"-3\" "
-				+ "style=\"stroke-width:2.0\"/>\n" +
+                "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n" +
 
-				"</svg>\n");
+                "<line x1=\"10\" y1=\"0\" x2=\"7\" y2=\"-3\" " + "style=\"stroke-width:2.0\"/>\n"
+                + "<line x1=\"10\" y1=\"0\" x2=\"13\" y2=\"-3\" "
+                + "style=\"stroke-width:2.0\"/>\n" +
 
-	}
+                "</svg>\n");
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.actor.Actor#doInitialize()
-	 */
-	@Override
-	protected void doInitialize() throws InitializationException {
-		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " - doInitialize() - entry");
-		}
+    }
 
-		triggerPortExhausted = !(triggerPort.getWidth() > 0);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.isencia.passerelle.actor.Actor#doInitialize()
+     */
+    @Override
+    protected void doInitialize() throws InitializationException {
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " - doInitialize() - entry");
+        }
 
-		handledPortExhausted = !(handledPort.getWidth() > 0);
-		currentIndex = 0;
-		// currentValue = valuesList[currentIndex];
-		// if (useValuesList)
-		// loopNumber = valuesList.length;
-		super.doInitialize();
-		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " - doInitialize() - exit");
-		}
-	}
+        triggerPortExhausted = !(triggerPort.getWidth() > 0);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ptolemy.kernel.util.NamedObj#attributeChanged(ptolemy.kernel.util.Attribute
-	 * )
-	 */
-	@Override
-	public void attributeChanged(final Attribute arg0)
-			throws IllegalActionException {
-		if (arg0 == loopNumberParam) {
-			loopNumber = Integer.valueOf(((StringToken) loopNumberParam
-					.getToken()).stringValue());
-		} else if (arg0 == useValuesListParam) {
-			useValuesList = Boolean.valueOf(useValuesListParam.getExpression());
-		} else if (arg0 == valuesListParam) {
-			final String[] table = ((StringToken) valuesListParam.getToken())
-					.stringValue().split(",");
-			valuesList = new Double[table.length];
-			for (int i = 0; i < table.length; i++) {
-				valuesList[i] = new Double(table[i]);
-			}
-			currentIndex = 0;
-		} else {
-			super.attributeChanged(arg0);
-		}
+        handledPortExhausted = !(handledPort.getWidth() > 0);
+        currentIndex = 0;
+        // currentValue = valuesList[currentIndex];
+        // if (useValuesList)
+        // loopNumber = valuesList.length;
+        super.doInitialize();
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " - doInitialize() - exit");
+        }
+    }
 
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * ptolemy.kernel.util.NamedObj#attributeChanged(ptolemy.kernel.util.Attribute
+     * )
+     */
+    @Override
+    public void attributeChanged(final Attribute arg0) throws IllegalActionException {
+        if (arg0 == loopNumberParam) {
+            loopNumber = Integer.valueOf(((StringToken) loopNumberParam.getToken()).stringValue());
+        } else if (arg0 == useValuesListParam) {
+            useValuesList = Boolean.valueOf(useValuesListParam.getExpression());
+        } else if (arg0 == valuesListParam) {
+            final String[] table = ((StringToken) valuesListParam.getToken()).stringValue().split(
+                    ",");
+            valuesList = new Double[table.length];
+            for (int i = 0; i < table.length; i++) {
+                valuesList[i] = new Double(table[i]);
+            }
+            currentIndex = 0;
+        } else {
+            super.attributeChanged(arg0);
+        }
 
-	@Override
-	protected void doFire() throws ProcessingException {
+    }
 
-		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " - doFire() - entry");
-		}
+    @Override
+    protected void doFire() throws ProcessingException {
 
-		ManagedMessage inputMsg = null;
-		int currentStep = 0;
-		if (!triggerPortExhausted) {
-			try {
-				inputMsg = MessageHelper.getMessage(triggerPort);
-				if (inputMsg != null) {
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " - doFire() - entry");
+        }
 
-					if (logger.isDebugEnabled()) {
-						logger.debug(getInfo()
-								+ " doFire() - received msg on port "
-								+ triggerPort.getName() + " msg :" + inputMsg);
-					}
-				} else {
-					triggerPortExhausted = true;
-					if (logger.isDebugEnabled()) {
-						logger.debug(getInfo()
-								+ " doFire() - found exhausted port "
-								+ triggerPort.getName());
-					}
-				}
-			} catch (final PasserelleException e) {
-				throw new ProcessingException("Error reading from port",
-						triggerPort, e);
-			}
-		}
+        ManagedMessage inputMsg = null;
+        int currentStep = 0;
+        if (!triggerPortExhausted) {
+            try {
+                inputMsg = MessageHelper.getMessage(triggerPort);
+                if (inputMsg != null) {
 
-		if (inputMsg != null) {
-			// send out first msg of the loop
-			sendLoopData();
-			currentStep++;
-			if (logger.isTraceEnabled()) {
-				logger.trace(getInfo() + " - doFire() - iteration "
-						+ currentStep);
-			}
-			// and now do the loop, each time after receiving a loop iteration
-			// handled notification.
-			// Loop step+1 times to send a message on the output hasFinished at
-			// the end of the last loop
-			while (!handledPortExhausted && currentStep < loopNumber + 1) {
-				try {
-					ManagedMessage handledMsg = null;
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(getInfo() + " doFire() - received msg on port "
+                                + triggerPort.getName() + " msg :" + inputMsg);
+                    }
+                } else {
+                    triggerPortExhausted = true;
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(getInfo() + " doFire() - found exhausted port "
+                                + triggerPort.getName());
+                    }
+                }
+            } catch (final PasserelleException e) {
+                throw new ProcessingException("Error reading from port", triggerPort, e);
+            }
+        }
 
-					if (!handledPortExhausted) {
-						handledMsg = MessageHelper.getMessage(handledPort);
-						if (handledMsg != null) {
-							if (logger.isDebugEnabled()) {
-								logger.debug(getInfo()
-										+ " doFire() - received msg on port "
-										+ handledPort.getName());
-							}
+        if (inputMsg != null) {
+            // send out first msg of the loop
+            sendLoopData();
+            currentStep++;
+            if (logger.isTraceEnabled()) {
+                logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+            }
+            // and now do the loop, each time after receiving a loop iteration
+            // handled notification.
+            // Loop step+1 times to send a message on the output hasFinished at
+            // the end of the last loop
+            while (!handledPortExhausted && currentStep < loopNumber + 1) {
+                try {
+                    ManagedMessage handledMsg = null;
 
-						} else {
-							handledPortExhausted = true;
-							if (logger.isDebugEnabled()) {
-								logger.debug(getInfo()
-										+ " doFire() - found exhausted port "
-										+ handledPort.getName());
-							}
-						}
-					}
-					// send output message only for the number of loops asked.
-					if (currentStep < loopNumber.intValue()) {
-						sendLoopData();
-					} else {
-						// output end loop signal
-						currentIndex = 0;
-						final ManagedMessage resultMsg = MessageFactory
-								.getInstance().createTriggerMessage();
-						sendOutputMsg(endLoopPort, resultMsg);
-						ExecutionTracerService.trace(this, "All loops done");
-					}
-					currentStep++;
-					if (logger.isTraceEnabled()) {
-						logger.trace(getInfo() + " - doFire() - iteration "
-								+ currentStep);
-					}
-				} catch (final PasserelleException e) {
-					throw new ProcessingException("Error on loop", null, e);
-				} catch (final NoRoomException e) {
-					throw new ProcessingException("Error on loop", null, e);
-				}
-			}
-		}
+                    if (!handledPortExhausted) {
+                        handledMsg = MessageHelper.getMessage(handledPort);
+                        if (handledMsg != null) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(getInfo() + " doFire() - received msg on port "
+                                        + handledPort.getName());
+                            }
 
-		if (triggerPortExhausted) {
-			requestFinish();
-		}
+                        } else {
+                            handledPortExhausted = true;
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(getInfo() + " doFire() - found exhausted port "
+                                        + handledPort.getName());
+                            }
+                        }
+                    }
+                    // send output message only for the number of loops asked.
+                    if (currentStep < loopNumber.intValue()) {
+                        sendLoopData();
+                    } else {
+                        // output end loop signal
+                        currentIndex = 0;
+                        final ManagedMessage resultMsg = MessageFactory.getInstance()
+                                .createTriggerMessage();
+                        sendOutputMsg(endLoopPort, resultMsg);
+                        ExecutionTracerService.trace(this, "All loops done");
+                    }
+                    currentStep++;
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+                    }
+                } catch (final PasserelleException e) {
+                    throw new ProcessingException("Error on loop", null, e);
+                } catch (final NoRoomException e) {
+                    throw new ProcessingException("Error on loop", null, e);
+                }
+            }
+        }
 
-		if (triggerPortExhausted && handledPortExhausted) {
-			if (logger.isTraceEnabled()) {
-				logger.trace(getInfo() + " - doFire() - exit");
-			}
-		}
+        if (triggerPortExhausted) {
+            requestFinish();
+        }
 
-	}
+        if (triggerPortExhausted && handledPortExhausted) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(getInfo() + " - doFire() - exit");
+            }
+        }
 
-	/**
-	 * @param inputMsg
-	 * @throws ProcessingException
-	 */
-	private void sendLoopData() throws ProcessingException {
-		ManagedMessage resultMsg = createMessage();
-		if (useValuesList) {
-			try {
-				resultMsg.setBodyContent(valuesList[currentIndex],
-						ManagedMessage.objectContentType);
-				ExecutionTracerService.trace(this, "Loop with value: "
-						+ valuesList[currentIndex]);
-			} catch (final MessageException e) {
-				throw new ProcessingException("Cannot send message out", this,
-						e);
-			}
-			if (currentIndex == valuesList.length - 1) {
-				currentIndex = 0;
-			} else {
-				currentIndex++;
-			}
-		} else {
-			resultMsg = MessageFactory.getInstance().createTriggerMessage();
-			ExecutionTracerService.trace(this, "Loop number "
-					+ (currentIndex + 1));
-			currentIndex++;
-		}
+    }
 
-		try {
-			sendOutputMsg(outputPort, resultMsg);
-		} catch (final NoRoomException e) {
-			e.printStackTrace();
-			throw new ProcessingException("No room exception", this, e);
-		}
-	}
+    /**
+     * @param inputMsg
+     * @throws ProcessingException
+     */
+    private void sendLoopData() throws ProcessingException {
+        ManagedMessage resultMsg = createMessage();
+        if (useValuesList) {
+            try {
+                resultMsg
+                        .setBodyContent(valuesList[currentIndex], ManagedMessage.objectContentType);
+                ExecutionTracerService.trace(this, "Loop with value: " + valuesList[currentIndex]);
+            } catch (final MessageException e) {
+                throw new ProcessingException("Cannot send message out", this, e);
+            }
+            if (currentIndex == valuesList.length - 1) {
+                currentIndex = 0;
+            } else {
+                currentIndex++;
+            }
+        } else {
+            resultMsg = MessageFactory.getInstance().createTriggerMessage();
+            ExecutionTracerService.trace(this, "Loop number " + (currentIndex + 1));
+            currentIndex++;
+        }
 
-	@Override
-	protected String getExtendedInfo() {
-		return this.getName();
-	}
+        try {
+            sendOutputMsg(outputPort, resultMsg);
+        } catch (final NoRoomException e) {
+            e.printStackTrace();
+            throw new ProcessingException("No room exception", this, e);
+        }
+    }
+
+    @Override
+    protected String getExtendedInfo() {
+        return this.getName();
+    }
 
 }
