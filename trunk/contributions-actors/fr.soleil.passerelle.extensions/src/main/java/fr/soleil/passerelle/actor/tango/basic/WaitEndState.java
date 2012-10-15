@@ -136,18 +136,19 @@ public class WaitEndState extends ATangoDeviceActor {
 			logger.trace(getInfo() + " doFire() - entry");
 		}
 
+		final String deviceName = getDeviceName();
 		if (isMockMode()) {
 			ExecutionTracerService.trace(this, "MOCK - waiting end of state: "
 					+ DeviceState.toString(waitingState) + " on "
-					+ getDeviceName());
+					+ deviceName);
 			ExecutionTracerService.trace(this, "MOCK - waiting end of state: "
 					+ DeviceState.toString(waitingState) + " finished");
 		} else {
 			try {
 				ExecutionTracerService.trace(this, "waiting end of state "
 						+ DeviceState.toString(waitingState) + " on "
-						+ getDeviceName());
-				waitTask = new WaitStateTask(getDeviceProxy(), waitingState,
+						+ deviceName);
+				waitTask = new WaitStateTask(deviceName, waitingState,
 						1000, false, timeOut,
 						"The device never left the state :"
 								+ DeviceState.toString(waitingState),
@@ -160,9 +161,7 @@ public class WaitEndState extends ATangoDeviceActor {
 						+ DeviceState.toString(waitingState) + " finished");
 			} catch (final DevFailed e) {
 				throw new DevFailedProcessingException(e, this);
-			} catch (final PasserelleException e) {
-				throw new ProcessingException(e.getMessage(), null, e);
-			}
+			} 
 		}
 		// sendOutputMsg(output, PasserelleUtil.createCopyMessage(this,
 		// message));

@@ -393,7 +393,7 @@ public class ScientaUtil {
 	public void doAcquisition(final Actor actor) throws DevFailed,
 			IllegalActionException {
 		dev.command_inout("Start");
-		final WaitStateTask waitTask = new WaitStateTask(dev, DevState.RUNNING,
+		final WaitStateTask waitTask = new WaitStateTask(deviceName, DevState.RUNNING,
 				1000, true);
 		waitTask.run();
 		if (waitTask.hasFailed()) {

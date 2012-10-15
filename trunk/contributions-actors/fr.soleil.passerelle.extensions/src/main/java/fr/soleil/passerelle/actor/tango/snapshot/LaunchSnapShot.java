@@ -123,7 +123,7 @@ public class LaunchSnapShot extends TransformerV3 {
 				// Wait for the end of Running State for the SnapManager
 				ExecutionTracerService.trace(this,
 						"waiting end of state Running on SnapManager");
-				waitTask = new WaitStateTask(launchCmd.getDeviceProxy(),
+				waitTask = new WaitStateTask(launchCmd.getDeviceProxy().get_name(),
 						DevState.RUNNING, 100, false, 60,
 						"The SnapManager is blocked",
 						"LaunchSnapShotWaitEndState");

@@ -285,7 +285,7 @@ public class Diffractometer extends Actor {
 					dev.write_attribute(da);
 					ExecutionTracerService.trace(this, "start moving H/K/L on "
 							+ deviceName);
-					waitTask = new WaitStateTask(dev, DevState.MOVING, 1000,
+					waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000,
 							false);
 					waitTask.run();
 					if (waitTask.hasFailed()) {

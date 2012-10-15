@@ -315,12 +315,12 @@ public class MCAMultiport extends ATangoDeviceActor {
 	protected void process(final ActorContext ctxt,
 			final ProcessRequest request, final ProcessResponse response)
 			throws ProcessingException {
-
+	        final String deviceName = getDeviceName();
 		if (isMockMode()) {
 			ExecutionTracerService.trace(this, "MOCK - Start acquisition on "
-					+ getDeviceName());
+					+ deviceName);
 			ExecutionTracerService.trace(this, "MOCK - End acquisition on "
-					+ getDeviceName());
+					+ deviceName);
 			// sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
 			response.addOutputMessage(0, output, PasserelleUtil
 					.createTriggerMessage());
@@ -333,9 +333,9 @@ public class MCAMultiport extends ATangoDeviceActor {
 
 				deviceHelper.execute();
 				ExecutionTracerService.trace(this, "start acquisition on "
-						+ getDeviceName());
+						+ deviceName);
 				final DeviceProxy dev = deviceHelper.getDeviceProxy();
-				waitTask = new WaitStateTask(dev, DevState.RUNNING,
+				waitTask = new WaitStateTask(deviceName, DevState.RUNNING,
 						(int) (integrationTime * 100), true);
 				waitTask.run();
 				if (waitTask.hasFailed()) {
@@ -346,10 +346,10 @@ public class MCAMultiport extends ATangoDeviceActor {
 				// Thread.sleep((long)(integrationTime + 100));
 				// } catch(InterruptedException e) { }
 				ExecutionTracerService.trace(this, "end acquisition on "
-						+ getDeviceName());
+						+ deviceName);
 
 				// save data if necessary
-				DataRecorder.getInstance().saveDevice(this, getDeviceName());
+				DataRecorder.getInstance().saveDevice(this, deviceName);
 				// sendOutputMsg(output,
 				// PasserelleUtil.createContentMessage(this,
 				// attOutHelper));

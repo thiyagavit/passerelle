@@ -95,10 +95,10 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
     @Override
     protected void process(final ActorContext ctxt, final ProcessRequest request,
 	    final ProcessResponse response) throws ProcessingException {
-
+        final String deviceName = getDeviceName();
 	if (isMockMode()) {
 	    ExecutionTracerService.trace(this, "MOCK - initializing reference position of "
-		    + getDeviceName());
+		    + deviceName);
 	} else {
 	    DeviceProxy dev = null;
 	    try {
@@ -113,7 +113,7 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		// Do an InitializeReferencePosition when possible
 		final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
 		if (!dev.status().contains(AXIS_NOT_INIT)) {
-		    ExecutionTracerService.trace(this, getDeviceName()
+		    ExecutionTracerService.trace(this, deviceName
 			    + " is already initialized, nothing done");
 		    // output data on output to mean that init is OK
 		    // sendOutputMsg(output,
@@ -121,14 +121,14 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		    response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
 
 		} else if (encoder.equals(EncoderType.ABSOLUTE)) {
-		    ExecutionTracerService.trace(this, getDeviceName()
+		    ExecutionTracerService.trace(this, deviceName
 			    + " has an absolute encoder, no need to intialize");
 		    // sendOutputMsg(noInitDone, PasserelleUtil
 		    // .createTriggerMessage());
 		    response.addOutputMessage(1, noInitDone, PasserelleUtil.createTriggerMessage());
 
 		} else if (initStrategy.equals(InitType.DP)) {
-		    ExecutionTracerService.trace(this, getDeviceName()
+		    ExecutionTracerService.trace(this, deviceName
 			    + " has no intialization strategy, must use DefinePosition");
 		    // sendOutputMsg(noInitDone, PasserelleUtil
 		    // .createTriggerMessage());
@@ -136,7 +136,7 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		} else {
 		    dev.command_inout("InitializeReferencePosition");
 		    ExecutionTracerService.trace(this, "initializing reference position of "
-			    + getDeviceName());
+			    + deviceName);
 		    // since I am not sure that the device motor switch
 		    // immediatly to the moving state, do a little sleep
 		    try {
@@ -144,7 +144,7 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		    } catch (final InterruptedException e) {
 			// ignore
 		    }
-		    waitTask = new WaitStateTask(dev, DevState.MOVING, 1000, false);
+		    waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
 		    waitTask.run();
 		    if (waitTask.hasFailed()) {
 			throw waitTask.getDevFailed();
@@ -152,13 +152,13 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		    if (dev.state().equals(DevState.FAULT) || dev.state().equals(DevState.ALARM)
 			    && dev.status().contains(AXIS_NOT_INIT)) {
 			final String status = dev.status();
-			ExecutionTracerService.trace(this, getDeviceName()
+			ExecutionTracerService.trace(this, deviceName
 				+ " has not been correcty inialized: " + status);
-			throw new ProcessingException(getDeviceName()
-				+ " has not been correcty inialized: " + status, getDeviceName(),
+			throw new ProcessingException(deviceName
+				+ " has not been correcty inialized: " + status, deviceName,
 				null);
 		    } else {
-			ExecutionTracerService.trace(this, getDeviceName()
+			ExecutionTracerService.trace(this, deviceName
 				+ " reference position initialized");
 			// sendOutputMsg(output, PasserelleUtil
 			// .createTriggerMessage());

@@ -22,7 +22,7 @@ public class MoveCommand implements IMoveAction {
     }
 
     public void waitEndMouvement() throws DevFailed {
-	waitTask = new WaitStateTask(cmd.getDeviceProxy(), DevState.MOVING,
+	waitTask = new WaitStateTask(deviceName, DevState.MOVING,
 		500, false);
 	waitTask.run();
 	if (waitTask.hasFailed()) {
