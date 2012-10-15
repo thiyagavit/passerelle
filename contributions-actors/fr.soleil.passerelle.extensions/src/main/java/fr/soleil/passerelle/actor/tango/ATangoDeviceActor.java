@@ -10,15 +10,16 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.core.PasserelleException;
-
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 /**
@@ -88,8 +89,12 @@ public abstract class ATangoDeviceActor extends ATangoActor {
 
 	if (!isMockMode() && createDeviceProxy) {
 	    try {
+	        // see bug 22954 : The deviceProxy is still created here because the 
+	        // daughter classes need of it
 		deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-		deviceProxy.ping();
+		//deviceProxy.ping();		
+		new TangoCommand(deviceName, "State").execute();
+		 
 	    } catch (final DevFailed e) {
 		throw new DevFailedInitializationException(e, this);
 	    }catch(final Exception e){

@@ -14,6 +14,7 @@ import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
+import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class ScientaRegionsManager {
@@ -82,8 +83,10 @@ public class ScientaRegionsManager {
 
 	public void initialize() throws DevFailed {
 		dev = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-		dev.ping();
-
+		// see bug 22954 : The deviceProxy is still created here because the 
+                // daughter classes need of it
+		// dev.ping();
+		new TangoCommand(deviceName, "State").execute();
 	}
 
 	public void intializeMulti() {

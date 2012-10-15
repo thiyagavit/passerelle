@@ -23,6 +23,7 @@ import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 @SuppressWarnings("serial")
@@ -95,7 +96,8 @@ public class ReportStatesForClass extends Transformer {
 				boolean started = true;
 				try {
 					dev = ProxyFactory.getInstance().createDeviceProxy(device);
-					dev.ping();
+					// see bug 22954          
+			                new TangoCommand(device, "State").execute();
 				} catch (final DevFailed e) {
 					started = false;
 				}
