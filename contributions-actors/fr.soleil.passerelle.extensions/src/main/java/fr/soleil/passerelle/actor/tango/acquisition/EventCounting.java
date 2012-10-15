@@ -73,17 +73,18 @@ public class EventCounting extends ATangoDeviceActor {
 
 	} else {
 	    try {
+	        final String deviceName = getDeviceName();
 		intTime.write(integrationTime);
 		ExecutionTracerService.trace(this, "Start counting for " + integrationTime);
 		cmd.execute();
-		waitTask = new WaitStateTask(cmd.getDeviceProxy(), DevState.RUNNING, 100, false);
+		waitTask = new WaitStateTask(deviceName, DevState.RUNNING, 100, false);
 		waitTask.run();
 		if (waitTask.hasFailed()) {
 		    throw waitTask.getDevFailed();
 		}
 		ExecutionTracerService.trace(this, "End counting");
 		if (isRecordData()) {
-		    DataRecorder.getInstance().saveDevice(this, getDeviceName());
+		    DataRecorder.getInstance().saveDevice(this,deviceName);
 		}
 	    } catch (final DevFailed e) {
 		throw new DevFailedProcessingException(e, this);

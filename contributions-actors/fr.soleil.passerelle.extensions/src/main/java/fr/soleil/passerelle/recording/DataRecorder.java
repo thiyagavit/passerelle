@@ -46,7 +46,7 @@ public class DataRecorder {
     }
 
     private void waitEndMoving(final DeviceProxy proxy) throws DevFailed {
-	waitTask = new WaitStateTask(proxy, DevState.MOVING, 100, false);
+	waitTask = new WaitStateTask(proxy.get_name(), DevState.MOVING, 100, false);
 	waitTask.run();
 	if (waitTask.hasFailed()) {
 	    throw waitTask.getDevFailed();

@@ -139,7 +139,7 @@ public class WaitState extends ATangoDeviceActor {
 			try {
 				ExecutionTracerService.trace(this, "waiting for state: " + DeviceState.toString(waitingState) + " on " + getDeviceName());
 
-				waitTask = new WaitStateTask(getDeviceProxy(), waitingState, 1000, true, timeOut, "the device never change it state to " + StateUtilities.getNameForState(waitingState), "WaitState");
+				waitTask = new WaitStateTask(getDeviceName(), waitingState, 1000, true, timeOut, "the device never change it state to " + StateUtilities.getNameForState(waitingState), "WaitState");
 				waitTask.run();
 				if (waitTask.hasFailed()) {
 					throw waitTask.getDevFailed();
@@ -147,9 +147,7 @@ public class WaitState extends ATangoDeviceActor {
 				ExecutionTracerService.trace(this, "waiting state: " + DeviceState.toString(waitingState) + " finished");
 			} catch (final DevFailed e) {
 				throw new DevFailedProcessingException(e, this);
-			} catch (final PasserelleException e) {
-				throw new ProcessingException(e.getMessage(), null, e);
-			}
+			} 
 		}
 		// sendOutputMsg(output, PasserelleUtil.createCopyMessage(this,
 		// message));

@@ -48,8 +48,7 @@ public class MoveNumericAttribute implements IMoveAction {
     }
 
     public void waitEndMouvement() throws DevFailed {
-	waitTask = new WaitStateTask(attributeToMove.getAttributeProxy().getDeviceProxy(),
-		DevState.MOVING, 100, false);
+	waitTask = new WaitStateTask(this.deviceName,DevState.MOVING, 100, false);
 	waitTask.run();
 	if (waitTask.hasFailed()) {
 	    throw waitTask.getDevFailed();

@@ -162,7 +162,7 @@ public class OpenClosePositioner extends ATangoDeviceActor {
 
 				if (action.equalsIgnoreCase("Close")) {
 					ExecutionTracerService.trace(this, "closing " + deviceName);
-					waitTask = new WaitStateTask(dev, DevState.RUNNING, 1000,
+					waitTask = new WaitStateTask(deviceName, DevState.RUNNING, 1000,
 							false);
 					waitTask.run();
 					if (waitTask.hasFailed()) {
@@ -177,7 +177,7 @@ public class OpenClosePositioner extends ATangoDeviceActor {
 					}
 				} else {
 					ExecutionTracerService.trace(this, "opening " + deviceName);
-					waitTask = new WaitStateTask(dev, DevState.RUNNING, 1000,
+					waitTask = new WaitStateTask(deviceName, DevState.RUNNING, 1000,
 							false);
 					waitTask.run();
 					if (waitTask.hasFailed()) {

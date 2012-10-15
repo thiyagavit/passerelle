@@ -19,7 +19,7 @@ import fr.soleil.tango.clientapi.TangoCommand;
  */
 public class WaitStateTask extends CancellableTangoTask {
     private static final Logger logger = LoggerFactory.getLogger(WaitStateTask.class);
-    private final DeviceProxy dev;
+    private final String devName;
     private final DevState state;
     private final int pollingPeriod;
     private final boolean waitForState;
@@ -40,9 +40,9 @@ public class WaitStateTask extends CancellableTangoTask {
      *            param state. <br>
      *            - If false, will wait for the device to be out of param state
      */
-    public WaitStateTask(final DeviceProxy dev, final DevState state, final int pollingPeriod,
+    public WaitStateTask(final String devName, final DevState state, final int pollingPeriod,
             final boolean waitForState) {
-        this.dev = dev;
+        this.devName = devName;
         this.state = state;
         this.pollingPeriod = pollingPeriod;
         this.waitForState = waitForState;
@@ -67,13 +67,11 @@ public class WaitStateTask extends CancellableTangoTask {
      * @param originErrorMsg
      *            origin of error whether timeOut is exceeded.
      */
-    public WaitStateTask(final DeviceProxy dev, final DevState state, final int pollingPeriod,
+    public WaitStateTask(final String devName, final DevState state, final int pollingPeriod,
             final boolean waitForState, final double timeOut, final String errorMsg,
             final String orginErrorMsg) {
-        this.dev = dev;
-        this.state = state;
-        this.pollingPeriod = pollingPeriod;
-        this.waitForState = waitForState;
+        
+        this(devName,state, pollingPeriod, waitForState);
 
         // convert timeOut in ms
         this.timeOut = timeOut * 1000;
@@ -91,11 +89,13 @@ public class WaitStateTask extends CancellableTangoTask {
 
         boolean stateCondition = true;
         try {
-            final TangoCommand cmd = new TangoCommand(dev.get_name(), "State");
+            final TangoCommand cmd = new TangoCommand(this.devName, "State");
 
             do {
                 try {
+                    // bug 22954
                     currentState = (DevState) cmd.executeExtract(null);
+                    
                     // currentState = dev.state();
                 } catch (final DevFailed e1) {
                     devFailed = e1;

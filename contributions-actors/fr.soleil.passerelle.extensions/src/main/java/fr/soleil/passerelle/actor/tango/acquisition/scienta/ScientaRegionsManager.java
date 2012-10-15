@@ -236,7 +236,7 @@ public class ScientaRegionsManager {
 		DataRecorder.getInstance().setSymbol(actor, symbolName,
 				currentScientaRegion.getRegionName());
 		dev.command_inout("Start");
-		final WaitStateTask waitTask = new WaitStateTask(dev, DevState.RUNNING,
+		final WaitStateTask waitTask = new WaitStateTask(deviceName, DevState.RUNNING,
 				1000, false);
 		waitTask.run();
 		if (waitTask.hasFailed()) {

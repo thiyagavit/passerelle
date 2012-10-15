@@ -176,12 +176,12 @@ public class CCDManager {
     }
 
     public void waitEndAcquisition() throws DevFailed {
-	final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
-		deviceName);
+//	final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
+//		deviceName);
 	// int polling =
 	// (int)Math.round(config.getExposureTime()+config.getPausingTime())/10;
 
-	waitTask = new WaitStateTask(dev, DevState.RUNNING, 500, false);
+	waitTask = new WaitStateTask(deviceName, DevState.RUNNING, 500, false);
 	waitTask.run();
 	if (waitTask.hasFailed()) {
 	    throw waitTask.getDevFailed();

@@ -285,9 +285,10 @@ public class ScientaAcquisition extends ATangoDeviceActor implements IActorFinal
 
 		// ==================start acquisition========================
 		ExecutionTracerService.trace(this, "Starting acquisition");
-
+		
+		final String deviceName = getDeviceName();
 		dev.command_inout("Start");
-		waitTask = new WaitStateTask(dev, DevState.STANDBY, 1000, true);
+		waitTask = new WaitStateTask(deviceName, DevState.STANDBY, 1000, true);
 		waitTask.run();
 		if (waitTask.hasFailed()) {
 		    throw waitTask.getDevFailed();
@@ -296,20 +297,20 @@ public class ScientaAcquisition extends ATangoDeviceActor implements IActorFinal
 		ExecutionTracerService.trace(this, "Acquisition finished");
 		// ============read result of acquisition====================
 		if (isRecordData()) {
-		    DataRecorder.getInstance().saveDevice(this, getDeviceName());
-		    DataRecorder.getInstance().saveExperimentalData(this, getDeviceName());
+		    DataRecorder.getInstance().saveDevice(this, deviceName);
+		    DataRecorder.getInstance().saveExperimentalData(this, deviceName);
 		}
 
 		// TODO: this output shall be removed
 		response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
 
-		final TangoAttribute sumDataProxy = new TangoAttribute(getDeviceName() + "/sumData");
+		final TangoAttribute sumDataProxy = new TangoAttribute(deviceName + "/sumData");
 
 		// read attribute is done by the TangoAttribute constructor
 		response.addOutputMessage(1, sumDataPort, PasserelleUtil.createContentMessage(this,
 			sumDataProxy));
 
-		final TangoAttribute dataProxy = new TangoAttribute(getDeviceName() + "/data");
+		final TangoAttribute dataProxy = new TangoAttribute(deviceName + "/data");
 
 		// read attribute is done by the TangoAttribute constructor
 		response.addOutputMessage(2, dataPort, PasserelleUtil.createContentMessage(this,

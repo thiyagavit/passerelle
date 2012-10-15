@@ -141,11 +141,12 @@ public class InsertExtractPositioner extends ATangoDeviceActor {
 				}
 			} else {
 				comHelp.execute();
+				final String deviceName = getDeviceName();
 				// wait for correct state
 				if (action.equalsIgnoreCase("Insert")) {
 					ExecutionTracerService.trace(this, "inserting "
-							+ getDeviceName());
-					waitTask = new WaitStateTask(getDeviceProxy(),
+							+ deviceName);
+					waitTask = new WaitStateTask(deviceName,
 							DevState.INSERT, 1000, true);
 					waitTask.run();
 					if (waitTask.hasFailed()) {
@@ -155,14 +156,14 @@ public class InsertExtractPositioner extends ATangoDeviceActor {
 							+ " is inserted");
 				} else {
 					ExecutionTracerService.trace(this, "extracting "
-							+ getDeviceName());
-					waitTask = new WaitStateTask(getDeviceProxy(),
+							+ deviceName);
+					waitTask = new WaitStateTask(deviceName,
 							DevState.EXTRACT, 1000, true);
 					waitTask.run();
 					if (waitTask.hasFailed()) {
 						throw waitTask.getDevFailed();
 					}
-					ExecutionTracerService.trace(this, getDeviceName()
+					ExecutionTracerService.trace(this, deviceName
 							+ " is extracted");
 				}
 			}
@@ -173,9 +174,7 @@ public class InsertExtractPositioner extends ATangoDeviceActor {
 
 		} catch (final DevFailed e) {
 			throw new DevFailedProcessingException(e, this);
-		} catch (final PasserelleException e) {
-			throw new ProcessingException(e.getMessage(), null, e);
-		}
+		} 
 
 	}
 

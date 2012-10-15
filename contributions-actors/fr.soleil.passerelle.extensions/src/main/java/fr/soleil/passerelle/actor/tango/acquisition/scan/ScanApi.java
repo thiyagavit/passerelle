@@ -251,15 +251,16 @@ public class ScanApi {
 			scanServer.start();
 			// TangoUtil.waitEndState(dev, DevState.MOVING, 1000);
 			boolean isScanning = true;
+			final String deviceName = dev.get_name();
 			while (isScanning) {
-				waitTask = new WaitStateTask(dev, DevState.MOVING, 1000, false);
+				waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
 				waitTask.run();
 				if (waitTask.hasFailed()) {
 					throw waitTask.getDevFailed();
 				}
 				// is the scan paused? so wait end pause
 				if (dev.state().equals(DevState.STANDBY)) {
-					waitTask = new WaitStateTask(dev, DevState.STANDBY, 1000,
+					waitTask = new WaitStateTask(deviceName, DevState.STANDBY, 1000,
 							false);
 					waitTask.run();
 					if (waitTask.hasFailed()) {
