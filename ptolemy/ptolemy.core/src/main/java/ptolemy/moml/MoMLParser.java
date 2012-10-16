@@ -50,9 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
+import ptolemy.actor.TypedCompositeActor;
 import ptolemy.actor.parameters.ParameterPort;
 import ptolemy.actor.parameters.PortParameter;
 import ptolemy.kernel.ComponentEntity;
@@ -82,7 +82,6 @@ import ptolemy.util.CancelException;
 import ptolemy.util.ClassUtilities;
 import ptolemy.util.MessageHandler;
 import ptolemy.util.StringUtilities;
-
 import com.microstar.xml.HandlerBase;
 import com.microstar.xml.XmlException;
 import com.microstar.xml.XmlParser;
@@ -2291,7 +2290,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
                 // NamedObj container = _current;
                 _pushContext();
 
-                Class newClass = Class.forName(className, true, _classLoader);
+                Class newClass = loadClass(className);
 
                 // NOTE: No propagation occurs here... Hopefully, deprecated
                 // elements are not used with class structures.
@@ -2638,7 +2637,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
                 Class newClass = null;
 
                 if ((className != null) && !className.trim().equals("")) {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 }
 
                 Port port = container.getPort(portName);
@@ -2812,7 +2811,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
                 Class newClass = null;
 
                 if (className != null) {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 }
 
                 Relation relation = container.getRelation(relationName);
@@ -3550,7 +3549,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
                     throw new XmlException("Could not find '" + classAsFile
                             + "' or '" + altClassAsFile + "' using base '"
                             + _base + "': ", _currentExternalEntity(),
-                            _getLineNumber(), _getColumnNumber(), ex2);
+                            _getLineNumber(), _getColumnNumber(), ex3);
                 }
             } else {
                 // No alternative. Rethrow exception.
@@ -3704,7 +3703,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
                 // with the cause of the original error in the unlikely event
                 // that our error correction fails
                 try {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 } catch (Exception ex) {
                     // NOTE: Java sometimes throws ClassNotFoundException
                     // and sometimes NullPointerException when the class
@@ -3962,6 +3961,19 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
         }
     }
 
+    protected Class<?> loadClass(String className) throws ClassNotFoundException {
+      Class newClass=null;
+      try {
+        newClass = Class.forName(className, true, _classLoader);
+      } catch(Exception e) {
+        // if className not found and it starts with "be.", 
+        // try it for alias starting with "com."
+        className = className.replace("be.isencia", "com.isencia");
+        newClass = Class.forName(className, true, _classLoader);
+      }
+      return newClass;
+    }
+
     /** Create an instance of the specified class name by finding a
      *  constructor that matches the specified arguments.  The specified
      *  class must be NamedObj or derived, or a ClassCastException will
@@ -3980,7 +3992,15 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
      */
     private NamedObj _createInstance(Class newClass, Object[] arguments)
             throws Exception {
-        Constructor[] constructors = newClass.getConstructors();
+      
+      if (TypedCompositeActor.class.isAssignableFrom(newClass) && arguments.length == 1) {
+        if (arguments[0] == _workspace) {
+          // is the toplevel, and we want it to be a Flow
+          return new TypedCompositeActor(_workspace);
+        }
+      }
+
+      Constructor[] constructors = newClass.getConstructors();
 
         for (int i = 0; i < constructors.length; i++) {
             Constructor constructor = constructors[i];
@@ -4991,7 +5011,7 @@ public class MoMLParser extends HandlerBase implements ChangeListener {
 
             if (className != null) {
                 try {
-                    newClass = Class.forName(className, true, _classLoader);
+                    newClass = loadClass(className);
                 } catch (NoClassDefFoundError ex) {
                     throw new XmlException("Failed to find class '" + className
                             + "'", _currentExternalEntity(), _getLineNumber(),
