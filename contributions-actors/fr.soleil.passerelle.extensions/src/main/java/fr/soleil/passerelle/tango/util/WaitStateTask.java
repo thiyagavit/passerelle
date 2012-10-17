@@ -94,7 +94,7 @@ public class WaitStateTask extends CancellableTangoTask {
             do {
                 try {
                     // bug 22954
-                    currentState = TangoAccess.getCurrentState(this.devName,cmd);                
+                    currentState = TangoAccess.getCurrentState(cmd);                
                 } catch (final DevFailed e1) {
                     devFailed = e1;
                     hasFailed = true;
