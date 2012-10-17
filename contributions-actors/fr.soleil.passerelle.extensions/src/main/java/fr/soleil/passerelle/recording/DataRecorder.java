@@ -11,6 +11,7 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.TangoConst;
 import fr.soleil.passerelle.domain.RecordingDirector;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
@@ -83,13 +84,14 @@ public class DataRecorder {
 			"WriteTangoDeviceData");
 		command.execute(deviceName);
 		if (DataRecorder.asyncMode) {
+		    // Bug 22954
+		    final TangoCommand commandState = new TangoCommand(dataRecorderName,
+	                        "State");
 		    logger.debug("DR state :"
-			    + TangoConst.Tango_DevStateName[command
-				    .getDeviceProxy().state().value()]);
+			    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		    waitEndMoving(command.getDeviceProxy());
 		    logger.debug("DR state :"
-			    + TangoConst.Tango_DevStateName[command
-				    .getDeviceProxy().state().value()]);
+			    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		}
 	    }
 	}
@@ -110,13 +112,14 @@ public class DataRecorder {
 
 		command.execute(deviceName);
 		if (DataRecorder.asyncMode) {
+		    // Bug 22954
+                    final TangoCommand commandState = new TangoCommand(dataRecorderName,
+                                "State");
 		    logger.debug("DR state :"
-			    + TangoConst.Tango_DevStateName[command
-				    .getDeviceProxy().state().value()]);
+			    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		    waitEndMoving(command.getDeviceProxy());
 		    logger.debug("DR state :"
-			    + TangoConst.Tango_DevStateName[command
-				    .getDeviceProxy().state().value()]);
+			    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		}
 	    }
 	}
@@ -217,6 +220,8 @@ public class DataRecorder {
 	    if (isRecordingStarted(actor)) {
 		final String dataRecorderName = ((RecordingDirector) actor
 			.getDirector()).getDataRecorderName();
+		final TangoCommand commandState = new TangoCommand(dataRecorderName,
+                        "State");
 		/*
 		 * ExecutionTracerService.trace(actor, "incrementing experiment
 		 * and acquisition indexes");
@@ -228,18 +233,17 @@ public class DataRecorder {
 			    dataRecorderName, "WritePostTechnicalData");
 		    commandWritePostTechnicalData.execute();
 		    if (DataRecorder.asyncMode) {
+		     // Bug 22954	                    
 			logger
 				.debug("DR state :"
-					+ TangoConst.Tango_DevStateName[commandWritePostTechnicalData
-						.getDeviceProxy().state()
+					+ TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState)
 						.value()]);
 
 			waitEndMoving(commandWritePostTechnicalData
 				.getDeviceProxy());
 			logger
 				.debug("DR state :"
-					+ TangoConst.Tango_DevStateName[commandWritePostTechnicalData
-						.getDeviceProxy().state()
+					+ TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState)
 						.value()]);
 		    }
 		} else {
@@ -272,13 +276,11 @@ public class DataRecorder {
 		if (DataRecorder.asyncMode) {
 		    logger
 			    .debug("DR state :"
-				    + TangoConst.Tango_DevStateName[commandWritePreTechnicalData
-					    .getDeviceProxy().state().value()]);
+				    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		    waitEndMoving(commandWritePreTechnicalData.getDeviceProxy());
 		    logger
 			    .debug("DR state :"
-				    + TangoConst.Tango_DevStateName[commandWritePreTechnicalData
-					    .getDeviceProxy().state().value()]);
+				    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		}
 	    }
 	}
@@ -291,6 +293,8 @@ public class DataRecorder {
 	    if (isRecordingStarted(actor)) {
 		final String dataRecorderName = ((RecordingDirector) actor
 			.getDirector()).getDataRecorderName();
+		final TangoCommand commandState = new TangoCommand(dataRecorderName,
+                        "State");
 		/*
 		 * ExecutionTracerService.trace(actor, "incrementing experiment
 		 * and acquisition indexes");
@@ -302,18 +306,16 @@ public class DataRecorder {
 		    final TangoCommand commandWritePostTechnicalData = new TangoCommand(
 			    dataRecorderName, "WritePostTechnicalData");
 		    commandWritePostTechnicalData.execute();
-		    if (DataRecorder.asyncMode) {
+		    if (DataRecorder.asyncMode) {		
 			logger
 				.debug("DR state :"
-					+ TangoConst.Tango_DevStateName[commandWritePostTechnicalData
-						.getDeviceProxy().state()
+					+ TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState)
 						.value()]);
 			waitEndMoving(commandWritePostTechnicalData
 				.getDeviceProxy());
 			logger
 				.debug("DR state :"
-					+ TangoConst.Tango_DevStateName[commandWritePostTechnicalData
-						.getDeviceProxy().state()
+					+ TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState)
 						.value()]);
 		    }
 		} else {
@@ -367,13 +369,11 @@ public class DataRecorder {
 		if (DataRecorder.asyncMode) {
 		    logger
 			    .debug("DR state :"
-				    + TangoConst.Tango_DevStateName[commandWritePreTechnicalData
-					    .getDeviceProxy().state().value()]);
+				    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		    waitEndMoving(commandWritePreTechnicalData.getDeviceProxy());
 		    logger
 			    .debug("DR state :"
-				    + TangoConst.Tango_DevStateName[commandWritePreTechnicalData
-					    .getDeviceProxy().state().value()]);
+				    + TangoConst.Tango_DevStateName[TangoAccess.getCurrentState(commandState).value()]);
 		}
 	    }
 	}
@@ -406,7 +406,7 @@ public class DataRecorder {
 	final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
 		dataRecorderName);
 	if (dev != null) {
-	    if (dev.state() == DevState.ON) {
+	    if (TangoAccess.isCurrentStateEqualStateRequired(dataRecorderName,DevState.ON)) {
 		result = false;
 	    } else {
 		result = true;
@@ -421,9 +421,9 @@ public class DataRecorder {
 	if (dir instanceof RecordingDirector) {
 	    final String dataRecorderName = ((RecordingDirector) actor
 		    .getDirector()).getDataRecorderName();
-	    final DeviceProxy dev = ProxyFactory.getInstance()
-		    .createDeviceProxy(dataRecorderName);
-	    if (dev.state() == DevState.ON) {
+
+	    // bug 22954
+	    if (TangoAccess.isCurrentStateEqualStateRequired(dataRecorderName,DevState.ON)) {
 		return false;
 	    } else {
 		return true;
