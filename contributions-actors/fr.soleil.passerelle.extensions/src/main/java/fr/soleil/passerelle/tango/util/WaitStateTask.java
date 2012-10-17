@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
 import fr.soleil.tango.clientapi.TangoCommand;
 
