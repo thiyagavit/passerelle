@@ -88,15 +88,13 @@ public class WaitStateTask extends CancellableTangoTask {
         double waitTime = 0;
 
         boolean stateCondition = true;
-        try {
+        try {                       
             final TangoCommand cmd = new TangoCommand(this.devName, "State");
 
             do {
                 try {
                     // bug 22954
-                    currentState = (DevState) cmd.executeExtract(null);
-                    
-                    // currentState = dev.state();
+                    currentState = TangoAccess.getCurrentState(this.devName,cmd);                
                 } catch (final DevFailed e1) {
                     devFailed = e1;
                     hasFailed = true;
