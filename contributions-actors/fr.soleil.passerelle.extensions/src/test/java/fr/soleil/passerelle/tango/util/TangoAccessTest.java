@@ -46,18 +46,21 @@ public class TangoAccessTest extends TangoUnitTest{
         
         cmdInit.execute();
             
-        assertTrue("Etat courant invalide devrait être Running", TangoAccess.getCurrentState(deviceName,null).equals(DevState.RUNNING));
+        assertTrue("Etat courant invalide devrait être Running", TangoAccess.getCurrentState(deviceName).equals(DevState.RUNNING));
         
         cmdSwitch.execute();
         
         final TangoCommand cmdState = new TangoCommand(deviceName, "State");        
-        assertTrue("Etat courant invalide devrait être Fault1", TangoAccess.getCurrentState(deviceName,cmdState).equals(DevState.FAULT));
-        assertTrue("Etat courant invalide devrait être Fault2", TangoAccess.getCurrentState(deviceName,cmdState)== DevState.FAULT);
-        assertTrue("Etat courant invalide devrait être Fault3", TangoAccess.getCurrentState(deviceName,cmdState).equals(DevState.FAULT));
+        assertTrue("Etat courant invalide devrait être Fault1", TangoAccess.getCurrentState(cmdState).equals(DevState.FAULT));
+        assertTrue("Etat courant invalide devrait être Fault2", TangoAccess.getCurrentState(cmdState)== DevState.FAULT);
+        assertTrue("Etat courant invalide devrait être Fault3", TangoAccess.getCurrentState(cmdState).equals(DevState.FAULT));
         
         cmdInit.execute();
-        assertTrue("Etat courant invalide devrait être Running", TangoAccess.getCurrentState(deviceName,cmdState).equals(DevState.RUNNING));
+        assertTrue("Etat courant invalide devrait être Running1", TangoAccess.getCurrentState(cmdState).equals(DevState.RUNNING));
+        assertTrue("Etat courant invalide devrait être Running2", TangoAccess.getCurrentState(deviceName).equals(DevState.RUNNING));
         
+        assertTrue("Etat courant invalide devrait être Unknown",TangoAccess.getCurrentState("")== DevState.UNKNOWN);
+ 
     }
     
     @Test
@@ -66,7 +69,7 @@ public class TangoAccessTest extends TangoUnitTest{
         cmdSwitch.execute();
         
         assertTrue("Commande non executee", TangoAccess.executeCmdAccordingState(deviceName, DevState.FAULT, "Init"));
-        assertTrue("Etat courant invalide devrait être Running", TangoAccess.getCurrentState(deviceName,null).equals(DevState.RUNNING));
+        assertTrue("Etat courant invalide devrait être Running", TangoAccess.getCurrentState(deviceName).equals(DevState.RUNNING));
         assertTrue("Commande executee", !TangoAccess.executeCmdAccordingState(deviceName, DevState.FAULT, "Init"));
         
         
