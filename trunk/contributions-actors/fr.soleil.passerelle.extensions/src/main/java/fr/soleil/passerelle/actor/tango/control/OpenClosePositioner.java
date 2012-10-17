@@ -43,6 +43,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActor;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
@@ -159,7 +160,7 @@ public class OpenClosePositioner extends ATangoDeviceActor {
 				comHelp.execute();
 				// wait for correct state
 				final DeviceProxy dev = comHelp.getDeviceProxy();
-
+				
 				if (action.equalsIgnoreCase("Close")) {
 					ExecutionTracerService.trace(this, "closing " + deviceName);
 					waitTask = new WaitStateTask(deviceName, DevState.RUNNING, 1000,
@@ -168,7 +169,8 @@ public class OpenClosePositioner extends ATangoDeviceActor {
 					if (waitTask.hasFailed()) {
 						throw waitTask.getDevFailed();
 					}
-					if (dev.state().equals(DevState.CLOSE)) {
+					// Bug 22954	                                
+					if(TangoAccess.isCurrentStateEqualStateRequired(deviceName, DevState.CLOSE)){
 						ExecutionTracerService.trace(this, deviceName
 								+ " is closed");
 					} else {
@@ -183,7 +185,9 @@ public class OpenClosePositioner extends ATangoDeviceActor {
 					if (waitTask.hasFailed()) {
 						throw waitTask.getDevFailed();
 					}
-					if (dev.state().equals(DevState.OPEN)) {
+					
+					// Bug 22954
+					if(TangoAccess.isCurrentStateEqualStateRequired(deviceName, DevState.OPEN)){
 						ExecutionTracerService.trace(this, deviceName
 								+ " is opened");
 					} else {
