@@ -5,6 +5,7 @@ Bundle-SymbolicName: com.isencia.passerelle.engine;singleton:=true
 Bundle-Version: 8.2.4
 Bundle-Activator: com.isencia.passerelle.engine.activator.Activator
 Bundle-Vendor: ISENCIA
+Eclipse-BuddyPolicy: registered
 Eclipse-RegisterBuddy: ptolemy.core
 Import-Package: javax.mail,
  javax.activation,
