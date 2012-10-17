@@ -16,6 +16,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
@@ -23,16 +24,16 @@ import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActor;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 
 @SuppressWarnings("serial")
 public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActorFinalizer {
@@ -173,9 +174,8 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
     public void doFinalAction() {
         try {
             if (!isMockMode()) {
-                final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
-                        getDeviceName());
-                if (dev.state().equals(DevState.RUNNING)) {
+                // bug 22954              
+                if (TangoAccess.isCurrentStateEqualStateRequired(getDeviceName(),DevState.RUNNING)) {
                     ccd.stopAcquisition();
                     ExecutionTracerService.trace(this, "CCD acquisition stopped");
                 }
