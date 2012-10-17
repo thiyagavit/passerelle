@@ -6,6 +6,7 @@ import ptolemy.actor.Director;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
@@ -15,6 +16,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
@@ -24,6 +26,7 @@ import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration.EncoderType;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration.InitType;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
@@ -149,7 +152,10 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
 		    if (waitTask.hasFailed()) {
 			throw waitTask.getDevFailed();
 		    }
-		    if (dev.state().equals(DevState.FAULT) || dev.state().equals(DevState.ALARM)
+		    
+		    // Bug 22954
+		    final DevState currentState = TangoAccess.getCurrentState(deviceName);
+		    if (currentState.equals(DevState.FAULT) || currentState.equals(DevState.ALARM)
 			    && dev.status().contains(AXIS_NOT_INIT)) {
 			final String status = dev.status();
 			ExecutionTracerService.trace(this, deviceName
@@ -190,11 +196,10 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
     public void doFinalAction() {
 	if (!isMockMode()) {
 	    try {
-		final DeviceProxy dev = getDeviceProxy();
-		if (dev.state().equals(DevState.MOVING)) {
-		    dev.command_inout("Stop");
-		    ExecutionTracerService.trace(this, "motor has been stop");
-		}
+		// bug 22954
+	        if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
+                    ExecutionTracerService.trace(this, "motor has been stop");
+                }
 	    } catch (final DevFailed e) {
 		TangoToPasserelleUtil.getDevFailedString(e, this);
 	    } catch (final Exception e) {

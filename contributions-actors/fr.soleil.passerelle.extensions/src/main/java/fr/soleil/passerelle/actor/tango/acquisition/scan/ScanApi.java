@@ -15,6 +15,7 @@ import fr.esrf.tangoatk.core.ConnectionException;
 import fr.esrf.tangoatk.core.Device;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.salsa.SalsaFactory;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
@@ -26,6 +27,7 @@ import fr.soleil.salsa.model.scanconfig.LinearTrajectory;
 import fr.soleil.salsa.model.scanconfig.Range;
 import fr.soleil.salsa.model.scanconfig.ScanConfiguration;
 import fr.soleil.salsa.model.scanmanagement.ScanManager;
+import fr.soleil.tango.clientapi.TangoCommand;
 
 public class ScanApi {
 
@@ -252,6 +254,8 @@ public class ScanApi {
 			// TangoUtil.waitEndState(dev, DevState.MOVING, 1000);
 			boolean isScanning = true;
 			final String deviceName = dev.get_name();
+			final TangoCommand cmd = new TangoCommand(deviceName, "State"); 
+			DevState currentState; 
 			while (isScanning) {
 				waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
 				waitTask.run();
@@ -259,7 +263,8 @@ public class ScanApi {
 					throw waitTask.getDevFailed();
 				}
 				// is the scan paused? so wait end pause
-				if (dev.state().equals(DevState.STANDBY)) {
+				currentState = (DevState) cmd.executeExtract(null);
+				if (currentState.equals(DevState.STANDBY)) {
 					waitTask = new WaitStateTask(deviceName, DevState.STANDBY, 1000,
 							false);
 					waitTask.run();
@@ -271,7 +276,8 @@ public class ScanApi {
 				}
 			}
 			// Check state of scan server. If fault, something's wrong.
-			if (dev.state() == DevState.FAULT) {
+			currentState = (DevState) cmd.executeExtract(null);
+			if (currentState == DevState.FAULT) {
 				final String runName = model.getScanManager().getScanServer()
 						.getRunName();
 				if (runName.equals("")) {
@@ -296,8 +302,10 @@ public class ScanApi {
 
 	public void stop() throws DevFailed {
 		if (dev != null) {
-			final DevState state = dev.state();
-			if (state != null && state == DevState.MOVING) {
+			//final DevState state = dev.state();
+			//if (state != null && state == DevState.MOVING) {
+			if(TangoAccess.isCurrentStateEqualStateRequired(dev.get_name(), DevState.MOVING))	
+			{
 				scanServer.abort();
 				ExecutionTracerService.trace(actor, "Scan aborted");
 			}

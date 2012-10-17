@@ -7,14 +7,16 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
+
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.control.motor.IMoveAction;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorMover;
 import fr.soleil.passerelle.actor.tango.control.motor.MoveNumericAttribute;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -74,11 +76,11 @@ public class SampleMover extends MotorMover implements IActorFinalizer {
     public void doFinalAction() {
 	if (!isMockMode()) {
 	    try {
-		final DeviceProxy dev = getDeviceProxy();
-		if (dev.state().equals(DevState.MOVING)) {
-		    dev.command_inout("Stop");
-		    ExecutionTracerService.trace(this, "motor has been stop");
-		}
+	        // bug 22954
+	        if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
+                    ExecutionTracerService.trace(this, "motor has been stop");
+                }
+
 	    } catch (final DevFailed e) {
 		TangoToPasserelleUtil.getDevFailedString(e, this);
 	    } catch (final Exception e) {
