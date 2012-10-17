@@ -11,26 +11,25 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.TangoConst;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActor;
 import fr.soleil.passerelle.tango.util.FilterHelper;
-import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 
 @SuppressWarnings("serial")
@@ -109,28 +108,14 @@ public class ReportStates extends ATangoDeviceActor {
 				if (isFinishRequested()) {
 					break;
 				}
-				DeviceProxy dev = null;
-				boolean started = true;
+				DevState state = null;
 				try {
-					dev = ProxyFactory.getInstance().createDeviceProxy(device);
-					 // see bug 22954
-			                  new TangoCommand(device, "State").execute();
+				        // bug 22954
+                                        state = TangoAccess.getCurrentState(device);
+                                        ExecutionTracerService.trace(this, device + " state: "
+                                                + TangoConst.Tango_DevStateName[state.value()]);
 				} catch (final DevFailed e) {
-					started = false;
-				}
-				if (!started) {
 					ExecutionTracerService.trace(this, device + " is stopped");
-				} else {
-					DevState state = null;
-					try {
-						state = dev.state();
-						ExecutionTracerService.trace(this, device + " state: "
-								+ TangoConst.Tango_DevStateName[state.value()]);
-					} catch (final DevFailed e) {
-						ExecutionTracerService
-								.trace(this, device + " - ERROR:");
-						TangoToPasserelleUtil.getDevFailedString(e, this);
-					}
 				}
 			}
 		}
@@ -140,3 +125,4 @@ public class ReportStates extends ATangoDeviceActor {
 				.createTriggerMessage());
 	}
 }
+
