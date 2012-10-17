@@ -1,7 +1,5 @@
 package fr.soleil.passerelle.tango.util;
 
-import com.isencia.passerelle.util.ExecutionTracerService;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.soleil.tango.clientapi.TangoCommand;
@@ -33,13 +31,26 @@ public final class TangoAccess {
      * @return
      * @throws DevFailed
      */
-    public static DevState getCurrentState(final String deviceName, TangoCommand cmd) throws DevFailed {
-        if (cmd == null) {
-            cmd = new TangoCommand(deviceName, "State");
-        }
-        return (DevState) cmd.executeExtract(null);
+    public static DevState getCurrentState(final TangoCommand cmd) throws DevFailed {
+        return getCurrentStateInternal("",cmd);
     }
 
+    public static DevState getCurrentState(final String deviceName) throws DevFailed {
+        return getCurrentStateInternal(deviceName,null);
+    }
+    
+    private static DevState getCurrentStateInternal(final String deviceName, TangoCommand cmd) throws DevFailed {
+        DevState state = DevState.UNKNOWN;
+        
+        if (!deviceName.isEmpty() && cmd == null) {
+            cmd = new TangoCommand(deviceName, "State");
+        }        
+        if(cmd != null){
+            state = (DevState) cmd.executeExtract(null);
+        }
+        return state;
+          
+    }
     /**
      * Execute a Tango Command if the device is in a particular state. Return
      * true if the command has been executed
@@ -52,7 +63,7 @@ public final class TangoAccess {
     public static boolean executeCmdAccordingState(final String deviceName, final DevState stateRequired,
             final String cmdToExecute) throws DevFailed {
         boolean cmdExecuted = false;
-        if (getCurrentState(deviceName, null).equals(stateRequired)) {
+        if (isCurrentStateEqualStateRequired(deviceName,stateRequired)) {
             new TangoCommand(deviceName, cmdToExecute).execute();
             cmdExecuted = true;
         }
