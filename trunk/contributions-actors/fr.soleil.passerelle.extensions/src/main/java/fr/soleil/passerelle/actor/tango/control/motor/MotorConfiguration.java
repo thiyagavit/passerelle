@@ -9,6 +9,8 @@ import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
+import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class MotorConfiguration {
@@ -94,8 +96,13 @@ public class MotorConfiguration {
 		final String cbName = this.retrieveMyControlBox();
 		final DeviceProxy controlBox = ProxyFactory.getInstance()
 				.createDeviceProxy(cbName);
-		if (controlBox.state().equals(DevState.FAULT)
-				|| controlBox.state().equals(DevState.UNKNOWN)) {
+		
+		// Bug 22954
+		final TangoCommand cmdStateOnCb = new TangoCommand(cbName, "State");  
+	        DevState currentStateOnCb = TangoAccess.getCurrentState(cmdStateOnCb);
+	        
+		if (currentStateOnCb.equals(DevState.FAULT)
+				|| currentStateOnCb.equals(DevState.UNKNOWN)) {
 			ExecutionTracerService.trace(actor, "Init command executed on "
 					+ cbName);
 			controlBox.command_inout("Init");
@@ -106,8 +113,10 @@ public class MotorConfiguration {
 			} catch (final InterruptedException e) {
 				// ignore
 			}
-			if (controlBox.state().equals(DevState.FAULT)
-					|| controlBox.state().equals(DevState.UNKNOWN)) {
+			
+			currentStateOnCb = TangoAccess.getCurrentState(cmdStateOnCb);
+			if (currentStateOnCb.equals(DevState.FAULT)
+					|| currentStateOnCb.equals(DevState.UNKNOWN)) {
 				throw new ProcessingException(
 						"error while after command init on control box, device is still in error",
 						null, null);
@@ -115,15 +124,18 @@ public class MotorConfiguration {
 		}
 
 		// if control box in ALARM -> microcode has been stop
-		if (controlBox.state().equals(DevState.ALARM)) {
+		currentStateOnCb = TangoAccess.getCurrentState(cmdStateOnCb);
+		if (currentStateOnCb.equals(DevState.ALARM)) {
 			ExecutionTracerService.trace(actor,
 					"StartMicrocode command executed on " + cbName);
 			controlBox.command_inout("StartMicrocode");
 		}
 
 		// now initialize the galil axis
-		if (axisProxy.state().equals(DevState.FAULT)
-				|| axisProxy.state().equals(DevState.UNKNOWN)) {
+		final TangoCommand cmdStateOnAxis = new TangoCommand(axisProxy.get_name(), "State");  
+		DevState currentStateOnAxis = TangoAccess.getCurrentState(cmdStateOnAxis);
+		if (currentStateOnAxis.equals(DevState.FAULT)
+				|| currentStateOnAxis.equals(DevState.UNKNOWN)) {
 
 			ExecutionTracerService.trace(actor, "Init command executed on "
 					+ deviceName);
@@ -137,15 +149,17 @@ public class MotorConfiguration {
 				// ignore
 			}
 		}
-		if (axisProxy.state().equals(DevState.FAULT)
-				|| axisProxy.state().equals(DevState.UNKNOWN)) {
+		currentStateOnAxis = TangoAccess.getCurrentState(cmdStateOnAxis);
+		if (currentStateOnAxis.equals(DevState.FAULT)
+				|| currentStateOnAxis.equals(DevState.UNKNOWN)) {
 			throw new ProcessingException(
 					"error while after command init on axis, device is still in error",
 					null, null);
 		}
 
 		// 2- chech if axis needs an On command
-		if (axisProxy.state().equals(DevState.OFF)) {
+		currentStateOnAxis = TangoAccess.getCurrentState(cmdStateOnAxis);
+		if (currentStateOnAxis.equals(DevState.OFF)) {
 			axisProxy.command_inout("MotorON");
 			ExecutionTracerService.trace(actor, deviceName
 					+ " was Off, Switched On");
