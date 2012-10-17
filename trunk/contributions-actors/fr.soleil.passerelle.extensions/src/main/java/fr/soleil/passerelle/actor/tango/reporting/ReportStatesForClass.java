@@ -8,23 +8,22 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.TangoConst;
-import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 @SuppressWarnings("serial")
 public class ReportStatesForClass extends Transformer {
@@ -92,18 +91,28 @@ public class ReportStatesForClass extends Transformer {
 				throw new DevFailedProcessingException(e1, this);
 			}
 			for (final String device : devices) {
-				DeviceProxy dev = null;
-				boolean started = true;
+			    if (isFinishRequested()) {
+                                break;
+                            }
+				//DeviceProxy dev = null;
+				//boolean started = true;
+				DevState state = null;
 				try {
-					dev = ProxyFactory.getInstance().createDeviceProxy(device);
+					//dev = ProxyFactory.getInstance().createDeviceProxy(device);
 					// see bug 22954          
-			                new TangoCommand(device, "State").execute();
+			                //new TangoCommand(device, "State").execute();
+			                state = TangoAccess.getCurrentState(device);
+			                ExecutionTracerService.trace(this, device + " state: "
+	                                            + TangoConst.Tango_DevStateName[state.value()]);
 				} catch (final DevFailed e) {
-					started = false;
+					//started = false;
+					ExecutionTracerService.trace(this, device + " is stopped");
 				}
-				if (!started) {
+				/*if (!started) {
 					ExecutionTracerService.trace(this, device + " is stopped");
 				} else {
+				        ExecutionTracerService.trace(this, device + " state: "
+                                            + TangoConst.Tango_DevStateName[state.value()]);
 					DevState state = null;
 					try {
 						state = dev.state();
@@ -113,7 +122,7 @@ public class ReportStatesForClass extends Transformer {
 						ExecutionTracerService.trace(this, device + " ERROR ");
 						TangoToPasserelleUtil.getDevFailedString(e, this);
 					}
-				}
+				}*/
 			}
 		}
 		sendOutputMsg(output, PasserelleUtil.createCopyMessage(this, arg0));
