@@ -111,6 +111,12 @@ public class ContextImpl implements Context {
   @Transient
   private List<ErrorItem> errorItems;
 
+  @Transient
+  private boolean minimized = false;
+  
+  @Transient
+  private List<Long> minimizedTasks = new ArrayList<Long>();
+
   public static final String _ID = "id";
   public static final String _STATUS = "status";
   public static final String _REQUEST = "request";
@@ -353,11 +359,6 @@ public class ContextImpl implements Context {
     eventCursorStack.push(events.size());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.isencia.passerelle.process.model.Context#join(com.isencia.passerelle .process.model.Context)
-   */
   public void join(Context other) {
     ContextImpl contextToMerge = (ContextImpl) other;
     try {
@@ -388,11 +389,6 @@ public class ContextImpl implements Context {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.isencia.passerelle.process.model.Context#fork()
-   */
   public Context fork() {
     ContextImpl copy = new ContextImpl();
     try {
@@ -439,4 +435,30 @@ public class ContextImpl implements Context {
     return errorItems;
   }
 
+  public synchronized Context minimize() {
+    if(!isMinimized()) {
+      minimized = true;
+      minimizedTasks.clear();
+      for (Task t : tasks) {
+        minimizedTasks.add(t.getId());
+      }
+      tasks.clear();
+    }
+    return this;
+  }
+
+  /**
+   * Not implemented yet
+   */
+  public synchronized Context restore() {
+    throw new UnsupportedOperationException();
+//    if(isMinimized()) {
+//      minimized = false;
+//    }
+//    return this;
+  }
+
+  public synchronized boolean isMinimized() {
+    return minimized;
+  }
 }

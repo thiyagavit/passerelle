@@ -177,4 +177,23 @@ public interface Context extends Identifiable, Serializable {
 	 */
 	boolean isForkedContext();
 	
+	/**
+	 * Remove all tasks to minimize memory usage.
+	 * 
+	 * @return this context without any stored tasks
+	 */
+	Context minimize();
+	
+	/**
+   * Restore all tasks in memory, if the context has previously been minimized.
+   * 
+   * @return this context without any stored tasks
+	 */
+	Context restore();
+	
+	/**
+	 * 
+	 * @return whether the context is minimized
+	 */
+	boolean isMinimized();
 }
