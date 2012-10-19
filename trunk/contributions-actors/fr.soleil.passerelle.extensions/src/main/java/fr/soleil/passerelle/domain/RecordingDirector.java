@@ -2,7 +2,6 @@ package fr.soleil.passerelle.domain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -21,141 +20,133 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class RecordingDirector extends BasicDirector {
 
-    private final static Logger logger = LoggerFactory.getLogger(BasicDirector.class);
+  private final static Logger logger = LoggerFactory.getLogger(BasicDirector.class);
 
-    private boolean asyncRecording = true;
-    public Parameter asyncRecordingParam;
+  private boolean asyncRecording = true;
+  public Parameter asyncRecordingParam;
 
-    // private Parameter saveParam;
-    // private boolean save = true;
+  // private Parameter saveParam;
+  // private boolean save = true;
 
-    private boolean autoChangeNxEntry = false;
-    public Parameter autoChangeNxEntryParam;
+  private boolean autoChangeNxEntry = false;
+  public Parameter autoChangeNxEntryParam;
 
-    private String dataRecorderName;
-    private final Parameter dataRecorderNameParam;
+  private String dataRecorderName;
+  private final Parameter dataRecorderNameParam;
 
-    public RecordingDirector() throws IllegalActionException, NameDuplicationException {
-        super();
+  public RecordingDirector() throws IllegalActionException, NameDuplicationException {
+    super();
 
-        dataRecorderNameParam = new StringParameter(this, "datarecorderName");
+    dataRecorderNameParam = new StringParameter(this, "datarecorderName");
 
-        autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
-        autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
+    autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
+    autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
 
-        asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
-        asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
+    asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
+    asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
+  }
+
+  public RecordingDirector(final CompositeEntity container, final String name) throws IllegalActionException, NameDuplicationException {
+    super(container, name);
+
+    dataRecorderNameParam = new StringParameter(this, "datarecorderName");
+
+    autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
+    autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
+
+    asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
+    asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
+  }
+
+  public RecordingDirector(final Workspace workspace) throws IllegalActionException, NameDuplicationException {
+    super(workspace);
+
+    dataRecorderNameParam = new StringParameter(this, "datarecorderName");
+
+    autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
+    autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
+
+    asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
+    asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
+  }
+
+  @Override
+  public void attributeChanged(final Attribute attribute) throws IllegalActionException {
+    if (attribute == autoChangeNxEntryParam) {
+      autoChangeNxEntry = Boolean.valueOf(autoChangeNxEntryParam.getExpression());
+    } else if (attribute == asyncRecordingParam) {
+      asyncRecording = Boolean.valueOf(asyncRecordingParam.getExpression());
+    } else {
+      super.attributeChanged(attribute);
     }
+  }
 
-    public RecordingDirector(final CompositeEntity container, final String name)
-            throws IllegalActionException, NameDuplicationException {
-        super(container, name);
+  public String getDataRecorderName() {
+    return dataRecorderName;
+  }
 
-        dataRecorderNameParam = new StringParameter(this, "datarecorderName");
-
-        autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
-        autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
-
-        asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
-        asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
-    }
-
-    public RecordingDirector(final Workspace workspace) throws IllegalActionException,
-            NameDuplicationException {
-        super(workspace);
-
-        dataRecorderNameParam = new StringParameter(this, "datarecorderName");
-
-        autoChangeNxEntryParam = new Parameter(this, "Auto Change NXEntry", new BooleanToken(false));
-        autoChangeNxEntryParam.setTypeEquals(BaseType.BOOLEAN);
-
-        asyncRecordingParam = new Parameter(this, "Asynchronous Recording", new BooleanToken(true));
-        asyncRecordingParam.setTypeEquals(BaseType.BOOLEAN);
-    }
-
-    @Override
-    public void attributeChanged(final Attribute attribute) throws IllegalActionException {
-        if (attribute == autoChangeNxEntryParam) {
-            autoChangeNxEntry = Boolean.valueOf(autoChangeNxEntryParam.getExpression());
+  @Override
+  public void initialize() throws IllegalActionException {
+    if (!getAdapter(null).isMockMode()) {
+      try {
+        // if (!useRecordTest) {
+        // dataRecorderName = SoleilUtilities
+        // .getDevicesFromClass("DataRecorder")[0];
+        // }
+        dataRecorderName = PasserelleUtil.getParameterValue(dataRecorderNameParam);
+        logger.info("using datarecorder " + dataRecorderName);
+        DataRecorder.getInstance().startSession();
+        DataRecorder.getInstance().setAsyncMode(dataRecorderName, asyncRecording);
+        if (asyncRecording) {
+          ExecutionTracerService.trace(this, "using asynchronous recording");
+        } else {
+          ExecutionTracerService.trace(this, "using synchronous recording");
         }
-        else if (attribute == asyncRecordingParam) {
-            asyncRecording = Boolean.valueOf(asyncRecordingParam.getExpression());
-        }
-        else {
-            super.attributeChanged(attribute);
-        }
+      } catch (final DevFailed e) {
+        throw new IllegalActionException(TangoToPasserelleUtil.getDevFailedString(e, this));
+      }
     }
 
-    public String getDataRecorderName() {
-        return dataRecorderName;
-    }
+    super.initialize();
+  }
 
-    @Override
-    public void initialize() throws IllegalActionException {
-        if (!isMockMode()) {
-            try {
-                // if (!useRecordTest) {
-                // dataRecorderName = SoleilUtilities
-                // .getDevicesFromClass("DataRecorder")[0];
-                // }
-                dataRecorderName = PasserelleUtil.getParameterValue(dataRecorderNameParam);
-                logger.info("using datarecorder " + dataRecorderName);
-                DataRecorder.getInstance().startSession();
-                DataRecorder.getInstance().setAsyncMode(dataRecorderName, asyncRecording);
-                if (asyncRecording) {
-                    ExecutionTracerService.trace(this, "using asynchronous recording");
-                }
-                else {
-                    ExecutionTracerService.trace(this, "using synchronous recording");
-                }
-            }
-            catch (final DevFailed e) {
-                throw new IllegalActionException(TangoToPasserelleUtil.getDevFailedString(e, this));
-            }
-        }
+  public boolean isAsyncRecording() {
+    return asyncRecording;
+  }
 
-        super.initialize();
-    }
+  public boolean isAutoChangeNxEntry() {
+    return autoChangeNxEntry;
+  }
 
-    public boolean isAsyncRecording() {
-        return asyncRecording;
-    }
+  public void setRecorderName(final String name) {
+    dataRecorderName = name;
+  }
 
-    public boolean isAutoChangeNxEntry() {
-        return autoChangeNxEntry;
+  @Override
+  public void stopFire() {
+    try {
+      if (!getAdapter(null).isMockMode()) {
+        DataRecorder.getInstance().cancel();
+        DataRecorder.getInstance().endRecording(dataRecorderName);
+      }
+    } catch (final Exception e) {
+      // ignore error
+      e.printStackTrace();
     }
+    super.stopFire();
+  }
 
-    public void setRecorderName(final String name) {
-        dataRecorderName = name;
+  @Override
+  public void wrapup() throws IllegalActionException {
+    if (!getAdapter(null).isMockMode()) {
+      try {
+        DataRecorder.getInstance().cancel();
+        DataRecorder.getInstance().endRecording(dataRecorderName);
+      } catch (final DevFailed e) {
+        // ignore error
+        // e.printStackTrace();
+      }
     }
-
-    @Override
-    public void stopFire() {
-        if (!isMockMode()) {
-            try {
-                DataRecorder.getInstance().cancel();
-                DataRecorder.getInstance().endRecording(dataRecorderName);
-            }
-            catch (final DevFailed e) {
-                // ignore error
-                e.printStackTrace();
-            }
-        }
-        super.stopFire();
-    }
-
-    @Override
-    public void wrapup() throws IllegalActionException {
-        if (!isMockMode()) {
-            try {
-                DataRecorder.getInstance().cancel();
-                DataRecorder.getInstance().endRecording(dataRecorderName);
-            }
-            catch (final DevFailed e) {
-                // ignore error
-                // e.printStackTrace();
-            }
-        }
-        super.wrapup();
-    }
+    super.wrapup();
+  }
 }
