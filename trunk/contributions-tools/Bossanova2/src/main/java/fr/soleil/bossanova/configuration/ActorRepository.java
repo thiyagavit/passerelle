@@ -1,6 +1,5 @@
 package fr.soleil.bossanova.configuration;
 
-import com.isencia.passerelle.actor.v3.Actor;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -11,19 +10,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.prefs.Preferences;
-
-// Bug 18567
+import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
+import ptolemy.actor.TypedAtomicActor;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.MoMLParser;
 import fr.soleil.bossanova.bossaNovaData.BossaNovaData;
-import org.apache.commons.lang.ClassUtils;
-import ptolemy.actor.TypedAtomicActor;
 
 public class ActorRepository extends Observable {
+  
+  private final static Logger LOGGER = LoggerFactory.getLogger(ActorRepository.class);
 
     private Preferences preferences;
     private Map<String, Class<? extends TypedAtomicActor>> actors = new HashMap<String, Class<? extends TypedAtomicActor>>();
@@ -89,8 +87,9 @@ public class ActorRepository extends Observable {
 
     private List<File> getActorFileList(String actorsXMLDirectory) {
         List<File> actorFiles = new ArrayList<File>();
-        File commonActorsXMLDir = new File(actorsXMLDirectory);
-        if (commonActorsXMLDir != null) {
+        if (!StringUtils.isEmpty(actorsXMLDirectory)) {
+          try {
+          File commonActorsXMLDir = new File(actorsXMLDirectory);
             File[] xmlFiles = commonActorsXMLDir.listFiles(new FilenameFilter() {
 
                 @Override
@@ -104,6 +103,9 @@ public class ActorRepository extends Observable {
                     actorFiles.add(file);
                 }
             }
+          } catch (Exception e) {
+            LOGGER.error("Error loading actors from directory "+actorsXMLDirectory, e);
+          }
         }
         return actorFiles;
     }
