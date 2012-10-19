@@ -1282,7 +1282,7 @@ public abstract class HMIBase implements ChangeListener {
 //      if (modelURL==null || !modelURL.equals(_modelURL)) {
         modelURL = _modelURL;
         currentModelDef = hmiModelsDef.getModel(modelKey);
-        if (currentModelDef == null || !currentModelDef.getMomlPath().equals(_modelURL)) {
+        if (currentModelDef == null || (_modelURL!= null && !currentModelDef.getMomlPath().equals(_modelURL))) {
           currentModelDef = new Model(_modelURL, new FieldMapping());
         }
         hmiModelsDef.addModel(modelKey, currentModelDef);
