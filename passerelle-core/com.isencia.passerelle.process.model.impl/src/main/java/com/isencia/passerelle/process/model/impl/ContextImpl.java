@@ -436,14 +436,17 @@ public class ContextImpl implements Context {
   }
 
   public synchronized Context minimize() {
-    if(!isMinimized()) {
+    // allow consecutive minimize calls that each time drop whatever
+    // might have been added since a previous call,
+    // and maintains task ids only for those new ones...
+//    if(!isMinimized()) {
       minimized = true;
       minimizedTasks.clear();
       for (Task t : tasks) {
         minimizedTasks.add(t.getId());
       }
       tasks.clear();
-    }
+//    }
     return this;
   }
 
