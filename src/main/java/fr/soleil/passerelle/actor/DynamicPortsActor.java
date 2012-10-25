@@ -123,11 +123,11 @@ public abstract class DynamicPortsActor extends
 		if (portType == PortType.INPUT) {
 			isInput = true;
 			isOutput = false;
-			namePrefix = inputPortPrefix;
+			namePrefix = getInputPortPrefix();
 		} else if (portType == PortType.OUTPUT) {
 			isInput = false;
 			isOutput = true;
-			namePrefix = outputPortPrefix;
+			namePrefix = getOutputPortPrefix();
 		} else {
 			throw new IllegalArgumentException("Unknown PortType: " + portType);
 		}
@@ -239,7 +239,7 @@ public abstract class DynamicPortsActor extends
 		final List<Port> inpPorts = new ArrayList<Port>();
 		final List<Port> inputPortList = inputPortList();
 		for (final Port inP : inputPortList) {
-			if (inP.getName().startsWith(inputPortPrefix, 0)) {
+			if (inP.getName().startsWith(getInputPortPrefix(), 0)) {
 				inpPorts.add(inP);
 			}
 		}
@@ -305,7 +305,7 @@ public abstract class DynamicPortsActor extends
 
   protected int getPortIndex(final MessageInputContext messageInputContext) {
     String portName = messageInputContext.getPortName();
-    String portIndexStr = portName.substring("input".length());
+    String portIndexStr = portName.substring(getInputPortPrefix().length());
     int portIndex = Integer.parseInt(portIndexStr);
     return portIndex;
   }
