@@ -113,7 +113,7 @@ public class ContextImpl implements Context {
 
   @Transient
   private boolean minimized = false;
-  
+
   @Transient
   private List<Long> minimizedTasks = new ArrayList<Long>();
 
@@ -199,8 +199,8 @@ public class ContextImpl implements Context {
 
   void addEvent(ContextEvent event) {
     events.add(event);
-    if(event instanceof ContextErrorEvent) {
-      _getErrors().add(((ContextErrorEvent)event).getErrorItem());
+    if (event instanceof ContextErrorEvent) {
+      _getErrors().add(((ContextErrorEvent) event).getErrorItem());
     }
   }
 
@@ -229,7 +229,7 @@ public class ContextImpl implements Context {
     if (name == null) {
       return null;
     }
-    
+
     String result = null;
 
     // first check in the context entries, these have highest priority
@@ -330,8 +330,7 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result
-   * entry that will be added.
+   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result entry that will be added.
    */
   protected void pushCurrentTaskCursorIndex() {
     taskCursorStack.push(tasks.size());
@@ -352,8 +351,7 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event
-   * entry that will be added.
+   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event entry that will be added.
    */
   protected void pushCurrentEventCursorIndex() {
     eventCursorStack.push(events.size());
@@ -417,18 +415,20 @@ public class ContextImpl implements Context {
   public List<ErrorItem> getErrors() {
     List<ErrorItem> allErrors = new ArrayList<ErrorItem>();
     allErrors.addAll(_getErrors());
-    for(Task task : tasks) {
+    for (Task task : tasks) {
       allErrors.addAll(task.getProcessingContext().getErrors());
     }
     return allErrors;
   }
 
   private List<ErrorItem> _getErrors() {
-    if(errorItems==null) {
+    if (errorItems == null) {
       errorItems = new ArrayList<ErrorItem>();
-      for(ContextEvent event : events) {
-        if(event instanceof ContextErrorEvent) {
-          errorItems.add(((ContextErrorEvent)event).getErrorItem());
+      for (ContextEvent event : events) {
+        if (event instanceof ContextErrorEvent) {
+          ErrorItem errorItem = ((ContextErrorEvent) event).getErrorItem();
+          if (errorItem != null)
+            errorItems.add(errorItem);
         }
       }
     }
@@ -439,14 +439,14 @@ public class ContextImpl implements Context {
     // allow consecutive minimize calls that each time drop whatever
     // might have been added since a previous call,
     // and maintains task ids only for those new ones...
-//    if(!isMinimized()) {
-      minimized = true;
-      minimizedTasks.clear();
-      for (Task t : tasks) {
-        minimizedTasks.add(t.getId());
-      }
-      tasks.clear();
-//    }
+    // if(!isMinimized()) {
+    minimized = true;
+    minimizedTasks.clear();
+    for (Task t : tasks) {
+      minimizedTasks.add(t.getId());
+    }
+    tasks.clear();
+    // }
     return this;
   }
 
@@ -455,10 +455,10 @@ public class ContextImpl implements Context {
    */
   public synchronized Context restore() {
     throw new UnsupportedOperationException();
-//    if(isMinimized()) {
-//      minimized = false;
-//    }
-//    return this;
+    // if(isMinimized()) {
+    // minimized = false;
+    // }
+    // return this;
   }
 
   public synchronized boolean isMinimized() {
