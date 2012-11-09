@@ -31,7 +31,6 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -60,6 +59,7 @@
       <plugin id="com.ibm.icu"/>
       <plugin id="com.isencia.passerelle.actor"/>
       <plugin id="com.isencia.passerelle.actor.conf" fragment="true"/>
+      <plugin id="com.isencia.passerelle.actor.help" fragment="true"/>
       <plugin id="com.isencia.passerelle.commons"/>
       <plugin id="com.isencia.passerelle.commons.ume"/>
       <plugin id="com.isencia.passerelle.engine"/>
