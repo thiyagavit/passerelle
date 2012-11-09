@@ -7,13 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.core.PasserelleException;
 
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class MessageMemoriserTest {
@@ -23,10 +25,19 @@ public class MessageMemoriserTest {
     private static final String MEMORISER_2 = "Memoriser_2";
     private static final String RESTORE_2 = "Restore_2";
 
-    @Rule
-    public MomlRule moml = new MomlRule("/sequences/MessageMemoriser.moml");
+    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "MessageMemoriser.moml");
 
-    @Test(expected = IllegalActionException.class)
+    @BeforeMethod
+    public void setUp() throws Throwable {
+        moml.before();
+    }
+
+    @AfterMethod
+    public void clean() {
+        moml.after();
+    }
+
+    @Test(expectedExceptions = IllegalActionException.class)
     public void should_trhow_exception_if_message_name_is_empty() throws IllegalActionException {
         final MessageMemoriser actor = (MessageMemoriser) moml.getEntity(MEMORISER_1);
         actor.messageNameParam.setToken("");

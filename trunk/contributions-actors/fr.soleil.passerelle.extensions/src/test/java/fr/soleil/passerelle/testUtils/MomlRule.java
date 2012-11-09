@@ -27,6 +27,7 @@ import fr.soleil.passerelle.domain.BasicDirector;
  * @author GRAMER
  * 
  */
+// TODO remove inheritance
 public class MomlRule extends ExternalResource {
 
     private Reader reader;
@@ -41,8 +42,9 @@ public class MomlRule extends ExternalResource {
         this.sequenceName = sequenceName;
     }
 
+    // TODO change signature (exception)
     @Override
-    protected void before() throws Throwable {
+    public void before() throws Throwable {
         reader = new InputStreamReader(getClass().getResourceAsStream(sequenceName));
         flowMgr = new FlowManager();
         original = FlowManager.readMoml(reader);
@@ -53,7 +55,7 @@ public class MomlRule extends ExternalResource {
     }
 
     @Override
-    protected void after() {
+    public void after() {
         if (reader != null) {
             try {
                 reader.close();

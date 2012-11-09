@@ -7,22 +7,33 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.core.PasserelleException;
 
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class DelayTest {
-    @Rule
-    public MomlRule moml = new MomlRule("/sequences/Delay.moml");
-
     private static final String ACTOR_NAME = "Delay1";
 
-    @Test(expected = NumberFormatException.class)
+    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "Delay.moml");
+
+    @BeforeMethod
+    public void setUp() throws Throwable {
+        moml.before();
+    }
+
+    @AfterMethod
+    public void clean() {
+        moml.after();
+    }
+
+    @Test(expectedExceptions = NumberFormatException.class)
     public void should_throw_expection_if_time_is_a_string() throws IllegalActionException {
 
         final Delay actor = (Delay) moml.getEntity(ACTOR_NAME);
@@ -31,7 +42,7 @@ public class DelayTest {
 
     }
 
-    @Test(timeout = 5000)
+    @Test(timeOut = 5000)
     public void parameterSleepTest() throws PasserelleException {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");
@@ -52,7 +63,7 @@ public class DelayTest {
 
     }
 
-    @Test(timeout = 5000)
+    @Test(timeOut = 5000)
     public void portSleepTest() throws PasserelleException {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");

@@ -6,17 +6,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.isencia.passerelle.core.PasserelleException;
 
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class MessageAssemblerTest {
     private static final String ACTOR_NAME = "MessageAssembler1";
-    @Rule
-    public MomlRule moml = new MomlRule("/sequences/MessageAssembler.moml");
+
+    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "MessageAssembler.moml");
+
+    @BeforeMethod
+    public void setUp() throws Throwable {
+        moml.before();
+    }
+
+    @AfterMethod
+    public void clean() {
+        moml.after();
+    }
 
     @Test
     public void should_assemble_message() throws PasserelleException {

@@ -23,14 +23,12 @@ public class FlowHelperForTests {
         final FlowManager flowMgr = new FlowManager();
         try {
             flowMgr.executeBlockingErrorLocally(flow, props);
-        }
-        catch (final FlowAlreadyExecutingException e) {
+        } catch (final FlowAlreadyExecutingException e) {
             e.printStackTrace();
-            //Assert.fail("flow is already executing " + e.getMessage());
-        }
-        catch (final PasserelleException e) {
+            // Assert.fail("flow is already executing " + e.getMessage());
+        } catch (final PasserelleException e) {
             e.printStackTrace();
-            //Assert.fail("impossible to execute flow " + e.getMessage());
+            // Assert.fail("impossible to execute flow " + e.getMessage());
         }
         return flowMgr;
     }
@@ -39,16 +37,13 @@ public class FlowHelperForTests {
         final FlowManager flowMgr = new FlowManager();
         try {
             flowMgr.execute(flow, props);
-        }
-        catch (final FlowAlreadyExecutingException e) {
+        } catch (final FlowAlreadyExecutingException e) {
             e.printStackTrace();
             Assert.fail("flow is already executing " + e.getMessage());
-        }
-        catch (final PasserelleException e) {
+        } catch (final PasserelleException e) {
             e.printStackTrace();
             Assert.fail("impossible to execute flow " + e.getMessage());
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Assert.fail("impossible to execute flow " + e.getMessage());
         }
@@ -60,8 +55,7 @@ public class FlowHelperForTests {
         Flow flow = null;
         try {
             flow = FlowManager.readMoml(in);
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Assert.fail(momlPath + " not found");
         }
@@ -72,23 +66,19 @@ public class FlowHelperForTests {
         BasicDirector dir = null;
         try {
             dir = new BasicDirector(flow, name);
-        }
-        catch (final IllegalActionException e) {
+        } catch (final IllegalActionException e) {
             e.printStackTrace();
             Assert.fail("impossible to create director " + e.getMessage());
-        }
-        catch (final NameDuplicationException e) {
+        } catch (final NameDuplicationException e) {
             e.printStackTrace();
             Assert.fail("impossible to create director " + e.getMessage());
         }
         try {
             flow.setDirector(dir);
-        }
-        catch (final IllegalActionException e) {
+        } catch (final IllegalActionException e) {
             e.printStackTrace();
             Assert.fail("impossible set director on flow " + e.getMessage());
-        }
-        catch (final NameDuplicationException e) {
+        } catch (final NameDuplicationException e) {
             e.printStackTrace();
             Assert.fail("impossible set director on flow " + e.getMessage());
         }
@@ -99,8 +89,7 @@ public class FlowHelperForTests {
         System.out.println("SET PROPERTIES");
         // System.setProperty("TANGO_HOST", "tangodb:20001,tangodb:20002");
         System.setProperty("TANGO_HOST", "calypso:20001");
-        final String logFile = clazz.getClass().getResource(
-                "/fr/soleil/passerelle/resources/log4j.properties").toString();
+        final String logFile = clazz.getClass().getResource(Constants.LOG4J_FILE).toString();
         System.out.println(logFile);
         System.setProperty("log4j.configuration", logFile);
     }
@@ -109,23 +98,19 @@ public class FlowHelperForTests {
         RecordingDirector dir = null;
         try {
             dir = new RecordingDirector(flow, name);
-        }
-        catch (final IllegalActionException e) {
+        } catch (final IllegalActionException e) {
             e.printStackTrace();
             Assert.fail("impossible to create director " + e.getMessage());
-        }
-        catch (final NameDuplicationException e) {
+        } catch (final NameDuplicationException e) {
             e.printStackTrace();
             Assert.fail("impossible to create director " + e.getMessage());
         }
         try {
             flow.setDirector(dir);
-        }
-        catch (final IllegalActionException e) {
+        } catch (final IllegalActionException e) {
             e.printStackTrace();
             Assert.fail("impossible set director on flow " + e.getMessage());
-        }
-        catch (final NameDuplicationException e) {
+        } catch (final NameDuplicationException e) {
             e.printStackTrace();
             Assert.fail("impossible set director on flow " + e.getMessage());
         }
@@ -135,24 +120,19 @@ public class FlowHelperForTests {
     public static void stopExecution(final FlowManager manager, final Flow flow) {
         try {
             manager.stopExecution(flow);
-        }
-        catch (final FlowNotExecutingException e) {
+        } catch (final FlowNotExecutingException e) {
             e.printStackTrace();
             Assert.fail("flow was not executing " + e.getMessage());
-        }
-        catch (final IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             e.printStackTrace();
             Assert.fail("flow was not executing " + e.getMessage());
-        }
-        catch (final IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             e.printStackTrace();
             Assert.fail("flow was not executing " + e.getMessage());
-        }
-        catch (final PasserelleException e) {
+        } catch (final PasserelleException e) {
             e.printStackTrace();
             Assert.fail("flow was not executing " + e.getMessage());
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Assert.fail("flow was not executing " + e.getMessage());
         }

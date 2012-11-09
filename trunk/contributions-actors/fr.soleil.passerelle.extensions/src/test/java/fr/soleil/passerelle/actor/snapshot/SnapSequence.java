@@ -1,6 +1,6 @@
 package fr.soleil.passerelle.actor.snapshot;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.ComponentEntity;
 
@@ -17,6 +17,7 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 
 public class SnapSequence {
 
@@ -28,7 +29,7 @@ public class SnapSequence {
     @Test
     public void testMock() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/snap.moml"));
+                Constants.SEQUENCES_PATH + "snap.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasicMock");
@@ -51,7 +52,7 @@ public class SnapSequence {
     @Test
     public void testRead() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/snap.moml"));
+                Constants.SEQUENCES_PATH + "snap.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasic");

@@ -5,8 +5,8 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Test;
 
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.Flow;
@@ -15,6 +15,7 @@ import com.isencia.passerelle.model.FlowManager;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class TimeoutSequence {
@@ -30,7 +31,7 @@ public class TimeoutSequence {
 
     private Flow topLevel;
 
-    @Test(expected = PasserelleException.class)
+    @Test(expectedExceptions = PasserelleException.class)
     public void testError() throws Exception {
 
         // String deviceName = "tango/tangotest/1";
@@ -39,7 +40,7 @@ public class TimeoutSequence {
         final DeviceProxy dev = new DeviceProxy(deviceName);
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/timeout.moml"));
+                Constants.SEQUENCES_PATH + "timeout.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasic");

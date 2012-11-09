@@ -1,42 +1,29 @@
 package fr.soleil.passerelle.testUtils;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import com.isencia.passerelle.model.Flow;
 
-@RunWith(Parameterized.class)
 public class LaunchSequence {
 
-	@Parameters
-	public static List<Object[]> getParametres() {
+    @DataProvider(name = "provider")
+    public static Object[][] getParametres() {
 
-		return Arrays
-				.asList(new Object[][] {
-						{ "/fr/soleil/passerelle/resources/automaticConversions.moml" },
-						{ "/fr/soleil/passerelle/resources/WriterWait.moml" } });
-	}
+        return new Object[][] { { Constants.SEQUENCES_PATH + "automaticConversions.moml" },
+                { Constants.SEQUENCES_PATH + "WriterWait.moml" } };
+    }
 
-	private final Flow topLevel;
+    @BeforeClass
+    public static void setUp() {
+        FlowHelperForTests.setProperties(LaunchSequence.class);
+    }
 
-	public LaunchSequence(final String sequencePath) {
-		topLevel = FlowHelperForTests.loadMoml(this.getClass(), sequencePath);
-	}
-
-	@BeforeClass
-	public static void setUp() {
-		FlowHelperForTests.setProperties(LaunchSequence.class);
-	}
-
-	@Test
-	public void execute() {
-		FlowHelperForTests.executeBlockingError(topLevel, null);
-	}
+    @Test(dataProvider = "provider")
+    public void execute(final String sequencePath) {
+        final Flow topLevel = FlowHelperForTests.loadMoml(this.getClass(), sequencePath);
+        FlowHelperForTests.executeBlockingError(topLevel, null);
+    }
 
 }

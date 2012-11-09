@@ -1,6 +1,6 @@
 package fr.soleil.passerelle.actor.flow;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.ComponentEntity;
 
@@ -20,6 +20,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.AttributeProxy;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 
 public class WhileLoopSequence {
 
@@ -28,10 +29,10 @@ public class WhileLoopSequence {
     private Reader in;
     private Flow topLevel;
 
-    @Test
+    @Test(enabled = false)
     public void test1() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/whileloop.moml"));
+                Constants.SEQUENCES_PATH + "whileloop.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasic");
@@ -55,12 +56,10 @@ public class WhileLoopSequence {
                     System.out.println("***************writing true");
                     da.insert(true);
                     attr.write(da);
-                }
-                catch (final DevFailed e) {
+                } catch (final DevFailed e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }
-                catch (final InterruptedException e) {
+                } catch (final InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }

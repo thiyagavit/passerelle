@@ -1,6 +1,6 @@
 package fr.soleil.passerelle.actor.flow;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.ComponentEntity;
 
@@ -17,6 +17,7 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 
 public class LoopsSequence {
 
@@ -28,7 +29,7 @@ public class LoopsSequence {
     @Test
     public void test1() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/loops.moml"));
+                Constants.SEQUENCES_PATH + "loops.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasic");
