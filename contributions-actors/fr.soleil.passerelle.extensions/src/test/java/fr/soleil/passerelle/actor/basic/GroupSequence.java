@@ -15,6 +15,7 @@ import com.isencia.passerelle.model.FlowManager;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.acquisition.CCDSequence;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.FlowHelperForTests;
 import fr.soleil.tangounit.device.Device;
 import fr.soleil.tangounit.junit.TangoUnitTest;
@@ -51,7 +52,7 @@ public class GroupSequence extends TangoUnitTest {
         // DeviceProxy dev = new DeviceProxy(deviceName);
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/groups.moml"));
+                Constants.SEQUENCES_PATH + "groups.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirBasic");

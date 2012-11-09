@@ -1,6 +1,7 @@
 package fr.soleil.passerelle.actor.acquisition;
 
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -8,13 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.soleil.passerelle.domain.RecordingDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 
 public class Storage {
     private FlowManager flowMgr;
@@ -23,7 +25,7 @@ public class Storage {
     @Test
     public void testAsyncRecording() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/storage.moml"));
+                Constants.SEQUENCES_PATH + "storage.moml"));
         flowMgr = new FlowManager();
         final Flow topLevel = FlowManager.readMoml(in);
         final RecordingDirector dir = new RecordingDirector(topLevel, "DirRecording");
@@ -47,7 +49,7 @@ public class Storage {
     @Test
     public void testSyncRecording() throws Exception {
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/storage.moml"));
+                Constants.SEQUENCES_PATH + "storage.moml"));
         flowMgr = new FlowManager();
         final Flow topLevel = FlowManager.readMoml(in);
         final RecordingDirector dir = new RecordingDirector(topLevel, "DirRecording");
@@ -65,7 +67,7 @@ public class Storage {
         final List<Actor> list = topLevel.entityList();
         for (final Object element2 : list) {
             final Actor element = (Actor) element2;
-            assertTrue(element.isFinishRequested());
+            assertThat(element.isFinishRequested()).isTrue();
         }
     }
 

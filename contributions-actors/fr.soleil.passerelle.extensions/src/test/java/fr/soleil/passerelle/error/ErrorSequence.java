@@ -5,9 +5,8 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -19,6 +18,7 @@ import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.testUtils.Constants;
 
 public class ErrorSequence {
 
@@ -27,17 +27,16 @@ public class ErrorSequence {
     private Reader in;
     private Flow topLevel;
 
-    @Test(expected = PasserelleException.class)
+    @Test(expectedExceptions = PasserelleException.class)
     public void testFireFatal() throws Exception {
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/error.moml"));
+                Constants.SEQUENCES_PATH + "error.moml"));
         flowMgr = new FlowManager();
         try {
             topLevel = FlowManager.readMoml(in);
-        }
-        catch (final Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (final Exception e) {
+            AssertJUnit.fail(e.getMessage());
             e.printStackTrace();
         }
         dir = new BasicDirector(topLevel, "DirFireFatal");
@@ -50,11 +49,11 @@ public class ErrorSequence {
         flowMgr.executeBlockingErrorLocally(topLevel, props);
     }
 
-    @Test(expected = PasserelleException.class)
+    @Test(expectedExceptions = PasserelleException.class)
     public void testFireNonFatal() throws Exception {
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/error.moml"));
+                Constants.SEQUENCES_PATH + "error.moml"));
         flowMgr = new FlowManager();
         topLevel = FlowManager.readMoml(in);
         dir = new BasicDirector(topLevel, "DirFireNonFatal");
@@ -68,18 +67,17 @@ public class ErrorSequence {
         flowMgr.executeBlockingErrorLocally(topLevel, props);
     }
 
-    @Test(expected = PasserelleException.class)
+    @Test(expectedExceptions = PasserelleException.class)
     public void testInitFatal() throws FlowAlreadyExecutingException, PasserelleException,
             IllegalActionException, NameDuplicationException {
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/error.moml"));
+                Constants.SEQUENCES_PATH + "error.moml"));
         flowMgr = new FlowManager();
         try {
             topLevel = FlowManager.readMoml(in);
-        }
-        catch (final Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (final Exception e) {
+            AssertJUnit.fail(e.getMessage());
             e.printStackTrace();
         }
         dir = new BasicDirector(topLevel, "DirInitFatal");
@@ -91,23 +89,21 @@ public class ErrorSequence {
         props.put("ErrorGenerator.severity", "FATAL");
         try {
             flowMgr.executeBlockingErrorLocally(topLevel, props);
-        }
-        catch (final Throwable t) {
+        } catch (final Throwable t) {
 
         }
     }
 
-    @Test(expected = PasserelleException.class)
+    @Test(expectedExceptions = PasserelleException.class)
     public void testInitNonFatal() throws Exception {
 
         in = new InputStreamReader(getClass().getResourceAsStream(
-                "/fr/soleil/passerelle/resources/error.moml"));
+                Constants.SEQUENCES_PATH + "error.moml"));
         flowMgr = new FlowManager();
         try {
             topLevel = FlowManager.readMoml(in);
-        }
-        catch (final Exception e) {
-            Assert.fail(e.getMessage());
+        } catch (final Exception e) {
+            AssertJUnit.fail(e.getMessage());
             e.printStackTrace();
         }
         dir = new BasicDirector(topLevel, "DirInitNonFatal");

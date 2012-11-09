@@ -1,44 +1,45 @@
 package fr.soleil.passerelle.actor.flow;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.fest.assertions.api.Assertions.fail;
+import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 
+import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
-@RunWith(Parameterized.class)
 public class DoWhileLoopTest {
 
     private static final String ACTOR_NAME = "DoWhileLoop";
 
-    @Rule
-    public MomlRule moml = new MomlRule("/sequences/doWhileLoop.moml");
+    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "doWhileLoop.moml");
 
-    private final String comparison;
-    private final String rValue;
-    private final String valueList;
-    private final int itteration;
+    @BeforeMethod
+    public void setUp() throws Throwable {
+        moml.before();
+    }
+
+    @AfterMethod
+    public void clean() {
+        moml.after();
+    }
 
     // XXX comparison with an empty can not be tested easily because
     // ValueListGenerator can not generate empty value
-    @Parameters
-    public static List<Object[]> getParametres() {
-        return Arrays.asList(new Object[][] { { "1.1,2.2,3.3,4.4,5.5", "!=", "4.4", 4 },// 0
+    @DataProvider(name = "provider")
+    public static Object[][] getParametres() {
+        return new Object[][] { { "1.1,2.2,3.3,4.4,5.5", "!=", "4.4", 4 },// 0
                 { "4.4 ,4.4, 4.4, 4.9, 4.4", "==", "4.4", 4 },// 1
                 { "5.6, 7.9, 4.9, 4.4, 10", ">", "4.4", 4 },// 2
                 { "5.6, 7.9, 4.4, 3.9, 4.9", ">=", "4.4", 4 },// 3
@@ -82,22 +83,14 @@ public class DoWhileLoopTest {
 
                 { "--,+,1.0,bbb,aaa", "<=", "1.0", 4 },// 28
                 { "--,+,1.2,bbb,aaa", "<=", "1.2", 4 },// 29 test decimal
-        });
+        };
 
-    }
-
-    public DoWhileLoopTest(final String valueList, final String comparison, final String rValue,
-            final int itteration) {
-
-        this.rValue = rValue;
-        this.comparison = comparison;
-        this.valueList = valueList;
-        this.itteration = itteration;
     }
 
     // to avoid infinity loop
-    @Test(timeout = 3000)
-    public void normalCase() throws Exception {
+    @Test(timeOut = 3000, dataProvider = "provider")
+    public void normalCase(final String valueList, final String comparison, final String rValue,
+            final int itteration) throws Exception {
 
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");
@@ -122,22 +115,18 @@ public class DoWhileLoopTest {
 
     // FIXME: the sequence is never stop and the exception is not forwarded to
     // moml.executeBlockingErrorLocally
-    // TODO: use dataProvider (final TestNg or JunitParam lib) to avoid to
-    // execute this test 30 times
-    @Ignore
-    @Test(timeout = 3000)
+    @Test(timeOut = 3000, enabled = false)
     public void should_stop_loop_and_sequence_when_exception_is_thrown() {
         final Map<String, String> props = new HashMap<String, String>();
         props.put("DirBasic.Mock Mode", "false");
-        props.put("DoWhileLoop.comparison", comparison);
-        props.put("DoWhileLoop.Rigth Value", rValue);
-        props.put("ValuesListGenerator.Values List (sep by commas)", valueList);
+        props.put("DoWhileLoop.comparison", "<=");
+        props.put("DoWhileLoop.Rigth Value", "1.2");
+        props.put("ValuesListGenerator.Values List (sep by commas)", "--,+,1.2,bbb,aaa");
 
         // throw exception thanks to errorGenerator
         props.put("generate_error.Values", "1");
 
-        final ArrayBlockingQueue<String> continuingReceiver = new ArrayBlockingQueue<String>(
-                itteration);
+        final ArrayBlockingQueue<String> continuingReceiver = new ArrayBlockingQueue<String>(4);
 
         final ArrayBlockingQueue<String> outputReceiver = new ArrayBlockingQueue<String>(1);
         moml.addMessageReceiver(ACTOR_NAME, DoWhileLoop.CONTINUE_PORT_NAME, continuingReceiver);
@@ -145,16 +134,11 @@ public class DoWhileLoopTest {
 
         try {
             moml.executeBlockingErrorLocally(props);
-            fail("missign exception");
+            failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final FlowAlreadyExecutingException e) {
             fail("this expcetion should not be thown : " + e.getMessage());
         } catch (final PasserelleException e) {
             // TODO assert is the exception thrown by errorGenerator
         }
-        //
-        // // check number of messages
-        // assertThat(continuingReceiver).hasSize(itteration);
-        // assertThat(outputReceiver).hasSize(1);
-
     }
 }
