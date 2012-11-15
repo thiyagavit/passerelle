@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="test" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="4.0.1">
+    </property>
+    <property name="director" class="com.isencia.passerelle.domain.cap.Director">
+    </property>
+    <entity name="fwd" class="com.isencia.passerelle.actor.examples.Forwarder">
+    </entity>
+    <entity name="constant1" class="com.isencia.passerelle.actor.general.Const">
+    </entity>
+    <entity name="console1" class="com.isencia.passerelle.actor.general.Console">
+    </entity>
+    <relation name="_R1" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="_R2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="constant1.output" relation="_R1"/>
+    <link port="fwd.input" relation="_R1"/>
+    <link port="fwd.output" relation="_R2"/>
+    <link port="console1.input" relation="_R2"/>
+</entity>
