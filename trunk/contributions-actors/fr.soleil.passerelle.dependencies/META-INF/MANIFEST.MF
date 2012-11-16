@@ -66,6 +66,7 @@ Bundle-ClassPath: .,
  lib/SoleilUtilities-2.0.2.jar,
  lib/swingx-1.6.jar,
  lib/TangORB-javadao-7.3.11.jar,
+ lib/testng-6.8.jar,
  lib/transmorph-3.1.1.jar
 Export-Package: TangoUnit,
  TangoUnitFactory,

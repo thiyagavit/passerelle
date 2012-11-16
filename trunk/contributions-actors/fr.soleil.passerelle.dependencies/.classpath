@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/testng-6.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/docgenerator-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dozer-5.2.2.jar"/>
