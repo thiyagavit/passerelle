@@ -189,7 +189,7 @@ public class ContextImpl implements Context {
     }
   }
 
-  void addTask(Task task) {
+  public void addTask(Task task) {
     this.tasks.add(task);
   }
 
