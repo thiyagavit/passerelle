@@ -1600,6 +1600,9 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
   public static void setClassLoadingStrategy(ClassLoadingStrategy classLoadingStrategy) {
     _defaultClassLoadingStrategy = classLoadingStrategy;
   }
+  public static ClassLoadingStrategy getClassLoadingStrategy() {
+    return _defaultClassLoadingStrategy;
+  }
 
   /**
    * Set the error handler to handle parsing errors. Note that this method is static. The specified error handler will handle all errors for any instance of
