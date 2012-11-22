@@ -683,6 +683,7 @@ public class FlowManager {
 	 */
 	private void executeLocally(Flow flow, Map<String, String> props) throws PasserelleException {
 		FlowHandle handle = flow.getHandle();
+		handle.setLocalFlow(flow);
 		if(handle==null) {
 			throw new PasserelleException("Invalid flow : missing FlowHandle", flow, null);
 		}
