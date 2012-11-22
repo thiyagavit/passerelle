@@ -58,7 +58,17 @@ public class FlowHandle {
 	private String execId;
 	private URL execResourceLocation;
 	
-	/**
+	private Flow localFlow;
+	
+	public Flow getLocalFlow() {
+    return localFlow;
+  }
+
+  public void setLocalFlow(Flow localFlow) {
+    this.localFlow = localFlow;
+  }
+
+  /**
 	 * 
 	 * @param id
 	 * @param name
