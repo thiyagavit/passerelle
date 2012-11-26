@@ -189,7 +189,7 @@ public class ContextImpl implements Context {
     }
   }
 
-  void addTask(Task task) {
+  public void addTask(Task task) {
     this.tasks.add(task);
   }
 
@@ -445,7 +445,7 @@ public class ContextImpl implements Context {
     for (Task t : tasks) {
       minimizedTasks.add(t.getId());
     }
-    tasks.clear();
+    tasks = new ArrayList<Task>();
     // }
     return this;
   }
