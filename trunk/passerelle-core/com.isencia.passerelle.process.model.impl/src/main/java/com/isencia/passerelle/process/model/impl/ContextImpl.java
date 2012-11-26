@@ -445,7 +445,7 @@ public class ContextImpl implements Context {
     for (Task t : tasks) {
       minimizedTasks.add(t.getId());
     }
-    tasks.clear();
+    tasks = new ArrayList<Task>();
     // }
     return this;
   }
