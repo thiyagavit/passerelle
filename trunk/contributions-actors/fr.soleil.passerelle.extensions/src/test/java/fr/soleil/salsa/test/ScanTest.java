@@ -16,7 +16,7 @@ import fr.soleil.salsa.model.scanmanagement.ScanManager;
 
 public class ScanTest {
 
-    @Test
+    @Test(enabled = false)
     public void testfirst() throws Exception {
         ScanConfiguration config = null;
         SalsaModel model = null;
