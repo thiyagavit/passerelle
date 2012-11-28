@@ -52,11 +52,10 @@ public class ForLoopTest {
                 { "0", "-3", "2", 2 },// 6 check with step !=1
 
         };
-
     }
 
     // to avoid infinity loop
-    @Test(timeOut = 3000, dataProvider = "provider")
+    @Test(timeOut = 5000, dataProvider = "provider")
     public void normalCase(final String start, final String end, final String step,
             final int nbItteration) throws Exception {
 
