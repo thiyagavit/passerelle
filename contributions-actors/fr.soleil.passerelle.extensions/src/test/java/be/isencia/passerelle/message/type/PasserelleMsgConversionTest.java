@@ -38,7 +38,7 @@ public class PasserelleMsgConversionTest {
      * 'be.isencia.passerelle.message.type.TypeConversionChain.convertPasserelleMessageContent(PasserelleToken,
      * Class)'
      */
-    @Test
+    @Test(enabled = false)
     public void testConvertPasserelleMessageContent() throws UnsupportedOperationException,
             PasserelleException {
 
