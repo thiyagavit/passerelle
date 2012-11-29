@@ -23,7 +23,7 @@ public class DoWhileLoopTest {
 
     private static final String ACTOR_NAME = "DoWhileLoop";
 
-    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "doWhileLoop.moml");
+    public MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH + "DoWhileLoop.moml");
 
     @BeforeMethod
     public void setUp() throws Throwable {
