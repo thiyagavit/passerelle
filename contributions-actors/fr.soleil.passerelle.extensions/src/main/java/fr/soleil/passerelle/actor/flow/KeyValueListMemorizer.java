@@ -69,13 +69,14 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * 
  * <p>
  * <b>Restore Action:</b> send the next brace Key/Value of the list on the key
- * and value ports. Also send the index of brace Key/Value on port
- * "current index". If the list does not exist then a ProcessingException is
- * raised and sequence is stopped. If there no more element in list and
- * fixedNumberOfValueParam is:
+ * and value ports. Also send the index of brace Key/Value on
+ * "current index"port. </br> If the list does not exist then a
+ * ProcessingException is raised and sequence is stopped. </br> If there no more
+ * element in list and fixedNumberOfValueParam is:
  * <ul>
  * <li>True: a ProcessingException is raised and sequence is stopped.</li>
- * <li>False: a empty brace Key/Value is send on Key/Value Port</li>
+ * <li>False: a empty brace Key/Value is send on Key/Value Port and an empty
+ * message is send on "current index" port.</li>
  * </ul>
  * </p>
  * 
@@ -482,7 +483,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                     response.addOutputMessage(2, outputValuePort, createMessage());
 
                     // -1 to have the last extracted value
-                    response.addOutputMessage(2, currentOutputIndexPort,
+                    response.addOutputMessage(3, currentOutputIndexPort,
                             PasserelleUtil.createContentMessage(this, valueList.getCursor() - 1));
 
                 } catch (final IndexOutOfBoundsException e) {
@@ -494,6 +495,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                         response.addOutputMessage(0, keyPort, createMessage());
                         response.addOutputMessage(1, valuePort, createMessage());
                         response.addOutputMessage(2, outputValuePort, createMessage());
+                        response.addOutputMessage(3, currentOutputIndexPort, createMessage());
                     }
                 }
             } else {

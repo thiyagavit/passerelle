@@ -322,25 +322,31 @@ public class KeyValueListMemorizerTest {
         final ArrayBlockingQueue<String> keyMessagesList1 = new ArrayBlockingQueue<String>(5, true);
         final ArrayBlockingQueue<String> valueMessagesList1 = new ArrayBlockingQueue<String>(5,
                 true);
+        final ArrayBlockingQueue<String> indexMessagesList1 = new ArrayBlockingQueue<String>(5,
+                true);
 
         moml.addMessageReceiver("outputList1", "key", keyMessagesList1);
         moml.addMessageReceiver("outputList1", "value", valueMessagesList1);
+        moml.addMessageReceiver("outputList1", "current index", indexMessagesList1);
 
         // execute sequence
         moml.executeBlockingErrorLocally(props);
 
         assertThat(keyMessagesList1).hasSize(5);
         assertThat(valueMessagesList1).hasSize(5);
+        assertThat(indexMessagesList1).hasSize(5);
 
         // we want to check last element is empty so we add to remove the
         // previous elements
         for (int i = 0; i < 4; i++) {
             keyMessagesList1.poll(1, TimeUnit.SECONDS);
             valueMessagesList1.poll(1, TimeUnit.SECONDS);
+            indexMessagesList1.poll(1, TimeUnit.SECONDS);
         }
 
         assertThat(keyMessagesList1.poll()).isEmpty();
         assertThat(valueMessagesList1.poll()).isEmpty();
+        assertThat(indexMessagesList1.poll()).isEmpty();
     }
 
     /**
