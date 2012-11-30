@@ -76,7 +76,12 @@ public class Delay extends Transformer {
 
         double currentTime = time;
         if (takePortValue) {
-            currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(message));
+            try {
+                currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(message));
+            } catch (final NumberFormatException e) {
+                throw new ProcessingException(
+                        getInfo() + " - doFire() delay must be a number " + e, message, e);
+            }
         }
         if (currentTime > 0) {
             final long millis = (long) (currentTime * 1000);
