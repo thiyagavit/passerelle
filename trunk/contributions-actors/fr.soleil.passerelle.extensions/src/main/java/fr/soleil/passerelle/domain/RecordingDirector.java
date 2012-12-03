@@ -87,7 +87,7 @@ public class RecordingDirector extends BasicDirector {
 
   @Override
   public void initialize() throws IllegalActionException {
-    if (!/*getAdapter(null).*/isMockMode()) {
+    if (!getAdapter(null).isMockMode()) {
       try {
         // if (!useRecordTest) {
         // dataRecorderName = SoleilUtilities
@@ -125,7 +125,7 @@ public class RecordingDirector extends BasicDirector {
   @Override
   public void stopFire() {
     try {
-      if (!/*getAdapter(null).*/isMockMode()) {
+      if (!getAdapter(null).isMockMode()) {
         DataRecorder.getInstance().cancel();
         DataRecorder.getInstance().endRecording(dataRecorderName);
       }
@@ -138,7 +138,7 @@ public class RecordingDirector extends BasicDirector {
 
   @Override
   public void wrapup() throws IllegalActionException {
-    if (!/*getAdapter(null).*/isMockMode()) {
+    if (!getAdapter(null).isMockMode()) {
       try {
         DataRecorder.getInstance().cancel();
         DataRecorder.getInstance().endRecording(dataRecorderName);

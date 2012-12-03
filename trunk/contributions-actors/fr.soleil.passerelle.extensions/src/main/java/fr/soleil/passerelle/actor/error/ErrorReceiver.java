@@ -11,10 +11,8 @@ package fr.soleil.passerelle.actor.error;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -28,7 +26,6 @@ import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -59,17 +56,7 @@ public class ErrorReceiver extends Actor implements ErrorCollector {
 
 	@Override
 	protected void doInitialize() throws InitializationException {
-		try {
-			((Director) getDirector()).addErrorCollector(this);
-		} catch (ClassCastException e) {
-			// means the actor is used without a Passerelle Director
-			// just log this. Only consequence is that we'll never receive
-			// any error messages via acceptError
-			logger.info(getInfo() + " - used without Passerelle Director!!");
-			throw new InitializationException(
-					"used without Passerelle Director", null, e);
-
-		}
+	  getDirectorAdapter().addErrorCollector(this);
 		super.doInitialize();
 	}
 
@@ -129,10 +116,7 @@ public class ErrorReceiver extends Actor implements ErrorCollector {
 
 	@Override
 	protected void doWrapUp() throws TerminationException {
-		try {
-			((Director) getDirector()).removeErrorCollector(this);
-		} catch (ClassCastException e) {
-		}
+	  getDirectorAdapter().removeErrorCollector(this);
 
 		try {
 			drainErrorsQueueTo(null);

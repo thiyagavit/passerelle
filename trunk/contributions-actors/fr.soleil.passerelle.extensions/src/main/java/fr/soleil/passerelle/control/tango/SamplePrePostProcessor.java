@@ -22,7 +22,7 @@ public class SamplePrePostProcessor extends AbstractExecutionPrePostProcessor im
 
 	public SamplePrePostProcessor(Director container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
-		container.setExecutionPrePostProcessor(this);
+		container.getAdapter(null).setExecutionPrePostProcessor(this);
 	}
 
 	/* (non-Javadoc)

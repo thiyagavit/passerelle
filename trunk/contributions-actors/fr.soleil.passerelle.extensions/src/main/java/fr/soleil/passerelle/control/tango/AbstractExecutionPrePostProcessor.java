@@ -11,7 +11,7 @@ public abstract class AbstractExecutionPrePostProcessor extends Attribute  imple
 
 	public AbstractExecutionPrePostProcessor(Director container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
-		container.setExecutionPrePostProcessor(this);
+		container.getAdapter(null).setExecutionPrePostProcessor(this);
 	}
 
 	public final void preProcess() {			
