@@ -44,6 +44,7 @@ public class ForLoopTest {
                 { "0", "3", "1", 4 },// 0 check step =1
                 { "2", "3", "1", 2 },// 1 check with start >0
                 { "0", "3", "2", 2 },// 2 check with step !=1
+                { "10.0", "11.4", "0.2", 8 },// 0 check step =1
 
                 // check negatives
                 { "0", "-3", "1", 4 },// 3 check step =1
