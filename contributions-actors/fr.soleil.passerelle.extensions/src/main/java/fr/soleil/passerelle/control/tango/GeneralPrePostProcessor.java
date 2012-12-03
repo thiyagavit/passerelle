@@ -40,7 +40,13 @@ public class GeneralPrePostProcessor extends AbstractExecutionPrePostProcessor i
 	 * @see com.isencia.passerelle.ext.ExecutionPrePostProcessor#preProcess()
 	 */
 	public void doPreProcess() {
-		if(dir.isMockMode()){
+	  boolean isMockMode=false;
+    try {
+      isMockMode = dir.getAdapter(null).isMockMode();
+    } catch (IllegalActionException e1) {
+      logger.debug("Error obtaining mock mode setting", e1);
+    }
+		if(isMockMode){
 			ExecutionTracerService.trace(dir,"MOCK- ###START SEQUENCE "+modelName +"###");
 		}else{
 			ExecutionTracerService.trace(dir,"###START SEQUENCE "+modelName +"###");
@@ -50,7 +56,7 @@ public class GeneralPrePostProcessor extends AbstractExecutionPrePostProcessor i
 				db = ApiUtil.get_db_obj();
 				db.setAccessControl(TangoConst.ACCESS_WRITE);
 			} catch (DevFailed e) {
-				logger.debug("Connection to TANGO failed");
+				logger.debug("Connection to TANGO failed", e);
 				ExecutionTracerService.trace(dir,"Connection to TANGO db failed - could not set write access");
 			}
 		}
@@ -61,7 +67,13 @@ public class GeneralPrePostProcessor extends AbstractExecutionPrePostProcessor i
 	 * @see com.isencia.passerelle.ext.ExecutionPrePostProcessor#postProcess()
 	 */
 	public void doPostProcess() {
-		if(dir.isMockMode()){
+    boolean isMockMode=false;
+    try {
+      isMockMode = dir.getAdapter(null).isMockMode();
+    } catch (IllegalActionException e1) {
+      logger.debug("Error obtaining mock mode setting", e1);
+    }
+    if(isMockMode){
 			ExecutionTracerService.trace(dir,"MOCK- ###END SEQUENCE "+modelName +"###");
 		}else{
 			ExecutionTracerService.trace(dir,"###END SEQUENCE "+modelName +"###");

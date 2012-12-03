@@ -75,7 +75,7 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 		}
 
 		try {
-			((Director)getDirector()).addErrorCollector(this);
+			getDirectorAdapter().addErrorCollector(this);
 		} catch (ClassCastException e) {
 			// means the actor is used without a Passerelle Director
 			// just log this. Only consequence is that we'll never receive

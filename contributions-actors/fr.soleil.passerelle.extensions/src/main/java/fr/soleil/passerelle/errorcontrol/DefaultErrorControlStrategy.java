@@ -35,7 +35,7 @@ public class DefaultErrorControlStrategy extends Attribute implements ErrorContr
 	 */
 	public DefaultErrorControlStrategy(Director container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container,name);
-		container.setErrorControlStrategy(this,false);
+		container.getAdapter(null).setErrorControlStrategy(this,false);
 	}
 
 	public void handleFireException(Actor a, ProcessingException e) throws IllegalActionException {
