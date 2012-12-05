@@ -334,7 +334,7 @@ public class LibraryManager {
     ChangeRequest request = new MoMLChangeRequest(this, library, "<deleteEntity name=\"" + entity.getName() + "\"/>\n") {
       @Override
       public NamedObj getLocality() {
-        return library;
+        return userLibraryMap.get(USER_LIBRARY_NAME);
       }
     };
     request.addChangeListener(new EntityLibraryChangedListener(this));
