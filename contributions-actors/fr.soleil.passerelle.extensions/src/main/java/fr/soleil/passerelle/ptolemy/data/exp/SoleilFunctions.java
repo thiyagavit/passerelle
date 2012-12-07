@@ -1,6 +1,6 @@
 package fr.soleil.passerelle.ptolemy.data.exp;
 
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.slf4j.Logger;
@@ -12,25 +12,26 @@ import fr.soleil.math.BeamCalculations;
 
 public class SoleilFunctions {
 
-	private final static Logger logger = LoggerFactory.getLogger(SoleilFunctions.class);
+    private final static Logger logger = LoggerFactory.getLogger(SoleilFunctions.class);
 
-	public static void init() {
-		PtParser.registerFunctionClass(SoleilFunctions.class.getName());
-		// use static classes of commons-maths
-		PtParser.registerFunctionClass(StatUtils.class.getName());
-		PtParser.registerFunctionClass(MathUtils.class.getName());
+    public static void init() {
+        PtParser.registerFunctionClass(SoleilFunctions.class.getName());
+        // use static classes of commons-maths
+        PtParser.registerFunctionClass(StatUtils.class.getName());
+        PtParser.registerFunctionClass(MathUtils.class.getName());
 
-		PtParser.registerFunctionClass(Analysis.class.getName());
-		PtParser.registerFunctionClass(BeamCalculations.class.getName());
-	}
+        PtParser.registerFunctionClass(Analysis.class.getName());
+        PtParser.registerFunctionClass(BeamCalculations.class.getName());
+        PtParser.registerFunctionClass(StringUtils.class.getName());
+    }
 
-	public static String test(String test) {
-		logger.debug("test - in");
-		return test;
-	}
+    public static String test(final String test) {
+        logger.debug("test - in");
+        return test;
+    }
 
-	public static String test2(Double[] test) {
-		logger.debug("test2 - in");
-		return test[0].toString();
-	}
+    public static String test2(final Double[] test) {
+        logger.debug("test2 - in");
+        return test[0].toString();
+    }
 }
