@@ -402,14 +402,12 @@ public class ModelUtils {
       comp = (CompositeActor) comp.getContainer();
     }
 
-    IProject project = null;
     String name = comp.workspace().getName();
-
-    if (name == null || name.equals("")) {
+    IProject project  = (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
+    
+    if (project == null) {
       // If this .moml is in .passerelle we return that project
       project = ModelUtils.getPasserelleProject();
-    } else {
-      project = (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
     }
 
     return project;
