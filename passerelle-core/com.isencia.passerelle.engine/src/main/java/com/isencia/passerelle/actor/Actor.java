@@ -61,10 +61,11 @@ import com.isencia.passerelle.statistics.ActorStatistics;
 import com.isencia.passerelle.statistics.StatisticsServiceFactory;
 
 /**
- * Base class for all Passerelle Actors. Uses Passerelle's custom parameter panes. Defines a getInfo() method, combining the actor's name with extended info
- * that can be defined in actor subclasses.
+ * Base class for all Passerelle Actors. Uses Passerelle's custom parameter panes. Defines a getInfo() method, combining
+ * the actor's name with extended info that can be defined in actor subclasses.
  * <p>
- * An actor's life cycle is determined/executed through the following methods, that are being invoked by the Passerelle engine. <br>
+ * An actor's life cycle is determined/executed through the following methods, that are being invoked by the Passerelle
+ * engine. <br>
  * 1. Constructor :
  * <ul>
  * <li>invoked once
@@ -78,16 +79,18 @@ import com.isencia.passerelle.statistics.StatisticsServiceFactory;
  * <li>Actor subclasses must call super.preInitialize()
  * </ul>
  * <p>
- * In the standard Passerelle execution mode, the above methods are invoked for all actors in a model in one common thread, e.g. the preInitialize() of all
- * actors is called sequentially. As a consequence, none of these methods should block!
+ * In the standard Passerelle execution mode, the above methods are invoked for all actors in a model in one common
+ * thread, e.g. the preInitialize() of all actors is called sequentially. As a consequence, none of these methods should
+ * block!
  * </p>
  * <p>
- * In the standard Passerelle execution mode, all methods below are invoked concurrently on all actors in a model, i.e. each actor's fireing cycle has its own
- * thread.
+ * In the standard Passerelle execution mode, all methods below are invoked concurrently on all actors in a model, i.e.
+ * each actor's fireing cycle has its own thread.
  * </p>
  * 3. initialize()
  * <ul>
- * <li>invoked once for every model execution AND for every dynamic model adjustment (not supported by engine in Passerelle v1.x)
+ * <li>invoked once for every model execution AND for every dynamic model adjustment (not supported by engine in
+ * Passerelle v1.x)
  * <li>this is where all run initialization must be done
  * <li>Actor subclasses must call super.initialize()
  * </ul>
@@ -103,21 +106,23 @@ import com.isencia.passerelle.statistics.StatisticsServiceFactory;
  * <ul>
  * <li>invoked once between every preFire() and postFire()
  * <li>this is where the real actor behaviour must be implemented: read inputs, do something and possibly send results
- * <li>fire() is implemented by Actor base classes as a template method, and some specific methods (doFire(),...) must be implemented to fill in the custom
- * behaviour.
+ * <li>fire() is implemented by Actor base classes as a template method, and some specific methods (doFire(),...) must
+ * be implemented to fill in the custom behaviour.
  * </ul>
  * 6. postFire()
  * <ul>
  * <li>invoked once after every fire()
  * <li>used to test cycle postconditions
  * <li>return true if actor's processing cycle should continue
- * <li>return false if actor's processing cycle should stop, after which wrapUp() will be invoked by the Passerelle Engine
+ * <li>return false if actor's processing cycle should stop, after which wrapUp() will be invoked by the Passerelle
+ * Engine
  * <li>Actor subclasses must call super.postFire() and include the returned boolean in their logical result expression
  * </ul>
  * 7a. wrapUp()
  * <ul>
  * <li>invoked once at the end of an actor's processing cycle
- * <li>this is where all resources should be released, and all extra threads that the actor has launched should be properly terminated
+ * <li>this is where all resources should be released, and all extra threads that the actor has launched should be
+ * properly terminated
  * <li>after this method invocation, the actor will leave from the running model
  * <li>Actor subclasses must call super.wrapUp()
  * </ul>
@@ -130,24 +135,31 @@ import com.isencia.passerelle.statistics.StatisticsServiceFactory;
  * </ul>
  * </p>
  * <p>
- * An actor normally determines by itself at what moment it can leave from a running model, i.e. when it is of no more use. This is typically related to the
- * status of the actor's input feeds: input ports (for Transformers and Sinks) or external data feeds (for Sources).
+ * An actor normally determines by itself at what moment it can leave from a running model, i.e. when it is of no more
+ * use. This is typically related to the status of the actor's input feeds: input ports (for Transformers and Sinks) or
+ * external data feeds (for Sources).
  * </p>
- * A Passerelle input may signal that it has reached the end of its feed by returning a "null" message. For actors with only 1 input, a "null" message indicates
- * that the actor can safely decide that it can leave the running model. The actor implementation code can signal that to the Passerelle infrastructure by
- * calling Actor.requestFinish(). Then the Actor.postFire() will return false, wrapUp() will be called etc. Actors with multiple inputs must determine which
- * inputs are critical for the actors' processing and which are optional. If a situation arises where the critical inputs are no longer alive, again
- * requestFinish() can be invoked after which the actor will gracefully leave the running model. </p>
+ * A Passerelle input may signal that it has reached the end of its feed by returning a "null" message. For actors with
+ * only 1 input, a "null" message indicates that the actor can safely decide that it can leave the running model. The
+ * actor implementation code can signal that to the Passerelle infrastructure by calling Actor.requestFinish(). Then the
+ * Actor.postFire() will return false, wrapUp() will be called etc. Actors with multiple inputs must determine which
+ * inputs are critical for the actors' processing and which are optional. If a situation arises where the critical
+ * inputs are no longer alive, again requestFinish() can be invoked after which the actor will gracefully leave the
+ * running model. </p>
  * <p>
  * Some actors also have a "trigger" port. These have the following behaviour:
  * <ul>
- * <li>the trigger port is not connected: the trigger port is completely ignored, i.e. the Actor behaves as a non-triggered one
+ * <li>the trigger port is not connected: the trigger port is completely ignored, i.e. the Actor behaves as a
+ * non-triggered one
  * <li>the trigger port is connected:
  * <ul>
  * <li>1. the actor may only start generating output messages after receiving a trigger message
- * <li>2. the actor may only invoke requestFinish() when its (critical) input(s) have run dry AND the trigger port as well.
- * <li>3. the actor must be able to restart getting input data and generating results after its inputs have run dry, when a next trigger message is received. <br>
- * E.g. a FileReader actor will re-read the same file and send the contents as output messages every time a new trigger is received.
+ * <li>2. the actor may only invoke requestFinish() when its (critical) input(s) have run dry AND the trigger port as
+ * well.
+ * <li>3. the actor must be able to restart getting input data and generating results after its inputs have run dry,
+ * when a next trigger message is received. <br>
+ * E.g. a FileReader actor will re-read the same file and send the contents as output messages every time a new trigger
+ * is received.
  * </ul>
  * </ul>
  * </p>
@@ -167,14 +179,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   private ErrorControlStrategy errorControlStrategy;
 
   /**
-   * Flag indicating that a polite request has arrived to finish this actors processing cycle. The actor will react on this by returning false from its next
-   * invocation of postFire().
+   * Flag indicating that a polite request has arrived to finish this actors processing cycle. The actor will react on
+   * this by returning false from its next invocation of postFire().
    */
   private boolean finishRequested = false;
 
   /**
-   * Flag indicating that the actor is in a paused state, as a consequence of a pause() call. In this state, its iteration cycle has been halted, and will only
-   * continue after a resume() has been done.
+   * Flag indicating that the actor is in a paused state, as a consequence of a pause() call. In this state, its
+   * iteration cycle has been halted, and will only continue after a resume() has been done.
    */
   private boolean paused;
 
@@ -185,15 +197,18 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   private PortHandler requestFinishHandler;
 
   /**
-   * CONTROL output port, used by an actor to indicate that a TECHNICAL error occurred during its processing. FUNCTIONAL errors should be handled by extra
-   * output ports, specific to the functional domain of each actor. The basic implementation of Actor.fire() uses a Template Method pattern that catches all
-   * checked and unchecked exceptions from the abstract doFire() method. In the catch-block, an error message is generated on the error port, containing some
-   * error information, if the error is {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL NON_FATAL}.
+   * CONTROL output port, used by an actor to indicate that a TECHNICAL error occurred during its processing. FUNCTIONAL
+   * errors should be handled by extra output ports, specific to the functional domain of each actor. The basic
+   * implementation of Actor.fire() uses a Template Method pattern that catches all checked and unchecked exceptions
+   * from the abstract doFire() method. In the catch-block, an error message is generated on the error port, containing
+   * some error information, if the error is {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL NON_FATAL}
+   * .
    */
   public ErrorPort errorPort = null;
 
   /**
-   * CONTROL output port, used by an actor to indicate that it has finished its processing, and is starting its wrapup() handling.
+   * CONTROL output port, used by an actor to indicate that it has finished its processing, and is starting its wrapup()
+   * handling.
    */
   public ControlPort hasFinishedPort = null;
 
@@ -205,21 +220,22 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   protected boolean isFiring = false;
 
   /**
-   * The options factory can be used to extend/modify options for actor parameters. It is typically set in the configuration files, so we don't need to modify
-   * actor source code for options extensions.
+   * The options factory can be used to extend/modify options for actor parameters. It is typically set in the
+   * configuration files, so we don't need to modify actor source code for options extensions.
    */
   public final static String OPTIONS_FACTORY_CFG_NAME = "_optionsFactory";
   private IOptionsFactory optionsFactory;
 
   /**
-   * The collection of parameters that are meant to be available to a model configurer tool. The actor's parameters that are not in this collection are not
-   * meant to be configurable, but are only meant to be used during model assembly (in addition to the public ones).
+   * The collection of parameters that are meant to be available to a model configurer tool. The actor's parameters that
+   * are not in this collection are not meant to be configurable, but are only meant to be used during model assembly
+   * (in addition to the public ones).
    */
   private Collection<Parameter> configurableParameters = new ArrayList<Parameter>();
 
   /**
-   * The collection of parameters that are meant to be available to an expert only, inside the modeling tool. All parameters that are not in this collection
-   * will always be visible in the modeling tool...
+   * The collection of parameters that are meant to be available to an expert only, inside the modeling tool. All
+   * parameters that are not in this collection will always be visible in the modeling tool...
    */
   private Collection<Parameter> expertParameters = new ArrayList<Parameter>();
 
@@ -229,19 +245,20 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   protected Map<String, String> actorMsgHeaders = new HashMap<String, String>();
 
   /**
-   * Parameter to set a size for input port queues, starting at which a warning message will be logged. This can be useful to determine processing hot-spots in
-   * Passerelle sequences, where actors may become flooded by input messages that they are unable to process in time.
+   * Parameter to set a size for input port queues, starting at which a warning message will be logged. This can be
+   * useful to determine processing hot-spots in Passerelle sequences, where actors may become flooded by input messages
+   * that they are unable to process in time.
    * <p>
    * Default value = -1 indicates that no such warning logs are generated.
    * </p>
    */
   public Parameter receiverQueueWarningSizeParam;
   /**
-   * Parameter to set a max capacity for input port queues. When a queue reaches its max capacity, any new tokens trying to reach the input port will be
-   * refused, and a NoRoomException will be thrown.
+   * Parameter to set a max capacity for input port queues. When a queue reaches its max capacity, any new tokens trying
+   * to reach the input port will be refused, and a NoRoomException will be thrown.
    * <p>
-   * Should only be used in very specific cases, as it does not correspond to the theoretical semantics of Kahn process networks, the basis for Passerelle's
-   * execution model (cfr Ptolemy project docs).
+   * Should only be used in very specific cases, as it does not correspond to the theoretical semantics of Kahn process
+   * networks, the basis for Passerelle's execution model (cfr Ptolemy project docs).
    * </p>
    * <p>
    * Default value = -1 indicates that received queues have unlimited capacity.
@@ -296,18 +313,36 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
+   * Utility method to log informational messages. 
+   * <br/>
+   * The idea is to harmonize the log message, if in 'info' level add the
+   * actor name and if in 'trace' or 'debug' level add the full name.
+   * 
+   * @param logMessage
+   */
+  public void logInfo(String logMessage) {
+    if (LOGGER.isTraceEnabled() || LOGGER.isDebugEnabled())
+      LOGGER.debug(this.getFullName() + " - " + logMessage);
+    else if (LOGGER.isInfoEnabled())
+      LOGGER.info(this.getName() + " - " + logMessage);
+  }
+
+  /**
    * Returns a unique and informative description of this actor instance.
    * 
    * @return A unique description of this actor instance
+   * @deprecated just use getName() or getFullName()
    */
   final public String getInfo() {
     return getName() + " - " + getExtendedInfo();
   }
 
   /**
-   * Returns a part of the unique description, often combining a number of parameter settings. This part is appended to the actor name in the getInfo() method.
+   * Returns a part of the unique description, often combining a number of parameter settings. This part is appended to
+   * the actor name in the getInfo() method.
    * 
    * @return A part of the unique description, often combining a number of parameter settings.
+   * @deprecated
    */
   protected abstract String getExtendedInfo();
 
@@ -330,11 +365,12 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   /**
    * <p>
-   * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked during <code>Actor.initialize()</code> to
-   * <code>Actor.preinitialize()</code>! This to allow a completely reliable stop of a model execution, i.c.o. a <code>ValidationException</code>, without
-   * running the risk that some other actor already did some work. In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all
-   * actors, i.a. when the actor threads have already started. <code>Actor.preinitialize()</code> is done sequentially for all actors, before their threads are
-   * started.
+   * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked during
+   * <code>Actor.initialize()</code> to <code>Actor.preinitialize()</code>! This to allow a completely reliable stop of
+   * a model execution, i.c.o. a <code>ValidationException</code>, without running the risk that some other actor
+   * already did some work. In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all
+   * actors, i.a. when the actor threads have already started. <code>Actor.preinitialize()</code> is done sequentially
+   * for all actors, before their threads are started.
    * </p>
    **/
   @SuppressWarnings("unchecked")
@@ -440,7 +476,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   /**
    * Overridable method to determine if an actor should do a validation of its initialization results. <br>
-   * By default, checks on its Passerelle director what must be done. If no Passerelle director is used (but e.g. a plain Ptolemy one), it returns true.
+   * By default, checks on its Passerelle director what must be done. If no Passerelle director is used (but e.g. a
+   * plain Ptolemy one), it returns true.
    * 
    * @see validateInitialization()
    * @see initialize()
@@ -462,15 +499,16 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   /**
    * <p>
-   * Method that should be overridden for actors that need to be able to validate their initial conditions, after the actor's doPreInitialize() is done and
-   * before their first iteration is executed when a model is launched.
+   * Method that should be overridden for actors that need to be able to validate their initial conditions, after the
+   * actor's doPreInitialize() is done and before their first iteration is executed when a model is launched.
    * </p>
    * <p>
-   * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked during <code>Actor.initialize()</code> to
-   * <code>Actor.preinitialize()</code>! This to allow a completely reliable stop of a model execution, i.c.o. a <code>ValidationException</code>, without
-   * running the risk that some other actor already did some work. In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all
-   * actors, i.a. when the actor threads have already started. <code>Actor.preinitialize()</code> is done sequentially for all actors, before their threads are
-   * started.
+   * IMPORTANT REMARK : Since Passerelle v8.0, this logic has moved from being invoked during
+   * <code>Actor.initialize()</code> to <code>Actor.preinitialize()</code>! This to allow a completely reliable stop of
+   * a model execution, i.c.o. a <code>ValidationException</code>, without running the risk that some other actor
+   * already did some work. In process-like domains, <code>Actor.initialize()</code> is invoked concurrently on all
+   * actors, i.a. when the actor threads have already started. <code>Actor.preinitialize()</code> is done sequentially
+   * for all actors, before their threads are started.
    * </p>
    * 
    * @throws ValidationException
@@ -479,8 +517,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Non-threadsafe method that can be used as an indication whether this actor is in its fire() processing. Can be used for example in a monitoring UI to
-   * activate some kind of actor decoration. TODO: better alternative is to implement an Observer for this feature.
+   * Non-threadsafe method that can be used as an indication whether this actor is in its fire() processing. Can be used
+   * for example in a monitoring UI to activate some kind of actor decoration. TODO: better alternative is to implement
+   * an Observer for this feature.
    * 
    * @return a flag indicating whether this actor is in its fire() processing
    */
@@ -489,25 +528,27 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * A slight variation on the stopFire() semantics, provided in Ptolemy. A stopFire() is used to interrupt asap an ongoing fire() - that may be blocked,
-   * waiting for some event or so - but does not assume that a resume of the fire() will be explicitly invoked.
+   * A slight variation on the stopFire() semantics, provided in Ptolemy. A stopFire() is used to interrupt asap an
+   * ongoing fire() - that may be blocked, waiting for some event or so - but does not assume that a resume of the
+   * fire() will be explicitly invoked.
    * <p>
-   * Even though the doc of the stopFire() mentions that it assumes that an actor should be able to continue where it left, when a next fire() is called after a
-   * stopFire(), it is not clear how this can be represented/implemented. E.g. a problem is that in principle, each fire() iteration risks needing new input
-   * messages on the input port(s)...
+   * Even though the doc of the stopFire() mentions that it assumes that an actor should be able to continue where it
+   * left, when a next fire() is called after a stopFire(), it is not clear how this can be represented/implemented.
+   * E.g. a problem is that in principle, each fire() iteration risks needing new input messages on the input port(s)...
    * </p>
    * <p>
-   * A Passerelle actor thus supports a more "traditional" pair of pauseFire/resumeFire methods, accompanied by 2 overridable doPauseFire()/doResumeFire()
-   * methods.
+   * A Passerelle actor thus supports a more "traditional" pair of pauseFire/resumeFire methods, accompanied by 2
+   * overridable doPauseFire()/doResumeFire() methods.
    * </p>
    * <p>
-   * When a running model is paused/resumed, the actors will first receive a "notification" invocation of the pauseFire/resumeFire methods, before the actual
-   * "pause" or "resume" of the model iterations is done. In this way, an actor can react in a consistent way, independently of the "normal" fire() iteration
-   * semantics.
+   * When a running model is paused/resumed, the actors will first receive a "notification" invocation of the
+   * pauseFire/resumeFire methods, before the actual "pause" or "resume" of the model iterations is done. In this way,
+   * an actor can react in a consistent way, independently of the "normal" fire() iteration semantics.
    * </p>
    * <p>
-   * E.g. a long-running external operation may be interrupted/paused in doPauseFire() and the actor may store status info if needed. During the doResumeFire(),
-   * the original operation may be continued till completion, before a next actor fire() iteration is done.
+   * E.g. a long-running external operation may be interrupted/paused in doPauseFire() and the actor may store status
+   * info if needed. During the doResumeFire(), the original operation may be continued till completion, before a next
+   * actor fire() iteration is done.
    * </p>
    * 
    * @return true if the actor was not yet paused, and is paused now.
@@ -528,7 +569,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Overridable template method, for when an actor implementation needs some special action to be done when an actor is being paused from an active state.
+   * Overridable template method, for when an actor implementation needs some special action to be done when an actor is
+   * being paused from an active state.
    * <p>
    * By default it calls doStopFire().
    * </p>
@@ -538,11 +580,12 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * A "notification" method, allowing an actor to first resume any pending operation that was interrupted/paused with pauseFire(), before the "normal" actor
-   * fire() iterations are resumed.
+   * A "notification" method, allowing an actor to first resume any pending operation that was interrupted/paused with
+   * pauseFire(), before the "normal" actor fire() iterations are resumed.
    * <p>
-   * Remark that all paused actors will receive a resumeFire() notification call sequentially, in 1 thread, and that the "normal" model iterations will only
-   * start after all actors have finished their resumeFire() actions. The order of the invocations on the different actors is not determined.
+   * Remark that all paused actors will receive a resumeFire() notification call sequentially, in 1 thread, and that the
+   * "normal" model iterations will only start after all actors have finished their resumeFire() actions. The order of
+   * the invocations on the different actors is not determined.
    * </p>
    * 
    * @return true if the actor was paused before, and is no longer paused after this method has finished.
@@ -563,7 +606,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Overridable template method, for when an actor implementation needs some special action to be done when an actor is resuming from a paused state.
+   * Overridable template method, for when an actor implementation needs some special action to be done when an actor is
+   * resuming from a paused state.
    * <p>
    * By default it does nothing.
    * </p>
@@ -601,9 +645,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Template method implementation for prefire(). Method that can be overriden to implement precondition checking for the fire() loop. By default, returns
-   * true. If the method returns true, the actor's fire() method will be called. If the method returns false, preFire() will be called again repetitively till
-   * it returns true. So it's important that for "false" results there is some blocking/waiting mechanism implemented to avoid wild looping!
+   * Template method implementation for prefire(). Method that can be overriden to implement precondition checking for
+   * the fire() loop. By default, returns true. If the method returns true, the actor's fire() method will be called. If
+   * the method returns false, preFire() will be called again repetitively till it returns true. So it's important that
+   * for "false" results there is some blocking/waiting mechanism implemented to avoid wild looping!
    * 
    * @return flag indicating whether the actor is ready for fire()
    * @see ptolemy.actor.AtomicActor#prefire()
@@ -613,12 +658,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * The basic implementation of Actor.fire() uses a Template Method pattern that catches all checked and unchecked exceptions from the abstract doFire()
-   * method. In the catch-block, an error message is generated on the error port, containing some error information, if the error is
-   * {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL NON_FATAL}. For {@link com.isencia.passerelle.core.PasserelleException#FATAL FATAL}
-   * exceptions, an IllegalException is generated. If the error port is not connected, {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL
-   * NON_FATAL} errors are notified to the Passerelle Director. The fire() method also generates notification messages on the {@link #hasFiredPort} for each
-   * successfull fire loop.
+   * The basic implementation of Actor.fire() uses a Template Method pattern that catches all checked and unchecked
+   * exceptions from the abstract doFire() method. In the catch-block, an error message is generated on the error port,
+   * containing some error information, if the error is
+   * {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL NON_FATAL}. For
+   * {@link com.isencia.passerelle.core.PasserelleException#FATAL FATAL} exceptions, an IllegalException is generated.
+   * If the error port is not connected, {@link com.isencia.passerelle.core.PasserelleException#NON_FATAL NON_FATAL}
+   * errors are notified to the Passerelle Director. The fire() method also generates notification messages on the
+   * {@link #hasFiredPort} for each successfull fire loop.
    * 
    * @throws IllegalActionException
    */
@@ -659,7 +706,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Template method implementation for fire(). The actual processing behaviour of the actor must be implemented by this method.
+   * Template method implementation for fire(). The actual processing behaviour of the actor must be implemented by this
+   * method.
    * 
    * @throws ProcessingException
    * @see ptolemy.actor.AtomicActor#fire()
@@ -667,9 +715,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   protected abstract void doFire() throws ProcessingException;
 
   /**
-   * Utility method to support developing actors that can run in mock mode. In that mode, they could e.g. simulate/mock some sample behaviour without needing to
-   * access external resources (databases, message buses etc). By default, this method just calls doFire(). Complex actors with dependencies on external
-   * resources, may override this method to allow easy local testing in the IDE. The mock mode is defined on the Passerelle director.
+   * Utility method to support developing actors that can run in mock mode. In that mode, they could e.g. simulate/mock
+   * some sample behaviour without needing to access external resources (databases, message buses etc). By default, this
+   * method just calls doFire(). Complex actors with dependencies on external resources, may override this method to
+   * allow easy local testing in the IDE. The mock mode is defined on the Passerelle director.
    * 
    * @throws ProcessingException
    */
@@ -697,9 +746,11 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Template method implementation for postfire(). Method that can be overriden to implement postcondition checking for the fire() loop. By default, returns
-   * true unless a finish has been requested, i.e. it delegates to isFinishRequested(). If the method returns true, the actor's preFire/fire/postFire loop will
-   * be called again. If the method returns false, the fire loop will stop and the actor's wrapup() method will be called by the Passerelle/Ptolemy framework.
+   * Template method implementation for postfire(). Method that can be overriden to implement postcondition checking for
+   * the fire() loop. By default, returns true unless a finish has been requested, i.e. it delegates to
+   * isFinishRequested(). If the method returns true, the actor's preFire/fire/postFire loop will be called again. If
+   * the method returns false, the fire loop will stop and the actor's wrapup() method will be called by the
+   * Passerelle/Ptolemy framework.
    * 
    * @return flag indicating whether the actor wants to continue with its fire loop
    * @see ptolemy.actor.AtomicActor#postfire()
@@ -863,8 +914,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Method attempts to find a Configurable parameter by class type. This encapsulates finding a parameter by name rather than pushing that find (current just a
-   * loop) to outside classes to implement.
+   * Method attempts to find a Configurable parameter by class type. This encapsulates finding a parameter by name
+   * rather than pushing that find (current just a loop) to outside classes to implement.
    * 
    * @param name
    * @return
@@ -886,8 +937,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Method attempts to find a Configurable parameter by name. This encapsulates finding a parameter by name rather than pushing that find (current just a loop)
-   * to outside classes to implement.
+   * Method attempts to find a Configurable parameter by name. This encapsulates finding a parameter by name rather than
+   * pushing that find (current just a loop) to outside classes to implement.
    * 
    * @param name
    * @return
@@ -909,8 +960,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Register an actor parameter as configurable. Such parameters will be available in the Passerelle model configuration tools. All other actor parameters are
-   * only available in model assembly tools.
+   * Register an actor parameter as configurable. Such parameters will be available in the Passerelle model
+   * configuration tools. All other actor parameters are only available in model assembly tools.
    * 
    * @param newParameter
    */
@@ -923,7 +974,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Register an actor parameter as visible for experts only in the modeling tool. This also sets the parameter's visibility for Ptolemy to Settable.EXPERT
+   * Register an actor parameter as visible for experts only in the modeling tool. This also sets the parameter's
+   * visibility for Ptolemy to Settable.EXPERT
    * 
    * @param newParameter
    */
@@ -960,8 +1012,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by actor sub-classes to handle message
-   * creation differently
+   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by
+   * actor sub-classes to handle message creation differently
    * 
    * @return
    */
@@ -978,8 +1030,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by actor sub-classes to handle message
-   * creation differently
+   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by
+   * actor sub-classes to handle message creation differently
    * 
    * @return
    * @throws MessageException
@@ -991,8 +1043,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by actor sub-classes to handle message
-   * creation differently
+   * Default implementation just creates a standard message using the MessageFactory. This method may be overridden by
+   * actor sub-classes to handle message creation differently
    * 
    * @return
    */
@@ -1001,8 +1053,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Default implementation for creating an error message, based on some exception. This method may be overridden by actor sub-classes to handle message
-   * creation differently.
+   * Default implementation for creating an error message, based on some exception. This method may be overridden by
+   * actor sub-classes to handle message creation differently.
    * 
    * @param exception
    * @return
@@ -1012,8 +1064,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Utility method, to be used by actor implementations that need to override createMessage(), or create ManagedMessages in another way... They should always
-   * pass this Map in the MessageFactory.createSomeMessage() methods... TODO find some better way to enforce this...
+   * Utility method, to be used by actor implementations that need to override createMessage(), or create
+   * ManagedMessages in another way... They should always pass this Map in the MessageFactory.createSomeMessage()
+   * methods... TODO find some better way to enforce this...
    * 
    * @return
    */
@@ -1022,7 +1075,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * TODO investigate if we can have an alternative to the 'public', which still allows an error strategy to somehow get an actor to send an error message...
+   * TODO investigate if we can have an alternative to the 'public', which still allows an error strategy to somehow get
+   * an actor to send an error message...
    * 
    * @param exception
    * @throws IllegalActionException
@@ -1040,14 +1094,16 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Send a message on an output port. Logs msg sending on debug level and in the audit trail. The log msg detail for the audit trail can be defined in actor
-   * sub-classes by overriding the method getAuditTrailMessage().
+   * Send a message on an output port. Logs msg sending on debug level and in the audit trail. The log msg detail for
+   * the audit trail can be defined in actor sub-classes by overriding the method getAuditTrailMessage().
    * 
    * @param port
    * @param message
    * @throws ProcessingException
-   * @throws IllegalArgumentException if the port is not a valid output port of this actor
-   * @throws NullPointerException when port or message are null
+   * @throws IllegalArgumentException
+   *           if the port is not a valid output port of this actor
+   * @throws NullPointerException
+   *           when port or message are null
    */
   protected void sendOutputMsg(Port port, ManagedMessage message) throws ProcessingException, IllegalArgumentException {
     if (port.getContainer() != this)
@@ -1079,7 +1135,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * Method to be overridden to specify custom audit logging messages. When it returns null, no audit trail is logged for an outgoing message.
+   * Method to be overridden to specify custom audit logging messages. When it returns null, no audit trail is logged
+   * for an outgoing message.
    * 
    * @param message
    * @param port
@@ -1090,8 +1147,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * To be invoked by actors when the actual fire() processing is starting. The actor developer must ensure that this method is called before the actual
-   * processing logic is being executed, after having received the relevant input messages (or leaving the blocked state for any other reason).
+   * To be invoked by actors when the actual fire() processing is starting. The actor developer must ensure that this
+   * method is called before the actual processing logic is being executed, after having received the relevant input
+   * messages (or leaving the blocked state for any other reason).
    */
   protected void notifyStartingFireProcessing() {
     getLogger().trace("{} - notifyStartingFireProcessing() - entry", getInfo());
@@ -1101,8 +1159,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
-   * To be invoked by actors when the actual fire() processing is finished. The actor developer must ensure that this method is called before the actor gets
-   * blocked, waiting for new input messages.
+   * To be invoked by actors when the actual fire() processing is finished. The actor developer must ensure that this
+   * method is called before the actor gets blocked, waiting for new input messages.
    */
   protected void notifyFinishedFireProcessing() {
     getLogger().trace("{} - notifyFinishedFireProcessing() - entry", getInfo());
@@ -1133,13 +1191,13 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     // where we need to add "active" PortHandlers with threads per input channel.
     // In event-driven domains, we don't need multithreaded PortHandlers...
     boolean needActiveHandlers = isInProcessDomain();
-    return new PortHandler(p,needActiveHandlers);
+    return new PortHandler(p, needActiveHandlers);
   }
 
   final protected boolean isInProcessDomain() {
     return getDirector() instanceof ProcessDirector;
   }
-  
+
   final protected PortHandler createPortHandler(Port p, PortListener portListener) {
     PortHandler pH = createPortHandler(p);
     pH.setListener(portListener);
