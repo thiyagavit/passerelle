@@ -31,12 +31,13 @@
 						</execution>
 					</executions>
 					<configuration>
-						<compress>true</compress>
+						<compress>false</compress>
 						<append>true</append>
 						<publishArtifacts>true</publishArtifacts>
 						<sourceLocation>${project.basedir}</sourceLocation>
 						<artifactRepositoryLocation>${project.parent.build.directory}/p2repo</artifactRepositoryLocation>
 						<metadataRepositoryLocation>${project.parent.build.directory}/p2repo</metadataRepositoryLocation>
+						<additionalArgs>-categoryDefinition file:/${project.parent.basedir}/category.xml</additionalArgs>
 					</configuration>
 				</plugin>
 			</plugins>
