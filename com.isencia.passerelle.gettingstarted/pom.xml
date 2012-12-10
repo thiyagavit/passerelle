@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.isencia.passerelle</groupId>
+	<artifactId>com.isencia.passerelle.gettingstarted</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>passerelle-thirdparty-base</module>
+		<module>passerelle-thirdparty-base-sources</module>
+		<module>passerelle-thirdparty-diagnosis</module>
+		<module>ptolemy</module>
+		<module>rcp-deltapack</module>
+	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonatype.tycho</groupId>
+					<artifactId>tycho-p2-extras-plugin</artifactId>
+					<version>0.11.0</version>
+					<executions>
+						<execution>
+							<phase>generate-resources</phase>
+							<goals>
+								<goal>publish-features-and-bundles</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<compress>true</compress>
+						<append>true</append>
+						<publishArtifacts>true</publishArtifacts>
+						<sourceLocation>${project.basedir}</sourceLocation>
+						<artifactRepositoryLocation>${project.parent.build.directory}/p2repo</artifactRepositoryLocation>
+						<metadataRepositoryLocation>${project.parent.build.directory}/p2repo</metadataRepositoryLocation>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
