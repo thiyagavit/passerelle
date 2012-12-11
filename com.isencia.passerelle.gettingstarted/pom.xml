@@ -7,6 +7,10 @@
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<tycho.version>0.16.0</tycho.version>
+	</properties>
+
 	<modules>
 		<module>passerelle-thirdparty-base</module>
 		<module>passerelle-thirdparty-base-sources</module>
@@ -21,7 +25,7 @@
 				<plugin>
 					<groupId>org.eclipse.tycho.extras</groupId>
 					<artifactId>tycho-p2-extras-plugin</artifactId>
-					<version>0.16.0</version>
+					<version>${tycho.version}</version>
 					<executions>
 						<execution>
 							<phase>generate-resources</phase>
@@ -37,6 +41,23 @@
 						<sourceLocation>${project.basedir}</sourceLocation>
 						<artifactRepositoryLocation>${project.parent.build.directory}/p2repo</artifactRepositoryLocation>
 						<metadataRepositoryLocation>${project.parent.build.directory}/p2repo</metadataRepositoryLocation>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<executions>
+						<execution>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>category-p2-metadata</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<target>${project.parent.build.directory}/p2repo</target>
+						<categoryDefinition>${project.parent.basedir}/category.xml</categoryDefinition>
 					</configuration>
 				</plugin>
 			</plugins>
