@@ -29,6 +29,7 @@ import com.isencia.message.IReceiverChannel;
 import com.isencia.message.NoMoreMessagesException;
 import com.isencia.message.interceptor.IMessageInterceptorChain;
 import com.isencia.message.interceptor.MessageInterceptorChain;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
@@ -36,19 +37,19 @@ import com.isencia.passerelle.message.interceptor.TextToMessageConverter;
 import com.isencia.passerelle.message.xml.XmlMessageHelper;
 
 /**
- * A TriggeredChannelSource is typically used to read messages from streams with limited data feeds. E.g. reading from a file, a DB query etc, where the length
- * of the stream, or the nr of items is limited. When the feed is exhausted, the source can be "re-activated" by sending a trigger pulse. If the trigger port is
- * not connected, the source will wrapup and terminate after exhausting its feed. Messages from a TriggeredChannelSource are generated in a sequence. Each time
- * the source is re-triggered, the sequence ID is incremented. Sequence IDs and positions follow the Java index conventions, i.e. they start at 0.
+ * A TriggeredChannelSource is typically used to read messages from streams with limited data feeds. E.g. reading from a
+ * file, a DB query etc, where the length of the stream, or the nr of items is limited. When the feed is exhausted, the
+ * source can be "re-activated" by sending a trigger pulse. If the trigger port is not connected, the source will wrapup
+ * and terminate after exhausting its feed. Messages from a TriggeredChannelSource are generated in a sequence. Each
+ * time the source is re-triggered, the sequence ID is incremented. Sequence IDs and positions follow the Java index
+ * conventions, i.e. they start at 0.
  * 
  * @author erwin
  */
 public abstract class TriggeredChannelSource extends TriggeredSource {
-  // ~ Static variables/initializers __________________________________________________________________________________________________________________________
+  private static final long serialVersionUID = 1L;
 
-  private static Logger logger = LoggerFactory.getLogger(TriggeredChannelSource.class);
-
-  // ~ Instance variables _____________________________________________________________________________________________________________________________________
+  private static Logger LOGGER = LoggerFactory.getLogger(TriggeredChannelSource.class);
 
   private IReceiverChannel receiverChannel = null;
   public Parameter passThroughParam = null;
@@ -74,8 +75,6 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
   // the message 1 step in advance...
   private IMessageInterceptorChain interceptorChain = null;
 
-  // ~ Constructors ___________________________________________________________________________________________________________________________________________
-
   /**
    * Constructor for Source.
    * 
@@ -89,14 +88,16 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
     passThroughParam = new Parameter(this, "PassThrough", new BooleanToken(false));
     passThroughParam.setTypeEquals(BaseType.BOOLEAN);
     registerExpertParameter(passThroughParam);
-
     new CheckBoxStyle(passThroughParam, "style");
+  }
+  
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
   }
 
   /**
-   * DOCUMENT ME!
-   * 
-   * @return DOCUMENT ME!
+   * @return the receiver channel encapsulated in this actor
    */
   public IReceiverChannel getChannel() {
     return receiverChannel;
@@ -105,72 +106,55 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
   /**
    * Triggered whenever e.g. a parameter has been modified.
    * 
-   * @param attribute The attribute that changed.
+   * @param attribute
+   *          The attribute that changed.
    * @exception IllegalActionException
    */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " :" + attribute);
+    LOGGER.trace("{} attributeChanged() - entry : {}", getFullName(), attribute);
 
     if (attribute == passThroughParam) {
       passThrough = ((BooleanToken) passThroughParam.getToken()).booleanValue();
     } else
       super.attributeChanged(attribute);
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    LOGGER.trace("{} attributeChanged() - exit", getFullName());
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     super.doInitialize();
-
     IReceiverChannel res = null;
     readAheadOK = false;
-
     try {
       res = createChannel();
     } catch (ChannelException e) {
-      throw new InitializationException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not created correctly.", this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not created correctly.", this, e);
     }
-
     if (res == null) {
-      throw new InitializationException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not created correctly.", this, null);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not created correctly.", this, null);
     } else {
       // just to make sure...
       try {
         closeChannel(getChannel());
       } catch (ChannelException e) {
-        throw new InitializationException("Receiver channel for " + getInfo() + " not initialized correctly.", getChannel(), e);
+        throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not initialized correctly.", this, e);
       }
-
       receiverChannel = res;
-
       if (!isPassThrough()) {
         interceptorChain = createInterceptorChain();
       }
-
-    }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
     }
   }
 
   protected boolean doPreFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     // this will cause the actor to wait for a trigger msg,
     // each time the channel is closed, and if the trigger port
     // is connected
     boolean res = true;
     if (mustWaitForTrigger()) {
       waitForTrigger();
-      if (isFinishRequested()) res = false;
+      if (isFinishRequested())
+        res = false;
     }
 
     // Channel open must not be done in initialize()
@@ -184,79 +168,52 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
     try {
       if (!getChannel().isOpen()) {
         openChannel(getChannel());
-
-        logger.debug("{} - Opened : {}",getInfo(),getChannel());
+        getLogger().debug("{} - Opened : {}", getFullName(), getChannel());
       }
-      if (res) res = super.doPreFire();
-
+      if (res)
+        res = super.doPreFire();
     } catch (ChannelException e) {
-      throw new ProcessingException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not opened correctly.", getChannel(), e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not opened correctly.", this, e);
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " :" + res);
-    }
-
     return res;
   }
 
   protected boolean doPostFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     try {
       if (hasNoMoreMessages()) {
         closeChannel(getChannel());
       }
     } catch (ChannelException e) {
-      throw new ProcessingException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Receiver channel not closed correctly.", this, e);
     }
-
-    boolean res = super.doPostFire();
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " :" + res);
-    }
-
-    return res;
+    return super.doPostFire();
   }
 
   protected void doWrapUp() throws TerminationException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     try {
       closeChannel(getChannel());
-
-      logger.debug("{} - Closed : {}",getInfo(),getChannel());
+      getLogger().debug("{} - Closed : {}", getFullName(), getChannel());
     } catch (ChannelException e) {
-      throw new TerminationException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
+      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Receiver channel not closed correctly.", this, e);
     }
-
     super.doWrapUp();
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
   }
 
   /**
-   * DOCUMENT ME!
-   * 
-   * @return DOCUMENT ME!
-   * @throws ChannelException DOCUMENT ME!
+   * @return the receiver channel encapsulated in this actor
+   * @throws ChannelException
    */
   protected abstract IReceiverChannel createChannel() throws ChannelException;
 
   /**
-   * This method can be overridden to define some custom mechanism to convert incoming messages of some specific format into standard passerelle messages. The
-   * method is called by this base class, only when it is not configured in "pass-through" mode. In pass-through mode, we assume that the incoming message is a
-   * xml serialization of a passerelle message, as generated by a passerelle sink in pass-through mode. By default, creates an interceptor chain with a
-   * text2message converter. Because of the need to identify end-of-sequence we can not let the channel create the ManagedMessage, but we need to do it after
-   * getting the next msg from the channel, in order to determine if we have to create an outgoing message with/without end-of-sequence flag. This actor will
-   * use the interceptor chain itself at the right moment...
+   * This method can be overridden to define some custom mechanism to convert incoming messages of some specific format
+   * into standard passerelle messages. The method is called by this base class, only when it is not configured in
+   * "pass-through" mode. In pass-through mode, we assume that the incoming message is a xml serialization of a
+   * passerelle message, as generated by a passerelle sink in pass-through mode. By default, creates an interceptor
+   * chain with a text2message converter. Because of the need to identify end-of-sequence we can not let the channel
+   * create the ManagedMessage, but we need to do it after getting the next msg from the channel, in order to determine
+   * if we have to create an outgoing message with/without end-of-sequence flag. This actor will use the interceptor
+   * chain itself at the right moment...
    * 
    * @see XmlMessageHelper.getXMLFromMessage() for the expected xml format in pass-through mode
    * @return
@@ -268,14 +225,9 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
   }
 
   protected ManagedMessage getMessage() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
+    getLogger().trace("{} getMessage() - entry", getFullName());
     ManagedMessage res = null;
-
     // TODO need to find a cleaner and more reusable way for this...
-
     if (!readAheadOK) {
       // read an extra first msg to start the read-ahead mechanism
       readAheadOK = true;
@@ -285,10 +237,9 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
         // ignore, just return null and the source will finish
         // its life-cycle automatically
       } catch (Exception e) {
-        throw new ProcessingException(getInfo() + " - getMessage() generated exception while reading from channel", getChannel(), e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
       }
     }
-
     if (messageBuffer != null) {
       // we still got a message previous time,
       // so try to get another one
@@ -308,43 +259,31 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
             res = (ManagedMessage) interceptorChain.accept(messageBuffer);
           else
             res = (ManagedMessage) messageBuffer;
-
         }
       } catch (NoMoreMessagesException e) {
         // ignore, just return null and the source will finish
         // its life-cycle automatically
       } catch (Exception e) {
-        throw new ProcessingException(getInfo() + " - getMessage() generated exception", res, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
       } finally {
         messageBuffer = msg;
       }
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " - Received msg :" + res);
-    }
-
+    getLogger().trace("{} getMessage() - exit", getFullName());
     return res;
   }
 
   /**
-   * DOCUMENT ME!
    * 
-   * @param ch DOCUMENT ME!
-   * @throws ChannelException DOCUMENT ME!
+   * @param ch
+   * @throws ChannelException
    */
   protected void closeChannel(IReceiverChannel ch) throws ChannelException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " :" + ch);
-    }
-
+    getLogger().trace("{} closeChannel() - entry", getFullName());
     if ((ch != null) && ch.isOpen()) {
       ch.close();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    getLogger().trace("{} closeChannel() - exit", getFullName());
   }
 
   /**
@@ -362,24 +301,16 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
   }
 
   /**
-   * DOCUMENT ME!
-   * 
-   * @param ch DOCUMENT ME!
-   * @throws ChannelException DOCUMENT ME!
+   * @param ch
+   * @throws ChannelException
    */
   protected void openChannel(IReceiverChannel ch) throws ChannelException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " :" + ch);
-    }
-
+    getLogger().trace("{} openChannel() - entry", getFullName());
     if ((ch != null) && !ch.isOpen()) {
       ch.open();
       sequenceID = MessageFactory.getInstance().createSequenceID();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    getLogger().trace("{} openChannel() - exit", getFullName());
   }
 
   /**
@@ -394,7 +325,8 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
   /**
    * Sets the passThrough.
    * 
-   * @param passThrough The passThrough to set
+   * @param passThrough
+   *          The passThrough to set
    */
   public void setPassThrough(boolean passThrough) {
     this.passThrough = passThrough;

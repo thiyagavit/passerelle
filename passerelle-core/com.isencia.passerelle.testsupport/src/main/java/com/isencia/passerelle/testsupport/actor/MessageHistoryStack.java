@@ -27,6 +27,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -40,6 +41,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  * 
  * @author erwin
  */
+@SuppressWarnings("serial")
 public class MessageHistoryStack extends Actor {
 
   public Port input;
@@ -87,7 +89,7 @@ public class MessageHistoryStack extends Actor {
         messageHistory = new LinkedBlockingDeque<ManagedMessage>();
       }
     } catch (IllegalActionException e) {
-      throw new InitializationException("Error constructing message history deque", this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error constructing message history deque", this, e);
     }
   }
 

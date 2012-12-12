@@ -20,6 +20,7 @@ import ptolemy.data.Token;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -28,17 +29,12 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 
 /**
- * @version 1.1
- * @author edeley
+ * @author erwin
  */
 public abstract class Transformer extends Actor {
 
-  /**
-	 * 
-	 */
   private static final long serialVersionUID = -956542172812952106L;
-
-  private final static Logger logger = LoggerFactory.getLogger(Transformer.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(Transformer.class);
 
   /**
    * Holds the last received message
@@ -46,8 +42,8 @@ public abstract class Transformer extends Actor {
   protected ManagedMessage message = null;
 
   /**
-   * The input port. This base class imposes no type constraints except that the type of the input cannot be greater than the type of the output. NOTE Ports
-   * must be public for composites to work.
+   * The input port. This base class imposes no type constraints except that the type of the input cannot be greater
+   * than the type of the output. NOTE Ports must be public for composites to work.
    */
   public Port input;
   private PortHandler inputHandler = null;
@@ -60,10 +56,14 @@ public abstract class Transformer extends Actor {
   /**
    * Construct an actor with the given container and name.
    * 
-   * @param container The container.
-   * @param name The name of this actor.
-   * @exception IllegalActionException If the actor cannot be contained by the proposed container.
-   * @exception NameDuplicationException If the container already has an actor with this name.
+   * @param container
+   *          The container.
+   * @param name
+   *          The name of this actor.
+   * @exception IllegalActionException
+   *              If the actor cannot be contained by the proposed container.
+   * @exception NameDuplicationException
+   *              If the container already has an actor with this name.
    */
   public Transformer(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
@@ -83,23 +83,19 @@ public abstract class Transformer extends Actor {
         + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
   }
 
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+  
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     inputHandler = createPortHandler(input);
     if (input.getWidth() > 0) {
       inputHandler.start();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
-
   }
 
   protected boolean doPreFire() throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - entry");
     boolean result = true;
     Token token = inputHandler.getToken();
     if (token == null) {
@@ -108,26 +104,20 @@ public abstract class Transformer extends Actor {
       try {
         message = MessageHelper.getMessageFromToken(token);
       } catch (PasserelleException e) {
-        throw new ProcessingException("Error handling token", token, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", token, e);
       }
     } else {
       result = false;
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - exit");
     return result && super.doPreFire();
   }
 
   protected void doFire() throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     if (message != null) {
       notifyStartingFireProcessing();
       try {
-        if (logger.isDebugEnabled()) {
-          logger.debug(getInfo() + " - Transformer received message :" + message);
+        if(getLogger().isDebugEnabled()) {
+          getLogger().debug("{} received message : {}",getFullName(), getAuditTrailMessage(message, null));
         }
         doFire(message);
       } catch (ProcessingException e) {
@@ -145,17 +135,10 @@ public abstract class Transformer extends Actor {
       } catch (InterruptedException e) {
       }
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
   }
 
   /**
    * @param message
    */
   protected abstract void doFire(ManagedMessage message) throws ProcessingException;
-
-  protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {
-    return " sent converted message";
-  }
 }

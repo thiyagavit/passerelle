@@ -24,6 +24,7 @@ import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.validation.version.ActorMajorVersionValidator;
 import com.isencia.passerelle.validation.version.ModelElementVersionValidationStrategy;
@@ -70,7 +71,7 @@ public class ModelValidationService {
             }
           }
         } catch (IllegalActionException iae) {
-          context.addError(new ValidationException("Invalid _version attribute", e, iae));
+          context.addError(new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Invalid _version attribute", e, iae));
         }
       }
     }

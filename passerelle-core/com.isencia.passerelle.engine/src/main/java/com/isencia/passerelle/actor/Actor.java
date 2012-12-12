@@ -41,6 +41,7 @@ import com.isencia.passerelle.actor.gui.EditorIcon;
 import com.isencia.passerelle.actor.gui.IOptionsFactory;
 import com.isencia.passerelle.actor.gui.OptionsFactory;
 import com.isencia.passerelle.core.ControlPort;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.ErrorPort;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.PasserelleToken;
@@ -167,8 +168,8 @@ import com.isencia.passerelle.statistics.StatisticsServiceFactory;
  * @author erwin
  */
 public abstract class Actor extends TypedAtomicActor implements IMessageCreator {
-  // ~ Static variables/initializers
-  // __________________________________________________________________________________________________________________________
+
+  private static final long serialVersionUID = 1L;
 
   private final static Logger LOGGER = LoggerFactory.getLogger(Actor.class);
 
@@ -344,7 +345,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return A part of the unique description, often combining a number of parameter settings.
    * @deprecated
    */
-  protected abstract String getExtendedInfo();
+  protected String getExtendedInfo() {
+    return "";
+  }
 
   public IOptionsFactory getOptionsFactory() {
     try {
@@ -457,7 +460,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     }
 
     try {
+      getLogger().trace("{} doInitialize() - entry", getFullName());
       doInitialize();
+      getLogger().trace("{} doInitialize() - exit", getFullName());
     } catch (InitializationException e) {
       getErrorControlStrategy().handleInitializationException(this, e);
     }
@@ -628,7 +633,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     try {
       if (!isFinishRequested()) {
         try {
+          getLogger().trace("{} doPreFire() - entry", getFullName());
           res = doPreFire();
+          getLogger().trace("{} doPreFire() - exit", getFullName());
         } catch (ProcessingException e) {
           getErrorControlStrategy().handlePreFireException(this, e);
         } catch (TerminateProcessException e) {
@@ -677,10 +684,13 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
       if (!isFinishRequested()) {
         try {
-          if (!isMockMode())
+          if (!isMockMode()) {
+            getLogger().trace("{} doFire() - entry", getFullName());
             doFire();
-          else
+            getLogger().trace("{} doFire() - exit", getFullName());
+          } else {
             doMockFire();
+          }
 
         } catch (ProcessingException e) {
           getErrorControlStrategy().handleFireException(this, e);
@@ -730,7 +740,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     getLogger().trace("{} - postfire() - entry", getInfo());
     boolean res = true;
     try {
+      getLogger().trace("{} doPostFire() - entry", getFullName());
       res = doPostFire();
+      getLogger().trace("{} doPostFire() - exit", getFullName());
     } catch (ProcessingException e) {
       getErrorControlStrategy().handlePostFireException(this, e);
     } catch (TerminateProcessException e) {
@@ -763,7 +775,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     getLogger().trace("{} - wrapup() - entry", getInfo());
 
     try {
+      getLogger().trace("{} doWrapUp() - entry", getFullName());
       doWrapUp();
+      getLogger().trace("{} doWrapUp() - exit", getFullName());
     } catch (TerminationException e) {
       getErrorControlStrategy().handleTerminationException(this, e);
     }
@@ -1130,7 +1144,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       }
 
     } catch (Exception e) {
-      throw new ProcessingException(getInfo() + " sendOutputMsg() - generated exception for sending msg on port " + port, message, e);
+      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on output "+port, message, e);
     }
   }
 
@@ -1142,8 +1156,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @param port
    * @return
    */
-  protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {
-    return getInfo() + " sent message " + message.getID() + " on port " + port.getDisplayName();
+  protected String getAuditTrailMessage(ManagedMessage message, Port port) {
+    return message.getID() + (port!=null? " on port " + port.getDisplayName() : "");
   }
 
   /**

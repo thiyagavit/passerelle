@@ -62,6 +62,8 @@ import com.isencia.passerelle.message.MessageHelper;
  * </p>
  * 
  * @author erwin.de.ley@isencia.be
+ * 
+ * @deprecated use com.isencia.passerelle.actor.v5.Actor as base-class instead.
  */
 public abstract class Actor extends com.isencia.passerelle.actor.Actor {
   private final static Logger logger = LoggerFactory.getLogger(Actor.class);

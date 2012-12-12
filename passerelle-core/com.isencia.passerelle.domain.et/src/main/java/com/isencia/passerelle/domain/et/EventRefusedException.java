@@ -11,42 +11,31 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.domain.et;
 
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
 /**
  * @author delerw
- *
  */
 @SuppressWarnings("serial")
 public class EventRefusedException extends PasserelleException {
-  
+
   private Event refusedEvent;
 
   /**
-   * @param event
+   * @param errorCode
    * @param message
    * @param context
    * @param rootException
    */
-  public EventRefusedException(Event event, String message, Object context, Throwable rootException) {
-    super(message, context, rootException);
-    this.refusedEvent=event;
+  public EventRefusedException(Event event, ErrorCode errorCode, String message, Object context, Throwable rootException) {
+    super(errorCode, message, context, rootException);
+    this.refusedEvent = event;
   }
-
-  /**
-   * @param severity
-   * @param event
-   * @param message
-   * @param context
-   * @param rootException
-   */
-  public EventRefusedException(Severity severity, Event event, String message, Object context, Throwable rootException) {
-    super(severity, message, context, rootException);
-    this.refusedEvent=event;  }
 
   public Event getRefusedEvent() {
     return refusedEvent;

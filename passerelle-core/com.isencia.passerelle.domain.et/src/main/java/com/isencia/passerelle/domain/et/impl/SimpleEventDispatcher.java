@@ -23,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.domain.et.AbstractEvent;
 import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventDispatchReporter;
@@ -105,12 +106,12 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   public void accept(Event e) throws EventRefusedException {
     if (!active) {
-      throw new EventRefusedException(e, "Dispatcher inactive", this, new IllegalStateException());
+      throw new EventRefusedException(e, ErrorCode.FLOW_STATE_ERROR, "Dispatcher inactive", this, new IllegalStateException());
     }
     try {
       eventQ.put(new EventEntry(e));
     } catch (Exception e1) {
-      throw new EventRefusedException(e, "Error accepting event", this, e1);
+      throw new EventRefusedException(e, ErrorCode.FLOW_EXECUTION_ERROR, "Error accepting event", this, e1);
     }
   }
 

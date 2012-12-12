@@ -33,13 +33,12 @@ import com.isencia.message.interceptor.IMessageInterceptorChain;
 import com.isencia.message.interceptor.MessageInterceptorChain;
 import com.isencia.message.requestreply.IMessage;
 import com.isencia.message.requestreply.IRequestReplyChannel;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListenerAdapter;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
@@ -48,18 +47,15 @@ import com.isencia.passerelle.message.xml.XmlMessageHelper;
 /**
  * Base class for all Passerelle Sources that use a IReceiverChannel. Sub-classes must implement createChannel(), returning a completely defined
  * IReceiverChannel of the desired type. Typically, sub-classes will also define their specific Passerelle Parameters, and will then override the default
- * attributeChanged() method to handle changes in parameter values. openChannel() and closeChannel() may sometimes be overriden to add specific open/close
+ * attributeChanged() method to handle changes in parameter values. openChannel() and closeChannel() may sometimes be overridden to add specific open/close
  * processing.
  * 
- * @version 1.0
- * @author edeley
+ * @author erwin
  */
 public abstract class ReqReplyChannelSource extends Source {
-  // ~ Static variables/initializers __________________________________________________________________________________________________________________________
+  private static final long serialVersionUID = 1L;
 
-  private static Logger logger = LoggerFactory.getLogger(ReqReplyChannelSource.class);
-
-  // ~ Instance variables _____________________________________________________________________________________________________________________________________
+  private static Logger LOGGER = LoggerFactory.getLogger(ReqReplyChannelSource.class);
 
   private IRequestReplyChannel receiverChannel = null;
   public Parameter passThroughParam = null;
@@ -67,8 +63,6 @@ public abstract class ReqReplyChannelSource extends Source {
 
   public Port replyPort = null;
   private PortHandler replyHandler = null;
-
-  // ~ Constructors ___________________________________________________________________________________________________________________________________________
 
   /**
    * Constructor for Source.
@@ -80,15 +74,16 @@ public abstract class ReqReplyChannelSource extends Source {
    */
   public ReqReplyChannelSource(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
-    // Ports
     replyPort = PortFactory.getInstance().createInputPort(this, "reply", null);
-
     passThroughParam = new Parameter(this, "PassThrough", new BooleanToken(false));
     passThroughParam.setTypeEquals(BaseType.BOOLEAN);
     registerExpertParameter(passThroughParam);
-
     new CheckBoxStyle(passThroughParam, "style");
-
+  }
+  
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
   }
 
   /**
@@ -98,17 +93,14 @@ public abstract class ReqReplyChannelSource extends Source {
    * @exception IllegalActionException
    */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " :" + attribute);
+    LOGGER.trace("{} attributeChanged() - entry : {}", getFullName(), attribute);
 
     if (attribute == passThroughParam) {
       passThrough = ((BooleanToken) passThroughParam.getToken()).booleanValue();
     } else
       super.attributeChanged(attribute);
 
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
+    LOGGER.trace("{} attributeChanged() - exit", getFullName());
   }
 
   /**
@@ -124,64 +116,49 @@ public abstract class ReqReplyChannelSource extends Source {
    * @todo improve termination handling with a combination of end of source and end of sink processing
    */
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     super.doInitialize();
-
     if (replyPort.getWidth() > 0) {
       replyHandler = createPortHandler(replyPort, new PortListenerAdapter() {
         public void tokenReceived() {
-          if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - inputHandler.tokenReceived() - entry");
-          }
           Token token = replyHandler.getToken();
           if (token != null && !token.isNil()) {
             try {
               ManagedMessage message = MessageHelper.getMessageFromToken(token);
-              logger.debug("{} - received reply msg : {}", getInfo(), message);
+              getLogger().debug("{} - received reply msg : {}", getFullName(), getAuditTrailMessage(message, replyPort));
               try {
                 getChannel().sendResponse(message, message.getCorrelationID());
               } catch (ChannelException e) {
                 try {
-                  sendErrorMessage(new ProcessingException("Failed to send reply msg", message, e));
+                  sendErrorMessage(new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Failed to send reply msg on channel", message, e));
                 } catch (IllegalActionException e1) {
-                  logger.error("", e);
-                  logger.error("", e1);
+                  getLogger().error("Error sending error msg", e);
+                  getLogger().error("Error sending response msg", e1);
                 }
               }
             } catch (Exception e) {
-              logger.error("", e);
+              getLogger().error("Error handling received token "+token, e);
             }
-          }
-          if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - inputHandler.tokenReceived() - exit");
           }
         }
       });
       // Start handling the port
       replyHandler.start();
     }
-
     IRequestReplyChannel res = null;
-
     try {
       res = createChannel();
     } catch (ChannelException e) {
-      throw new InitializationException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not created correctly.", this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not created correctly.", this, e);
     }
-
     if (res == null) {
-      throw new InitializationException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not created correctly.", this, null);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not created correctly.", this, null);
     } else {
       // just to make sure...
       try {
         closeChannel(getChannel());
       } catch (ChannelException e) {
-        throw new InitializationException("Receiver channel for " + getInfo() + " not initialized correctly.", getChannel(), e);
+        throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not initialized correctly.", this, e);
       }
-
       receiverChannel = res;
       // This does not work for request reply:
       // - the converter is called by the regular receiver channel when it invokes its interceptor chain,
@@ -191,30 +168,15 @@ public abstract class ReqReplyChannelSource extends Source {
       // correlation ID into the MessageFactory.
       // This is done inside the getMessage()
       if (!isPassThrough()) {
-        // IMessageInterceptorChain interceptors = new MessageInterceptorChain();
-        // interceptors.add(new TextToMessageConverter());
-        // getChannel().setInterceptorChainOnLeave(interceptors);
-        if (logger.isDebugEnabled())
-          logger.debug(getInfo() + "Converting message to text");
         IMessageInterceptorChain interceptors = new MessageInterceptorChain();
         interceptors.add(new MessageToTextConverter());
         getChannel().setInterceptorChainForResponse(interceptors);
       }
-
-    }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
     }
   }
 
   protected boolean doPreFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     boolean res = true;
-
     // Channel open must not be done in initialize()
     // All initialize() invocations on the actors in a model
     // are done sequentially in 1 thread. So if a certain channel
@@ -226,62 +188,33 @@ public abstract class ReqReplyChannelSource extends Source {
     try {
       if (!getChannel().isOpen()) {
         openChannel(getChannel());
-
-        logger.debug("{} - Opened : {}",getInfo(),getChannel());
+        getLogger().debug("{} - Opened : {}",getFullName(),getChannel());
       }
     } catch (ChannelException e) {
-      throw new ProcessingException(PasserelleException.Severity.FATAL, "Receiver channel for " + getInfo() + " not opened correctly.", getChannel(), e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Receiver channel not opened correctly.", this, e);
     }
-
-    res = res && super.doPreFire();
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " :" + res);
-    }
-
-    return res;
+    return res && super.doPreFire();
   }
 
   protected boolean doPostFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     try {
       if (hasNoMoreMessages()) {
         closeChannel(getChannel());
       }
     } catch (ChannelException e) {
-      throw new ProcessingException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Receiver channel not closed correctly.", this, e);
     }
-
-    boolean res = super.doPostFire();
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " :" + res);
-    }
-
-    return res;
+    return super.doPostFire();
   }
 
   protected void doWrapUp() throws TerminationException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     try {
       closeChannel(getChannel());
-
-      logger.debug("{} - Closed : {}",getInfo(),getChannel());
+      getLogger().debug("{} - Closed : {}",getFullName(),getChannel());
     } catch (ChannelException e) {
-      throw new TerminationException("Receiver channel for " + getInfo() + " not closed correctly.", getChannel(), e);
+      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Receiver channel not closed correctly.", this, e);
     }
-
     super.doWrapUp();
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
   }
 
   /**
@@ -294,9 +227,7 @@ public abstract class ReqReplyChannelSource extends Source {
   protected abstract IRequestReplyChannel createChannel() throws ChannelException, InitializationException;
 
   protected ManagedMessage getMessage() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
+    getLogger().trace("{} getMessage() - entry", getFullName());
 
     ManagedMessage res = null;
 
@@ -308,25 +239,17 @@ public abstract class ReqReplyChannelSource extends Source {
         // this allows to directly link the output port to the reply port
         // as the msg contains its own ID as correlationID
         res = MessageFactory.getInstance().createCorrelatedMessage(msg.getCorrelationID().toString(), getStandardMessageHeaders());
-        try {
-          res.setBodyContentPlainText(msg.getMessage().toString());
-        } catch (MessageException e) {
-          logger.error(e.getMessage());
-          res = null;
-        }
+        res.setBodyContentPlainText(msg.getMessage().toString());
       }
 
     } catch (NoMoreMessagesException e) {
       // ignore, just return null and the source will finish
       // its life-cycle automatically
     } catch (Exception e) {
-      throw new ProcessingException(getInfo() + " - getMessage() generated exception", res, e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit " + " - Received msg :" + res);
-    }
-
+    getLogger().trace("{} getMessage() - exit", getFullName());
     return res;
   }
 
@@ -337,17 +260,11 @@ public abstract class ReqReplyChannelSource extends Source {
    * @throws ChannelException
    */
   protected void closeChannel(IReceiverChannel ch) throws ChannelException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " :" + ch);
-    }
-
+    getLogger().trace("{} closeChannel() - entry", getFullName());
     if ((ch != null) && ch.isOpen()) {
       ch.close();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    getLogger().trace("{} closeChannel() - exit", getFullName());
   }
 
   /**
@@ -357,17 +274,11 @@ public abstract class ReqReplyChannelSource extends Source {
    * @throws ChannelException
    */
   protected void openChannel(IReceiverChannel ch) throws ChannelException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " :" + ch);
-    }
-
+    getLogger().trace("{} openChannel() - entry", getFullName());
     if ((ch != null) && !ch.isOpen()) {
       ch.open();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
+    getLogger().trace("{} openChannel() - exit", getFullName());
   }
 
   /**

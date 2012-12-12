@@ -40,9 +40,10 @@ import com.isencia.passerelle.message.ManagedMessage;
  * 
  * @author delerw
  */
+@SuppressWarnings("serial")
 public class DevNullActor extends Actor {
 
-  private final static Logger logger = LoggerFactory.getLogger(DevNullActor.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(DevNullActor.class);
 
   public Port input;
   public Parameter logReceivedMessages;
@@ -82,10 +83,10 @@ public class DevNullActor extends Actor {
     try {
       if (((BooleanToken) logReceivedMessages.getToken()).booleanValue()) {
         ManagedMessage msg = request.getMessage(input);
-        logger.info("Discarding msg " + msg);
+        LOGGER.info("Discarding msg " + msg);
       }
     } catch (IllegalActionException e) {
-      logger.error("Error reading parameter value", e);
+      LOGGER.error("Error reading parameter value", e);
     }
   }
 

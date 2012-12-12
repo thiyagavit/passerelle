@@ -14,11 +14,15 @@
  */
 package com.isencia.passerelle.actor.test;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
+import org.apache.commons.io.FileUtils;
 import ptolemy.actor.Manager;
 import ptolemy.actor.Manager.State;
 import com.isencia.passerelle.actor.control.Stop;
@@ -212,8 +216,10 @@ public class ActorTest extends TestCase {
     flow.connect(cmdExecutor.errorPort, errorCatcher.input);
     flow.connect(errorCatcher.errorDescrOutput, cmdExitErrorSink.input);
 
+    String scriptPath = getTempFilePath("/runEchoes.bat");
     Map<String, String> props = new HashMap<String, String>();
-    props.put("cmdExecutor.command", "runEchoes.bat");
+    props.put("cmdExecutor.command", scriptPath);
+    props.put("errorCatcher.Log received messages", "true");
     flowMgr.executeBlockingLocally(flow, props);
 
     new FlowStatisticsAssertion()
@@ -225,6 +231,12 @@ public class ActorTest extends TestCase {
     assertEquals("Wrong last stdOut", "and now for something completely different", cmdStdOutSink.poll().getBodyContentAsString());
     assertEquals("Wrong first stdOut", "this is a first output to stdout", cmdStdOutSink.poll().getBodyContentAsString());
     assertEquals("Wrong stdErr", "some error msg", cmdStdErrSink.poll().getBodyContentAsString());
+  }
+
+  private String getTempFilePath(String resourcePath) throws URISyntaxException, IOException {
+    File tempFile = File.createTempFile("script", ".bat");
+    FileUtils.copyURLToFile(this.getClass().getResource(resourcePath), tempFile);
+    return tempFile.getAbsolutePath();
   }
 
   public void testCommandExecutorWithErrorExit() throws Exception {
@@ -241,8 +253,10 @@ public class ActorTest extends TestCase {
     flow.connect(cmdExecutor.errorPort, errorCatcher.input);
     flow.connect(errorCatcher.errorDescrOutput, cmdExitErrorSink.input);
 
+    String scriptPath = getTempFilePath("/runEchoesWithErrorExit.bat");
     Map<String, String> props = new HashMap<String, String>();
-    props.put("cmdExecutor.command", "runEchoesWithErrorExit.bat");
+    props.put("cmdExecutor.command", scriptPath);
+    props.put("errorCatcher.Log received messages", "true");
     flowMgr.executeBlockingLocally(flow, props);
 
     new FlowStatisticsAssertion()

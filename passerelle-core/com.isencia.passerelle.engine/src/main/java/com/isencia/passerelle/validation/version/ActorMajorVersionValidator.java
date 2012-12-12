@@ -17,6 +17,7 @@ package com.isencia.passerelle.validation.version;
 
 import java.util.SortedSet;
 import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.core.ErrorCode;
 
 /**
  * This validator checks whether the major version nr of an actor present in a model, is the same as the major version number as registered for the actor
@@ -46,7 +47,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
         if (res==0) {
           // all's well
         } else if (res<0) {
-          throw new ValidationException("Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " too old.",
+          throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " too old.",
               versionedElement, null);
         } else {
           // This means the runtime has a more recent major version than what's required for the element.
@@ -62,7 +63,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
             }
           }
           if (!foundCompatibleVersion) {
-            throw new ValidationException("Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " more recent.",
+            throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " more recent.",
                 versionedElement, null);
           }
         }

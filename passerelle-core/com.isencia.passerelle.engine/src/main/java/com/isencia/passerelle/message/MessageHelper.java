@@ -30,6 +30,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.PasserelleToken;
 import com.isencia.passerelle.core.PortHandler;
@@ -272,7 +273,7 @@ public class MessageHelper {
         }
       }
     } catch (IllegalActionException e) {
-      throw new PasserelleException("Unexpected error while reading token from port", input, e);
+      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Unexpected error while reading token from port", input, e);
     }
 
     if (logger.isTraceEnabled()) {
@@ -309,7 +310,7 @@ public class MessageHelper {
         }
       }
     } catch (IllegalActionException e) {
-      throw new PasserelleException("Unexpected error while reading token from port", input, e);
+      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Unexpected error while reading token from port", input, e);
     }
 
     if (logger.isTraceEnabled()) {
@@ -343,7 +344,7 @@ public class MessageHelper {
         }
       }
     } catch (IllegalActionException e) {
-      throw new PasserelleException("Unexpected error while reading token from port", input, e);
+      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Unexpected error while reading token from port", input, e);
     }
 
     if (logger.isTraceEnabled()) {
@@ -398,7 +399,7 @@ public class MessageHelper {
       }
 
     } catch (Exception e) {
-      throw new PasserelleException("Error building MessageContainer from token", token, e);
+      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Error building MessageContainer from token", token, e);
     }
 
     if (logger.isTraceEnabled()) {
@@ -492,7 +493,7 @@ public class MessageHelper {
       ContentType type = new ContentType(message.getBodyContentType());
       return type.getPrimaryType();
     } catch (ParseException e) {
-      throw new MessageException(PasserelleException.Severity.NON_FATAL, "", message, e);
+      throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid body content type "+message.getBodyContentType(), message, e);
     }
   }
 
@@ -508,7 +509,7 @@ public class MessageHelper {
       ContentType type = new ContentType(message.getBodyContentType());
       return type.getSubType();
     } catch (ParseException e) {
-      throw new MessageException(PasserelleException.Severity.NON_FATAL, "", message, e);
+      throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid body content type "+message.getBodyContentType(), message, e);
     }
   }
 

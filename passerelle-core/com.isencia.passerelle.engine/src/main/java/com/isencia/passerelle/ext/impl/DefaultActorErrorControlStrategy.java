@@ -22,6 +22,7 @@ import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
 import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
 
@@ -41,28 +42,28 @@ import ptolemy.kernel.util.IllegalActionException;
 public class DefaultActorErrorControlStrategy implements ErrorControlStrategy {
 
 	public void handleInitializationException(Actor a, InitializationException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " initialize() - generated exception during doInitialize()", e);
-		Actor.getAuditLogger().error(a.getInfo() + " INITIALIZATION FAILED");
+		getLoggerForActor(a).error(a.getFullName() + " initialize() - generated exception during doInitialize()", e);
+		Actor.getAuditLogger().error(a.getFullName() + " INITIALIZATION FAILED");
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handleInitializationValidationException(Actor a, ValidationException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " initialize() - generated exception during validateInitialization()", e);
-		Actor.getAuditLogger().error(a.getInfo() + " INITIALIZATION VALIDATION FAILED");
+		getLoggerForActor(a).error(a.getFullName() + " initialize() - generated exception during validateInitialization()", e);
+		Actor.getAuditLogger().error(a.getFullName() + " INITIALIZATION VALIDATION FAILED");
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handleIterationValidationException(Actor a, ValidationException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " generated exception during iterationValidation()", e);
-		Actor.getAuditLogger().error(a.getInfo() + " ITERATION VALIDATION FAILED");
+		getLoggerForActor(a).error(a.getFullName() + " generated exception during iterationValidation()", e);
+		Actor.getAuditLogger().error(a.getFullName() + " ITERATION VALIDATION FAILED");
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handlePreFireException(Actor a, ProcessingException e) throws IllegalActionException {
-		if (e.getSeverity() != PasserelleException.Severity.FATAL) {
+		if (e.getErrorCode().getSeverity() != ErrorCode.Severity.FATAL) {
 			a.sendErrorMessage(e);
 		} else {
-			getLoggerForActor(a).error(a.getInfo() + " prefire() - generated exception", e);
+			getLoggerForActor(a).error(a.getFullName() + " prefire() - generated exception", e);
 			throw new IllegalActionException(a, e, "");
 		}
 	}
@@ -72,40 +73,40 @@ public class DefaultActorErrorControlStrategy implements ErrorControlStrategy {
 	}
 
 	public void handleFireException(Actor a, ProcessingException e) throws IllegalActionException {
-		if (e.getSeverity() != PasserelleException.Severity.FATAL) {
+    if (e.getErrorCode().getSeverity() != ErrorCode.Severity.FATAL) {
 			a.sendErrorMessage(e);
 		} else {
-			getLoggerForActor(a).error(a.getInfo() + " fire() - generated exception", e);
+			getLoggerForActor(a).error(a.getFullName() + " fire() - generated exception", e);
 			throw new IllegalActionException(a, e, "");
 		}
 	}
 
 	public void handlePostFireException(Actor a, ProcessingException e) throws IllegalActionException {
-		if (e.getSeverity() != PasserelleException.Severity.FATAL) {
+    if (e.getErrorCode().getSeverity() != ErrorCode.Severity.FATAL) {
 			a.sendErrorMessage(e);
 		} else {
-			getLoggerForActor(a).error(a.getInfo() + " postfire() -generated exception", e);
+			getLoggerForActor(a).error(a.getFullName() + " postfire() -generated exception", e);
 			throw new IllegalActionException(a, e, "");
 		}
 	}
 
 	public void handleTerminationException(Actor a, TerminationException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " wrapup() - generated exception during doWrapUp()", e);
+		getLoggerForActor(a).error(a.getFullName() + " wrapup() - generated exception during doWrapUp()", e);
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handleFireRuntimeException(Actor a, RuntimeException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " fire() - generated exception during doFire()", e);
+		getLoggerForActor(a).error(a.getFullName() + " fire() - generated exception during doFire()", e);
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handlePostFireRuntimeException(Actor a, RuntimeException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " postfire() -generated exception during doPostFire()", e);
+		getLoggerForActor(a).error(a.getFullName() + " postfire() -generated exception during doPostFire()", e);
 		throw new IllegalActionException(a, e, "");
 	}
 
 	public void handlePreFireRuntimeException(Actor a, RuntimeException e) throws IllegalActionException {
-		getLoggerForActor(a).error(a.getInfo() + " prefire() - generated exception during doPreFire()", e);
+		getLoggerForActor(a).error(a.getFullName() + " prefire() - generated exception during doPreFire()", e);
 		throw new IllegalActionException(a, e, "");
 	}
 

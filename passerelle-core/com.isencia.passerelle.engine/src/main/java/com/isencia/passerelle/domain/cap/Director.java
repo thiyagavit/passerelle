@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.CompositeActor;
@@ -35,10 +33,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.actor.InitializationException;
-import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.ProcessDirector;
-import com.isencia.passerelle.util.SchedulerUtils;
 
 /**
  * The standard Passerelle director. Besides the std Ptolemy director stuff,
@@ -60,8 +55,6 @@ public class Director extends ProcessDirector {
 	public FileParameter propsFileParameter;
 	public final static String PROPSFILE_PARAM = "Properties File";
 	
-	private Scheduler scheduler = null;
-
 	private Collection<BlockingQueueReceiver> managedReceivers = new HashSet<BlockingQueueReceiver>();
 	
 	//~ Constructors ___________________________________________________________________________________________________________________________________________
@@ -291,30 +284,6 @@ public class Director extends ProcessDirector {
 		if(logger.isTraceEnabled())
 			logger.trace(getName()+" wrapup() - entry");
 		
-		if(scheduler!=null) {
-			try {
-            	if(logger.isDebugEnabled())
-            		logger.debug("Stopping scheduler "+scheduler.getSchedulerName());
-            	// as the scheduler is typically a centralized instance,
-            	// used across multiple models, we can not do any shutdown or so here!
-            	// but as an illustration, here are two options if it would ever be needed :
-//				scheduler.shutdown();
-//				or, a bit less drastic :
-//				for (String group : scheduler.getJobGroupNames()) {
-//                    for (String jobName : scheduler.getJobNames(group)) {
-//                        try {
-//                            scheduler.interrupt(jobName, group);
-//                            scheduler.deleteJob(jobName, group);
-//                        } catch (Exception e) {
-//
-//                        }
-//                    }
-//                }
-			} catch (SchedulerException e) {
-				logger.error("Error shutting down the scheduler",e);
-			}
-			scheduler=null;
-		}
 		super.wrapup();
 		if(logger.isTraceEnabled())
 			logger.trace(getName()+" wrapup() - exit");
@@ -334,22 +303,5 @@ public class Director extends ProcessDirector {
 		} else {
 			return true;
 		}
-	}
-	
-	public Scheduler getScheduler() throws InitializationException {
-		if(scheduler==null) {
-            try {
-            	// obtain a unique scheduler instance per scheduler actor
-            	String schedulerName = getContainer().getName()+"_"+getName();
-            	if(logger.isDebugEnabled())
-            		logger.debug("Starting scheduler "+schedulerName);
-            	
-                scheduler = SchedulerUtils.getQuartzScheduler(schedulerName);
-                scheduler.start();
-    		} catch (SchedulerException e) {
-    			throw new InitializationException(PasserelleException.Severity.FATAL,getName()+ " - Error starting the scheduler",this,e);
-    		} 
-		}
-		return scheduler;
 	}
 }

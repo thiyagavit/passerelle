@@ -27,6 +27,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 
@@ -34,6 +35,7 @@ import com.isencia.passerelle.core.PortFactory;
  * @author erwin
  *
  */
+@SuppressWarnings("serial")
 public class InitializationValidator extends Actor {
   
   public Parameter mustValidateWithErrorParameter;
@@ -76,10 +78,10 @@ public class InitializationValidator extends Actor {
       boolean mustValidateWithError = ((BooleanToken)mustValidateWithErrorParameter.getToken()).booleanValue();
       if(mustValidateWithError) {
         String validationErrorMsg = ((StringToken)validationErrorMessageParameter.getToken()).stringValue();
-        throw new ValidationException(validationErrorMsg, this, null);
+        throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, validationErrorMsg, this, null);
       }
     } catch (IllegalActionException e) {
-      throw new ValidationException("Error reading parameter", this, e);
+      throw new ValidationException(ErrorCode.ERROR, "Error reading parameter", this, e);
     }
   }
 

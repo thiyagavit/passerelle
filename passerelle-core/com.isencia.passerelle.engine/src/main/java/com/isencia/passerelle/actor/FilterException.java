@@ -14,6 +14,8 @@
 */
 package com.isencia.passerelle.actor;
 
+import com.isencia.passerelle.core.ErrorCode;
+
 /**
  * FilterException
  * 
@@ -23,11 +25,34 @@ package com.isencia.passerelle.actor;
  */
 public class FilterException extends ProcessingException {
 
+  /**
+   * 
+   * @param message
+   * @param context
+   * @param rootException
+   * @deprecated
+   */
 	public FilterException(String message, Object context, Throwable rootException) {
 		super(message,context,rootException);
 	}
+	/**
+	 * 
+	 * @param severity
+	 * @param message
+	 * @param context
+	 * @param rootException
+   * @deprecated
+	 */
 	public FilterException(Severity severity, String message, Object context, Throwable rootException) {
 		super(severity,message,context,rootException);
 	}
-
+  /**
+   * @param errorCode
+   * @param message
+   * @param context
+   * @param rootException
+   */
+  public FilterException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
+    super(errorCode, message, context, rootException);
+  }
 }
