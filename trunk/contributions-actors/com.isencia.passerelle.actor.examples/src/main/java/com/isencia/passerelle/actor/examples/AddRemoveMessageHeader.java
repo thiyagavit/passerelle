@@ -25,6 +25,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -81,12 +82,12 @@ public class AddRemoveMessageHeader extends Actor {
     
     String mode = modeParameter.getExpression();
     if(!MODE_REMOVE.equalsIgnoreCase(mode) && !MODE_ADD.equalsIgnoreCase(mode)) {
-      throw new ValidationException("Invalide mode "+mode, this, null);
+      throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Invalid mode "+mode, this, null);
     }
     
     String headerName = headerNameParameter.getExpression().trim();
     if(headerName.length()==0) {
-      throw new ValidationException("Undefined header name", this, null);
+      throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Undefined header name", this, null);
     }
   }
 
@@ -113,7 +114,7 @@ public class AddRemoveMessageHeader extends Actor {
       
       response.addOutputMessage(output, outputMsg);
     } catch (Exception e) {
-      throw new ProcessingException("[PASS-EX-1234] - Failed to add/remove a header", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to add/remove a header", receivedMsg, e);
     }
   }
 }
