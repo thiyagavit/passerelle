@@ -14,6 +14,7 @@
 */
 package com.isencia.passerelle.actor;
 
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
 
@@ -33,18 +34,28 @@ public class TerminationException extends PasserelleException {
 	 * @param message
 	 * @param context
 	 * @param rootException
+   * @deprecated
 	 */
 	public TerminationException(String message, Object context, Throwable rootException) {
-		super(Severity.NON_FATAL, message, context, rootException);
+		super(message, context, rootException);
 	}
 	/**
 	 * @param severity
 	 * @param message
 	 * @param context
 	 * @param rootException
+   * @deprecated
 	 */
 	public TerminationException(Severity severity, String message, Object context, Throwable rootException) {
 		super(severity, message, context, rootException);
 	}
-
+  /**
+   * @param errorCode
+   * @param message
+   * @param context
+   * @param rootException
+   */
+  public TerminationException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
+    super(errorCode, message, context, rootException);
+  }
 }

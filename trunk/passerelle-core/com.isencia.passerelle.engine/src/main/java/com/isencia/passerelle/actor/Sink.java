@@ -25,6 +25,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -35,11 +36,12 @@ import com.isencia.passerelle.message.MessageHelper;
 /**
  * Base class for all Passerelle sinks:
  * 
- * @version 1.1
  * @author erwin
  */
 public abstract class Sink extends Actor {
-  private static Logger logger = LoggerFactory.getLogger(Sink.class);
+  private static final long serialVersionUID = 1L;
+
+  private static Logger LOGGER = LoggerFactory.getLogger(Sink.class);
 
   /**
    * Holds the last received message
@@ -65,7 +67,6 @@ public abstract class Sink extends Actor {
   public Sink(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
 
-    // Ports
     input = PortFactory.getInstance().createInputPort(this, null);
 
     passThroughParam = new Parameter(this, "PassThrough", new BooleanToken(false));
@@ -85,39 +86,36 @@ public abstract class Sink extends Actor {
         + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
         + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
   }
+  
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
 
   /**
    * Check whether the changed attribute corresponds to the "PassThrough" parameter and if so, adjust the param's value.
    * 
-   * @param The changed attribute
+   * @param The
+   *          changed attribute
    */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " :" + attribute);
+    LOGGER.trace("{} attributeChanged() - entry : {}", getFullName(), attribute);
 
     if (attribute == passThroughParam) {
       setPassThrough(((BooleanToken) passThroughParam.getToken()).booleanValue());
     } else
       super.attributeChanged(attribute);
 
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
+    LOGGER.trace("{} attributeChanged() - exit", getFullName());
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     if (input.getWidth() > 0) {
       inputHandler = createPortHandler(input);
       inputHandler.start();
     } else {
       requestFinish();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
-
   }
 
   /**
@@ -132,16 +130,14 @@ public abstract class Sink extends Actor {
   /**
    * Sets the passThrough.
    * 
-   * @param passThrough The passThrough to set
+   * @param passThrough
+   *          The passThrough to set
    */
   public void setPassThrough(boolean passThrough) {
     this.passThrough = passThrough;
   }
 
   protected boolean doPreFire() throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - entry");
-
     boolean result = true;
     Token token = inputHandler.getToken();
     if (token == null) {
@@ -150,50 +146,32 @@ public abstract class Sink extends Actor {
       try {
         message = MessageHelper.getMessageFromToken(token);
       } catch (PasserelleException e) {
-        throw new ProcessingException("Error handling token", token, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", token, e);
       }
     } else {
       result = false;
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - exit");
     return result && super.doPreFire();
   }
 
   /**
-   * Default and fully-functional implementation, relying on the ISenderChannel instance to send out all messages received on the actor's input port.
+   * Default and fully-functional implementation, relying on the ISenderChannel instance to send out all messages
+   * received on the actor's input port.
    * 
    * @throws ProcessingException
    */
   final protected void doFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     if (message != null) {
       notifyStartingFireProcessing();
-
       try {
-        logger.debug("{} - Sink generated message : {}", getInfo(), message);
+        getLogger().debug("{} - Sink generated message : {}", getFullName(), getAuditTrailMessage(message, null));
         sendMessage(message);
-      } catch (ProcessingException e) {
-        throw e;
       } finally {
         notifyFinishedFireProcessing();
       }
     } else {
       requestFinish();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
-  }
-
-  protected String getExtendedInfo() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   /**

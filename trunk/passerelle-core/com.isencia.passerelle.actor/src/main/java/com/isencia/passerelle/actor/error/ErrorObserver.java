@@ -18,6 +18,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -39,6 +40,7 @@ import com.isencia.passerelle.message.MessageException;
  * @author delerw
  */
 public class ErrorObserver extends Actor implements ErrorCollector {
+  private static final long serialVersionUID = 1L;
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ErrorObserver.class);
 
@@ -116,7 +118,7 @@ public class ErrorObserver extends Actor implements ErrorCollector {
       response.addOutputMessage(errorTextOutput, createMessage(e.getMessage(), "text/plain"));
     } catch (MessageException e1) {
       // should not happen, but...
-      throw new ProcessingException("Error generating error text output", e.getContext(), e1);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error generating error text output", e.getContext(), e1);
     }
   }
 
@@ -160,9 +162,8 @@ public class ErrorObserver extends Actor implements ErrorCollector {
     try {
       drainErrorsQueueTo(null);
     } catch (Exception e) {
-      throw new TerminationException(getInfo() + " - doWrapUp() generated exception " + e, errors, e);
+      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error draining remaining error queue", errors, e);
     }
-
     super.doWrapUp();
   }
 

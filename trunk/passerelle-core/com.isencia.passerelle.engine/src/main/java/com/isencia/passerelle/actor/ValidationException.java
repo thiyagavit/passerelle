@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.actor;
 
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
 /**
@@ -31,6 +32,7 @@ public class ValidationException extends PasserelleException {
 	 * @param message
 	 * @param context
 	 * @param rootException
+   * @deprecated
 	 */
 	public ValidationException(String message, Object context, Throwable rootException) {
 		super(message, context, rootException);
@@ -41,8 +43,19 @@ public class ValidationException extends PasserelleException {
 	 * @param message
 	 * @param context
 	 * @param rootException
+   * @deprecated
 	 */
 	public ValidationException(Severity severity, String message, Object context, Throwable rootException) {
 		super(severity, message, context, rootException);
 	}
+
+  /**
+   * @param errorCode
+   * @param message
+   * @param context
+   * @param rootException
+   */
+  public ValidationException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
+    super(errorCode, message, context, rootException);
+  }
 }

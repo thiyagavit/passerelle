@@ -25,6 +25,7 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TriggeredSource;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 
 //////////////////////////////////////////////////////////////////////////
@@ -33,10 +34,17 @@ import com.isencia.passerelle.message.ManagedMessage;
  * Produce a constant output.
  */
 
+@SuppressWarnings("serial")
 public class Const extends TriggeredSource {
 
-  private static Logger logger = LoggerFactory.getLogger(Const.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(Const.class);
   private boolean messageSent = false;
+
+  /**
+   * The value produced by this constant source. By default, it contains an
+   * StringToken with an empty string.
+   */
+  public Parameter value;
 
   /**
    * Construct a constant source with the given container and name. Create the
@@ -55,29 +63,19 @@ public class Const extends TriggeredSource {
     value = new StringParameter(this, "value");
     value.setExpression("");
     registerConfigurableParameter(value);
-
   }
 
-  // /////////////////////////////////////////////////////////////////
-  // // ports and parameters ////
-
-  /**
-   * The value produced by this constant source. By default, it contains an
-   * StringToken with an empty string.
-   */
-  public Parameter value;
-
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    LOGGER.trace("{} doInitialize() - entry ", getFullName());
 
     messageSent = false;
     super.doInitialize();
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    LOGGER.trace("{} doInitialize() - exit ", getFullName());
   }
 
   protected ManagedMessage getMessage() throws ProcessingException {
-    if (logger.isTraceEnabled()) logger.trace(getInfo());
+    LOGGER.trace("{} getMessage() - entry ", getFullName());
 
     if (messageSent && !isTriggerConnected()) return null;
 
@@ -86,22 +84,17 @@ public class Const extends TriggeredSource {
       String tokenMessage = ((StringToken) value.getToken()).stringValue();
       dataMsg = createMessage(tokenMessage, "text/plain");
     } catch (Exception e) {
-      throw new ProcessingException(getInfo() + " - getMessage() generated exception " + e, value, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error constructing message from value parameter", value, e);
     } finally {
       messageSent = true;
     }
 
-    if (logger.isTraceEnabled()) logger.trace(getInfo() + " - exit ");
+    LOGGER.trace("{} getMessage() - exit ", getFullName());
 
     return dataMsg;
-  }
-
-  protected String getExtendedInfo() {
-    return value.getExpression();
   }
 
   protected boolean mustWaitForTrigger() {
     return true;
   }
-
 }

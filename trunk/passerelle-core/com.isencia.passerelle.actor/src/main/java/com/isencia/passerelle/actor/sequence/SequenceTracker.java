@@ -25,6 +25,7 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -44,6 +45,7 @@ import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
  * @author erwin
  */
 public class SequenceTracker extends Transformer {
+  private static final long serialVersionUID = 1L;
   private static Logger LOGGER = LoggerFactory.getLogger(SequenceTracker.class);
 
   private Map<Long, SequenceTrace> sequences = new HashMap<Long, SequenceTrace>();
@@ -72,11 +74,13 @@ public class SequenceTracker extends Transformer {
     handled = PortFactory.getInstance().createInputPort(this, "handledMsg", null);
     seqFinished = PortFactory.getInstance().createOutputPort(this, "seqFinished");
   }
+  
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
 
   protected void doInitialize() throws InitializationException {
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getInfo() + " doInitialize() - entry");
-
     super.doInitialize();
     sequences.clear();
     seqFinishedMsgPending = false;
@@ -89,26 +93,19 @@ public class SequenceTracker extends Transformer {
           if (message != null)
             acceptHandledMessage(message);
         } catch (PasserelleException e) {
-          LOGGER.error(getInfo() + " error getting message from handled port", e);
+          LOGGER.error("Error getting message from handled port", e);
         }
       }
-
       public void noMoreTokens() {
-        if (LOGGER.isDebugEnabled())
-          LOGGER.debug(getInfo() + " handled port exhausted");
+        LOGGER.trace("{} handled port exhausted", getFullName());
       }
-
     });
 
     if (handled.getWidth() > 0) {
       handledHandler.start();
     } else {
-      throw new InitializationException("handled port not connected", this, null);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "handled port not connected", this, null);
     }
-
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getInfo() + " doInitialize() - exit");
-
   }
 
   /**
@@ -119,7 +116,7 @@ public class SequenceTracker extends Transformer {
     SequenceTrace seqTrace = (SequenceTrace) sequences.get(message.getSequenceID());
     if (seqTrace == null) {
       // notify our director about the problem
-      getDirectorAdapter().reportError(new ProcessingException("Received message feedback for unknown sequence " + message.getSequenceID(), message, null));
+      getDirectorAdapter().reportError(new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Received message feedback for unknown sequence " + message.getSequenceID(), message, null));
     } else {
       seqTrace.messageHandled(message);
       boolean seqCompletelyFinished = seqTrace.isHandled();
@@ -137,20 +134,16 @@ public class SequenceTracker extends Transformer {
             sendErrorMessage(e);
           } catch (IllegalActionException e1) {
             // can't do much more...
-            LOGGER.error("", e1);
+            LOGGER.error("Error sending error msg", e1);
           }
         } finally {
           seqFinishedMsgPending = false;
         }
       }
     }
-
   }
 
   protected void doFire(ManagedMessage message) throws ProcessingException {
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getInfo() + " doFire() - entry - message :" + message);
-
     try {
       if (message.isPartOfSequence()) {
         SequenceTrace seqTrace = (SequenceTrace) sequences.get(message.getSequenceID());
@@ -161,14 +154,9 @@ public class SequenceTracker extends Transformer {
         seqTrace.addMessage(message);
       }
     } catch (Exception e) {
-      throw new ProcessingException("", message, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error processing msg", message, e);
     }
-
     sendOutputMsg(output, message);
-
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getInfo() + " doFire() - exit");
-
   }
 
   protected boolean doPostFire() throws ProcessingException {
@@ -180,9 +168,5 @@ public class SequenceTracker extends Transformer {
     // meaningful lifetime: e.g. whether there are still sequences active
     // return super.doPostFire() || handledInputStillAlive;
     return super.doPostFire() || (handled.getWidth() > 0 && (!sequences.isEmpty() || seqFinishedMsgPending));
-  }
-
-  protected String getExtendedInfo() {
-    return "";
   }
 }

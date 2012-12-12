@@ -16,6 +16,7 @@ package com.isencia.passerelle.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -28,23 +29,21 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
 /**
- * Filter TODO: class comment
+ * Filter actors provide binary routing logic based on some boolean logic,
+ * which must be provided by concrete actor implementations.
  * 
  * @author erwin
  */
 public abstract class Filter extends Actor {
-  // ~ Static variables/initializers __________________________________________________________________________________________________________________________
+  private static final long serialVersionUID = 1L;
 
-  private static Logger logger = LoggerFactory.getLogger(Filter.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(Filter.class);
 
   /**
    * Holds the last received message
    */
   private ManagedMessage message = null;
   private Token token = null;
-
-  // /////////////////////////////////////////////////////////////////
-  // // ports and parameters ////
 
   /**
    * The input port. This base class imposes no type constraints except that the type of the input cannot be greater than the type of the outputOK.
@@ -93,10 +92,12 @@ public abstract class Filter extends Actor {
         + "</svg>\n");
   }
 
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+  
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     super.doInitialize();
     if (input.getWidth() > 0) {
       inputHandler = createPortHandler(input);
@@ -104,10 +105,6 @@ public abstract class Filter extends Actor {
     } else {
       requestFinish();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
-
   }
 
   /**
@@ -118,9 +115,6 @@ public abstract class Filter extends Actor {
   protected abstract boolean isMatchingFilter(Object msg) throws FilterException;
 
   protected boolean doPreFire() throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - entry");
-
     boolean result = true;
     token = inputHandler.getToken();
     if (token == null) {
@@ -129,51 +123,39 @@ public abstract class Filter extends Actor {
       try {
         message = MessageHelper.getMessageFromToken(token);
       } catch (PasserelleException e) {
-        throw new ProcessingException("Error handling token", token, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", token, e);
       }
     } else {
       result = false;
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPreFire() - exit");
     return result && super.doPreFire();
   }
 
   public void doFire() throws ProcessingException {
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo());
-    }
-
     if (message != null) {
       notifyStartingFireProcessing();
       try {
-        if (logger.isDebugEnabled()) {
-          logger.debug(getInfo() + " - Filter received message :" + message);
-        }
         boolean matchFound = false;
         try {
           matchFound = isMatchingFilter(message);
         } catch (FilterException e) {
-          logger.error(getInfo(), e);
+          getLogger().error("Error applying filter condition", e);
         }
         if (matchFound) {
           try {
             outputOk.broadcast(token);
           } catch (Throwable e) {
-            throw new ProcessingException(getInfo() + " - doFire() generated exception during sending to output OK port " + e, message, e);
+            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on OK output", message, e);
           }
-
-          logger.debug("{} - Sent message OK  {}:", getInfo(), token);
+          getLogger().debug("{} - Sent message OK  {}:", getFullName(), token);
           getAuditLogger().debug("Sent message OK");
         } else {
           try {
             outputNotOk.broadcast(token);
           } catch (Throwable e) {
-            throw new ProcessingException(getInfo() + " - doFire() generated exception during sending to output NOT OK port " + e, message, e);
+            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on NotOK output", message, e);
           }
-
-          logger.debug("{} - Sent message NOT OK  {}:", getInfo(), token);
+          getLogger().debug("{} - Sent message NOT OK  {}:", getFullName(), token);
           getAuditLogger().debug("Sent message NOT OK");
         }
       } finally {
@@ -182,10 +164,5 @@ public abstract class Filter extends Actor {
     } else {
       requestFinish();
     }
-
-    if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " - exit ");
-    }
   }
-
 }

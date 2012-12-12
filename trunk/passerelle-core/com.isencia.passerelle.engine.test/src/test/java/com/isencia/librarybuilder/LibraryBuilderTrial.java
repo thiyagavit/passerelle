@@ -33,7 +33,7 @@ public class LibraryBuilderTrial extends TestCase {
 
 	private void testClassFileParsing(String fileName) throws Exception {
 		MoMLParser parser = new MoMLParser();
-		Entity e = (Entity) parser.parse(null, new File(fileName).toURL());
+		Entity e = (Entity) parser.parse(null, new File(fileName).toURI().toURL());
 		assertNotNull("did not load an entity",e);
 		assertTrue("the thing we loaded is not a class",e.isClassDefinition());
 	}

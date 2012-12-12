@@ -25,21 +25,17 @@ import com.isencia.message.IMessageSender;
 import com.isencia.message.ISenderChannel;
 import com.isencia.message.interceptor.IMessageInterceptorChain;
 import com.isencia.message.interceptor.MessageInterceptorChain;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
 
 /**
- * @version 1.0
- * @author edeley
+ * @author erwin
  */
 public abstract class MessageSenderSink extends Sink {
-  // ~ Instance/static variables ..............................................................................................................................
-
-  private static Logger logger = LoggerFactory.getLogger(MessageSenderSink.class);
+  private static final long serialVersionUID = 1L;
+  private static Logger LOGGER = LoggerFactory.getLogger(MessageSenderSink.class);
   private IMessageSender messageSender = null;
-
-  // ~ Constructors ...........................................................................................................................................
 
   /**
    * Constructor for ChannelSink.
@@ -53,40 +49,30 @@ public abstract class MessageSenderSink extends Sink {
     super(container, name);
   }
 
-  // ~ Methods ................................................................................................................................................
-
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+  
   /**
-   * DOCUMENT ME !
    * 
    * @throws IllegalActionException
    */
   protected void sendMessage(ManagedMessage message) throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     if (message != null) {
       messageSender.sendMessage(message);
     } else {
       requestFinish();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
   }
 
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     super.doInitialize();
-
     messageSender = createMessageSender();
-
     if (messageSender == null) {
-      throw new InitializationException(PasserelleException.Severity.FATAL, "MessageSender for " + getInfo() + " not created correctly.", this, null);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "MessageSender not created correctly.", this, null);
     } else {
       IMessageInterceptorChain interceptors = createInterceptorChainOnEnter();
-
       if (interceptors == null) {
         // default implementation
         if (!isPassThrough()) {
@@ -94,46 +80,30 @@ public abstract class MessageSenderSink extends Sink {
           interceptors.add(new MessageToTextConverter());
         }
       }
-
       Collection<ISenderChannel> channels = messageSender.getChannels();
       Iterator<ISenderChannel> iter = channels.iterator();
-
       while (iter.hasNext()) {
         ISenderChannel element = iter.next();
         element.setInterceptorChainOnEnter(interceptors);
       }
-
       messageSender.open();
-      logger.debug("{} - Opened : {}", getInfo(), getMessageSender());
+      getLogger().debug("{} - Opened : {}", getFullName(), getMessageSender());
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
   }
 
   protected void doWrapUp() throws TerminationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     super.doWrapUp();
     getMessageSender().close();
-    logger.debug("{} - Closed : {}", getInfo(), getMessageSender());
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
+    getLogger().debug("{} - Closed : {}", getFullName(), getMessageSender());
   }
 
   /**
-   * DOCUMENT ME !
-   * 
-   * @return
+   * @return a chain of interceptors that are invoked when the msg enters the message sender
    */
   protected abstract IMessageInterceptorChain createInterceptorChainOnEnter();
 
   /**
-   * DOCUMENT ME !
-   * 
-   * @return
+   * @return the message sender encapsulated by this actor
    */
   protected abstract IMessageSender createMessageSender();
 

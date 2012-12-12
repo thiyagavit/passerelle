@@ -14,6 +14,7 @@
 */
 package com.isencia.passerelle.statistics;
 
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
 /**
@@ -26,17 +27,19 @@ import com.isencia.passerelle.core.PasserelleException;
  */
 public class InsufficientDataException extends PasserelleException {
 	
-	public InsufficientDataException() {
-		super(null,null,null);
+  private static final long serialVersionUID = 1L;
+
+  public InsufficientDataException() {
+		super(ErrorCode.INFO,null,null,null);
 	}
 
-	/**
-	 * @param message
-	 * @param context
-	 * @param rootException
-	 */
-	public InsufficientDataException(String message, Object context) {
-		super(message, context, null);
-	}
-
+  /**
+   * @param errorCode
+   * @param message
+   * @param context
+   * @param rootException
+   */
+  protected InsufficientDataException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
+    super(errorCode, message, context, rootException);
+  }
 }

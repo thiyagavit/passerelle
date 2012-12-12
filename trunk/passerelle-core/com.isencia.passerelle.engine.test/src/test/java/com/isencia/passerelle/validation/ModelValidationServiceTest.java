@@ -19,7 +19,7 @@ import ptolemy.kernel.attributes.VersionAttribute;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.testsupport.actor.Const;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;
-import com.isencia.passerelle.testsupport.actor.MockWorker;
+import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.validation.version.ActorVersionRegistry;
 import com.isencia.passerelle.validation.version.VersionSpecification;
 import junit.framework.TestCase;
@@ -34,7 +34,7 @@ public class ModelValidationServiceTest extends TestCase {
 
   protected void setUp() throws Exception {
     ActorVersionRegistry.getInstance().addActorVersion(Const.class.getName(), VersionSpecification.parse("1.2.3"));
-    ActorVersionRegistry.getInstance().addActorVersion(MockWorker.class.getName(), VersionSpecification.parse("10.0.0-hello"));
+    ActorVersionRegistry.getInstance().addActorVersion(Delay.class.getName(), VersionSpecification.parse("10.0.0-hello"));
     flow = new Flow("actor version validation unit test", null);
   }
 
@@ -46,7 +46,7 @@ public class ModelValidationServiceTest extends TestCase {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("1.2.3");
     
-    MockWorker workerActor = new MockWorker(flow, "worker");
+    Delay workerActor = new Delay(flow, "worker");
     new VersionAttribute(workerActor, "_version").setExpression("10.0.0-hello");
     
     flow.connect(constActor, workerActor);
@@ -61,7 +61,7 @@ public class ModelValidationServiceTest extends TestCase {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("1.6.3");
     
-    MockWorker workerActor = new MockWorker(flow, "worker");
+    Delay workerActor = new Delay(flow, "worker");
     new VersionAttribute(workerActor, "_version").setExpression("10.1.0-world");
     
     flow.connect(constActor, workerActor);
@@ -76,7 +76,7 @@ public class ModelValidationServiceTest extends TestCase {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("1.2.3");
     
-    MockWorker workerActor = new MockWorker(flow, "worker");
+    Delay workerActor = new Delay(flow, "worker");
     new VersionAttribute(workerActor, "_version").setExpression("10.0.0-hello");
     
     DevNullActor devNullActor = new DevNullActor(flow, "devNull");
@@ -95,7 +95,7 @@ public class ModelValidationServiceTest extends TestCase {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("2.6.3");
     
-    MockWorker workerActor = new MockWorker(flow, "worker");
+    Delay workerActor = new Delay(flow, "worker");
     new VersionAttribute(workerActor, "_version").setExpression("10.1.0-world");
     
     flow.connect(constActor, workerActor);
@@ -111,7 +111,7 @@ public class ModelValidationServiceTest extends TestCase {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("1.6.3");
     
-    MockWorker workerActor = new MockWorker(flow, "worker");
+    Delay workerActor = new Delay(flow, "worker");
     new VersionAttribute(workerActor, "_version").setExpression("9.1.0-world");
     
     flow.connect(constActor, workerActor);
@@ -120,7 +120,7 @@ public class ModelValidationServiceTest extends TestCase {
     ModelValidationService.getInstance().validate(flow, context );
     
     assertFalse("Actors with newer major versions as registered, should be validated NOK", context.isValid());
-    assertTrue("MockWorker actor should be marked with invalid version",  !context.getErrors(workerActor).isEmpty());
+    assertTrue("Delay actor should be marked with invalid version",  !context.getErrors(workerActor).isEmpty());
   }
   
 

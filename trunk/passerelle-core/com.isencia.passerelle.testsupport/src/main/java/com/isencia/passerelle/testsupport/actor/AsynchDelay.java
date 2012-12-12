@@ -22,6 +22,7 @@ import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 
+@SuppressWarnings("serial")
 public class AsynchDelay extends Delay {
 
   public AsynchDelay(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {

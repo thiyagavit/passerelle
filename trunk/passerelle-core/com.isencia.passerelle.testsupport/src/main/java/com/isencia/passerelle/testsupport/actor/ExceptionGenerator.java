@@ -31,13 +31,14 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 
 /**
  * @author erwin
  */
+@SuppressWarnings("serial")
 public class ExceptionGenerator extends Actor {
 
   public Port input;
@@ -46,7 +47,7 @@ public class ExceptionGenerator extends Actor {
   public Parameter runtimeExcParameter;
 
   public Parameter severityParam;
-  public Severity severity = Severity.NON_FATAL;
+  public ErrorCode errorCode = ErrorCode.ERROR;
 
   public Parameter preInitExcParameter;
   public Parameter initExcParameter;
@@ -70,9 +71,9 @@ public class ExceptionGenerator extends Actor {
     new CheckBoxStyle(runtimeExcParameter, "rte box");
 
     severityParam = new StringParameter(this, "severity");
-    severityParam.setExpression(severity.toString());
-    severityParam.addChoice(Severity.FATAL.toString());
-    severityParam.addChoice(Severity.NON_FATAL.toString());
+    severityParam.setExpression(ErrorCode.ERROR.name());
+    severityParam.addChoice(ErrorCode.ERROR.name());
+    severityParam.addChoice(ErrorCode.FATAL.name());
 
     preInitExcParameter = new Parameter(this, "preInit Exception", BooleanToken.FALSE);
     new CheckBoxStyle(preInitExcParameter, "check box");
@@ -92,9 +93,9 @@ public class ExceptionGenerator extends Actor {
   public void attributeChanged(final Attribute attribute) throws IllegalActionException {
     if (attribute == severityParam) {
       String severityStr = ((StringToken) severityParam.getToken()).stringValue();
-      severity= Severity.NON_FATAL;
-      if (Severity.FATAL.toString().equals(severityStr)) {
-        severity = Severity.FATAL;
+      errorCode = ErrorCode.ERROR;
+      if (ErrorCode.FATAL.name().equals(severityStr)) {
+        errorCode = ErrorCode.FATAL;
       }
     } else {
       super.attributeChanged(attribute);
@@ -107,20 +108,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) preInitExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new InitializationException("Error reading parameter", this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new InitializationException("Error reading parameter", this, e);
+        throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".doPreInitialize";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new InitializationException(severity, message, this, null);
+        throw new InitializationException(errorCode, message, this, null);
       }
     } else {
       super.doPreInitialize();
@@ -133,20 +134,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) initExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new InitializationException("Error reading parameter", this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new InitializationException("Error reading parameter", this, e);
+        throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".doInitialize";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new InitializationException(severity, message, this, null);
+        throw new InitializationException(errorCode, message, this, null);
       }
     } else {
       super.doInitialize();
@@ -159,20 +160,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) preFireExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new ProcessingException("Error reading parameter", this, e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new ProcessingException("Error reading parameter", this, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".doPreFire";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new ProcessingException(severity, message, this, null);
+        throw new ProcessingException(errorCode, message, this, null);
       }
     } else {
       return super.doPreFire();
@@ -185,20 +186,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) processExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new ProcessingException("Error reading parameter", this, e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new ProcessingException("Error reading parameter", this, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".process";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new ProcessingException(severity, message, this, null);
+        throw new ProcessingException(errorCode, message, this, null);
       }
     } else {
       response.addOutputMessage(output, request.getMessage(input));
@@ -211,20 +212,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) postFireExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new ProcessingException("Error reading parameter", this, e);
+      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new ProcessingException("Error reading parameter", this, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".doPostFire";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new ProcessingException(severity, message, this, null);
+        throw new ProcessingException(errorCode, message, this, null);
       }
     } else {
       return super.doPostFire();
@@ -237,20 +238,20 @@ public class ExceptionGenerator extends Actor {
     try {
       mustThrowException = ((BooleanToken) wrapupExcParameter.getToken()).booleanValue();
     } catch (IllegalActionException e) {
-      throw new TerminationException("Error reading parameter", this, e);
+      throw new TerminationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
     }
     if (mustThrowException) {
       boolean mustThrowRuntimeException = false;
       try {
         mustThrowRuntimeException = ((BooleanToken) runtimeExcParameter.getToken()).booleanValue();
       } catch (IllegalActionException e) {
-        throw new TerminationException("Error reading parameter", this, e);
+        throw new TerminationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error reading parameter", this, e);
       }
       String message = getName()+".doWrapUp";
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new TerminationException(severity, message, this, null);
+        throw new TerminationException(errorCode, message, this, null);
       }
     } else {
       super.doWrapUp();

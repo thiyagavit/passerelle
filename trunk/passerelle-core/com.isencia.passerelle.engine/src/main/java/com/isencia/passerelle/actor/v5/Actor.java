@@ -39,8 +39,8 @@ import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.ControlPort;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortMode;
@@ -186,7 +186,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       pushedMessages.offer(ctxt);
       msgQNonEmpty.signal();
     } catch (Exception e) {
-      throw new PasserelleException("Error storing received msg", ctxt.getMsg(), e);
+      throw new PasserelleException(ErrorCode.MSG_DELIVERY_FAILURE, "Error storing received msg", ctxt.getMsg(), e);
     } finally {
       try {
         msgQLock.unlock();
@@ -232,7 +232,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     try {
       triggerFirstIteration();
     } catch (IllegalActionException e) {
-      throw new InitializationException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
+      throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error triggering a fire iteration for source actor " + getFullName(), this, e);
     }
 
     getLogger().trace("{} - doInitialize() - exit", getFullName());
@@ -275,7 +275,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
             } catch (ProcessingException e) {
               throw e;
             } catch (PasserelleException e) {
-              throw new ProcessingException("Error getting messages from input port", _p, e);
+              throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", _p, e);
             }
             if (portExhausted) {
               blockingInputFinishRequests.put(handler.getPort(), Boolean.TRUE);
@@ -294,11 +294,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           // for all PULL ports having a message.
           int bufferTime = ((IntToken) bufferTimeParameter.getToken()).intValue();
           if (bufferTime > 0) {
-            getLogger().debug("{} - doPreFire() - sleeping for buffer time {}", getInfo(), bufferTime);
+            getLogger().debug("{} - doPreFire() - sleeping for buffer time {}", getFullName(), bufferTime);
             Thread.sleep(bufferTime);
           }
         } catch (Exception e) {
-          getLogger().warn(getInfo() + " - Failed to enforce buffer time", e);
+          getLogger().warn(getFullName() + " - Failed to enforce buffer time", e);
         }
         // we've got at least one PUSH port that registered a msg provider
         // so we need to include all pushed msgs in the request as well
@@ -333,7 +333,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
             getErrorControlStrategy().handleIterationValidationException(this, e);
           } catch (IllegalActionException e1) {
             // interpret this is a FATAL error
-            throw new ProcessingException(Severity.FATAL, "Error reporting iteration validation error", this, e);
+            throw new ProcessingException(ErrorCode.ERROR_PROCESSING_FAILURE, "Error reporting iteration validation error", this, e);
           }
         }
       }
@@ -376,7 +376,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       try {
         triggerNextIteration();
       } catch (IllegalActionException e) {
-        throw new ProcessingException("Error triggering a fire iteration for source actor " + getFullName(), this, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error triggering a fire iteration for source actor " + getFullName(), this, e);
       }
     }
 
@@ -422,7 +422,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
         // if we did not get the lock, something is getting overcharged,
         // so refuse the task
-        throw new ProcessingException("Msg Queue lock overcharged...", this, null);
+        throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock overcharged...", this, null);
       }
       // while (!isFinishRequested() && !areAllInputsFinished() && pushedMessages.isEmpty()) {
       // msgQNonEmpty.await(100, TimeUnit.MILLISECONDS);
@@ -433,7 +433,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         msgCtr++;
       }
     } catch (InterruptedException e) {
-      throw new ProcessingException("Msg Queue lock interrupted...", this, null);
+      throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock interrupted...", this, null);
     } finally {
       try {
         msgQLock.unlock();
@@ -450,11 +450,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       if (!msgQLock.tryLock(1, TimeUnit.SECONDS)) {
         // if we did not get the lock, something is getting overcharged,
         // so refuse the task
-        throw new ProcessingException("Msg Queue lock overcharged...", this, null);
+        throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock overcharged...", this, null);
       }
       result = !pushedMessages.isEmpty();
     } catch (InterruptedException e) {
-      throw new ProcessingException("Msg Queue lock interrupted...", this, null);
+      throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock interrupted...", this, null);
     } finally {
       try {
         msgQLock.unlock();
@@ -536,7 +536,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
               ManagedMessage msgInSeq = MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
               sendOutputMsg(context.getPort(), msgInSeq);
             } catch (MessageException e) {
-              throw new ProcessingException("Error creating output sequence msg for msg " + context.getMessage().getID(), context.getMessage(), e);
+              throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(), context.getMessage(), e);
             }
           }
         }

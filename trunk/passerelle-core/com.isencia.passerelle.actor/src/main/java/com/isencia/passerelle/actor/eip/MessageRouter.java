@@ -25,6 +25,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -34,6 +35,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  *
  */
 public abstract class MessageRouter extends Actor {
+  private static final long serialVersionUID = 1L;
   public Port input;
   public Port defaultOutput;
   public OutputPortConfigurationExtender outputPortCfgExt;
@@ -67,7 +69,7 @@ public abstract class MessageRouter extends Actor {
       if(!foundSelectedPort)
         response.addOutputMessage(defaultOutput, inputMsg);
     } catch (Exception e) {
-      throw new ProcessingException("Error matching filter for "+getFullName(), inputMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter for "+getFullName(), inputMsg, e);
     }
   }
   

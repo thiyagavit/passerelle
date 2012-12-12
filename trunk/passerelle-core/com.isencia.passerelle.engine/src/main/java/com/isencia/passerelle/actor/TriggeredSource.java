@@ -20,6 +20,7 @@ import ptolemy.data.Token;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -33,8 +34,8 @@ import com.isencia.passerelle.message.MessageHelper;
  * @author dirk
  */
 public abstract class TriggeredSource extends Source {
-
-  private static Logger logger = LoggerFactory.getLogger(TriggeredSource.class);
+  private static final long serialVersionUID = 1L;
+  private static Logger LOGGER = LoggerFactory.getLogger(TriggeredSource.class);
 
   public final static String TRIGGER_PORT = "trigger";
 
@@ -52,57 +53,34 @@ public abstract class TriggeredSource extends Source {
    */
   public TriggeredSource(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
-
-    /**
-     * The trigger port.
-     */
     trigger = PortFactory.getInstance().createInputPort(this, TRIGGER_PORT, null);
-
   }
 
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
+  }
+  
   protected void doInitialize() throws InitializationException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     super.doInitialize();
-
     triggerConnected = trigger.getWidth() > 0;
     if (triggerConnected) {
-      if (logger.isDebugEnabled())
-        logger.debug(getInfo() + " - Trigger(s) connected");
       triggerHandler = createPortHandler(trigger);
       triggerHandler.start();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit ");
-
   }
 
   protected boolean doPreFire() throws ProcessingException {
     boolean res = true;
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo());
-
     if (isTriggerConnected() && mustWaitForTrigger()) {
       ManagedMessage triggerMsg = waitForTrigger();
       if (isFinishRequested() || (triggerMsg == null))
         res = false;
     }
-    if (res)
-      res = super.doPreFire();
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " - exit " + " :" + res);
-
-    return res;
+    return res && super.doPreFire();
   }
 
   protected boolean doPostFire() throws ProcessingException {
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPostFire() - entry");
-
     boolean res = !hasNoMoreMessages() || isTriggerConnected();
     if (!res) {
       // just to make sure base class knows that we're finished
@@ -110,10 +88,6 @@ public abstract class TriggeredSource extends Source {
     } else {
       res = super.doPostFire();
     }
-
-    if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doPostFire() - exit :" + res);
-
     return res;
   }
 
@@ -124,9 +98,7 @@ public abstract class TriggeredSource extends Source {
    */
   public final ManagedMessage waitForTrigger() throws ProcessingException {
     if (triggerConnected) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(getInfo() + " - Waiting for trigger");
-      }
+      getLogger().debug("{} - Waiting for trigger", getFullName());
       Token token = triggerHandler.getToken();
       if (token == null) {
         // no more triggers will arrive so let's call it quits
@@ -136,10 +108,10 @@ public abstract class TriggeredSource extends Source {
         try {
           ManagedMessage message = MessageHelper.getMessageFromToken(token);
           acceptTriggerMessage(message);
-          logger.debug("{} - Trigger received",getInfo());
+          getLogger().debug("{} - Trigger received",getFullName());
           return message;
         } catch (PasserelleException e) {
-          throw new ProcessingException("Error handling token", token, e);
+          throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error handling trigger", this, e);
         }
       } else {
         return null;
@@ -167,5 +139,4 @@ public abstract class TriggeredSource extends Source {
   }
 
   protected abstract boolean mustWaitForTrigger();
-
 }

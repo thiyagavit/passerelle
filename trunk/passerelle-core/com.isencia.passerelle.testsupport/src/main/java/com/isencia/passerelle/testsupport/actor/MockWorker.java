@@ -40,6 +40,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  * @deprecated Just use the Delay actor that has similar functionality.
  *
  */
+@SuppressWarnings("serial")
 public class MockWorker extends Actor {
   
   public Parameter workTimeParameter;

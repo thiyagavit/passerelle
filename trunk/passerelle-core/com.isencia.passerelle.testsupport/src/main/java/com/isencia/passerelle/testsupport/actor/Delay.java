@@ -27,6 +27,7 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 
 /**
  * Simple actor for testing, that mocks some work for each incoming msg,
@@ -34,12 +35,14 @@ import com.isencia.passerelle.actor.v5.ProcessResponse;
  * 
  * @author erwin
  */
+@SuppressWarnings("serial")
 public class Delay extends Forwarder {
   private final static Logger LOGGER = LoggerFactory.getLogger(Delay.class);
 
   public Parameter timeParameter = null;
   
   private boolean fireInterrupted;
+  private boolean flowExecutionStopped;
 
   /**
    * Construct an actor with the given container and name.
@@ -65,7 +68,7 @@ public class Delay extends Forwarder {
       if (time > 0) {
         for (int i = 0; i < time; ++i) {
           Thread.sleep(1000);
-          if (isFinishRequested() || fireInterrupted) {
+          if (isFinishRequested() || fireInterrupted || flowExecutionStopped) {
             break;
           }
         }
@@ -73,7 +76,7 @@ public class Delay extends Forwarder {
     } catch (InterruptedException e) {
       // do nothing, means someone wants us to stop
     } catch (Exception e) {
-      throw new ProcessingException("[PASS-EX-1111] - Error in delay processing", this, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in delay processing", this, e);
     }
 
     super.process(ctxt, request, response);
@@ -83,6 +86,7 @@ public class Delay extends Forwarder {
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
     fireInterrupted = false;
+    flowExecutionStopped = false;
   }
   
   @Override
@@ -91,6 +95,12 @@ public class Delay extends Forwarder {
     fireInterrupted = true;
   }
   
+  @Override
+  protected void doStop() {
+    super.doStop();
+    flowExecutionStopped = true;
+  }
+
   @Override
   public Logger getLogger() {
     return LOGGER;

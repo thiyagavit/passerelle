@@ -76,7 +76,7 @@ public class ErrorMessageContainer extends MessageContainer {
 	 */
 	public Throwable getRootException() {
 		try {
-			return ((PasserelleException)getBodyContent()).getRootException();
+			return ((PasserelleException)getBodyContent()).getCause();
 		} catch (Throwable e) {
 			return null;
 		}

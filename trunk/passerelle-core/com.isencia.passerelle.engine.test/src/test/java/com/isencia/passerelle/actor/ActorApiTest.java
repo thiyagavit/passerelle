@@ -23,8 +23,8 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.Const;
+import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;
-import com.isencia.passerelle.testsupport.actor.MockWorker;
 
 public class ActorApiTest extends TestCase {
   /**
@@ -60,9 +60,9 @@ public class ActorApiTest extends TestCase {
     
     Const source = new Const(flow,"Constant");
     DevNullActor sink = new DevNullActor(flow, "sink");
-    MockWorker firstWorker = new MockWorker(flow, "firstWorker");
-    MockWorker secondWorker = new MockWorker(flow, "secondWorker");
-    MockWorker thirdWorker = new MockWorker(flow, "thirdWorker");
+    Delay firstWorker = new Delay(flow, "firstWorker");
+    Delay secondWorker = new Delay(flow, "secondWorker");
+    Delay thirdWorker = new Delay(flow, "thirdWorker");
     InitializationValidator validationError = new InitializationValidator(flow, "validationError");
     InitializationValidator validationOk = new InitializationValidator(flow, "validationOk");
     
@@ -104,9 +104,9 @@ public class ActorApiTest extends TestCase {
     
     Const source = new Const(flow,"Constant");
     DevNullActor sink = new DevNullActor(flow, "sink");
-    MockWorker firstWorker = new MockWorker(flow, "firstWorker");
-    MockWorker secondWorker = new MockWorker(flow, "secondWorker");
-    MockWorker thirdWorker = new MockWorker(flow, "thirdWorker");
+    Delay firstWorker = new Delay(flow, "firstWorker");
+    Delay secondWorker = new Delay(flow, "secondWorker");
+    Delay thirdWorker = new Delay(flow, "thirdWorker");
     InitializationValidator validationError = new InitializationValidator(flow, "validationError");
     InitializationValidator validationOk = new InitializationValidator(flow, "validationOk");
     
@@ -150,9 +150,9 @@ public class ActorApiTest extends TestCase {
     
     Const source = new Const(flow,"Constant");
     DevNullActor sink = new DevNullActor(flow, "sink");
-    MockWorker firstWorker = new MockWorker(flow, "firstWorker");
-    MockWorker secondWorker = new MockWorker(flow, "secondWorker");
-    MockWorker thirdWorker = new MockWorker(flow, "thirdWorker");
+    Delay firstWorker = new Delay(flow, "firstWorker");
+    Delay secondWorker = new Delay(flow, "secondWorker");
+    Delay thirdWorker = new Delay(flow, "thirdWorker");
     InitializationValidator validationError = new InitializationValidator(flow, "validationError");
     InitializationValidator validationOk = new InitializationValidator(flow, "validationOk");
     

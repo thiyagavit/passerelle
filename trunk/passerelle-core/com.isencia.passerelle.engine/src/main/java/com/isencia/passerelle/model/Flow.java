@@ -248,7 +248,7 @@ public class Flow extends TypedCompositeActor {
 				input.unlink(relation);
 				output.unlink(relation);
 			}
-			if(!relation.linkedPorts().hasMoreElements()) {
+			if(relation.linkedPortList().isEmpty()) {
 				// the relation was only between the given ports
 				// so now it doesn't connect anything anymore
 				// and we'll just remove it altogether

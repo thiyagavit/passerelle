@@ -11,40 +11,32 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 package com.isencia.passerelle.model;
 
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
 /**
- * Exception thrown when someone tries to stop the execution of a given Flow
- * while it is not executing.
+ * Exception thrown when someone tries to stop the execution of a given Flow while it is not executing.
  * 
  * @author erwin
- *
  */
+@SuppressWarnings("serial")
 public class FlowNotExecutingException extends PasserelleException {
 
-	/**
-	 * @param message
-	 * @param context
-	 * @param rootException
-	 */
-	public FlowNotExecutingException(String message, Object context,
-			Throwable rootException) {
-		super(message, context, rootException);
-	}
-
-	/**
-	 * @param severity
-	 * @param message
-	 * @param context
-	 * @param rootException
-	 */
-	public FlowNotExecutingException(Severity severity, String message,
-			Object context, Throwable rootException) {
-		super(severity, message, context, rootException);
-	}
-
+  /**
+   * @param context
+   */
+  public FlowNotExecutingException(Object context) {
+    super(ErrorCode.FLOW_STATE_ERROR, "Flow not executing", context, null);
+  }
+  /**
+   * @param errorCode
+   * @param context
+   */
+  public FlowNotExecutingException(ErrorCode errorCode, Object context) {
+    super(errorCode, context, null);
+  }
 }

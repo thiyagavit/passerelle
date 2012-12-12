@@ -50,7 +50,7 @@ public class ErrorCatcher extends Actor {
 
 	private static final long serialVersionUID = 1L;
 
-	private final static Logger logger = LoggerFactory.getLogger(ErrorCatcher.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ErrorCatcher.class);
 
 	public Port input;
 	public Port output;
@@ -129,6 +129,6 @@ public class ErrorCatcher extends Actor {
 
   @Override
   protected Logger getLogger() {
-    return logger;
+    return LOGGER;
   }
 }
