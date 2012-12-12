@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -17,6 +19,7 @@ import com.isencia.passerelle.actor.dynaport.DynamicNamedOutputPortsActor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -45,8 +48,10 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
  * 
  */
 public class Fork extends DynamicNamedOutputPortsActor {
-	
-	// Header name to set the name of this actor in each outgoing msg
+  private static final long serialVersionUID = 1L;
+  private static final Logger LOGGER = LoggerFactory.getLogger(Fork.class);
+
+  // Header name to set the name of this actor in each outgoing msg
 	// join actors must then search for this actor with that name.
 	// This assumes that Fork and Join are within the same containing CompositeActor.
 	public final static String FORK_ACTOR_HEADER_NAME = "__PSRL_FORK_ACTOR";
@@ -67,6 +72,11 @@ public class Fork extends DynamicNamedOutputPortsActor {
 		input = PortFactory.getInstance().createInputPort(this, null);
 	}
 
+	@Override
+	protected Logger getLogger() {
+	  return LOGGER;
+	}
+	
 	@Override
 	protected void process(ActorContext ctx, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
 		MessageContainer message = (MessageContainer) procRequest.getMessage(input);
@@ -100,7 +110,7 @@ public class Fork extends DynamicNamedOutputPortsActor {
 					procResponse.addOutputMessage(outputPorts.get(i), outputMsg);
 				}
 			} catch (Exception e) {
-				throw new ProcessingException("", message, e);
+				throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR,"Error generating forked messages", message, e);
 			}
 		}
 	}
@@ -126,12 +136,10 @@ public class Fork extends DynamicNamedOutputPortsActor {
   		seqTrace.addMessage(branchedMsg);
 			if(seqTrace.isComplete()) {
 				try {
-					if(getAuditLogger().isDebugEnabled()) {
-						getAuditLogger().debug(getInfo()+" - All branch messages received for scope "+scopeId);
-					}
+					getAuditLogger().debug("{} All branch messages received for scope {}", getFullName(), scopeId);
 					mergedMsg = mergeFromMessages(seqTrace);
 				} catch (Exception e) {
-					throw new ProcessingException("Error merging messages for scope "+scopeId, this, e);
+					throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error merging messages for scope "+scopeId, this, e);
 				} finally {
 					msgSequences.remove(seqTrace);
 					seqTrace.clear();
@@ -160,12 +168,17 @@ public class Fork extends DynamicNamedOutputPortsActor {
   }
 
 	@Override
-	protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {
-		if (message.getBodyContent() instanceof Context) {
-			Context diagnosisContext = (Context) message.getBodyContent();
-			return port.getFullName() + " - msg for request " + diagnosisContext.getRequest().getId();
-		} else {
-			return super.getAuditTrailMessage(message, port);
-		}
+	protected String getAuditTrailMessage(ManagedMessage message, Port port) {
+		try {
+      if (message.getBodyContent() instanceof Context) {
+      	Context diagnosisContext = (Context) message.getBodyContent();
+      	return port.getFullName() + " - msg for request " + diagnosisContext.getRequest().getId();
+      } else {
+      	return super.getAuditTrailMessage(message, port);
+      }
+    } catch (MessageException e) {
+      getLogger().error("Error getting msg content", e);
+      return super.getAuditTrailMessage(message, port);
+    }
 	}
 }
