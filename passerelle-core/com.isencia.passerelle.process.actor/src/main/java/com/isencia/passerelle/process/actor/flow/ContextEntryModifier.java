@@ -30,6 +30,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -98,9 +99,9 @@ public class ContextEntryModifier extends Actor {
 
     String mode = modeParameter.getExpression();
     try {
-      Mode m = Mode.valueOf(mode);
+      Mode.valueOf(mode);
     } catch (IllegalArgumentException e) {
-      throw new ValidationException("Invalid mode " + mode, this, null);
+      throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Invalid mode " + mode, this, null);
     }
   }
 
@@ -122,7 +123,7 @@ public class ContextEntryModifier extends Actor {
         }
         response.addOutputMessage(output, message);
       } catch (Exception e) {
-        throw new ProcessingException("Failed to modify Context entries", message, e);
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to modify Context entries", message, e);
       }
     }
   }
@@ -137,6 +138,7 @@ public class ContextEntryModifier extends Actor {
    * @throws IllegalStateException e.g. when the Context has a conflicting entry for e.g. scope
    * @throws IllegalArgumentException e.g. when an invalid mode is passed
    */
+  @SuppressWarnings("unchecked")
   private void doItOnScope(Context diagnosisContext, String modeStr, String scopeStr, String entryName, String entryValue) throws IllegalStateException, IllegalArgumentException {
     Object scopeObj = diagnosisContext.getEntryValue(scopeStr);
     HashMap<String, String> scopeMap = null;
