@@ -25,16 +25,11 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
-import com.isencia.passerelle.actor.dynaport.InputPortBuilder;
-import com.isencia.passerelle.actor.dynaport.InputPortConfigurationExtender;
 import com.isencia.passerelle.actor.dynaport.InputPortSetterBuilder;
-import com.isencia.passerelle.actor.dynaport.OutputPortConfigurationExtender;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -43,12 +38,10 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * @author delerw
  */
 public class MultiInputsTracerConsole extends Actor {
-
+  private static final long serialVersionUID = 1L;
   public Parameter chopLengthParam;
   private long counter;
 
-//  public Port input;
-  
   InputPortSetterBuilder inputPortBldr;
   private static final String INPUT_PORTNAMES = "Input port names (comma-separated)";
   public StringParameter inputPortNamesParameter = null;

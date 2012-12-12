@@ -25,12 +25,13 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 
 public class TextSource extends Actor {
-
+  private static final long serialVersionUID = 1L;
   public Port output;
   public StringParameter textParameter;
   public String[] messageContents;
@@ -50,7 +51,7 @@ public class TextSource extends Actor {
       String tokenMessage = ((StringToken) textParameter.getToken()).stringValue();
       messageContents = tokenMessage.split(",");
     } catch (Exception e) {
-      throw new InitializationException("Error reading configured msg contents", this, e);
+      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading configured msg contents", this, e);
     }
   }
 
@@ -71,7 +72,7 @@ public class TextSource extends Actor {
         requestFinish();
       }
     } catch (Exception e) {
-      throw new ProcessingException("[PASS-EX-1111] - Error creating output msg", this, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output msg", this, e);
     }
   }
 }

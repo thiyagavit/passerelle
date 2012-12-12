@@ -28,6 +28,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  *
  */
 public class RandomMessageRouter extends MessageRouter {
+  private static final long serialVersionUID = 1L;
 
   /**
    * @param container

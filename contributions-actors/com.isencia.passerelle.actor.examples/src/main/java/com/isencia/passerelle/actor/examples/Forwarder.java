@@ -22,6 +22,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -29,7 +30,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 
 public class Forwarder extends Actor {
-  
+  private static final long serialVersionUID = 1L;
   public Port input;
   public Port output;
 
@@ -48,7 +49,7 @@ public class Forwarder extends Actor {
       ManagedMessage outputMsg = MessageFactory.getInstance().createCausedCopyMessage(receivedMsg);
       response.addOutputMessage(output, outputMsg);
     } catch (MessageException e) {
-      throw new ProcessingException("[PASS-EX-1111] - Failed to create & send output msg", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Failed to create & send output msg", receivedMsg, e);
     }
   }
 }

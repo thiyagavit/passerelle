@@ -28,6 +28,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortMode;
@@ -38,6 +39,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * @author erwin
  */
 public class DelayWithExecutionTrace extends Actor {
+  private static final long serialVersionUID = 1L;
   private final static Logger LOGGER = LoggerFactory.getLogger(DelayWithExecutionTrace.class);
 
   public Parameter timeParameter = null;
@@ -93,20 +95,16 @@ public class DelayWithExecutionTrace extends Actor {
       } catch (InterruptedException e) {
         // do nothing, means someone wants us to stop
       } catch (Exception e) {
-        throw new ProcessingException("[PASS-EX-1111] - Error in delay processing", this, e);
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in delay processing", this, e);
       }
 
-      try {
-        if(PortMode.PUSH.equals(input.getMode())) {
-          // To make sure we send each outgoing msg right after its delay passed,
-          // an explicit sendOutputMsg() must be done here, i.o. adding to the response object.
-          // The response object is only processed, i.e. its contained msgs are only sent, when the process() method returns!
-          sendOutputMsg(output, msg);
-        } else {
-          response.addOutputMessage(output, msg);
-        }
-      } catch (IllegalArgumentException e) {
-        throw new ProcessingException("[PASS-EX-1111] - Error in output sending", msg, e);
+      if(PortMode.PUSH.equals(input.getMode())) {
+        // To make sure we send each outgoing msg right after its delay passed,
+        // an explicit sendOutputMsg() must be done here, i.o. adding to the response object.
+        // The response object is only processed, i.e. its contained msgs are only sent, when the process() method returns!
+        sendOutputMsg(output, msg);
+      } else {
+        response.addOutputMessage(output, msg);
       }
     }
   }

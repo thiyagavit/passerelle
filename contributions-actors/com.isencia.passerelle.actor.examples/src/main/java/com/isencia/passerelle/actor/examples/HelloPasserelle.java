@@ -25,6 +25,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -81,7 +82,7 @@ public class HelloPasserelle extends Actor {
     } catch (Exception e) {
       // When something failed, throw a ProcessingException which will be handled as needed
       // by Passerelle's default error handling mechanisms.
-      throw new ProcessingException("[PASS-EX-1234] - Failed to transform the received text", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to transform the received text", receivedMsg, e);
     }
   }
 }

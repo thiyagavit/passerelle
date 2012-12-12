@@ -25,6 +25,7 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -117,7 +118,7 @@ public abstract class Filter extends Actor {
     } catch (ProcessingException e) {
       throw e;
     } catch (Exception e) {
-      throw new ProcessingException("[PASS-EX-1100] - Error matching filter for "+getFullName(), inputMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter for "+getFullName(), inputMsg, e);
     }
   }
   
