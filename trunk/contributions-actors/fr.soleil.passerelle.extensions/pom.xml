@@ -109,9 +109,9 @@
 		</plugins>
 	</build>
 
- 	<properties>
- 		<maven.test.skip>true</maven.test.skip>
-	</properties> 
+<!--  	<properties> -->
+<!--  		<maven.test.skip>true</maven.test.skip> -->
+<!-- 	</properties>  -->
 
 	<dependencies>
 		<dependency>
