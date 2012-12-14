@@ -118,6 +118,7 @@ public class Flow extends TypedCompositeActor {
 		super(workspace);
 		this.authorativeResourceLocation = authorativeResourceLocation;
 		handle = new FlowHandle(0L, null, authorativeResourceLocation);
+		handle.setLocalFlow(this);
 	}
 
   @Override
