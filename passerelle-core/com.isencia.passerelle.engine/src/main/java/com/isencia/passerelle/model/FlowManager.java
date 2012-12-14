@@ -381,6 +381,7 @@ public class FlowManager {
     final MoMLParser parser = new MoMLParser(null, versionSpec, classLoader);
     final Flow toplevel = (Flow) parser.parse(null, in);
     final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), null);
+    handle.setLocalFlow(toplevel);
     toplevel.setHandle(handle);
     return toplevel;
   }
@@ -593,6 +594,7 @@ public class FlowManager {
 	 */
 	public void executeBlockingLocally(Flow flow, Map<String, String> props) throws FlowAlreadyExecutingException, PasserelleException {
 		FlowHandle handle = flow.getHandle();
+		handle.setLocalFlow(flow);
 		if(handle==null) {
       throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Invalid flow : missing FlowHandle", flow, null);
 		}
