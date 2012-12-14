@@ -7,7 +7,7 @@ Bundle-Activator: com.isencia.passerelle.engine.activator.Activator
 Bundle-Vendor: ISENCIA
 Eclipse-BuddyPolicy: registered
 Eclipse-RegisterBuddy: ptolemy.core
-Import-Package: com.isencia.sherpa.commons;version="6.2.5",
+Import-Package: com.isencia.sherpa.commons,
  com.thoughtworks.xstream,
  javax.activation,
  javax.mail,
