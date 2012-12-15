@@ -10,7 +10,7 @@ Import-Package:
  com.isencia.passerelle.process.model,
  com.isencia.passerelle.process.model.factory,
  com.isencia.passerelle.process.model.service,
- com.isencia.sherpa.commons;version="6.2.0",
+ com.isencia.sherpa.commons,
  javax.mail,
  javax.mail.internet,
  org.apache.commons.lang;version="2.4.0",
