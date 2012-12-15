@@ -403,8 +403,10 @@ public class ModelUtils {
     }
 
     String name = comp.workspace().getName();
-    IProject project  = (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
-    
+    IProject project = null;
+    if (!name.equals("")) {
+      project = (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
+    }
     if (project == null) {
       // If this .moml is in .passerelle we return that project
       project = ModelUtils.getPasserelleProject();
