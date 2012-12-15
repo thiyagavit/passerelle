@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE plot PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="tango viewers" class="ptolemy.moml.EntityLibrary">
+  <configure>
+    <?moml
+      <group>
+<doc>Viewer</doc>
+
+
+<entity name="ScalarViewer" class="fr.soleil.passerelle.ScalarViewer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SpectrumViewer" class="fr.soleil.passerelle.SpectrumViewer">
+	<property name="_controllerFactory" class="ptolemy.vergil.basic.NodeControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="ImageViewer" class="fr.soleil.passerelle.ImageViewer">
+	<property name="_controllerFactory" class="ptolemy.vergil.basic.NodeControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="MultipleSpectrumViewer" class="fr.soleil.passerelle.MultipleSpectrumViewer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+      </group>
+    ?>
+  </configure>
+</entity>
