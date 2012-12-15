@@ -380,6 +380,7 @@ public class FlowManager {
     final MoMLParser parser = new MoMLParser(null, versionSpec, classLoader);
     final Flow toplevel = (Flow) parser.parse(null, in);
     final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), null);
+    handle.setLocalFlow(toplevel);
     toplevel.setHandle(handle);
     return toplevel;
   }
