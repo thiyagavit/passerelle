@@ -30,7 +30,6 @@ import com.isencia.message.NoMoreMessagesException;
 import com.isencia.message.interceptor.IMessageInterceptorChain;
 import com.isencia.message.interceptor.MessageInterceptorChain;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.interceptor.TextToMessageConverter;
@@ -237,7 +236,7 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
         // ignore, just return null and the source will finish
         // its life-cycle automatically
       } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error getting message from channel", this, e);
       }
     }
     if (messageBuffer != null) {
@@ -264,7 +263,7 @@ public abstract class TriggeredChannelSource extends TriggeredSource {
         // ignore, just return null and the source will finish
         // its life-cycle automatically
       } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error getting message from channel", this, e);
       } finally {
         messageBuffer = msg;
       }

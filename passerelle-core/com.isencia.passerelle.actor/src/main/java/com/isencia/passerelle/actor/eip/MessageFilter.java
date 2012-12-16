@@ -120,7 +120,7 @@ public abstract class MessageFilter extends Actor {
     } catch (ProcessingException e) {
       throw e;
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter for "+getFullName(), inputMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter", this, inputMsg, e);
     }
   }
   

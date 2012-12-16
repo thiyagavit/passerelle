@@ -47,7 +47,9 @@ import com.isencia.passerelle.ext.DirectorAdapter;
  *
  */
 public class Flow extends TypedCompositeActor {
-	/**
+  private static final long serialVersionUID = 1L;
+
+  /**
 	 * For a top-level Flow instance, this field contains the authorative resource location
 	 * from which this Flow instance was constructed.
 	 * 
@@ -102,7 +104,7 @@ public class Flow extends TypedCompositeActor {
 		super(new Workspace(name));
 		setName(name);
 		this.authorativeResourceLocation = authorativeResourceLocation;
-		handle = new FlowHandle(0L, name, authorativeResourceLocation);
+		handle = new FlowHandle(0L, this, authorativeResourceLocation);
 	}
 
 
@@ -117,8 +119,7 @@ public class Flow extends TypedCompositeActor {
 	public Flow(Workspace workspace, URL authorativeResourceLocation) {
 		super(workspace);
 		this.authorativeResourceLocation = authorativeResourceLocation;
-		handle = new FlowHandle(0L, null, authorativeResourceLocation);
-		handle.setLocalFlow(this);
+		handle = new FlowHandle(0L, this, authorativeResourceLocation);
 	}
 
   @Override

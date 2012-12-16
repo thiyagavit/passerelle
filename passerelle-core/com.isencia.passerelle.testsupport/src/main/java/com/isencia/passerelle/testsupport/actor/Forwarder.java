@@ -50,7 +50,7 @@ public class Forwarder extends Actor {
       ManagedMessage outputMsg = MessageFactory.getInstance().createCausedCopyMessage(receivedMsg);
       response.addOutputMessage(output, outputMsg);
     } catch (MessageException e) {
-      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error constructing copy from received message from value parameter", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error constructing copy from received message from value parameter", this, receivedMsg, e);
     }
   }
 }

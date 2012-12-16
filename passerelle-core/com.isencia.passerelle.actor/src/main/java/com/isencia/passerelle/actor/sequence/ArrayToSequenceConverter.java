@@ -71,7 +71,7 @@ public final class ArrayToSequenceConverter extends Transformer {
         sendOutputMsg(output, message);
       }
     } catch (MessageException e) {
-      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "", message, e);
+      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "", this, message, e);
     }
   }
 }

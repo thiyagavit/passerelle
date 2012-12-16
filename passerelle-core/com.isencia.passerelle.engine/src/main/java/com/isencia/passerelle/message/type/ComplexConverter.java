@@ -73,7 +73,7 @@ public class ComplexConverter extends ConverterBase {
         }
         result = new ComplexToken(new Complex(complex.getReal(), complex.getImaginary()));
       } catch (ParseException e) {
-        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "", content, e);
+        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error converting " + content, e);
       }
     }
     return result;
@@ -132,7 +132,7 @@ public class ComplexConverter extends ConverterBase {
         }
         return new Complex(complex.getReal(), complex.getImaginary());
       } catch (ParseException e) {
-        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "", content, e);
+        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error converting " + content, e);
       }
     }
   }

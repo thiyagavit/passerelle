@@ -106,7 +106,7 @@ public abstract class MessageReceiverSource extends Source {
       if (messageReceiver != null)
         res = (ManagedMessage) messageReceiver.getMessage();
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from messageReceiver", res, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error getting message from messageReceiver", this, e);
     }
     getLogger().trace("{} getMessage() - exit",getFullName());
     return res;

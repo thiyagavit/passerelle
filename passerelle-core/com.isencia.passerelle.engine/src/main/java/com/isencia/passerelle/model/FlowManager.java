@@ -380,9 +380,9 @@ public class FlowManager {
   public static Flow readMoml(Reader in, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
     final MoMLParser parser = new MoMLParser(null, versionSpec, classLoader);
     final Flow toplevel = (Flow) parser.parse(null, in);
-    final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), null);
-    handle.setLocalFlow(toplevel);
-    toplevel.setHandle(handle);
+    // should no longer be necessary. A Flow and its handle are constructed together, during the parsing.
+//    final FlowHandle handle = new FlowHandle(0L, toplevel, null);
+//    toplevel.setHandle(handle);
     return toplevel;
   }
 
@@ -594,10 +594,11 @@ public class FlowManager {
 	 */
 	public void executeBlockingLocally(Flow flow, Map<String, String> props) throws FlowAlreadyExecutingException, PasserelleException {
 		FlowHandle handle = flow.getHandle();
-		handle.setLocalFlow(flow);
 		if(handle==null) {
       throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Invalid flow : missing FlowHandle", flow, null);
 		}
+    // should not be necessary, a flow's handle already knows about it's flow
+    //handle.setLocalFlow(flow);
 		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);
@@ -689,7 +690,8 @@ public class FlowManager {
 		if(handle==null) {
       throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Invalid flow : missing FlowHandle", flow, null);
 		}
-    handle.setLocalFlow(flow);
+    // should not be necessary, a flow's handle already knows about it's flow
+    //handle.setLocalFlow(flow);
 		checkFlowAlreadyExecuting(flow);
 		if (props != null) {
 			applyParameterSettings(flow, props);

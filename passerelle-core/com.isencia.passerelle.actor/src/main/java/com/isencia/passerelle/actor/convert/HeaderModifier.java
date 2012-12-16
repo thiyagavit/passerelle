@@ -112,7 +112,7 @@ public class HeaderModifier extends Transformer {
             message.removeBodyHeader(propName);
           }
         } catch (MessageException e) {
-          throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "", message, e);
+          throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "", this, message, e);
         }
       }
     }

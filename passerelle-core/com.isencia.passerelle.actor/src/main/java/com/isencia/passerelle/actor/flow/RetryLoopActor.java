@@ -101,7 +101,7 @@ public class RetryLoopActor extends Actor {
         counter = Integer.parseInt(counterHdrValue) + 1;
       } catch (NumberFormatException e) {
         // should not happen, means someone tampered with the header!!
-        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid counter header value " + counterHdrValue, msg, e);
+        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid counter header value " + counterHdrValue, this, msg, e);
       }
     }
     msg.setHeader(getFullName() + ".counter", Integer.toString(counter));
@@ -109,7 +109,7 @@ public class RetryLoopActor extends Actor {
     try {
       maxCounterValue = ((IntToken) retryCountParameter.getToken()).intValue();
     } catch (IllegalActionException e) {
-      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error getting max counter value", msg, e);
+      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error getting max counter value", this, msg, e);
     }
     if (counter < maxCounterValue) {
       response.addOutputMessage(retryOutput, msg);

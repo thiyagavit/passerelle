@@ -123,7 +123,7 @@ public abstract class Filter extends Actor {
       try {
         message = MessageHelper.getMessageFromToken(token);
       } catch (PasserelleException e) {
-        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", token, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input " + token, this, e);
       }
     } else {
       result = false;
@@ -145,7 +145,7 @@ public abstract class Filter extends Actor {
           try {
             outputOk.broadcast(token);
           } catch (Throwable e) {
-            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on OK output", message, e);
+            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on OK output", this, message, e);
           }
           getLogger().debug("{} - Sent message OK  {}:", getFullName(), token);
           getAuditLogger().debug("Sent message OK");
@@ -153,7 +153,7 @@ public abstract class Filter extends Actor {
           try {
             outputNotOk.broadcast(token);
           } catch (Throwable e) {
-            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on NotOK output", message, e);
+            throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on NotOK output", this, message, e);
           }
           getLogger().debug("{} - Sent message NOT OK  {}:", getFullName(), token);
           getAuditLogger().debug("Sent message NOT OK");

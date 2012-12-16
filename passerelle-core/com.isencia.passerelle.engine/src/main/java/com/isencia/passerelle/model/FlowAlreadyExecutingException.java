@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.model;
 
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
@@ -27,18 +28,18 @@ import com.isencia.passerelle.core.PasserelleException;
 public class FlowAlreadyExecutingException extends PasserelleException {
 
   /**
-   * @param context
+   * @param flow
    */
-  public FlowAlreadyExecutingException(Object context) {
-    super(ErrorCode.FLOW_STATE_ERROR, "Flow already executing", context, null);
+  public FlowAlreadyExecutingException(NamedObj flow) {
+    super(ErrorCode.FLOW_STATE_ERROR, "Flow already executing", flow, null);
   }
 
   /**
    * @param errorCode
-   * @param context
+   * @param flow
    */
-  public FlowAlreadyExecutingException(ErrorCode errorCode, Object context) {
-    super(errorCode, context, null);
+  public FlowAlreadyExecutingException(ErrorCode errorCode, NamedObj flow) {
+    super(errorCode, flow, null);
   }
 
 }

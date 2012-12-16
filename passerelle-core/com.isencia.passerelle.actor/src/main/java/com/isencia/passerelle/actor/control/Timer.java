@@ -185,7 +185,7 @@ public class Timer extends Actor {
     try {
       message.setBodyContent(Long.toString(time), "text/plain");
     } catch (MessageException e) {
-      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output msg", message, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output msg", this, message, e);
     }
     sendOutputMsg(outputPort, message);
   }

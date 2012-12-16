@@ -14,6 +14,9 @@
  */
 package com.isencia.passerelle.core;
 
+import ptolemy.kernel.util.NamedObj;
+import com.isencia.passerelle.message.ManagedMessage;
+
 
 /**
  * PasserelleException Base class for all exceptions in Passerelle.
@@ -79,11 +82,11 @@ public class PasserelleException extends Exception {
   /**
    * 
    * @param errorCode can not be null
-   * @param message
-   * @param context
+   * @param modelElement the element where the error was raised. 
+   * Typically an actor, or the parent flow ico non-actor-related errors.
    * @param rootException
    */
-  public PasserelleException(ErrorCode errorCode, Object context, Throwable rootException) {
+  public PasserelleException(ErrorCode errorCode, NamedObj modelElement, Throwable rootException) {
     super(errorCode!=null ? errorCode.getDescription() : null, rootException);
     if(errorCode==null) {
       throw new IllegalArgumentException("error code can not be null");
@@ -91,7 +94,7 @@ public class PasserelleException extends Exception {
     
     this.errorCode = errorCode;
     this.rootException = rootException;
-    this.context = context;
+    this.context = modelElement;
     if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
       this.severity = Severity.FATAL;
     } else {
@@ -101,18 +104,60 @@ public class PasserelleException extends Exception {
   /**
    * 
    * @param errorCode can not be null
-   * @param message
-   * @param context
+   * @param message containing extra info/description for the error
    * @param rootException
    */
-  public PasserelleException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
+  public PasserelleException(ErrorCode errorCode, String message, Throwable rootException) {
     super(message, rootException);
     if(errorCode==null) {
       throw new IllegalArgumentException("error code can not be null");
     }
     this.errorCode = errorCode;
     this.rootException = rootException;
-    this.context = context;
+    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+      this.severity = Severity.FATAL;
+    } else {
+      this.severity = Severity.NON_FATAL;
+    }
+  }
+  /**
+   * 
+   * @param errorCode can not be null
+   * @param message containing extra info/description for the error
+   * @param modelElement the element where the error was raised. 
+   * @param rootException
+   */
+  public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
+    super(message, rootException);
+    if(errorCode==null) {
+      throw new IllegalArgumentException("error code can not be null");
+    }
+    this.errorCode = errorCode;
+    this.rootException = rootException;
+    this.context = modelElement;
+    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+      this.severity = Severity.FATAL;
+    } else {
+      this.severity = Severity.NON_FATAL;
+    }
+  }
+
+  /**
+   * 
+   * @param errorCode can not be null
+   * @param message containing extra info/description for the error
+   * @param modelElement the element where the error was raised. 
+   * @param msgContext
+   * @param rootException
+   */
+  public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, ManagedMessage msgContext, Throwable rootException) {
+    super(message, rootException);
+    if(errorCode==null) {
+      throw new IllegalArgumentException("error code can not be null");
+    }
+    this.errorCode = errorCode;
+    this.rootException = rootException;
+    this.context = modelElement;
     if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
       this.severity = Severity.FATAL;
     } else {

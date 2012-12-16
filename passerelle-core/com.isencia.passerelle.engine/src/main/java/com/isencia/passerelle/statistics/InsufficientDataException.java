@@ -14,6 +14,7 @@
 */
 package com.isencia.passerelle.statistics;
 
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
@@ -36,10 +37,10 @@ public class InsufficientDataException extends PasserelleException {
   /**
    * @param errorCode
    * @param message
-   * @param context
+   * @param modelElement
    * @param rootException
    */
-  protected InsufficientDataException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
-    super(errorCode, message, context, rootException);
+  protected InsufficientDataException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
+    super(errorCode, message, modelElement, rootException);
   }
 }

@@ -104,7 +104,7 @@ public abstract class Transformer extends Actor {
       try {
         message = MessageHelper.getMessageFromToken(token);
       } catch (PasserelleException e) {
-        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input", token, e);
+        throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from input " + token, this, e);
       }
     } else {
       result = false;

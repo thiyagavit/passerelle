@@ -106,7 +106,7 @@ class MessageBuilder {
             try {
               mpElement = builder.build((Multipart) bodyContent);
             } catch (Exception e) {
-              throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Message-to-XML conversion error", bodyContent, e);
+              throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Message-to-XML conversion error", message, e);
             }
             if (mpElement != null) {
               bodyElement.addContent(mpElement);
@@ -118,7 +118,7 @@ class MessageBuilder {
       } catch (IllegalDataException e) {
         // don't add message object as context, as this leads to a cycle when trying
         // to log the exception which includes a toString on the context...
-        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Illegal content for XML", message.getBodyContentAsString(), e);
+        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Illegal content for XML", message, e);
       }
     }
     msgRoot.addContent(msgBody);
@@ -206,7 +206,7 @@ class MessageBuilder {
     try {
       msgDoc = bldr.build(new StringReader(msgXML));
     } catch (Exception e) {
-      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error parsing XML", msgXML, e);
+      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error parsing XML " + msgXML, e);
     }
     Element rootElem = msgDoc.getRootElement();
     List headerElements = rootElem.getChildren(headerTag);
@@ -224,7 +224,7 @@ class MessageBuilder {
     try {
       res.setBody(bpb.build(partElem));
     } catch (Exception e) {
-      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Failed to build message body", msgXML, e);
+      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Failed to build message body from " + msgXML, e);
     }
     return res;
   }
@@ -242,7 +242,7 @@ class MessageBuilder {
     try {
       res = (SettableMessage) message;
     } catch (ClassCastException e) {
-      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Message is not settable", msgXML, e);
+      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Message is not settable for "+msgXML, message, e);
     }
 
     SAXBuilder bldr = new SAXBuilder(false);
@@ -250,7 +250,7 @@ class MessageBuilder {
     try {
       msgDoc = bldr.build(new StringReader(msgXML));
     } catch (Exception e) {
-      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error parsing XML", msgXML, e);
+      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error parsing XML "+msgXML, message, e);
     }
     Element rootElem = msgDoc.getRootElement();
     List headerElements = rootElem.getChildren(headerTag);
@@ -268,7 +268,7 @@ class MessageBuilder {
     try {
       res.setBody(bpb.build(partElem));
     } catch (Exception e) {
-      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Failed to build message body", msgXML, e);
+      throw new MessageException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Failed to build message body "+msgXML, message, e);
     }
     return res;
   }

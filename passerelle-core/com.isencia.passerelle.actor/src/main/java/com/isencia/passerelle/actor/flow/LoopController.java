@@ -144,7 +144,7 @@ public class LoopController extends Actor {
           getLogger().debug("{} doFire() - found exhausted port {}", countPort);
         }
       } catch (MessageException e) {
-        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error reading msg content", countMsg, e);
+        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error reading msg content", this, countMsg, e);
       } catch (PasserelleException e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error reading from port", countPort, e);
       }
@@ -205,7 +205,7 @@ public class LoopController extends Actor {
       resultMsg = MessageFactory.getInstance().createMessageCopyInSequence(inputMsg, seqCount, new Long(seqPos), seqEnd);
       if (handledMsg != null) resultMsg.addCauseID(handledMsg.getID());
     } catch (MessageException e) {
-      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating msg copy", inputMsg, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating msg copy", this, inputMsg, e);
     }
     sendOutputMsg(outputPort, resultMsg);
   }

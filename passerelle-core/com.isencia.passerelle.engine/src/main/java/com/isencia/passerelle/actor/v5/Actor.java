@@ -186,7 +186,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       pushedMessages.offer(ctxt);
       msgQNonEmpty.signal();
     } catch (Exception e) {
-      throw new PasserelleException(ErrorCode.MSG_DELIVERY_FAILURE, "Error storing received msg", ctxt.getMsg(), e);
+      throw new PasserelleException(ErrorCode.MSG_DELIVERY_FAILURE, "Error storing received msg", this, ctxt.getMsg(), e);
     } finally {
       try {
         msgQLock.unlock();
@@ -536,7 +536,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
               ManagedMessage msgInSeq = MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
               sendOutputMsg(context.getPort(), msgInSeq);
             } catch (MessageException e) {
-              throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(), context.getMessage(), e);
+              throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(), this, context.getMessage(), e);
             }
           }
         }

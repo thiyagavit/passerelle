@@ -16,6 +16,7 @@
 package com.isencia.passerelle.validation.version;
 
 import java.util.SortedSet;
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.ErrorCode;
 
@@ -35,7 +36,7 @@ import com.isencia.passerelle.core.ErrorCode;
  */
 public class ActorMajorVersionValidator implements ModelElementVersionValidationStrategy {
 
-  public void validate(Object versionedElement, VersionSpecification versionToBeValidated) throws ValidationException {
+  public void validate(NamedObj versionedElement, VersionSpecification versionToBeValidated) throws ValidationException {
     if (versionedElement != null && versionToBeValidated != null) {
       String versionedElementClassName = versionedElement.getClass().getName();
       // first check with the most recent version

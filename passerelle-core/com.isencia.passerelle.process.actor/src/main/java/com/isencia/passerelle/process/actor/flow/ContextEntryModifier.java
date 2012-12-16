@@ -123,7 +123,7 @@ public class ContextEntryModifier extends Actor {
         }
         response.addOutputMessage(output, message);
       } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to modify Context entries", message, e);
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to modify Context entries", this, message, e);
       }
     }
   }

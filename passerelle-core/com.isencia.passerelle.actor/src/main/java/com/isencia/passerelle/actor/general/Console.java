@@ -87,7 +87,7 @@ public class Console extends Sink {
             content = content.substring(0, chopLength) + " !! CHOPPED !! ";
           }
         } catch (MessageException e) {
-          throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg to console", message, e);
+          throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg to console", this, message, e);
         }
         if (content != null)
           getConsole().println(content);
