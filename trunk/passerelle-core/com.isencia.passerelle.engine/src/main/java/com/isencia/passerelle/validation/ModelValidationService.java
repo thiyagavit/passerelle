@@ -71,7 +71,7 @@ public class ModelValidationService {
             }
           }
         } catch (IllegalActionException iae) {
-          context.addError(new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Invalid _version attribute", e, iae));
+          context.addError(new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Invalid _version attribute", a, iae));
         }
       }
     }

@@ -78,7 +78,7 @@ public class TokenHelper {
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building String from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building String from token " + token, e);
       }
     }
 
@@ -117,7 +117,7 @@ public class TokenHelper {
             try {
               res = Integer.valueOf(obj.toString());
             } catch (NumberFormatException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Integer format", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Integer format in " + token, e);
             }
           }
         } else {
@@ -127,7 +127,7 @@ public class TokenHelper {
               try {
                 res = Integer.valueOf(tokenMessage);
               } catch (NumberFormatException e) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Integer format", token, e);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Integer format in " + token, e);
               }
             }
           } else if (token instanceof ScalarToken) {
@@ -139,15 +139,15 @@ public class TokenHelper {
                 res = new Integer((int) Math.round(((ScalarToken) token).doubleValue()));
               } catch (IllegalActionException e1) {
                 // not even doubleValue is supported...
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Integer value", token, e1);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Integer value in " + token, e1);
               }
             }
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Integer value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Integer value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Integer from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Integer from token in " + token, e);
       }
     }
 
@@ -188,7 +188,7 @@ public class TokenHelper {
             try {
               res = Short.valueOf(obj.toString());
             } catch (NumberFormatException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Short format", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Short format in " + token, e);
             }
           }
         } else {
@@ -198,7 +198,7 @@ public class TokenHelper {
               try {
                 res = Short.valueOf(tokenMessage);
               } catch (NumberFormatException e) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Short format", token, e);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Short format in " + token, e);
               }
             }
           } else if (token instanceof ScalarToken) {
@@ -210,15 +210,15 @@ public class TokenHelper {
                 res = new Short((short) Math.round(((ScalarToken) token).doubleValue()));
               } catch (IllegalActionException e1) {
                 // not even doubleValue is supported...
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Short value", token, e1);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Short value in " + token, e1);
               }
             }
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Short value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Short value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Short from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Short from token in " + token, e);
       }
     }
 
@@ -265,7 +265,7 @@ public class TokenHelper {
               try {
                 res = jFormat.parse(content);
               } catch (ParseException e1) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Complex format", token, e1);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Complex format in " + token, e1);
               }
             }
           }
@@ -287,14 +287,14 @@ public class TokenHelper {
             try {
               res = new Complex(((ScalarToken) token).doubleValue(), 0);
             } catch (IllegalActionException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Complex value", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Complex value in " + token, e);
             }
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Complex value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Complex value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Complex from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Complex from token in " + token, e);
       }
     }
 
@@ -332,7 +332,7 @@ public class TokenHelper {
             try {
               res = Double.valueOf(obj.toString());
             } catch (NumberFormatException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Double format", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Double format in " + token, e);
             }
           }
         } else {
@@ -342,21 +342,21 @@ public class TokenHelper {
               try {
                 res = Double.valueOf(tokenMessage);
               } catch (NumberFormatException e) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Double format", token, e);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Double format in " + token, e);
               }
             }
           } else if (token instanceof ScalarToken) {
             try {
               res = new Double(((ScalarToken) token).doubleValue());
             } catch (IllegalActionException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Double value", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Double value in " + token, e);
             }
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Double value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Double value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Double from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Double from token in " + token, e);
       }
     }
 
@@ -396,7 +396,7 @@ public class TokenHelper {
             try {
               res = Float.valueOf(obj.toString());
             } catch (NumberFormatException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Float format", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Float format in " + token, e);
             }
           }
         } else {
@@ -406,21 +406,21 @@ public class TokenHelper {
               try {
                 res = Float.valueOf(tokenMessage);
               } catch (NumberFormatException e) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Float format", token, e);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Float format in " + token, e);
               }
             }
           } else if (token instanceof ScalarToken) {
             try {
               res = new Float(((ScalarToken) token).doubleValue());
             } catch (IllegalActionException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Float value", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Float value in " + token, e);
             }
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Float value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Float value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Float from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Float from token in " + token, e);
       }
     }
 
@@ -474,11 +474,11 @@ public class TokenHelper {
           } else if (token instanceof BooleanToken) {
             res = new Boolean(((BooleanToken) token).booleanValue());
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Boolean value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Boolean value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Boolean from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Boolean from token in " + token, e);
       }
     }
 
@@ -516,7 +516,7 @@ public class TokenHelper {
             try {
               res = Byte.valueOf(obj.toString());
             } catch (NumberFormatException e) {
-              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Byte format", token, e);
+              throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Byte format in " + token, e);
             }
           }
         } else {
@@ -526,17 +526,17 @@ public class TokenHelper {
               try {
                 res = Byte.valueOf(tokenMessage);
               } catch (NumberFormatException e) {
-                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Byte format", token, e);
+                throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid Byte format in " + token, e);
               }
             }
           } else if (token instanceof ScalarToken) {
             res = new Byte(((ScalarToken) token).byteValue());
           } else {
-            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Byte value", token, null);
+            throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Invalid token for obtaining Byte value in " + token, null);
           }
         }
       } catch (Exception e) {
-        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Byte from token", token, e);
+        throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error building Byte from token in " + token, e);
       }
     }
 

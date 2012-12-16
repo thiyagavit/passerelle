@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.model;
 
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
@@ -27,16 +28,29 @@ import com.isencia.passerelle.core.PasserelleException;
 public class FlowNotExecutingException extends PasserelleException {
 
   /**
-   * @param context
+   * @param flow
    */
-  public FlowNotExecutingException(Object context) {
-    super(ErrorCode.FLOW_STATE_ERROR, "Flow not executing", context, null);
+  public FlowNotExecutingException(NamedObj flow) {
+    super(ErrorCode.FLOW_STATE_ERROR, "Flow not executing", flow, null);
+  }
+  /**
+   * @param flowName
+   */
+  public FlowNotExecutingException(String flowName) {
+    super(ErrorCode.FLOW_STATE_ERROR, "Flow not executing " + flowName, null);
   }
   /**
    * @param errorCode
-   * @param context
+   * @param flow
    */
-  public FlowNotExecutingException(ErrorCode errorCode, Object context) {
-    super(errorCode, context, null);
+  public FlowNotExecutingException(ErrorCode errorCode, NamedObj flow) {
+    super(errorCode, "Flow not executing", flow, null);
+  }
+  /**
+   * @param errorCode
+   * @param flowName
+   */
+  public FlowNotExecutingException(ErrorCode errorCode, String flowName) {
+    super(errorCode, "Flow not executing " + flowName, null);
   }
 }

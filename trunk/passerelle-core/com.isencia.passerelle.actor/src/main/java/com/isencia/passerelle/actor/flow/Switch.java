@@ -147,7 +147,7 @@ public class Switch extends Actor {
     try {
       msg = MessageHelper.getMessage(input);
     } catch (PasserelleException e) {
-      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error getting msg from MessageHelper.getMessageAsToken()", msg, e);
+      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error getting msg from MessageHelper.getMessageAsToken()", this, e);
     }
     if (msg == null) {
       requestFinish();
@@ -163,7 +163,7 @@ public class Switch extends Actor {
         sendOutputMsg((Port) outputPorts.get(outNr), msg);
         getLogger().trace("{} has sent message on {}" + msg);
       } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending output msg", msg, e);
+        throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending output msg", this, msg, e);
       }
     }
   }

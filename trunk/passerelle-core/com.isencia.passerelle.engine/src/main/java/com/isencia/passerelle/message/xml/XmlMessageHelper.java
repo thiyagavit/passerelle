@@ -45,7 +45,7 @@ public class XmlMessageHelper {
     try {
       return MessageBuilder.buildToXML(content);
     } catch (Exception e) {
-      throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Message-to-XML conversion error", content, e);
+      throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Message-to-XML conversion error " + content, e);
     }
   }
 }

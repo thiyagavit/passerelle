@@ -83,7 +83,7 @@ public class TracerConsole extends Sink {
             content = content.substring(0, chopLength) + " !! CHOPPED !! ";
           }
         } catch (MessageException e) {
-          throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error getting msg content", message, e);
+          throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error getting msg content", this, message, e);
         }
         if (content != null) {
           ExecutionTracerService.trace(this, content);

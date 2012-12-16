@@ -89,7 +89,7 @@ public class SequenceToArrayConverter extends Transformer {
           seqTrace.clear();
           sequences.remove(seqTrace.getSequenceID());
         } catch (MessageException e) {
-          throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating result msg for completed sequence", seqTrace, e);
+          throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating result msg for completed sequence "+seqTrace.getSequenceID(), this, e);
         }
         sendOutputMsg(output, resultMsg);
       }

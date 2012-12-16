@@ -61,7 +61,7 @@ public class ArrayConverter extends ConverterBase {
 			} catch (MessageException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"",content,e);
+				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"Error converting " + content,e);
 			}
 		} else if(content.getClass().isArray()) {
 			try {
@@ -76,7 +76,7 @@ public class ArrayConverter extends ConverterBase {
 			} catch (MessageException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"",content,e);
+				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"Error converting " + content,e);
 			}
 		} else if(Collection.class.isInstance(content)) {
 			try {
@@ -91,7 +91,7 @@ public class ArrayConverter extends ConverterBase {
 			} catch (MessageException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"",content,e);
+				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"Error converting " + content,e);
 			}
 		} else {
 			// just try to treat the content string representation...
@@ -108,7 +108,7 @@ public class ArrayConverter extends ConverterBase {
 			} catch (MessageException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"",content,e);
+				throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"Error converting " + content,e);
 			}
 		}
 
@@ -137,7 +137,7 @@ public class ArrayConverter extends ConverterBase {
 				} catch (MessageException e) {
 					throw e;
 				} catch (Exception e) {
-					throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"",typedToken,e);
+					throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR,"Error converting " + typedToken,e);
 				}
 			} else if(String.class.isAssignableFrom(targetType)) {
 				// do a conversion to a String representation

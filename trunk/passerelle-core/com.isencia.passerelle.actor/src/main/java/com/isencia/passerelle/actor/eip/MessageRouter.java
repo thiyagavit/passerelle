@@ -69,7 +69,7 @@ public abstract class MessageRouter extends Actor {
       if(!foundSelectedPort)
         response.addOutputMessage(defaultOutput, inputMsg);
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter for "+getFullName(), inputMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error matching filter", this, inputMsg, e);
     }
   }
   

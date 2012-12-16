@@ -399,7 +399,7 @@ public class MessageHelper {
       }
 
     } catch (Exception e) {
-      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Error building MessageContainer from token", token, e);
+      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Error building MessageContainer from token in " + token, e);
     }
 
     if (logger.isTraceEnabled()) {

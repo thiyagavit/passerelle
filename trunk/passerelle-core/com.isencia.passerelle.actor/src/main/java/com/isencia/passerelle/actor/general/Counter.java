@@ -126,7 +126,7 @@ public class Counter extends Transformer {
     try {
       newMsg = createMessage(Long.toString(value++), "text/plain");
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating msg with counter", newMsg, e);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating msg with counter", this, newMsg, e);
     }
     sendOutputMsg(output, newMsg);
   }

@@ -126,7 +126,7 @@ public class HeaderFilter extends Filter {
       } catch (NullPointerException e) {
         // do nothing, means the required element was not present
       } catch (Exception e) {
-        throw new FilterException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in filter check", msg, e);
+        throw new FilterException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in filter check", this, message, e);
       }
     }
     return matchFound;

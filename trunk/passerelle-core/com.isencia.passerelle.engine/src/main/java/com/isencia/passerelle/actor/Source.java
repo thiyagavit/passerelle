@@ -95,7 +95,7 @@ public abstract class Source extends Actor {
       try {
         sendOutputMsg(output, message);
       } catch (IllegalArgumentException e) {
-        throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg on output", message, e);
+        throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg on output", this, message, e);
       } finally {
         notifyFinishedFireProcessing();
       }

@@ -106,12 +106,12 @@ public class SimpleEventDispatcher implements EventDispatcher, EventDispatchRepo
 
   public void accept(Event e) throws EventRefusedException {
     if (!active) {
-      throw new EventRefusedException(e, ErrorCode.FLOW_STATE_ERROR, "Dispatcher inactive", this, new IllegalStateException());
+      throw new EventRefusedException(e, ErrorCode.FLOW_STATE_ERROR, "Dispatcher inactive " + getName(), new IllegalStateException());
     }
     try {
       eventQ.put(new EventEntry(e));
     } catch (Exception e1) {
-      throw new EventRefusedException(e, ErrorCode.FLOW_EXECUTION_ERROR, "Error accepting event", this, e1);
+      throw new EventRefusedException(e, ErrorCode.FLOW_EXECUTION_ERROR, "Error accepting event " + getName(), e1);
     }
   }
 

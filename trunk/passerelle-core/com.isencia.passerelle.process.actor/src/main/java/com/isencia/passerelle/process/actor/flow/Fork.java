@@ -110,7 +110,7 @@ public class Fork extends DynamicNamedOutputPortsActor {
 					procResponse.addOutputMessage(outputPorts.get(i), outputMsg);
 				}
 			} catch (Exception e) {
-				throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR,"Error generating forked messages", message, e);
+				throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR,"Error generating forked messages", this, message, e);
 			}
 		}
 	}

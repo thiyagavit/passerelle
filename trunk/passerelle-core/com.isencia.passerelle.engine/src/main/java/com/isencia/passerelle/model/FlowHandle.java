@@ -82,6 +82,23 @@ public class FlowHandle {
 		this.creationTS = new Date();
 	}
 	
+	/**
+	 * FlowHandle for a locally created Flow instance.
+	 * It takes the flow's full name as the handle's name.
+	 * 
+	 * @param id
+	 * @param flow should be not-null!
+	 * @param authorativeResourceLocation
+	 */
+  public FlowHandle(Long id, Flow flow, URL authorativeResourceLocation) {
+    this.id = id;
+    this.code = name;
+    this.localFlow = flow;
+    this.name = flow.getFullName();
+    this.authorativeResourceLocation = authorativeResourceLocation;
+    this.creationTS = new Date();
+  }
+  
 	void setName(String name) {
 		this.name = name;
 	}

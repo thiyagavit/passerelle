@@ -91,7 +91,7 @@ public class FtpFileWriter extends FtpWriter {
     } catch (InterruptedException e) {
       // do nothing, just means we've got to stop
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "", message, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "", this, message, e);
     }
   }
 }

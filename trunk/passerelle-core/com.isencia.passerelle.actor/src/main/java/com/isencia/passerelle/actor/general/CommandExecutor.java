@@ -180,7 +180,7 @@ public class CommandExecutor extends Actor {
         try {
           msg = MessageHelper.getMessageFromToken(token);
         } catch (PasserelleException e) {
-          throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Exception while reading message", token, e);
+          throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Exception while reading message from "+token, this, e);
         }
         getLogger().debug("{} - Received msg : {}", getFullName(), getAuditTrailMessage(msg, trigger));
       }
@@ -230,12 +230,12 @@ public class CommandExecutor extends Actor {
           if (exitValue != 0) {
             // this indicates an error exit from the executed command
             // then this actor generates an error msg with the exit value
-            throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Exit : " + exitValue + " for command : " + sourcePath[0], msg, null);
+            throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Exit : " + exitValue + " for command : " + sourcePath[0], this, msg, null);
           }
         } catch (ProcessingException e) {
           throw e;
         } catch (Exception e) {
-          throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Unable to execute command : " + sourcePath[0], msg, e);
+          throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Unable to execute command : " + sourcePath[0], this, msg, e);
         }
       }
     }

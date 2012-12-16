@@ -30,10 +30,18 @@ public class MessageException extends PasserelleException {
   /**
    * @param errorCode
    * @param message
+   * @param rootException
+   */
+  public MessageException(ErrorCode errorCode, String message, Throwable rootException) {
+    super(errorCode, message, rootException);
+  }
+  /**
+   * @param errorCode
+   * @param message
    * @param context
    * @param rootException
    */
-  public MessageException(ErrorCode errorCode, String message, Object context, Throwable rootException) {
-    super(errorCode, message, context, rootException);
+  public MessageException(ErrorCode errorCode, String message, ManagedMessage msgContext, Throwable rootException) {
+    super(errorCode, message, null, msgContext, rootException);
   }
 }

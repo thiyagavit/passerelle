@@ -85,7 +85,7 @@ public class RESTFacade {
 		try {
 			doc = parser.build(new StringReader(jobHeadersResponse));
 		} catch (Exception e) {
-			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data", jobHeadersResponse, e);
+			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data "+jobHeadersResponse, e);
 		}
 		if (doc != null) {
 			List<Element> scheduledJobElements = doc.getRootElement().getChildren("scheduledJob");
@@ -104,7 +104,7 @@ public class RESTFacade {
 					flowHandle.setExecResourceLocation(new URL(execHREF));
 					flowHandles.add(flowHandle);
 				} catch (Exception e) {
-					throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + jobHREF + " in response ", jobHeadersResponse, e);
+					throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + jobHREF + " in response " + jobHeadersResponse, e);
 				}
 			}
 		}
@@ -129,7 +129,7 @@ public class RESTFacade {
 				flowHandle.setMoml(moml);
 			}
 		} catch (Exception e) {
-			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data", seqDetail, e);
+			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data " + seqDetail, e);
 		}
 
 		return flowHandle;
@@ -143,7 +143,7 @@ public class RESTFacade {
 		try {
 			doc = parser.build(new StringReader(seqHeadersResponse));
 		} catch (Exception e) {
-			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data", seqHeadersResponse, e);
+			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data " + seqHeadersResponse, e);
 		}
 		if (doc != null) {
 			List<Element> seqElements = doc.getRootElement().getChildren("sequence");
@@ -158,7 +158,7 @@ public class RESTFacade {
 					FlowHandle flowHandle = new FlowHandle(new Long(id), name, new URL(href));
 					flowHandles.add(flowHandle);
 				} catch (Exception e) {
-					throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + href + " in response ", seqHeadersResponse, e);
+					throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + href + " in response " + seqHeadersResponse, e);
 				}
 			}
 		}
@@ -233,7 +233,7 @@ public class RESTFacade {
 			try {
 				doc = parser.build(new StringReader(tracesResponse));
 			} catch (Exception e) {
-				throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data", tracesResponse, e);
+				throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data " + tracesResponse, e);
 			}
 			if (doc != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
@@ -265,7 +265,7 @@ public class RESTFacade {
 
 			return traces;
 		} else {
-			throw new FlowNotExecutingException(fHandle);
+			throw new FlowNotExecutingException(fHandle.getName());
 		}
 	}
 
@@ -333,7 +333,7 @@ public class RESTFacade {
 		try {
 			doc = parser.build(new StringReader(startInfo));
 		} catch (Exception e) {
-			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data", startInfo, e);
+			throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Unable to parse response data " + startInfo, e);
 		}
 		if (doc != null) {
 			Element scheduledJobElement = doc.getRootElement().getChild("scheduledJob");
@@ -344,7 +344,7 @@ public class RESTFacade {
 			try {
 				fHandle.setExecResourceLocation(new URL(execHREF));
 			} catch (Exception e) {
-				throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + execHREF + " in response ", startInfo, e);
+				throw new PasserelleException(ErrorCode.RUNTIME_COMMUNICATION_ERROR, "Invalid URL " + execHREF + " in response " + startInfo, e);
 			}
 		}
 		return fHandle;

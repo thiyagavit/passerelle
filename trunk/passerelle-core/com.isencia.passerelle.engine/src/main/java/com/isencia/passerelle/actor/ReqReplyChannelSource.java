@@ -129,7 +129,7 @@ public abstract class ReqReplyChannelSource extends Source {
                 getChannel().sendResponse(message, message.getCorrelationID());
               } catch (ChannelException e) {
                 try {
-                  sendErrorMessage(new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Failed to send reply msg on channel", message, e));
+                  sendErrorMessage(new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Failed to send reply msg on channel", ReqReplyChannelSource.this, message, e));
                 } catch (IllegalActionException e1) {
                   getLogger().error("Error sending error msg", e);
                   getLogger().error("Error sending response msg", e1);
@@ -246,7 +246,7 @@ public abstract class ReqReplyChannelSource extends Source {
       // ignore, just return null and the source will finish
       // its life-cycle automatically
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error getting message from channel", this, e);
     }
 
     getLogger().trace("{} getMessage() - exit", getFullName());

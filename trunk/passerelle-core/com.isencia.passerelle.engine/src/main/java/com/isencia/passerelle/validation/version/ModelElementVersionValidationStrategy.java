@@ -15,6 +15,7 @@
 
 package com.isencia.passerelle.validation.version;
 
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.ValidationException;
 
 /**
@@ -37,5 +38,5 @@ public interface ModelElementVersionValidationStrategy {
    * @throws ValidationException when the element's version does not match the
    * environment's requirements.
    */
-  void validate(Object versionedElement, VersionSpecification versionToBeValidated) throws ValidationException;
+  void validate(NamedObj versionedElement, VersionSpecification versionToBeValidated) throws ValidationException;
 }

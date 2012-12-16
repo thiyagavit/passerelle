@@ -48,7 +48,7 @@ public abstract class ConverterBase implements TypeConverter {
 						ManagedMessage passerelleMsg = passerelleMsgToken.getMessage();
 						result = convertContentToToken(passerelleMsg.getBodyContent(), targetType);
 					} catch (MessageException e) {
-						throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error converting to "+targetType, passerelleMsgToken, e);
+						throw new PasserelleException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error converting to "+targetType + " from " + passerelleMsgToken, e);
 					}
 					return result;
 				} else {

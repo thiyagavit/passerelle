@@ -1144,7 +1144,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       }
 
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on output "+port, message, e);
+      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on output "+port, this, message, e);
     }
   }
 

@@ -207,7 +207,7 @@ public abstract class ChannelSource extends Source {
         }
       }
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.FLOW_EXECUTION_ERROR, "Error getting message from channel", res, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error getting message from channel", this, e);
     }
     getLogger().trace("{} getMessage() - exit",getFullName());
     return res;

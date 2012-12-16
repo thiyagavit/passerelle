@@ -81,7 +81,7 @@ public abstract class ChannelSink extends Sink {
     } catch (InterruptedException e) {
       // do nothing, just means we've got to stop
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg on channel", message, e);
+      throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE, "Error sending msg on channel", this, message, e);
     }
   }
 
@@ -137,7 +137,7 @@ public abstract class ChannelSink extends Sink {
       closeChannel(getChannel());
       getLogger().debug("{} - Closed : {}", getFullName(), getChannel());
     } catch (ChannelException e) {
-      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, getFullName() + " - Error closing channel.", getChannel(), e);
+      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error closing channel.", this, e);
     }
   }
 

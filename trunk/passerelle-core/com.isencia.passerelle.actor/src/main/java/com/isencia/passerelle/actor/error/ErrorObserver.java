@@ -110,15 +110,16 @@ public class ErrorObserver extends Actor implements ErrorCollector {
     ManagedMessage errorMsg = createErrorMessage(e);
     response.addOutputMessage(errorOutput, errorMsg);
 
+    ManagedMessage msg = null;
     if (e.getContext() instanceof ManagedMessage) {
-      ManagedMessage msg = (ManagedMessage) e.getContext();
+      msg = (ManagedMessage) e.getContext();
       response.addOutputMessage(messageInErrorOutput, msg);
     }
     try {
       response.addOutputMessage(errorTextOutput, createMessage(e.getMessage(), "text/plain"));
     } catch (MessageException e1) {
       // should not happen, but...
-      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error generating error text output", e.getContext(), e1);
+      throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error generating error text output", this, msg, e1);
     }
   }
 
@@ -162,7 +163,7 @@ public class ErrorObserver extends Actor implements ErrorCollector {
     try {
       drainErrorsQueueTo(null);
     } catch (Exception e) {
-      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error draining remaining error queue", errors, e);
+      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error draining remaining error queue " + errors, this, e);
     }
     super.doWrapUp();
   }

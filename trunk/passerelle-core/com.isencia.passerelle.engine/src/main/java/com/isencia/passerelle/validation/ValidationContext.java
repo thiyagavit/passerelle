@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.ValidationException;
 
 /**
@@ -56,7 +57,7 @@ public class ValidationContext {
    * @param validatedElement
    * @return all validation errors found for the given model element, during a validation check for this context
    */
-  public Collection<ValidationException> getErrors(Object validatedElement) {
+  public Collection<ValidationException> getErrors(NamedObj validatedElement) {
     Collection<ValidationException> result = new HashSet<ValidationException>();
     for(ValidationException ex : errors) {
       if(ex.getContext().equals(validatedElement)) {
