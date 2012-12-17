@@ -488,18 +488,19 @@ public class Expression extends DynamicPortsActor {
             memorizedResults.put(targetName, result);
         }
 
+        final String resultAsString;
         if (result instanceof StringToken) {
-            final String resultAsString = ((StringToken) result).stringValue();
-
-            ExecutionTracerService.trace(this, "result is " + resultAsString);
+            resultAsString = ((StringToken) result).stringValue();
             response.addOutputMessage(output,
                     PasserelleUtil.createContentMessage(this, resultAsString));
         }
         else {// Token can be an instance of DoubleToken or what ever... (depends of input type)
-            ExecutionTracerService.trace(this, "result is " + result.toString());
+            resultAsString = result.toString();           
             response.addOutputMessage(output, PasserelleUtil.createContentMessage(this, result));
         }
-
+        
+        ExecutionTracerService.trace(this, "result is " + resultAsString);
+        
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo() + " doFire() - exit");
         }
