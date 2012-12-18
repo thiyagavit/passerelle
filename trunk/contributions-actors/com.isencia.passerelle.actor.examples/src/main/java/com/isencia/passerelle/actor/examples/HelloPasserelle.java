@@ -82,7 +82,7 @@ public class HelloPasserelle extends Actor {
     } catch (Exception e) {
       // When something failed, throw a ProcessingException which will be handled as needed
       // by Passerelle's default error handling mechanisms.
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to transform the received text", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to transform the received text", this, receivedMsg, e);
     }
   }
 }
