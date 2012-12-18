@@ -842,8 +842,16 @@ public abstract class HMIBase implements ChangeListener {
 
     return modelsSubMenu;
   }
-
+  
   public JToolBar createDefaultToolbar() {
+      return createToolbar(true);
+  }
+  
+  public JToolBar createToolbarWithoutSave() {
+      return createToolbar(false);
+  }
+  
+  private JToolBar createToolbar(final boolean withSaveButton) {
     final JToolBar toolBar = new JToolBar();
 
     if (modelExecutor == null) {
@@ -864,9 +872,9 @@ public abstract class HMIBase implements ChangeListener {
     if (modelResumer == null) {
       modelResumer = new ModelResumer(this);
     }
-    if (saveAction == null) {
-      saveAction = new SaveAction(this);
-    }
+//    if (saveAction == null) {
+//      saveAction = new SaveAction(this);
+//    }
     // DBA : add tooltip for each button
     createToolbarButton(modelExecutor, toolBar, HMIMessages.getString(HMIMessages.MENU_EXECUTE));
     createToolbarButton(modelSuspender, toolBar, HMIMessages.getString(HMIMessages.MENU_SUSPEND));
@@ -877,7 +885,13 @@ public abstract class HMIBase implements ChangeListener {
     createToolbarButton(modelDebugStepper, toolBar, HMIMessages.getString(HMIMessages.MENU_DEBUG_STEP));
     toolBar.addSeparator();
     toolBar.addSeparator();
-    createToolbarButton(saveAction, toolBar, HMIMessages.getString(HMIMessages.MENU_SAVE));
+    
+    if(withSaveButton){
+        if (saveAction == null) {
+            saveAction = new SaveAction(this);
+          }
+        createToolbarButton(saveAction, toolBar, HMIMessages.getString(HMIMessages.MENU_SAVE));
+    }
 
     StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_EXECUTE, modelExecutor);
     StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_DEBUG, modelDebugger);
