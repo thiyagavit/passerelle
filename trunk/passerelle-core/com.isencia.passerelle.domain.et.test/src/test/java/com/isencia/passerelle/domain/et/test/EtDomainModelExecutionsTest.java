@@ -24,6 +24,7 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.control.Stop;
 import com.isencia.passerelle.actor.convert.HeaderModifier;
 import com.isencia.passerelle.actor.error.ErrorObserver;
+import com.isencia.passerelle.actor.filter.HeaderFilter;
 import com.isencia.passerelle.actor.general.DevNullActor;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.Director;
@@ -255,6 +256,47 @@ public class EtDomainModelExecutionsTest extends TestCase {
 //    
 //    System.out.println(errCount+" errors on 100");
 //  }
+  public void testConcurrentInputsOnHeaderFilter() throws Exception {
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    Actor src1 = new TextSource(flow, "src1");
+    Actor src2 = new TextSource(flow, "src2");
+    Actor src3 = new TextSource(flow, "src3");
+    HeaderModifier hdrModif1 = new HeaderModifier(flow, "hdrModif1");
+    HeaderFilter hdrFltr2 = new HeaderFilter(flow, "hdrFltr2");
+    HeaderModifier hdrModif3 = new HeaderModifier(flow, "hdrModif3");
+    MessageHistoryStack sink1 = new MessageHistoryStack(flow, "sink1");
+    MessageHistoryStack sink2 = new MessageHistoryStack(flow, "sink2");
+
+    flow.connect(src1, hdrModif1);
+    flow.connect(src2, hdrFltr2);
+    flow.connect(src3, hdrFltr2);
+    flow.connect(hdrModif1, hdrFltr2);
+    flow.connect(hdrFltr2.outputOk, hdrModif3.input);
+    flow.connect(hdrFltr2.outputNotOk, sink2.input);
+    flow.connect(hdrModif3, sink1);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src1.values", "pol1,pol2,pol3");
+    props.put("src2.values", "pel1,pel2,pel3");
+    props.put("src3.values", "pingo1,pingo2,pingo3");
+    props.put("hdrModif1.mode", "Add");
+    props.put("hdrFltr2.FilterType", "Contains");
+    props.put("hdrModif3.mode", "Remove");
+    props.put("hdrModif1.header name", "Hello");
+    props.put("hdrModif1.header value", "world");
+    props.put("hdrFltr2.Header", "Hello");
+    props.put("hdrFltr2.Filter", "world");
+    props.put("hdrModif3.header name", "Hello");
+
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion().
+    expectMsgReceiptCount(sink1, 3L).
+    expectMsgReceiptCount(sink2, 6L).
+    assertFlow(flow);
+  }
+
   public void testConcurrentInputsOnHeaderModifier() throws Exception {
     flow.setDirector(new ETDirector(flow, "director"));
 
