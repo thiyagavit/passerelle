@@ -99,7 +99,7 @@ public class Bossanova2 extends GenericHMI implements ExecutionListener {
 		JFrame mainPasserelleFrame = (JFrame) this.getDialogHookComponent();
 		mainPasserelleFrame.setTitle("BossaNova");
 		// End Bug 17412
-		mainScreen.disableSaveButton();
+		
 		BossaNovaSequencerImpl.setCurrentBatchSaved(true);
 	}
 
