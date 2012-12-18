@@ -17,16 +17,14 @@ package com.isencia.passerelle.ext.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
-
-import ptolemy.kernel.util.IllegalActionException;
 
 /**
  * Default implementation of an error control strategy for an actor:

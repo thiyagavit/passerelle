@@ -172,6 +172,7 @@ public class ETDirector extends Director implements PasserelleDirector {
 
   @Override
   public void initialize() throws IllegalActionException {
+    getAdapter(null).getExecutionPrePostProcessor().preProcess();
     try {
       enqueueEvent(new FlowExecutionEvent((CompositeActor) getContainer(), FlowExecutionEventType.START));
     } catch (EventRefusedException e) {
@@ -221,6 +222,7 @@ public class ETDirector extends Director implements PasserelleDirector {
     } catch (InterruptedException e) {
       LOGGER.warn("Internal status error - interrupted flow finish event",e);
     }
+    getAdapter(null).getExecutionPrePostProcessor().postProcess();
     super.wrapup();
     
     dispatcher.shutdown();

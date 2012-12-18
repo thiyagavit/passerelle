@@ -46,7 +46,7 @@ public class ExceptionGenerator extends Actor {
 
   public Parameter runtimeExcParameter;
 
-  public Parameter severityParam;
+  public StringParameter errorParameter;
   public ErrorCode errorCode = ErrorCode.ERROR;
 
   public Parameter preInitExcParameter;
@@ -70,10 +70,11 @@ public class ExceptionGenerator extends Actor {
     runtimeExcParameter = new Parameter(this, "RuntimeException", BooleanToken.FALSE);
     new CheckBoxStyle(runtimeExcParameter, "rte box");
 
-    severityParam = new StringParameter(this, "severity");
-    severityParam.setExpression(ErrorCode.ERROR.name());
-    severityParam.addChoice(ErrorCode.ERROR.name());
-    severityParam.addChoice(ErrorCode.FATAL.name());
+    errorParameter = new StringParameter(this, "error");
+    errorParameter.setExpression(getErrorCodeInfo(ErrorCode.ERROR));
+    for(ErrorCode errorCode : ErrorCode.values()) {
+      errorParameter.addChoice(getErrorCodeInfo(errorCode));
+    }
 
     preInitExcParameter = new Parameter(this, "preInit Exception", BooleanToken.FALSE);
     new CheckBoxStyle(preInitExcParameter, "check box");
@@ -88,14 +89,24 @@ public class ExceptionGenerator extends Actor {
     wrapupExcParameter = new Parameter(this, "wrapup Exception", BooleanToken.FALSE);
     new CheckBoxStyle(wrapupExcParameter, "check box");
   }
+  
+  private static String getErrorCodeInfo(ErrorCode errorCode) {
+    return errorCode.name() + ":" + errorCode.getFormattedCode();
+  }
+  
+  private static ErrorCode getErrorCodeFromInfo(String errorCodeInfo) {
+    return ErrorCode.valueOf(errorCodeInfo.split(":")[0]);
+  }
 
   @Override
   public void attributeChanged(final Attribute attribute) throws IllegalActionException {
-    if (attribute == severityParam) {
-      String severityStr = ((StringToken) severityParam.getToken()).stringValue();
-      errorCode = ErrorCode.ERROR;
-      if (ErrorCode.FATAL.name().equals(severityStr)) {
-        errorCode = ErrorCode.FATAL;
+    if (attribute == errorParameter) {
+      String errorCodeStr = ((StringToken) errorParameter.getToken()).stringValue();
+      try {
+        errorCode = getErrorCodeFromInfo(errorCodeStr);
+      } catch (Exception e) {
+        getLogger().warn("{} Unknown error configured : {} ", getFullName(), errorCodeStr);
+        errorCode = ErrorCode.ERROR;
       }
     } else {
       super.attributeChanged(attribute);
@@ -199,7 +210,7 @@ public class ExceptionGenerator extends Actor {
       if(mustThrowRuntimeException) {
         throw new RuntimeException(message);
       } else {
-        throw new ProcessingException(errorCode, message, this, null);
+        throw new ProcessingException(errorCode, message, this, request.getMessage(input), null);
       }
     } else {
       response.addOutputMessage(output, request.getMessage(input));

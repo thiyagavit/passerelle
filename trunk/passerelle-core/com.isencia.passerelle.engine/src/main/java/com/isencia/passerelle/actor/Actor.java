@@ -1103,7 +1103,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       errorPort.broadcast(errorToken);
     } else {
       // notify our director about the problem
-      getDirectorAdapter().reportError(exception);
+      getDirectorAdapter().reportError(this, exception);
     }
   }
 
