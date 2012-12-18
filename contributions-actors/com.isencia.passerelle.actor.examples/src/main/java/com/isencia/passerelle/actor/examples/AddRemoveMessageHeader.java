@@ -114,7 +114,7 @@ public class AddRemoveMessageHeader extends Actor {
       
       response.addOutputMessage(output, outputMsg);
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to add/remove a header", receivedMsg, e);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to add/remove a header", this, receivedMsg, e);
     }
   }
 }
