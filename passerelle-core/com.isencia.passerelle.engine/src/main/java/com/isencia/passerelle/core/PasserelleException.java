@@ -17,7 +17,6 @@ package com.isencia.passerelle.core;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.message.ManagedMessage;
 
-
 /**
  * PasserelleException Base class for all exceptions in Passerelle.
  * 
@@ -33,14 +32,28 @@ public class PasserelleException extends Exception {
     NON_FATAL, FATAL;
   }
 
-  // still keeping it around for a while for backwards compatibility
+  // deprecated since v8.3, but still keeping it around for a while for backwards compatibility
   private Severity severity;
   // should by preference contain a ManagedMessage, to facilitate in-model error handling continuations
+  // in that case, since v8.3, the msg will also be maintained in msgContext
   private Object context;
-  
-  private Throwable rootException;
-  
+
+  /**
+   * the main msg that was being processed when the exception was generated. in general, an actor's processing can depend on multiple received messages. but in
+   * many cases one of the received messages can be designated as "the most important one". this one could then be selected for alternative flow continuations
+   * ico errors.
+   */
+  private ManagedMessage msgContext;
+  /**
+   * the model element to which the exception is related, or has generated it. typically an actor.
+   */
+  private NamedObj modelElement;
+
   private ErrorCode errorCode;
+
+  // the place where the full msg is kept stored once it has been built,
+  // after the first call to getMessage()
+  private String detailedMessage;
 
   /**
    * @param message
@@ -50,25 +63,28 @@ public class PasserelleException extends Exception {
    */
   public PasserelleException(String message, Object context, Throwable rootException) {
     super(message, rootException);
-    this.rootException = rootException;
-    this.context = context;
+    if (context instanceof ManagedMessage) {
+      this.msgContext = (ManagedMessage) context;
+    } else if (context instanceof NamedObj) {
+      this.modelElement = (NamedObj) context;
+    } else {
+      this.context = context;
+    }
     this.errorCode = ErrorCode.ERROR;
     this.severity = Severity.NON_FATAL;
   }
 
   /**
-   * @param severity can not be null
+   * @param severity
+   *          can not be null
    * @param message
    * @param context
    * @param rootException
    * @deprecated use the constructors with ErrorCodes instead
    */
   public PasserelleException(Severity severity, String message, Object context, Throwable rootException) {
-    super(message, rootException);
-    this.rootException = rootException;
-    this.context = context;
+    this(message, context, rootException);
     this.severity = severity;
-    
     switch (severity) {
     case FATAL:
       errorCode = ErrorCode.FATAL;
@@ -80,62 +96,20 @@ public class PasserelleException extends Exception {
   }
 
   /**
-   * 
-   * @param errorCode can not be null
-   * @param modelElement the element where the error was raised. 
-   * Typically an actor, or the parent flow ico non-actor-related errors.
+   * @param errorCode
+   *          can not be null
+   * @param modelElement
+   *          the element where the error was raised. Typically an actor, or the parent flow ico non-actor-related errors.
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, NamedObj modelElement, Throwable rootException) {
-    super(errorCode!=null ? errorCode.getDescription() : null, rootException);
-    if(errorCode==null) {
-      throw new IllegalArgumentException("error code can not be null");
-    }
-    
-    this.errorCode = errorCode;
-    this.rootException = rootException;
-    this.context = modelElement;
-    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
-      this.severity = Severity.FATAL;
-    } else {
-      this.severity = Severity.NON_FATAL;
-    }
-  }
-  /**
-   * 
-   * @param errorCode can not be null
-   * @param message containing extra info/description for the error
-   * @param rootException
-   */
-  public PasserelleException(ErrorCode errorCode, String message, Throwable rootException) {
-    super(message, rootException);
-    if(errorCode==null) {
+    super(errorCode != null ? errorCode.getDescription() : null, rootException);
+    if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
     }
     this.errorCode = errorCode;
-    this.rootException = rootException;
-    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
-      this.severity = Severity.FATAL;
-    } else {
-      this.severity = Severity.NON_FATAL;
-    }
-  }
-  /**
-   * 
-   * @param errorCode can not be null
-   * @param message containing extra info/description for the error
-   * @param modelElement the element where the error was raised. 
-   * @param rootException
-   */
-  public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
-    super(message, rootException);
-    if(errorCode==null) {
-      throw new IllegalArgumentException("error code can not be null");
-    }
-    this.errorCode = errorCode;
-    this.rootException = rootException;
-    this.context = modelElement;
-    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+    this.modelElement = modelElement;
+    if (ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
       this.severity = Severity.FATAL;
     } else {
       this.severity = Severity.NON_FATAL;
@@ -143,22 +117,67 @@ public class PasserelleException extends Exception {
   }
 
   /**
-   * 
-   * @param errorCode can not be null
-   * @param message containing extra info/description for the error
-   * @param modelElement the element where the error was raised. 
+   * @param errorCode
+   *          can not be null
+   * @param message
+   *          containing extra info/description for the error
+   * @param rootException
+   */
+  public PasserelleException(ErrorCode errorCode, String message, Throwable rootException) {
+    super(message, rootException);
+    if (errorCode == null) {
+      throw new IllegalArgumentException("error code can not be null");
+    }
+    this.errorCode = errorCode;
+    if (ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+      this.severity = Severity.FATAL;
+    } else {
+      this.severity = Severity.NON_FATAL;
+    }
+  }
+
+  /**
+   * @param errorCode
+   *          can not be null
+   * @param message
+   *          containing extra info/description for the error
+   * @param modelElement
+   *          the element where the error was raised.
+   * @param rootException
+   */
+  public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
+    super(message, rootException);
+    if (errorCode == null) {
+      throw new IllegalArgumentException("error code can not be null");
+    }
+    this.errorCode = errorCode;
+    this.modelElement = modelElement;
+    if (ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+      this.severity = Severity.FATAL;
+    } else {
+      this.severity = Severity.NON_FATAL;
+    }
+  }
+
+  /**
+   * @param errorCode
+   *          can not be null
+   * @param message
+   *          containing extra info/description for the error
+   * @param modelElement
+   *          the element where the error was raised.
    * @param msgContext
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, ManagedMessage msgContext, Throwable rootException) {
     super(message, rootException);
-    if(errorCode==null) {
+    if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
     }
     this.errorCode = errorCode;
-    this.rootException = rootException;
-    this.context = modelElement;
-    if(ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
+    this.modelElement = modelElement;
+    this.msgContext = msgContext;
+    if (ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
       this.severity = Severity.FATAL;
     } else {
       this.severity = Severity.NON_FATAL;
@@ -166,14 +185,28 @@ public class PasserelleException extends Exception {
   }
 
   /**
-   * @return the context object that was specified for this exception (can be null)
+   * @return the msgContext
    */
-  public Object getContext() {
-    return context;
+  public ManagedMessage getMsgContext() {
+    return msgContext;
   }
 
   /**
-   * 
+   * @return the modelElement
+   */
+  public NamedObj getModelElement() {
+    return modelElement;
+  }
+
+  /**
+   * @return the context object that was specified for this exception (can be null)
+   * @deprecated use getMsgContext and getModelElement
+   */
+  public Object getContext() {
+    return context != null ? context : (msgContext != null ? msgContext : modelElement);
+  }
+
+  /**
    * @return the error code of this exception
    */
   public ErrorCode getErrorCode() {
@@ -182,10 +215,10 @@ public class PasserelleException extends Exception {
 
   /**
    * @return the root exception that caused this exception (can be null)
-   * @deprecated since JDK 1.4; use Throwable.getCause()
+   * @deprecated getCause()
    */
   public Throwable getRootException() {
-    return rootException;
+    return getCause();
   }
 
   /**
@@ -199,7 +232,23 @@ public class PasserelleException extends Exception {
    * @return a string with the full info about the exception, incl severity, context etc.
    */
   public String getMessage() {
-    return getErrorCode() + " - " + super.getMessage() + "\n - Context:" + getContext() + "\n - RootException:" + getCause();
+    if (detailedMessage == null) {
+      StringBuilder msgBldr = new StringBuilder(getErrorCode() + " - " + super.getMessage());
+      msgBldr.append("\n - Context:");
+      boolean ctxtDetailsFound = false;
+      if (modelElement != null) {
+        msgBldr.append("\n\t -- element:" + modelElement);
+      }
+      if (msgContext != null) {
+        msgBldr.append("\n\t -- message:" + msgContext);
+      }
+      if (!ctxtDetailsFound && context != null) {
+        msgBldr.append("\n\t -- " + context);
+      }
+      msgBldr.append("\n - RootException:" + getCause());
+      detailedMessage = msgBldr.toString();
+    }
+    return detailedMessage;
   }
 
   /**

@@ -116,7 +116,7 @@ public class SequenceTracker extends Transformer {
     SequenceTrace seqTrace = (SequenceTrace) sequences.get(message.getSequenceID());
     if (seqTrace == null) {
       // notify our director about the problem
-      getDirectorAdapter().reportError(new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Received message feedback for unknown sequence " + message.getSequenceID(), this, message, null));
+      getDirectorAdapter().reportError(this, new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Received message feedback for unknown sequence " + message.getSequenceID(), this, message, null));
     } else {
       seqTrace.messageHandled(message);
       boolean seqCompletelyFinished = seqTrace.isHandled();

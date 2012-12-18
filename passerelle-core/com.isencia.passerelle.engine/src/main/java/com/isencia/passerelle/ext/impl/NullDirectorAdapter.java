@@ -18,6 +18,7 @@ package com.isencia.passerelle.ext.impl;
 import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.data.expr.Parameter;
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
@@ -62,7 +63,7 @@ public class NullDirectorAdapter implements DirectorAdapter {
   public void removeAllErrorCollectors() {
   }
 
-  public void reportError(PasserelleException e) {
+  public void reportError(NamedObj modelElement, PasserelleException e) {
   }
 
   public ErrorControlStrategy getErrorControlStrategy() {

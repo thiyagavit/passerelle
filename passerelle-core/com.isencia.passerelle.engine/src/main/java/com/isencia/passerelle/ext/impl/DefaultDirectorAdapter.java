@@ -18,6 +18,7 @@ package com.isencia.passerelle.ext.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
+import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -37,6 +39,7 @@ import com.isencia.passerelle.ext.ConfigurationExtender;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
+import com.isencia.passerelle.ext.ErrorHandler;
 import com.isencia.passerelle.ext.ExecutionControlStrategy;
 import com.isencia.passerelle.ext.ExecutionPrePostProcessor;
 import com.isencia.passerelle.ext.FiringEventListener;
@@ -45,6 +48,8 @@ import com.isencia.passerelle.ext.FiringEventListener;
  * @author erwin
  */
 public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter, ConfigurationExtender {
+  private static final long serialVersionUID = 1L;
+
   private Logger LOGGER;
 
   /**
@@ -134,15 +139,40 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     errorCollectors.clear();
   }
 
-  public void reportError(PasserelleException e) {
-    if (!errorCollectors.isEmpty()) {
-      for (Iterator<ErrorCollector> errCollItr = errorCollectors.iterator(); errCollItr.hasNext();) {
-        ErrorCollector element = errCollItr.next();
-        element.acceptError(e);
+  public void reportError(NamedObj modelElement, PasserelleException e) {
+    boolean isHandled = handleError(modelElement, e);
+    if (!isHandled) {
+      if (!errorCollectors.isEmpty()) {
+        for (Iterator<ErrorCollector> errCollItr = errorCollectors.iterator(); errCollItr.hasNext();) {
+          ErrorCollector element = errCollItr.next();
+          element.acceptError(e);
+        }
+      } else {
+        LOGGER.error("reportError() - no errorCollectors but received exception", e);
       }
-    } else {
-      LOGGER.error("reportError() - no errorCollectors but received exception", e);
     }
+  }
+  
+  private boolean handleError(NamedObj errorSource, PasserelleException error) {
+    boolean result = false;
+    NamedObj container = errorSource;
+    while(!(container instanceof CompositeEntity) && (container!=null)) {
+      container = container.getContainer();
+    }
+    while(!result && (container!=null)) {
+      result = handleErrorOnOneLevel((CompositeEntity) container, errorSource, error);
+      container = container.getContainer();
+    }
+    return result;
+  }
+
+  private boolean handleErrorOnOneLevel(CompositeEntity parentComposite, NamedObj errorSource, PasserelleException error) {
+    boolean result = false;
+    List<ErrorHandler> errHandlerList = parentComposite.entityList(ErrorHandler.class);
+    for (ErrorHandler errorHandler : errHandlerList) {
+      result = result || errorHandler.handleError(errorSource, error);
+    }
+    return result;
   }
 
   public ErrorControlStrategy getErrorControlStrategy() {
@@ -239,17 +269,17 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   public void clearBusyTaskActors() {
     busyTaskActors.clear();
   }
-  
+
   public boolean hasBusyTaskActors() {
-   return busyTaskActors.size()>0; 
+    return busyTaskActors.size() > 0;
   }
-  
+
   public boolean isActorBusy(Actor actor) {
     return busyTaskActors.values().contains(actor);
   }
-  
+
   public void notifyActorStartedTask(Actor actor, Object task) {
-    if(task==null) {
+    if (task == null) {
       // no task differentiation possible, so just use the actor itself as key
       task = actor;
     }
@@ -259,7 +289,7 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   }
 
   public void notifyActorFinishedTask(Actor actor, Object task) throws IllegalArgumentException {
-    if(task==null) {
+    if (task == null) {
       // no task differentiation possible, so just use the actor itself as key
       task = actor;
     }

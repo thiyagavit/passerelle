@@ -52,6 +52,7 @@ public class ErrorCode extends Enumerated<ErrorCode> {
   }
 
   private String code;
+  private Integer codeAsInteger;
   private ErrorCategory category;
   private Severity severity;
   private String topic;
@@ -74,10 +75,11 @@ public class ErrorCode extends Enumerated<ErrorCode> {
     super(name);
     assert CODE_FORMAT_PATTERN.matcher(code).matches();
     this.code = code;
+    this.codeAsInteger = Integer.parseInt(code);
     this.category = category;
     this.severity = severity;
     this.description = description;
-    this.topic = category.getPrefix() + TOPIC_SEPARATOR + severity;
+    this.topic = category.getPrefix() + TOPIC_SEPARATOR + severity + TOPIC_SEPARATOR + name;
   }
 
   /**
@@ -95,6 +97,10 @@ public class ErrorCode extends Enumerated<ErrorCode> {
 
   public String getCode() {
     return code;
+  }
+  
+  public int getCodeAsInteger() {
+    return codeAsInteger;
   }
 
   public ErrorCategory getCategory() {
@@ -135,7 +141,7 @@ public class ErrorCode extends Enumerated<ErrorCode> {
   @Override
   public String toString() {
     if(formattedString==null) {
-      formattedString = getSeverity() + TOSTRING_SEPARATOR + getFormattedCode() + TOSTRING_SEPARATOR + getDescription();
+      formattedString = name() + TOSTRING_SEPARATOR + getSeverity() + TOSTRING_SEPARATOR + getFormattedCode() + TOSTRING_SEPARATOR + getDescription();
     }
     return formattedString;
   }

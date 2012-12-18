@@ -19,8 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import com.isencia.constants.IPropertyNames;
 
-import ptolemy.util.MessageHandler;
-
 
 /**
  * EnvironmentUtils
