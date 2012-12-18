@@ -52,6 +52,7 @@ import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.util.ExecutionTracerService;
+import com.isencia.passerelle.util.Level;
 import com.isencia.passerelle.workbench.model.ui.utils.StringUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -78,8 +79,8 @@ public class ExecutionTracesView extends ViewPart {
       }
     };
 
-//    Timer timer = new Timer(true);
-//    timer.scheduleAtFixedRate(task, 5000, 2000);
+    Timer timer = new Timer(true);
+    timer.scheduleAtFixedRate(task, 5000, 2000);
     
     ExecutionTracerService.registerTracer(new TraceHandler());
   }
@@ -301,6 +302,16 @@ public class ExecutionTracesView extends ViewPart {
       String source = FlowUtils.getFullNameWithoutFlow((NamedObj) director);
       TraceEntry e = new TraceEntry(tsFormat.format(new Date()), source, message);
       addTraceEntry(e);
+    }
+
+    @Override
+    public void trace(Actor source, String message, Level level) {
+      trace(source, message);
+    }
+
+    @Override
+    public void trace(Director source, String message, Level level) {
+      trace(source, message);
     }
     
   }
