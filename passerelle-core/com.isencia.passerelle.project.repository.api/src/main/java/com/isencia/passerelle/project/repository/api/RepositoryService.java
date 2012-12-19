@@ -57,6 +57,8 @@ public interface RepositoryService {
 	 */
 	Flow getFlow(String sequenceCode);
 
+  MetaData getFlowMetaData(String flowCode);
+
 	/**
 	 * 
 	 * @param projectCode
