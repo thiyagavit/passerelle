@@ -17,6 +17,8 @@ import com.isencia.passerelle.model.Flow;
  */
 public interface Project {
 	
+  MetaData getMetaData();
+  
 	String getCode();
 		
 	/**
@@ -25,6 +27,8 @@ public interface Project {
 	 * @return the sequence in this project, for the given seqCode, or null if not found
 	 */
 	Flow getFlow(String flowCode);
+
+	MetaData getFlowMetaData(String flowCode);
 	
 	/**
 	 * @param seqCode the unique code identifying the sequence in the project 
