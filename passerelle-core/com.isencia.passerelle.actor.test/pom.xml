@@ -10,5 +10,5 @@
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.actor.test</artifactId>
   <version>8.2.0</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-test-plugin</packaging>
 </project>
