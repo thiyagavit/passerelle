@@ -11,8 +11,8 @@ Import-Package: com.isencia.passerelle.actor;version="7.0.0",
  com.isencia.passerelle.message;version="7.0.0",
  com.isencia.passerelle.model;version="7.0.0",
  com.isencia.passerelle.statistics;version="7.0.0",
+ com.isencia.sherpa.commons;version="6.2.5",
  junit.framework;version="3.8.2",
- org.eclipse.core.runtime;version="3.4.0",
  org.slf4j;version="1.5.8",
  ptolemy.actor;version="7.0.1",
  ptolemy.actor.gui.style;version="7.0.1",
@@ -21,5 +21,6 @@ Import-Package: com.isencia.passerelle.actor;version="7.0.0",
  ptolemy.data.type;version="7.0.1",
  ptolemy.kernel;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
+Require-Bundle:  org.eclipse.core.runtime;bundle-version="3.4.0"
 Export-Package: com.isencia.passerelle.testsupport,
  com.isencia.passerelle.testsupport.actor

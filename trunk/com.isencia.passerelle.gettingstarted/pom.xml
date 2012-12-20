@@ -3,14 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.isencia.passerelle</groupId>
-	<artifactId>com.isencia.passerelle.gettingstarted</artifactId>
 	<version>1.0.0</version>
+	<artifactId>com.isencia.passerelle.gettingstarted</artifactId>
 	<packaging>pom</packaging>
+
+	<name>Passerelle :: Getting Started</name>
 
 	<properties>
 		<tycho.version>0.16.0</tycho.version>
 	</properties>
-
+	
 	<modules>
 		<module>passerelle-thirdparty-base</module>
 		<module>passerelle-thirdparty-base-sources</module>
