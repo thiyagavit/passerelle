@@ -7,16 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Random;
-
 import javax.swing.JOptionPane;
-
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedAtomicActor;
 import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.Workspace;
-
 import com.isencia.passerelle.actor.v3.Actor;
 import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.PasserelleException;
@@ -26,10 +23,10 @@ import com.isencia.passerelle.hmi.action.ModelExecutor;
 import com.isencia.passerelle.hmi.state.StateMachine;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-
 import fr.soleil.bossanova.bossaNovaData.BossaNovaData;
 import fr.soleil.bossanova.configuration.RepositoryManager;
 import fr.soleil.bossanova.model.Batch;
+import fr.soleil.bossanova.model.BossanovaDirectorAdapter;
 import fr.soleil.bossanova.model.DirectorFactory;
 import fr.soleil.bossanova.model.DirectorType;
 import fr.soleil.bossanova.model.Step;
@@ -299,6 +296,8 @@ public class BossaNovaSequencerImpl extends Observable implements Runnable, Sequ
         // GenericHMI.showModelForm(...) checks for the presence of this attribute.
         // when present : cfg panel is not created
         try {
+          ((Attribute)d.getAdapter(null)).setContainer(null);
+          new BossanovaDirectorAdapter(d);
             new Attribute(d, "__not_configurable");
         } catch (final Exception e) {
             e.printStackTrace();
