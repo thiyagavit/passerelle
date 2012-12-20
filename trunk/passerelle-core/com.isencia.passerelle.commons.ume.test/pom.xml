@@ -10,5 +10,5 @@
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.commons.ume.test</artifactId>
   <version>7.0.0</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-test-plugin</packaging>
 </project>
