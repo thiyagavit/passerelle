@@ -5,11 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.engine"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.microstar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/diva"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ptolemy.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ptolemy.domains.and.actors"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ptolemy.gui"/>
 	<classpathentry kind="lib" path="lib/filters-2.0.235.jar"/>
 	<classpathentry kind="lib" path="lib/flexdock-0.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.0.6.jar"/>
@@ -37,5 +32,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.hmi.definition"/>
 	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/org.slf4j_1.5.8.jar"/>
 	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/org.slf4j.impl_1.5.8.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/com.microstar_1.2.0.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/diva_7.0.1.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.core_7.0.1.1.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.domains.and.actors_7.0.1.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.gui_7.0.1.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

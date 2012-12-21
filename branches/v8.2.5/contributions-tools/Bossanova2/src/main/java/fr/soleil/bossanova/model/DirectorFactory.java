@@ -4,6 +4,8 @@
 package fr.soleil.bossanova.model;
 
 import ptolemy.data.expr.Parameter;
+import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.domain.cap.Director;
 import fr.soleil.bossanova.configuration.Configuration;
@@ -35,6 +37,10 @@ public class DirectorFactory {
 		// Erwin DL : this is not right. Class name has a specific purpose.
 		// result.setClassName("Bossanova Director");
 		result.setName("Bossanova Director");
+		if(result.getAdapter(null)!=null) {
+		  ((Attribute)result.getAdapter(null)).setContainer(null);
+		}
+		new BossanovaDirectorAdapter(result);
 		// no longer done. System properties must be set elsewhere, e.g. in a hmi.ini file.
 //		Parameter directorParam = (Parameter) result.getAttribute("Properties File", Parameter.class);
 //		directorParam.setExpression(Configuration.getPasserelleConfDirectory() + "systemproperties.txt");
