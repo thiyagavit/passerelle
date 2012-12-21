@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.actor.error;
 
 import java.util.concurrent.BlockingQueue;
@@ -36,6 +36,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageOutputContext;
 
 /**
+ * Base class for all kinds of ErrorHandler actors, without input ports.
+ * 
  * @author erwin
  */
 public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHandler {
@@ -56,7 +58,7 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
     outputPortBuilder = new OutputPortSetterBuilder(this, "outputPortBldr");
 
     setDaemon(true);
-    
+
     _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" height=\"40\" style=\"fill:red;stroke:red\"/>\n"
         + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" style=\"stroke-width:1.0;stroke:white\"/>\n"
         + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" style=\"stroke-width:1.0;stroke:white\"/>\n"
@@ -73,11 +75,11 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
   protected void setOutputPortNames(String... portNames) {
     outputPortBuilder.setOutputPortNames(portNames);
   }
-  
+
   protected void addErrorOutput(MessageOutputContext errorOutput) {
     bufferedErrorOutputs.add(errorOutput);
   }
-  
+
   @Override
   protected void doPreInitialize() throws InitializationException {
     super.doPreInitialize();
@@ -85,15 +87,19 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
   }
 
   @Override
-  protected synchronized void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  final protected synchronized void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  }
+  
+  @Override
+  protected boolean doPostFire() throws ProcessingException {
     // This actor has no data input ports,
     // so it's like a Source in the days of the original Actor API.
     // The BlockingQueue (errors) is our data feed.
     try {
       MessageOutputContext errOutput = bufferedErrorOutputs.poll(1, TimeUnit.SECONDS);
       if (errOutput != null) {
-        sendOutErrorInfo(response, errOutput);
-        drainErrorsQueueTo(response);
+        sendOutErrorInfo(null, errOutput);
+        drainErrorsQueueTo(null);
       }
     } catch (InterruptedException e) {
       // should not happen,
@@ -101,13 +107,15 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
       // and with an empty queue, so we can just finish then
       requestFinish();
     }
+    return super.doPostFire() || !(bufferedErrorOutputs.isEmpty());
   }
 
   protected boolean sendErrorMsgOnwardsVia(String outputName, ManagedMessage msg, PasserelleException error) {
     boolean result = false;
     Object outputPort = getPort(outputName);
     if (outputPort == null || !(outputPort instanceof Port)) {
-      getLogger().error("Error in actor's ports",new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error finding port for range " + outputName, this, error));
+      getLogger().error("Error in actor's ports",
+          new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error finding port for range " + outputName, this, error));
     } else {
       try {
         addErrorOutput(new MessageOutputContext((Port) outputPort, msg));
@@ -122,7 +130,7 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
   }
 
   private void sendOutErrorInfo(ProcessResponse response, MessageOutputContext msgOutputCtxt) throws ProcessingException {
-    if(response!=null) {
+    if (response != null) {
       response.addOutputContext(msgOutputCtxt);
     } else {
       sendOutputMsg(msgOutputCtxt.getPort(), msgOutputCtxt.getMessage());
