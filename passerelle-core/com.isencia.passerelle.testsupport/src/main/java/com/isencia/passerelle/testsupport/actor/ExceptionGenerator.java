@@ -15,6 +15,8 @@
 
 package com.isencia.passerelle.testsupport.actor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.StringToken;
@@ -41,6 +43,8 @@ import com.isencia.passerelle.core.PortFactory;
 @SuppressWarnings("serial")
 public class ExceptionGenerator extends Actor {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(ExceptionGenerator.class);
+  
   public Port input;
   public Port output;
 
@@ -88,6 +92,11 @@ public class ExceptionGenerator extends Actor {
     new CheckBoxStyle(postFireExcParameter, "check box");
     wrapupExcParameter = new Parameter(this, "wrapup Exception", BooleanToken.FALSE);
     new CheckBoxStyle(wrapupExcParameter, "check box");
+  }
+  
+  @Override
+  public Logger getLogger() {
+    return LOGGER;
   }
   
   private static String getErrorCodeInfo(ErrorCode errorCode) {
