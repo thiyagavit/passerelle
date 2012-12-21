@@ -5,6 +5,7 @@ Bundle-SymbolicName: com.isencia.passerelle.domain.et
 Bundle-Version: 8.3.0.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Eclipse-RegisterBuddy: ptolemy.core
 Import-Package: com.isencia.passerelle.core;version="8.2.0",
  com.isencia.passerelle.director;version="8.2.0",
  com.isencia.passerelle.ext;version="8.2.0",

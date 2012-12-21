@@ -16,10 +16,8 @@
 package com.isencia.passerelle.domain.et;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +65,6 @@ public class ETDirector extends Director implements PasserelleDirector {
   private EventDispatchReporter dispatchReporter;
 
   private boolean notDone = true;
-  private Set<Actor> inactiveActors = new HashSet<Actor>();
 
   // Map maintaining which actors are currently iterating, and for which triggering event
   private Map<Actor, Event> busyIteratingActors = new ConcurrentHashMap<Actor, Event>();
@@ -145,6 +142,7 @@ public class ETDirector extends Director implements PasserelleDirector {
   @SuppressWarnings("unchecked")
   @Override
   public void preinitialize() throws IllegalActionException {
+    getAdapter(null).clearExecutionState();
     super.preinitialize();
 
     int threadCount = ((IntToken) dispatchThreadsParameter.getToken()).intValue();
@@ -166,8 +164,6 @@ public class ETDirector extends Director implements PasserelleDirector {
     dispatchReporter = (EventDispatchReporter) dispatcher;
     dispatchReporter.enableEventHistory(needEventLog);
     notDone = true;
-    inactiveActors.clear();
-    getAdapter(null).clearBusyTaskActors();
   }
 
   @Override
@@ -279,15 +275,6 @@ public class ETDirector extends Director implements PasserelleDirector {
 
   public boolean isActorIterating(Actor actor) {
     return busyIteratingActors.get(actor) != null;
-  }
-
-  public void notifyActorInactive(Actor actor) {
-    LOGGER.debug("Marking actor {} as inactive.", actor.getName());
-    inactiveActors.add(actor);
-  }
-
-  public boolean isActorInactive(Actor actor) {
-    return inactiveActors.contains(actor);
   }
 
   public List<Event> getEventHistory() {

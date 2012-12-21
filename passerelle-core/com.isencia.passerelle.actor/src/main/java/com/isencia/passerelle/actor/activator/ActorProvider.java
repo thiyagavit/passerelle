@@ -21,18 +21,14 @@ import com.isencia.passerelle.validation.version.VersionSpecification;
 
 /**
  * @author delerw
- * 
  */
 public class ActorProvider implements ModelElementClassProvider {
 
-	public Class<? extends NamedObj> getClass(String className,
-			VersionSpecification versionSpec) throws ClassNotFoundException {
-		if (className.startsWith("be.isencia")) {
-			return (Class<? extends NamedObj>) Class.forName(className.replace(
-					"be.isencia", "com.isencia"));
-		}
-		return (Class<? extends NamedObj>) this.getClass().getClassLoader()
-				.loadClass(className);
-	}
+  public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
+    if (className.startsWith("be.isencia")) {
+      return (Class<? extends NamedObj>) Class.forName(className.replace("be.isencia", "com.isencia"));
+    }
+    return (Class<? extends NamedObj>) this.getClass().getClassLoader().loadClass(className);
+  }
 
 }

@@ -1,6 +1,17 @@
-/**
- * 
- */
+/* Copyright 2012 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 package com.isencia.passerelle.actor.error;
 
 import java.io.BufferedReader;
@@ -9,9 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.gui.style.TextStyle;
@@ -21,29 +29,16 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.actor.InitializationException;
-import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.TerminationException;
-import com.isencia.passerelle.actor.dynaport.OutputPortSetterBuilder;
-import com.isencia.passerelle.actor.v5.Actor;
-import com.isencia.passerelle.actor.v5.ActorContext;
-import com.isencia.passerelle.actor.v5.ProcessRequest;
-import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.ext.ErrorHandler;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageOutputContext;
 
 /**
  * @author erwin
  */
-public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
+public class ErrorHandlerByCodeRange extends AbstractErrorHandlerActor {
   private static final long serialVersionUID = 1L;
   private final static Logger LOGGER = LoggerFactory.getLogger(ErrorHandlerByCodeRange.class);
-
-  public OutputPortSetterBuilder outputPortBuilder;
 
   /**
    * multi-line definition of error ranges for which this handler will take ownership. <br/>
@@ -54,10 +49,7 @@ public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
    * </ul>
    */
   public StringParameter errorRangesParameter;
-
-  private Set<CodeRange> errorRanges = new TreeSet<ErrorHandlerByCodeRange.CodeRange>();
-
-  private BlockingQueue<MessageOutputContext> bufferedErrorOutputs = new LinkedBlockingQueue<MessageOutputContext>();
+  private Set<CodeRange> handledErrorRanges = new TreeSet<CodeRange>();
 
   /**
    * @param container
@@ -67,21 +59,8 @@ public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
    */
   public ErrorHandlerByCodeRange(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-    outputPortBuilder = new OutputPortSetterBuilder(this, "outputPortBldr");
     errorRangesParameter = new StringParameter(this, "error ranges");
     new TextStyle(errorRangesParameter, "textbox");
-
-    _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" height=\"40\" style=\"fill:red;stroke:red\"/>\n"
-        + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" style=\"stroke-width:1.0;stroke:white\"/>\n"
-        + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" style=\"stroke-width:1.0;stroke:white\"/>\n"
-        + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" style=\"stroke-width:1.0;stroke:black\"/>\n"
-        + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" style=\"stroke-width:1.0;stroke:black\"/>\n"
-        + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" style=\"stroke-width:1.0;stroke:grey\"/>\n"
-        + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" style=\"stroke-width:1.0;stroke:grey\"/>\n"
-        + "<circle cx=\"0\" cy=\"0\" r=\"10\" style=\"fill:white;stroke-width:2.0\"/>\n"
-        + "<line x1=\"0\" y1=\"-15\" x2=\"0\" y2=\"0\" style=\"stroke-width:2.0\"/>\n"
-        + "<line x1=\"-3\" y1=\"-3\" x2=\"0\" y2=\"0\" style=\"stroke-width:2.0\"/>\n"
-        + "<line x1=\"3\" y1=\"-3\" x2=\"0\" y2=\"0\" style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
   }
 
   @Override
@@ -91,6 +70,7 @@ public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
     } else
       try {
         List<String> rangeNames = new ArrayList<String>();
+        handledErrorRanges.clear();
         String mappingDefs = errorRangesParameter.getExpression();
         BufferedReader reader = new BufferedReader(new StringReader(mappingDefs));
         String mappingDef = null;
@@ -99,41 +79,19 @@ public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
           if (mappingParts.length == 2) {
             String rangeName = mappingParts[0];
             rangeNames.add(rangeName);
+            String rangeDef = mappingParts[1];
+            CodeRange cr = CodeRange.buildFrom(rangeName, rangeDef);
+            if (cr != null) {
+              handledErrorRanges.add(cr);
+            }
           } else {
             getLogger().warn("{} - Invalid mapping definition: {}", getFullName(), mappingDef);
           }
         }
-        outputPortBuilder.setOutputPortNames(rangeNames.toArray(new String[rangeNames.size()]));
+        setOutputPortNames(rangeNames.toArray(new String[rangeNames.size()]));
       } catch (Exception e) {
         throw new IllegalActionException(this, e, "Error processing error range mapping");
       }
-  }
-
-  @Override
-  protected void doPreInitialize() throws InitializationException {
-    super.doPreInitialize();
-    try {
-      bufferedErrorOutputs.clear();
-      
-      String mappingDefs = errorRangesParameter.getExpression();
-      BufferedReader reader = new BufferedReader(new StringReader(mappingDefs));
-      String mappingDef = null;
-      while ((mappingDef = reader.readLine()) != null) {
-        String[] mappingParts = mappingDef.split("=");
-        if (mappingParts.length == 2) {
-          String rangeName = mappingParts[0];
-          String rangeDef = mappingParts[1];
-          CodeRange cr = CodeRange.buildFrom(rangeName, rangeDef);
-          if (cr != null) {
-            errorRanges.add(cr);
-          }
-        } else {
-          getLogger().warn("{} - Invalid mapping definition: {}", getFullName(), mappingDef);
-        }
-      }
-    } catch (Exception e) {
-      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error processing error range mapping", this, e);
-    }
   }
 
   /**
@@ -145,87 +103,14 @@ public class ErrorHandlerByCodeRange extends Actor implements ErrorHandler {
     ManagedMessage msg = error.getMsgContext();
     ErrorCode errCode = error.getErrorCode();
     if ((msg != null) && (errCode != null)) {
-      for (CodeRange codeRange : errorRanges) {
+      for (CodeRange codeRange : handledErrorRanges) {
         if (codeRange.isInRange(errCode.getCodeAsInteger())) {
-          Object outputPort = getPort(codeRange.getName());
-          if (outputPort == null || !(outputPort instanceof Port)) {
-            getLogger().error("Error in actor's ports",new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error finding port for range " + codeRange, this, error));
-          } else {
-            try {
-              bufferedErrorOutputs.put(new MessageOutputContext((Port) outputPort, msg));
-              super.triggerNextIteration();
-              result = true;
-            } catch (InterruptedException e1) {
-              // should not happen, or if it does only when terminating the model execution
-              getLogger().error("Receipt interrupted for ", error);
-            } catch (IllegalActionException e2) {
-              getLogger().error("Failed to trigger next iteration ", e2);
-              getLogger().error("Error received ", error);
-            }
-          }
+          result = sendErrorMsgOnwardsVia(codeRange.getName(), msg, error);
           break;
         }
       }
     }
     return result;
-  }
-
-  @Override
-  protected synchronized void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    // This actor has no data input ports,
-    // so it's like a Source in the days of the original Actor API.
-    // The BlockingQueue (errors) is our data feed.
-    try {
-      MessageOutputContext errOutput = bufferedErrorOutputs.poll(1, TimeUnit.SECONDS);
-      if (errOutput != null) {
-        sendOutErrorInfo(response, errOutput);
-        drainErrorsQueueTo(response);
-      }
-    } catch (InterruptedException e) {
-      // should not happen,
-      // or if it does only when terminating the model execution
-      // and with an empty queue, so we can just finish then
-      requestFinish();
-    }
-  }
-
-  private void sendOutErrorInfo(ProcessResponse response, MessageOutputContext msgOutputCtxt) throws ProcessingException {
-    if(response!=null) {
-      response.addOutputContext(msgOutputCtxt);
-    } else {
-      sendOutputMsg(msgOutputCtxt.getPort(), msgOutputCtxt.getMessage());
-    }
-  }
-
-  private synchronized void drainErrorsQueueTo(ProcessResponse response) throws ProcessingException {
-    while (!bufferedErrorOutputs.isEmpty()) {
-      MessageOutputContext errOutput = bufferedErrorOutputs.poll();
-      if (errOutput != null) {
-        sendOutErrorInfo(response, errOutput);
-      } else {
-        break;
-      }
-    }
-  }
-
-  @Override
-  protected void doWrapUp() throws TerminationException {
-    try {
-      drainErrorsQueueTo(null);
-    } catch (Exception e) {
-      throw new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error draining remaining error queue " + bufferedErrorOutputs, this, e);
-    }
-    super.doWrapUp();
-  }
-
-  @Override
-  protected void triggerFirstIteration() throws IllegalActionException {
-    // no unconditional triggering here, dude!
-  }
-
-  @Override
-  protected void triggerNextIteration() throws IllegalActionException {
-    // no unconditional triggering here, dude!
   }
 
   public Logger getLogger() {

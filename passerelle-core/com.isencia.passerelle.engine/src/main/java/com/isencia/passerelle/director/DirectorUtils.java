@@ -15,11 +15,16 @@
 
 package com.isencia.passerelle.director;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Director;
+import ptolemy.kernel.Port;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.impl.DefaultDirectorAdapter;
 import com.isencia.passerelle.ext.impl.NullDirectorAdapter;
@@ -31,18 +36,18 @@ public class DirectorUtils {
   private static Logger LOGGER = LoggerFactory.getLogger(DirectorUtils.class);
 
   /**
-   * Tries to obtain the configured adapter with the given name, on the given director.
-   * If the name is null, it is treated as the default name <code>DirectorAdapter.DEFAULT_ADAPTER_NAME</code>.
+   * Tries to obtain the configured adapter with the given name, on the given director. If the name is null, it is treated as the default name
+   * <code>DirectorAdapter.DEFAULT_ADAPTER_NAME</code>.
    * <p>
-   * For the default name, if no adapter was present yet, a default adapter is set.
-   * For other names, null is returned in that case.
+   * For the default name, if no adapter was present yet, a default adapter is set. For other names, null is returned in that case.
    * </p>
    * <p>
-   * I.e. there is theoretical support to optionally attach multiple adapters to a same director, for very specific cases.
-   * But a default adapter is presumed present.
+   * I.e. there is theoretical support to optionally attach multiple adapters to a same director, for very specific cases. But a default adapter is presumed
+   * present.
    * </p>
    * 
-   * @param director not null!
+   * @param director
+   *          not null!
    * @param adapterName
    * @return
    */
@@ -67,4 +72,33 @@ public class DirectorUtils {
     }
   }
 
+  /**
+   * @param director
+   * @return
+   */
+  public static Set<Actor> getActiveActorsWithoutInputs(Director director) {
+    Set<Actor> result = new HashSet<Actor>();
+    DirectorAdapter adapter = DirectorUtils.getAdapter(director, null);
+    for (ptolemy.actor.Actor actor : adapter.getActiveActors()) {
+      if (actor instanceof Actor) {
+        Actor a = (Actor) actor;
+        List<Port> portList = a.inputPortList();
+        boolean actorHasInputs = false;
+        for (Port port : portList) {
+          if (port instanceof com.isencia.passerelle.core.Port) {
+            com.isencia.passerelle.core.Port p = (com.isencia.passerelle.core.Port) port;
+            if (!p.getActiveSources().isEmpty()) {
+              actorHasInputs = true;
+            }
+          }
+        }
+        if(!actorHasInputs) {
+          result.add(a);
+        }
+      } else {
+        LOGGER.warn("Model contains non-Passerelle actor "+actor.getFullName());
+      }
+    }
+    return result;
+  }
 }
