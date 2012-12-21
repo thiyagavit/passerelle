@@ -14,6 +14,8 @@
  */
 package com.isencia.passerelle.ext;
 
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.data.expr.Parameter;
@@ -145,9 +147,37 @@ public interface DirectorAdapter {
   void registerConfigurableParameter(Parameter newParameter);
 
   /**
-   * remove all busy actor state indicators
+   * Notify the director that the actor is initialized and ready to start working.
+   * @param actor
    */
-  void clearBusyTaskActors();
+  void notifyActorActive(Actor actor);
+  
+  /**
+   * Notify the director that the actor is no longer active in the model execution,
+   * i.e. it has indicated its postFire=false.
+   * @param actor
+   */
+  void notifyActorInactive(Actor actor);
+  
+  /**
+   * @param actor
+   * @return true if the actor is active for work in the current execution.
+   */
+  boolean isActorActive(Actor actor);
+  
+  /**
+   * Remark : in multi-threaded execution models, actor state may be reported
+   * from different threads. This implies that code iterating over the returned set
+   * should be prepared to handle {@link ConcurrentModificationException}s.
+   * 
+   * @return an unmodifiable view on the set of all active actors
+   */
+  Collection<Actor> getActiveActors();
+  
+  /**
+   * remove all actor state indicators
+   */
+  void clearExecutionState();
 
   /**
    * @return true if any actor in the model is currently busy processing a task

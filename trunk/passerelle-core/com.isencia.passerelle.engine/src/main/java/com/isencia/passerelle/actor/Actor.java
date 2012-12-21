@@ -190,6 +190,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * iteration cycle has been halted, and will only continue after a resume() has been done.
    */
   private boolean paused;
+  
+  /**
+   * Flag indicating that the actor should be treated as a "daemon" actor, similar to the concept of daemon threads.
+   * I.e. the actor serves as "support"for the actor/model execution, but should not block the model termination.
+   * <br/>
+   * This can be applied e.g. to ErrorHandler actors without connected input ports etc.
+   */
+  private boolean daemon;
 
   /**
    * CONTROL input port, used to request an actor to finish its processing.
@@ -407,6 +415,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       getLogger().error(getInfo() + " generated exception during doPreInitialize()", e);
       throw new IllegalActionException(this, e.toString());
     }
+    getDirectorAdapter().notifyActorActive(this);
 
     getLogger().trace("{} - preinitialize() - exit ", getInfo());
   }
@@ -522,6 +531,23 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   /**
+   * @return a flag indicating that the actor should be treated as a "daemon" actor, similar to the concept of daemon threads.
+   * I.e. the actor serves as "support"for the actor/model execution, but should not block the model termination.
+   */
+  public boolean isDaemon() {
+    return daemon;
+  }
+  
+  /**
+   * Actor implementations should invoke this method with argument "true" when they want to be treated as daemon actors.
+   * 
+   * @param daemon set true when the actor must be treated as a daemon actor.
+   */
+  protected void setDaemon(boolean daemon) {
+    this.daemon = daemon;
+  }
+  
+  /**
    * Non-threadsafe method that can be used as an indication whether this actor is in its fire() processing. Can be used
    * for example in a monitoring UI to activate some kind of actor decoration. TODO: better alternative is to implement
    * an Observer for this feature.
@@ -532,6 +558,14 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     return (isFiring);
   }
 
+  /**
+   * Within Passerelle, actors typically change state info during prefire/fire...
+   */
+  @Override
+  public boolean isFireFunctional() {
+    return false;
+  }
+  
   /**
    * A slight variation on the stopFire() semantics, provided in Ptolemy. A stopFire() is used to interrupt asap an
    * ongoing fire() - that may be blocked, waiting for some event or so - but does not assume that a resume of the
@@ -752,6 +786,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       getErrorControlStrategy().handlePostFireRuntimeException(this, e);
     }
 
+    if(!res) {
+      getDirectorAdapter().notifyActorInactive(this);
+    }
     getLogger().trace("{} - postfire() - exit - {}", getInfo(), res);
 
     return res;

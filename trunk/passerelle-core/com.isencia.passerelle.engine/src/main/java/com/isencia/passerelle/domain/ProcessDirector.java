@@ -17,6 +17,7 @@ package com.isencia.passerelle.domain;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
@@ -95,8 +96,9 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
 
   @Override
   public void preinitialize() throws IllegalActionException {
-    super.preinitialize();
+    getAdapter(null).clearExecutionState();
     myThreads.clear();
+    super.preinitialize();
   }
 
   @Override
@@ -104,6 +106,20 @@ public abstract class ProcessDirector extends CompositeProcessDirector implement
     super.removeThread(thread);
     if (thread instanceof ProcessThread) {
       myThreads.remove((ProcessThread) thread);
+    }
+    
+    Set<com.isencia.passerelle.actor.Actor> activeActorsWithoutInputs = DirectorUtils.getActiveActorsWithoutInputs(this);
+    boolean areAllDaemon = true;
+    for (com.isencia.passerelle.actor.Actor actor : activeActorsWithoutInputs) {
+      if(!actor.isDaemon()) {
+        areAllDaemon = false;
+        break;
+      }
+    }
+    if(areAllDaemon) {
+      for (com.isencia.passerelle.actor.Actor actor : activeActorsWithoutInputs) {
+        actor.requestFinish();
+      }
     }
   }
 

@@ -38,24 +38,26 @@ public abstract class AbstractActorEventHandler implements EventHandler {
     Actor actor = getDestinationActorFromEvent(event);
     synchronized (actor) {
       if (director.isActorIterating(actor)) {
-        getLogger().debug("Skipping {} - Actor {} is busy.", event, actor.getName());
+        getLogger().debug("Skipping {} - Actor {} is busy.", event, actor.getFullName());
         return HandleResult.RETRY;
-      } else if (director.isActorInactive(actor)) {
-        getLogger().debug("Skipping {} - Actor {} is inactive.", event, actor.getName());
+      } else if (!director.getAdapter(null).isActorActive(actor)) {
+        getLogger().debug("Skipping {} - Actor {} is inactive.", event, actor.getFullName());
         return HandleResult.SKIPPED;
       } else {
         director.notifyActorIteratingForEvent(actor, event);
       }
     }
     try {
-      getLogger().debug("Handling {} - iterating Actor {}.", event, actor.getName());
+      getLogger().debug("Handling {} - iterating Actor {}.", event, actor.getFullName());
       boolean fired=false;
       if (actor.prefire()) {
         actor.fire();
         fired=true;
         if (!actor.postfire()) {
-          director.notifyActorInactive(actor);
+          getLogger().debug("Handling {} - postFire() returned false for Actor {}.", event, actor.getFullName());
         }
+      } else {
+        getLogger().debug("Handling {} - preFire() returned false for Actor {}.", event, actor.getFullName());
       }
       if(!fired) {
         getLogger().error("Did not fire for "+event);

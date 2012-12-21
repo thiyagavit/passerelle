@@ -808,4 +808,16 @@ public class Port extends TypedIOPort {
   public boolean isExhausted() {
     return operationalSourcePorts == null || operationalSourcePorts.size()==0;
   }
+  
+  /**
+   * 
+   * @return the model entities (should be actors) that can still send input msgs to this port
+   */
+  public synchronized Set<Entity> getActiveSources() {
+    Set<Entity> results = new HashSet<Entity>();
+    for(IOPort port : operationalSourcePorts) {
+      results.add((Entity) port.getContainer());
+    }
+    return results;
+  }
 }

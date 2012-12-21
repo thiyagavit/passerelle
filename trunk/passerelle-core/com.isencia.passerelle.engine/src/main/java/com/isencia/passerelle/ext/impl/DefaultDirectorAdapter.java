@@ -16,11 +16,14 @@
 package com.isencia.passerelle.ext.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
@@ -62,12 +65,12 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
    * The collection of listeners for FiringEvents. If the collection is empty, no events are generated. If non-empty, inside the ProcessThread.run(), lots of
    * events are generated for each transition in the iteration of an actor.
    */
-  private Collection<FiringEventListener> firingEventListeners = new HashSet<FiringEventListener>();
+  private Collection<FiringEventListener> firingEventListeners = Collections.synchronizedSet(new HashSet<FiringEventListener>());
 
   /**
    * The collection of error collectors, to which the Director forwards any reported errors. If the collection is empty, reported errors are logged.
    */
-  private Collection<ErrorCollector> errorCollectors = new HashSet<ErrorCollector>();
+  private Collection<ErrorCollector> errorCollectors = Collections.synchronizedSet(new HashSet<ErrorCollector>());
 
   private DefaultExecutionControlStrategy execCtrlStrategy = new DefaultExecutionControlStrategy();
   private ExecutionPrePostProcessor execPrePostProcessor = new DefaultExecutionPrePostProcessor();
@@ -90,6 +93,10 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   // The startTime could be used for internal CEP, timeout mgmt etc.
   private Map<Object, Actor> busyTaskActors = new ConcurrentHashMap<Object, Actor>();
 
+  // maintains which actors have already indicated that they're no longer
+  // participating in the current model execution
+  private Queue<Actor> activeActors = new ConcurrentLinkedQueue<Actor>();
+
   /**
    * @param container
    * @param name
@@ -100,25 +107,41 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     super(container, name);
     LOGGER = LoggerFactory.getLogger(container.getClass().getName() + "." + this.getClass().getName());
 
-    mockModeParam = new Parameter(container, MOCKMODE_PARAM, new BooleanToken(false));
-    mockModeParam.setTypeEquals(BaseType.BOOLEAN);
-    new CheckBoxStyle(mockModeParam, "style");
-    registerConfigurableParameter(mockModeParam);
+    if (container.getAttribute(MOCKMODE_PARAM) != null) {
+      mockModeParam = (Parameter) container.getAttribute(MOCKMODE_PARAM);
+    } else {
+      mockModeParam = new Parameter(container, MOCKMODE_PARAM, new BooleanToken(false));
+      mockModeParam.setTypeEquals(BaseType.BOOLEAN);
+      new CheckBoxStyle(mockModeParam, "style");
+      registerConfigurableParameter(mockModeParam);
+    }
 
-    expertModeParam = new Parameter(container, EXPERTMODE_PARAM, new BooleanToken(false));
-    expertModeParam.setTypeEquals(BaseType.BOOLEAN);
-    new CheckBoxStyle(expertModeParam, "style");
-    registerConfigurableParameter(expertModeParam);
+    if (container.getAttribute(EXPERTMODE_PARAM) != null) {
+      expertModeParam = (Parameter) container.getAttribute(EXPERTMODE_PARAM);
+    } else {
+      expertModeParam = new Parameter(container, EXPERTMODE_PARAM, new BooleanToken(false));
+      expertModeParam.setTypeEquals(BaseType.BOOLEAN);
+      new CheckBoxStyle(expertModeParam, "style");
+      registerConfigurableParameter(expertModeParam);
+    }
 
-    validateInitializationParam = new Parameter(container, VALIDATE_INITIALIZATION_PARAM, new BooleanToken(true));
-    validateInitializationParam.setTypeEquals(BaseType.BOOLEAN);
-    new CheckBoxStyle(validateInitializationParam, "style");
-    registerConfigurableParameter(validateInitializationParam);
+    if (container.getAttribute(VALIDATE_INITIALIZATION_PARAM) != null) {
+      validateInitializationParam = (Parameter) container.getAttribute(VALIDATE_INITIALIZATION_PARAM);
+    } else {
+      validateInitializationParam = new Parameter(container, VALIDATE_INITIALIZATION_PARAM, new BooleanToken(true));
+      validateInitializationParam.setTypeEquals(BaseType.BOOLEAN);
+      new CheckBoxStyle(validateInitializationParam, "style");
+      registerConfigurableParameter(validateInitializationParam);
+    }
 
-    validateIterationParam = new Parameter(container, VALIDATE_ITERATION_PARAM, new BooleanToken(false));
-    validateIterationParam.setTypeEquals(BaseType.BOOLEAN);
-    new CheckBoxStyle(validateIterationParam, "style");
-    registerConfigurableParameter(validateIterationParam);
+    if (container.getAttribute(VALIDATE_ITERATION_PARAM) != null) {
+      validateIterationParam = (Parameter) container.getAttribute(VALIDATE_ITERATION_PARAM);
+    } else {
+      validateIterationParam = new Parameter(container, VALIDATE_ITERATION_PARAM, new BooleanToken(false));
+      validateIterationParam.setTypeEquals(BaseType.BOOLEAN);
+      new CheckBoxStyle(validateIterationParam, "style");
+      registerConfigurableParameter(validateIterationParam);
+    }
   }
 
   public void addErrorCollector(ErrorCollector errCollector) {
@@ -142,24 +165,26 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   public void reportError(NamedObj modelElement, PasserelleException e) {
     boolean isHandled = handleError(modelElement, e);
     if (!isHandled) {
-      if (!errorCollectors.isEmpty()) {
-        for (Iterator<ErrorCollector> errCollItr = errorCollectors.iterator(); errCollItr.hasNext();) {
-          ErrorCollector element = errCollItr.next();
-          element.acceptError(e);
+      synchronized (errorCollectors) {
+        if (!errorCollectors.isEmpty()) {
+          for (Iterator<ErrorCollector> errCollItr = errorCollectors.iterator(); errCollItr.hasNext();) {
+            ErrorCollector element = errCollItr.next();
+            element.acceptError(e);
+          }
+        } else {
+          LOGGER.error("reportError() - no errorCollectors but received exception", e);
         }
-      } else {
-        LOGGER.error("reportError() - no errorCollectors but received exception", e);
       }
     }
   }
-  
+
   private boolean handleError(NamedObj errorSource, PasserelleException error) {
     boolean result = false;
     NamedObj container = errorSource;
-    while(!(container instanceof CompositeEntity) && (container!=null)) {
+    while (!(container instanceof CompositeEntity) && (container != null)) {
       container = container.getContainer();
     }
-    while(!result && (container!=null)) {
+    while (!result && (container != null)) {
       result = handleErrorOnOneLevel((CompositeEntity) container, errorSource, error);
       container = container.getContainer();
     }
@@ -170,7 +195,7 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     boolean result = false;
     List<ErrorHandler> errHandlerList = parentComposite.entityList(ErrorHandler.class);
     for (ErrorHandler errorHandler : errHandlerList) {
-      result = result || errorHandler.handleError(errorSource, error);
+      result = errorHandler.handleError(errorSource, error) || result;
     }
     return result;
   }
@@ -245,8 +270,9 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   }
 
   public void registerFiringEventListener(FiringEventListener listener) {
-    if (listener != null)
+    if (listener != null) {
       firingEventListeners.add(listener);
+    }
   }
 
   public boolean removeFiringEventListener(FiringEventListener listener) {
@@ -259,15 +285,41 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
 
   public void notifyFiringEventListeners(FiringEvent event) {
     if (event != null && event.getDirector().equals(this)) {
-      for (Iterator<FiringEventListener> listenerItr = firingEventListeners.iterator(); listenerItr.hasNext();) {
-        FiringEventListener listener = listenerItr.next();
-        listener.onEvent(event);
+      synchronized (firingEventListeners) {
+        for (Iterator<FiringEventListener> listenerItr = firingEventListeners.iterator(); listenerItr.hasNext();) {
+          FiringEventListener listener = listenerItr.next();
+          listener.onEvent(event);
+        }
       }
     }
   }
 
-  public void clearBusyTaskActors() {
+  public void notifyActorActive(Actor actor) {
+    LOGGER.debug("notifyActorActive() - Marking actor {} as active.", actor.getFullName());
+    synchronized (activeActors) {
+      activeActors.add(actor);
+    }
+  }
+
+  public void notifyActorInactive(Actor actor) {
+    LOGGER.debug("notifyActorInactive() - Marking actor {} as inactive.", actor.getFullName());
+    if (!activeActors.remove(actor)) {
+      LOGGER.warn("notifyActorInactive() - Actor {} was not marked as active", actor.getFullName());
+    }
+  }
+
+  public boolean isActorActive(Actor actor) {
+    return activeActors.contains(actor);
+  }
+
+  public Collection<Actor> getActiveActors() {
+    return activeActors;
+  }
+
+  public void clearExecutionState() {
+    LOGGER.debug("clearExecutionState()");
     busyTaskActors.clear();
+    activeActors.clear();
   }
 
   public boolean hasBusyTaskActors() {

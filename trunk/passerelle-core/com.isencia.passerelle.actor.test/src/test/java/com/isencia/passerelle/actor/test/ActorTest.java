@@ -45,12 +45,7 @@ import com.isencia.passerelle.testsupport.actor.TextSource;
 
 public class ActorTest extends TestCase {
   private Flow flow;
-  private FlowManager flowMgr;
-
-  protected void setUp() throws Exception {
-    flow = new Flow("actors unit test", null);
-    flowMgr = new FlowManager();
-  }
+  private FlowManager flowMgr = FlowManager.getDefault();
 
   /**
    * A unit test for a plain model with Error Observer
@@ -59,6 +54,7 @@ public class ActorTest extends TestCase {
    * @throws Exception
    */
   public void testFlowWithErrorObserver() throws Exception {
+    flow = new Flow("testFlowWithErrorObserver", null);
     flow.setDirector(new Director(flow, "director"));
 
     Const source = new Const(flow, "Constant");
@@ -97,6 +93,7 @@ public class ActorTest extends TestCase {
    * @throws Exception
    */
   public void testFlowWithErrorObserverAndStop() throws Exception {
+    flow = new Flow("testFlowWithErrorObserverAndStop", null);
     flow.setDirector(new Director(flow, "director"));
 
     Const source = new Const(flow, "Constant");
@@ -125,6 +122,7 @@ public class ActorTest extends TestCase {
    * @throws Exception
    */
   public void testHelloPasserelle() throws Exception {
+    flow = new Flow("testHelloPasserelle", null);
     flow.setDirector(new Director(flow, "director"));
 
     Const source = new Const(flow, "Constant");
@@ -143,6 +141,7 @@ public class ActorTest extends TestCase {
   }
 
   public void testConcurrentInputsOnHeaderModifier() throws Exception {
+    flow = new Flow("testConcurrentInputsOnHeaderModifier", null);
     flow.setDirector(new Director(flow, "director"));
 
     Actor src1 = new TextSource(flow, "src1");
@@ -179,6 +178,7 @@ public class ActorTest extends TestCase {
   }
 
   public void testConcurrentInputsOnHeaderFilter() throws Exception {
+    flow = new Flow("testConcurrentInputsOnHeaderFilter", null);
     flow.setDirector(new Director(flow, "director"));
 
     Actor src1 = new TextSource(flow, "src1");
@@ -225,6 +225,7 @@ public class ActorTest extends TestCase {
    * @throws Exception
    */
   public void testHelloPasserelleWithTrigger() throws Exception {
+    flow = new Flow("testHelloPasserelleWithTrigger", null);
     flow.setDirector(new Director(flow, "director"));
 
     Trigger trigger = new Trigger(flow, "trigger");
@@ -245,6 +246,7 @@ public class ActorTest extends TestCase {
   }
 
   public void testCommandExecutor() throws Exception {
+    flow = new Flow("testCommandExecutor", null);
     flow.setDirector(new Director(flow, "director"));
 
     CommandExecutor cmdExecutor = new CommandExecutor(flow, "cmdExecutor");
@@ -282,6 +284,7 @@ public class ActorTest extends TestCase {
   }
 
   public void testCommandExecutorWithErrorExit() throws Exception {
+    flow = new Flow("testCommandExecutorWithErrorExit", null);
     flow.setDirector(new Director(flow, "director"));
 
     CommandExecutor cmdExecutor = new CommandExecutor(flow, "cmdExecutor");

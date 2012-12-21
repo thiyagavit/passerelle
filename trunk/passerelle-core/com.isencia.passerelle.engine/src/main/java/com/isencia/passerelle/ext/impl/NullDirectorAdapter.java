@@ -15,6 +15,8 @@
 
 package com.isencia.passerelle.ext.impl;
 
+import java.util.HashSet;
+import java.util.Set;
 import ptolemy.actor.Actor;
 import ptolemy.actor.FiringEvent;
 import ptolemy.data.expr.Parameter;
@@ -38,6 +40,7 @@ import com.isencia.passerelle.ext.FiringEventListener;
 public class NullDirectorAdapter implements DirectorAdapter {
   
   private final static Parameter[] EMPTY_PARAMETER_ARRAY = new Parameter[0];
+  private final static Set<Actor> EMPTY_ACTIVE_ACTORS = new HashSet<Actor>();
 
   private DefaultExecutionControlStrategy execCtrlStrategy = new DefaultExecutionControlStrategy();
   private ExecutionPrePostProcessor execPrePostProcessor = new DefaultExecutionPrePostProcessor();
@@ -139,5 +142,22 @@ public class NullDirectorAdapter implements DirectorAdapter {
   
   public boolean isActorBusy(Actor actor) {
     return false;
+  }
+
+  public void notifyActorActive(Actor actor) {
+  }
+
+  public void notifyActorInactive(Actor actor) {
+  }
+
+  public boolean isActorActive(Actor actor) {
+    return false;
+  }
+
+  public Set<Actor> getActiveActors() {
+    return EMPTY_ACTIVE_ACTORS;
+  }
+
+  public void clearExecutionState() {
   }
 }
