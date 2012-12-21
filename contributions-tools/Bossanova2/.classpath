@@ -35,7 +35,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.commons.ume"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.hmi"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.hmi.definition"/>
-	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/org.slf4j_1.5.8.jar"/>
-	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/org.slf4j.impl_1.5.8.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/slf4j-api-1.6.0.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base/plugins/slf4j-log4j12-1.6.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
