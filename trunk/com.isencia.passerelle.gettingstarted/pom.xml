@@ -17,8 +17,10 @@
 		<module>passerelle-thirdparty-base</module>
 		<module>passerelle-thirdparty-base-sources</module>
 		<module>passerelle-thirdparty-diagnosis</module>
-		<module>ptolemy</module>
 		<module>rcp-deltapack</module>
+		
+		<!-- no need to have ptolemy bundles here, will be build from workspace -->
+		<!--<module>ptolemy</module>-->
 	</modules>
 
 	<build>
