@@ -37,12 +37,17 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 
 /**
+ * An ErrorHandler actor that can be configured with one or more accepted error severities.
+ * <p>
+ * When an exception is received that has one of the configured severities,
+ * its message context is sent out via the corresponding output port.
+ * </p>
  * @author erwin
  *
  */
 public class ErrorHandlerBySeverity extends AbstractErrorHandlerActor {
   private static final long serialVersionUID = 1L;
-  private final static Logger LOGGER = LoggerFactory.getLogger(ErrorHandlerByCodeRange.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ErrorHandlerBySeverity.class);
 
   private SortedSet<String> handledSeverities = new TreeSet<String>();
   

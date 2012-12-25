@@ -37,6 +37,7 @@ import com.isencia.passerelle.message.MessageOutputContext;
 
 /**
  * Base class for all kinds of ErrorHandler actors, without input ports.
+ * The output ports are configurable, matching the different error cases that can be handled by the implemented actor.
  * 
  * @author erwin
  */

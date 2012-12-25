@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.actor.error;
 
 import java.io.BufferedReader;
@@ -34,6 +34,12 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 
 /**
+ * An ErrorHandler actor that can be configured with one or more numerical error code ranges.
+ * <p>
+ * When an exception is received that has an error code in one/some of the configured ranges, 
+ * the exception's message context is sent out via the corresponding output port(s).
+ * </p>
+ * 
  * @author erwin
  */
 public class ErrorHandlerByCodeRange extends AbstractErrorHandlerActor {
@@ -67,7 +73,7 @@ public class ErrorHandlerByCodeRange extends AbstractErrorHandlerActor {
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
     if (attribute != errorRangesParameter) {
       super.attributeChanged(attribute);
-    } else
+    } else {
       try {
         List<String> rangeNames = new ArrayList<String>();
         handledErrorRanges.clear();
@@ -92,11 +98,12 @@ public class ErrorHandlerByCodeRange extends AbstractErrorHandlerActor {
       } catch (Exception e) {
         throw new IllegalActionException(this, e, "Error processing error range mapping");
       }
+    }
   }
 
   /**
-   * Checks if the given error contains a msg and an error code.
-   * If the code matches one of the configured ranges, the msg will be sent out via the corresponding port.
+   * Checks if the given error contains a msg and an error code. If the code matches one/some of the configured ranges, the msg will be sent out via the
+   * corresponding port(s).
    */
   public synchronized boolean handleError(NamedObj errorSource, PasserelleException error) {
     boolean result = false;
@@ -106,7 +113,6 @@ public class ErrorHandlerByCodeRange extends AbstractErrorHandlerActor {
       for (CodeRange codeRange : handledErrorRanges) {
         if (codeRange.isInRange(errCode.getCodeAsInteger())) {
           result = sendErrorMsgOnwardsVia(codeRange.getName(), msg, error);
-          break;
         }
       }
     }
