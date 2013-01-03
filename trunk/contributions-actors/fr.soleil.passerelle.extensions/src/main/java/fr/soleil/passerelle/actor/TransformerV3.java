@@ -64,7 +64,7 @@ public abstract class TransformerV3 extends Actor {
 	 * (non-Javadoc)
 	 * @see com.isencia.passerelle.actor.Actor#getAuditTrailMessage(com.isencia.passerelle.message.ManagedMessage, com.isencia.passerelle.core.Port)
 	 */
-	protected String getAuditTrailMessage(ManagedMessage message, Port port) throws Exception {
+	protected String getAuditTrailMessage(ManagedMessage message, Port port) {
 		return " sent converted message";
 	}
 }
