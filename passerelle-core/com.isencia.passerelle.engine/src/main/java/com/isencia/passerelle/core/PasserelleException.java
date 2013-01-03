@@ -22,7 +22,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  * 
  * @author erwin
  */
-public class PasserelleException extends Exception {
+public class PasserelleException extends Exception implements Comparable<PasserelleException> {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -256,5 +256,21 @@ public class PasserelleException extends Exception {
    */
   public String getSimpleMessage() {
     return super.getMessage();
+  }
+
+  /**
+   * Compares the exceptions' ErrorCode severities and in second priority also their actual numerical code.
+   * Does an inverted order, i.e. to sort by "most-important" first.
+   */
+  public int compareTo(PasserelleException o) {
+    if(o == this)
+      return 0;
+    if(o == null)
+      return -1;
+    int res =  - getErrorCode().getSeverity().compareTo(o.getErrorCode().getSeverity());
+    if(res == 0) {
+      res = getErrorCode().getCode().compareTo(o.getErrorCode().getCode());
+    }
+    return res;
   }
 }

@@ -39,9 +39,11 @@ public class ErrorCode extends Enumerated<ErrorCode> {
   public static final ErrorCode ACTOR_EXECUTION_FATAL = new ErrorCode("ACTOR_EXECUTION_FATAL", "0229", ErrorCategory.PASS_FUNCTIONAL, ErrorCode.Severity.FATAL, "Fatal error in Actor execution");
 
   public static final ErrorCode FLOW_LOADING_ERROR = new ErrorCode("FLOW_LOADING_ERROR", "0300", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error loading Flow");
-  public static final ErrorCode FLOW_CONFIGURATION_ERROR = new ErrorCode("FLOW_CONFIGURATION_ERROR", "0310", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error configuring Flow");
-  public static final ErrorCode FLOW_EXECUTION_ERROR = new ErrorCode("FLOW_EXECUTION_ERROR", "0320", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error executing Flow");
-  public static final ErrorCode FLOW_EXECUTION_FATAL = new ErrorCode("FLOW_EXECUTION_FATAL", "0329", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Fatal error executing Flow");
+  public static final ErrorCode FLOW_VALIDATION_WARNING = new ErrorCode("FLOW_VALIDATION_WARNING", "0310", ErrorCategory.PASS_FUNCTIONAL, ErrorCode.Severity.WARNING, "Warning validating Flow");
+  public static final ErrorCode FLOW_VALIDATION_ERROR = new ErrorCode("FLOW_VALIDATION_ERROR", "0311", ErrorCategory.PASS_FUNCTIONAL, ErrorCode.Severity.ERROR, "Error validating Flow");
+  public static final ErrorCode FLOW_CONFIGURATION_ERROR = new ErrorCode("FLOW_CONFIGURATION_ERROR", "0320", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error configuring Flow");
+  public static final ErrorCode FLOW_EXECUTION_ERROR = new ErrorCode("FLOW_EXECUTION_ERROR", "0330", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error executing Flow");
+  public static final ErrorCode FLOW_EXECUTION_FATAL = new ErrorCode("FLOW_EXECUTION_FATAL", "0339", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Fatal error executing Flow");
   public static final ErrorCode FLOW_STATE_ERROR = new ErrorCode("FLOW_STATE_ERROR", "0390", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Internal state error in Flow");
 
   public static final ErrorCode RUNTIME_COMMUNICATION_ERROR = new ErrorCode("RUNTIME_COMMUNICATION_ERROR", "0900", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error communicating with runtime");

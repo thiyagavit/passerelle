@@ -57,7 +57,7 @@ public class ModelValidationServiceTest extends TestCase {
     assertTrue("Actors with identical versions as registered, should be validated OK", context.isValid());
   }
   
-  public void testMajorVersionsIdentical() throws Exception {
+  public void testMinorVersionsDifferent() throws Exception {
     Const constActor = new Const(flow, "const");
     new VersionAttribute(constActor, "_version").setExpression("1.6.3");
     
@@ -69,7 +69,7 @@ public class ModelValidationServiceTest extends TestCase {
     ValidationContext context = new ValidationContext();
     ModelValidationService.getInstance().validate(flow, context );
     
-    assertTrue("Actors with same major versions as registered, should be validated OK", context.isValid());
+    assertFalse("Actors with different minor versions as registered, should be validated NOK", context.isValid());
   }
   
   public void testAllVersionsIdenticalWithOneExtra() throws Exception {

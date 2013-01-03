@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -50,7 +49,6 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-
 import net.infonode.docking.TabWindow;
 import net.infonode.tabbedpanel.Tab;
 import net.infonode.tabbedpanel.TabDragEvent;
@@ -62,11 +60,9 @@ import net.infonode.tabbedpanel.TabRemovedEvent;
 import net.infonode.tabbedpanel.TabStateChangedEvent;
 import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.tabbedpanel.titledtab.TitledTab;
-
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.gui.PtolemyEffigy;
 import ptolemy.actor.gui.PtolemyPreferences;
@@ -80,7 +76,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Settable;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
-
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ValidationException;
@@ -95,6 +90,7 @@ import com.isencia.passerelle.actor.gui.PasserelleQuery.RenameRequest;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
 import com.isencia.passerelle.actor.gui.graph.EditPreferencesDialog;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
+import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.HMIMessages;
@@ -114,13 +110,11 @@ import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.validation.ModelValidationService;
 import com.isencia.passerelle.validation.ValidationContext;
-
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
 
 /**
  * @todo Class Comment
- * 
  * @author erwin.de.ley@isencia.be
  */
 public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, QueryLabelProvider {
@@ -325,28 +319,41 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     boolean modelAlreadyLoaded = selectTab(_modelFile.toURI(), modelGraphTabPanel);
     Flow loadedModel = super.loadModel(_modelFile, modelKey);
 
-    if(!modelAlreadyLoaded) {
+    if (!modelAlreadyLoaded) {
       boolean needToValidateModels = true;
       Token validateModelsToken = PtolemyPreferences.preferenceValueLocal(loadedModel, "_validateModels");
       if (validateModelsToken != null && validateModelsToken instanceof BooleanToken) {
         needToValidateModels = ((BooleanToken) validateModelsToken).booleanValue();
       }
-  
+
       if (needToValidateModels) {
         ValidationContext validationContext = new ValidationContext();
         ModelValidationService.getInstance().validate(loadedModel, validationContext);
         if (!validationContext.isValid()) {
-          for (ValidationException e : validationContext.getErrors()) {
-            Object obj = e.getContext();
-            String validationErrorMsg = e.getSimpleMessage();
-  
-            if (obj instanceof Actor) {
-              ExecutionTracerService.trace((Actor) obj, "WARNING : "+validationErrorMsg);
-            } else if (obj instanceof Director) {
-              ExecutionTracerService.trace((Director) obj, "WARNING : "+validationErrorMsg);
+          boolean isError = false;
+          for (NamedObj validatedElement : validationContext.getElementsWithErrors()) {
+            for (ValidationException e : validationContext.getErrors(validatedElement)) {
+              Object obj = e.getModelElement();
+              String validationErrorMsg = e.getSimpleMessage();
+              Severity severity = e.getErrorCode().getSeverity();
+              if(Severity.ERROR.compareTo(severity)<=0) {
+                isError = true;
+              }
+              String severityStr = severity.name();
+              if (obj instanceof Actor) {
+                ExecutionTracerService.trace((Actor) obj, severityStr + " : " + validationErrorMsg);
+              } else if (obj instanceof Director) {
+                ExecutionTracerService.trace((Director) obj, severityStr + " : " + validationErrorMsg);
+              }
+              // only need the first one, which should be the most important one
+              break;
             }
           }
-          PopupUtil.showWarning(getDialogHookComponent(), "warning.flow.validationError");
+          if(!isError) {
+            PopupUtil.showWarning(getDialogHookComponent(), "warning.flow.validationError");
+          } else {
+            PopupUtil.showError(getDialogHookComponent(), "warning.flow.validationError");
+          }
         }
       }
     }
@@ -364,7 +371,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         String newName = (_ch.getContext().getFullName() + "." + _ch.getNewName()).substring(1);
         ((LookInsideViewFactory) graphPanel.getViewFactory()).renameView(oldName, newName);
       }
-      final String[] importantChanges = new String[] { "entity", "property", "relation", "link", "unlink", "deleteRelation", "deleteEntity", "deleteProperty", "class" };
+      final String[] importantChanges = new String[] { "entity", "property", "relation", "link", "unlink", "deleteRelation", "deleteEntity", "deleteProperty",
+          "class" };
       for (final String changeType : importantChanges) {
         if (change.getDescription().contains(changeType)) {
           hasImpact = true;
@@ -410,7 +418,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
       // thread and blocks for a second!!
       graphPanel.setAnimationDelay(1000);
 
-//      final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
+      // final TitledTab tab = new TitledTab(getCurrentModel().getDisplayName(), null, graphPanel, null);
       final TitledTab tab = new TitledTab(modelKey, null, graphPanel, null);
 
       graphTabsMap.put(getModelURL().toString(), tab);
@@ -665,10 +673,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     title.setName("title");
     title.setBackground(new Color(r, g, bl));
     /*
-     * ImageIcon icon = new ImageIcon( Toolkit .getDefaultToolkit() .getImage( (getClass()
-     * .getResource("/com/isencia/passerelle/hmi/resources/composite.gif" )))); JLabel lab = new JLabel(icon);
-     * 
-     * title.add(lab, BorderLayout.LINE_START);
+     * ImageIcon icon = new ImageIcon( Toolkit .getDefaultToolkit() .getImage( (getClass() .getResource("/com/isencia/passerelle/hmi/resources/composite.gif"
+     * )))); JLabel lab = new JLabel(icon); title.add(lab, BorderLayout.LINE_START);
      */
     final JLabel lab2 = new JLabel(name);
     final Font f = lab2.getFont();
