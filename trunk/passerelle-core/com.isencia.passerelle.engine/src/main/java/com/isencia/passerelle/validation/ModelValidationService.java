@@ -27,6 +27,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.validation.version.ActorMajorVersionValidator;
+import com.isencia.passerelle.validation.version.ActorMinorVersionValidator;
 import com.isencia.passerelle.validation.version.ModelElementVersionValidationStrategy;
 import com.isencia.passerelle.validation.version.VersionSpecification;
 
@@ -47,6 +48,7 @@ public class ModelValidationService {
 
   private ModelValidationService() {
     versionValidationStrategies.add(new ActorMajorVersionValidator());
+    versionValidationStrategies.add(new ActorMinorVersionValidator());
   }
 
   public static ModelValidationService getInstance() {

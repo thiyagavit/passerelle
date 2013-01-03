@@ -24,6 +24,9 @@ import com.isencia.passerelle.core.ErrorCode;
  * This validator checks whether the major version nr of an actor present in a model, is the same as the major version number as registered for the actor
  * implementation present in the runtime.
  * <p>
+ * If the major version is different, a validation error is thrown.
+ * </p>
+ * <p>
  * Alternative versioning can be based on a code/tag. This can be the case e.g. when models are stored/used in Passerelle's asset repository. In such a case,
  * the code must be equal, i.e. the code is treated in the same way as a major version number.
  * </p>
@@ -48,7 +51,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
         if (res==0) {
           // all's well
         } else if (res<0) {
-          throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " too old.",
+          throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " too old.",
               versionedElement, null);
         } else {
           // This means the runtime has a more recent major version than what's required for the element.
@@ -64,7 +67,7 @@ public class ActorMajorVersionValidator implements ModelElementVersionValidation
             }
           }
           if (!foundCompatibleVersion) {
-            throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " more recent.",
+            throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " more recent.",
                 versionedElement, null);
           }
         }
