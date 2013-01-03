@@ -237,12 +237,12 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
             // throw an IllegalActionException if operation is unknown
             operation = Operation.fromDescription(PasserelleUtil.getParameterValue(operationParam).trim());
         } else if (attribute == FilteredKeysParam) {
+            filteredKeysList.clear();
+            
             final String filteredKeys = PasserelleUtil.getParameterValue(FilteredKeysParam);
-
             if (!filteredKeys.isEmpty()) {
-                final StringTokenizer tokenizer = new StringTokenizer(filteredKeys, FILTERED_KEYS_SEPARATOR);
-                filteredKeysList.clear();
-
+                final StringTokenizer tokenizer = new StringTokenizer(filteredKeys, FILTERED_KEYS_SEPARATOR);                
+                
                 // key is added to list only if it's not empty
                 while (tokenizer.hasMoreTokens()) {
                     final String key = tokenizer.nextToken().trim();
@@ -470,19 +470,20 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                 try {
                     final StringPairList valueList = memorizedKeyValues.get(listName);
                     final StringPair temp = valueList.getNextElement(filteredKeysList);
-
+                 // -1 to have the last extracted value
+                    final int currentIndexValue = valueList.getCursor() - 1;
+                    
                     LOGGER.debug("output mode: getNextValue in \"{}\" = {} is {}", new String[] { listName,
                             memorizedKeyValues.get(listName).toString(), temp.toString() });
 
-                    ExecutionTracerService.trace(this, "key: " + temp.key);
-                    ExecutionTracerService.trace(this, "value: " + temp.value);
+  
                     response.addOutputMessage(0, keyPort, PasserelleUtil.createContentMessage(this, temp.key));
                     response.addOutputMessage(1, valuePort, PasserelleUtil.createContentMessage(this, temp.value));
-                    response.addOutputMessage(2, outputValuePort, createMessage());
-
-                    // -1 to have the last extracted value
+                    response.addOutputMessage(2, outputValuePort, createMessage());                    
                     response.addOutputMessage(3, currentOutputIndexPort,
-                            PasserelleUtil.createContentMessage(this, valueList.getCursor() - 1));
+                            PasserelleUtil.createContentMessage(this, currentIndexValue));
+                    
+                    ExecutionTracerService.trace(this, "key: " + temp.key + " value: " + temp.value + " index: " + currentIndexValue);
 
                 } catch (final IndexOutOfBoundsException e) {
                     if (fixedNumberOfValue) {
