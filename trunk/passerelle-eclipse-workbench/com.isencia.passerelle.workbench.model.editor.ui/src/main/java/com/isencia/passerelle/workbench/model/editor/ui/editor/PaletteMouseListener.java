@@ -29,12 +29,12 @@ public class PaletteMouseListener implements MouseMotionListener {
 		this.paletteViewer = paletteViewer;
 	}
 
-	@Override
+
 	public void mouseDragged(MouseEvent me) {
 
 	}
 
-	@Override
+
 	public void mouseEntered(MouseEvent me) {
 		try {
 			addFavorite();
@@ -70,17 +70,17 @@ public class PaletteMouseListener implements MouseMotionListener {
 		}
 	}
 
-	@Override
+
 	public void mouseExited(MouseEvent me) {
 
 	}
 
-	@Override
+
 	public void mouseHover(MouseEvent me) {
 
 	}
 
-	@Override
+
 	public void mouseMoved(MouseEvent me) {
 	}
 
