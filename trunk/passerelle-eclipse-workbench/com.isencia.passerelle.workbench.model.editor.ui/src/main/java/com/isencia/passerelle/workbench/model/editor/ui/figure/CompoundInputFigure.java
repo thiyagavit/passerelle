@@ -14,65 +14,64 @@ import com.isencia.passerelle.workbench.model.editor.ui.IBody;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
 
 public class CompoundInputFigure extends CompoundIOFigure {
-	public static final String INPUT_PORT_NAME = "input";
+  public static final String INPUT_PORT_NAME = "input";
 
-	public CompoundInputFigure(String name,Class type) {
-		super(name,type);
-		addOutput(INPUT_PORT_NAME, INPUT_PORT_NAME);
-		setBackgroundColor(ColorConstants.white);
-		setBorder(null);
-	}
+  public CompoundInputFigure(String name, Class type) {
+    super(name, type);
+    addOutput(INPUT_PORT_NAME, INPUT_PORT_NAME);
+    setBackgroundColor(ColorConstants.white);
+    setBorder(null);
+  }
 
-	@Override
-	protected Color getBackGroundcolor() {
-		return ColorConstants.white;
-	}
+  @Override
+  protected Color getBackGroundcolor() {
+    return ColorConstants.white;
+  }
 
-	private class Body extends RectangleFigure implements IBody {
+  private class Body extends RectangleFigure implements IBody {
 
-		/**
-		 * @param s
-		 */
-		public Body() {
-			BorderLayout layout = new BorderLayout();
-			setLayoutManager(layout);
-			setBorder(null);
+    /**
+     * @param s
+     */
+    public Body() {
+      BorderLayout layout = new BorderLayout();
+      setLayoutManager(layout);
+      setBorder(null);
 
-			setBackgroundColor(ColorConstants.white);
-			setOpaque(true);
-			Image image = PaletteItemFactory.getInstance().getIcon(type).createImage();
-			
-			final Label label = new Label(image);
-			label.setBackgroundColor(ColorConstants.white);
-			label.setOpaque(false);
-			label.setBorder(null);
-			add(label, BorderLayout.CENTER);
-		}
+      setBackgroundColor(ColorConstants.white);
+      setOpaque(true);
+      Image image = PaletteItemFactory.getInstance().getIcon(type).createImage();
 
-		public void initClickable(Clickable clickable) {
-			if (clickable != null) {
-				add(clickable, BorderLayout.BOTTOM);
-			}
-		}
+      final Label label = new Label(image);
+      label.setBackgroundColor(ColorConstants.white);
+      label.setOpaque(false);
+      label.setBorder(null);
+      add(label, BorderLayout.CENTER);
+    }
 
-		public Dimension getPreferredSize(int wHint, int hHint) {
-			Dimension size = getParent().getSize().getCopy();
-			return size;
-		}
+    public void initClickable(Clickable clickable) {
+      if (clickable != null) {
+        add(clickable, BorderLayout.BOTTOM);
+      }
+    }
 
-		@Override
-		public void initImage(Image image) {
+    public Dimension getPreferredSize(int wHint, int hHint) {
+      Dimension size = getParent().getSize().getCopy();
+      return size;
+    }
 
-		}
+    public void initImage(Image image) {
 
-	}
+    }
 
-	protected IFigure generateBody(Image image, Clickable[] clickables) {
-		Body body = new Body();
-		body.setBorder(null);
-		for (Clickable clickable : clickables)
-			body.initClickable(clickable);
-		return (body);
-	}
+  }
+
+  protected IFigure generateBody(Image image, Clickable[] clickables) {
+    Body body = new Body();
+    body.setBorder(null);
+    for (Clickable clickable : clickables)
+      body.initClickable(clickable);
+    return (body);
+  }
 
 }
