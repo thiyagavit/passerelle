@@ -48,9 +48,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.PortFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.RectangularActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
-import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
-import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
-import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class ActorEditPart extends AbstractNodeEditPart implements

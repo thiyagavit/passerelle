@@ -219,19 +219,19 @@ public class CompositeActorEditPart extends ContainerEditPart implements
 		Clickable button = new Clickable(drillDownImageFigure);
 		button.addMouseListener(new MouseListener() {
 
-			@Override
+
 			public void mouseDoubleClicked(MouseEvent e) {
 				initPage((TypedCompositeActor) getModel());
 
 			}
 
-			@Override
+
 			public void mousePressed(MouseEvent arg0) {
 				// Not action when mouse pressed
 
 			}
 
-			@Override
+
 			public void mouseReleased(MouseEvent arg0) {
 				// Not action when mouse released
 

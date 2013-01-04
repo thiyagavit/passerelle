@@ -27,113 +27,106 @@ import com.isencia.passerelle.workbench.model.ui.VertexLink;
  * Implements a Relation Editpart to represent a Wire like connection.
  * 
  */
-public class VertexLinkEditPart extends AbstractConnectionEditPart
-		implements ChangeListener {
-	public Relation getRelation() {
-		return ((VertexLink) getModel()).getRelation();
-	}
+public class VertexLinkEditPart extends AbstractConnectionEditPart implements ChangeListener {
+  public Relation getRelation() {
+    return ((VertexLink) getModel()).getRelation();
+  }
 
-	public IOPort getPort() {
-		return ((VertexLink) getModel()).getPort();
-	}
+  public IOPort getPort() {
+    return ((VertexLink) getModel()).getPort();
+  }
 
-	public Vertex getVertex() {
-		return ((VertexLink) getModel()).getTargetVertex();
-	}
+  public Vertex getVertex() {
+    return ((VertexLink) getModel()).getTargetVertex();
+  }
 
-	private static Logger logger = LoggerFactory
-			.getLogger(VertexLinkEditPart.class);
+  private static Logger logger = LoggerFactory.getLogger(VertexLinkEditPart.class);
 
-	public static final Color alive = new Color(Display.getDefault(), 0, 74,
-			168), dead = new Color(Display.getDefault(), 0, 0, 0);
+  public static final Color alive = new Color(Display.getDefault(), 0, 74, 168), dead = new Color(Display.getDefault(), 0, 0, 0);
 
-	private AccessibleEditPart acc;
+  private AccessibleEditPart acc;
 
-	public Logger getLogger() {
-		return logger;
-	}
+  public Logger getLogger() {
+    return logger;
+  }
 
-	public void activate() {
-		super.activate();
-	}
+  public void activate() {
+    super.activate();
+  }
 
-	public void deactivate() {
-		super.deactivate();
-	}
+  public void deactivate() {
+    super.deactivate();
+  }
 
-	public void activateFigure() {
-		super.activateFigure();
-		if (getRelation() instanceof Changeable) {
-			Changeable changeable = (Changeable) getRelation();
-			changeable.addChangeListener(this);
-		}
-	}
+  public void activateFigure() {
+    super.activateFigure();
+    if (getRelation() instanceof Changeable) {
+      Changeable changeable = (Changeable) getRelation();
+      changeable.addChangeListener(this);
+    }
+  }
 
-	public void deactivateFigure() {
-		if (getRelation() instanceof Changeable) {
-			Changeable changeable = (Changeable) getRelation();
-			changeable.removeChangeListener(this);
-		}
-		super.deactivateFigure();
-	}
+  public void deactivateFigure() {
+    if (getRelation() instanceof Changeable) {
+      Changeable changeable = (Changeable) getRelation();
+      changeable.removeChangeListener(this);
+    }
+    super.deactivateFigure();
+  }
 
-	/**
-	 * Adds extra EditPolicies as required.
-	 */
-	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE,
-				new RelationEndpointEditPolicy());
-		installEditPolicy(EditPolicy.CONNECTION_ROLE,
-				new VertexRelationDeletePolicy());
-	}
+  /**
+   * Adds extra EditPolicies as required.
+   */
+  protected void createEditPolicies() {
+    installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE, new RelationEndpointEditPolicy());
+    installEditPolicy(EditPolicy.CONNECTION_ROLE, new VertexRelationDeletePolicy());
+  }
 
-	/**
-	 * Returns a newly created Figure to represent the connection.
-	 * 
-	 * @return The created Figure.
-	 */
-	protected IFigure createFigure() {
-		PolylineConnection connection = new PolylineConnection();
-		ManhattanConnectionRouter connectionRouter = new ManhattanConnectionRouter();
-		connection.setConnectionRouter(connectionRouter);
-		return connection;
-	}
+  /**
+   * Returns a newly created Figure to represent the connection.
+   * 
+   * @return The created Figure.
+   */
+  protected IFigure createFigure() {
+    PolylineConnection connection = new PolylineConnection();
+    ManhattanConnectionRouter connectionRouter = new ManhattanConnectionRouter();
+    connection.setConnectionRouter(connectionRouter);
+    return connection;
+  }
 
-	public AccessibleEditPart getAccessibleEditPart() {
-		if (acc == null)
-			acc = new AccessibleGraphicalEditPart() {
-				public void getName(AccessibleEvent e) {
-					e.result = "Link";
-				}
-			};
+  public AccessibleEditPart getAccessibleEditPart() {
+    if (acc == null)
+      acc = new AccessibleGraphicalEditPart() {
+        public void getName(AccessibleEvent e) {
+          e.result = "Link";
+        }
+      };
 
-		return acc;
-	}
+    return acc;
+  }
 
-	/**
-	 * Returns the Figure associated with this, which draws the Wire.
-	 * 
-	 * @return Figure of this.
-	 */
-	protected IFigure getWireFigure() {
-		return (PolylineConnection) getFigure();
-	}
+  /**
+   * Returns the Figure associated with this, which draws the Wire.
+   * 
+   * @return Figure of this.
+   */
+  protected IFigure getWireFigure() {
+    return (PolylineConnection) getFigure();
+  }
 
-	/**
-	 * Refreshes the visual aspects of this, based upon the model (Wire). It
-	 * changes the wire color depending on the state of Wire.
-	 * 
-	 */
-	protected void refreshVisuals() {
-	}
+  /**
+   * Refreshes the visual aspects of this, based upon the model (Wire). It changes the wire color depending on the state
+   * of Wire.
+   * 
+   */
+  protected void refreshVisuals() {
+  }
 
-	@Override
-	public void changeExecuted(ChangeRequest change) {
-	}
+  public void changeExecuted(ChangeRequest change) {
+  }
 
-	@Override
-	public void changeFailed(ChangeRequest change, Exception exception) {
-		getLogger().error("Error executing ChangeRequest", exception);
-	}
+  public void changeFailed(ChangeRequest change, Exception exception) {
+    getLogger().error("Error executing ChangeRequest", exception);
+  }
 
 }

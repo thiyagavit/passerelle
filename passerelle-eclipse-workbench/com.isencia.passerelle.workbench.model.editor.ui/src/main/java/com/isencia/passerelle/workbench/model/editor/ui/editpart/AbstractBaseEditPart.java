@@ -28,7 +28,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.INameable;
 import com.isencia.passerelle.workbench.model.editor.ui.ImageRegistry;
 import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.EntityPropertySource;
-import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
 import com.isencia.passerelle.workbench.model.ui.command.IRefreshConnections;
@@ -81,7 +80,6 @@ abstract public class AbstractBaseEditPart extends
 		if (expertUpdater == null)
 			expertUpdater = new IPropertyChangeListener() {
 
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(PreferenceConstants.EXPERT)) {
 						final PropertySheet sheet = (PropertySheet) EclipseUtils
@@ -162,7 +160,7 @@ abstract public class AbstractBaseEditPart extends
 		return propertySource;
 	}
 
-	@Override
+
 	public void changeExecuted(ChangeRequest changerequest) {
 
 		getLogger().trace("Change Executed");
@@ -222,7 +220,6 @@ abstract public class AbstractBaseEditPart extends
 		return ((NamedObj) source).getDisplayName();
 	}
 
-	@Override
 	public void changeFailed(ChangeRequest changerequest, Exception exception) {
 		getLogger().trace("Change Failed : " + exception.getMessage());
 	}
