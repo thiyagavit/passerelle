@@ -81,7 +81,7 @@ public class ExecutionTracesView extends ViewPart {
 
     Timer timer = new Timer(true);
     timer.scheduleAtFixedRate(task, 5000, 2000);
-    
+
     ExecutionTracerService.registerTracer(new TraceHandler());
   }
 
@@ -105,7 +105,7 @@ public class ExecutionTracesView extends ViewPart {
   protected void createFilters(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(3, false));
-    
+
     final Label searchLabel = new Label(container, SWT.NONE);
     searchLabel.setText("Search: ");
     final Text searchText = new Text(container, SWT.BORDER | SWT.SEARCH);
@@ -124,7 +124,7 @@ public class ExecutionTracesView extends ViewPart {
 
     final Label maxCountLabel = new Label(maxCountContainer, SWT.NONE);
     maxCountLabel.setText("Max: ");
-    
+
     final Button maxCountActiveButton = new Button(maxCountContainer, SWT.CHECK);
     maxCountActiveButton.setSelection(maxCountActive);
     maxCountActiveButton.addSelectionListener(new SelectionAdapter() {
@@ -138,12 +138,12 @@ public class ExecutionTracesView extends ViewPart {
     maxCountText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
     maxCountText.addKeyListener(new KeyAdapter() {
       public void keyReleased(KeyEvent ke) {
-        System.out.println("max count "+maxCountText.getText());
+        System.out.println("max count " + maxCountText.getText());
         String mcStr = maxCountText.getText();
         try {
           maxCount = Integer.parseInt(mcStr);
-        } catch(Exception e) {
-          if(!StringUtils.isEmpty(mcStr)) {
+        } catch (Exception e) {
+          if (!StringUtils.isEmpty(mcStr)) {
             maxCount = 100;
             maxCountText.setText(maxCount.toString());
           } else {
@@ -153,7 +153,7 @@ public class ExecutionTracesView extends ViewPart {
         tableViewer.refresh();
       }
     });
-}
+  }
 
   protected void createTableViewer(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
@@ -246,11 +246,10 @@ public class ExecutionTracesView extends ViewPart {
     adaptMaxCount(maxCountActive, maxCount);
   }
 
-
   private void adaptMaxCount(boolean maxCountActive, Integer maxCount) {
-    if(maxCountActive && maxCount!=null && maxCount > 0 && ENTRIES.size() > maxCount) {
+    if (maxCountActive && maxCount != null && maxCount > 0 && ENTRIES.size() > maxCount) {
       int diff = ENTRIES.size() - maxCount;
-      for(int i=0; i<diff;++i) {
+      for (int i = 0; i < diff; ++i) {
         ENTRIES.remove(0);
       }
       tableViewer.refresh();
@@ -279,16 +278,14 @@ public class ExecutionTracesView extends ViewPart {
     final String[] names = new String[] { "tim", "sam", "oma", "rik" };
     final String[] msgs = new String[] { "basket", "zwemmen", "roepen Error" };
 
-    @Override
     public void run() {
       TraceEntry e = new TraceEntry((ctr++) + "AM", names[ctr % 4], msgs[ctr % 3]);
       addTraceEntry(e);
     }
   }
-  
+
   final class TraceHandler implements ExecutionTracer {
 
-    @Override
     public void trace(Actor actor, String message) {
       SimpleDateFormat tsFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss:SS");
       String source = FlowUtils.getFullNameWithoutFlow((NamedObj) actor);
@@ -296,7 +293,6 @@ public class ExecutionTracesView extends ViewPart {
       addTraceEntry(e);
     }
 
-    @Override
     public void trace(Director director, String message) {
       SimpleDateFormat tsFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss:SS");
       String source = FlowUtils.getFullNameWithoutFlow((NamedObj) director);
@@ -304,15 +300,13 @@ public class ExecutionTracesView extends ViewPart {
       addTraceEntry(e);
     }
 
-    @Override
     public void trace(Actor source, String message, Level level) {
       trace(source, message);
     }
 
-    @Override
     public void trace(Director source, String message, Level level) {
       trace(source, message);
     }
-    
+
   }
 }
