@@ -87,25 +87,25 @@ public class CommentEditPart extends AbstractNodeEditPart {
 		}
 		return "";
 	}
-	@Override
+
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart arg0) {
 		// Not source connection anchor for Comment
 		return null;
 	}
 
-	@Override
+
 	public ConnectionAnchor getSourceConnectionAnchor(Request arg0) {
 		// Not source connection anchor for Comment
 		return null;
 	}
 
-	@Override
+
 	public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart arg0) {
 		// Not target connection anchor for Comment
 		return null;
 	}
 
-	@Override
+
 	public ConnectionAnchor getTargetConnectionAnchor(Request arg0) {
 		// Not target connection anchor for Comment
 		return null;
