@@ -83,7 +83,7 @@ public class ActorAttributesView extends ViewPart implements
 
 	private VariableEditingSupport valueColumnEditor;
 
-	@Override
+
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (part instanceof PasserelleModelMultiPageEditor) {
 			this.part = part;
@@ -138,17 +138,17 @@ public class ActorAttributesView extends ViewPart implements
 			Collections.sort(parameterList, new NamedObjComparator());
 		try {
 			viewer.setContentProvider(new IStructuredContentProvider() {
-				@Override
+
 				public void dispose() {
 
 				}
 
-				@Override
+
 				public void inputChanged(Viewer viewer, Object oldInput,
 						Object newInput) {
 				}
 
-				@Override
+		
 				public Object[] getElements(Object inputElement) {
 					if (parameterList == null) return new Parameter[] {};
 					final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
@@ -216,11 +216,11 @@ public class ActorAttributesView extends ViewPart implements
 
 		viewer.getTable().addKeyListener(new KeyListener() {
 
-			@Override
+	
 			public void keyReleased(KeyEvent e) {
 			}
 
-			@Override
+
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.F1) {
 					try {
@@ -319,7 +319,7 @@ public class ActorAttributesView extends ViewPart implements
 		super.dispose();
 	}
 
-	@Override
+
 	public void stackChanged(CommandStackEvent event) {
 		viewer.refresh();
 	}
