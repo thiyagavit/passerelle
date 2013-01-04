@@ -33,7 +33,7 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 		run(this);
 	}
 	
-	@Override
+
 	public void run(IAction action) {
 	    
 		try { 
@@ -76,23 +76,23 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 		}
 	}
 
-	@Override
+
 	public void selectionChanged(IAction action, ISelection selection) {
        
 	}
 
-	@Override
+
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+
 	public void executionStarted(ModelChangeEvent evt) {
 		updateActionsAvailable(100);
 	}
 
-	@Override
+
 	public void executionTerminated(ModelChangeEvent evt) {
 		updateActionsAvailable(500);
 	}

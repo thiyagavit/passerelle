@@ -223,12 +223,12 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
 		return true;
 	}
 
-	@Override
+
 	public boolean isNameValid(final String name) {
 		return !SubModelUtils.isSubModel(name);
 	}
 
-	@Override
+
 	public String getErrorMessage(String name) {
 		if (SubModelUtils.isSubModel(name)) {
 			return "'" + name + "' is already existing as a composite.";
