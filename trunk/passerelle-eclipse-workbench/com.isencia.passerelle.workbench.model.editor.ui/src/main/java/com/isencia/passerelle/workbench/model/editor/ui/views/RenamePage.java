@@ -35,6 +35,7 @@ class RenamePage extends WizardPage {
     nameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
     nameText.setText(oldName);
     nameText.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
         newName = nameText.getText();
       }
     });
