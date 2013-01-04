@@ -245,7 +245,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		}
 
 		getSite().getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
+
 			public void run() {
 				try {
 					EclipseUtils.getActivePage().showView(
@@ -945,7 +945,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 	}
 
 	// get the container of the page where the user is on this moment
-	@Override
+
 	public CompositeActor getSelectedContainer() {
 		IPasserelleEditor editor = getSelectedPage();
 		if (editor != null && editor.getContainer() != null) {
@@ -954,7 +954,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		return getDiagram();
 	}
 
-	@Override
+
 	public void selectPage(CompositeActor actor) {
 		int index = getPageIndex(actor);
 		if (index != -1)
@@ -984,12 +984,16 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		editor.clearActorSelections();
 	}
 
-	@Override
+
 	public CompositeActor getModel() {
 		return model;
 	}
 
-	public boolean isParseError() {
+	public void setModel(CompositeActor model) {
+    this.model = model;
+  }
+
+  public boolean isParseError() {
 		return parseError;
 	}
 
@@ -1000,7 +1004,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart
 		super.setActivePage(ipage);
 	}
 
-	@Override
+
 	public void setPasserelleEditorActive() {
 		setActivePage(0);
 	}
