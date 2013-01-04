@@ -21,7 +21,6 @@ public class PasserellePreferencePage extends FieldEditorPreferencePage implemen
 
 	}
 	
-	@Override
 	public void init(IWorkbench workbench) {
 		// TODO Auto-generated method stub
 		
