@@ -65,7 +65,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 		run(this);
 	}
 	
-	@Override
+
 	public void run(IAction action) {
 		try {
 			final IFile   config  = getModelRunner();
@@ -153,12 +153,12 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 
 	}
 
-	@Override
+	
 	public void executionStarted(ModelChangeEvent evt) {
 		updateActionsAvailable(100);
 	}
 
-	@Override
+
 	public void executionTerminated(ModelChangeEvent evt) {
 		updateActionsAvailable(500);
 	}
@@ -182,7 +182,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 		}
 	}
 
-	@Override
+
 	public void selectionChanged(IAction action, ISelection selection) {
 
 	}
@@ -217,7 +217,7 @@ public class RunAction extends ExecutionAction implements IEditorActionDelegate,
 		return null;
 	}
 
-	@Override
+
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		// TODO Auto-generated method stub
 
