@@ -17,8 +17,8 @@ package com.isencia.passerelle.hmi.util;
  */
 public class VersionPrinter {
     public static final String VERSION_MAJOR = "8";
-    public static final String VERSION_MINOR = "1";
-    public static final String VERSION_ITERATION = "1";
+    public static final String VERSION_MINOR = "3";
+    public static final String VERSION_ITERATION = "0";
     public static final String PROJECT_NAME = "Passerelle HMI";
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

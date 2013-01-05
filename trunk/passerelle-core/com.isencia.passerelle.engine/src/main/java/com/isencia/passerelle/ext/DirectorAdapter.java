@@ -29,6 +29,7 @@ import com.isencia.passerelle.core.PasserelleException;
  */
 public interface DirectorAdapter {
 
+  public static final String STOP_FOR_UNHANDLED_ERROR_PARAM = "Stop for unhandled Error";
   public static final String MOCKMODE_PARAM = "Mock Mode";
   public static final String EXPERTMODE_PARAM = "Expert Modeler";
   public static final String VALIDATE_INITIALIZATION_PARAM = "Validate Initialization";
@@ -113,6 +114,12 @@ public interface DirectorAdapter {
    */
   ExecutionPrePostProcessor getExecutionPrePostProcessor();
 
+  /**
+   * @return whether a flow execution should be stopped when an actor error is not handled
+   * in the model or through a registered ErrorHandler or ErrorCollector.
+   */
+  boolean isStopForUnhandledError();
+  
   /**
    * @return Returns the mockMode.
    */

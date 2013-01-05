@@ -27,7 +27,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
+import ptolemy.actor.CompositeActor;
 import ptolemy.actor.FiringEvent;
+import ptolemy.actor.Manager;
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
@@ -78,6 +80,7 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   private ErrorControlStrategy errorCtrlStrategy = new DefaultActorErrorControlStrategy();
   private boolean enforcedErrorCtrlStrategy;
 
+  public Parameter stopForUnhandledErrorParam = null;
   public Parameter mockModeParam = null;
   public Parameter expertModeParam = null;
   public Parameter validateInitializationParam = null;
@@ -107,6 +110,15 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     super(container, name);
     LOGGER = LoggerFactory.getLogger(container.getClass().getName() + "." + this.getClass().getName());
 
+    if (container.getAttribute(STOP_FOR_UNHANDLED_ERROR_PARAM) != null) {
+      stopForUnhandledErrorParam = (Parameter) container.getAttribute(STOP_FOR_UNHANDLED_ERROR_PARAM);
+    } else {
+      stopForUnhandledErrorParam = new Parameter(container, STOP_FOR_UNHANDLED_ERROR_PARAM, new BooleanToken(false));
+      stopForUnhandledErrorParam.setTypeEquals(BaseType.BOOLEAN);
+      new CheckBoxStyle(stopForUnhandledErrorParam, "style");
+      registerConfigurableParameter(stopForUnhandledErrorParam);
+    }
+    
     if (container.getAttribute(MOCKMODE_PARAM) != null) {
       mockModeParam = (Parameter) container.getAttribute(MOCKMODE_PARAM);
     } else {
@@ -173,6 +185,11 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
           }
         } else {
           LOGGER.error("reportError() - no errorCollectors but received exception", e);
+          Manager manager = ((CompositeActor)toplevel()).getManager();
+          manager.notifyListenersOfException(e);
+          if(isStopForUnhandledError()) {
+            manager.finish();
+          }
         }
       }
     }
@@ -225,6 +242,14 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
 
   public ExecutionPrePostProcessor getExecutionPrePostProcessor() {
     return execPrePostProcessor;
+  }
+
+  public boolean isStopForUnhandledError() {
+    try {
+      return ((BooleanToken) stopForUnhandledErrorParam.getToken()).booleanValue();
+    } catch (IllegalActionException e) {
+      return false;
+    }
   }
 
   public boolean isMockMode() {

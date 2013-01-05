@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle HMI
 Bundle-SymbolicName: com.isencia.passerelle.hmi
-Bundle-Version: 8.2.0
+Bundle-Version: 8.3.0
 Bundle-Activator: com.isencia.passerelle.hmi.activator.Activator
 Bundle-Vendor: isencia
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -21,20 +21,27 @@ Bundle-ClassPath: .,
  lib/swing-layout-1.0.3.jar,
  lib/swing-worker-1.1.jar,
  lib/swingx-1.6.jar,
- lib/com.isencia.passerelle.actor_8.2.2.jar,
- lib/com.isencia.passerelle.commons_8.0.0.jar,
- lib/com.isencia.passerelle.commons.ume_8.0.0.jar,
- lib/com.isencia.passerelle.domain.et_8.2.1.201210082015.jar,
- lib/com.isencia.passerelle.engine_8.2.4.jar,
- lib/com.isencia.passerelle.hmi.definition_7.0.0.jar,
  lib/com.isencia.passerelle.diagnosis_8.0.0.jar,
  lib/com.isencia.passerelle.diagnosis.actor_8.0.0.jar,
  lib/com.isencia.passerelle.diagnosis.impl_8.0.0.jar,
  lib/com.isencia.passerelle.diagnosis.impl.filesystem_8.0.0.jar,
+ lib/com.isencia.passerelle.hmi.definition_7.0.0.jar,
  lib/com.isencia.passerelle.project.repository.api_8.0.0.jar,
  lib/com.isencia.passerelle.project.repository.impl.filesystem_8.0.0.jar
 Require-Bundle: diva;bundle-version="7.0.1",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
- com.microstar;bundle-version="1.2.0"
+ com.microstar;bundle-version="1.2.0",
+ com.isencia.passerelle.actor;bundle-version="8.3.0",
+ com.isencia.passerelle.actor.advanced;bundle-version="8.3.0",
+ com.isencia.passerelle.actor.examples;bundle-version="8.3.0",
+ com.isencia.passerelle.commons;bundle-version="8.0.0",
+ com.isencia.passerelle.commons.ume;bundle-version="8.0.0",
+ com.isencia.passerelle.defaulttypeconverterprovider;bundle-version="7.0.0",
+ com.isencia.passerelle.domain.et;bundle-version="8.3.0",
+ com.isencia.passerelle.engine;bundle-version="8.3.0",
+ com.isencia.passerelle.hmi.definition;bundle-version="8.1.0",
+ com.isencia.passerelle.process.actor;bundle-version="8.3.0",
+ com.isencia.passerelle.process.model;bundle-version="8.3.0",
+ com.isencia.passerelle.testsupport;bundle-version="8.3.0"
