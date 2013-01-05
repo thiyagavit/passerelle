@@ -17,6 +17,9 @@ package com.isencia.passerelle.domain.et.impl;
 
 import org.slf4j.Logger;
 import ptolemy.actor.Actor;
+import ptolemy.actor.CompositeActor;
+import ptolemy.actor.Manager;
+import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.Event;
 import com.isencia.passerelle.domain.et.EventHandler;
@@ -63,6 +66,10 @@ public abstract class AbstractActorEventHandler implements EventHandler {
         getLogger().error("Did not fire for "+event);
       }
       return HandleResult.DONE;
+    } catch (IllegalActionException e) {
+      Manager manager = ((CompositeActor)director.toplevel()).getManager();
+      manager.notifyListenersOfException(e);
+      throw e;
     } finally {
       director.notifyActorDoneIteratingForEvent(actor, event);
     }
