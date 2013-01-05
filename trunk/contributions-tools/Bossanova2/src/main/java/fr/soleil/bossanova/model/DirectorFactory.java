@@ -7,6 +7,7 @@ import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.domain.cap.Director;
 import fr.soleil.bossanova.configuration.Configuration;
 import fr.soleil.passerelle.domain.BasicDirector;
@@ -40,7 +41,7 @@ public class DirectorFactory {
 		if(result.getAdapter(null)!=null) {
 		  ((Attribute)result.getAdapter(null)).setContainer(null);
 		}
-		new BossanovaDirectorAdapter(result);
+		DirectorUtils.getAdapter(result, null);
 		// no longer done. System properties must be set elsewhere, e.g. in a hmi.ini file.
 //		Parameter directorParam = (Parameter) result.getAttribute("Properties File", Parameter.class);
 //		directorParam.setExpression(Configuration.getPasserelleConfDirectory() + "systemproperties.txt");
