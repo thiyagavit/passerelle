@@ -649,6 +649,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
         }
       }
       return res;
+    } catch (IllegalActionException e) {
+      getDirectorAdapter().notifyActorInactive(this);
+      throw e;
     } finally {
       getLogger().trace("{} - prefire() - exit - {}", getInfo(), res);
     }
@@ -678,10 +681,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    */
   final public void fire() throws IllegalActionException {
     isFiring = true;
-
     try {
       getLogger().trace("{} - fire() - entry", getInfo());
-
       if (!isFinishRequested()) {
         try {
           if (!isMockMode()) {
@@ -691,7 +692,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
           } else {
             doMockFire();
           }
-
         } catch (ProcessingException e) {
           getErrorControlStrategy().handleFireException(this, e);
         } catch (TerminateProcessException e) {
@@ -702,6 +702,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
           getErrorControlStrategy().handleFireRuntimeException(this, e);
         }
       }
+    } catch (IllegalActionException e) {
+      getDirectorAdapter().notifyActorInactive(this);
+      throw e;
     } finally {
       getLogger().trace("{} - fire() - exit", getInfo());
       isFiring = false;
