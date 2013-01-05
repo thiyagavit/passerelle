@@ -1520,7 +1520,7 @@ public abstract class HMIBase implements ChangeListener {
     }
 
     public synchronized void executionError(final Manager manager, final Throwable throwable) {
-      logger.error(HMIMessages.getString("error.execution.error"), throwable);
+//      logger.error(HMIMessages.getString("error.execution.error"), throwable);
       if(Manager.IDLE.equals(manager.getState())) {
         // There's a big chance that the executionFinished() will not be invoked anymore
         // as Ptolemy only calls it when execution is successfully finished.

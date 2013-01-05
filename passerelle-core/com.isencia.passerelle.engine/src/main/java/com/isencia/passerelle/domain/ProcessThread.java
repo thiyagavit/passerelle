@@ -138,7 +138,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
       logger.debug("{} - Clean termination of ProcessThread",getActor().getFullName());
     } catch (Throwable t) {
       thrownWhenIterate = t;
-      logger.error(getActor().getFullName() + " - Error in ProcessThread", t);
+      logger.debug(getActor().getFullName() + " - Error in ProcessThread " + t);
       //t.printStackTrace();
     } finally {
       // Let the director know that this thread stopped.
