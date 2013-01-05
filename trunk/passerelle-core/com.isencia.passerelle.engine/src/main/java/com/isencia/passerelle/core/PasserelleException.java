@@ -103,9 +103,12 @@ public class PasserelleException extends Exception implements Comparable<Passere
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, NamedObj modelElement, Throwable rootException) {
-    super(errorCode != null ? errorCode.getDescription() : null, rootException);
+    super(errorCode != null ? errorCode.getDescription() : null);
     if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
+    }
+    if(rootException!=null) {
+      initCause(rootException);
     }
     this.errorCode = errorCode;
     this.modelElement = modelElement;
@@ -124,9 +127,12 @@ public class PasserelleException extends Exception implements Comparable<Passere
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, String message, Throwable rootException) {
-    super(message, rootException);
+    super(message);
     if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
+    }
+    if(rootException!=null) {
+      initCause(rootException);
     }
     this.errorCode = errorCode;
     if (ErrorCode.Severity.FATAL.equals(errorCode.getSeverity())) {
@@ -146,9 +152,12 @@ public class PasserelleException extends Exception implements Comparable<Passere
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
-    super(message, rootException);
+    super(message);
     if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
+    }
+    if(rootException!=null) {
+      initCause(rootException);
     }
     this.errorCode = errorCode;
     this.modelElement = modelElement;
@@ -170,9 +179,12 @@ public class PasserelleException extends Exception implements Comparable<Passere
    * @param rootException
    */
   public PasserelleException(ErrorCode errorCode, String message, NamedObj modelElement, ManagedMessage msgContext, Throwable rootException) {
-    super(message, rootException);
+    super(message);
     if (errorCode == null) {
       throw new IllegalArgumentException("error code can not be null");
+    }
+    if(rootException!=null) {
+      initCause(rootException);
     }
     this.errorCode = errorCode;
     this.modelElement = modelElement;
@@ -245,7 +257,9 @@ public class PasserelleException extends Exception implements Comparable<Passere
       if (!ctxtDetailsFound && context != null) {
         msgBldr.append("\n\t -- " + context);
       }
-      msgBldr.append("\n - RootException:" + getCause());
+      if(getCause()!=null) {
+        msgBldr.append("\n - RootException:" + getCause());
+      }
       detailedMessage = msgBldr.toString();
     }
     return detailedMessage;
