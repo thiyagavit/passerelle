@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import javax.swing.JDialog;
+import com.isencia.passerelle.util.Level;
 import ptolemy.actor.Actor;
 import ptolemy.actor.Director;
 import ptolemy.kernel.util.NamedObj;
@@ -74,5 +75,13 @@ public class TraceDialog extends JDialog implements TraceVisualizer {
     }
 
     return fullName;
+  }
+
+  public void trace(Actor source, String message, Level level) {
+    trace(source, message);
+  }
+
+  public void trace(Director source, String message, Level level) {
+    trace(source, message);
   }
 }

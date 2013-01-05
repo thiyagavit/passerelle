@@ -4,14 +4,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.diagnosis.actor_8.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.diagnosis.impl_8.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.diagnosis.impl.filesystem_8.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.hmi.definition_7.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.project.repository.api_8.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.project.repository.impl.filesystem_8.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.actor_8.2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.commons_8.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.commons.ume_8.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.domain.et_8.2.1.201210082015.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.engine_8.2.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/com.isencia.passerelle.hmi.definition_7.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/filters-2.0.235.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/flexdock-0.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/forms-1.0.6.jar"/>

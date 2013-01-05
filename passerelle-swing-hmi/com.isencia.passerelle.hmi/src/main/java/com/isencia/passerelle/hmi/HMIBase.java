@@ -1112,7 +1112,6 @@ public abstract class HMIBase implements ChangeListener {
 
       directorAdapter.removeAllErrorCollectors();
       final ModelExecutionListener executionListener = createExecutionListener();
-      directorAdapter.addErrorCollector(executionListener);
 
       animationEventListener = setModelAnimation(model, animateModelExecution, animationEventListener);
 
@@ -1122,7 +1121,7 @@ public abstract class HMIBase implements ChangeListener {
         flowManager.execute(model, null, executionListener);
       }
 
-      if (updateState && executor != null) {
+      if (updateState && executor != null && executionListener.isExecuting()) {
         StateMachine.getInstance().transitionTo(executor.getSuccessState());
       }
     } catch (final Throwable t) {
@@ -1514,12 +1513,13 @@ public abstract class HMIBase implements ChangeListener {
   protected class ModelExecutionListener implements ExecutionListener, ErrorCollector {
 
     private boolean popUpError = true;
+    private boolean execDone = false;
 
     public void acceptError(final PasserelleException e) {
       executionError(null, e);
     }
 
-    public void executionError(final Manager manager, final Throwable throwable) {
+    public synchronized void executionError(final Manager manager, final Throwable throwable) {
       logger.error(HMIMessages.getString("error.execution.error"), throwable);
       if (popUpError) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -1532,7 +1532,7 @@ public abstract class HMIBase implements ChangeListener {
       }
     }
 
-    public void executionFinished(final Manager manager) {
+    public synchronized void executionFinished(final Manager manager) {
       if (!StateMachine.getInstance().getCurrentState().equals(StateMachine.MODEL_OPEN)) {
         StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
         // SwingUtilities.invokeLater(new Runnable() {
@@ -1542,12 +1542,17 @@ public abstract class HMIBase implements ChangeListener {
         // }
         // });
       }
+      execDone = true;
+    }
+    
+    public synchronized boolean isExecuting() {
+      return !execDone;
     }
 
-    public void managerStateChanged(final Manager manager) {
-      // System.out.println(manager.getState());
+    public synchronized void managerStateChanged(final Manager manager) {
       if (manager.getState().equals(Manager.INITIALIZING)) {
         popUpError = true;
+        execDone = false;
       }
     }
   }

@@ -12,6 +12,7 @@ import ptolemy.actor.Director;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.hmi.util.DynamicStepExecutionControlStrategy;
+import com.isencia.passerelle.util.Level;
 
 /**
  * An ExecutionTracer wrapper that allows to register itself as an attribute on
@@ -41,5 +42,13 @@ public class HMIExecutionTracer implements ExecutionTracer {
 
   public void trace(final Director director, final String message) {
     tracedialog.trace(director, message);
+  }
+
+  public void trace(Actor source, String message, Level level) {
+    trace(source, message);
+  }
+
+  public void trace(Director source, String message, Level level) {
+    trace(source, message);
   }
 }

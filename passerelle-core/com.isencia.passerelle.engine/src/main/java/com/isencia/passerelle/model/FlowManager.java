@@ -94,9 +94,11 @@ public class FlowManager {
 		private Throwable throwable;
 
 		private final Flow flow;
+		private ExecutionListener[] delegateListeners;
 
-		ModelExecutionListener(final Flow flow) {
+		ModelExecutionListener(final Flow flow, ExecutionListener... delegateListeners) {
 			this.flow = flow;
+			this.delegateListeners = delegateListeners;
 		}
 
 		public void acceptError(final PasserelleException e) {
@@ -106,9 +108,21 @@ public class FlowManager {
 		public void executionError(ptolemy.actor.Manager manager, final Throwable throwable) {
 			this.throwable = throwable;
 			logger.error("Error during model execution", throwable);
+			if(delegateListeners!=null) {
+			  for (ExecutionListener delegateListener : delegateListeners) {
+			    if(delegateListener!=null)
+			      delegateListener.executionError(manager, throwable);
+        }
+			}
 		}
 
 		public void executionFinished(final ptolemy.actor.Manager manager) {
+      if(delegateListeners!=null) {
+        for (ExecutionListener delegateListener : delegateListeners) {
+          if(delegateListener!=null)
+            delegateListener.executionFinished(manager);
+        }
+      }
 			FlowManager.this.executionFinished(flow);
 		}
 
@@ -127,7 +141,12 @@ public class FlowManager {
 		}
 
 		public void managerStateChanged(ptolemy.actor.Manager manager) {
-			//System.out.println("manager state changed to "+manager.getState());
+      if(delegateListeners!=null) {
+        for (ExecutionListener delegateListener : delegateListeners) {
+          if(delegateListener!=null)
+            delegateListener.managerStateChanged(manager);
+        }
+      }
 		}
 
 		public void otherExceptionOccured() throws Throwable {
@@ -683,39 +702,10 @@ public class FlowManager {
 	 * 
 	 * @param flow
 	 * @param props
+	 * @param executionListeners
 	 * @throws PasserelleException
 	 */
-	private void executeLocally(Flow flow, Map<String, String> props) throws PasserelleException {
-		FlowHandle handle = flow.getHandle();
-		if(handle==null) {
-      throw new PasserelleException(ErrorCode.FLOW_STATE_ERROR, "Invalid flow : missing FlowHandle", flow, null);
-		}
-    // should not be necessary, a flow's handle already knows about it's flow
-    //handle.setLocalFlow(flow);
-		checkFlowAlreadyExecuting(flow);
-		if (props != null) {
-			applyParameterSettings(flow, props);
-		}
-		try {
-			ModelExecutionListener listener = this.new ModelExecutionListener(flow);
-			flowExecutionListeners.put(handle, listener);
-			final Manager manager = new Manager(flow.workspace(), flow.getName());
-			manager.addExecutionListener(listener);
-			
-			flow.setManager(manager);
-			flowExecutions.put(handle, manager);
-			manager.startRun();
-    } catch (Exception e) {
-      if(e.getCause() instanceof PasserelleException) {
-        throw ((PasserelleException)e.getCause());
-      } else {
-        throw new PasserelleException(ErrorCode.FLOW_EXECUTION_ERROR, flow, e);
-      }
-		}
-
-	}
-
-	private void executeLocally(final Flow flow, final Map<String, String> props, final ExecutionListener executionListener)
+	private void executeLocally(final Flow flow, final Map<String, String> props, final ExecutionListener... executionListeners)
 			throws FlowAlreadyExecutingException, PasserelleException {
 		FlowHandle handle = flow.getHandle();
 		if(handle==null) {
@@ -726,11 +716,10 @@ public class FlowManager {
 			applyParameterSettings(flow, props);
 		}
 		try {
-			ModelExecutionListener listener = this.new ModelExecutionListener(flow);
+			ModelExecutionListener listener = this.new ModelExecutionListener(flow, executionListeners);
 			flowExecutionListeners.put(handle, listener);
 			final Manager manager = new Manager(flow.workspace(), flow.getName());
 			manager.addExecutionListener(listener);
-			manager.addExecutionListener(executionListener);
 
 			flow.setManager(manager);
 			flowExecutions.put(handle, manager);
@@ -742,7 +731,6 @@ public class FlowManager {
         throw new PasserelleException(ErrorCode.FLOW_EXECUTION_ERROR, flow, e);
       }
 		}
-
 	}
 
 	/**

@@ -90,6 +90,9 @@ public class NullDirectorAdapter implements DirectorAdapter {
     return execPrePostProcessor;
   }
 
+  public boolean isStopForUnhandledError() {
+    return false;
+  }
   public boolean isMockMode() {
     return false;
   }
