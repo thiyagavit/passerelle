@@ -390,10 +390,10 @@ public class KernelException extends Exception {
     public void printStackTrace(PrintWriter printWriter) {
         super.printStackTrace(printWriter);
 
-        if (_cause != null) {
-            printWriter.print("Caused by: ");
-            _cause.printStackTrace(printWriter);
-        }
+//        if (_cause != null) {
+//            printWriter.print("Caused by: ");
+//            _cause.printStackTrace(printWriter);
+//        }
 
         printWriter.flush();
     }
