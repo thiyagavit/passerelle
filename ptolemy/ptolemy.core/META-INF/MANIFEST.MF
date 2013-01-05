@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ptolemy Core Plug-in
 Bundle-SymbolicName: ptolemy.core
-Bundle-Version: 7.0.1.3
+Bundle-Version: 7.0.1.4
 Bundle-Activator: ptolemy.core.activator.Activator
 Bundle-Vendor: isencia
 Eclipse-BuddyPolicy: registered
