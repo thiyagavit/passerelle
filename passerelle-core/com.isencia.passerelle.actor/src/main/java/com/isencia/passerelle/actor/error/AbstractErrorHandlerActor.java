@@ -93,6 +93,7 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
   
   @Override
   protected boolean doPostFire() throws ProcessingException {
+    boolean res = super.doPostFire();
     // This actor has no data input ports,
     // so it's like a Source in the days of the original Actor API.
     // The BlockingQueue (errors) is our data feed.
@@ -108,7 +109,7 @@ public abstract class AbstractErrorHandlerActor extends Actor implements ErrorHa
       // and with an empty queue, so we can just finish then
       requestFinish();
     }
-    return super.doPostFire() || !(bufferedErrorOutputs.isEmpty());
+    return  res || !(bufferedErrorOutputs.isEmpty());
   }
 
   protected boolean sendErrorMsgOnwardsVia(String outputName, ManagedMessage msg, PasserelleException error) {

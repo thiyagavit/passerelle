@@ -15,7 +15,6 @@
 package com.isencia.passerelle.ext;
 
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
 
 /**

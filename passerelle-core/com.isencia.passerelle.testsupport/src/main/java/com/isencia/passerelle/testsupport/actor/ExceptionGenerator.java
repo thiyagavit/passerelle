@@ -228,6 +228,7 @@ public class ExceptionGenerator extends Actor {
 
   @Override
   protected boolean doPostFire() throws ProcessingException {
+    boolean res = super.doPostFire();
     boolean mustThrowException=false;
     try {
       mustThrowException = ((BooleanToken) postFireExcParameter.getToken()).booleanValue();
@@ -248,7 +249,7 @@ public class ExceptionGenerator extends Actor {
         throw new ProcessingException(errorCode, message, this, null);
       }
     } else {
-      return super.doPostFire();
+      return res;
     }
   }
 

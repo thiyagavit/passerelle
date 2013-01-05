@@ -139,7 +139,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
     } catch (Throwable t) {
       thrownWhenIterate = t;
       logger.error(getActor().getFullName() + " - Error in ProcessThread", t);
-      t.printStackTrace();
+      //t.printStackTrace();
     } finally {
       // Let the director know that this thread stopped.
       // This is synchronized to prevent a race condition

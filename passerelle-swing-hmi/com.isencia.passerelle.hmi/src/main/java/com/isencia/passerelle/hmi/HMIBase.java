@@ -1521,6 +1521,14 @@ public abstract class HMIBase implements ChangeListener {
 
     public synchronized void executionError(final Manager manager, final Throwable throwable) {
       logger.error(HMIMessages.getString("error.execution.error"), throwable);
+      if(Manager.IDLE.equals(manager.getState())) {
+        // There's a big chance that the executionFinished() will not be invoked anymore
+        // as Ptolemy only calls it when execution is successfully finished.
+        // And since we're still getting error notifs after the Manager went to IDLE
+        // we can be pretty sure something dramatic went wrong (e.g. an Actor.preInitialize error).
+        // But the HMI needs to be made aware about the execution having been stopped...
+        executionFinished(manager);
+      }
       if (popUpError) {
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
