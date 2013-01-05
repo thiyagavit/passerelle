@@ -19,9 +19,7 @@ public class ErrorCodeTest extends TestCase {
   
   public void testErrorCodeAutoTopic() {
     TestErrorCode TESTERRCODE = new TestErrorCode("TESTERRCODE", "1234", ErrorCategory.PASS_FUNCTIONAL, Severity.ERROR, "nothing special");
-    assertEquals("FUNC/ERROR", TESTERRCODE.getTopic());
-    
-    System.out.println(TESTERRCODE);
+    assertEquals("FUNC/ERROR/TESTERRCODE", TESTERRCODE.getTopic());
   }
   
   public void testErrorCodeSpecificTopic() {
