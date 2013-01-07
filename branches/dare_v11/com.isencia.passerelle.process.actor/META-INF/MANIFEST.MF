@@ -23,7 +23,8 @@ Require-Bundle: ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
  com.isencia.passerelle.actor;bundle-version="7.0.0",
- com.isencia.passerelle.engine;bundle-version="7.0.0"
+ com.isencia.passerelle.engine;bundle-version="7.0.0",
+ com.isencia.passerelle.project.repository.api;bundle-version="8.0.4"
 Export-Package: com.isencia.passerelle.process.actor.flow,
  com.isencia.passerelle.process.actor.trial
 
