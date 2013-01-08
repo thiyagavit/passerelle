@@ -431,7 +431,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.jdom"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.quartz"/>
-      <import plugin="org.slf4j"/>
       <import plugin="ptolemy.core"/>
       <import plugin="ptolemy.gui"/>
       <import plugin="org.eclipse.help"/>
@@ -444,6 +443,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.apache.commons.beanutils"/>
       <import plugin="org.apache.commons.httpclient"/>
       <import plugin="org.eclipse.equinox.preferences"/>
+      <import plugin="slf4j.api"/>
    </requires>
 
    <plugin
