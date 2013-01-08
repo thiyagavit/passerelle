@@ -22,6 +22,7 @@
 		<module>com.isencia.passerelle.workbench.logging.development</module>
 		<module>com.isencia.passerelle.workbench.logging.production</module>
 		<module>com.isencia.passerelle.workbench.feature</module>
+		<module>com.isencia.passerelle.workbench.product</module>
 	</modules>
 
 </project>
