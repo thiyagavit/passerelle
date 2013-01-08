@@ -433,7 +433,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.ui" version="3.5.1" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.digester"/>
       <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="org.slf4j"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.gef" version="3.4.1" match="greaterOrEqual"/>
@@ -459,13 +458,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.jdt.debug.ui" version="3.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.variables" version="3.2.100" match="greaterOrEqual"/>
       <import plugin="com.isencia.passerelle.engine" version="5.3.0" match="greaterOrEqual"/>
+      <import plugin="slf4j.api"/>
    </requires>
 
    <plugin
          id="com.isencia.passerelle.workbench"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="7.0.1"
          unpack="false"/>
 
    <plugin
@@ -480,14 +480,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="com.isencia.passerelle.workbench.model"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.workbench.model.editor.ui"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="8.2.0"
          unpack="false"/>
 
    <plugin
