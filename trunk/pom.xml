@@ -89,8 +89,21 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<environments>
-						<!-- environment does not matter, build looks the same but need to 
-							set one -->
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
 						<environment>
 							<os>linux</os>
 							<ws>gtk</ws>
@@ -145,6 +158,12 @@
 							<id>materialize-products</id>
 							<goals>
 								<goal>materialize-products</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>archive-products</id>
+							<goals>
+								<goal>archive-products</goal>
 							</goals>
 						</execution>
 					</executions>
