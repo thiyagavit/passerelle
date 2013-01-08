@@ -10,32 +10,28 @@
 
 	<artifactId>passerelle-core</artifactId>
 	<packaging>pom</packaging>
-	<name>Passerelle :: Core</name>
+	<name>Passerelle :: Core :: parent</name>
 
 	<modules>
+		<module>com.isencia.passerelle.commons</module>
+		<module>com.isencia.passerelle.commons.ume</module>
+		<module>com.isencia.passerelle.engine</module>
+		<module>com.isencia.passerelle.defaulttypeconverterprovider</module>
+		<module>com.isencia.passerelle.process.model</module>
+		<module>com.isencia.passerelle.process.model.impl</module>
+		<module>com.isencia.passerelle.project.repository.api</module>
+		<module>com.isencia.passerelle.domain.et</module>
 		<module>com.isencia.passerelle.actor</module>
 		<module>com.isencia.passerelle.actor.conf</module>
 		<module>com.isencia.passerelle.actor.help</module>
-		<module>com.isencia.passerelle.actor.test</module>
-		<module>com.isencia.passerelle.commons</module>
-		<module>com.isencia.passerelle.commons.test</module>
-		<module>com.isencia.passerelle.commons.ume</module>
-		<module>com.isencia.passerelle.commons.ume.test</module>
-		<module>com.isencia.passerelle.core.feature</module>
-		<module>com.isencia.passerelle.defaulttypeconverterprovider</module>
-		<module>com.isencia.passerelle.domain.et</module>
-		<module>com.isencia.passerelle.domain.et.test</module>
-		<module>com.isencia.passerelle.engine</module>
-		<module>com.isencia.passerelle.engine.test</module>
 		<module>com.isencia.passerelle.process.actor</module>
-		<module>com.isencia.passerelle.process.model</module>
-		
-		<!-- FIXME depends on slf4j 1.6 -->
-		<!--<module>com.isencia.passerelle.process.model.impl</module>-->
-		<!--<module>com.isencia.passerelle.project.repository.api</module>-->
-		
-		<!-- FIXME depends on sherpa enumerated class -->
 		<module>com.isencia.passerelle.testsupport</module>
+		<module>com.isencia.passerelle.core.feature</module>
+		<module>com.isencia.passerelle.actor.test</module>
+		<module>com.isencia.passerelle.commons.test</module>
+		<module>com.isencia.passerelle.commons.ume.test</module>
+		<module>com.isencia.passerelle.domain.et.test</module>
+		<module>com.isencia.passerelle.engine.test</module>
 	</modules>
 
 </project>

@@ -25,12 +25,18 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>${common.jacoco.reportPath}</sonar.jacoco.reportPath>
 		<sonar.surefire.reportsPath>../${project.artifactId}.test/target/surefire-reports/</sonar.surefire.reportsPath>
-		<sonar.skippedModules></sonar.skippedModules>
+		<sonar.skippedModules>
+			com.isencia.passerelle.actor.test,
+			com.isencia.passerelle.commons.test,
+			com.isencia.passerelle.commons.ume.test,
+			com.isencia.passerelle.domain.et.test,
+			com.isencia.passerelle.engine.test
+		</sonar.skippedModules>
 	</properties>
 
 	<modules>
-		<module>passerelle-core</module>
 		<module>ptolemy</module>
+		<module>passerelle-core</module>
 	</modules>
 
 	<repositories>
