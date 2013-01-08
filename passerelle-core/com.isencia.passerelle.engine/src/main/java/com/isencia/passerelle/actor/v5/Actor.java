@@ -176,6 +176,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     return msgProviders.remove(provider);
   }
 
+  /**
+   * This method is called from the actor's PUSH ports, each time they receive a message.
+   */
   public void offer(MessageInputContext ctxt) throws PasserelleException {
     getLogger().debug("{} - offer {}", getFullName(), ctxt);
     try {
