@@ -17,10 +17,15 @@ package com.isencia.passerelle.testsupport;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import junit.framework.Assert;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.model.FlowManager;
 
 /**
  * This is a simple "builder" class to specify and assert flow execution expectations :
@@ -45,6 +50,8 @@ import com.isencia.passerelle.model.Flow;
  * @author erwin
  */
 public class FlowStatisticsAssertion {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowStatisticsAssertion.class);
+	
   /**
    * Maintains the expected counts of received messages for input ports. Ports are specified by their name. Please check the class doc for info about naming
    * options.
@@ -338,6 +345,7 @@ public class FlowStatisticsAssertion {
     if (receivedCounts != null) {
       for (Entry<String, Long> rcvCountEntry : receivedCounts.entrySet()) {
         String portName = rcvCountEntry.getKey();
+        LOGGER.debug("assertPortReceiptStatistics called for port " + portName);
         long expCount = rcvCountEntry.getValue();
         if (portName.startsWith("." + flow.getName())) {
           // chop flow name
@@ -361,6 +369,7 @@ public class FlowStatisticsAssertion {
     if (sentCounts != null) {
       for (Entry<String, Long> rcvCountEntry : sentCounts.entrySet()) {
         String portName = rcvCountEntry.getKey();
+        LOGGER.debug("assertPortSentStatistics called for port " + portName);
         long expCount = rcvCountEntry.getValue();
         if (portName.startsWith("." + flow.getName())) {
           // chop flow name
