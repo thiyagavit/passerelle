@@ -31,6 +31,7 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
 
@@ -69,7 +70,9 @@
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
       <plugin id="com.isencia.passerelle.workbench.model.ui"/>
       <plugin id="com.isencia.passerelle.workbench.util"/>
+      <plugin id="com.isencia.sherpa.commons.reduced"/>
       <plugin id="com.microstar"/>
+      <plugin id="com.sun.packages" fragment="true"/>
       <plugin id="com.teaminabox.eclipse.wiki"/>
       <plugin id="com.thoughtworks.xstream"/>
       <plugin id="diva"/>
@@ -340,5 +343,12 @@
       <plugin id="slf4j.log4j12" fragment="true"/>
    </plugins>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="false" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="4" />
+   </configurations>
 
 </product>

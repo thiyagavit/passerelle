@@ -18,10 +18,10 @@
 		<module>com.isencia.passerelle.workbench.model</module>
 		<module>com.isencia.passerelle.workbench.model.ui</module>
 		<module>com.isencia.passerelle.workbench.model.editor.ui</module>
-		<module>com.isencia.passerelle.workbench</module>
 		<module>com.isencia.passerelle.workbench.logging.development</module>
 		<module>com.isencia.passerelle.workbench.logging.production</module>
 		<module>com.isencia.passerelle.workbench.feature</module>
+		<module>com.isencia.passerelle.workbench</module>
 		<module>com.isencia.passerelle.workbench.product</module>
 	</modules>
 
