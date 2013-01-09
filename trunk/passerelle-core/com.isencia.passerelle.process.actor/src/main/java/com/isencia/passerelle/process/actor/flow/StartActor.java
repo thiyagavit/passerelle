@@ -27,6 +27,7 @@ import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
+import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
@@ -136,14 +137,14 @@ public class StartActor extends Actor {
           }
 
           req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, getCategory(), processType, jobID);
-
-          for (Map.Entry<String, String> entry : systemParameterMap.entrySet()) {
-            addSystemAttribute(req, entry);
-          }
-
-          for (Map.Entry<String, String> entry : applicationParameterMap.entrySet()) {
-            addApplicationAttribute(req, entry);
-          }
+          if (systemParameterMap != null)
+            for (Map.Entry<String, String> entry : systemParameterMap.entrySet()) {
+              addSystemAttribute(req, entry);
+            }
+          if (applicationParameterMap != null)
+            for (Map.Entry<String, String> entry : applicationParameterMap.entrySet()) {
+              addApplicationAttribute(req, entry);
+            }
           ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
         }
 
