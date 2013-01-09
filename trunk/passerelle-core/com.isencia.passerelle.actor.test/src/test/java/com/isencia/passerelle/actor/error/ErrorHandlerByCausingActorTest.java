@@ -101,6 +101,33 @@ public class ErrorHandlerByCausingActorTest extends TestCase {
 		.expectMsgSentCount(actorUnderTest, "exMatchPort", 1L)
 		.assertFlow(flow);
 	}
+	
+	public void testHandleErrorRegexpStrictUsingFullName() throws Exception {
+		Flow flow = new Flow("testHandleErrorRegexpStrictUsingFullName", null);
+		flow.setDirector(new Director(flow, "director"));
+
+		Const source = new Const(flow, "Constant");
+		ErrorHandlerByCausingActor actorUnderTest = new ErrorHandlerByCausingActor(
+				flow, "ErrorHandler");
+		Actor exceptionThrower = new ExceptionThrower(flow, "exceptionThrower");
+
+		flow.connect(source, exceptionThrower);
+
+		Map<String, String> props = new HashMap<String, String>();
+		props.put("Constant.value", "Error-1234");
+		// match exceptionThrower, source of ex
+		props.put("ErrorHandler.match mode", "regexp strict");
+		props.put(
+				"ErrorHandler.actor name patterns",
+				"exMatchPort=\\.testHandleErrorRegexpStrictUsingFullName\\.exception\\D{7}");
+		props.put("ErrorHandler.match full name", "true");
+		flowMgr.executeBlockingLocally(flow, props);
+
+		new FlowStatisticsAssertion()
+		.expectMsgSentCount(source, 1L)
+		.expectMsgSentCount(actorUnderTest, "exMatchPort", 1L)
+		.assertFlow(flow);
+	}
 
 	private class ExceptionThrower extends Transformer {
 		public ExceptionThrower(CompositeEntity container, String name)
