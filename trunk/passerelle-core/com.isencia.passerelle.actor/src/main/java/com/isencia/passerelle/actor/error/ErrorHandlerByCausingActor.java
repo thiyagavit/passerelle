@@ -69,14 +69,14 @@ public class ErrorHandlerByCausingActor extends AbstractErrorHandlerActor {
   /**
    * Flag to indicate if the error source actor's short name or its full name should be matched
    */
-  public Parameter useFullNameParam;
+  public Parameter useFullNameParam;//NOSONAR
   private boolean useFullName = false;
 
   /**
    * Flag to indicate if a strict pattern match is needed, or a "contains" match, i.e. whether the given pattern should match a part of the actor name or
    * completely. Practically speaking, non-strict matching implies pre-&post-fixing the pattern with a ".*".
    */
-  public StringParameter matchModeParam;
+  public StringParameter matchModeParam;//NOSONAR
   private MatchMode matchMode;
 
   public ErrorHandlerByCausingActor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
