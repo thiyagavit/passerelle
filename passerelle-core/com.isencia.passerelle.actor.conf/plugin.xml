@@ -110,12 +110,6 @@
             name="Synchronizer">
       </actor>
       
-      <actor id="com.isencia.passerelle.actor.chronometer"
-            class="com.isencia.passerelle.actor.control.Chronometer"
-            group="com.isencia.passerelle.actor.actorgroup.time"
-            icon="icons/time.png"
-            name="Chronometer">
-      </actor>
       <actor id="com.isencia.passerelle.actor.timer"
             class="com.isencia.passerelle.actor.control.Timer"
             group="com.isencia.passerelle.actor.actorgroup.time"
