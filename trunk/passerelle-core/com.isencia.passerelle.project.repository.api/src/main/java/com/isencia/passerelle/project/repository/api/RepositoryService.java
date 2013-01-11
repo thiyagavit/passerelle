@@ -5,9 +5,6 @@ package com.isencia.passerelle.project.repository.api;
 
 import java.util.List;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-
 import com.isencia.passerelle.core.IEventLog;
 import com.isencia.passerelle.model.Flow;
 
@@ -86,7 +83,7 @@ public interface RepositoryService {
 	 * @param packageCode
 	 * @return the project for the given packageCode, or null if not found
 	 */
-	KnowledgeBase getKnowledgeBase(String packageCode) throws Exception;
+	Object getKnowledgeBase(String packageCode) throws Exception;
 
 	/**
 	 * 
@@ -112,7 +109,7 @@ public interface RepositoryService {
 
 	String getDefaultDslr(String name);
 	 
-  KnowledgeBaseConfiguration getKnowledgeBaseConfiguration();
+  Object getKnowledgeBaseConfiguration();
 
   void commitFlow(Flow flow,String comment)  throws Exception;
   
