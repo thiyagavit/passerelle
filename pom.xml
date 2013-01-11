@@ -26,6 +26,12 @@
 		<sonar.jacoco.reportPath>${common.jacoco.reportPath}</sonar.jacoco.reportPath>
 		<sonar.surefire.reportsPath>../${project.artifactId}.test/target/surefire-reports/</sonar.surefire.reportsPath>
 		<sonar.skippedModules>
+			com.microstar,
+			diva,
+			ptolemy.core,
+			ptolemy.domains.and.actors,
+			ptolemy.gui,
+			ptolemy.feature,
 			com.isencia.passerelle.actor.test,
 			com.isencia.passerelle.commons.test,
 			com.isencia.passerelle.commons.ume.test,
