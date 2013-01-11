@@ -17,10 +17,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactory;
-
 import ptolemy.actor.CompositeActor;
 
 import com.isencia.passerelle.core.IEventLog;
@@ -61,8 +57,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
    * Instantiates a service instance with the default root folder (C:/temp/passerelle-repository)
    */
 
-  public FileSystemBasedRepositoryService(String rootFolderPath, String submodelFolderPath ) {
-    this(new File(rootFolderPath),new File(submodelFolderPath));
+  public FileSystemBasedRepositoryService(String rootFolderPath, String submodelFolderPath) {
+    this(new File(rootFolderPath), new File(submodelFolderPath));
   }
 
   /**
@@ -144,18 +140,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
    * Performs a very inefficient traversal of the Projects to find the right KB...
    * 
    */
-  public KnowledgeBase getKnowledgeBase(String packageCode) throws Exception {
-    KnowledgeBase result = null;
-    File[] projectFolders = rootFolder.listFiles((FileFilter) null);
-    for (File projectFolder : projectFolders) {
-      if (projectFolder.isDirectory()) {
-        Project p = getProject(projectFolder.getName());
-        result = (KnowledgeBase)p.getKnowledgeBase(packageCode);
-        if (result != null)
-          break;
-      }
-    }
-    return result;
+  public Object getKnowledgeBase(String packageCode) throws Exception {
+    return null;
   }
 
   public String getFlowCode(Long id) {
@@ -172,13 +158,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     return new MetaData("Flow", null, null, flowCode, null, null);
   }
 
-  KnowledgeBaseConfiguration kbConfig;
-
-  public KnowledgeBaseConfiguration getKnowledgeBaseConfiguration() {
-    if (kbConfig == null) {
-      kbConfig = KnowledgeBaseFactory.newKnowledgeBaseConfiguration(null, KnowledgeBaseFactory.class.getClassLoader());
-    }
-    return kbConfig;
+  public Object getKnowledgeBaseConfiguration() {
+    return null;
   }
 
   public void commitFlow(Flow flow, String comment) throws Exception {

@@ -5,21 +5,10 @@ package com.isencia.passerelle.project.repository.impl.filesystem;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseConfiguration;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.compiler.PackageBuilderConfiguration;
-import org.drools.io.ResourceFactory;
 
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -67,48 +56,9 @@ public class FileSystemBasedProject implements Project {
     return results.toArray(new String[results.size()]);
   }
 
-  public KnowledgeBase getKnowledgeBase(String kbCode) throws Exception {
-    File kbFolder = new File(kbPackagesFolder, kbCode);
-    KnowledgeBase result = null;
-    if (kbFolder.exists() && kbFolder.isDirectory()) {
-      Properties packageBuilderProps = new Properties();
-      packageBuilderProps.setProperty("drools.dialect.java.compiler", "JANINO");
-      packageBuilderProps.setProperty("drools.dialect.default", "java");
-      PackageBuilderConfiguration packageBuilderCfg = new PackageBuilderConfiguration(packageBuilderProps);
+  public Object getKnowledgeBase(String kbCode) throws Exception {
 
-      KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(packageBuilderCfg);
-      File[] rulesFiles = kbFolder.listFiles((FileFilter) new SuffixFileFilter(new String[] { "drl" }));
-      for (File rulesFile : rulesFiles) {
-        try {
-          kbuilder.add(ResourceFactory.newUrlResource(rulesFile.toURL()), ResourceType.DRL);
-        } catch (MalformedURLException e) {
-          throw new Exception("Url file not ok : " + rulesFile.toURL(), e);
-        }
-      }
-      File[] rulesFlowFiles = kbFolder.listFiles((FileFilter) new SuffixFileFilter(new String[] { "rf" }));
-      for (File rulesFlowFile : rulesFlowFiles) {
-        try {
-          kbuilder.add(ResourceFactory.newUrlResource(rulesFlowFile.toURL()), ResourceType.DRF);
-        } catch (MalformedURLException e) {
-          throw new Exception("Url file not ok : " + rulesFlowFile.toURL(), e);
-        }
-      }
-
-      if (kbuilder.hasErrors()) {
-        StringBuffer errorMessage = new StringBuffer("Compilation errors during building package: ");
-        for (KnowledgeBuilderError error : kbuilder.getErrors()) {
-          errorMessage.append(error.getMessage());
-          errorMessage.append(" ");
-        }
-        throw new Exception(errorMessage.toString());
-
-      } else {
-        KnowledgeBaseConfiguration kbConfig = KnowledgeBaseFactory.newKnowledgeBaseConfiguration(null);
-        result = KnowledgeBaseFactory.newKnowledgeBase(kbConfig);
-        result.addKnowledgePackages(kbuilder.getKnowledgePackages());
-      }
-    }
-    return result;
+    return null;
   }
 
   public Long[] getAllFlowIds() {
