@@ -71,12 +71,13 @@ public class PasserelleContextMenuProvider extends org.eclipse.gef.ContextMenuPr
 		action = getActionRegistry().getAction(ActionFactory.PASTE.getId());
 		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
 		action = getActionRegistry().getAction(ActionFactory.CLOSE.getId());
+    if (action != null && action.isEnabled())
+      manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+//   action = getActionRegistry().getAction(UpdateFlowAction.ID);
+//    if (action != null && action.isEnabled())
+//      manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+//    action = getActionRegistry().getAction(CommitFlowAction.ID);
 //		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
-//		
-//		action = getActionRegistry().getAction(UpdateFlowAction.ID);
-//		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
-//		action = getActionRegistry().getAction(CommitFlowAction.ID);
-		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		action = getActionRegistry().getAction(ActionFactory.NEW.getId());
 		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		action = getActionRegistry().getAction(ActionFactory.EXPORT.getId());		

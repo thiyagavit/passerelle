@@ -564,7 +564,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
       this.parseError = true;
       logger.error("Error during reading/parsing of model file", e);
 
-      EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
+     // EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
     } finally {
       if (is != null) {
         try {

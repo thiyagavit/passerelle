@@ -517,14 +517,14 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		registry.registerAction(subModelAction);
 		getSelectionActions().add(subModelAction.getId());
 		
-//		CommitFlowAction commitFlow = new CommitFlowAction(this,getParent());
-//		commitFlow.setText("Commit flow");
-//		registry.registerAction(commitFlow);
-//		getSelectionActions().add(commitFlow.getId());
-//		UpdateFlowAction updateFlow = new UpdateFlowAction(this,getParent());
-//		updateFlow.setText("Update flow");
-//		registry.registerAction(updateFlow);
-//		getSelectionActions().add(updateFlow.getId());
+//    CommitFlowAction commitFlow = new CommitFlowAction(this, getParent());
+//    commitFlow.setText("Commit flow");
+//    registry.registerAction(commitFlow);
+//    getSelectionActions().add(commitFlow.getId());
+//    UpdateFlowAction updateFlow = new UpdateFlowAction(this, getParent());
+//    updateFlow.setText("Update flow");
+//    registry.registerAction(updateFlow);
+//    getSelectionActions().add(updateFlow.getId());
 //		
 		final IToolBarManager man = getEditorSite().getActionBars().getToolBarManager();
 		final Separator sep = new Separator(getClass().getName() + ".openActions");
