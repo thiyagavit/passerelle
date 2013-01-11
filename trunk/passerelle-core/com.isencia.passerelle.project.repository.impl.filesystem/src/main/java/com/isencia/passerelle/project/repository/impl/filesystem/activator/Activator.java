@@ -1,6 +1,5 @@
 package com.isencia.passerelle.project.repository.impl.filesystem.activator;
 
-import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -14,7 +13,9 @@ public class Activator implements BundleActivator {
 	private ServiceRegistration repoSvcReg;
 
 	public void start(BundleContext context) throws Exception {
-		repoSvc = new FileSystemBasedRepositoryService();
+	  String rootFolderPath = System.getProperty("com.isencia.passerelle.project.root", "C:/temp/passerelle-repository");
+	  String submodelPath = System.getProperty("com.isencia.passerelle.submodel.root", "C:/temp/submodel-repository");
+		repoSvc = new FileSystemBasedRepositoryService(rootFolderPath,submodelPath);
 		repoSvcReg = context.registerService(RepositoryService.class.getName(),
 				repoSvc, null);
 	}
