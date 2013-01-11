@@ -18,52 +18,49 @@ import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
  * @author Dirk Jacobs
  * 
  */
-public class ComponentNodeDeletePolicy extends
-		org.eclipse.gef.editpolicies.ComponentEditPolicy {
-	private PasserelleModelMultiPageEditor multiPageEditor;
-	private DeleteComponentCommand getDeleteComponentCommand() {
-		return new DeleteComponentCommand();
-	}
+public class ComponentNodeDeletePolicy extends org.eclipse.gef.editpolicies.ComponentEditPolicy {
+  private PasserelleModelMultiPageEditor multiPageEditor;
 
-	public ComponentNodeDeletePolicy() {
+  private DeleteComponentCommand getDeleteComponentCommand() {
+    return new DeleteComponentCommand();
+  }
 
-	}
+  public ComponentNodeDeletePolicy() {
 
-	public ComponentNodeDeletePolicy(
-			PasserelleModelMultiPageEditor multiPageEditor) {
-		this.multiPageEditor = multiPageEditor;
-	}
+  }
 
-	protected Command createDeleteCommand(GroupRequest request) {
-		NamedObj child = (NamedObj) getHost().getModel();
-		Object parent = getHost().getParent().getModel();
-		DeleteComponentCommand deleteCmd = getDeleteComponentCommand();
-		if (multiPageEditor != null && child instanceof CompositeActor) {
-			deleteCmd.setMultiPageEditor(multiPageEditor);
-			deleteCmd.emptyIndexList();
-			addCompositeActorIndex(child, deleteCmd);
-		}
-		deleteCmd.setParent((CompositeEntity) parent);
-		deleteCmd.setChild(child);
+  public ComponentNodeDeletePolicy(PasserelleModelMultiPageEditor multiPageEditor) {
+    this.multiPageEditor = multiPageEditor;
+  }
 
-		return deleteCmd;
-	}
+  protected Command createDeleteCommand(GroupRequest request) {
+    NamedObj child = (NamedObj) getHost().getModel();
+    Object parent = getHost().getParent().getModel();
+    DeleteComponentCommand deleteCmd = getDeleteComponentCommand();
+    if (multiPageEditor != null && child instanceof CompositeActor) {
+      deleteCmd.setMultiPageEditor(multiPageEditor);
+      deleteCmd.emptyIndexList();
+      addCompositeActorIndex(child, deleteCmd);
+    }
+    deleteCmd.setParent((CompositeEntity) parent);
+    deleteCmd.setChild(child);
 
-	private void addCompositeActorIndex(NamedObj child,
-			DeleteComponentCommand deleteCmd) {
+    return deleteCmd;
+  }
 
-		if (child instanceof CompositeActor) {
-			int index = multiPageEditor.getPageIndex((CompositeActor) child);
-			if (index != -1) {
-				deleteCmd.addIndex(index);
-			}
-			Enumeration entities = ((CompositeActor) child).getEntities();
-			while (entities.hasMoreElements()) {
-				addCompositeActorIndex((NamedObj) entities.nextElement(),
-						deleteCmd);
-			}
+  private void addCompositeActorIndex(NamedObj child, DeleteComponentCommand deleteCmd) {
 
-		}
-	}
+    if (child instanceof CompositeActor) {
+      int index = multiPageEditor.getPageIndex((CompositeActor) child);
+      if (index != -1) {
+        deleteCmd.addIndex(index);
+      }
+      Enumeration entities = ((CompositeActor) child).getEntities();
+      while (entities.hasMoreElements()) {
+        addCompositeActorIndex((NamedObj) entities.nextElement(), deleteCmd);
+      }
+
+    }
+  }
 
 }
