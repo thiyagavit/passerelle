@@ -1,7 +1,5 @@
 package com.isencia.passerelle.project.repository.api;
 
-import org.drools.KnowledgeBase;
-
 import com.isencia.passerelle.model.Flow;
 
 /**
@@ -53,7 +51,7 @@ public interface Project {
 	 * (also unique within the complete repository??)
 	 * @return the knowledgebase in this project, for the given kbCode, or null if not found
 	 */
-	KnowledgeBase getKnowledgeBase(String kbCode) throws Exception ;
+	Object getKnowledgeBase(String kbCode) throws Exception ;
 	/**
 	 * 
 	 * @return array of all KB codes in this project. Since KBs can be quite large,

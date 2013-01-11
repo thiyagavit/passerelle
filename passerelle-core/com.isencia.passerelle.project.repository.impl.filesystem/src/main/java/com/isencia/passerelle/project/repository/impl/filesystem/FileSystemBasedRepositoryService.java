@@ -123,7 +123,7 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     for (File projectFolder : projectFolders) {
       if (projectFolder.isDirectory()) {
         Project p = getProject(projectFolder.getName());
-        result = p.getKnowledgeBase(packageCode);
+        result = (KnowledgeBase)p.getKnowledgeBase(packageCode);
         if (result != null)
           break;
       }
