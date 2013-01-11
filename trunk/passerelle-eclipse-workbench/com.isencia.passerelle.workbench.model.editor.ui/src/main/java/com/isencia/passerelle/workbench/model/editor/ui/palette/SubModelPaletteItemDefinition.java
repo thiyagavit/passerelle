@@ -36,6 +36,9 @@ public class SubModelPaletteItemDefinition extends PaletteItemDefinition {
 	private Workspace workSpace;
 
 	public Flow getFlow() {
+		if (flow == null){
+			flow = Activator.getDefault().getRepositoryService().getSubmodel(getName());
+		}
 		return flow;
 	}
 
