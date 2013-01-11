@@ -80,6 +80,7 @@ abstract public class AbstractBaseEditPart extends
 		if (expertUpdater == null)
 			expertUpdater = new IPropertyChangeListener() {
 
+				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(PreferenceConstants.EXPERT)) {
 						final PropertySheet sheet = (PropertySheet) EclipseUtils
@@ -160,7 +161,7 @@ abstract public class AbstractBaseEditPart extends
 		return propertySource;
 	}
 
-
+	@Override
 	public void changeExecuted(ChangeRequest changerequest) {
 
 		getLogger().trace("Change Executed");
@@ -220,6 +221,7 @@ abstract public class AbstractBaseEditPart extends
 		return ((NamedObj) source).getDisplayName();
 	}
 
+	@Override
 	public void changeFailed(ChangeRequest changerequest, Exception exception) {
 		getLogger().trace("Change Failed : " + exception.getMessage());
 	}

@@ -15,8 +15,7 @@ public class DirectorEditPart extends AbstractBaseEditPart {
 	public final static  ImageDescriptor IMAGE_DESCRIPTOR_DIRECTOR  = Activator.getImageDescriptor("icons/director.gif");
 
 	protected void createEditPolicies() {
-//		installEditPolicy(EditPolicy.COMPONENT_ROLE, new
-//				 ComponentNodeDeletePolicy());
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy());
 	}
 
 	/**
