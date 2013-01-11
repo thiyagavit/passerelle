@@ -7,10 +7,11 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.RetargetAction;
 
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CommitFlowAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.OpenFileAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ScreenshotAction;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.UpdateFlowAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 
 public class PasserelleContextMenuProvider extends org.eclipse.gef.ContextMenuProvider {
@@ -70,8 +71,12 @@ public class PasserelleContextMenuProvider extends org.eclipse.gef.ContextMenuPr
 		action = getActionRegistry().getAction(ActionFactory.PASTE.getId());
 		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_COPY, action);
 		action = getActionRegistry().getAction(ActionFactory.CLOSE.getId());
+//		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+//		
+//		action = getActionRegistry().getAction(UpdateFlowAction.ID);
+//		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
+//		action = getActionRegistry().getAction(CommitFlowAction.ID);
 		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
-		
 		action = getActionRegistry().getAction(ActionFactory.NEW.getId());
 		if (action != null && action.isEnabled()) manager.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		action = getActionRegistry().getAction(ActionFactory.EXPORT.getId());		
