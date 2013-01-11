@@ -5,6 +5,8 @@ package com.isencia.passerelle.project.repository.api;
 
 import java.util.List;
 
+import ptolemy.actor.CompositeActor;
+
 import com.isencia.passerelle.core.IEventLog;
 import com.isencia.passerelle.model.Flow;
 
@@ -114,6 +116,10 @@ public interface RepositoryService {
   void commitFlow(Flow flow,String comment)  throws Exception;
   
   String[] getAllSubmodels();
+  
+  void createSubmodel(CompositeActor flow);
+  
+  void deleteSubmodel(String flow);
   
   List<IEventLog> getLogs(String name,Integer maxResult);
 }
