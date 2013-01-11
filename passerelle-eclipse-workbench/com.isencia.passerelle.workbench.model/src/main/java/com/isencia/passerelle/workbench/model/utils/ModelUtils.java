@@ -452,27 +452,13 @@ public class ModelUtils {
     return new ByteArrayInputStream(contents.getBytes());
   }
 
-  public static InputStream getEmptyCompositeStream(final String filePath) throws UnsupportedEncodingException {
+  public static InputStream getEmptyCompositeStream(String name) throws UnsupportedEncodingException {
+    String momlTemplate = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
+        + "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n"
+        + "<class  name=\"$modelName\" extends=\"ptolemy.actor.TypedCompositeActor\"> \r\n </class >";
+    momlTemplate = momlTemplate.replace("$modelName", name);
 
-    final File source = new File(filePath);
-    String name = source.getName();
-    if (name.toLowerCase().endsWith(".moml"))
-      name = name.substring(0, name.length() - 5);
-
-    final StringBuilder contents = new StringBuilder();
-    contents.append("<?xml version=\"1.0\" standalone=\"no\"?> \r\n");
-    contents.append("<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\">\r\n");
-
-    contents.append("<class name=\"" + name + "\" extends=\"" + TypedCompositeActor.class.getName() + "\" >\r\n");
-    contents.append("<property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\"></property>\r\n");
-    contents.append("<property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\""
-        + System.getProperty("passerelle.workbench.version") + "\"></property>\r\n");
-    contents.append("<property name=\"_controllerFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory\"></property>\r\n");
-    contents.append("<property name=\"_editorFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleEditorFactory\"></property>\r\n");
-    contents.append("<property name=\"_editorPaneFactory\" class=\"com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory\"></property>\r\n");
-    contents.append("</class>\r\n");
-
-    return new ByteArrayInputStream(contents.toString().getBytes("UTF-8"));
+    return new ByteArrayInputStream(momlTemplate.getBytes("UTF-8"));
   }
 
   public static IProject getPasserelleProject() throws Exception {
