@@ -36,7 +36,7 @@ import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
-import com.isencia.passerelle.ext.DirectorAdapter;
+import ptolemy.actor.Director;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
@@ -83,7 +83,7 @@ public class ActorAttributesView extends ViewPart implements
 
 	private VariableEditingSupport valueColumnEditor;
 
-
+	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (part instanceof PasserelleModelMultiPageEditor) {
 			this.part = part;
@@ -138,28 +138,28 @@ public class ActorAttributesView extends ViewPart implements
 			Collections.sort(parameterList, new NamedObjComparator());
 		try {
 			viewer.setContentProvider(new IStructuredContentProvider() {
-
+				@Override
 				public void dispose() {
 
 				}
 
-
+				@Override
 				public void inputChanged(Viewer viewer, Object oldInput,
 						Object newInput) {
 				}
 
-		
+				@Override
 				public Object[] getElements(Object inputElement) {
 					if (parameterList == null) return new Parameter[] {};
 					final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
 					
-					final DirectorAdapter director = actor instanceof Actor
-					                        ? ((Actor)actor).getDirectorAdapter()
+					final Director director = actor instanceof Actor
+					                        ? (Director)((Actor)actor).getDirector()
 					                        : null;
 					if (actor instanceof Actor)
 						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
 
-					if (actor instanceof Actor && director!=null && director.isExpertMode())
+					if (actor instanceof Actor && director!=null )
 						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
 
 					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.getInstance().getType(actor.getName())));
@@ -171,10 +171,7 @@ public class ActorAttributesView extends ViewPart implements
 			viewer.setInput(new Object());
 			viewer.refresh();
 		} catch (Exception e) {
-		  // TODO : fix error java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?)
-		  // that happens for every actor selection after an ActorDialog(containing an ActorAttributesView) has been opened&closed.
-		  // but for the moment, just disable this error logging as it pollutes our log files for a known, non-critical issue.
-         //   logger.error("Cannot set input", e);
+            logger.error("Cannot set input", e);
 		}
 	}
 
@@ -216,11 +213,11 @@ public class ActorAttributesView extends ViewPart implements
 
 		viewer.getTable().addKeyListener(new KeyListener() {
 
-	
+			@Override
 			public void keyReleased(KeyEvent e) {
 			}
 
-
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.F1) {
 					try {
@@ -319,7 +316,7 @@ public class ActorAttributesView extends ViewPart implements
 		super.dispose();
 	}
 
-
+	@Override
 	public void stackChanged(CommandStackEvent event) {
 		viewer.refresh();
 	}
