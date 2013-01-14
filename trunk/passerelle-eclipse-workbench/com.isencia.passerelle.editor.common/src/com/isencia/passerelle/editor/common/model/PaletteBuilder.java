@@ -18,7 +18,7 @@ import ptolemy.kernel.util.Location;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 
-import com.isencia.passerelle.editor.common.utils.PasserelleUtils;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 
 public class PaletteBuilder implements Serializable {
@@ -88,9 +88,6 @@ public class PaletteBuilder implements Serializable {
     return group.getPaletteItem(id);
   }
 
-  Object defaultIdeIcon;
-  Object defaultFolderIcon;
-
   public Object getIcon(String clazzName) {
     if (Flow.class.getName().equals(clazzName)) {
       if (submodelDefinition != null)
@@ -100,7 +97,11 @@ public class PaletteBuilder implements Serializable {
     if (itemDefinition != null) {
       return itemDefinition.getIcon();
     }
-    return defaultIdeIcon;
+    return newDefaultIdeIcon();
+  }
+
+  protected Object newDefaultIdeIcon() {
+    return null;
   }
 
   public String getType(String clazzName) {
@@ -109,7 +110,7 @@ public class PaletteBuilder implements Serializable {
     if (itemDefinition != null) {
       return itemDefinition.getName();
     }
-    Class clazz = PasserelleUtils.loadClass(clazzName);
+    Class clazz = EditorUtils.loadClass(clazzName);
     if (clazz != null) {
       return clazz.getSimpleName();
     }
@@ -121,7 +122,7 @@ public class PaletteBuilder implements Serializable {
 
   public List<PaletteGroup> createCategories() {
     List<PaletteGroup> actorGroups = new ArrayList<PaletteGroup>();
-    Object folderIcon = defaultFolderIcon;
+    Object folderIcon = newDefaultFolderIcon();
     groups = new HashMap<String, PaletteGroup>();
     paletteItemMap = new HashMap<String, PaletteItemDefinition>();
     try {
@@ -237,6 +238,10 @@ public class PaletteBuilder implements Serializable {
     return actorGroups;
   }
 
+  protected Object newDefaultFolderIcon() {
+    return null;
+  }
+
   protected boolean checkPermission(String feature) {
     return true;
   }
@@ -262,7 +267,7 @@ public class PaletteBuilder implements Serializable {
   public Class<?> loadClass(final IConfigurationElement configurationElement, final String bundleId) {
 
     String className = configurationElement.getAttribute("class");
-    return PasserelleUtils.loadClass(className);
+    return EditorUtils.loadClass(className);
 
   }
 
