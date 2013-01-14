@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.isencia.passerelle.editor.common.utils.PasserelleUtils;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 
 public class PaletteItemDefinition implements Serializable, Comparable<PaletteItemDefinition> {
   @Override
@@ -88,7 +88,7 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
   }
 
   public Class getClazz() {
-    return PasserelleUtils.loadClass(clazz);
+    return EditorUtils.loadClass(clazz);
   }
 
   public String getColor() {

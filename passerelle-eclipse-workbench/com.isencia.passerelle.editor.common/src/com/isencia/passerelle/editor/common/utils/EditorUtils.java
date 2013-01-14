@@ -41,9 +41,9 @@ import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler;
 import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler.ErrorItem;
 import com.isencia.passerelle.model.util.MoMLParser;
 
-public class PasserelleUtils {
+public class EditorUtils {
   public static final String CLIP_BOARD = "clipBoard";
-  public static Logger logger = LoggerFactory.getLogger(PasserelleUtils.class);;
+  public static Logger logger = LoggerFactory.getLogger(EditorUtils.class);;
 
   public static Class<?> loadClass(String className) {
     try {
