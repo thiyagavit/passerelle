@@ -300,5 +300,9 @@ public class PaletteBuilder implements Serializable {
       }
     }
   }
+  
+  public static boolean isSubModelGroup(PaletteGroup group){
+    return group != null && group.getName().equals(SUBMODELS);
+  }
 
 }
