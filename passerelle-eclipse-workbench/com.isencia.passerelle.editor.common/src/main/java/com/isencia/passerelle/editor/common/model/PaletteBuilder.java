@@ -40,6 +40,16 @@ public class PaletteBuilder implements Serializable {
     return paletteGroups;
   }
 
+  public List<PaletteGroup> getRootPaletteGroups() {
+    List<PaletteGroup> groups = new ArrayList<PaletteGroup>();
+    for (PaletteGroup group : paletteGroups) {
+      if (group.getParent() == null) {
+        groups.add(group);
+      }
+    }
+    return groups;
+  }
+
   public List<PaletteGroup> getEditablePaletteGroups() {
     if (editablePaletteGroups == null) {
       editablePaletteGroups = new ArrayList<PaletteGroup>();
@@ -193,7 +203,7 @@ public class PaletteBuilder implements Serializable {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    submodels = groups.get(SUBMODELS);
+    submodels = getSubModelGroup();
 
     // Find all Actors and add them to the corresponding container
     IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("com.isencia.passerelle.engine.actors");
@@ -212,7 +222,7 @@ public class PaletteBuilder implements Serializable {
             String iconLocationAttribute = configurationElement.getAttribute("iconClass");
             final String bundleId = configurationElement.getDeclaringExtension().getContributor().getName();
 
-            Object icon = createIcon(folderIcon, iconLocationAttribute, iconAttribute, bundleId);
+            Object icon = createIcon(null, iconLocationAttribute, iconAttribute, bundleId);
             if (group != null && submodels != null && submodels.getId().equals(group.getId())) {
               submodelDefinition = new PaletteItemDefinition(icon, null, idAttribute, nameAttribute, colorAttribute, Flow.class);
             } else {
@@ -236,6 +246,10 @@ public class PaletteBuilder implements Serializable {
 
     }
     return actorGroups;
+  }
+
+  public PaletteGroup getSubModelGroup() {
+    return groups.get(SUBMODELS);
   }
 
   protected Object newDefaultFolderIcon() {
@@ -300,8 +314,8 @@ public class PaletteBuilder implements Serializable {
       }
     }
   }
-  
-  public static boolean isSubModelGroup(PaletteGroup group){
+
+  public static boolean isSubModelGroup(PaletteGroup group) {
     return group != null && group.getName().equals(SUBMODELS);
   }
 
