@@ -1,6 +1,7 @@
 package com.isencia.passerelle.editor.common.model;
 
 import com.isencia.passerelle.editor.common.activator.Activator;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 
 public class SubModelPaletteItemDefinition extends PaletteItemDefinition {
@@ -20,6 +21,11 @@ public class SubModelPaletteItemDefinition extends PaletteItemDefinition {
   public SubModelPaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color) {
     super(icon, group, id, name, color, null);
 
+  }
+
+  public Class getClazz() {
+
+    return Flow.class;
   }
 
 }

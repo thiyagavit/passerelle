@@ -12,6 +12,9 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     if (obj == null) {
       return false;
     }
+    if (!(obj instanceof PaletteItemDefinition)){
+      return false;
+    }
     PaletteItemDefinition def = (PaletteItemDefinition) obj;
     return def.getClazz().equals(getClazz()) && def.getId().equals(getId());
   }
@@ -88,6 +91,7 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
   }
 
   public Class getClazz() {
+
     return EditorUtils.loadClass(clazz);
   }
 
