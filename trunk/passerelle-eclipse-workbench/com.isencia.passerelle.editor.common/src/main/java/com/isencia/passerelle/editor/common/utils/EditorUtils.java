@@ -21,6 +21,7 @@ import ptolemy.actor.Director;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.util.Attribute;
@@ -34,7 +35,7 @@ import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.editor.common.model.PaletteBuilder;
+import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler;
@@ -318,5 +319,12 @@ public class EditorUtils {
       throw (new PasserelleException(ErrorCode.ERROR, "Error parsing model", e));
     }
 
+  }
+  public static Link generateLink(ComponentRelation relation, Object source, Object target) {
+    Link link = new Link();
+    link.setHead(source);
+    link.setTail(target);
+    link.setRelation(relation);
+    return link;
   }
 }
