@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.isencia.passerelle.process.common
 Bundle-Version: 1.1.2.qualifier
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: com.isencia.passerelle.process.common.configurable,
- com.isencia.passerelle.process.common.exception,
+Export-Package: com.isencia.passerelle.process.common.exception,
  com.isencia.passerelle.process.common.util
 Require-Bundle: org.eclipse.equinox.preferences;bundle-version="3.2.201" 
 Import-Package: com.isencia.passerelle.process.model,
