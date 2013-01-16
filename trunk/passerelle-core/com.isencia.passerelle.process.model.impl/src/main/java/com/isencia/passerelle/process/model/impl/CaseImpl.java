@@ -39,6 +39,10 @@ import com.isencia.passerelle.process.model.Request;
 @DiscriminatorValue("CASE")
 public class CaseImpl implements Case {
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
