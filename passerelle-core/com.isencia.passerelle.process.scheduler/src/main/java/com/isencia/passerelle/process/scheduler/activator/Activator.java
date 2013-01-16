@@ -35,8 +35,6 @@ public class Activator extends AbstractActivator {
 	private ServiceRegistration schedulerFactoryServiceRegistration;
 	private ServiceRegistration schedulerRegistryServiceRegistration;
 
-	private ServiceTracker engineMonitoringServiceTracker;
-
 	private TaskSchedulerRegistry defaultSchedulerRegistry;
 	private TaskSchedulerFactory defaultSchedulerFactory;
 
@@ -71,8 +69,6 @@ public class Activator extends AbstractActivator {
 			this.bundleContext = bundleContext;
 			bundleSymbolicName = bundleContext.getBundle().getSymbolicName();
 
-			engineMonitoringServiceTracker.open();
-
 			defaultSchedulerRegistry = new DefaultTaskSchedulerRegistry();
 			schedulerRegistryServiceRegistration = bundleContext.registerService(TaskSchedulerRegistry.class.getName(), defaultSchedulerRegistry, null);
 
@@ -91,8 +87,6 @@ public class Activator extends AbstractActivator {
 	public void stop(BundleContext bundleContext) throws Exception {
 		super.stop(bundleContext);
 		instance = null;
-
-		engineMonitoringServiceTracker.close();
 
 		if (schedulerRegistryServiceRegistration != null) {
 			schedulerRegistryServiceRegistration.unregister();
