@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
@@ -283,6 +284,12 @@ public class PaletteBuilder implements Serializable {
     String className = configurationElement.getAttribute("class");
     return EditorUtils.loadClass(className);
 
+  }
+
+  protected Class loadClassFromBundleId(final String bundleId, String iconClazz) throws ClassNotFoundException {
+    Bundle bundle = Platform.getBundle(bundleId);
+    Class dummy = bundle.loadClass(iconClazz);
+    return dummy;
   }
 
   @SuppressWarnings("unchecked")
