@@ -20,7 +20,11 @@
 		<module>com.isencia.passerelle.process.model</module>
 		<module>com.isencia.passerelle.process.model.impl</module>
 		<module>com.isencia.passerelle.project.repository.api</module>
+		<module>com.isencia.passerelle.project.repository.impl.filesystem</module>
 		<module>com.isencia.passerelle.domain.et</module>
+		<module>com.isencia.passerelle.edm.common</module>
+		<module>com.isencia.passerelle.edm.request.scheduler</module>
+		<module>com.isencia.passerelle.edm.request.service</module>
 		<module>com.isencia.passerelle.actor</module>
 		<module>com.isencia.passerelle.actor.conf</module>
 		<module>com.isencia.passerelle.actor.help</module>
