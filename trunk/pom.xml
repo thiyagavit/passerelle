@@ -38,6 +38,8 @@
 			com.isencia.passerelle.domain.et.test,
 			com.isencia.passerelle.engine.test
 		</sonar.skippedModules>
+		<sonar.pdf.username>hudson</sonar.pdf.username>
+		<sonar.pdf.password>{MLKMJBHVG78T889876734658970!?KJ}</sonar.pdf.password>
 	</properties>
 
 	<modules>
