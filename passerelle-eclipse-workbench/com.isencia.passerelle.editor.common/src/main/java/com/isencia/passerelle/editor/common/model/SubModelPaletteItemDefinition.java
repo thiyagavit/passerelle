@@ -19,7 +19,7 @@ public class SubModelPaletteItemDefinition extends PaletteItemDefinition {
   }
 
   public SubModelPaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color) {
-    super(icon, group, id, name, color, null);
+    super(icon, group, id, name, color, null,null);
 
   }
 

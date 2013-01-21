@@ -12,7 +12,7 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof PaletteItemDefinition)){
+    if (!(obj instanceof PaletteItemDefinition)) {
       return false;
     }
     PaletteItemDefinition def = (PaletteItemDefinition) obj;
@@ -24,12 +24,13 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     return new HashCodeBuilder().append(getClazz()).append(id).hashCode();
   }
 
-  public PaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color,
-      Class clazz) {
+  
+  public PaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color, Class clazz,String bundleId) {
     this.group = group;
     this.id = id;
     this.icon = icon;
     this.name = name;
+    this.bundleId = bundleId;
     if (clazz != null)
       this.clazz = clazz.getName();
     if (group != null)
@@ -43,6 +44,12 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
       this.color = color;
     }
 
+  }
+
+  private String bundleId;
+  
+  public String getBundleId() {
+    return bundleId;
   }
 
   private Object icon;
