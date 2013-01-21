@@ -1,8 +1,8 @@
 package com.isencia.passerelle.process.scheduler.activator;
 
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,21 +11,8 @@ import com.isencia.passerelle.process.scheduler.TaskSchedulerFactory;
 import com.isencia.passerelle.process.scheduler.TaskSchedulerRegistry;
 import com.isencia.passerelle.process.scheduler.impl.DefaultTaskSchedulerFactory;
 import com.isencia.passerelle.process.scheduler.impl.DefaultTaskSchedulerRegistry;
-import com.isencia.sherpa.commons.osgi.AbstractActivator;
 
-public class Activator extends AbstractActivator {
-	private static final long serialVersionUID = 1L;
-
-	@Override
-	public void onApplicationInit() {
-
-		super.onApplicationInit();
-
-		defaultSchedulerFactory = new DefaultTaskSchedulerFactory();
-		schedulerFactoryServiceRegistration = bundleContext.registerService(TaskSchedulerFactory.class.getName(), defaultSchedulerFactory, null);
-
-	}
-
+public class Activator implements BundleActivator {
 	private final static Logger LOGGER = LoggerFactory.getLogger(Activator.class);
 
 	private static Activator instance;
@@ -63,7 +50,6 @@ public class Activator extends AbstractActivator {
 	 * )
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		super.start(bundleContext);
 		try {
 			instance = this;
 			this.bundleContext = bundleContext;
@@ -71,6 +57,9 @@ public class Activator extends AbstractActivator {
 
 			defaultSchedulerRegistry = new DefaultTaskSchedulerRegistry();
 			schedulerRegistryServiceRegistration = bundleContext.registerService(TaskSchedulerRegistry.class.getName(), defaultSchedulerRegistry, null);
+			
+			defaultSchedulerFactory = new DefaultTaskSchedulerFactory();
+			schedulerFactoryServiceRegistration = bundleContext.registerService(TaskSchedulerFactory.class.getName(), defaultSchedulerFactory, null);
 
 		} catch (Exception ex) {
 			LOGGER.error(ErrorCode.BUNDLE_START_FAILED + " - " + bundleContext.getBundle().getSymbolicName(), ex);
@@ -85,7 +74,6 @@ public class Activator extends AbstractActivator {
 	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext bundleContext) throws Exception {
-		super.stop(bundleContext);
 		instance = null;
 
 		if (schedulerRegistryServiceRegistration != null) {
