@@ -43,6 +43,9 @@ import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler.Error
 import com.isencia.passerelle.model.util.MoMLParser;
 
 public class EditorUtils {
+
+  public static final String DEFAULT_OUTPUT_PORT = "OutputPort";
+  public static final String DEFAULT_INPUT_PORT = "InputPort";
   public static final String CLIP_BOARD = "clipBoard";
   public static Logger logger = LoggerFactory.getLogger(EditorUtils.class);;
 
