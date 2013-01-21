@@ -5,6 +5,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlineEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class HelpUtils {
@@ -28,10 +29,26 @@ public class HelpUtils {
 
       final NamedObj parent = ((ActorEditPart) element).getEntity();
       final String actorName = parent.getClass().getName();
-      
+
       String id = getHelpId(actorName);
       String path = "/" + id + "/html/" + actorName + ".html";
       return path;
+
+    } else if (element instanceof OutlineEditPart) {
+      OutlineEditPart out = (OutlineEditPart) element;
+      Object model = out.getModel();
+      if (model instanceof Variable) {
+        final NamedObj parent = ((Variable) element).getContainer();
+        final String actorName = parent.getClass().getName();
+        String id = getHelpId(actorName);
+        String path = "/" + id + "/html/" + actorName + "_attributes.html";
+        return path;
+      } else {
+        String actorName = model.getClass().getName();
+        String id = getHelpId(actorName);
+        String path = "/" + id + "/html/" + actorName + ".html";
+        return path;
+      }
 
     } else if (element instanceof Variable) {
 
@@ -47,11 +64,11 @@ public class HelpUtils {
 
   private static String getHelpId(final String actorName) {
     String id = PaletteBuilder.getInstance().getBuildId(actorName);
-    if (id == null){
+    if (id == null) {
       id = HELP_BUNDLE_ID;
-    }else{
-      if (id.endsWith(".conf")){
-        id = id.substring(0, id.length() -4) + "help";
+    } else {
+      if (id.endsWith(".conf")) {
+        id = id.substring(0, id.length() - 4) + "help";
       }
     }
     return id;

@@ -590,7 +590,7 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 				getActionRegistry().getAction(ActionFactory.DELETE.getId()));
 
 		keyHandler.put(KeyStroke.getPressed(SWT.F2, 0), getActionRegistry()
-				.getAction(ActionFactory.DYNAMIC_HELP.getId()));
+				.getAction(ActionFactory.HELP_CONTENTS.getId()));
 		keyHandler.put(KeyStroke.getPressed(SWT.F3, 0), getActionRegistry()
 				.getAction(ActionFactory.RENAME.getId()));
 		graphicalViewerKeyHandler.setParent(keyHandler);
