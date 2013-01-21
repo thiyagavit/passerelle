@@ -239,12 +239,15 @@ public class PaletteBuilder implements Serializable {
       }
     }
 
-    for (String actorClass : MomlClassRegistry.getAllActorClasses()) {
+    try {
+      for (String actorClass : MomlClassRegistry.getAllActorClasses()) {
 
-      SubModelPaletteItemDefinition item = addSubModel(actorClass);
-      if (submodels != null)
-        submodels.addPaletteItem(item);
-
+        SubModelPaletteItemDefinition item = addSubModel(actorClass);
+        if (submodels != null)
+          submodels.addPaletteItem(item);
+      }
+    } catch (Exception e) {
+      logError(e);
     }
     return actorGroups;
   }
@@ -326,4 +329,7 @@ public class PaletteBuilder implements Serializable {
     return group != null && group.getName().equals(SUBMODELS);
   }
 
+  public void logError(Exception e) {
+
+  }
 }
