@@ -27,6 +27,13 @@ public class PaletteBuilder implements Serializable {
   public static final String SUBMODELS = "com.isencia.passerelle.actor.actorgroup.submodels";
   List<PaletteGroup> paletteGroups;
   List<PaletteGroup> editablePaletteGroups;
+  
+  private Map<String, String> actorBundleMap = new HashMap<String, String>();
+  
+  public String getBuildId(String className) {
+    return actorBundleMap.get(className);
+  }
+  
   private boolean rerender = false;
 
   public boolean isRerender() {
@@ -225,12 +232,14 @@ public class PaletteBuilder implements Serializable {
 
             Object icon = createIcon(null, iconLocationAttribute, iconAttribute, bundleId);
             if (group != null && submodels != null && submodels.getId().equals(group.getId())) {
-              submodelDefinition = new PaletteItemDefinition(icon, null, idAttribute, nameAttribute, colorAttribute, Flow.class);
+              submodelDefinition = new PaletteItemDefinition(icon, null, idAttribute, nameAttribute, colorAttribute, Flow.class,null);
             } else {
               final Class<?> clazz = loadClass(configurationElement, bundleId);
+              
               if (clazz != null && group != null) {
-                PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz);
+                PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz,bundleId);
                 group.addPaletteItem(item);
+                actorBundleMap.put(clazz.getName(), bundleId);
                 paletteItemMap.put(item.getClazz().getName(), item);
               }
             }
@@ -247,7 +256,7 @@ public class PaletteBuilder implements Serializable {
           submodels.addPaletteItem(item);
       }
     } catch (Exception e) {
-      logError(e);
+     // logError(e);
     }
     return actorGroups;
   }
