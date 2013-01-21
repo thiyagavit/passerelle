@@ -11,7 +11,10 @@ public class MomlClassRegistry {
     MomlClassRegistry.service = service;
   }
 
-  public static Collection<String> getAllActorClasses() {
+  public static Collection<String> getAllActorClasses() throws Exception {
+    if (service == null) {
+      throw new Exception("Moml class service defined");
+    }
     if (service != null) {
       return service.getAllActorClasses();
     }
