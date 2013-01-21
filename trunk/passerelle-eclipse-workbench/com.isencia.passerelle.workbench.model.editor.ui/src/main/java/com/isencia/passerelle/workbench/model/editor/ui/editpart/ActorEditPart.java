@@ -187,19 +187,9 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
    * @return Port.
    */
   public Port getSourcePort(ConnectionAnchor anchor) {
-    getLogger().trace("Get Source port  based on anchor");
+    getLogger().debug("Get Source port  based on anchor");
 
-    AbstractNodeFigure anchorFigure = getComponentFigure();
-    List outputPortList = getActor().outputPortList();
-    for (Iterator iterator = outputPortList.iterator(); iterator.hasNext();) {
-      Port port = (Port) iterator.next();
-      String connectionAnchorName = anchorFigure.getConnectionAnchorName(anchor);
-      String portName = port.getName();
-      if (portName != null && portName.equals(connectionAnchorName)) {
-        return port;
-      }
-    }
-    return null;
+    return getPort(anchor, (ActorFigure) getComponentFigure(), getActor(), true);
   }
 
   /**
@@ -208,17 +198,25 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
    * @return Port.
    */
   public Port getTargetPort(ConnectionAnchor anchor) {
-    getLogger().trace("Get Target port  based on anchor");
+    getLogger().debug("Get Target port  based on anchor");
 
-    AbstractNodeFigure anchorFigure = getComponentFigure();
-    List inputPortList = getActor().inputPortList();
-    for (Iterator iterator = inputPortList.iterator(); iterator.hasNext();) {
+    return getPort(anchor, (ActorFigure) getComponentFigure(), getActor(), false);
+  }
+
+  public static Port getPort(ConnectionAnchor anchor, ActorFigure actorFigure, Actor actor, boolean source) {
+    List outputPortList = null;
+    if (source)
+      outputPortList = actor.outputPortList();
+    else
+      outputPortList = actor.inputPortList();
+    for (Iterator iterator = outputPortList.iterator(); iterator.hasNext();) {
       Port port = (Port) iterator.next();
-      if (port.getName() != null && port.getName().equals(anchorFigure.getConnectionAnchorName(anchor)))
+      if (port.getName() != null && port.getName().equals(actorFigure.getConnectionAnchorName(anchor)))
         return port;
     }
     return null;
   }
+
 
   /**
    * Returns the connection anchor of a terget connection which is at the given point.

@@ -126,32 +126,6 @@ public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEd
     Point pt = new Point(((DropRequest) request).getLocation());
     return getVertexFigure().getTargetConnectionAnchorAt(pt);
   }
-
-  public Object getAdapter(Class key) {
-    if (key == AccessibleAnchorProvider.class)
-      return new DefaultAccessibleAnchorProvider() {
-        public List<Point> getSourceAnchorLocations() {
-          List<Point> list = new ArrayList<Point>();
-          List<ConnectionAnchor> sourceAnchors = getVertexFigure().getInputAnchors();
-          for (ConnectionAnchor sourceAnchor : sourceAnchors) {
-            list.add(sourceAnchor.getReferencePoint().getTranslated(0, -3));
-          }
-          return list;
-        }
-
-        public List<Point> getTargetAnchorLocations() {
-          List<Point> list = new ArrayList<Point>();
-          List<ConnectionAnchor> outputAnchors = getVertexFigure().getOutputAnchors();
-          for (ConnectionAnchor outputAnchor : outputAnchors) {
-            list.add(outputAnchor.getReferencePoint().getTranslated(0, 3));
-          }
-
-          return list;
-        }
-      };
-    return super.getAdapter(key);
-  }
-
   public Port getSourcePort(ConnectionAnchor anchor) {
     return null;
   }
