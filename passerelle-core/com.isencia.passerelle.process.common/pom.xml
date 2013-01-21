@@ -10,7 +10,7 @@
 	</parent>
 	
 	<groupId>com.isencia.passerelle</groupId>
-	<artifactId>com.isencia.passerelle.edm.common</artifactId>
+	<artifactId>com.isencia.passerelle.process.common</artifactId>
 	<version>1.1.2-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>
