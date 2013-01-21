@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.project.repository.api;
 
+import java.io.File;
 import java.util.List;
 
 import ptolemy.actor.CompositeActor;
@@ -29,6 +30,8 @@ import com.isencia.passerelle.model.Flow;
  */
 public interface RepositoryService {
 
+  String PROJECT_ROOT = "com.isencia.passerelle.project.root";
+  String SUBMODEL_ROOT = "com.isencia.passerelle.project.root";
 	String REVISION_ID = "revisionID";
 	String LOCALE = "locale";
 	String REFERENCE = "REFERENCE";
@@ -122,4 +125,8 @@ public interface RepositoryService {
   void deleteSubmodel(String flow);
   
   List<IEventLog> getLogs(String name,Integer maxResult);
+  
+  void setSubmodelFolder(File folder);
+  
+  File getSubmodelFolder();
 }

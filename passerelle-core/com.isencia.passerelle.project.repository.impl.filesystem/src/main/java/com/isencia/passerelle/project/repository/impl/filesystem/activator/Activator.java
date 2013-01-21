@@ -9,20 +9,19 @@ import com.isencia.passerelle.project.repository.impl.filesystem.FileSystemBased
 
 public class Activator implements BundleActivator {
 
-	private RepositoryService repoSvc;
-	private ServiceRegistration repoSvcReg;
+  private RepositoryService repoSvc;
+  private ServiceRegistration repoSvcReg;
 
-	public void start(BundleContext context) throws Exception {
-	  String rootFolderPath = System.getProperty("com.isencia.passerelle.project.root", "C:/temp/passerelle-repository");
-	  String submodelPath = System.getProperty("com.isencia.passerelle.submodel.root", "C:/temp/submodel-repository");
-		repoSvc = new FileSystemBasedRepositoryService(rootFolderPath,submodelPath);
-		repoSvcReg = context.registerService(RepositoryService.class.getName(),
-				repoSvc, null);
-	}
+  public void start(BundleContext context) throws Exception {
+    String rootFolderPath = System.getProperty("com.isencia.passerelle.project.root", "C:/temp/passerelle-repository");
+    String submodelPath = System.getProperty("com.isencia.passerelle.submodel.root", "C:/temp/submodel-repository");
+    repoSvc = new FileSystemBasedRepositoryService(rootFolderPath, submodelPath);
+    repoSvcReg = context.registerService(RepositoryService.class.getName(), repoSvc, null);
+  }
 
-	public void stop(BundleContext context) throws Exception {
-		repoSvcReg.unregister();
+  public void stop(BundleContext context) throws Exception {
+    repoSvcReg.unregister();
 
-		repoSvc = null;
-	}
+    repoSvc = null;
+  }
 }
