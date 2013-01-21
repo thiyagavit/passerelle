@@ -155,10 +155,6 @@
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.general"
 			features="Sequences" name="General" priority="500">
 		</actorgroup>
-		<actorgroup id="com.isencia.passerelle.actor.actorgroup.net"
-			name="Network" icon="icons/connect.png"
-			parent="com.isencia.passerelle.actor.actorgroup.general">
-		</actorgroup>
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.time"
 			name="Time Control" icon="icons/time.png"
 			parent="com.isencia.passerelle.actor.actorgroup.general">
