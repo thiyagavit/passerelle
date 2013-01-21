@@ -83,6 +83,20 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     }
   }
 
+  /**
+   * @return the submodelFolder
+   */
+  public File getSubmodelFolder() {
+    return submodelFolder;
+  }
+
+  /**
+   * @param submodelFolder the submodelFolder to set
+   */
+  public void setSubmodelFolder(File submodelFolder) {
+    this.submodelFolder = submodelFolder;
+  }
+
   public String[] getAllProjectCodes() {
     List<String> results = new ArrayList<String>();
     File[] files = rootFolder.listFiles((FileFilter) null);
