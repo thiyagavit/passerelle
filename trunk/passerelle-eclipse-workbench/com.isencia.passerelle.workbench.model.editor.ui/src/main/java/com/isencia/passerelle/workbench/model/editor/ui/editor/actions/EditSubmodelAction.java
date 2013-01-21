@@ -1,8 +1,6 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringWriter;
 
 import org.eclipse.core.resources.IFile;
@@ -11,10 +9,10 @@ import org.eclipse.jface.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.isencia.passerelle.editor.common.model.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
@@ -42,8 +40,7 @@ public class EditSubmodelAction extends Action {
   protected boolean checkEnabled() {
     if (!(definition instanceof SubModelPaletteItemDefinition))
       return false;
-    SubModelPaletteItemDefinition item = (SubModelPaletteItemDefinition) definition;
-    return item.getPath() != null && item.getWorkSpace() != null;
+    return true;
   }
 
   @Override

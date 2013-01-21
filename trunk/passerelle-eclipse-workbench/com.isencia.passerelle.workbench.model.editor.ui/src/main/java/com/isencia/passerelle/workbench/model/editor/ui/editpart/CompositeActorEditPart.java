@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.draw2d.Clickable;
@@ -30,17 +29,14 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
-import ptolemy.actor.IORelation;
 import ptolemy.actor.TypedCompositeActor;
 import ptolemy.actor.TypedIOPort;
-import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
-import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelEditor;
@@ -49,12 +45,11 @@ import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ActorEditPoli
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompositeActorFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
-import com.isencia.passerelle.workbench.model.utils.ModelUtils.ConnectionType;
 
 public class CompositeActorEditPart extends ContainerEditPart implements IActorNodeEditPart {
   private PasserelleModelMultiPageEditor multiPageEditorPart;
@@ -126,37 +121,6 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     this.multiPageEditorPart = multiPageEditorPart;
   }
 
-  public void changeExecuted(ChangeRequest changerequest) {
-    super.changeExecuted(changerequest);
-
-    Object source = changerequest.getSource();
-    if (changerequest instanceof ModelChangeRequest) {
-      Class<?> type = ((ModelChangeRequest) changerequest).getType();
-      NamedObj child = ((ModelChangeRequest) changerequest).getChild();
-      NamedObj container = ((ModelChangeRequest) changerequest).getContainer();
-      updateFigure(type, child, container);
-    } else {
-      if (source instanceof TypedIOPort && getModel().equals(((TypedIOPort) source).getContainer())) {
-        if (changerequest.getDescription().equals("undo-delete")) {
-          updateFigure(CreateComponentCommand.class, (NamedObj) source, (NamedObj) getModel());
-        }
-
-      }
-    }
-
-  }
-
-  private void updateFigure(Class<?> type, NamedObj child, NamedObj container) {
-    if ((CreateComponentCommand.class.equals(type)) && child instanceof IOPort && ModelUtils.isPortOfActor((IOPort) child, (Actor) getModel())) {
-      updateFigure();
-      getFigure().repaint();
-    } else if (getModel() == container && (DeleteComponentCommand.class.equals(type) && child instanceof IOPort)) {
-      deletePort((IOPort) child);
-      getFigure().repaint();
-
-    }
-  }
-
   private void deletePort(IOPort port) {
     if (port.isInput()) {
       ((CompositeActorFigure) getFigure()).removeInput(port.getName());
@@ -181,9 +145,10 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
    * Installs EditPolicies specific to this.
    */
   protected void createEditPolicies() {
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy((PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(),(PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
     installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(multiPageEditorPart, this));
   }
+
 
   /**
    * Returns a Figure to represent this.
@@ -241,7 +206,7 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
   }
 
   protected ImageDescriptor getIcon() {
-    ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(getModel().getClass());
+    ImageDescriptor imageDescriptor = PaletteBuilder.getInstance().getIcon(getModel().getClass());
     return imageDescriptor;
   }
 
@@ -322,32 +287,24 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     return super.getAdapter(key);
   }
 
-  @Override
-  protected List getModelTargetConnections() {
-    return getModelConnections(ModelUtils.ConnectionType.TARGET);
+  public Actor getActor() {
+    Object model = getModel();
+    if (model instanceof Actor)
+      return (Actor) model;
+    return null;
   }
 
   @Override
   protected List getModelSourceConnections() {
-    return getModelConnections(ModelUtils.ConnectionType.SOURCE);
+
+    return getModelConnections(getDiagram().getLinkHolder(), getActor(), false);
   }
 
-  protected List getModelConnections(ConnectionType connectionType) {
-    Set<Relation> connectedRelations = ModelUtils.getConnectedRelations(getActorModel(), connectionType);
-    List modelTargetConnections = new ArrayList();
-    for (Relation rel : connectedRelations) {
-      Vertex vertex = getVertex(rel);
-      if (vertex != null) {
-        List<IOPort> ports = ModelUtils.getPorts(rel, (NamedObj) getActorModel());
-        for (IOPort port : ports) {
-          Object relation = VertexEditPart.getRelation((TypedIORelation) rel, port, vertex, false);
-          modelTargetConnections.add(relation);
-        }
-      } else {
-        modelTargetConnections.add(rel);
-      }
-    }
-    return modelTargetConnections;
+  @Override
+  protected List getModelTargetConnections() {
+
+    return getModelConnections(getDiagram().getLinkHolder(), getActor(), true);
+
   }
 
   public Vertex getVertex(Relation model) {
@@ -419,8 +376,8 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
    * @return ConnectionAnchor.
    */
   public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connEditPart) {
-    getLogger().debug("Get SourceConnectionAnchor based on ConnectionEditPart");
-    return getConnectionActor(connEditPart, true);
+    return getConnectionAnchor(connEditPart, getComponentFigure(), getActor(), false);
+
   }
 
   /**
@@ -429,27 +386,7 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
    * @return ConnectionAnchor.
    */
   public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connEditPart) {
-    getLogger().debug("Get TargetConnectionAnchor based on ConnectionEditPart");
-    return getConnectionActor(connEditPart, false);
-  }
-
-  private ConnectionAnchor getConnectionActor(ConnectionEditPart connEditPart, boolean isSource) {
-    Relation relation = null;
-    Port port = null;
-    if (connEditPart instanceof VertexLinkEditPart) {
-      relation = ((VertexLinkEditPart) connEditPart).getRelation();
-      port = ((VertexLinkEditPart) connEditPart).getPort();
-
-    } else {
-      relation = (Relation) connEditPart.getModel();
-      List linkedPortList = isSource ? ((IORelation) relation).linkedSourcePortList() : ((IORelation) relation).linkedDestinationPortList();
-      if (linkedPortList == null || linkedPortList.size() == 0)
-        return null;
-      port = (Port) linkedPortList.get(0);
-
-    }
-    ConnectionAnchor connectionAnchor = getComponentFigure().getConnectionAnchor(port.getName());
-    return connectionAnchor;
+    return getConnectionAnchor(connEditPart, getComponentFigure(), getActor(), true);
   }
 
   /**
@@ -486,4 +423,35 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     parent.setText(index, WorkbenchUtility.getPath(actor));
   }
 
+  @Override
+  public void changeExecuted(ChangeRequest changerequest) {
+    super.changeExecuted(changerequest);
+
+    Object source = changerequest.getSource();
+    if (changerequest instanceof ModelChangeRequest) {
+      Class<?> type = ((ModelChangeRequest) changerequest).getType();
+      NamedObj child = ((ModelChangeRequest) changerequest).getChild();
+      NamedObj container = ((ModelChangeRequest) changerequest).getContainer();
+      updateFigure(type, child, container);
+    } else {
+      if (source instanceof TypedIOPort && getModel().equals(((TypedIOPort) source).getContainer())) {
+        if (changerequest.getDescription().equals("undo-delete")) {
+          updateFigure(CreateComponentCommand.class, (NamedObj) source, (NamedObj) getModel());
+        }
+
+      }
+    }
+
+  }
+
+  private void updateFigure(Class<?> type, NamedObj child, NamedObj container) {
+    if ((CreateComponentCommand.class.equals(type)) && child instanceof IOPort && ModelUtils.isPortOfActor((IOPort) child, (Actor) getModel())) {
+      updateFigure();
+      getFigure().repaint();
+    } else if (getModel() == container && (DeleteComponentCommand.class.equals(type) && child instanceof IOPort)) {
+      deletePort((IOPort) child);
+      getFigure().repaint();
+
+    }
+  }
 }

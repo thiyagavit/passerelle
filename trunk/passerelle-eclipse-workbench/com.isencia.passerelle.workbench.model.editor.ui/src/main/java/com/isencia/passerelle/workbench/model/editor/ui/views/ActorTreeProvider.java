@@ -12,7 +12,9 @@
 package com.isencia.passerelle.workbench.model.editor.ui.views;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -21,10 +23,10 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 
+import com.isencia.passerelle.editor.common.model.PaletteGroup;
+import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
 
 /**
  * The provider class used by views
@@ -35,8 +37,8 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
   public Object[] getChildren(Object parentElement) {
 
     if (parentElement instanceof PaletteGroup) {
-      List<PaletteItemDefinition> paletteItems = ((PaletteGroup) parentElement).getPaletteItems();
-      List<PaletteGroup> groups = ((PaletteGroup) parentElement).getPaletteGroups();
+      SortedSet<PaletteItemDefinition> paletteItems = ((PaletteGroup) parentElement).getPaletteItems();
+      Collection<PaletteGroup> groups = ((PaletteGroup) parentElement).getChildren();
       List allItems = new ArrayList();
       allItems.addAll(paletteItems);
       allItems.addAll(groups);
@@ -57,7 +59,7 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
 
   public boolean hasChildren(Object element) {
     // TODO Auto-generated method stub
-    return element instanceof PaletteGroup && (((PaletteGroup) element).hasPaletteItems() || ((PaletteGroup) element).hasPaletteGroups());
+    return element instanceof PaletteGroup && (((PaletteGroup) element).hasPaletteItems() || ((PaletteGroup) element).hasChildren());
   }
 
   public Object[] getElements(Object inputElement) {
@@ -80,7 +82,7 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
 
   public Image getImage(Object element) {
     if (element instanceof PaletteItemDefinition) {
-      ImageDescriptor icon = ((PaletteItemDefinition) element).getIcon();
+      ImageDescriptor icon = (ImageDescriptor) ((PaletteItemDefinition) element).getIcon();
       if (icon == null) {
         return ActorEditPart.IMAGE_DESCRIPTOR_ACTOR.createImage();
       }
@@ -89,7 +91,7 @@ public class ActorTreeProvider implements ITreeContentProvider, ILabelProvider {
     if (element instanceof PaletteGroup) {
 
       if (((PaletteGroup) element).getIcon() != null) {
-        return ((PaletteGroup) element).getIcon().createImage();
+        return ((ImageDescriptor) ((PaletteGroup) element).getIcon()).createImage();
       } else {
         Activator.getImageDescriptor("icons/folder.gif").createImage();
       }

@@ -408,7 +408,7 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 	protected PaletteRoot getPaletteRoot() {
 		if (palletBuilder == null) {
 			try {
-				palletBuilder = PaletteBuilder.createPalette(this);
+				palletBuilder = PaletteBuilder.getInstance().createPalette(this);
 			} catch (Exception e) {
 				logger.error("Cannot create platte builder", e);
 			}

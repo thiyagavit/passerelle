@@ -1,7 +1,6 @@
 package com.isencia.passerelle.workbench.model.utils;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -13,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.digester.substitution.MultiVariableExpander;
 import org.apache.commons.digester.substitution.VariableSubstitutor;
 import org.eclipse.core.resources.IFile;
@@ -23,14 +23,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
-import ptolemy.actor.TypedCompositeActor;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.InstantiableNamedObj;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.Attribute;
@@ -42,7 +41,8 @@ import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 import ptolemy.moml.Vertex;
-import ptolemy.vergil.kernel.attributes.TextAttribute;
+
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 
 public class ModelUtils {
 
@@ -72,46 +72,6 @@ public class ModelUtils {
       return ((CompositeActor) model).isClassDefinition();
     }
     return false;
-  }
-
-  public static final boolean isPort(String type) {
-    return ModelConstants.INPUT_IOPORT.equals(type) || ModelConstants.OUTPUT_IOPORT.equals(type);
-  }
-
-  public static final boolean isOutputPort(String type) {
-    return ModelConstants.OUTPUT_IOPORT.equals(type);
-  }
-
-  public static final boolean isInputPort(String type) {
-    return ModelConstants.INPUT_IOPORT.equals(type);
-  }
-
-  public static Set<Relation> getConnectedRelations(Nameable model, ConnectionType connectionType) {
-
-    return getConnectedRelations(model, connectionType, false);
-
-  }
-
-  public static boolean containsVertex(Relation model) {
-    Enumeration attributes = model.getAttributes();
-    while (attributes.hasMoreElements()) {
-      Object temp = attributes.nextElement();
-      if (temp instanceof Vertex) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static Vertex getVertex(Relation model) {
-    Enumeration attributes = model.getAttributes();
-    while (attributes.hasMoreElements()) {
-      Object temp = attributes.nextElement();
-      if (temp instanceof Vertex) {
-        return (Vertex) temp;
-      }
-    }
-    return null;
   }
 
   public static List<IOPort> getPorts(Relation relation, NamedObj obj) {
@@ -150,12 +110,10 @@ public class ModelUtils {
           Port port = (Port) o;
           if (port.getContainer().equals(model) || (model instanceof IOPort && (port.equals(((IOPort) model))))) {
             if (connectionType.equals(ConnectionType.SOURCE)) {
-              if (port instanceof IOPort && (!(model instanceof IOPort) && ((IOPort) port).isOutput())
-                  || ((model instanceof IOPort) && ((IOPort) port).isInput()))
+              if (port instanceof IOPort && (!(model instanceof IOPort) && ((IOPort) port).isOutput()) || ((model instanceof IOPort) && ((IOPort) port).isInput()))
                 connections.add(relation);
             } else {
-              if (port instanceof IOPort && (!(model instanceof IOPort) && ((IOPort) port).isInput())
-                  || ((model instanceof IOPort) && ((IOPort) port).isOutput()))
+              if (port instanceof IOPort && (!(model instanceof IOPort) && ((IOPort) port).isInput()) || ((model instanceof IOPort) && ((IOPort) port).isOutput()))
                 connections.add(relation);
             }
           }
@@ -281,61 +239,8 @@ public class ModelUtils {
     return true;
   }
 
-  private static String generateUniqueTextAttributeName(String name, NamedObj parent, int index, Class clazz) {
-    try {
-      String newName = index != 0 ? (name + "(" + index + ")") : name;
-      if (parent.getAttribute(newName, clazz) == null) {
-        return newName;
-      } else {
-        index++;
-        return generateUniqueTextAttributeName(name, parent, index, clazz);
-      }
-    } catch (IllegalActionException e) {
-      return name;
-    }
-
-  }
-
-  private static String generateUniqueVertexName(String name, NamedObj parent, int index, Class clazz) {
-
-    return "Vertex" + System.currentTimeMillis();
-
-  }
-
-  private static String generateUniquePortName(String name, CompositeEntity parent, int index) {
-    String newName = index != 0 ? (name + "(" + index + ")") : name;
-    boolean contains = false;
-    Enumeration ports = parent.getPorts();
-    while (ports.hasMoreElements()) {
-      String portName = ((Port) ports.nextElement()).getName();
-      if (newName.equals(portName)) {
-        contains = true;
-        break;
-      }
-
-    }
-    if (!contains) {
-      return newName;
-    }
-    index++;
-    return generateUniquePortName(name, parent, index);
-
-  }
-
   public static String findUniqueName(CompositeEntity parentModel, Class clazz, String startName, String actorName) {
-
-    if (Vertex.class.isAssignableFrom(clazz)) {
-      return generateUniqueVertexName(clazz.getSimpleName(), parentModel, 0, clazz);
-
-    } else if (TextAttribute.class.isAssignableFrom(clazz)) {
-      return generateUniqueTextAttributeName(clazz.getSimpleName(), parentModel, 0, clazz);
-
-    } else if (TypedIOPort.class.isAssignableFrom(clazz)) {
-      return generateUniquePortName(startName, parentModel, 0);
-
-    } else {
-      return findUniqueActorName(parentModel, actorName != null ? actorName : clazz.getSimpleName());
-    }
+    return EditorUtils.findUniqueName(parentModel, clazz, startName, actorName);
   }
 
   /**
@@ -352,23 +257,6 @@ public class ModelUtils {
       return entity;
 
     return null;
-  }
-
-  private static void printChildren(InstantiableNamedObj entity) {
-
-    if (entity == null)
-      return;
-    final List childs = entity.getChildren();
-    if (childs == null)
-      return;
-    for (Object o : childs) {
-      if (o instanceof NamedObj) {
-        System.out.println(((NamedObj) o).getName());
-      }
-      if (o instanceof InstantiableNamedObj) {
-        printChildren((InstantiableNamedObj) o);
-      }
-    }
   }
 
   public static IFile getProjectFile(final String modelPath) {
@@ -445,9 +333,8 @@ public class ModelUtils {
         + "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n" + "<entity name=\""
         + fileName.substring(0, fileName.length() - 5) + "\" class=\"ptolemy.actor.TypedCompositeActor\"> \r\n"
         + "   <property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\" /> \r\n"
-        + "   <property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\""
-        + System.getProperty("passerelle.workbench.version") + "\" /> \r\n"
-        + "   <property name=\"Director\" class=\"com.isencia.passerelle.domain.cap.Director\" > \r\n"
+        + "   <property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"" + System.getProperty("passerelle.workbench.version")
+        + "\" /> \r\n" + "   <property name=\"Director\" class=\"com.isencia.passerelle.domain.cap.Director\" > \r\n"
         + "      <property name=\"_location\" class=\"ptolemy.kernel.util.Location\" value=\"{20, 20}\" /> \r\n" + "   </property> \r\n" + "</entity>";
     return new ByteArrayInputStream(contents.getBytes());
   }

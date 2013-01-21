@@ -24,10 +24,8 @@ import org.slf4j.Logger;
 
 import ptolemy.kernel.util.NamedObj;
 
-import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.editor.common.model.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
 

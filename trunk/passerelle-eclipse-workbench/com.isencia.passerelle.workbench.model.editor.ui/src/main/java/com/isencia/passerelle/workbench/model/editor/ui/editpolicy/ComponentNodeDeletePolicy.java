@@ -9,7 +9,9 @@ import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.NamedObj;
 
+import com.isencia.passerelle.editor.common.model.LinkHolder;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
+import com.isencia.passerelle.workbench.model.editor.ui.editpart.DiagramEditPart;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
 
 /**
@@ -19,17 +21,20 @@ import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
  * 
  */
 public class ComponentNodeDeletePolicy extends org.eclipse.gef.editpolicies.ComponentEditPolicy {
+  private DiagramEditPart diagram;
   private PasserelleModelMultiPageEditor multiPageEditor;
 
   private DeleteComponentCommand getDeleteComponentCommand() {
     return new DeleteComponentCommand();
   }
 
-  public ComponentNodeDeletePolicy() {
+  public ComponentNodeDeletePolicy(DiagramEditPart diagram) {
 
+    this.diagram = diagram;
   }
 
-  public ComponentNodeDeletePolicy(PasserelleModelMultiPageEditor multiPageEditor) {
+  public ComponentNodeDeletePolicy(DiagramEditPart diagram, PasserelleModelMultiPageEditor multiPageEditor) {
+    this(diagram);
     this.multiPageEditor = multiPageEditor;
   }
 
@@ -37,6 +42,7 @@ public class ComponentNodeDeletePolicy extends org.eclipse.gef.editpolicies.Comp
     NamedObj child = (NamedObj) getHost().getModel();
     Object parent = getHost().getParent().getModel();
     DeleteComponentCommand deleteCmd = getDeleteComponentCommand();
+    deleteCmd.setLinkHolder(diagram.getLinkHolder());
     if (multiPageEditor != null && child instanceof CompositeActor) {
       deleteCmd.setMultiPageEditor(multiPageEditor);
       deleteCmd.emptyIndexList();

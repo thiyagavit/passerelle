@@ -3,103 +3,123 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.gef.EditPart;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
-import ptolemy.data.expr.Parameter;
+import ptolemy.actor.TypedIORelation;
+import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.Relation;
-import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
-import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.editor.common.model.Link;
+import com.isencia.passerelle.editor.common.model.LinkHolder;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 
 /**
  * Provides support for Container EditParts.
  */
 abstract public class ContainerEditPart extends AbstractBaseEditPart {
 
-	private boolean showChildren = true;
-	// This actor will be used as offset. It's not possible to have multiple editors with different model
-	private CompositeActor actor;
-	public CompositeActor getCompositeActor() {
-		return actor;
-	}
+  private boolean showChildren = true;
+  // This actor will be used as offset. It's not possible to have multiple editors with different model
+  private CompositeActor actor;
 
-	public ContainerEditPart(CompositeActor actor) {
-		super();
-		this.actor = actor;
-	}
+  public CompositeActor getCompositeActor() {
+    return actor;
+  }
 
-	public ContainerEditPart(boolean showChildren) {
-		super();
-		this.showChildren = showChildren;
-	}
+  public ContainerEditPart(CompositeActor actor) {
+    super();
+    this.actor = actor;
+  }
 
-	/**
-	 * Installs the desired EditPolicies for this.
-	 */
-	protected void createEditPolicies() {
-	}
+  public ContainerEditPart(boolean showChildren) {
+    super();
+    this.showChildren = showChildren;
+  }
 
-	/**
-	 * Returns the model of this as a CompositeActor.
-	 * 
-	 * @return CompositeActor of this.
-	 */
-	protected CompositeActor getModelDiagram(CompositeActor actor) {
-		if (actor == null)
-			return (CompositeActor) getModel();
-		return actor;
-	}
+  /**
+   * Installs the desired EditPolicies for this.
+   */
+  protected void createEditPolicies() {
+  }
 
-	/**
-	 * Returns the children of this through the model.
-	 * 
-	 * @return Children of this as a List.
-	 */
-	protected List getModelChildren() {
-		if (!showChildren)
-			return Collections.EMPTY_LIST;
-		CompositeActor modelDiagram = getModelDiagram(actor);
+  /**
+   * Returns the model of this as a CompositeActor.
+   * 
+   * @return CompositeActor of this.
+   */
+  protected CompositeActor getModelDiagram(CompositeActor actor) {
+    if (actor == null)
+      return (CompositeActor) getModel();
+    return actor;
+  }
 
-		ArrayList children = new ArrayList();
-		
-		List entities = modelDiagram.entityList();
-		if (entities != null)
-			children.addAll(entities);
+  /**
+   * Returns the children of this through the model.
+   * 
+   * @return Children of this as a List.
+   */
+  protected List getModelChildren() {
+    if (!showChildren)
+      return Collections.EMPTY_LIST;
+    CompositeActor modelDiagram = getModelDiagram(actor);
 
-		if (modelDiagram.getContainer() == null
-				&& modelDiagram.getDirector() != null)
-			children.add(modelDiagram.getDirector());
+    ArrayList children = new ArrayList();
+    LinkHolder linkHolder = getLinkHolder();
+    if (linkHolder != null) {
 
-		
-		children.addAll(modelDiagram.attributeList(TextAttribute.class));
-		children.addAll(modelDiagram.attributeList(IOPort.class));
-		children.addAll(modelDiagram.inputPortList());
-		children.addAll(modelDiagram.outputPortList());
+      linkHolder.generateLinks(modelDiagram);
+    }
+    List entities = modelDiagram.entityList();
+    if (entities != null)
+      children.addAll(entities);
 
-		Enumeration relations = modelDiagram.getRelations();
-		while (relations.hasMoreElements()) {
+    if (modelDiagram.getContainer() == null && modelDiagram.getDirector() != null)
+      children.add(modelDiagram.getDirector());
 
-			Object nextElement = relations.nextElement();
-			children.addAll(getVertexModelChildren((Relation) nextElement));
-		}
-		return children;
-	}
+    children.addAll(modelDiagram.attributeList(TextAttribute.class));
+    children.addAll(modelDiagram.attributeList(IOPort.class));
+    children.addAll(modelDiagram.inputPortList());
+    children.addAll(modelDiagram.outputPortList());
+    Enumeration relations = modelDiagram.getRelations();
+    while (relations.hasMoreElements()) {
 
-	protected List getVertexModelChildren(Relation relation) {
-		ArrayList children = new ArrayList();
+      Object nextElement = relations.nextElement();
+      children.addAll(getVertexModelChildren((Relation) nextElement));
+    }
+    return children;
+  }
 
-		Enumeration attributes = relation.getAttributes();
-		while (attributes.hasMoreElements()) {
+  public LinkHolder getLinkHolder() {
+    DiagramEditPart diagram = null;
+    if (this instanceof DiagramEditPart) {
+      diagram = (DiagramEditPart) this;
+    } else {
+      diagram = getDiagram();
+    }
+    return diagram.getMultiPageEditorPart();
+  }
 
-			Object nextElement = attributes.nextElement();
-			if (nextElement instanceof Vertex)
-				children.add(nextElement);
-		}
-		return children;
-	}
+  protected List getVertexModelChildren(Relation relation) {
+    ArrayList children = new ArrayList();
 
+    Enumeration attributes = relation.getAttributes();
+    while (attributes.hasMoreElements()) {
+
+      Object nextElement = attributes.nextElement();
+      if (nextElement instanceof Vertex)
+        children.add(nextElement);
+    }
+    return children;
+  }
 }

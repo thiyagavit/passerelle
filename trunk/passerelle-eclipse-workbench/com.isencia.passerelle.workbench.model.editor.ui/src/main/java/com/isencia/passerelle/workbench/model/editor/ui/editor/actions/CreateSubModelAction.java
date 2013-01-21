@@ -30,7 +30,8 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorTreeView;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.ui.utils.FileUtils;
@@ -122,9 +123,10 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
             if (editorPaneFact == null) {
               new PasserelleEditorPaneFactory(flow, "_editorPaneFactory");
             }
-            PaletteItemFactory factory = PaletteItemFactory.getInstance();
-            factory.addSubModel(flow);
+            PaletteBuilder factory = PaletteBuilder.getInstance();
+
             Activator.getDefault().getRepositoryService().createSubmodel(flow);
+            factory.addSubModel(flow.getName());
           } catch (Exception e) {
 
           }
@@ -177,11 +179,11 @@ public class CreateSubModelAction extends SelectionAction implements NameChecker
       new PasserelleEditorPaneFactory(entityAsClass, "_editorPaneFactory");
     }
 
-    PaletteItemFactory factory = PaletteItemFactory.getInstance();
+    PaletteBuilder factory = PaletteBuilder.getInstance();
 
     Activator.getDefault().getRepositoryService().createSubmodel(entityAsClass);
     Flow flow = Activator.getDefault().getRepositoryService().getSubmodel(entityAsClass.getName());
-    factory.addSubModel(flow);
+    factory.addSubModel(flow.getName());
     return entityAsClass;
   }
 

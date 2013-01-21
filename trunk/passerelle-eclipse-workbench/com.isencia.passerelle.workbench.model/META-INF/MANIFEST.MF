@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0",
  com.microstar;bundle-version="1.2.0",
  ptolemy.core;bundle-version="7.0.1",
  org.eclipse.ui;bundle-version="3.5.1",
- com.isencia.passerelle.engine
+ com.isencia.passerelle.engine,
+ com.isencia.passerelle.editor.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.isencia.passerelle.workbench.model.activator,

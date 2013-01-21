@@ -9,8 +9,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -24,7 +27,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.draw2d.LightweightSystem;
@@ -42,6 +44,7 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.parts.ContentOutlinePage;
 import org.eclipse.gef.ui.parts.TreeViewer;
+import org.eclipse.help.ui.internal.util.ErrorUtil;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -84,13 +87,23 @@ import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.TypedCompositeActor;
+import ptolemy.actor.TypedIORelation;
+import ptolemy.kernel.ComponentRelation;
+import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.NamedObj;
+import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.editor.common.model.Link;
+import com.isencia.passerelle.editor.common.model.LinkHolder;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler;
 import com.isencia.passerelle.model.util.MoMLParser;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlinePartFactory;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorPalettePage;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorTreeViewerPage;
@@ -108,7 +121,7 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
  * <li>page 2 shows the words in page 0 in sorted order
  * </ul>
  */
-public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implements IPasserelleMultiPageEditor, IResourceChangeListener {
+public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implements LinkHolder, IPasserelleMultiPageEditor, IResourceChangeListener {
 
   public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor";
 
@@ -304,7 +317,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
 
   void removePage(PasserelleModelEditor editor) {
     try {
-     
+
       removePage(editor.getIndex());
       int index = addPage(editor, getEditorInput());
       setPageText(index, editor.getTitle());
@@ -337,7 +350,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
           if (ModelUtils.getPasserelleProject().equals(file.getProject())) {
             if (diagram.isClassDefinition()) {
               Flow flow = (Flow) diagram;
-              PaletteItemFactory.getInstance().addSubModel(flow);
+              PaletteBuilder.getInstance().addSubModel(flow.getName());
               Activator.getDefault().getRepositoryService().createSubmodel(flow);
 
             }
@@ -552,7 +565,22 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
       FileReader reader = new FileReader(new File(filePath));
 
       final IFile ifile = EclipseUtils.getIFile(input);
+
+      CollectingMomlParsingErrorHandler errorHandler = new CollectingMomlParsingErrorHandler();
+      MoMLParser.setErrorHandler(errorHandler);
       Flow compositeActor = FlowManager.readMoml(reader);
+      if (errorHandler != null && errorHandler.hasErrors()) {
+        Iterator itr = errorHandler.iterator();
+        StringBuilder errorMsgBldr = new StringBuilder("Error during reading/parsing of model file");
+        while (itr.hasNext()) {
+          CollectingMomlParsingErrorHandler.ErrorItem errorItem = (CollectingMomlParsingErrorHandler.ErrorItem) itr.next();
+          errorMsgBldr.append(errorItem.context.getName() + ":" + errorItem.exception.getMessage());
+        }
+        this.parseError = true;
+        logger.error(errorMsgBldr.toString());
+        ErrorUtil.displayErrorDialog(errorMsgBldr.toString());
+
+      }
       compositeActor.setSource(filePath);
       compositeActor.workspace().setName(ifile.getProject().getName());
 
@@ -564,7 +592,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
       this.parseError = true;
       logger.error("Error during reading/parsing of model file", e);
 
-     // EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
+      // EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
     } finally {
       if (is != null) {
         try {
@@ -958,8 +986,100 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
   public void setPasserelleEditorActive() {
     setActivePage(0);
   }
-  
+
   protected int getWorkflowPageIndex() {
     return 0;
+  }
+
+  Map<Object, List<Link>> linkMap = new HashMap<Object, List<Link>>();
+  Set<Link> links = new HashSet<Link>();
+
+  public List<Link> getLinks(Object o) {
+
+    List<Link> list = linkMap.get(o);
+    return list;
+  }
+
+  public void registerLink(Link link) {
+    List<Link> links = linkMap.get(link.getHead());
+    if (links == null) {
+      links = new ArrayList<Link>();
+      linkMap.put(link.getHead(), links);
+    }
+    links.add(link);
+    links = linkMap.get(link.getTail());
+    if (links == null) {
+      links = new ArrayList<Link>();
+      linkMap.put(link.getTail(), links);
+    }
+    links.add(link);
+  }
+
+  public void generateLinks(CompositeActor modelDiagram) {
+    linkMap = new HashMap<Object, List<Link>>();
+    links = new HashSet<Link>();
+    List<NamedObj> relations = modelDiagram.relationList();
+    for (NamedObj modelObject : relations) {
+      TypedIORelation relation = (TypedIORelation) modelObject;
+      if (relation.getContainer() != null) {
+        if (modelObject.attributeList(Vertex.class).isEmpty()) {
+          if (!relation.linkedSourcePortList().isEmpty() && !relation.linkedDestinationPortList().isEmpty()) {
+            generateLink(relation, relation.linkedSourcePortList().get(0), relation.linkedDestinationPortList().get(0));
+          } else {
+            try {
+              relation.setContainer(null);
+            } catch (Exception e) {
+            }
+          }
+
+        } else {
+          NamedObj vertex = (NamedObj) modelObject.attributeList(Vertex.class).get(0);
+          List list = relation.linkedObjectsList();
+
+          for (Object o : list) {
+            Link generateLink = null;
+            if (o instanceof TypedIORelation) {
+
+              TypedIORelation o2 = (TypedIORelation) o;
+              if (!o2.attributeList(Vertex.class).isEmpty()) {
+                NamedObj otherVertex = (NamedObj) o2.attributeList(Vertex.class).get(0);
+                if (otherVertex != null) {
+                  generateLink = generateLink(relation, otherVertex, vertex);
+                }
+              }
+            } else {
+              if (relation.linkedSourcePortList().contains(o)) {
+                generateLink = generateLink(relation, (NamedObj) o, vertex);
+              } else {
+                generateLink = generateLink(relation, vertex, (NamedObj) o);
+              }
+            }
+
+          }
+
+        }
+      }
+    }
+  }
+
+  public void removeLink(Link link) {
+    links.remove(link);
+    linkMap.remove(link.getHead());
+    linkMap.remove(link.getTail());
+  }
+
+  public Link generateLink(ComponentRelation relation, Object source, Object target) {
+    Link link = EditorUtils.generateLink(relation, source, target);
+    if (!links.contains(link)) {
+      registerLink(link);
+      links.add(link);
+    } else {
+      for (Link l : links) {
+        if (l.equals(link)) {
+          return l;
+        }
+      }
+    }
+    return link;
   }
 }

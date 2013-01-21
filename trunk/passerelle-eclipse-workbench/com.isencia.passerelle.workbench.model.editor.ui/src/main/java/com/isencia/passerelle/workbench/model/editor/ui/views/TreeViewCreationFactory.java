@@ -2,8 +2,8 @@ package com.isencia.passerelle.workbench.model.editor.ui.views;
 
 import org.eclipse.gef.requests.CreationFactory;
 
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.SubModelPaletteItemDefinition;
+import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
+import com.isencia.passerelle.editor.common.model.SubModelPaletteItemDefinition;
 
 public class TreeViewCreationFactory implements CreationFactory {
   PaletteItemDefinition selected;
