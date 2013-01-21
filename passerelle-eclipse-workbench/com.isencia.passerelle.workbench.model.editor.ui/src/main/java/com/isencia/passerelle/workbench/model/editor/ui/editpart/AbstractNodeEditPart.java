@@ -10,7 +10,6 @@ import org.eclipse.gef.AccessibleAnchorProvider;
 import org.eclipse.gef.NodeEditPart;
 
 import com.isencia.passerelle.workbench.model.editor.ui.figure.AbstractNodeFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 
 public abstract class AbstractNodeEditPart extends AbstractBaseEditPart implements NodeEditPart {
 

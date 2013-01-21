@@ -145,10 +145,9 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
    * Installs EditPolicies specific to this.
    */
   protected void createEditPolicies() {
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(),(PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(), (PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
     installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(multiPageEditorPart, this));
   }
-
 
   /**
    * Returns a Figure to represent this.
@@ -326,7 +325,7 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
   public Port getSourcePort(ConnectionAnchor anchor) {
     getLogger().debug("Get Source port  based on anchor");
 
-    return getPort(anchor, getActorModel().outputPortList());
+    return ActorEditPart.getPort(anchor, getComponentFigure(), getActor(), true);
   }
 
   /**
@@ -337,18 +336,10 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
   public Port getTargetPort(ConnectionAnchor anchor) {
     getLogger().debug("Get Target port  based on anchor");
 
-    return getPort(anchor, getActorModel().inputPortList());
+    return ActorEditPart.getPort(anchor, getComponentFigure(), getActor(), false);
   }
 
-  protected Port getPort(ConnectionAnchor anchor, List outputPortList) {
-    ActorFigure anchorFigure = getComponentFigure();
-    for (Iterator iterator = outputPortList.iterator(); iterator.hasNext();) {
-      Port port = (Port) iterator.next();
-      if (port.getName() != null && port.getName().equals(anchorFigure.getConnectionAnchorName(anchor)))
-        return port;
-    }
-    return null;
-  }
+
 
   /**
    * Returns the connection anchor of a source connection which is at the given point.

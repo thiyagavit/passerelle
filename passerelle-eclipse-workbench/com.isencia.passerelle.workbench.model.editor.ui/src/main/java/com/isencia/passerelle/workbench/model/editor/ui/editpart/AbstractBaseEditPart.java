@@ -261,4 +261,5 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     }
     return null;
   }
+  
 }
