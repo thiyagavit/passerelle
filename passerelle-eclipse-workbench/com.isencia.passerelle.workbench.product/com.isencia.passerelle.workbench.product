@@ -62,6 +62,7 @@
       <plugin id="com.isencia.passerelle.actor.help"/>
       <plugin id="com.isencia.passerelle.commons"/>
       <plugin id="com.isencia.passerelle.commons.ume"/>
+      <plugin id="com.isencia.passerelle.domain.et"/>
       <plugin id="com.isencia.passerelle.editor.common"/>
       <plugin id="com.isencia.passerelle.engine"/>
       <plugin id="com.isencia.passerelle.project.repository.api"/>
