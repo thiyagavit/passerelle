@@ -37,12 +37,6 @@
 			icon="icons/error.gif" id="com.isencia.passerelle.actor.general.Const"
 			color="200,50,50" name="Constant">
 		</actor>
-
-
-		<actor class="com.isencia.passerelle.process.actor.flow.StartActor"
-			group="com.isencia.passerelle.actor.actorgroup.flow" id="com.isencia.passerelle.process.actor.flow.StartActor"
-			icon="icons/start.gif" color="229,103,23" name="Start">
-		</actor>
 		<actor class="com.isencia.passerelle.process.actor.trial.DummyResultActor"
 			group="com.isencia.passerelle.actor.actorgroup.trial" id="com.isencia.passerelle.process.actor.trial.DummyResultActor"
 			color="229,103,23" name="Dummy Result">
@@ -130,10 +124,15 @@
 			group="com.isencia.passerelle.actor.actorgroup.general" id="com.isencia.passerelle.actor.control.Trigger"
 			name="Trigger">
 		</actor>
-		<actor class="com.isencia.passerelle.actor.control.Timer" group="com.isencia.passerelle.actor.actorgroup.general"
-			id="com.isencia.passerelle.actor.control.Timer" name="Timer">
+		<actor class="com.isencia.passerelle.process.actor.flow.StartActor"
+			group="com.isencia.passerelle.actor.actorgroup.flow" id="com.isencia.passerelle.process.actor.flow.StartActor"
+			icon="icons/start.gif" color="229,103,23" name="Start Flow">
 		</actor>
 
+		<actor class="com.isencia.passerelle.process.actor.trial.DummyResultActor"
+			group="com.isencia.passerelle.actor.actorgroup.trial" id="com.isencia.passerelle.process.actor.trial.DummyResultActor"
+			name="Dummy Result">
+		</actor>
 
 	</extension>
 	<extension point="com.isencia.passerelle.engine.actorGroups">
@@ -154,15 +153,22 @@
 			open="false">
 		</actorgroup>
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.general"
-			features="Sequences" name="General">
+			features="Sequences" name="General" priority="500">
+		</actorgroup>
+		<actorgroup id="com.isencia.passerelle.actor.actorgroup.net"
+			name="Network" icon="icons/connect.png"
+			parent="com.isencia.passerelle.actor.actorgroup.general">
 		</actorgroup>
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.time"
 			name="Time Control" icon="icons/time.png"
-			parent="com.isencia.passerelle.actor.actorgroup.general" priority="700">
+			parent="com.isencia.passerelle.actor.actorgroup.general">
 		</actorgroup>
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.msg"
 			name="Msg sequences" icon="icons/seq.gif"
-			parent="com.isencia.passerelle.actor.actorgroup.general" priority="600">
+			parent="com.isencia.passerelle.actor.actorgroup.general">
+		</actorgroup>
+		<actorgroup id="com.isencia.passerelle.actor.actorgroup.submodels"
+			name="Shared Submodels" open="false" priority="0">
 		</actorgroup>
 	</extension>
 </fragment>
