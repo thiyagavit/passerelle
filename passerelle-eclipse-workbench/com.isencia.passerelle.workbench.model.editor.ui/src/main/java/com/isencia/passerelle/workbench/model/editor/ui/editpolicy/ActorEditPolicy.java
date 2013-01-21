@@ -133,8 +133,8 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
         cmd.setNewTarget((NamedObj) target.getModel());
       }
 
-    } else if (target instanceof ActorEditPart) {
-      ActorEditPart actorEditPart = (ActorEditPart) target;
+    } else if (target instanceof IActorNodeEditPart) {
+      IActorNodeEditPart actorEditPart = (IActorNodeEditPart) target;
       ConnectionAnchor anchor = actorEditPart.getTargetConnectionAnchor(request);
       Port port = actorEditPart.getTargetPort(anchor);
       if (!port.equals(cmd.getTarget())) {
