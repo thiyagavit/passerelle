@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 import com.isencia.passerelle.workbench.model.editor.ui.IBody;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class CompoundInputFigure extends CompoundIOFigure {
   public static final String INPUT_PORT_NAME = "input";
@@ -40,7 +40,7 @@ public class CompoundInputFigure extends CompoundIOFigure {
 
       setBackgroundColor(ColorConstants.white);
       setOpaque(true);
-      Image image = PaletteItemFactory.getInstance().getIcon(type).createImage();
+      Image image = PaletteBuilder.getInstance().getIcon(type).createImage();
 
       final Label label = new Label(image);
       label.setBackgroundColor(ColorConstants.white);

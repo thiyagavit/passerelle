@@ -36,13 +36,16 @@ import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.PasserelleConfigurer;
+import com.isencia.passerelle.editor.common.utils.ParameterUtils;
+
 import ptolemy.actor.Director;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.HelpUtils;
+import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
 import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
@@ -117,10 +120,11 @@ public class ActorAttributesView extends ViewPart implements
 					filter = Parameter.class;
 				}
 				Iterator parameterIterator = actor.attributeList(filter).iterator();
+				boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
 				while (parameterIterator.hasNext()) {
 					Attribute parameter = (Attribute) parameterIterator.next();
-
-					if (!(parameter instanceof Parameter) || (PasserelleConfigurer.isVisible(actor,(Parameter) parameter))) {
+					
+					if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(actor,(Parameter) parameter,expert))) {
 						parameterList.add(parameter);
 					}
 				}
@@ -157,12 +161,12 @@ public class ActorAttributesView extends ViewPart implements
 					                        ? (Director)((Actor)actor).getDirector()
 					                        : null;
 					if (actor instanceof Actor)
-						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteItemFactory.getInstance().getType(actor.getClass())));
+						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteBuilder.getInstance().getType(actor.getClass())));
 
 					if (actor instanceof Actor && director!=null )
 						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
 
-					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteItemFactory.getInstance().getType(actor.getName())));
+					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteBuilder.getInstance().getType(actor.getName())));
 					ret.addAll(parameterList);
 					return ret.toArray(new Object[ret.size()]);
 				}

@@ -15,25 +15,23 @@ import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.ChangeListener;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.Changeable;
-import ptolemy.kernel.util.NamedObj;
 
+import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserellRootEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.RelationDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.RelationEndpointEditPolicy;
-import com.isencia.passerelle.workbench.model.editor.ui.router.SCAManhattanConnectionRouter;
 
 /**
  * Implements a Relation Editpart to represent a Wire like connection.
  * 
  */
-public class RelationEditPart extends AbstractConnectionEditPart implements ChangeListener, EditPartListener {
+public class LinkEditPart extends AbstractConnectionEditPart implements ChangeListener, EditPartListener {
 
-  private static Logger logger = LoggerFactory.getLogger(RelationEditPart.class);
+  private static Logger logger = LoggerFactory.getLogger(LinkEditPart.class);
 
   private static final Color alive = new Color(Display.getDefault(), 0, 74, 168), dead = new Color(Display.getDefault(), 0, 0, 0);
 
@@ -59,15 +57,15 @@ public class RelationEditPart extends AbstractConnectionEditPart implements Chan
 
   public void activateFigure() {
     super.activateFigure();
-    if (getRelation() instanceof Changeable) {
-      Changeable changeable = (Changeable) getRelation();
+    if (getRelation().getRelation() instanceof Changeable) {
+      Changeable changeable = (Changeable) getRelation().getRelation();
       changeable.addChangeListener(this);
     }
   }
 
   public void deactivateFigure() {
-    if (getRelation() instanceof Changeable) {
-      Changeable changeable = (Changeable) getRelation();
+    if (getRelation().getRelation() instanceof Changeable) {
+      Changeable changeable = (Changeable) getRelation().getRelation();
       changeable.removeChangeListener(this);
     }
     super.deactivateFigure();
@@ -115,8 +113,8 @@ public class RelationEditPart extends AbstractConnectionEditPart implements Chan
    * 
    * @return Model of this as <code>Relation</code>
    */
-  public Relation getRelation() {
-    return (Relation) getModel();
+  public Link getRelation() {
+    return (Link) getModel();
   }
 
   /**
@@ -141,11 +139,9 @@ public class RelationEditPart extends AbstractConnectionEditPart implements Chan
   }
 
   public void changeExecuted(ChangeRequest change) {
-    getLogger().trace("ChangeRequest executed in RelationEditPart");
   }
 
   public void changeFailed(ChangeRequest change, Exception exception) {
-    getLogger().trace("Error executing ChangeRequest", exception);
   }
 
   public void childAdded(EditPart child, int index) {

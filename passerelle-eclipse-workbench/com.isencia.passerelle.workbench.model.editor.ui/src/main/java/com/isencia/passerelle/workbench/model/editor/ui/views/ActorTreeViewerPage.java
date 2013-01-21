@@ -35,9 +35,10 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteGroup;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemDefinition;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.editor.common.model.PaletteGroup;
+import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 /**
  * This class represents the tree view page of the data view
@@ -105,12 +106,12 @@ public class ActorTreeViewerPage extends ActorPalettePage implements IAdaptable 
         }
       }
     });
-
-    final List<PaletteGroup> grps = PaletteItemFactory.getInstance().getPaletteGroups();
+    PaletteBuilder builder = PaletteBuilder.getInstance();
+    
+    final List<PaletteGroup> grps = builder.getRootPaletteGroups();
     for (PaletteGroup grp : grps) {
-      if (grp.isExpanded()) {
         getTreeViewer().expandToLevel(grp, 1);
-      }
+   
     }
 
   }
@@ -167,8 +168,8 @@ public class ActorTreeViewerPage extends ActorPalettePage implements IAdaptable 
    * 
    */
   private void initRoot() {
-    PaletteItemFactory builder = PaletteItemFactory.getInstance();
-    getTreeViewer().setInput(builder.getPaletteGroups().toArray());
+    PaletteBuilder builder = PaletteBuilder.getInstance();
+     getTreeViewer().setInput(builder.getRootPaletteGroups().toArray());
   }
 
   /**

@@ -21,7 +21,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMu
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.OutlineEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class HelpAction extends SelectionAction {
 	private PasserelleModelMultiPageEditor parent;
@@ -62,7 +62,7 @@ public class HelpAction extends SelectionAction {
 // TODO revert this code when enabling context specific help
 //				String actorName = ((ActorEditPart) o).getEntity().getClass()
 //						.getName();
-//				String path = "/" + PaletteItemFactory.getBuildId(actorName)
+//				String path = "/" + PaletteBuilder.getBuildId(actorName)
 //						+ "/html/" + actorName + ".html";
 
 				final String path = HelpUtils.getContextId(o);

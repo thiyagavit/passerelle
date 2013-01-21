@@ -8,153 +8,157 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.ComponentPort;
+import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.editor.common.business.ICommand;
+import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
-public class CreateConnectionCommand extends Command implements IRefreshConnections{
+public class CreateConnectionCommand extends Command implements IRefreshConnections, ICommand {
 
-	private IPasserelleMultiPageEditor editor;
+  private IPasserelleMultiPageEditor editor;
+  private Link link;
 
-	public CreateConnectionCommand(NamedObj source, NamedObj target,
-			IPasserelleMultiPageEditor editor) {
-		super();
-		this.source = source;
-		this.target = target;
-		this.editor = editor;
-	}
+  public CreateConnectionCommand(NamedObj source, NamedObj target, IPasserelleMultiPageEditor editor) {
+    super();
+    this.sourceNamedObj = source;
+    this.targetNamedObj = target;
+    this.editor = editor;
+  }
 
-	public CreateConnectionCommand(IPasserelleMultiPageEditor editor) {
-		super();
-		this.editor = editor;
+  public CreateConnectionCommand(IPasserelleMultiPageEditor editor) {
+    super();
+    this.editor = editor;
 
-	}
+  }
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(CreateConnectionCommand.class);
+  private final static Logger logger = LoggerFactory.getLogger(CreateConnectionCommand.class);
 
-	public Logger getLogger() {
-		return logger;
-	}
+  public Logger getLogger() {
+    return logger;
+  }
 
-	protected NamedObj container;
+  protected CompositeEntity container;
 
-	public void setContainer(CompositeEntity container) {
-		this.container = container;
-	}
+  public void setContainer(CompositeEntity container) {
+    this.container = container;
+  }
 
-	protected TypedIORelation connection;
-	protected NamedObj source;
-	protected NamedObj target;
+  protected TypedIORelation connection;
+  protected NamedObj sourceNamedObj;
+  protected NamedObj targetNamedObj;
 
-	public boolean canExecute() {
-		return (source != null && target != null);
-	}
+  public boolean canExecute() {
+    return (sourceNamedObj != null && targetNamedObj != null);
+  }
 
-	public void execute() {
-		doExecute();
-	}
+  public void execute() {
+    doExecute();
+  }
 
-	public void doExecute() {
-		if (source != null && target != null) {
-			NamedObj temp = getContainer(source, target);
-			if (temp != null) {
-				container = temp;
-			}
-			if (container == null) {
-				return;
-			}
-			// Perform Change in a ChangeRequest so that all Listeners are
-			// notified
-			container.requestChange(new ModelChangeRequest(this.getClass(),
-					container, "connection") {
-				@Override
-				protected void _execute() throws Exception {
-					try {
+  public void doExecute() {
+    if (sourceNamedObj != null && targetNamedObj != null) {
+      CompositeEntity temp = getContainer(sourceNamedObj, targetNamedObj);
+      if (temp != null) {
+        container = temp;
+      }
+      if (container == null) {
+        return;
+      }
+      // Perform Change in a ChangeRequest so that all Listeners are
+      // notified
+      ModelChangeRequest modelChangeRequest = new ModelChangeRequest(this.getClass(), container, "connection") {
+        /**
+         * @return the link
+         */
 
-						if (source instanceof ComponentPort
-								&& target instanceof ComponentPort)
-							connection = (TypedIORelation) ((CompositeEntity)container).connect(
-									(ComponentPort) source,
-									(ComponentPort) target);
-						if (source instanceof Vertex
-								&& target instanceof ComponentPort) {
-							((ComponentPort) target)
-									.link((Relation) ((Vertex) source)
-											.getContainer());
-						}
-						if (target instanceof Vertex
-								&& source instanceof ComponentPort) {
-							((ComponentPort) source)
-									.link((Relation) ((Vertex) target)
-											.getContainer());
-						}
-						if (target instanceof Vertex
-								&& source instanceof Vertex) {
-							
-							((TypedIORelation)((Vertex) source).getContainer()).link((TypedIORelation)((Vertex) target).getContainer());
-						}
-					} catch (Exception e) {
-						logger.error("Unable to create connection",e);
+        @Override
+        protected void _execute() throws Exception {
+          try {
+            if (sourceNamedObj == null || targetNamedObj == null) {
+              return;
+            }
+            ComponentRelation relation = null;
+            if ((targetNamedObj instanceof ComponentPort) && (sourceNamedObj instanceof ComponentPort)) {
+              relation = container.connect((ComponentPort) sourceNamedObj, (ComponentPort) targetNamedObj);
+            } else if (sourceNamedObj instanceof Vertex && targetNamedObj instanceof Vertex) {
+              relation = (TypedIORelation) ((Vertex) sourceNamedObj).getContainer();
+              relation.link((TypedIORelation) ((Vertex) targetNamedObj).getContainer());
 
-						EclipseUtils.logError(e, "Unable to create connection", IStatus.ERROR);
-					}
-				}
-			});
-		}
-	}
+              ((Relation) ((Vertex) targetNamedObj).getContainer()).link((Relation) ((Vertex) sourceNamedObj).getContainer());
+            } else {
+              if (targetNamedObj instanceof Vertex) {
+                relation = (ComponentRelation) ((Vertex) targetNamedObj).getContainer();
+                ((ComponentPort) sourceNamedObj).link(relation);
+              } else {
+                relation = (ComponentRelation) ((Vertex) sourceNamedObj).getContainer();
+                ((ComponentPort) targetNamedObj).link(relation);
+              }
+            }
+            setLink(editor.generateLink(relation, sourceNamedObj, targetNamedObj));
+          } catch (Exception e) {
+            if (link != null) {
+              editor.registerLink(link);
+            } else {
+              logger.error("Unable to create connection", e);
+              EclipseUtils.logError(e, "Unable to create connection", IStatus.ERROR);
+            }
+          }
 
-	private NamedObj getContainer(NamedObj source, NamedObj target) {
+        }
+      };
+      container.requestChange(modelChangeRequest);
+      this.link = modelChangeRequest.getLink();
+    }
+  }
 
-		if (editor != null
-				&& (source instanceof TypedIOPort || target instanceof TypedIOPort)) {
-			return editor.getSelectedPage().getContainer();
-		}
+  private CompositeEntity getContainer(NamedObj source, NamedObj target) {
+    if (container != null)
+      return container;
+    if (editor != null && (source instanceof TypedIOPort || target instanceof TypedIOPort)) {
+      return editor.getSelectedPage().getContainer();
+    }
 
-		return  source.getContainer();
-	}
+    return (CompositeEntity) source.toplevel();
+  }
 
-	public String getLabel() {
-		return "";
-	}
+  public String getLabel() {
+    return "";
+  }
 
-	public NamedObj getSource() {
-		return source;
-	}
+  public NamedObj getSource() {
+    return sourceNamedObj;
+  }
 
-	public NamedObj getTarget() {
-		return target;
-	}
+  public NamedObj getTarget() {
+    return targetNamedObj;
+  }
 
-	public void redo() {
-		doExecute();
-	}
+  public void redo() {
+    doExecute();
+  }
 
-	public void setSource(NamedObj newSource) {
-		source = newSource;
-	}
+  public void setSource(NamedObj newSource) {
+    sourceNamedObj = newSource;
+  }
 
-	public void setTarget(NamedObj newTarget) {
-		target = newTarget;
-	}
+  public void setTarget(NamedObj newTarget) {
+    targetNamedObj = newTarget;
+  }
 
-	public void undo() {
-		if (connection != null) {
-			// Perform Change in a ChangeRequest so that all Listeners are
-			// notified
-			container.requestChange(new ModelChangeRequest(this.getClass(),
-					container, "connection") {
-				@Override
-				protected void _execute() throws Exception {
-					connection.setContainer(null);
-				}
-			});
-		}
-	}
+  public void undo() {
+    if (link != null) {
+      try {
+        new DeleteLinkCommand(container, link).doExecute();
+      } catch (Exception e) {
+      }
+    }
+  }
 
 }

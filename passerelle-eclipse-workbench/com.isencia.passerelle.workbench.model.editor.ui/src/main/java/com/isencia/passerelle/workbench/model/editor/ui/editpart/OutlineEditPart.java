@@ -27,7 +27,7 @@ import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.workbench.model.editor.ui.ImageRegistry;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 /**
  * EditPart for components in the Tree.
@@ -157,7 +157,7 @@ public class OutlineEditPart extends org.eclipse.gef.editparts.AbstractTreeEditP
     } else if (model instanceof TypedAtomicActor) {
       setWidgetImage(ActorEditPart.IMAGE_DESCRIPTOR_ACTOR, model);
     } else if (model instanceof CompositeActor) {
-      setWidgetImage(PaletteItemFactory.getInstance().getIcon(model.getClass()), model);
+      setWidgetImage(PaletteBuilder.getInstance().getIcon(model.getClass()), model);
     }
     // Set Text
     if (model instanceof Parameter) {

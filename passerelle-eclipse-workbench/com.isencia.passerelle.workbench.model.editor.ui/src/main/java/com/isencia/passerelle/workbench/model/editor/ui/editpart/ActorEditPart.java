@@ -1,20 +1,13 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.draw2d.Clickable;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.ImageFigure;
-import org.eclipse.draw2d.MarginBorder;
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.AccessibleAnchorProvider;
 import org.eclipse.gef.ConnectionEditPart;
@@ -24,31 +17,23 @@ import org.eclipse.gef.requests.DropRequest;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewSite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.Actor;
-import ptolemy.actor.IOPort;
-import ptolemy.actor.IORelation;
 import ptolemy.actor.TypedIOPort;
-import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
-import ptolemy.kernel.Relation;
-import ptolemy.kernel.util.NamedObj;
-import ptolemy.moml.Vertex;
 
 import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.ErrorPort;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ActorEditPolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
+import com.isencia.passerelle.workbench.model.editor.ui.figure.AbstractNodeFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.PortFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.RectangularActorFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteItemFactory;
-import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEditPart {
 
@@ -73,7 +58,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
     if (getParent() instanceof DiagramEditPart) {
       installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(((DiagramEditPart) getParent()).getMultiPageEditorPart(), this));
     }
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy());
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram()));
   }
 
   /**
@@ -88,7 +73,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
     // drillDownImageFigure.setAlignment(PositionConstants.SOUTH);
     // drillDownImageFigure.setBorder(new MarginBorder(0, 0, 5, 0));
 
-    ImageDescriptor imageDescriptor = PaletteItemFactory.getInstance().getIcon(actorModel.getClass());
+    ImageDescriptor imageDescriptor = PaletteBuilder.getInstance().getIcon(actorModel.getClass());
     if (imageDescriptor == null) {
       imageDescriptor = IMAGE_DESCRIPTOR_ACTOR;
     }
@@ -131,40 +116,11 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
     return new RectangularActorFigure(displayName, getModel().getClass(), createImage, clickables);
   }
 
-  public Object getAdapter(Class key) {
-    if (key == AccessibleAnchorProvider.class)
-      return new DefaultAccessibleAnchorProvider() {
-        public List<Point> getSourceAnchorLocations() {
-          List<Point> list = new ArrayList<Point>();
-          Vector<ConnectionAnchor> sourceAnchors = getComponentFigure().getSourceConnectionAnchors();
-          for (int i = 0; i < sourceAnchors.size(); i++) {
-            ConnectionAnchor anchor = (ConnectionAnchor) sourceAnchors.get(i);
-            list.add(anchor.getReferencePoint().getTranslated(0, -3));
-          }
-          return list;
-        }
-
-        public List<Point> getTargetAnchorLocations() {
-          List<Point> list = new ArrayList<Point>();
-          Vector<ConnectionAnchor> targetAnchors = getComponentFigure().getTargetConnectionAnchors();
-          for (int i = 0; i < targetAnchors.size(); i++) {
-            ConnectionAnchor anchor = (ConnectionAnchor) targetAnchors.get(i);
-            list.add(anchor.getReferencePoint().getTranslated(0, 3));
-          }
-          return list;
-        }
-      };
-    return super.getAdapter(key);
-  }
-
   /**
    * Returns the Figure of this as a ActorFigure.
    * 
    * @return ActorFigure of this.
    */
-  public ActorFigure getComponentFigure() {
-    return (ActorFigure) getFigure();
-  }
 
   /**
    * Returns the model of this as a Actor.
@@ -185,50 +141,15 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
 
   @Override
   protected List getModelSourceConnections() {
-    Set<Relation> connectedRelations = ModelUtils.getConnectedRelations((NamedObj) getModel(), ModelUtils.ConnectionType.SOURCE);
-    List modelSourceConnections = new ArrayList();
-    for (Relation rel : connectedRelations) {
-      Vertex vertex = getVertex(rel);
-      if (vertex != null) {
-        List<IOPort> ports = ModelUtils.getPorts(rel, (NamedObj) getModel());
-        for (IOPort port : ports) {
-          Object relation = VertexEditPart.getRelation((TypedIORelation) rel, port, vertex, false);
-          modelSourceConnections.add(relation);
-        }
-      } else {
-        modelSourceConnections.add(rel);
-      }
-    }
-    return modelSourceConnections;
+
+    return getModelConnections(getDiagram().getLinkHolder(), getActor(), false);
   }
 
   @Override
   protected List getModelTargetConnections() {
-    Set<Relation> connectedRelations = ModelUtils.getConnectedRelations((NamedObj) getModel(), ModelUtils.ConnectionType.TARGET);
-    List modelTargetConnections = new ArrayList();
-    for (Relation rel : connectedRelations) {
-      Vertex vertex = getVertex(rel);
-      if (vertex != null) {
-        for (IOPort port : ModelUtils.getPorts(rel, (NamedObj) getModel())) {
-          modelTargetConnections.add(VertexEditPart.getRelation((TypedIORelation) rel, port, vertex, false));
-        }
 
-      } else {
-        modelTargetConnections.add(rel);
-      }
-    }
-    return modelTargetConnections;
-  }
+    return getModelConnections(getDiagram().getLinkHolder(), getActor(), true);
 
-  public Vertex getVertex(Relation model) {
-    Enumeration attributes = model.getAttributes();
-    while (attributes.hasMoreElements()) {
-      Object temp = attributes.nextElement();
-      if (temp instanceof Vertex) {
-        return (Vertex) temp;
-      }
-    }
-    return null;
   }
 
   /**
@@ -237,21 +158,8 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
    * @return ConnectionAnchor.
    */
   public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connEditPart) {
-    getLogger().trace("Get SourceConnectionAnchor based on ConnectionEditPart");
-    Port port = null;
-    if (connEditPart instanceof VertexLinkEditPart) {
-      port = ((VertexLinkEditPart) connEditPart).getPort();
+    return getConnectionAnchor(connEditPart, (ActorFigure) getComponentFigure(), getActor(), false);
 
-    } else {
-      Relation relation = (Relation) connEditPart.getModel();
-      List linkedPortList = ((IORelation) relation).linkedSourcePortList();
-      if (linkedPortList == null || linkedPortList.size() == 0)
-        return null;
-      port = (Port) linkedPortList.get(0);
-
-    }
-    ConnectionAnchor connectionAnchor = getComponentFigure().getConnectionAnchor(port.getName());
-    return connectionAnchor;
   }
 
   /**
@@ -270,22 +178,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
    * @return ConnectionAnchor.
    */
   public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connEditPart) {
-    getLogger().trace("Get TargetConnectionAnchor based on ConnectionEditPart");
-    Port port = null;
-    if (connEditPart instanceof VertexLinkEditPart) {
-      port = ((VertexLinkEditPart) connEditPart).getPort();
-
-    } else {
-
-      IORelation relation = (IORelation) connEditPart.getModel();
-      List linkedPortList = relation.linkedDestinationPortList();
-      if (linkedPortList == null || linkedPortList.size() == 0)
-        return null;
-      port = (Port) linkedPortList.get(0);
-    }
-
-    ConnectionAnchor connectionAnchor = getComponentFigure().getConnectionAnchor(port.getName());
-    return connectionAnchor;
+    return getConnectionAnchor(connEditPart, (ActorFigure) getComponentFigure(), getActor(), true);
   }
 
   /**
@@ -296,7 +189,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
   public Port getSourcePort(ConnectionAnchor anchor) {
     getLogger().trace("Get Source port  based on anchor");
 
-    ActorFigure anchorFigure = getComponentFigure();
+    AbstractNodeFigure anchorFigure = getComponentFigure();
     List outputPortList = getActor().outputPortList();
     for (Iterator iterator = outputPortList.iterator(); iterator.hasNext();) {
       Port port = (Port) iterator.next();
@@ -317,7 +210,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
   public Port getTargetPort(ConnectionAnchor anchor) {
     getLogger().trace("Get Target port  based on anchor");
 
-    ActorFigure anchorFigure = getComponentFigure();
+    AbstractNodeFigure anchorFigure = getComponentFigure();
     List inputPortList = getActor().inputPortList();
     for (Iterator iterator = inputPortList.iterator(); iterator.hasNext();) {
       Port port = (Port) iterator.next();
