@@ -2,10 +2,10 @@ package com.isencia.passerelle.workbench.model.editor.ui.palette;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
 import org.eclipse.gef.palette.ConnectionCreationToolEntry;
 import org.eclipse.gef.palette.MarqueeToolEntry;
@@ -19,6 +19,7 @@ import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gef.requests.CreationFactory;
 import org.eclipse.gef.tools.MarqueeSelectionTool;
 import org.eclipse.gef.ui.palette.PaletteViewer;
+import org.eclipse.help.ui.internal.util.ErrorUtil;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.part.EditorPart;
@@ -28,13 +29,21 @@ import ptolemy.actor.Director;
 import com.isencia.passerelle.editor.common.model.PaletteGroup;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.editor.common.model.SubModelPaletteItemDefinition;
+import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.ColorRegistry;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.PaletteBuilder {
+  @Override
+  public void logError(Exception e) {
+    EclipseUtils.logError(e, e.getMessage(), IStatus.ERROR);
+//    EclipseUtils.displayErrorDialog("Error during open palette", e.getMessage());
+  }
+
   private static PaletteBuilder builder;
 
   public static PaletteBuilder getInstance() {
@@ -219,7 +228,10 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
     return drawer;
   }
 
+  private EditorPart parent;
+
   public PaletteRoot createPalette(EditorPart parent) throws Exception {
+    this.parent = parent;
     if (paletteRoot == null) {
       paletteRoot = new PaletteRoot();
       paletteRoot.addAll(createCategories(paletteRoot, parent, PaletteBuilder.getInstance().getPaletteGroup(PaletteBuilder.UTILITIES)));
