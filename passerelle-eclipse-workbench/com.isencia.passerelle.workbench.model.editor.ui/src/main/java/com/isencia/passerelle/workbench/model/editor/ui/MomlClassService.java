@@ -14,10 +14,10 @@ public class MomlClassService implements IMomlClassService {
   }
 
   @Override
-  public List<String> getAllActorClasses() {
+  public List<String> getAllActorClasses() throws Exception{
     RepositoryService repoService = Activator.getDefault().getRepositoryService();
     if (repoService == null) {
-      return Collections.EMPTY_LIST;
+      throw new Exception("Not project service defined");
     }
     return Arrays.asList(repoService.getAllSubmodels());
   }

@@ -6,10 +6,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.help.ui.internal.util.ErrorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.CompositeActor;
+import ptolemy.actor.Director;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.data.BooleanToken;
@@ -81,10 +83,22 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
   }
 
   public void execute() {
-    doExecute();
+    try {
+      doExecute();
+    } catch (Exception e) {
+      logger.error("Unable to create component", e);
+      EclipseUtils.logError(e, "Unable to create component", IStatus.ERROR);
+      ErrorUtil.displayErrorDialog(e.getMessage());
+    }
   }
 
-  public void doExecute() {
+  public void doExecute() throws Exception {
+    if (clazz != null && Director.class.isAssignableFrom(clazz)) {
+      if (parent instanceof CompositeActor && ((CompositeActor) parent).getDirector() != null) {
+        throw new Exception("Multiple directors are not allowed, please remove first the current director");
+
+      }
+    }
     // Perform Change in a ChangeRequest so that all Listeners are notified
     parent.requestChange(new ModelChangeRequest(this.getClass(), parent, "create") {
       @Override
@@ -92,6 +106,7 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
         try {
           CompositeEntity parentModel = (CompositeEntity) parent;
           String componentName = null;
+
           if (model == null) {
             componentName = EditorUtils.findUniqueName(parentModel, clazz, name, name);
             componentName = ModelUtils.getLegalName(componentName);
@@ -151,8 +166,8 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
           setChild(child);
 
         } catch (Exception e) {
-          logger.error("Unable to create component", e);
-          EclipseUtils.logError(e, "Unable to create component", IStatus.ERROR);
+
+          throw e;
         }
 
       }

@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.draw2d.LightweightSystem;
@@ -111,6 +112,7 @@ import com.isencia.passerelle.workbench.model.ui.IPasserelleEditor;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
+import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 /**
@@ -122,6 +124,14 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
  * </ul>
  */
 public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implements LinkHolder, IPasserelleMultiPageEditor, IResourceChangeListener {
+  boolean dirty = false;
+
+  @Override
+  public boolean isDirty() {
+    if (dirty)
+      return true;
+    return super.isDirty();
+  }
 
   public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor";
 
@@ -226,7 +236,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
   /** The text widget used in page 2. */
   private StyledText text;
   private TextEditor textEditor;
-  private boolean parseError;
+  private boolean parseError  =false;
 
   /**
    * Creates a multi-page editor example.
@@ -269,7 +279,6 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
   protected void createWorkflowPage(int pageIndex) throws PartInitException {
 
     editor = new PasserelleModelEditor(this, model);
-
     addPage(editor, getEditorInput());
     editor.setIndex(pageIndex);
     setPageText(pageIndex, "Edit");
@@ -333,6 +342,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
   public void doSave(final IProgressMonitor monitor) {
 
     editorSaving = true;
+    dirty = false;
     if (!this.parseError) {
       SafeRunner.run(new SafeRunnable() {
         public void run() throws Exception {
@@ -476,9 +486,9 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     if (outlinePage != null)
       outlinePage.switchThumbnail(newPageIndex);
 
-    if (newPageIndex == 1) { // Text Editor
-      doSave(new NullProgressMonitor());
-    }
+    // if (newPageIndex == 1) { // Text Editor
+    // doSave(new NullProgressMonitor());
+    // }
 
     super.pageChange(newPageIndex);
   }
@@ -576,23 +586,22 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
           CollectingMomlParsingErrorHandler.ErrorItem errorItem = (CollectingMomlParsingErrorHandler.ErrorItem) itr.next();
           errorMsgBldr.append(errorItem.context.getName() + ":" + errorItem.exception.getMessage());
         }
-        this.parseError = true;
+        this.dirty = true;
         logger.error(errorMsgBldr.toString());
-        ErrorUtil.displayErrorDialog(errorMsgBldr.toString());
+        EclipseUtils.logError(new Exception(errorMsgBldr.toString()), "Error parsing model", IStatus.ERROR);
+        EclipseUtils.displayErrorDialog("Error parsing model", errorMsgBldr.toString());
 
       }
       compositeActor.setSource(filePath);
       compositeActor.workspace().setName(ifile.getProject().getName());
 
-      this.parseError = false;
-
       setDiagram(compositeActor);
 
     } catch (Exception e) {
+      this.dirty = true;
       this.parseError = true;
       logger.error("Error during reading/parsing of model file", e);
-
-      // EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
+      EclipseUtils.logError(e, "Error during reading/parsing of model file", IStatus.ERROR);
     } finally {
       if (is != null) {
         try {

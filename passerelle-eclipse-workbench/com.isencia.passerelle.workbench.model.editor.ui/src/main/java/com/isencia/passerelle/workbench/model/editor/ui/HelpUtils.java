@@ -8,7 +8,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 
 public class HelpUtils {
-  public static final String HELP_BUNDLE_ID = "com.isencia.passerelle.actor.conf";
+  public static final String HELP_BUNDLE_ID = "com.isencia.passerelle.actor.help";
 
   // TODO enable again when we decide to use context specific help
   // public static String getContextId(Object element) {
@@ -28,18 +28,33 @@ public class HelpUtils {
 
       final NamedObj parent = ((ActorEditPart) element).getEntity();
       final String actorName = parent.getClass().getName();
-      String path = "/" + PaletteBuilder.getInstance().getPaletteItem(actorName).getId() + "/html/" + actorName + ".html";
+      
+      String id = getHelpId(actorName);
+      String path = "/" + id + "/html/" + actorName + ".html";
       return path;
 
     } else if (element instanceof Variable) {
 
       final NamedObj parent = ((Variable) element).getContainer();
       final String actorName = parent.getClass().getName();
-      String path = "/" + PaletteBuilder.getInstance().getPaletteItem(actorName).getId() + "/html/" + actorName + "_attributes.html";
+      String id = getHelpId(actorName);
+      String path = "/" + id + "/html/" + actorName + "_attributes.html";
       return path;
 
     }
     return null;
+  }
+
+  private static String getHelpId(final String actorName) {
+    String id = PaletteBuilder.getInstance().getBuildId(actorName);
+    if (id == null){
+      id = HELP_BUNDLE_ID;
+    }else{
+      if (id.endsWith(".conf")){
+        id = id.substring(0, id.length() -4) + "help";
+      }
+    }
+    return id;
   }
 
   public static String getContextIdOfVariable(Variable param) {

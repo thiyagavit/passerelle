@@ -87,6 +87,9 @@ public class Activator extends AbstractUIPlugin {
   public RepositoryService getRepositoryService() {
     try {
       RepositoryService repositoryService = (RepositoryService) (repoSvcTracker != null ? repoSvcTracker.waitForService(3000) : null);
+      if (repositoryService == null){
+        return null;
+      }
       IPreferenceStore store = Activator.getDefault().getPreferenceStore();
       String submodelPath = store.getString(RepositoryService.SUBMODEL_ROOT);
       if (submodelPath == null || submodelPath.trim().equals("")) {
