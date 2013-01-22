@@ -50,6 +50,13 @@ public interface ResultBlock extends Serializable, Identifiable, AttributeHolder
   Collection<ResultItem<?>> getAllItems();
 
   /**
+   * 
+   * @param matcher
+   * @return all items that match the matcher
+   */
+  Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher);
+  
+  /**
    * @param name
    * @return the ResultItem with the given name
    */

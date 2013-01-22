@@ -36,6 +36,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.isencia.passerelle.process.model.Attribute;
+import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
@@ -107,62 +108,27 @@ public class ResultBlockImpl implements ResultBlock {
 		this.task.addResultBlock(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
 	public Long getId() {
 		return id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java
-	 * .lang.String)
-	 */
 	public Attribute getAttribute(String name) {
 		return attributes.get(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com
-	 * .isencia.passerelle.process.model.Attribute)
-	 */
 	public Attribute putAttribute(Attribute attribute) {
 		return attributes.put(attribute.getName(), attribute);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
-	 */
 	public Iterator<String> getAttributeNames() {
 		return attributes.keySet().iterator();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributes()
-	 */
 	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.Coloured#getColour()
-	 */
 	public String getColour() {
 		return colour;
 	}
@@ -171,42 +137,29 @@ public class ResultBlockImpl implements ResultBlock {
 		this.colour = colour;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getCreationTS()
-	 */
 	public Date getCreationTS() {
 		return creationTS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getType()
-	 */
 	public String getType() {
 		return type;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.ResultBlock#addItem(com.isencia.
-	 * passerelle.process.model.ResultItem)
-	 */
 	public ResultItem<?> putItem(ResultItem<?> item) {
 		return resultItems.put(item.getName(), item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getAllItems()
-	 */
 	public Collection<ResultItem<?>> getAllItems() {
 		return Collections.unmodifiableCollection(resultItems.values());
+	}
+	
+	public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
+		Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
+		for(ResultItem<?> item : resultItems.values()) {
+			if(matcher.matches(item))
+				results.add(item);
+		}
+		return results;
 	}
 
 	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
@@ -214,13 +167,6 @@ public class ResultBlockImpl implements ResultBlock {
 		return new HashSet<ResultItem>(resultItems.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.ResultBlock#getItemForName(java.
-	 * lang.String)
-	 */
 	public ResultItem<?> getItemForName(String name) {
 		return resultItems.get(name);
 	}
