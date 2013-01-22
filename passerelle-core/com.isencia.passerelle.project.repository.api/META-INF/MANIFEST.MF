@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Repository Api Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.project.repository.api
-Bundle-Version: 8.0.5
+Bundle-Version: 8.0.6
 Bundle-Activator: com.isencia.passerelle.project.repository.api.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
