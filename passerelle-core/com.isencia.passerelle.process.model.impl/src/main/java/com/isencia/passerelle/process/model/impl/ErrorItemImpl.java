@@ -9,6 +9,8 @@ import java.io.StringWriter;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.isencia.passerelle.core.ErrorCategory;
+import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.process.model.ErrorItem;
 
 /**
@@ -18,7 +20,7 @@ import com.isencia.passerelle.process.model.ErrorItem;
 public class ErrorItemImpl implements ErrorItem, Serializable {
   private static final long serialVersionUID = -6470343890215671989L;
 
-  private Category category;
+  private ErrorCategory category;
   private Severity severity;
   private String code;
   private Set<String> relatedDataTypes = new TreeSet<String>();
@@ -36,7 +38,7 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
    * @param description
    * @param relatedDataTypes
    */
-  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
+  public ErrorItemImpl(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     super();
     this.severity = severity;
     this.category = category;
@@ -61,7 +63,7 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
    * @param cause
    * @param relatedDataTypes
    */
-  public ErrorItemImpl(Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
+  public ErrorItemImpl(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     super();
     this.severity = severity;
     this.category = category;
@@ -80,7 +82,7 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     return sw.toString();
   }
 
-  public Category getCategory() {
+  public ErrorCategory getCategory() {
     return category;
   }
 

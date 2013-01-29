@@ -36,6 +36,12 @@ import java.util.Collection;
  * The resolution of the complaint, or the execution and delivery of the ordered goods could be controlled by the execution of one-or-more
  * flows, each triggered by specific <code>Request</code>s.
  * </p>
+ * <p>
+ * <p>
+ * Or for a research environment, the Case could be related to an experiment. 
+ * And consecutive flow executions (with their Request instances) could represent consecutive experiment phases, 
+ * from experiment preparation via automated execution (device control and data acquisition) to data analysis flows.
+ * </p>
  * 
  * @author erwin
  *

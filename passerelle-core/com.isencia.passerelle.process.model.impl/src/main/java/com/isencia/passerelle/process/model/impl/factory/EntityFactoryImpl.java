@@ -5,7 +5,8 @@ package com.isencia.passerelle.process.model.impl.factory;
 
 import java.util.Date;
 import java.util.Set;
-
+import com.isencia.passerelle.core.ErrorCategory;
+import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
 import com.isencia.passerelle.process.model.Case;
@@ -13,8 +14,6 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
-import com.isencia.passerelle.process.model.ErrorItem.Category;
-import com.isencia.passerelle.process.model.ErrorItem.Severity;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -92,19 +91,19 @@ public class EntityFactoryImpl implements EntityFactory {
     throw new UnsupportedOperationException();
   }
 
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
-  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
   }
 
-  public ErrorItem createErrorItem(Severity severity, Category category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
   }
 }

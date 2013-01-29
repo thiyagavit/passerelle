@@ -4,6 +4,8 @@
 package com.isencia.passerelle.process.model;
 
 import java.util.Set;
+import com.isencia.passerelle.core.ErrorCode.Severity;
+import com.isencia.passerelle.core.ErrorCategory;
 
 
 /**
@@ -15,14 +17,6 @@ import java.util.Set;
  */
 public interface ErrorItem {
 
-  public enum Severity {
-    INFO, WARNING, ERROR, FATAL;
-  }
-  
-  public enum Category {
-    FUNCTIONAL, TECHNICAL;
-  }
-
   /**
    * @return how severe was the error
    */
@@ -31,7 +25,7 @@ public interface ErrorItem {
   /**
    * @return whether the error concerns a functional or technical issue.
    */
-  Category getCategory();
+  ErrorCategory getCategory();
 
   /**
    * @return a formatted error code identifying the error type of this item, e.g. PASS-1234
