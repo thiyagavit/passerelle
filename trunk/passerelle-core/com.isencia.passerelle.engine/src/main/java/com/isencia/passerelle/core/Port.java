@@ -185,7 +185,9 @@ public class Port extends TypedIOPort {
    */
   public void setMode(PortMode mode) {
     this.mode = mode;
-    if (PortMode.PUSH.equals(mode)) {
+    if (!PortMode.PULL.equals(mode)) {
+      // we're outside of normal ptolemy-like port handling
+      // so store this in the moml
       if (modeAttr == null) {
         try {
           modeAttr = new StringAttribute(this, "portMode");
