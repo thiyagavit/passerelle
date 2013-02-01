@@ -408,7 +408,7 @@ public class MainScreen extends JFrame implements Observer, ItemListener {
 	}
 
 	private void addExtraPreferenceMenuElements(JMenuBar superMenuBar) {
-		JMenu prefMenu = superMenuBar.getMenu(3);
+		JMenu prefMenu = superMenuBar.getMenu(2);
 		if (prefMenu != null) {
 			prefMenu.addSeparator();
 			prefMenu.add(new JMenuItem(ScreenManager
@@ -507,7 +507,9 @@ public class MainScreen extends JFrame implements Observer, ItemListener {
 	// --------------------------------------------------------------------------
 	// ----
 	private void initToolbar() {
-		toolBar = BossaNovaData.getSingleton().getApplication().createDefaultToolbar();
+	  //Bug 23752
+        toolBar = BossaNovaData.getSingleton().getApplication().createToolbarWithoutSave();
+        // End Bug 23752
 		getContentPane().add(toolBar, BorderLayout.NORTH);
 
         // Bug 17629
