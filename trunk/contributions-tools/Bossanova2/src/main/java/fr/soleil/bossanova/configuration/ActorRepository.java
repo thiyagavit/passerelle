@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.prefs.Preferences;
+
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.TypedAtomicActor;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.MoMLParser;
@@ -46,12 +48,10 @@ public class ActorRepository extends Observable {
             String commonActorsXMLDirectory = Configuration.getCommonActorsDirectory();
             String specificActorsXMLDirectory = Configuration.getSpecificActorsDirectory();
             actorFiles = getActorFileList(commonActorsXMLDirectory);
-            actorFiles.addAll(getActorFileList(specificActorsXMLDirectory));
-
+            actorFiles.addAll(getActorFileList(specificActorsXMLDirectory));      
 
             for (Iterator<File> iterator = actorFiles.iterator(); iterator.hasNext();) {
                 File xmlFile = (File) iterator.next();
-
                 MoMLParser parser = new MoMLParser();
                 MoMLParser.purgeModelRecord(xmlFile.toURL());
                 NamedObj namedObject = null;
@@ -59,7 +59,8 @@ public class ActorRepository extends Observable {
                     namedObject = (NamedObj) parser.parse(null, xmlFile.toURL());
                 } catch (Exception e) {
                     // Bug 18567
-                    LoggerFactory.getLogger(this.getClass()).error("Error while loading Actor in file " + xmlFile.toURL(), e);
+                    LoggerFactory.getLogger(this.getClass()).error(
+                            "Error while loading Actor in file " + xmlFile.toURL(), e);
                 }
                 if (namedObject != null) {
                     for (Iterator<NamedObj> iterator2 = namedObject.containedObjectsIterator(); iterator2.hasNext();) {
@@ -69,7 +70,7 @@ public class ActorRepository extends Observable {
                         if (classes.contains(TypedAtomicActor.class)) {
                             Class<? extends TypedAtomicActor> actorClass = ((TypedAtomicActor) obj).getClass();
                             actors.put(name, actorClass);
-                            instances.put(name, (TypedAtomicActor)obj);
+                            instances.put(name, (TypedAtomicActor) obj);
                             if (!preferences.getBoolean(name, false)) {
                                 enabledActors.add(name);
                             }
@@ -78,6 +79,7 @@ public class ActorRepository extends Observable {
                 }
             }
             Collections.sort(enabledActors);
+//            System.out.println("==============> EnabledActors = " + enabledActors.toString());
         } catch (Exception e) {
             e.printStackTrace();
             // Bug 18567
@@ -88,24 +90,28 @@ public class ActorRepository extends Observable {
     private List<File> getActorFileList(String actorsXMLDirectory) {
         List<File> actorFiles = new ArrayList<File>();
         if (!StringUtils.isEmpty(actorsXMLDirectory)) {
-          try {
-          File commonActorsXMLDir = new File(actorsXMLDirectory);
-            File[] xmlFiles = commonActorsXMLDir.listFiles(new FilenameFilter() {
+            try {
+                File commonActorsXMLDir = new File(actorsXMLDirectory);
+                if (commonActorsXMLDir != null) {
+                    File[] xmlFiles = commonActorsXMLDir.listFiles(new FilenameFilter() {
 
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".xml");
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith(".xml");
+                        }
+                    });
+                    if (xmlFiles != null) {
+                        for (int i = 0; i < xmlFiles.length; i++) {
+                            File file = xmlFiles[i];
+                            actorFiles.add(file);
+                        }
+                    }
+
                 }
-            });
-            if (xmlFiles != null) {
-                for (int i = 0; i < xmlFiles.length; i++) {
-                    File file = xmlFiles[i];
-                    actorFiles.add(file);
-                }
+            } catch (Exception e) {
+                LoggerFactory.getLogger(this.getClass()).error(
+                        "Error loading actors from directory " + actorsXMLDirectory, e);
             }
-          } catch (Exception e) {
-            LOGGER.error("Error loading actors from directory "+actorsXMLDirectory, e);
-          }
         }
         return actorFiles;
     }
@@ -135,8 +141,7 @@ public class ActorRepository extends Observable {
     }
 
     public void addEnabledElement(String elementName) {
-        if( enabledActors.contains(elementName) == false)
-        {
+        if (enabledActors.contains(elementName) == false) {
             enabledActors.add(elementName);
         }
         preferences.remove(elementName);
@@ -151,5 +156,3 @@ public class ActorRepository extends Observable {
         notifyObservers();
     }
 }
-
-

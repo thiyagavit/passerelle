@@ -1,6 +1,3 @@
-/**
- *
- */
 package fr.soleil.bossanova;
 
 import java.io.IOException;
@@ -68,7 +65,7 @@ public class Bossanova2 extends GenericHMI implements ExecutionListener {
 	 * @throws IOException
 	 */
 	public Bossanova2() throws IOException {
-		super(true, false);
+		super(true,false);
 		BossaNovaData.getSingleton().setApplication(this);
 		sequencer = new BossaNovaSequencerImpl();
 		BossaNovaData.getSingleton().setSequencer(sequencer);
