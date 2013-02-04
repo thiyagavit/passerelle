@@ -10,17 +10,19 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.actor.InitializationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v3.ActorContext;
-import com.isencia.passerelle.actor.v3.ProcessRequest;
-import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
@@ -73,14 +75,14 @@ public class PreConfiguredScan extends Scan {
 	 * Initialize actor
 	 */
 	@Override
-	public void doInitialize() throws InitializationException {
-		super.doInitialize();
+	public void validateInitialization() throws ValidationException {
+		super.validateInitialization();
 		// if (!(conf instanceof Config1DImpl)) {
 		if (!(conf instanceof IConfig1D)) {
 			String errorMessage = "Error: " + conf.getFullPath()
 					+ " is not 1D configuration.";
 			ExecutionTracerService.trace(this, errorMessage);
-			throw new InitializationException(errorMessage, this, null);
+			throw new ValidationException(errorMessage, this, null);
 		}
 	}
 

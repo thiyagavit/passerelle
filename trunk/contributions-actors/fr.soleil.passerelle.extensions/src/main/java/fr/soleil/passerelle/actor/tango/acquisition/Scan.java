@@ -37,18 +37,19 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v3.ActorContext;
-import com.isencia.passerelle.actor.v3.ProcessRequest;
-import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
-import com.isencia.passerelle.doc.generator.ParameterName;
-
 import fr.soleil.passerelle.actor.IActorFinalizer;
-import fr.soleil.passerelle.actor.TransformerV3;
+import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.recording.DataRecorder;
@@ -66,7 +67,7 @@ import fr.soleil.salsa.exception.ScanNotFoundException;
  * @author GRAMER
  */
 @SuppressWarnings("serial")
-public class Scan extends TransformerV3 implements IActorFinalizer{
+public class Scan extends TransformerV5 implements IActorFinalizer{
 
 	private static final String SCAN_CONFIG = "Scan Config";
 	private final static Logger logger = LoggerFactory.getLogger(Scan.class);
@@ -114,8 +115,8 @@ public class Scan extends TransformerV3 implements IActorFinalizer{
 	 * Initialize actor
 	 */
 	@Override
-	public void doInitialize() throws InitializationException {
-		super.doInitialize();
+	public void validateInitialization() throws ValidationException {
+		super.validateInitialization();
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " doInitialize() - entry");
 		}
@@ -138,7 +139,7 @@ public class Scan extends TransformerV3 implements IActorFinalizer{
 			} catch (final ScanNotFoundException e) {
 				ExecutionTracerService.trace(this,
 						"Error: Unknown scan configuration " + confName);
-				throw new InitializationException(
+				throw new ValidationException(
 						"Unknown scan configuration ", confName, e);
 			}
 
@@ -147,7 +148,7 @@ public class Scan extends TransformerV3 implements IActorFinalizer{
 			} catch (SalsaDeviceException e) {
 				ExecutionTracerService.trace(this,
 						"Error: Recording session configuration error");
-				throw new InitializationException("Error: Recording session configuration error",confName, e);
+				throw new ValidationException("Error: Recording session configuration error",confName, e);
 			}
 
 		}
@@ -184,8 +185,7 @@ public class Scan extends TransformerV3 implements IActorFinalizer{
 
 		}
 
-		response.addOutputMessage(0, output, PasserelleUtil
-				.createTriggerMessage());
+		sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
 
 		if (logger.isTraceEnabled()) {
 			logger.trace(getInfo() + " doFire() - exit");
