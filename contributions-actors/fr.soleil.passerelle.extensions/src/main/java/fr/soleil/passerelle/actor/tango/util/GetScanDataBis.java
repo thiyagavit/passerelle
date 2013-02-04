@@ -14,6 +14,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
@@ -22,6 +23,7 @@ import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.PortUtilities;
@@ -30,7 +32,6 @@ import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
-import fr.soleil.salsa.api.SalsaAPI;
 import fr.soleil.salsa.entity.IActuator;
 import fr.soleil.salsa.entity.IScanResult;
 import fr.soleil.salsa.entity.ISensor;
