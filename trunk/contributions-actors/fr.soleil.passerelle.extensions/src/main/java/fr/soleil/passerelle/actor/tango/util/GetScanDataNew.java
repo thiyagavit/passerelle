@@ -237,7 +237,7 @@ public class GetScanDataNew extends TransformerV5 {
                         System.out.println("allValues " + Arrays.toString(allValues));
                         DeviceAttribute actuators = nbActuators.read();
                         String[] actuatorsList = actuators.extractStringArray();
-                        int nbAct = actuatorsList.length;
+                        int nbAct = actuatorsList.length / 2; // Attention au Read/wtrite
 
                         if (allValues != null && allValues.length > 0) {
                             double[] readValues = Arrays.copyOf(allValues, attribute.getNbRead());
