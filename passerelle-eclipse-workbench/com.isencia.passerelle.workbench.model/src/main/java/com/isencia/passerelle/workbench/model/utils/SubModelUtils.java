@@ -74,8 +74,7 @@ public class SubModelUtils {
 		final IProject pass = ModelUtils.getPasserelleProject();
 		pass.refreshLocal(IResource.DEPTH_INFINITE, null);
 
-		final Properties models = PropUtils.loadProperties(getModelStore()
-				.getContents());
+		final Properties models = PropUtils.loadProperties(getModelStore().getContents());
 
 		final Set<Object> sorted = new TreeSet<Object>();
 		sorted.addAll(models.keySet());
@@ -85,18 +84,24 @@ public class SubModelUtils {
 
 		List<String> modelNames = initializeSubmodels(sorted, pass);
 
-		for (String modelName : modelNames) {
-
-			final IFile file = pass.getFile(modelName + ".moml");
-			Flow flow = FlowManager.readMoml(new InputStreamReader(file
-					.getContents()));
-			// flow.setSource(file.getLocation().toOSString());
-			if (flow.isClassDefinition()) {
-				MoMLParser.putActorClass(modelName, flow);
-				flow.setName(modelName);
-				modelList.put(modelName, flow);
-			}
-		}
+    for (Object modelOb : sorted) {
+      final String modelName = (String)modelOb;
+      if (modelName==null||"".equals(modelName)) continue;
+      final IFile file = pass.getFile(modelName + ".moml");
+      try {
+        if (file.exists()) {
+          Flow flow = FlowManager.readMoml(new InputStreamReader(file.getContents()));
+//          flow.setSource(file.getLocation().toOSString());
+          if (flow.isClassDefinition()) {
+            MoMLParser.putActorClass(modelName, flow);
+            flow.setName(modelName);
+            modelList.put(modelName, flow);
+          }
+        }
+      } catch (Exception e1) {
+        logger.error("Cannot read moml file!", e1);
+      }
+    }
 
 		pass.refreshLocal(IResource.DEPTH_INFINITE, null);
 
