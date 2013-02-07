@@ -981,7 +981,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * 
    * @param newParameter
    */
-  final protected void registerConfigurableParameter(Parameter newParameter) {
+  final public void registerConfigurableParameter(Parameter newParameter) {
     if (newParameter != null && !configurableParameters.contains(newParameter) && newParameter.getContainer().equals(this)) {
       configurableParameters.add(newParameter);
     }
@@ -994,7 +994,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * 
    * @param newParameter
    */
-  final protected void registerExpertParameter(Parameter newParameter) {
+  final public void registerExpertParameter(Parameter newParameter) {
     if (newParameter != null && newParameter.getContainer().equals(this)) {
       if (!expertParameters.contains(newParameter))
         expertParameters.add(newParameter);
