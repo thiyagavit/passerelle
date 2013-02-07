@@ -119,7 +119,8 @@ public class EditorUtils {
 
   public static NamedObj readMomlWithErrorHandling(byte[] bytes, CollectingMomlParsingErrorHandler errorHandler) throws Exception {
     MoMLParser moMLParser = new MoMLParser();
-    MoMLParser.setErrorHandler(errorHandler);
+    if (errorHandler != null)
+      MoMLParser.setErrorHandler(errorHandler);
     return moMLParser.parse(new String(bytes));
 
   }
@@ -313,16 +314,27 @@ public class EditorUtils {
     }
   }
 
-  public static Flow initFlow(byte[] input) throws PasserelleException {
+  public static Flow initFlow(byte[] input, CollectingMomlParsingErrorHandler errorHandler) throws PasserelleException {
     InputStream in = new ByteArrayInputStream(input);
     Reader reader = new InputStreamReader(in);
+
     try {
-      return FlowManager.readMoml(reader);
+      if (errorHandler != null)
+        MoMLParser.setErrorHandler(errorHandler);
+      Flow flow = FlowManager.readMoml(reader);
+      if (errorHandler != null)
+        MoMLParser.setErrorHandler(null);
+      return flow;
     } catch (Exception e) {
       throw (new PasserelleException(ErrorCode.ERROR, "Error parsing model", e));
     }
+  }
+
+  public static Flow initFlow(byte[] input) throws PasserelleException {
+    return initFlow(input, null);
 
   }
+
   public static Link generateLink(ComponentRelation relation, Object source, Object target) {
     Link link = new Link();
     link.setHead(source);
