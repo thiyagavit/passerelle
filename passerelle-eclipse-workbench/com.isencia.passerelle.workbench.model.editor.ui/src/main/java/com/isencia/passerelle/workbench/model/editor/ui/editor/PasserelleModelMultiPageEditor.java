@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,7 +29,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MarginBorder;
@@ -45,7 +45,6 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.parts.ContentOutlinePage;
 import org.eclipse.gef.ui.parts.TreeViewer;
-import org.eclipse.help.ui.internal.util.ErrorUtil;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -90,14 +89,12 @@ import ptolemy.actor.CompositeActor;
 import ptolemy.actor.TypedCompositeActor;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.ComponentRelation;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
 import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.editor.common.model.LinkHolder;
-import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler;
@@ -108,11 +105,11 @@ import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorPalettePage;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorTreeViewerPage;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleEditor;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.command.RefreshCommand;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
-import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 /**
@@ -236,7 +233,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
   /** The text widget used in page 2. */
   private StyledText text;
   private TextEditor textEditor;
-  private boolean parseError  =false;
+  private boolean parseError = false;
 
   /**
    * Creates a multi-page editor example.
@@ -1000,36 +997,39 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     return 0;
   }
 
-  Map<Object, List<Link>> linkMap = new HashMap<Object, List<Link>>();
+  Map<Object, Set<Link>> linkMap;
   Set<Link> links = new HashSet<Link>();
 
-  public List<Link> getLinks(Object o) {
+  public Set<Link> getLinks(Object o) {
 
-    List<Link> list = linkMap.get(o);
+    Set<Link> list = linkMap.get(o);
+    if (list == null) {
+      return Collections.EMPTY_SET;
+
+    }
     return list;
   }
 
   public void registerLink(Link link) {
-    List<Link> links = linkMap.get(link.getHead());
+    Set<Link> links = linkMap.get(link.getHead());
     if (links == null) {
-      links = new ArrayList<Link>();
+      links = new HashSet<Link>();
       linkMap.put(link.getHead(), links);
     }
     links.add(link);
     links = linkMap.get(link.getTail());
     if (links == null) {
-      links = new ArrayList<Link>();
+      links = new HashSet<Link>();
       linkMap.put(link.getTail(), links);
     }
     links.add(link);
   }
 
-  public void generateLinks(CompositeActor modelDiagram) {
-    linkMap = new HashMap<Object, List<Link>>();
-    links = new HashSet<Link>();
+  public void generateCompositeLinks(CompositeActor modelDiagram) {
     List<NamedObj> relations = modelDiagram.relationList();
     for (NamedObj modelObject : relations) {
       TypedIORelation relation = (TypedIORelation) modelObject;
+
       if (relation.getContainer() != null) {
         if (modelObject.attributeList(Vertex.class).isEmpty()) {
           if (!relation.linkedSourcePortList().isEmpty() && !relation.linkedDestinationPortList().isEmpty()) {
@@ -1046,21 +1046,28 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
           List list = relation.linkedObjectsList();
 
           for (Object o : list) {
-            Link generateLink = null;
+            LinkWithBendPoints generateLinkWithBendPoints = null;
             if (o instanceof TypedIORelation) {
 
               TypedIORelation o2 = (TypedIORelation) o;
               if (!o2.attributeList(Vertex.class).isEmpty()) {
                 NamedObj otherVertex = (NamedObj) o2.attributeList(Vertex.class).get(0);
                 if (otherVertex != null) {
-                  generateLink = generateLink(relation, otherVertex, vertex);
+                  double[] otherVertexLocation = ModelUtils.getLocation(otherVertex);
+                  double[] vertexLocation = ModelUtils.getLocation(vertex);
+                  if (vertexLocation[0] < otherVertexLocation[0]) {
+                    generateLinkWithBendPoints = generateLink(relation, otherVertex, vertex);
+                  } else {
+                    generateLinkWithBendPoints = generateLink(relation, vertex, otherVertex);
+                  }
+
                 }
               }
             } else {
               if (relation.linkedSourcePortList().contains(o)) {
-                generateLink = generateLink(relation, (NamedObj) o, vertex);
+                generateLinkWithBendPoints = generateLink(relation, (NamedObj) o, vertex);
               } else {
-                generateLink = generateLink(relation, vertex, (NamedObj) o);
+                generateLinkWithBendPoints = generateLink(relation, vertex, (NamedObj) o);
               }
             }
 
@@ -1070,25 +1077,54 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
       }
     }
   }
+  public void generateLinks(CompositeActor modelDiagram) {
+    linkMap = new HashMap<Object, Set<Link>>();
+    if (links == null)
+      links = new HashSet<Link>();
+
+    Flow flow = (Flow) modelDiagram.toplevel();
+    generateCompositeLinks(flow);
+    for (Object entity : flow.entityList(CompositeActor.class)){
+      CompositeActor compositeEntity = (CompositeActor)entity;
+      generateCompositeLinks(compositeEntity);
+    }
+    
+  }
 
   public void removeLink(Link link) {
     links.remove(link);
-    linkMap.remove(link.getHead());
-    linkMap.remove(link.getTail());
+    Set<Link> headLinks = linkMap.get(link.getHead());
+    if (headLinks != null) {
+      headLinks.remove(link);
+    }
+    Set<Link> tailLinks = linkMap.get(link.getTail());
+    if (tailLinks != null) {
+      tailLinks.remove(link);
+    }
   }
 
-  public Link generateLink(ComponentRelation relation, Object source, Object target) {
-    Link link = EditorUtils.generateLink(relation, source, target);
+  public LinkWithBendPoints generateLink(ComponentRelation relation, Object source, Object target) {
+    LinkWithBendPoints link = generate(relation, source, target);
     if (!links.contains(link)) {
       registerLink(link);
       links.add(link);
     } else {
       for (Link l : links) {
         if (l.equals(link)) {
-          return l;
+          registerLink(l);
+          return (LinkWithBendPoints) l;
         }
       }
     }
     return link;
   }
+
+  public LinkWithBendPoints generate(ComponentRelation relation, Object source, Object target) {
+    LinkWithBendPoints link = new LinkWithBendPoints();
+    link.setHead(source);
+    link.setTail(target);
+    link.setRelation(relation);
+    return link;
+  }
+
 }

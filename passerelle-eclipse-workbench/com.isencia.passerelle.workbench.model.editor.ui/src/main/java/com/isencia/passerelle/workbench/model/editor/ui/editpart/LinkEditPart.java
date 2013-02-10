@@ -1,14 +1,21 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.draw2d.AbsoluteBendpoint;
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.AccessibleEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartListener;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractConnectionEditPart;
+import org.eclipse.gef.editpolicies.ConnectionEndpointEditPolicy;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -19,17 +26,28 @@ import ptolemy.kernel.util.ChangeListener;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.Changeable;
 
-import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserellRootEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.LinkBendpointEditPolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.RelationDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.RelationEndpointEditPolicy;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
+import com.isencia.passerelle.workbench.model.opm.OPMLink;
+import com.isencia.passerelle.workbench.model.ui.command.IRefreshBendpoints;
+import com.isencia.passerelle.workbench.model.ui.command.LinkCreateBendpointCommand;
+import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
+import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 /**
  * Implements a Relation Editpart to represent a Wire like connection.
  * 
  */
 public class LinkEditPart extends AbstractConnectionEditPart implements ChangeListener, EditPartListener {
+
+  public LinkEditPart() {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
   private static Logger logger = LoggerFactory.getLogger(LinkEditPart.class);
 
@@ -55,6 +73,17 @@ public class LinkEditPart extends AbstractConnectionEditPart implements ChangeLi
     }
   }
 
+  @Override
+  protected void refreshVisuals() {
+    Connection connection = getConnectionFigure();
+    List<Point> modelConstraint = ((OPMLink) getModel()).getBendpoints();
+    List<AbsoluteBendpoint> figureConstraint = new ArrayList<AbsoluteBendpoint>();
+    for (Point p : modelConstraint) {
+      figureConstraint.add(new AbsoluteBendpoint(p));
+    }
+    connection.setRoutingConstraint(figureConstraint);
+  }
+
   public void activateFigure() {
     super.activateFigure();
     if (getRelation().getRelation() instanceof Changeable) {
@@ -77,8 +106,9 @@ public class LinkEditPart extends AbstractConnectionEditPart implements ChangeLi
   protected void createEditPolicies() {
 
     installEditPolicy(EditPolicy.CONNECTION_ROLE, new RelationDeletePolicy());
-
     installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE, new RelationEndpointEditPolicy());
+    installEditPolicy(EditPolicy.CONNECTION_ENDPOINTS_ROLE, new ConnectionEndpointEditPolicy());
+    installEditPolicy(EditPolicy.CONNECTION_BENDPOINTS_ROLE, new LinkBendpointEditPolicy(((DiagramEditPart)((PasserellRootEditPart) getParent()).getContents()).getMultiPageEditorPart()));
 
   }
 
@@ -113,8 +143,8 @@ public class LinkEditPart extends AbstractConnectionEditPart implements ChangeLi
    * 
    * @return Model of this as <code>Relation</code>
    */
-  public Link getRelation() {
-    return (Link) getModel();
+  public LinkWithBendPoints getRelation() {
+    return (LinkWithBendPoints) getModel();
   }
 
   /**
@@ -138,7 +168,15 @@ public class LinkEditPart extends AbstractConnectionEditPart implements ChangeLi
     }
   }
 
-  public void changeExecuted(ChangeRequest change) {
+  public void changeExecuted(ChangeRequest changerequest) {
+    if (changerequest instanceof ModelChangeRequest) {
+      Class<?> type = ((ModelChangeRequest) changerequest).getType();
+     if (LinkCreateBendpointCommand.class.equals(type) && getModel().equals(changerequest.getSource())) {
+        
+        refreshVisuals();
+        return;
+      }
+    }
   }
 
   public void changeFailed(ChangeRequest change, Exception exception) {

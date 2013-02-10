@@ -176,7 +176,7 @@ public class ActorEditPolicy extends GraphicalNodeEditPolicy {
       IActorNodeEditPart actorEditPart = (IActorNodeEditPart) target;
       ConnectionAnchor anchor = actorEditPart.getSourceConnectionAnchor(request);
       Port port = actorEditPart.getSourcePort(anchor);
-      if (!port.equals(cmd.getSource())) {
+      if (port!=null && !port.equals(cmd.getSource())) {
         cmd.setNewSource(port);
       }
     }

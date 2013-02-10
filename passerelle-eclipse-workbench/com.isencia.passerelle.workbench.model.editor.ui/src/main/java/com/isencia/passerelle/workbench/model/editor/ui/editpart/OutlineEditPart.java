@@ -2,7 +2,6 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;

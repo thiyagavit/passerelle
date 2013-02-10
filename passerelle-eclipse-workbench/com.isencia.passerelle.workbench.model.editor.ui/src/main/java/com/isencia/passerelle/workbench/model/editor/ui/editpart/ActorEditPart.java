@@ -58,7 +58,7 @@ public class ActorEditPart extends AbstractNodeEditPart implements IActorNodeEdi
     if (getParent() instanceof DiagramEditPart) {
       installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(((DiagramEditPart) getParent()).getMultiPageEditorPart(), this));
     }
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram()));
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(),((DiagramEditPart) getParent()).getMultiPageEditorPart()));
   }
 
   /**

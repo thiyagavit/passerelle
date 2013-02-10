@@ -2,11 +2,11 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.gef.AccessibleAnchorProvider;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
@@ -44,7 +44,7 @@ public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEd
 
     List<Link> allLinks = new ArrayList<Link>();
 
-    List<Link> links = getDiagram().getLinkHolder().getLinks(getModel());
+    Set<Link> links = getDiagram().getLinkHolder().getLinks(getModel());
     if (links != null)
       for (Link link : links) {
         if (link.getHead().equals(getModel())) {
@@ -59,7 +59,7 @@ public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEd
   protected List getModelTargetConnections() {
     List<Link> allLinks = new ArrayList<Link>();
 
-    List<Link> links = getDiagram().getLinkHolder().getLinks(getModel());
+    Set<Link> links = getDiagram().getLinkHolder().getLinks(getModel());
     if (links != null)
       for (Link link : links) {
         if (link.getTail().equals(getModel())) {
@@ -75,7 +75,7 @@ public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEd
 
   public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connEditPart) {
     getLogger().debug("Get SourceConnectionAnchor based on ConnectionEditPart");
-    return getVertexFigure().getInputAnchor(getLocation(connEditPart, true), ModelUtils.getLocation((Vertex) getModel()));
+    return getVertexFigure().getInputAnchor(getLocation(connEditPart, false), ModelUtils.getLocation((Vertex) getModel()));
   }
 
   private double[] getLocation(ConnectionEditPart connEditPart, boolean isSource) {
@@ -108,13 +108,13 @@ public class VertexEditPart extends AbstractNodeEditPart implements IActorNodeEd
   public ConnectionAnchor getTargetConnectionAnchor(ConnectionEditPart connEditPart) {
     getLogger().debug("Get TargetConnectionAnchor based on ConnectionEditPart");
 
-    return getVertexFigure().getOutputAnchor(getLocation(connEditPart, false), ModelUtils.getLocation((Vertex) getModel()));
+    return getVertexFigure().getOutputAnchor(getLocation(connEditPart, true), ModelUtils.getLocation((Vertex) getModel()));
   }
 
   protected void createEditPolicies() {
     if (getParent() instanceof DiagramEditPart)
       installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(((DiagramEditPart) getParent()).getMultiPageEditorPart(), this));
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram()));
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(),((DiagramEditPart) getParent()).getMultiPageEditorPart()));
   }
 
   public ConnectionAnchor getSourceConnectionAnchor(Request request) {

@@ -1,11 +1,14 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.PartInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,26 +54,30 @@ public class EditSubmodelAction extends Action {
       try {
         final SubModelPaletteItemDefinition item = (SubModelPaletteItemDefinition) definition;
         final String name = item.getName();
-        Flow flow = Activator.getDefault().getRepositoryService().getSubmodel(name);
-        final IProject pass = ModelUtils.getPasserelleProject();
-
-        final IFile file = pass.getFile(name + ".moml");
-        StringWriter writer = new StringWriter();
-        flow.exportMoML(writer);
-
-        final ByteArrayInputStream contents = new ByteArrayInputStream(writer.toString().getBytes());
-        if (!file.exists()) {
-          file.create(contents, true, null);
-        } else {
-          file.setContents(contents, true, true, null);
-        }
-        final IPasserelleMultiPageEditor ed = (IPasserelleMultiPageEditor) EclipseUtils.openEditor(file, PasserelleModelMultiPageEditor.ID);
-        ed.setPasserelleEditorActive();
+        openFlowEditor(name);
 
       } catch (Exception e) {
         logger.error("Cannot edit submodel!", e);
       }
     }
+  }
+
+  public static void openFlowEditor(final String name) throws Exception, IOException, CoreException, PartInitException {
+    Flow flow = Activator.getDefault().getRepositoryService().getSubmodel(name);
+    final IProject pass = ModelUtils.getPasserelleProject();
+
+    final IFile file = pass.getFile(name + ".moml");
+    StringWriter writer = new StringWriter();
+    flow.exportMoML(writer);
+
+    final ByteArrayInputStream contents = new ByteArrayInputStream(writer.toString().getBytes());
+    if (!file.exists()) {
+      file.create(contents, true, null);
+    } else {
+      file.setContents(contents, true, true, null);
+    }
+    final IPasserelleMultiPageEditor ed = (IPasserelleMultiPageEditor) EclipseUtils.openEditor(file, PasserelleModelMultiPageEditor.ID);
+    ed.setPasserelleEditorActive();
   }
 
 }

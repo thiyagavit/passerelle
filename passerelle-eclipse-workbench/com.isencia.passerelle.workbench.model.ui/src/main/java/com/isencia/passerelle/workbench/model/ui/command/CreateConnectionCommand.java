@@ -19,17 +19,23 @@ import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
+import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class CreateConnectionCommand extends Command implements IRefreshConnections, ICommand {
 
   private IPasserelleMultiPageEditor editor;
   private Link link;
 
+  public Link getLink() {
+    return link;
+  }
+
   public CreateConnectionCommand(NamedObj source, NamedObj target, IPasserelleMultiPageEditor editor) {
     super();
     this.sourceNamedObj = source;
     this.targetNamedObj = target;
     this.editor = editor;
+    this.container = editor.getSelectedContainer();
   }
 
   public CreateConnectionCommand(IPasserelleMultiPageEditor editor) {
@@ -51,6 +57,7 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
   }
 
   protected TypedIORelation connection;
+
   protected NamedObj sourceNamedObj;
   protected NamedObj targetNamedObj;
 
@@ -101,7 +108,20 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
                 ((ComponentPort) targetNamedObj).link(relation);
               }
             }
-            setLink(editor.generateLink(relation, sourceNamedObj, targetNamedObj));
+            Link generateLink = null;
+//            if (sourceNamedObj instanceof Vertex && targetNamedObj instanceof Vertex) {
+//              double[] otherVertexLocation = ModelUtils.getLocation(sourceNamedObj);
+//              double[] vertexLocation = ModelUtils.getLocation(targetNamedObj);
+//              if (vertexLocation[0] < otherVertexLocation[0]) {
+//                generateLink = editor.generateLink(relation, sourceNamedObj, targetNamedObj);
+//              } else {
+//                generateLink = editor.generateLink(relation, targetNamedObj, sourceNamedObj);
+//              }
+//
+//            } else {
+              generateLink = editor.generateLink(relation, sourceNamedObj, targetNamedObj);
+//            }
+            setLink(generateLink);
           } catch (Exception e) {
             if (link != null) {
               editor.registerLink(link);
@@ -121,11 +141,11 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
   private CompositeEntity getContainer(NamedObj source, NamedObj target) {
     if (container != null)
       return container;
-    if (editor != null && (source instanceof TypedIOPort || target instanceof TypedIOPort)) {
-      return editor.getSelectedPage().getContainer();
-    }
+    // if (editor != null && (source instanceof TypedIOPort || target instanceof TypedIOPort)) {
+    // return editor.getSelectedPage().getContainer();
+    // }
 
-    return (CompositeEntity) source.toplevel();
+    return editor.getSelectedPage().getContainer();
   }
 
   public String getLabel() {
@@ -155,7 +175,7 @@ public class CreateConnectionCommand extends Command implements IRefreshConnecti
   public void undo() {
     if (link != null) {
       try {
-        new DeleteLinkCommand(container, link).doExecute();
+        new DeleteLinkCommand(container, link, editor).doExecute();
       } catch (Exception e) {
       }
     }

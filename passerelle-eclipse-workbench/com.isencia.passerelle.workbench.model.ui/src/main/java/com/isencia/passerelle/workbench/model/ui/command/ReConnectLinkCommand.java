@@ -13,6 +13,9 @@ import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class ReConnectLinkCommand extends Command {
 
+  private CompositeEntity parent;
+  private IPasserelleMultiPageEditor editor;
+
   private DeleteLinkCommand deleteLinkCommand;
   private CreateConnectionCommand createLinkCommand;
 
@@ -23,7 +26,6 @@ public class ReConnectLinkCommand extends Command {
   }
 
   private static final Logger logger = LoggerFactory.getLogger(ReConnectLinkCommand.class);
-  private IPasserelleMultiPageEditor editor;
 
   private Link link;
 
@@ -31,8 +33,8 @@ public class ReConnectLinkCommand extends Command {
     return link;
   }
 
-  public void setLink(Link vertexLink) {
-    this.link = vertexLink;
+  public void setLink(Link link) {
+    this.link = link;
   }
 
   protected NamedObj source;
@@ -74,10 +76,16 @@ public class ReConnectLinkCommand extends Command {
   }
 
   protected NamedObj target;
-  private CompositeEntity parent;
 
   public ReConnectLinkCommand() {
     super("Reconnect");
+  }
+
+  public ReConnectLinkCommand(IPasserelleMultiPageEditor editor, Link link) {
+    super();
+    this.editor = editor;
+    this.parent = this.editor.getSelectedContainer();
+    this.link = link;
   }
 
   public Logger getLogger() {
@@ -88,31 +96,21 @@ public class ReConnectLinkCommand extends Command {
     doExecute();
   }
 
-  private Command delCommand;
-  private CreateConnectionCommand conCommand;
-
   protected void doExecute() {
-    // Perform Change in a ChangeRequest so that all Listeners are notified
-
-    parent.requestChange(new ModelChangeRequest(this.getClass(), link, "reconnect") {
-      @SuppressWarnings("unchecked")
-      @Override
-      protected void _execute() throws Exception {
-        if (newSource != null || newTarget != null) {
-          deleteLinkCommand = new DeleteLinkCommand(parent, link);
-          deleteLinkCommand.doExecute();
-          createLinkCommand = new CreateConnectionCommand(editor);
-          if (newSource != null){
-            createLinkCommand.setTarget(getTarget());
-            createLinkCommand.setSource(newSource);
-          }else{
-            createLinkCommand.setTarget(newTarget);
-            createLinkCommand.setSource((NamedObj) link.getHead());
-          }
-          createLinkCommand.doExecute();
-        }
+    if (newSource != null || newTarget != null) {
+      deleteLinkCommand = new DeleteLinkCommand(parent, link, editor);
+      deleteLinkCommand.doExecute();
+      createLinkCommand = new CreateConnectionCommand(editor);
+      if (newSource != null) {
+        createLinkCommand.setTarget(getTarget());
+        createLinkCommand.setSource(newSource);
+      } else {
+        createLinkCommand.setTarget(newTarget);
+        createLinkCommand.setSource((NamedObj) link.getHead());
       }
-    });
+      createLinkCommand.doExecute();
+
+    }
 
   }
 
@@ -125,8 +123,12 @@ public class ReConnectLinkCommand extends Command {
   }
 
   public void undo() {
-    createLinkCommand.undo();
-    deleteLinkCommand.undo();
+    try {
+      createLinkCommand.undo();
+      // deleteLinkCommand.undo();
+    } catch (Exception e) {
+
+    }
   }
 
 }

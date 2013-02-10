@@ -39,8 +39,18 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
   private static Logger logger = LoggerFactory.getLogger(CreateComponentCommand.class);
 
   private Class<? extends NamedObj> clazz;
+
   private String name;
+
   private Flow flow;
+
+  private NamedObj parent;
+
+  private NamedObj child;
+
+  private IPasserelleMultiPageEditor editor;
+  
+  private TypedIORelation relation;
 
   public Flow getFlow() {
     return flow;
@@ -50,24 +60,24 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
     this.flow = flow;
   }
 
-  private NamedObj model;
-  private NamedObj parent;
-  private NamedObj child;
-  private IPasserelleMultiPageEditor editor;
+  private double[] location;
 
   public NamedObj getChild() {
     return child;
   }
 
-  private double[] location;
-
   public CreateComponentCommand(IPasserelleMultiPageEditor editor) {
     super("CreateComponent");
     this.editor = editor;
+    this.parent = editor.getSelectedContainer();
   }
 
-  public void setModel(NamedObj model) {
-    this.model = model;
+  public CreateComponentCommand(Class<? extends NamedObj> clazz, String name, NamedObj parent, double[] location,TypedIORelation relation) {
+    this.parent = parent;
+    this.clazz = clazz;
+    this.name = name;
+    this.location = location;
+    this.relation= relation;
   }
 
   public Logger getLogger() {
@@ -105,57 +115,40 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
       protected void _execute() throws Exception {
         try {
           CompositeEntity parentModel = (CompositeEntity) parent;
-          String componentName = null;
+          
+          String componentName = EditorUtils.findUniqueName(parentModel, clazz, name, name);
 
-          if (model == null) {
-            componentName = EditorUtils.findUniqueName(parentModel, clazz, name, name);
-            componentName = ModelUtils.getLegalName(componentName);
-
-            if (Vertex.class.isAssignableFrom(clazz)) {
-
-              TypedIORelation rel = new TypedIORelation(parentModel, componentName);
-              child = new Vertex(rel, "Vertex");
-
-            } else if (Flow.class.isAssignableFrom(clazz)) {
-              if (flow != null) {
-
-                child = (NamedObj) flow.instantiate(parentModel, componentName);
-                ((CompositeActor) child).setClassName(flow.getName());
-
-              }
-
-            } else {
-              Class constructorClazz = CompositeEntity.class;
-              if (TypedIOPort.class.isAssignableFrom(clazz)) {
-                constructorClazz = ComponentEntity.class;
-
-              } else if (TextAttribute.class.isAssignableFrom(clazz)) {
-                constructorClazz = NamedObj.class;
-
-              }
-              Constructor constructor = clazz.getConstructor(constructorClazz, String.class);
-
-              child = (NamedObj) constructor.newInstance(parentModel, componentName);
-              if (child instanceof TypedIOPort) {
-                boolean isInput = name.equalsIgnoreCase("INPUT") || clazz.getName().toLowerCase().endsWith(".input");
-                ((TypedIOPort) child).setInput(isInput);
-                ((TypedIOPort) child).setOutput(!isInput);
-              }
+          if (Vertex.class.isAssignableFrom(clazz)) {
+            if (relation == null){
+              relation = new TypedIORelation(parentModel, componentName);
             }
+            child = new Vertex(relation, "Vertex");
+
+          } else if (Flow.class.isAssignableFrom(clazz)) {
+            if (flow != null) {
+
+              child = (NamedObj) flow.instantiate(parentModel, componentName);
+              ((CompositeActor) child).setClassName(flow.getName());
+
+            }
+
           } else {
+            Class constructorClazz = CompositeEntity.class;
+            if (TypedIOPort.class.isAssignableFrom(clazz)) {
+              constructorClazz = ComponentEntity.class;
 
-            componentName = ModelUtils.findUniqueName(parentModel, model.getClass(), name, name);
+            } else if (TextAttribute.class.isAssignableFrom(clazz)) {
+              constructorClazz = NamedObj.class;
 
-            componentName = ModelUtils.getLegalName(componentName);
-            if (Vertex.class.isAssignableFrom(model.getClass())) {
-              TypedIORelation rel = new TypedIORelation(parentModel, componentName);
-              child = new Vertex(rel, "Vertex");
-
-            } else {
-              child = (NamedObj) model.clone(((CompositeEntity) parentModel).workspace());
-              child.setName(componentName);
             }
-            EditorUtils.setContainer(child, parentModel);
+            Constructor constructor = clazz.getConstructor(constructorClazz, String.class);
+
+            child = (NamedObj) constructor.newInstance(parentModel, componentName);
+            if (child instanceof TypedIOPort) {
+              boolean isInput = name.equalsIgnoreCase("INPUT") || clazz.getName().toLowerCase().endsWith(".input");
+              ((TypedIOPort) child).setInput(isInput);
+              ((TypedIOPort) child).setOutput(!isInput);
+            }
           }
 
           createDefaultValues(child);
@@ -180,7 +173,8 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
     parent.requestChange(new ModelChangeRequest(this.getClass(), parent, "create") {
       @Override
       protected void _execute() throws Exception {
-        editor.selectPage((CompositeActor) parent);
+        if (child instanceof CompositeActor && editor != null)
+          editor.selectPage((CompositeActor) parent);
         if (child instanceof NamedObj) {
           EditorUtils.setContainer(child, parent);
 
@@ -207,7 +201,8 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
     parent.requestChange(new ModelChangeRequest(this.getClass(), parent, "create") {
       @Override
       protected void _execute() throws Exception {
-        editor.selectPage((CompositeActor) parent);
+        if (child instanceof CompositeActor && editor != null)
+          editor.selectPage((CompositeActor) parent);
         if (child instanceof NamedObj) {
           EditorUtils.setContainer(child, null);
         }
