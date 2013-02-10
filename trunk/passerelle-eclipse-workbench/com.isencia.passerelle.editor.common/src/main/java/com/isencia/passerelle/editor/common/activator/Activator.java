@@ -6,13 +6,17 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.ext.ActorOrientedClassProvider;
+import com.isencia.passerelle.ext.ModelElementClassProvider;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 public class Activator implements BundleActivator {
   private ActorOrientedClassProviderTracker repoSvcTracker;
   private static Activator plugin;
-  private ServiceRegistration factoryServiceRegistration;
 
+  private ServiceRegistration apSvcReg;
   public static Activator getDefault() {
     return plugin;
   }
@@ -25,11 +29,18 @@ public class Activator implements BundleActivator {
     plugin = this;
     repoSvcTracker = new ActorOrientedClassProviderTracker(context);
     repoSvcTracker.open();
+    
+    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new ModelElementClassProvider() {
+      public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
+        return (Class<? extends NamedObj>) this.getClass().getClassLoader().loadClass(className);
+      }
+    }, null);
 
   }
 
   public void stop(BundleContext context) throws Exception {
-
+    apSvcReg.unregister();
+    repoSvcTracker.close();
   }
 
   public ActorOrientedClassProvider getActorOrientedClassProvider() {
