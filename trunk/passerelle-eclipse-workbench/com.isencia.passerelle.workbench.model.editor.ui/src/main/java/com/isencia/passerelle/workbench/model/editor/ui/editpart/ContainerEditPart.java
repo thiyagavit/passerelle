@@ -3,26 +3,15 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.eclipse.gef.EditPart;
 
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
-import ptolemy.actor.TypedIORelation;
-import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.Relation;
-import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
-import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.editor.common.model.LinkHolder;
-import com.isencia.passerelle.editor.common.utils.EditorUtils;
 
 /**
  * Provides support for Container EditParts.

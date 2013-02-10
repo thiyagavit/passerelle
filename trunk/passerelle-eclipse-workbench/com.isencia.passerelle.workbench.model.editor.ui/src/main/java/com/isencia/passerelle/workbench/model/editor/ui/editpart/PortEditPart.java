@@ -8,24 +8,16 @@ import java.util.Set;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.ConnectionEditPart;
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.RootEditPart;
 
-import ptolemy.actor.Actor;
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedIOPort;
-import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.Port;
-import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.NamedObj;
-import ptolemy.moml.Vertex;
 
 import com.isencia.passerelle.editor.common.model.Link;
-import com.isencia.passerelle.editor.common.model.LinkHolder;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompoundIOFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompoundInputFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompoundOutputFigure;
-import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 /**
  * <code>PortEditPart</code> is the EditPart for the Port model objects
@@ -55,7 +47,7 @@ public class PortEditPart extends ActorEditPart {
   @Override
   protected List getModelSourceConnections() {
     if (isInput) {
-      return getPortSourceConnections();
+      return getPortConnections();
     }
     return Collections.EMPTY_LIST;
   }
@@ -63,20 +55,28 @@ public class PortEditPart extends ActorEditPart {
   @Override
   protected List getModelTargetConnections() {
     if (!isInput) {
-      return getPortTargetConnections();
+      return getPortConnections();
     }
     return Collections.EMPTY_LIST;
   }
 
-  protected List getPortSourceConnections() {
+  protected List getPortConnections() {
+    List allLinks = new ArrayList();
+    Set<Link> links = getDiagram().getLinkHolder().getLinks(getModel());
+    if (links != null) {
+      for (Link link : links) {
+        NamedObj container = ((IOPort) getModel()).getContainer();
+        NamedObj relContainer = link.getRelation().getContainer();
+        if (container != null && container.equals(relContainer)) {
+          allLinks.add(link);
+        }
+      }
 
-    return (getDiagram().getLinkHolder().getLinks(getModel()));
+    }
+    return allLinks;
   }
 
-  protected List getPortTargetConnections() {
 
-    return (getDiagram().getLinkHolder().getLinks(getModel()));
-  }
 
   public Port getSourcePort(ConnectionAnchor anchor) {
     getLogger().trace("Get Source port  based on anchor");

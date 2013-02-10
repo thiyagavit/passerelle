@@ -20,6 +20,7 @@ import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.editor.common.business.ICommand;
 import com.isencia.passerelle.editor.common.model.Link;
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 
 public class PasteNodeCommand extends Command {
@@ -89,7 +90,7 @@ public class PasteNodeCommand extends Command {
     while (it.hasNext()) {
       try {
         Object o = it.next();
-        if (o instanceof Link) {
+        if (o instanceof LinkWithBendPoints) {
           hasLinks = true;
           Link link = (Link) o;
           NamedObj head = (NamedObj) link.getHead();

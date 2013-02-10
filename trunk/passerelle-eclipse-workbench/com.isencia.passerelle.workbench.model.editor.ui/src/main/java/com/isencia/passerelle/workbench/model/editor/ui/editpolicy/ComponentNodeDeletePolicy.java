@@ -42,9 +42,8 @@ public class ComponentNodeDeletePolicy extends org.eclipse.gef.editpolicies.Comp
     NamedObj child = (NamedObj) getHost().getModel();
     Object parent = getHost().getParent().getModel();
     DeleteComponentCommand deleteCmd = getDeleteComponentCommand();
-    deleteCmd.setLinkHolder(diagram.getLinkHolder());
+    deleteCmd.setMultiPageEditor(multiPageEditor);
     if (multiPageEditor != null && child instanceof CompositeActor) {
-      deleteCmd.setMultiPageEditor(multiPageEditor);
       deleteCmd.emptyIndexList();
       addCompositeActorIndex(child, deleteCmd);
     }

@@ -3,7 +3,9 @@ package com.isencia.passerelle.workbench.model.ui.command;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gef.commands.Command;
@@ -13,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.TypedIORelation;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
@@ -27,15 +28,6 @@ import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 
 public class DeleteComponentCommand extends Command implements IRefreshConnections {
   private IPasserelleMultiPageEditor multiPageEditor;
-  private LinkHolder linkHolder;
-
-  /**
-   * @param linkHolder
-   *          the linkHolder to set
-   */
-  public void setLinkHolder(LinkHolder linkHolder) {
-    this.linkHolder = linkHolder;
-  }
 
   public void setMultiPageEditor(IPasserelleMultiPageEditor multiPageEditor) {
     this.multiPageEditor = multiPageEditor;
@@ -91,7 +83,7 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
             multiPageEditor.removePage(index);
           }
         }
-        List<Link> links = new ArrayList<Link>();
+        Set<Link> links = new HashSet<Link>();
 
         if (child instanceof Actor) {
           Actor actor = (Actor) child;
@@ -99,7 +91,7 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
           ports.addAll(actor.inputPortList());
           ports.addAll(actor.outputPortList());
           for (Object p : ports) {
-            List<Link> portLinks = linkHolder.getLinks(p);
+            Set<Link> portLinks = multiPageEditor.getLinks(p);
             if (portLinks != null) {
               links.addAll(portLinks);
             }
@@ -107,12 +99,14 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
           }
 
         } else {
-          links = linkHolder.getLinks(child);
+          links = multiPageEditor.getLinks(child);
         }
         if (links != null && links.size() > 0) {
           delecteListCommands = new ArrayList<DeleteLinkCommand>(links.size());
           for (Link link : links) {
-            delecteListCommands.add(new DeleteLinkCommand((CompositeEntity) container, link));
+            DeleteLinkCommand deleteLinkCommand = new DeleteLinkCommand((CompositeEntity)link.getRelation().getContainer(), link,multiPageEditor);
+            deleteLinkCommand.execute();
+            delecteListCommands.add(deleteLinkCommand);
           }
         }
       }
@@ -120,11 +114,7 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
 
   }
 
-  /*
-   * private void reattachToGuides(LogicSubpart part) { if (vGuide != null) vGuide.attachPart(part, vAlign); if (hGuide
-   * != null) hGuide.attachPart(part, hAlign); }
-   */
-
+ 
   public void redo() {
     doExecute();
   }
@@ -146,7 +136,7 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
 
   public void undo() {
     // Perform Change in a ChangeRequest so that all Listeners are notified
-    parent.requestChange(new ChangeRequest(child, "undo-delete") {
+    parent.requestChange(new ModelChangeRequest(this.getClass(),parent, "undo-delete",child) {
       @Override
       protected void _execute() throws Exception {
         try {

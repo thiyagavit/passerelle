@@ -2,6 +2,7 @@ package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
@@ -35,8 +36,9 @@ import com.isencia.passerelle.workbench.model.editor.ui.INameable;
 import com.isencia.passerelle.workbench.model.editor.ui.ImageRegistry;
 import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.AbstractNodeFigure;
-import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
 import com.isencia.passerelle.workbench.model.ui.command.ChangeActorPropertyCommand;
+import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 import com.isencia.passerelle.workbench.model.ui.command.IRefreshConnections;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.ui.command.SetConstraintCommand;
@@ -161,7 +163,7 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     return null;
   }
 
-  public void refreshConnections(Class type, Object source) {
+  public void refreshConnections() {
     try {
       refreshSourceConnections();
       refreshTargetConnections();
@@ -192,12 +194,27 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
 
   @Override
   public void changeExecuted(ChangeRequest changerequest) {
+
     Object source = changerequest.getSource();
     if (changerequest instanceof ModelChangeRequest) {
+
       Class<?> type = ((ModelChangeRequest) changerequest).getType();
+      if (CreateComponentCommand.class.equals(type)) {
+        return;
+      }
       if (SetConstraintCommand.class.equals(type)) {
         if (source == getModel() && source instanceof NamedObj) {
           refresh();
+        } else {
+          DiagramEditPart diagram = getDiagram();
+          if (diagram != null && diagram.getLinkHolder() != null) {
+            Set<Link> links = diagram.getLinkHolder().getLinks(source);
+            for (Link link : links) {
+              if (link.getTail().equals(getModel()) || link.getHead().equals(getModel())) {
+                refresh();
+              }
+            }
+          }
         }
         return;
       }
@@ -211,9 +228,14 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
         }
         return;
       }
+//      if (changerequest.getDescription().contains("undo")){
+//        refresh();
+//      }
       if (IRefreshConnections.class.isAssignableFrom(type) && (this instanceof IActorNodeEditPart)) {
-
-        refreshConnections(type, source);
+        try {
+          refreshConnections();
+        } catch (Exception e) {
+        }
         return;
       }
 
@@ -229,9 +251,16 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     else
       ports = no.outputPortList();
     for (Object port : ports) {
-      List<Link> links = diagram.getLinks(port);
+      Set<Link> links = diagram.getLinks(port);
       if (links != null) {
-        allLinks.addAll(links);
+        for (Link link : links) {
+          NamedObj container = no.getContainer();
+          NamedObj relContainer = link.getRelation().getContainer();
+          if (container != null && container.equals(relContainer)) {
+            allLinks.add(link);
+          }
+        }
+
       }
     }
     return allLinks;
@@ -240,7 +269,7 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
   public static ConnectionAnchor getConnectionAnchor(ConnectionEditPart connEditPart, AbstractNodeFigure actorFigure, Actor no, boolean target) {
     Port port = null;
     Object model = connEditPart.getModel();
-    if (model instanceof Link) {
+    if (model instanceof LinkWithBendPoints) {
       Link link = (Link) model;
       Object source = null;
       if (target)
@@ -254,12 +283,12 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
           return actorFigure.getConnectionAnchor(port.getName());
         }
       }
-      if (source instanceof Vertex){
-        return actorFigure.getConnectionAnchor(((Vertex)source).getName());
-        
+      if (source instanceof Vertex) {
+        return actorFigure.getConnectionAnchor(((Vertex) source).getName());
+
       }
     }
     return null;
   }
-  
+
 }

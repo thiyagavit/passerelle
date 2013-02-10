@@ -62,7 +62,7 @@ public class RouterFactory {
 			case 3:
 				return RECTILINEAR;
 			default:
-				return SCAMANHATTAN;
+				return DIRECT;
 			}
 		}
 	}

@@ -1,11 +1,15 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.Clickable;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
@@ -21,6 +25,7 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.requests.DropRequest;
+import org.eclipse.help.ui.internal.util.ErrorUtil;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.slf4j.Logger;
@@ -37,17 +42,23 @@ import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
 
+import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
+import com.isencia.passerelle.workbench.model.editor.ui.PasserellePreferencePage;
+import com.isencia.passerelle.workbench.model.editor.ui.PreferenceConstants;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelEditor;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.EditSubmodelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ActorEditPolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.editpolicy.ComponentNodeDeletePolicy;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.CompositeActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
+import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 import com.isencia.passerelle.workbench.model.ui.command.DeleteComponentCommand;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -95,13 +106,13 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
           index = multiPageEditor.addPage(model, editor, multiPageEditor.getEditorInput());
           multiPageEditor.setText(index, WorkbenchUtility.getPath(model));
           multiPageEditor.setActiveEditor(editor);
-          index = index - 1;
 
         }
-        multiPageEditor.setActiveEditor(multiPageEditor.getEditor(index + 1));
+        multiPageEditor.setActiveEditor(multiPageEditor.getEditor(index ));
       }
 
     } catch (Exception e) {
+      e.printStackTrace();
     }
 
   }
@@ -164,7 +175,17 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     button.addMouseListener(new MouseListener() {
 
       public void mouseDoubleClicked(MouseEvent e) {
-        initPage((TypedCompositeActor) getModel());
+        TypedCompositeActor model = (TypedCompositeActor) getModel();
+        if (model instanceof Flow && Activator.getDefault().getPreferenceStore().getBoolean(PasserellePreferencePage.SUBMODEL_DRILLDOWN)) {
+          try {
+            EditSubmodelAction.openFlowEditor(model.getName());
+          } catch (Exception e1) {
+            EclipseUtils.logError(e1, "Open submodel failed", Status.ERROR);
+          }
+
+        } else {
+          initPage(model);
+        }
 
       }
 
@@ -338,8 +359,6 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
 
     return ActorEditPart.getPort(anchor, getComponentFigure(), getActor(), false);
   }
-
-
 
   /**
    * Returns the connection anchor of a source connection which is at the given point.

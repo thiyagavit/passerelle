@@ -14,6 +14,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.editor.common.model.Link;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleMultiPageEditor;
 
 public class CutNodeCommand extends CopyNodeCommand {
@@ -33,9 +34,9 @@ public class CutNodeCommand extends CopyNodeCommand {
       Iterator it = list.iterator();
       while (it.hasNext()) {
         Object o = it.next();
-        if (o instanceof Link) {
+        if (o instanceof LinkWithBendPoints) {
           Link link = (Link) o;
-          cmdStack.add(new DeleteLinkCommand((CompositeEntity) link.getRelation().getContainer(), link));
+          cmdStack.add(new DeleteLinkCommand((CompositeEntity) link.getRelation().getContainer(), link,editor));
         }
       }
 

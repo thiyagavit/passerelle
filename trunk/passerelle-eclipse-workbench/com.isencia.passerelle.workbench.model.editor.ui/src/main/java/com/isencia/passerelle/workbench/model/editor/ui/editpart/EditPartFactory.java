@@ -1,9 +1,7 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editpart;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,15 +18,14 @@ import ptolemy.actor.Director;
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedAtomicActor;
 import ptolemy.actor.TypedCompositeActor;
-import ptolemy.kernel.ComponentRelation;
 import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.actor.Sink;
 import com.isencia.passerelle.actor.Source;
 import com.isencia.passerelle.editor.common.model.Link;
-import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
+import com.isencia.passerelle.workbench.model.opm.LinkWithBendPoints;
 
 public class EditPartFactory implements org.eclipse.gef.EditPartFactory {
   Map<Object, EditPart> componentsMap = new HashMap<Object, EditPart>();
@@ -36,7 +33,7 @@ public class EditPartFactory implements org.eclipse.gef.EditPartFactory {
  
   public Link getLink(EditPart id) {
     Object mo = getModelObj(id);
-    if (mo instanceof Link) {
+    if (mo instanceof LinkWithBendPoints) {
       return (Link) mo;
     }
     return null;
@@ -105,7 +102,7 @@ public class EditPartFactory implements org.eclipse.gef.EditPartFactory {
         child = new PortEditPart(true);
       else
         child = new PortEditPart(false);
-    } else if (model instanceof Link) {
+    } else if (model instanceof LinkWithBendPoints) {
       
       child = new LinkEditPart();
     } else if (model instanceof TypedCompositeActor) {

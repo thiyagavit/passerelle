@@ -12,7 +12,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 public class PasserellePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
+  public static final String SUBMODEL_DRILLDOWN = "com.isencia.passerelle.submodel.drilldown";
   public PasserellePreferencePage() {
     super();
     setPreferenceStore(Activator.getDefault().getPreferenceStore());
@@ -27,6 +27,8 @@ public class PasserellePreferencePage extends FieldEditorPreferencePage implemen
 
     final DirectoryFieldEditor subModelRoot = new DirectoryFieldEditor(RepositoryService.SUBMODEL_ROOT, "Submodel Root", getFieldEditorParent());
     addField(subModelRoot);
+    final BooleanFieldEditor submodelDrillDown = new BooleanFieldEditor(SUBMODEL_DRILLDOWN, "Open submodel in separate browser", getFieldEditorParent());
+    addField(submodelDrillDown);
 
   }
 
