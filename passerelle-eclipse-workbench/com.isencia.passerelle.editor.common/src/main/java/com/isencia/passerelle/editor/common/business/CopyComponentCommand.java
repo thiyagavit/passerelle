@@ -3,6 +3,7 @@ package com.isencia.passerelle.editor.common.business;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.TypedIOPort;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.NamedObj;
 
@@ -54,7 +55,11 @@ public class CopyComponentCommand implements ICommand {
   public void doExecute() {
     try {
       newChild = (NamedObj) child.clone(parent.workspace());
-      String name = EditorUtils.findUniqueName(parent, child.getClass(), false ? EditorUtils.DEFAULT_INPUT_PORT : EditorUtils.DEFAULT_OUTPUT_PORT, child.getName());
+      boolean input = false;
+      if (child instanceof TypedIOPort){
+        input = ((TypedIOPort)child).isInput();
+      }
+      String name = EditorUtils.findUniqueName(parent, child.getClass(), input ? EditorUtils.DEFAULT_INPUT_PORT : EditorUtils.DEFAULT_OUTPUT_PORT, child.getName());
 
       newChild.setName(name);
 

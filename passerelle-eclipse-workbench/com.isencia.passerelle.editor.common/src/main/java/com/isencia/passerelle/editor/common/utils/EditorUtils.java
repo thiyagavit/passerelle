@@ -36,6 +36,7 @@ import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.editor.common.model.Link;
+import com.isencia.passerelle.editor.common.model.LinkImpl;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.CollectingMomlParsingErrorHandler;
@@ -336,7 +337,7 @@ public class EditorUtils {
   }
 
   public static Link generateLink(ComponentRelation relation, Object source, Object target) {
-    Link link = new Link();
+    Link link = new LinkImpl();
     link.setHead(source);
     link.setTail(target);
     link.setRelation(relation);
