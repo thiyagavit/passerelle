@@ -43,6 +43,10 @@ public class Forwarder extends Actor {
 
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    doProcess(ctxt, request, response);
+  }
+
+  protected void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage receivedMsg = request.getMessage(input);
     // Create a new outgoing msg, "caused by" the received input msg
     // and for the rest a complete copy of the received msg
