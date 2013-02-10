@@ -9,7 +9,8 @@ import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
 
 /**
- * @author delerw
+ * 
+ * @author erwin
  *
  */
 public class ProcessRequest extends com.isencia.passerelle.actor.v5.ProcessRequest {
@@ -44,8 +45,8 @@ public class ProcessRequest extends com.isencia.passerelle.actor.v5.ProcessReque
   @Override
   public void addInputMessage(int inputIndex, String inputName, ManagedMessage inputMsg) {
     String[] ctxtIDs = ((SettableMessage)inputMsg).getHeader(HEADER_PROCESS_CONTEXT);
-    boolean itsOk=processContext==null || (ctxtIDs.length==0);
-    if(ctxtIDs.length>0) {
+    boolean itsOk= (processContext==null) || (ctxtIDs.length==0);
+    if(!itsOk) {
       for (String id : ctxtIDs) {
         
       }
