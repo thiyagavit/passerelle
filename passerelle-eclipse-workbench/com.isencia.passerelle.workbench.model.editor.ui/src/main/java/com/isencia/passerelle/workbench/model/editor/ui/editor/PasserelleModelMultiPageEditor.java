@@ -838,7 +838,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     }
 
     public void switchThumbnail(int newPageIndex) {
-      // index = getActivePage();
+      index = getActivePage();
 
       IEditorPart newEditor = getEditor(newPageIndex);
       if (newEditor instanceof PasserelleModelEditor)

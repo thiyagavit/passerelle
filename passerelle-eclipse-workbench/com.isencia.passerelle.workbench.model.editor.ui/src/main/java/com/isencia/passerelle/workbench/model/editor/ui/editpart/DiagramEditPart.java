@@ -45,7 +45,7 @@ public class DiagramEditPart extends ContainerEditPart implements LayerConstants
   private PasserelleModelMultiPageEditor multiPageEditorPart;
 
   public DiagramEditPart(PasserelleModelMultiPageEditor parent, CompositeActor actor) {
-    super(actor);
+    super(parent,actor);
     this.multiPageEditorPart = parent;
   }
 
