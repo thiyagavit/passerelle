@@ -109,9 +109,9 @@ public abstract class AbstractGetScanData extends TransformerV5 {
 
     protected abstract int getNbRequieredSensor();
 
-    protected abstract void readActuatorValue()throws IllegalActionException;
+    protected abstract void readActuatorValue() throws IllegalActionException;
 
-    protected abstract void readSensorValue()throws IllegalActionException;
+    protected abstract void readSensorValue() throws IllegalActionException;
 
     @Override
     protected void validateInitialization() throws ValidationException {
@@ -124,7 +124,6 @@ public abstract class AbstractGetScanData extends TransformerV5 {
         }
     }
 
- 
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
         // Output dynamique ports creation
@@ -192,9 +191,11 @@ public abstract class AbstractGetScanData extends TransformerV5 {
     protected String getExtendedInfo() {
         return this.getName();
     }
-    
-    protected abstract void realProcessImpl(final IScanResult res,final List<IActuator> actuatorList, final List<ISensor> sensorList) throws ProcessingException, DevFailed;
-    
+
+    protected abstract void realProcessImpl(final IScanResult res,
+            final List<IActuator> actuatorList, final List<ISensor> sensorList)
+            throws ProcessingException, DevFailed;
+
     @Override
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
@@ -210,11 +211,16 @@ public abstract class AbstractGetScanData extends TransformerV5 {
         }
         else {
             try {
-                
-                final IScanResult res = ScanUtil.getCurrentSalsaApi().readScanResult();
+                final IScanResult res;
+                if (isTrajectoryValue) {
+                    res = ScanUtil.getCurrentSalsaApi().readScanResultWithTrajectories();
+                }
+                else {
+                    res = ScanUtil.getCurrentSalsaApi().readScanResult();
+                }
                 final List<IActuator> actuatorList = res.getActuatorsXList();
                 final List<ISensor> sensorList = res.getSensorsList();
-                
+
                 // if scan is a 2D scan we add Y actuator at the end of actuator
                 // list.
                 if (res.getResultType() == IScanResult.ResultType.RESULT_2D) {
@@ -222,8 +228,8 @@ public abstract class AbstractGetScanData extends TransformerV5 {
                     actuatorList.addAll(res2D.getActuatorsYList());
                 }
 
-                realProcessImpl(res,actuatorList,sensorList);
-                
+                realProcessImpl(res, actuatorList, sensorList);
+
             }
             catch (final SalsaDeviceException e) {
                 throw new ProcessingException(e.getMessage(), this, e);
@@ -237,19 +243,20 @@ public abstract class AbstractGetScanData extends TransformerV5 {
 
         }
     }
-    
-    protected void sendTimestampsOnOutputPort(final String TimeStampsCompleteName)throws ProcessingException, DevFailed{
+
+    protected void sendTimestampsOnOutputPort(final String TimeStampsCompleteName)
+            throws ProcessingException, DevFailed {
         // output timestamps
-        final TangoAttribute timestamps = new TangoAttribute(TimeStampsCompleteName); 
+        final TangoAttribute timestamps = new TangoAttribute(TimeStampsCompleteName);
         // read attribute is done by the TangoAttribute constructor
         ExecutionTracerService.trace(this, "reading data for sensorTimestamps ");
         sendOutputMsg(output, PasserelleUtil.createContentMessage(this, timestamps));
-        
+
     }
-    
-    protected Map<String, double[]> getRealTrajectory(final IScanResult res)throws DevFailed {
+
+    protected Map<String, double[]> getRealTrajectory(final IScanResult res) throws DevFailed {
         Map<String, double[]> realTrajectoryValues = new HashMap<String, double[]>();
-        
+
         // Récupération de l'ensemble des trajectoires
         AttributeProxy att = new AttributeProxy(res.getScanServer() + "/trajectories");
         AttributeProxy nbActuators = new AttributeProxy(res.getScanServer() + "/actuators");

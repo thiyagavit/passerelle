@@ -124,7 +124,8 @@ public class GetScanData extends AbstractGetScanData {
                 0);
         if (isTrajectoryValue) {
             Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);
-
+           // Map<IActuator, double[]> realTrajectoryValues = res.getTrajectoryMap();
+            
             for (i = 0; i < actuators.length; i++) {
                 double[] trajectory = realTrajectoryValues.get(actuators[i]);
                 if (trajectory != null) {
