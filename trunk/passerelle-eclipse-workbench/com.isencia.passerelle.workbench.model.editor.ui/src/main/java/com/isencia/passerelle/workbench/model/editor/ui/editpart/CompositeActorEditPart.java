@@ -63,14 +63,10 @@ import com.isencia.passerelle.workbench.model.utils.ModelChangeRequest;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class CompositeActorEditPart extends ContainerEditPart implements IActorNodeEditPart {
-  private PasserelleModelMultiPageEditor multiPageEditorPart;
+  private PasserelleModelMultiPageEditor editor;
 
-  public PasserelleModelMultiPageEditor getMultiPageEditorPart() {
-    return multiPageEditorPart;
-  }
-
-  public void setMultiPageEditorPart(PasserelleModelMultiPageEditor multiPageEditorPart) {
-    this.multiPageEditorPart = multiPageEditorPart;
+  public PasserelleModelMultiPageEditor getEditor() {
+    return editor;
   }
 
   private final static Logger logger = LoggerFactory.getLogger(ActorEditPart.class);
@@ -80,8 +76,8 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     return logger;
   }
 
-  public CompositeActorEditPart(CompositeActor actor) {
-    super(actor);
+  public CompositeActorEditPart(CompositeActor actor, PasserelleModelMultiPageEditor editor) {
+    super(editor,actor);
 
   }
 
@@ -127,9 +123,9 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
     return null;
   }
 
-  public CompositeActorEditPart(boolean showChildren, PasserelleModelMultiPageEditor multiPageEditorPart) {
-    super(showChildren);
-    this.multiPageEditorPart = multiPageEditorPart;
+  public CompositeActorEditPart(boolean showChildren, PasserelleModelMultiPageEditor editor) {
+    super(editor,showChildren);
+    this.editor = editor;
   }
 
   private void deletePort(IOPort port) {
@@ -156,8 +152,8 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
    * Installs EditPolicies specific to this.
    */
   protected void createEditPolicies() {
-    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(), (PasserelleModelMultiPageEditor) getMultiPageEditorPart()));
-    installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(multiPageEditorPart, this));
+    installEditPolicy(EditPolicy.COMPONENT_ROLE, new ComponentNodeDeletePolicy(getDiagram(), (PasserelleModelMultiPageEditor) getEditor()));
+    installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new ActorEditPolicy(editor, this));
   }
 
   /**
@@ -427,7 +423,7 @@ public class CompositeActorEditPart extends ContainerEditPart implements IActorN
   }
 
   private void updatePageName(CompositeActor actor) {
-    PasserelleModelMultiPageEditor parent = (PasserelleModelMultiPageEditor) multiPageEditorPart;
+    PasserelleModelMultiPageEditor parent = (PasserelleModelMultiPageEditor) editor;
     int index = parent.getPageIndex(actor);
 
     parent.setText(index, WorkbenchUtility.getPath(actor));

@@ -12,11 +12,15 @@ import ptolemy.moml.Vertex;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 
 import com.isencia.passerelle.editor.common.model.LinkHolder;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelEditor;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMultiPageEditor;
 
 /**
  * Provides support for Container EditParts.
  */
 abstract public class ContainerEditPart extends AbstractBaseEditPart {
+
+  private PasserelleModelMultiPageEditor editor;
 
   private boolean showChildren = true;
   // This actor will be used as offset. It's not possible to have multiple editors with different model
@@ -26,13 +30,15 @@ abstract public class ContainerEditPart extends AbstractBaseEditPart {
     return actor;
   }
 
-  public ContainerEditPart(CompositeActor actor) {
+  public ContainerEditPart(PasserelleModelMultiPageEditor editor, CompositeActor actor) {
     super();
+    this.editor = editor;
     this.actor = actor;
   }
 
-  public ContainerEditPart(boolean showChildren) {
+  public ContainerEditPart(PasserelleModelMultiPageEditor editor, boolean showChildren) {
     super();
+    this.editor = editor;
     this.showChildren = showChildren;
   }
 
@@ -62,7 +68,15 @@ abstract public class ContainerEditPart extends AbstractBaseEditPart {
     if (!showChildren)
       return Collections.EMPTY_LIST;
     CompositeActor modelDiagram = getModelDiagram(actor);
-
+    if (editor != null) {
+      try{
+      CompositeActor selectedActor = editor.getSelectedContainer();
+      if (selectedActor != null && !containsActor(selectedActor, actor))
+        modelDiagram = selectedActor;
+      }catch(Exception e){
+        
+      }
+    }
     ArrayList children = new ArrayList();
     LinkHolder linkHolder = getLinkHolder();
     if (linkHolder != null) {
@@ -110,5 +124,21 @@ abstract public class ContainerEditPart extends AbstractBaseEditPart {
         children.add(nextElement);
     }
     return children;
+  }
+
+  public boolean containsActor(CompositeActor parent, CompositeActor child) {
+    Enumeration entities = parent.getEntities();
+    while (entities.hasMoreElements()) {
+      Object el = entities.nextElement();
+      if (el == child) {
+        return true;
+      }
+      if (el instanceof CompositeActor) {
+        if (containsActor((CompositeActor) el, child)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

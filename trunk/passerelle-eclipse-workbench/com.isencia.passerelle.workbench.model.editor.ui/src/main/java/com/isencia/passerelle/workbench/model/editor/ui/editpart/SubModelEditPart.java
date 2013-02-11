@@ -20,14 +20,13 @@ public class SubModelEditPart extends CompositeActorEditPart {
     return IMAGE_SUBMODEL;
   }
 
-  public SubModelEditPart(boolean showChildren, PasserelleModelMultiPageEditor multiPageEditorPart) {
-    super(showChildren, multiPageEditorPart);
-    // TODO Auto-generated constructor stub
+  public SubModelEditPart(boolean showChildren, PasserelleModelMultiPageEditor editor) {
+    super(showChildren, editor);
   }
 
-  public SubModelEditPart(CompositeActor actor) {
-    super(actor);
-    // TODO Auto-generated constructor stub
+  public SubModelEditPart(CompositeActor actor, PasserelleModelMultiPageEditor editor) {
+    super(actor,editor);
+
   }
 
   protected CompositeActorFigure createCompositeActorFigure(Clickable button, Actor actorModel, ImageDescriptor imageDescriptor) {
