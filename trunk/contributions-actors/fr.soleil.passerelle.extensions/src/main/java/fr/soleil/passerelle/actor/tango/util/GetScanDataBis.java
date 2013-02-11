@@ -81,12 +81,15 @@ public class GetScanDataBis extends AbstractGetScanData {
         IActuator iact;
         if (isTrajectoryValue) {
 
-            Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);            
+            //Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);           
+            Map<IActuator, double[]> realTrajectoryValues = res.getTrajectoryMap();
+            
             while (iteratorAct.hasNext()) {
                 iact = iteratorAct.next();
                 realScanDataName = iact.getScanServerAttributeName();
                 scanDataName = iact.getName();
-                double[] trajectory = realTrajectoryValues.get(scanDataName);
+                //double[] trajectory = realTrajectoryValues.get(scanDataName);
+                double[] trajectory = realTrajectoryValues.get(iact);
 
                 if (trajectory != null) {
                     System.out.println("trajectory " + Arrays.toString(trajectory));
