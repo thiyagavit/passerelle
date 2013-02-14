@@ -32,10 +32,7 @@ public class ModelRunner implements IApplication {
 	 
 	private   Manager manager;
 	
-	/**
-	 * 
-	 */
-	@Override
+
 	public Object start(IApplicationContext applicationContextMightBeNull) throws Exception {
 		
 		String model = System.getProperty("model");
@@ -43,7 +40,7 @@ public class ModelRunner implements IApplication {
 		return  IApplication.EXIT_OK;
 	}
 
-	@Override
+
 	public void stop() {
 		if (manager!=null) {
 			try {
