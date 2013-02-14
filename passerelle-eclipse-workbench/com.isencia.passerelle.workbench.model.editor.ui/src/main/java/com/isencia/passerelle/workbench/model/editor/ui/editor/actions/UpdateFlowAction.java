@@ -97,12 +97,10 @@ public class UpdateFlowAction extends SelectionAction implements NameChecker {
 		}
 	}
 
-	@Override
 	public boolean isNameValid(String name) {
 		return true;
 	}
 
-	@Override
 	public String getErrorMessage(String name) {
 		return null;
 	}

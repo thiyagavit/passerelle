@@ -192,7 +192,6 @@ public class EventLogView extends ViewPart implements ISelectionListener {
     viewer.getControl().setFocus();
   }
 
-  @Override
   public void selectionChanged(IWorkbenchPart part, ISelection arg1) {
     if (part instanceof PasserelleModelMultiPageEditor) {
       this.part = part;

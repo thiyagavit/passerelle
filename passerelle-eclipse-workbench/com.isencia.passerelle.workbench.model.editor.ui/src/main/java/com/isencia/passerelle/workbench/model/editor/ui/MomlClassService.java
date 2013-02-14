@@ -13,7 +13,6 @@ public class MomlClassService implements IMomlClassService {
 
   }
 
-  @Override
   public List<String> getAllActorClasses() throws Exception{
     RepositoryService repoService = Activator.getDefault().getRepositoryService();
     if (repoService == null) {

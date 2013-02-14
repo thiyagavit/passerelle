@@ -207,7 +207,6 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		return logger;
 	}
 
-	@Override
 	public String getContributorId() {
 		return "com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor";
 	}
@@ -869,7 +868,6 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		return root.getZoomManager();
 	}
 
-	@Override
 	public IFigure getWorkflowFigure() {
 		return getEditor().getContents();
 	}

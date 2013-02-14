@@ -91,7 +91,6 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     if (expertUpdater == null)
       expertUpdater = new IPropertyChangeListener() {
 
-        @Override
         public void propertyChange(PropertyChangeEvent event) {
           if (event.getProperty().equals(PreferenceConstants.EXPERT)) {
             final PropertySheet sheet = (PropertySheet) EclipseUtils.getPage().findView(IPageLayout.ID_PROP_SHEET);
@@ -183,7 +182,6 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     return ((NamedObj) source).getDisplayName();
   }
 
-  @Override
   public void changeFailed(ChangeRequest changerequest, Exception exception) {
     getLogger().trace("Change Failed : " + exception.getMessage());
   }
@@ -192,7 +190,6 @@ abstract public class AbstractBaseEditPart extends org.eclipse.gef.editparts.Abs
     return logger;
   }
 
-  @Override
   public void changeExecuted(ChangeRequest changerequest) {
 
     Object source = changerequest.getSource();
