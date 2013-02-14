@@ -67,7 +67,6 @@ public class WizardWorkflowEditor extends PasserelleModelMultiPageEditor impleme
     }
 
     getSite().getShell().getDisplay().asyncExec(new Runnable() {
-      @Override
       public void run() {
         try {
           final int page = Activator.getDefault().getPreferenceStore().getInt(getPageKey());

@@ -68,7 +68,7 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
 
   public static String[] getFavoriteGroupNames() throws Exception {
     String groups = ModelUtils.getFavouritesStore().getString(FAVORITE_GROUPS);
-    if (groups == null || groups.isEmpty()) {
+    if (groups == null || groups.trim().equals("")) {
       return new String[] { DEFAULT_FAVORITES_NAME };
     }
     return groups.split(",");
@@ -92,7 +92,7 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
   @Override
   protected Object createIcon(Object defaultIcon, String iconClazzAttribute, String iconAttribute, String bundleId) {
     try {
-      if (iconAttribute != null && !iconAttribute.isEmpty()) {
+      if (iconAttribute != null && !iconAttribute.trim().equals("")) {
         return Activator.getImageDescriptor(bundleId, iconAttribute);
       }
     } catch (Exception e) {
@@ -261,7 +261,7 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
       favoritesContainers.put(favoriteGroup, createPaletteContainer);
       categories.add(createPaletteContainer);
       String favorites = ModelUtils.getFavouritesStore().getString(favoriteGroup);
-      if (favorites != null && !favorites.isEmpty()) {
+      if (favorites != null && !favorites.trim().equals("")) {
         String[] names = favorites.split(",");
         for (String name : names) {
           addFavorite(name, (PaletteContainer) createPaletteContainer);
