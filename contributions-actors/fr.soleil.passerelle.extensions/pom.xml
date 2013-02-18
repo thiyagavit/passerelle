@@ -178,8 +178,8 @@
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>fr.soleil.comete.bean</groupId>
 			<artifactId>CurrentScanDataModel</artifactId>
@@ -233,6 +233,10 @@
 		<dependency>
 			<groupId>com.microstar</groupId>
 			<artifactId>xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle.sherpa</groupId>
+			<artifactId>commons.reduced</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
