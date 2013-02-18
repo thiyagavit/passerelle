@@ -129,6 +129,10 @@
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>project-repository-impl-filesystem</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle.sherpa</groupId>
+			<artifactId>commons.reduced</artifactId>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.drools</groupId> -->
 		<!-- <artifactId>drools-api</artifactId> -->
