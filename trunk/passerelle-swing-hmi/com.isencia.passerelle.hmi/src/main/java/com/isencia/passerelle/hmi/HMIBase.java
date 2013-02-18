@@ -480,7 +480,7 @@ public abstract class HMIBase implements ChangeListener {
   public boolean checkFlowLoadingError(Flow model) {
     boolean result = true;
     if (modelURL != null) {
-      Boolean chgStatus = modelsChangedStatus.get(modelURL);
+     // Boolean chgStatus = modelsChangedStatus.get(modelURL);
       if (!model.isLoadedFaultless()) {
         Icon icon = new ImageIcon(getClass().getResource("/com/isencia/passerelle/hmi/resources/ide32.gif"));
         int choice = PopupUtil.showOptionDialog(getDialogHookComponent(), HMIMessages.getString("warning.flow.loadingError"), HMIMessages.getString("warning"),
@@ -1036,10 +1036,16 @@ public abstract class HMIBase implements ChangeListener {
         }
       }
     }
-    if (modelURL != null)
-      return getModelsChangedStatus().get(modelURL);
-    else
-      return false;
+    
+    boolean returnValue = false;
+    if (modelURL != null){
+        try {
+            returnValue = getModelsChangedStatus().get(modelURL.toURI()).booleanValue();
+          } catch (URISyntaxException e) {
+            // We can safely ignore this since all used URLs are in compliance with RFC2396
+          }
+    }
+    return returnValue;
   }
 
   public File getLocalFileFromURL(final URI destinationURL) throws IOException {
