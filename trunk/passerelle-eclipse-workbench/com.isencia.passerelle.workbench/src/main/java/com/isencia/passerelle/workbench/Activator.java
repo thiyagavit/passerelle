@@ -53,6 +53,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator, Bund
     context.addBundleListener(this);
 
     for (Bundle bundle : context.getBundles()) {
+      if (!(bundle.getSymbolicName().contains("eclipse") && !bundle.getSymbolicName().contains("persistence")) && !bundle.equals(context.getBundle()))
         bundles.push(bundle);
     }
 
