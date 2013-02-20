@@ -10,13 +10,13 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.actor.InitializationException;
-import com.isencia.passerelle.core.PasserelleException;
 
+import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
+import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
@@ -36,10 +36,10 @@ public abstract class ATangoCommandActor extends ATangoDeviceActor {
     private TangoCommand tangoCommand;
 
     public ATangoCommandActor(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
-	commandNameParam = new StringParameter(this, COMMAND_NAME);
-	commandNameParam.setExpression(commandName);
+            throws NameDuplicationException, IllegalActionException {
+        super(container, name);
+        commandNameParam = new StringParameter(this, COMMAND_NAME);
+        commandNameParam.setExpression(commandName);
     }
 
     @Override
@@ -47,11 +47,12 @@ public abstract class ATangoCommandActor extends ATangoDeviceActor {
      * @throws IllegalActionException
      */
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
-	if (arg0 == commandNameParam) {
-	    commandName = PasserelleUtil.getParameterValue(commandNameParam);
-	} else {
-	    super.attributeChanged(arg0);
-	}
+        if (arg0 == commandNameParam) {
+            commandName = PasserelleUtil.getParameterValue(commandNameParam);
+        }
+        else {
+            super.attributeChanged(arg0);
+        }
     }
 
     @Override
@@ -60,42 +61,42 @@ public abstract class ATangoCommandActor extends ATangoDeviceActor {
      * 
      * @throws InitializationException
      */
-    protected void doInitialize() throws InitializationException {
+    protected void validateInitialization() throws ValidationException {
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - entry");
-	}
-	if (!isMockMode()) {
-	    try {
-		tangoCommand = new TangoCommand(getDeviceName(), commandName);
-	    } catch (final DevFailed e) {
-		throw new DevFailedInitializationException(e, this);
-	    }
-	}
-	super.doInitialize();
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - exit");
-	}
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - entry");
+        }
+        if (!isMockMode()) {
+            try {
+                tangoCommand = new TangoCommand(getDeviceName(), commandName);
+            }
+            catch (final DevFailed e) {
+                throw new DevFailedValidationException(e, this);
+            }
+        }
+        super.validateInitialization();
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - exit");
+        }
     }
 
     /**
      * 
-     * @return The TangoCommand which is initialized in
-     *         {@link ATangoCommandActor#doInitialize()}
+     * @return The TangoCommand which is initialized in {@link ATangoCommandActor#doInitialize()}
      * @throws PasserelleException
      */
     public TangoCommand getTangoCommand() throws PasserelleException {
-	if (tangoCommand == null) {
-	    throw new PasserelleException("field not initialized", commandName, null);
-	}
-	return tangoCommand;
+        if (tangoCommand == null) {
+            throw new PasserelleException("field not initialized", commandName, null);
+        }
+        return tangoCommand;
     }
 
     @Override
     public Object clone(final Workspace workspace) throws CloneNotSupportedException {
-	final ATangoCommandActor copy = (ATangoCommandActor) super.clone(workspace);
-	copy.tangoCommand = null;
-	return copy;
+        final ATangoCommandActor copy = (ATangoCommandActor) super.clone(workspace);
+        copy.tangoCommand = null;
+        return copy;
     }
 
 }
