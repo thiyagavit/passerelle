@@ -10,13 +10,14 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.actor.InitializationException;
-import com.isencia.passerelle.core.PasserelleException;
 
+import com.isencia.passerelle.actor.InitializationException;
+import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
+import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -36,10 +37,10 @@ public abstract class ATangoAttributeActor extends ATangoActor {
     private TangoAttribute tangoAttribute;
 
     public ATangoAttributeActor(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
-	attributeNameParam = new StringParameter(this, ATTRIBUTE_NAME);
-	attributeNameParam.setExpression(attributeName);
+            throws NameDuplicationException, IllegalActionException {
+        super(container, name);
+        attributeNameParam = new StringParameter(this, ATTRIBUTE_NAME);
+        attributeNameParam.setExpression(attributeName);
     }
 
     @Override
@@ -47,11 +48,12 @@ public abstract class ATangoAttributeActor extends ATangoActor {
      * @throws IllegalActionException
      */
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
-	if (arg0 == attributeNameParam) {
-	    attributeName = PasserelleUtil.getParameterValue(attributeNameParam);
-	} else {
-	    super.attributeChanged(arg0);
-	}
+        if (arg0 == attributeNameParam) {
+            attributeName = PasserelleUtil.getParameterValue(attributeNameParam);
+        }
+        else {
+            super.attributeChanged(arg0);
+        }
     }
 
     /**
@@ -59,25 +61,27 @@ public abstract class ATangoAttributeActor extends ATangoActor {
      * 
      * @throws InitializationException
      */
+
     @Override
-    protected void doInitialize() throws InitializationException {
+    protected void validateInitialization() throws ValidationException {
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - entry");
-	}
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - entry");
+        }
 
-	if (!isMockMode()) {
-	    try {
-		tangoAttribute = new TangoAttribute(attributeName);
-	    } catch (final DevFailed e) {
-		throw new DevFailedInitializationException(e, this);
-	    }
-	}
-	super.doInitialize();
+        if (!isMockMode()) {
+            try {
+                tangoAttribute = new TangoAttribute(attributeName);
+            }
+            catch (final DevFailed e) {
+                throw new DevFailedValidationException(e, this);
+            }
+        }
+        super.validateInitialization();
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - exit");
-	}
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - exit");
+        }
     }
 
     /**
@@ -85,27 +89,26 @@ public abstract class ATangoAttributeActor extends ATangoActor {
      * @return The attribute name
      */
     public String getAttributeName() {
-	return attributeName;
+        return attributeName;
     }
 
     /**
      * 
-     * @return A TangoAttribute that is initialized in
-     *         {@link ATangoAttributeActor#doInitialize()}
+     * @return A TangoAttribute that is initialized in {@link ATangoAttributeActor#doInitialize()}
      * @throws PasserelleException
      */
     public TangoAttribute getTangoAttribute() throws PasserelleException {
-	if (tangoAttribute == null) {
-	    throw new PasserelleException("field not initialized", attributeName, null);
-	}
-	return tangoAttribute;
+        if (tangoAttribute == null) {
+            throw new PasserelleException("field not initialized", attributeName, null);
+        }
+        return tangoAttribute;
     }
 
     @Override
     public Object clone(final Workspace workspace) throws CloneNotSupportedException {
-	final ATangoAttributeActor copy = (ATangoAttributeActor) super.clone(workspace);
-	copy.tangoAttribute = null;
-	return copy;
+        final ATangoAttributeActor copy = (ATangoAttributeActor) super.clone(workspace);
+        copy.tangoAttribute = null;
+        return copy;
     }
 
 }
