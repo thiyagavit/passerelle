@@ -10,7 +10,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.isencia.passerelle.editor.common.model.MomlClassRegistry;
-import com.isencia.passerelle.ext.ActorOrientedClassProvider;
+
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 /**
@@ -44,8 +44,6 @@ public class Activator extends AbstractUIPlugin {
     repoSvcTracker.open();
 
     MomlClassRegistry.setService(new MomlClassService());
-
-    submodelSvcReg = context.registerService(ActorOrientedClassProvider.class.getName(), new SubmodelProvider(), null);
 
   }
 
