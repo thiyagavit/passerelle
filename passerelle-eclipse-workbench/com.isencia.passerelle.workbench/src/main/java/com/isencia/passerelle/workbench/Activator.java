@@ -10,14 +10,12 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.BundleListener;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin implements BundleActivator, BundleListener {
+public class Activator extends AbstractUIPlugin implements BundleActivator {
   private Stack<Bundle> bundles = new Stack<Bundle>();
   // The plug-in ID
   public static final String PLUGIN_ID = "com.isencia.passerelle.workbench";
@@ -50,23 +48,6 @@ public class Activator extends AbstractUIPlugin implements BundleActivator, Bund
 
     plugin = this;
 
-    context.addBundleListener(this);
-
-    for (Bundle bundle : context.getBundles()) {
-      if (!(bundle.getSymbolicName().contains("eclipse") && !bundle.getSymbolicName().contains("persistence")) && !bundle.equals(context.getBundle()))
-        bundles.push(bundle);
-    }
-
-    // while there are bundles still to be started...
-    Bundle bundle = null;
-
-    while (!bundles.isEmpty()) {
-      bundle = bundles.pop();
-      try {
-        start(bundle);
-      } catch (BundleException e) {
-      }
-    }
   }
 
   /*
@@ -76,7 +57,6 @@ public class Activator extends AbstractUIPlugin implements BundleActivator, Bund
    */
   public void stop(BundleContext context) throws Exception {
     plugin = null;
-    context.removeBundleListener(this);
     super.stop(context);
   }
 
@@ -138,11 +118,4 @@ public class Activator extends AbstractUIPlugin implements BundleActivator, Bund
     bundle.start();
   }
 
-  public void bundleChanged(BundleEvent event) {
-    if (event.getType() == 32)
-      try {
-        start(event.getBundle());
-      } catch (BundleException e) {
-      }
-  }
 }
