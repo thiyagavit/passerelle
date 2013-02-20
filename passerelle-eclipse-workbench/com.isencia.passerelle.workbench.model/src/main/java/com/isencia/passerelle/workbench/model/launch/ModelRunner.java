@@ -3,6 +3,7 @@ package com.isencia.passerelle.workbench.model.launch;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -18,6 +19,8 @@ import ptolemy.actor.Manager;
 import ptolemy.kernel.util.Workspace;
 import ptolemy.moml.MoMLParser;
 
+import com.isencia.passerelle.editor.common.model.MomlClassRegistry;
+import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.workbench.model.jmx.RemoteManagerAgent;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -106,10 +109,8 @@ public class ModelRunner implements IApplication {
 					MoMLParser.purgeModelRecord(modelPath);
 				    MoMLParser.purgeAllModelRecords();
 					
-					
 					final Workspace  workspace  = ModelUtils.getWorkspace(modelPath);
-				    final MoMLParser moMLParser = new MoMLParser(workspace);
-					compositeActor = (CompositeActor) moMLParser.parse(null, reader);
+					compositeActor = FlowManager.readMoml(reader);
 					if (System.getProperty("com.isencia.require.file.source")!=null) {
 					    compositeActor.setSource(modelPath);
 					}
