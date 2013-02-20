@@ -118,7 +118,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer{
 	public void validateInitialization() throws ValidationException {
 		super.validateInitialization();
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " doInitialize() - entry");
+			logger.trace(getInfo() + " validateInitialization() - entry");
 		}
 
 
