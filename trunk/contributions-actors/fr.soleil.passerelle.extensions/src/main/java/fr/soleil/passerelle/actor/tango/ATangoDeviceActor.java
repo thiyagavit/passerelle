@@ -12,20 +12,21 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
 import com.isencia.passerelle.actor.InitializationException;
+import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
+import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 /**
- *
+ * 
  * @author ABEILLE
- *
+ * 
  */
 @SuppressWarnings("serial")
 public abstract class ATangoDeviceActor extends ATangoActor {
@@ -57,10 +58,10 @@ public abstract class ATangoDeviceActor extends ATangoActor {
      * @throws IllegalActionException
      */
     public ATangoDeviceActor(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
-	deviceNameParam = new StringParameter(this, DEVICE_NAME);
-	deviceNameParam.setExpression(deviceName);
+            throws NameDuplicationException, IllegalActionException {
+        super(container, name);
+        deviceNameParam = new StringParameter(this, DEVICE_NAME);
+        deviceNameParam.setExpression(deviceName);
     }
 
     @Override
@@ -68,11 +69,12 @@ public abstract class ATangoDeviceActor extends ATangoActor {
      * @throws IllegalActionException
      */
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
-	if (arg0 == deviceNameParam) {
-	    deviceName = PasserelleUtil.getParameterValue(deviceNameParam);
-	} else {
-	    super.attributeChanged(arg0);
-	}
+        if (arg0 == deviceNameParam) {
+            deviceName = PasserelleUtil.getParameterValue(deviceNameParam);
+        }
+        else {
+            super.attributeChanged(arg0);
+        }
     }
 
     @Override
@@ -81,74 +83,76 @@ public abstract class ATangoDeviceActor extends ATangoActor {
      *
      * @throws InitializationException
      */
-    protected void doInitialize() throws InitializationException {
+    protected void validateInitialization() throws ValidationException {
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - entry");
-	}
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - entry");
+        }
 
-	if (!isMockMode() && createDeviceProxy) {
-	    try {
-	        // see bug 22954 : The deviceProxy is still created here because the 
-	        // daughter classes need of it
-		deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-		//deviceProxy.ping();		
-		new TangoCommand(deviceName, "State").execute();
-		 
-	    } catch (final DevFailed e) {
-		throw new DevFailedInitializationException(e, this);
-	    }catch(final Exception e){
-	    	throw new InitializationException(PasserelleException.Severity.FATAL, "Exception during doInit " + e.getMessage(), this, null);
-	    }
-	}
-	super.doInitialize();
+        if (!isMockMode() && createDeviceProxy) {
+            try {
+                // see bug 22954 : The deviceProxy is still created here because the
+                // daughter classes need of it
+                deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
+                // deviceProxy.ping();
+                new TangoCommand(deviceName, "State").execute();
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - exit");
-	}
+            }
+            catch (final DevFailed e) {
+                throw new DevFailedValidationException(e, this);
+            }
+            catch (final Exception e) {
+                throw new ValidationException(PasserelleException.Severity.FATAL,
+                        "Exception during doInit " + e.getMessage(), this, null);
+            }
+        }
+        super.validateInitialization();
+
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - exit");
+        }
     }
 
     /**
-     *
+     * 
      * @return The parameter for device name
      */
     protected final Parameter getDeviceNameParam() {
-	return deviceNameParam;
+        return deviceNameParam;
     }
 
     /**
-     *
+     * 
      * @return The device name
      */
     protected final String getDeviceName() {
-	return deviceName;
+        return deviceName;
     }
 
     /**
-     *
-     * @return The device proxy (initialized in
-     *         {@link ATangoDeviceActor#doInitialize()}
+     * 
+     * @return The device proxy (initialized in {@link ATangoDeviceActor#doInitialize()}
      * @throws PasserelleException
      */
     protected final DeviceProxy getDeviceProxy() throws PasserelleException {
-	if (deviceProxy == null) {
-	    throw new InitializationException("field not initialized", deviceName, null);
-	}
-	return deviceProxy;
+        if (deviceProxy == null) {
+            throw new InitializationException("field not initialized", deviceName, null);
+        }
+        return deviceProxy;
     }
 
     public boolean isCreateDeviceProxy() {
-	return createDeviceProxy;
+        return createDeviceProxy;
     }
 
     public void setCreateDeviceProxy(final boolean createDeviceProxy) {
-	this.createDeviceProxy = createDeviceProxy;
+        this.createDeviceProxy = createDeviceProxy;
     }
 
     @Override
     public Object clone(final Workspace workspace) throws CloneNotSupportedException {
-	final ATangoDeviceActor copy = (ATangoDeviceActor) super.clone(workspace);
-	copy.deviceProxy = null;
-	return copy;
+        final ATangoDeviceActor copy = (ATangoDeviceActor) super.clone(workspace);
+        copy.deviceProxy = null;
+        return copy;
     }
 }
