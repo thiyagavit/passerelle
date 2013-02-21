@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.actor.test;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -19,14 +19,16 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 
 public class TestRunner implements CommandProvider {
 
-	public String getHelp() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("\n---Passerelle process actor tests---\n");
-		buffer.append("\trunProcessActorTests\n");
-		return buffer.toString();
-	}
+  public String getHelp() {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("\n---Passerelle process actor tests---\n");
+    buffer.append("\trunProcessActorTests\n");
+    return buffer.toString();
+  }
 
-	public void _runProcessActorTests(CommandInterpreter ci) {
-		junit.textui.TestRunner.run(AllTests.suite());
-	}
+  public void _runProcessActorTests(CommandInterpreter ci) {
+//    for (int i = 0; i < 200; ++i) {
+      junit.textui.TestRunner.run(AllTests.suite());
+//    }
+  }
 }

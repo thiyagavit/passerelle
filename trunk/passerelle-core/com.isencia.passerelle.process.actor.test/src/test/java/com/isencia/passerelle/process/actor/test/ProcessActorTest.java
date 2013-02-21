@@ -16,48 +16,72 @@ package com.isencia.passerelle.process.actor.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import junit.framework.TestCase;
 import ptolemy.actor.IOPort;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import junit.framework.TestCase;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.process.actor.MockTaskResultActor;
+import com.isencia.passerelle.process.actor.DelimitedResultLineGenerator;
+import com.isencia.passerelle.process.actor.TaskResultActor;
+import com.isencia.passerelle.process.actor.RequestSource;
 import com.isencia.passerelle.process.actor.flow.Fork;
 import com.isencia.passerelle.process.actor.flow.Join;
-import com.isencia.passerelle.process.actor.flow.StartActor;
 import com.isencia.passerelle.process.actor.trial.ContextTracerConsole;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 
 public class ProcessActorTest extends TestCase {
 
-  public void testForkJoin5() throws Exception {
-    int branchCount = 5;
-    _testForkJoin(branchCount);
+//  public void testForkJoin5Branches_1s() throws Exception {
+//    _testForkJoin(5,"1");
+//  }
+//
+//  public void testForkJoin5Branches_0s() throws Exception {
+//    _testForkJoin(5,"0");
+//  }
+
+  public void testForkJoin5Branches_1_5s() throws Exception {
+    _testForkJoin(5,"1","1","2","3","5");
   }
 
-  public void testForkJoin100() throws Exception {
-    int branchCount = 100;
-    _testForkJoin(branchCount);
-  }
+//  public void testForkJoin9Branches_1s() throws Exception {
+//    _testForkJoin(9,"1");
+//  }
+//
+//  public void testForkJoin9Branches_0s() throws Exception {
+//    _testForkJoin(9,"0");
+//  }
+  
+//  public void testForkJoin100Branches_1s() throws Exception {
+//    int branchCount = 100;
+//    _testForkJoin(branchCount,"1");
+//  }
+//
+//  public void testForkJoin100Branches_0s() throws Exception {
+//    int branchCount = 100;
+//    _testForkJoin(branchCount,"0");
+//  }
 
-  protected void _testForkJoin(int branchCount) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
+  protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
     Flow flow = new Flow("testForkJoin1",null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     
-    StartActor start = new StartActor(flow,"start");
+    RequestSource start = new RequestSource(flow,"start");
     Fork fork = new Fork(flow, "fork");
     Join join = new Join(flow, "join");
+    DelimitedResultLineGenerator lineGen = new DelimitedResultLineGenerator(flow, "lineGen");
     ContextTracerConsole sink = new ContextTracerConsole(flow, "sink");
     flow.connect(start, fork);
-    flow.connect(join, sink);
+    flow.connect(join, lineGen);
+    flow.connect(lineGen, sink);
 
     Map<String, String> props = new HashMap<String, String>();
-
+    props.put("lineGen.result item names", "requestID,task0_says,goodbye");
+    
     String[] portNames = new String[branchCount];
     portNames[0] = "p0";
     StringBuilder portNamesBldr = new StringBuilder(portNames[0]);
@@ -68,15 +92,16 @@ public class ProcessActorTest extends TestCase {
     
     fork.outputPortNamesParameter.setToken(portNamesBldr.toString());
     
-    MockTaskResultActor[] taskActors = new MockTaskResultActor[branchCount];
+    TaskResultActor[] taskActors = new TaskResultActor[branchCount];
     for(int i = 0; i<branchCount;++i) {
       String actorName = "task"+i;
       String portName = portNames[i];
-      taskActors[i] = new MockTaskResultActor(flow, actorName);
+      taskActors[i] = new TaskResultActor(flow, actorName);
       flow.connect((IOPort)fork.getPort(portName), taskActors[i].input);
       flow.connect(taskActors[i],join);
-      props.put(actorName+".Result items", "hello=world");
-      props.put(actorName+".time(s)", "1");
+      props.put(actorName+".Result items", "task"+i+"_says=hello world"+i);
+      int ttIndex = Math.min(taskTimes.length - 1, i);
+      props.put(actorName+".time(s)", taskTimes[ttIndex]);
     }
     
     flowMgr.executeBlockingLocally(flow,props);
