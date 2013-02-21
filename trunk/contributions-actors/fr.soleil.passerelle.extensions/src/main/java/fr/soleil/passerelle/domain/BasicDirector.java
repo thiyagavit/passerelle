@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
@@ -12,7 +13,9 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ExecutionTracer;
+import com.isencia.passerelle.ext.impl.DefaultDirectorAdapter;
 import com.isencia.passerelle.ext.impl.DefaultExecutionTracer;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
@@ -54,6 +57,12 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
   private boolean interactiveExecution;
 
   private void init() throws IllegalActionException, NameDuplicationException {
+    DirectorAdapter adapter = getAdapter(null);
+
+    if(adapter instanceof DefaultDirectorAdapter) {
+      ((DefaultDirectorAdapter)adapter).stopForUnhandledErrorParam.setToken(BooleanToken.TRUE);
+    }
+    
     propsFileParameter.setVisibility(Settable.EXPERT);
     boolean firstTime = true;
     selectedErrCtrlStrategyParameter = new StringParameter(this, "Error Control");
