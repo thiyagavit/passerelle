@@ -17,6 +17,7 @@
 		<jetty-version>6.1.22</jetty-version>
 		<jaxb2-plugin-version>0.8.2</jaxb2-plugin-version>
 		<jacoco-maven-plugin-version>0.6.0.201210061924</jacoco-maven-plugin-version>
+		<clean.plugin.version>2.5</clean.plugin.version>
 
 		<!-- JaCoCo -->
 		<common.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</common.jacoco.reportPath>
@@ -161,6 +162,53 @@
 				</executions>
 			</plugin>
 		</plugins>
-
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>mr-proper</id>
+			<build>
+				<plugins>
+					<!-- 
+			Plugins for cleaning up before the build. 
+			The versions plugin will update the pom files based on the manifest. 
+			The clean plugin will also clean local p2 caching directories. 
+			It is advised to first run mvn clean and then mvn install
+			Calling mvn clean install will update the pom files too late to be taken into account in the build.
+			-->
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-versions-plugin</artifactId>
+						<version>${tycho-version}</version>
+						<executions>
+							<execution>
+								<id>update-pom</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>update-pom</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-clean-plugin</artifactId>
+						<version>${clean.plugin.version}</version>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${settings.localRepository}/.cache</directory>
+								</fileset>
+								<fileset>
+									<directory>${settings.localRepository}/.meta</directory>
+								</fileset>
+								<fileset>
+									<directory>${settings.localRepository}/p2</directory>
+								</fileset>
+							</filesets>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
