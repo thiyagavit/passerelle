@@ -32,14 +32,14 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * @author erwin
  *
  */
-public class MockTaskResultActor extends AsynchDelay {
+public class TaskResultActor extends AsynchDelay {
   private static final long serialVersionUID = 1L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(MockTaskResultActor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TaskResultActor.class);
 
   public StringParameter resultTypeParam; // NOSONAR
   public StringParameter resultItemsParameter; // NOSONAR
 
-  public MockTaskResultActor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
+  public TaskResultActor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
     resultTypeParam = new StringParameter(this, "Result type");
     resultTypeParam.setExpression(name);
