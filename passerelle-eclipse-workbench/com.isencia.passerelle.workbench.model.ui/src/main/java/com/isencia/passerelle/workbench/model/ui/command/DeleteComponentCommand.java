@@ -99,7 +99,8 @@ public class DeleteComponentCommand extends Command implements IRefreshConnectio
           }
 
         } else {
-          links = multiPageEditor.getLinks(child);
+          if (multiPageEditor != null)
+            links = multiPageEditor.getLinks(child);
         }
         if (links != null && links.size() > 0) {
           delecteListCommands = new ArrayList<DeleteLinkCommand>(links.size());
