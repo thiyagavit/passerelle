@@ -865,6 +865,9 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 
 	public ZoomManager getZoomManager() {
 		ScalableFreeformRootEditPart root = (ScalableFreeformRootEditPart)(getGraphicalViewer().getRootEditPart());
+		if(root.getZoomManager()!=null) {
+		  root.getZoomManager().setZoomLevels(new double[]{.5,.6,.7,.8,.9, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3, 4});
+		}
 		return root.getZoomManager();
 	}
 
