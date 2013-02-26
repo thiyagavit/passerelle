@@ -45,6 +45,17 @@ public class Activator extends AbstractUIPlugin {
 
     MomlClassRegistry.setService(new MomlClassService());
 
+    IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+    String submodelPath = store.getString(RepositoryService.SUBMODEL_ROOT);
+    if (submodelPath == null || submodelPath.trim().equals("")) {
+      submodelPath = System.getProperty(RepositoryService.SUBMODEL_ROOT, "C:/temp/submodel-repository");
+      store.setValue(RepositoryService.SUBMODEL_ROOT, submodelPath);
+    } else {
+      System.setProperty(RepositoryService.SUBMODEL_ROOT, submodelPath);
+    }
+    // just call this here, so we're sure the submodel folder pref has been read and applied to the repo svc,
+    // before opening any editor
+    getRepositoryService();
   }
 
   /*
@@ -88,14 +99,7 @@ public class Activator extends AbstractUIPlugin {
       if (repositoryService == null){
         return null;
       }
-      IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-      String submodelPath = store.getString(RepositoryService.SUBMODEL_ROOT);
-      if (submodelPath == null || submodelPath.trim().equals("")) {
-        submodelPath = System.getProperty(RepositoryService.SUBMODEL_ROOT, "C:/temp/submodel-repository");
-        store.setValue(RepositoryService.SUBMODEL_ROOT, submodelPath);
-
-      }
-      File folder = new File(getPreferenceStore().getString(RepositoryService.SUBMODEL_ROOT));
+      File folder = new File(System.getProperty(RepositoryService.SUBMODEL_ROOT, "C:/temp/submodel-repository"));
       if (!folder.exists()) {
         folder.mkdirs();
       }
