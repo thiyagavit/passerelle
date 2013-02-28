@@ -235,6 +235,10 @@
 			<artifactId>xml</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.isencia.passerelle.sherpa</groupId>
+			<artifactId>commons.reduced</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>commons</artifactId>
 		</dependency>
