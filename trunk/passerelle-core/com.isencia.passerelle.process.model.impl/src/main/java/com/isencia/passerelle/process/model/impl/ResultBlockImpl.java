@@ -52,160 +52,164 @@ import com.isencia.passerelle.process.model.Task;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class ResultBlockImpl implements ResultBlock {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@Column(name = "ID", nullable = false, unique = true, updatable = false)
-	@GeneratedValue(generator = "pas_resultblock")
-	private Long id;
+  @Id
+  @Column(name = "ID", nullable = false, unique = true, updatable = false)
+  @GeneratedValue(generator = "pas_resultblock")
+  private Long id;
 
-	@SuppressWarnings("unused")
-	@Version
-	private int version;
+  @SuppressWarnings("unused")
+  @Version
+  private int version;
 
-	// Remark: need to use the implementation class instead of the interface
-	// here to ensure jpa implementations like EclipseLink will generate setter
-	// methods
-	@ManyToOne(targetEntity = TaskImpl.class, optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "TASK_ID")
-	private TaskImpl task;
+  // Remark: need to use the implementation class instead of the interface
+  // here to ensure jpa implementations like EclipseLink will generate setter
+  // methods
+  @ManyToOne(targetEntity = TaskImpl.class, optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "TASK_ID")
+  private TaskImpl task;
 
-	@OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@MapKey(name = "name")
-	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+  @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @MapKey(name = "name")
+  private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
-	@Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
-	private String colour;
+  @Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
+  private String colour;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
-	private Date creationTS;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
+  private Date creationTS;
 
-	@Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
-	private String type;
+  @Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
+  private String type;
 
-	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "RESULTBLOCK_ID")
-	@MapKey(name = "name")
-	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
+  @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "RESULTBLOCK_ID")
+  @MapKey(name = "name")
+  private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
 
-	public static final String _ID = "id";
-	public static final String _CREATION_TS = "creationTS";
-	public static final String _TYPE = "type";
-	public static final String _RESULT_ITEMS = "allItems";
-	public static final String _COLOUR = "colour";
-	public static final String _ATTRIBUTES = "attributes";
-	public static final String _DISCRIMINATOR = "discriminator";
+  public static final String _ID = "id";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _TYPE = "type";
+  public static final String _RESULT_ITEMS = "allItems";
+  public static final String _COLOUR = "colour";
+  public static final String _ATTRIBUTES = "attributes";
+  public static final String _DISCRIMINATOR = "discriminator";
 
-	public ResultBlockImpl() {
-	}
+  public ResultBlockImpl() {
+  }
 
-	public ResultBlockImpl(Task task, String type) {
-		this.creationTS = new Date();
-		this.task = (TaskImpl) task;
-		this.type = type;
+  public ResultBlockImpl(Task task, String type, Date creationTS) {
+    this.creationTS = creationTS;
+    this.task = (TaskImpl) task;
+    this.type = type;
 
-		this.task.addResultBlock(this);
-	}
+    this.task.addResultBlock(this);
+  }
 
-	public Long getId() {
-		return id;
-	}
+  public ResultBlockImpl(Task task, String type) {
+    this(task, type, new Date());
+  }
 
-	public Attribute getAttribute(String name) {
-		return attributes.get(name);
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public Attribute putAttribute(Attribute attribute) {
-		return attributes.put(attribute.getName(), attribute);
-	}
+  public Attribute getAttribute(String name) {
+    return attributes.get(name);
+  }
 
-	public Iterator<String> getAttributeNames() {
-		return attributes.keySet().iterator();
-	}
+  public Attribute putAttribute(Attribute attribute) {
+    return attributes.put(attribute.getName(), attribute);
+  }
 
-	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
-	public Set<Attribute> getAttributes() {
-		return new HashSet<Attribute>(attributes.values());
-	}
+  public Iterator<String> getAttributeNames() {
+    return attributes.keySet().iterator();
+  }
 
-	public String getColour() {
-		return colour;
-	}
+  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
+  public Set<Attribute> getAttributes() {
+    return new HashSet<Attribute>(attributes.values());
+  }
 
-	public void setColour(String colour) {
-		this.colour = colour;
-	}
+  public String getColour() {
+    return colour;
+  }
 
-	public Date getCreationTS() {
-		return creationTS;
-	}
+  public void setColour(String colour) {
+    this.colour = colour;
+  }
 
-	public String getType() {
-		return type;
-	}
+  public Date getCreationTS() {
+    return creationTS;
+  }
 
-	public ResultItem<?> putItem(ResultItem<?> item) {
-		return resultItems.put(item.getName(), item);
-	}
+  public String getType() {
+    return type;
+  }
 
-	public Collection<ResultItem<?>> getAllItems() {
-		return Collections.unmodifiableCollection(resultItems.values());
-	}
-	
-	public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
-		Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
-		for(ResultItem<?> item : resultItems.values()) {
-			if(matcher.matches(item))
-				results.add(item);
-		}
-		return results;
-	}
+  public ResultItem<?> putItem(ResultItem<?> item) {
+    return resultItems.put(item.getName(), item);
+  }
 
-	@OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
-	public Set<ResultItem> getResultItems() {
-		return new HashSet<ResultItem>(resultItems.values());
-	}
+  public Collection<ResultItem<?>> getAllItems() {
+    return Collections.unmodifiableCollection(resultItems.values());
+  }
 
-	public ResultItem<?> getItemForName(String name) {
-		return resultItems.get(name);
-	}
+  public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
+    Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
+    for (ResultItem<?> item : resultItems.values()) {
+      if (matcher.matches(item))
+        results.add(item);
+    }
+    return results;
+  }
 
-	public Task getTask() {
-		return task;
-	}
+  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
+  public Set<ResultItem> getResultItems() {
+    return new HashSet<ResultItem>(resultItems.values());
+  }
 
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Resultblock [id=");
-		builder.append(id);
-		if (type != null) {
-			builder.append(", type=");
-			builder.append(type);
-		}
-		if (colour != null) {
-			builder.append(", colour=");
-			builder.append(getColour());
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+  public ResultItem<?> getItemForName(String name) {
+    return resultItems.get(name);
+  }
 
-	@SuppressWarnings("unused")
-	@Column(name = "DTYPE", updatable = false)
-	private String discriminator;
+  public Task getTask() {
+    return task;
+  }
 
-	@SuppressWarnings("all")
-	public int hashCode() {
-		return new HashCodeBuilder(31, 71).append(id).append(type).toHashCode();
-	}
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Resultblock [id=");
+    builder.append(id);
+    if (type != null) {
+      builder.append(", type=");
+      builder.append(type);
+    }
+    if (colour != null) {
+      builder.append(", colour=");
+      builder.append(getColour());
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 
-	@Override
-	public boolean equals(Object arg0) {
-		if (!(arg0 instanceof ResultBlockImpl)) {
-			return false;
-		}
-		ResultBlockImpl rhs = (ResultBlockImpl) arg0;
-		return new EqualsBuilder().append(this.id, rhs.id).append(this.type, rhs.type).isEquals();
-	}
+  @SuppressWarnings("unused")
+  @Column(name = "DTYPE", updatable = false)
+  private String discriminator;
+
+  @SuppressWarnings("all")
+  public int hashCode() {
+    return new HashCodeBuilder(31, 71).append(id).append(type).toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object arg0) {
+    if (!(arg0 instanceof ResultBlockImpl)) {
+      return false;
+    }
+    ResultBlockImpl rhs = (ResultBlockImpl) arg0;
+    return new EqualsBuilder().append(this.id, rhs.id).append(this.type, rhs.type).isEquals();
+  }
 }
