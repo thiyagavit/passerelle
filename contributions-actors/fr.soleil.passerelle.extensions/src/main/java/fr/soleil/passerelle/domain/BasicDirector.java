@@ -129,7 +129,12 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
       pausingTime = PasserelleUtil.getParameterDoubleValue(pausingTimeParameter);
     } else if (attribute == selectedErrCtrlStrategyParameter) {
       final String val = PasserelleUtil.getParameterValue(selectedErrCtrlStrategyParameter);
-      errorStrategy = ErrorStrategy.valueOf(val);
+      //errorStrategy = ErrorStrategy.valueOf(val);
+      if (val.equals(ErrorStrategy.DEFAULT.toString())) {
+          errorStrategy = ErrorStrategy.DEFAULT;
+          } else {
+          errorStrategy = ErrorStrategy.RETRY;
+          }
     } else {
       super.attributeChanged(attribute);
     }
