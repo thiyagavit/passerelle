@@ -423,33 +423,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    </license>
 
    <requires>
+      <import plugin="org.eclipse.ui" version="3.5.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.4.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.4.2" match="greaterOrEqual"/>
+      <import plugin="ptolemy.core" version="7.0.1" match="greaterOrEqual"/>
       <import plugin="org.apache.log4j" version="1.2.14" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.microstar" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="ptolemy.core" version="7.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui" version="3.5.1" match="greaterOrEqual"/>
-      <import plugin="org.apache.commons.digester"/>
+      <import plugin="com.isencia.passerelle.engine" version="5.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.gef" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="ptolemy.gui" version="7.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.gef" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="com.isencia.passerelle.actor" version="7.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed"/>
-      <import plugin="ptolemy.gui" version="7.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.edit.ui" version="2.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.help.base" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help.webapp" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="com.teaminabox.eclipse.wiki"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.draw2d"/>
-      <import plugin="org.eclipse.gmf.runtime.common.core"/>
-      <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
       <import plugin="org.eclipse.wst.sse.ui"/>
       <import plugin="org.eclipse.jdt.launching" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.core" version="3.4.4" match="greaterOrEqual"/>
@@ -457,8 +454,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.pde.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.debug.ui" version="3.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.variables" version="3.2.100" match="greaterOrEqual"/>
-      <import plugin="com.isencia.passerelle.engine" version="5.3.0" match="greaterOrEqual"/>
-      <import plugin="slf4j.api"/>
+      <import plugin="com.isencia.passerelle.editor.common" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="com.isencia.passerelle.project.repository.api" version="8.3.0" match="greaterOrEqual"/>
+      <import plugin="com.isencia.passerelle.engine" version="7.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.pde.ui" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="com.isencia.passerelle.project.repository.api" version="8.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.launching" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="com.isencia.passerelle.project.repository.api" version="8.0.5" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.swt"/>
    </requires>
 
    <plugin
@@ -502,6 +509,159 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          download-size="0"
          install-size="0"
          version="7.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.isencia.passerelle.workbench.starter"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.cocoa.macosx"
+         os="macosx"
+         ws="cocoa"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.cocoa.macosx.x86_64"
+         os="macosx"
+         ws="cocoa"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.x86"
+         os="linux"
+         ws="gtk"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.x86_64"
+         os="linux"
+         ws="gtk"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.win32.win32.x86"
+         os="win32"
+         ws="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.win32.win32.x86_64"
+         os="win32"
+         ws="win32"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem.linux.x86"
+         os="linux"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem.linux.x86_64"
+         os="linux"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem.macosx"
+         os="macosx"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem.win32.x86"
+         os="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.filesystem.win32.x86_64"
+         os="win32"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.resources"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.resources.win32.x86"
+         os="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>
