@@ -54,6 +54,10 @@ public class EntityFactoryImpl implements EntityFactory {
 	public ResultBlock createResultBlock(Task task, String type) {
 		return new ResultBlockImpl(task, type);
 	}
+	
+	public ResultBlock createResultBlock(Task task, String type, Date date) {
+	  return new ResultBlockImpl(task, type, date);
+	}
 
 	public Attribute createAttribute(AttributeHolder holder, String name, String value) {
 		if (holder == null) {

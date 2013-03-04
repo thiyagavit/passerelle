@@ -41,68 +41,37 @@ public class ResultBlockImpl implements ResultBlock {
 	}
 
 	public ResultBlockImpl(Task task, String type) {
-		this.creationTS = new Date();
-		this.task = (TaskImpl) task;
-		this.type = type;
-
-		this.task.addResultBlock(this);
+		this(task, type, new Date());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
+  public ResultBlockImpl(Task task, String type, Date creationTS) {
+    this.creationTS = creationTS;
+    this.task = (TaskImpl) task;
+    this.type = type;
+
+    this.task.addResultBlock(this);
+  }
+
 	public Long getId() {
 		return id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#getAttribute(java
-	 * .lang.String)
-	 */
 	public Attribute getAttribute(String name) {
 		return attributes.get(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#putAttribute(com
-	 * .isencia.passerelle.process.model.Attribute)
-	 */
 	public Attribute putAttribute(Attribute attribute) {
 		return attributes.put(attribute.getName(), attribute);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.AttributeHolder#getAttributeNames()
-	 */
 	public Iterator<String> getAttributeNames() {
 		return attributes.keySet().iterator();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.AttributeHolder#getAttributes()
-	 */
 	public Set<Attribute> getAttributes() {
 		return new HashSet<Attribute>(attributes.values());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.Coloured#getColour()
-	 */
 	public String getColour() {
 		return colour;
 	}
@@ -111,40 +80,18 @@ public class ResultBlockImpl implements ResultBlock {
 		this.colour = colour;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getCreationTS()
-	 */
 	public Date getCreationTS() {
 		return creationTS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getType()
-	 */
 	public String getType() {
 		return type;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.isencia.passerelle.process.model.ResultBlock#addItem(com.isencia.
-	 * passerelle.process.model.ResultItem)
-	 */
 	public ResultItem<?> putItem(ResultItem<?> item) {
 		return resultItems.put(item.getName(), item);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultBlock#getAllItems()
-	 */
 	public Collection<ResultItem<?>> getAllItems() {
 		return Collections.unmodifiableCollection(resultItems.values());
 	}
