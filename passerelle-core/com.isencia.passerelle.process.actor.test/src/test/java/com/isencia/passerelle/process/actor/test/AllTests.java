@@ -1,4 +1,4 @@
-/* Copyright 2012 - iSencia Belgium NV
+/* Copyright 2013 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
