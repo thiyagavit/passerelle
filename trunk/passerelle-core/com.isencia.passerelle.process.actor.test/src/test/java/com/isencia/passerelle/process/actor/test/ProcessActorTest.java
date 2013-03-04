@@ -25,6 +25,7 @@ import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.process.actor.BatchRequestSequenceSource;
 import com.isencia.passerelle.process.actor.DelimitedResultLineGenerator;
 import com.isencia.passerelle.process.actor.TaskResultActor;
 import com.isencia.passerelle.process.actor.RequestSource;
@@ -65,6 +66,54 @@ public class ProcessActorTest extends TestCase {
 //    _testForkJoin(branchCount,"0");
 //  }
 
+  public void testBatchSource() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
+    Flow flow = new Flow("testBatch",null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new ETDirector(flow,"director"));
+    
+    RequestSource start = new RequestSource(flow,"start");
+    BatchRequestSequenceSource batchStart = new BatchRequestSequenceSource(flow, "batchStart");
+    ContextTracerConsole sink = new ContextTracerConsole(flow, "sink");
+    flow.connect(start, batchStart);
+    flow.connect(batchStart, sink);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("batchStart.Request parameter names", "NA,SERVICE");
+    props.put("batchStart.Request parameter values", "021234567,027654321\r\nFIA,IDTV");
+
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(start, 1L)
+    .expectMsgSentCount(batchStart, 2L)
+    .expectMsgReceiptCount(sink, 2L)
+    .assertFlow(flow);
+  }
+  
+  public void testBatchSourceWithOverrides() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
+    Flow flow = new Flow("testBatch",null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new ETDirector(flow,"director"));
+    
+    RequestSource start = new RequestSource(flow,"start");
+    BatchRequestSequenceSource batchStart = new BatchRequestSequenceSource(flow, "batchStart");
+    ContextTracerConsole sink = new ContextTracerConsole(flow, "sink");
+    flow.connect(start, batchStart);
+    flow.connect(batchStart, sink);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("batchStart.Request parameter names", "NA,SERVICE");
+    props.put("batchStart.Request parameter values", "021234567,027654321\r\nFIA,IDTV");
+    props.put("start.request parameters", "NA=01111111,01111112,01111113\r\nSERVICE=FIA,IDTV,FIA");
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(start, 1L)
+    .expectMsgSentCount(batchStart, 3L)
+    .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow);
+  }
+  
   protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
     Flow flow = new Flow("testForkJoin1",null);
     FlowManager flowMgr = new FlowManager();
