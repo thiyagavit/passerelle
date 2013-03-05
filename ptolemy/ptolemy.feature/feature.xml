@@ -2,7 +2,7 @@
 <feature
       id="ptolemy.feature"
       label="Ptolemy Feature"
-      version="7.0.1"
+      version="8.3.0"
       provider-name="isencia">
 
    <description url="http://www.example.com/description">

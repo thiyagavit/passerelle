@@ -2,7 +2,7 @@
 <feature
       id="com.isencia.passerelle.workbench.feature"
       label="Passerelle workbench Feature"
-      version="7.0.0"
+      version="8.3.0"
       provider-name="ISENCIA">
 
    <description url="http://code.google.com/a/eclipselabs.org/p/passerelle/">
@@ -424,62 +424,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    <requires>
       <import plugin="org.eclipse.ui" version="3.5.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="compatible"/>
       <import plugin="org.eclipse.ui.ide" version="3.4.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.4.2" match="greaterOrEqual"/>
-      <import plugin="ptolemy.core" version="7.0.1" match="greaterOrEqual"/>
+      <import plugin="slf4j.api"/>
       <import plugin="org.apache.log4j" version="1.2.14" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.microstar" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="com.isencia.passerelle.engine" version="5.3.0" match="greaterOrEqual"/>
+      <import plugin="com.isencia.passerelle.editor.common" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.digester"/>
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="org.eclipse.gef" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="ptolemy.gui" version="7.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="com.isencia.passerelle.actor" version="7.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed"/>
       <import plugin="org.eclipse.emf.edit.ui" version="2.4.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.pde.ui" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.help.base" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help.webapp" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.jdt.launching" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="com.teaminabox.eclipse.wiki"/>
+      <import plugin="org.eclipse.core.filesystem" version="1.3.0" match="compatible"/>
       <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.gmf.runtime.common.core"/>
+      <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
       <import plugin="org.eclipse.wst.sse.ui"/>
-      <import plugin="org.eclipse.jdt.launching" version="3.4.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.4.4" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.console" version="3.3.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.pde.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.debug.ui" version="3.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.variables" version="3.2.100" match="greaterOrEqual"/>
-      <import plugin="com.isencia.passerelle.editor.common" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.common" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.registry" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.expressions" version="3.2.0" match="compatible"/>
       <import plugin="com.isencia.passerelle.project.repository.api" version="8.3.0" match="greaterOrEqual"/>
       <import plugin="com.isencia.passerelle.engine" version="7.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.pde.ui" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="com.isencia.passerelle.project.repository.api" version="8.0.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.launching" version="3.6.0" match="greaterOrEqual"/>
-      <import plugin="com.isencia.passerelle.project.repository.api" version="8.0.5" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.emf.common" version="2.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.osgi" version="3.2.0" match="compatible"/>
+      <import feature="com.isencia.passerelle.core.feature" version="8.3.0"/>
+      <import feature="ptolemy.feature" version="8.3.0"/>
    </requires>
 
    <plugin
          id="com.isencia.passerelle.workbench"
          download-size="0"
          install-size="0"
-         version="7.0.1"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.workbench.logging.production"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="8.3.0"
          fragment="true"
          unpack="false"/>
 
@@ -494,35 +495,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="com.isencia.passerelle.workbench.model.editor.ui"
          download-size="0"
          install-size="0"
-         version="8.2.0"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.workbench.model.ui"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.workbench.util"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.workbench.starter"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="8.3.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.swt"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          unpack="false"/>
 
    <plugin
@@ -532,7 +533,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -543,7 +544,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -554,7 +555,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -565,7 +566,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -576,7 +577,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -587,7 +588,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.0.v3735b"
          fragment="true"
          unpack="false"/>
 
@@ -595,7 +596,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="org.eclipse.core.filesystem"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.3.100.v20110423-0524"
          unpack="false"/>
 
    <plugin
@@ -604,7 +605,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.4.0.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
@@ -614,7 +615,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.2.0.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
@@ -623,7 +624,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          os="macosx"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.3.0.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
@@ -633,7 +634,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.300.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
@@ -643,7 +644,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.300.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
@@ -651,7 +652,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="org.eclipse.core.resources"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.7.100.v20110510-0712"
          unpack="false"/>
 
    <plugin
@@ -660,7 +661,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          arch="x86"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.5.100.v20110423-0524"
          fragment="true"
          unpack="false"/>
 
