@@ -60,6 +60,7 @@ public class SocketServerReceiver extends ChannelSource {
     socketPort = new Parameter(this, "port", new IntToken(getPort()));
     socketPort.setTypeEquals(BaseType.INT);
     msgExtractorType = new StringParameter(this, MSG_EXTRACTOR_PARAM_NAME);
+    new SocketSvrRcvOptionsFactory(this, OPTIONS_FACTORY_CFG_NAME).setOptionsForParameter(msgExtractorType);
   }
   
   @Override

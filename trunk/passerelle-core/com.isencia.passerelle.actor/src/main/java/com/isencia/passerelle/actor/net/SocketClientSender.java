@@ -67,8 +67,9 @@ public class SocketClientSender extends ChannelSink {
     hostParam = new StringParameter(this, "remote host");
     hostParam.setExpression(getHost());
     msgGeneratorType = new StringParameter(this, MSG_GENERATOR_PARAM_NAME);
+    new SocketCltSndOptionsFactory(this, OPTIONS_FACTORY_CFG_NAME).setOptionsForParameter(msgGeneratorType);
   }
-  
+
   @Override
   protected Logger getLogger() {
     return LOGGER;
@@ -105,7 +106,8 @@ public class SocketClientSender extends ChannelSink {
   }
 
   /**
-   * @param host The host to set
+   * @param host
+   *          The host to set
    */
   public void setHost(String host) {
     this.host = host;
@@ -119,7 +121,8 @@ public class SocketClientSender extends ChannelSink {
   }
 
   /**
-   * @param port  The port to set
+   * @param port
+   *          The port to set
    */
   public void setPort(int port) {
     this.port = port;
