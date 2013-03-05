@@ -31,6 +31,7 @@
       </win>
    </launcher>
 
+
    <vm>
    </vm>
 
@@ -350,9 +351,9 @@
    </plugins>
 
    <features>
-      <feature id="com.isencia.passerelle.core.feature" version="7.0.0"/>
-      <feature id="com.isencia.passerelle.workbench.feature" version="7.0.0"/>
-      <feature id="ptolemy.feature" version="7.0.1"/>
+      <feature id="com.isencia.passerelle.core.feature" version="8.3.0"/>
+      <feature id="com.isencia.passerelle.workbench.feature" version="8.3.0"/>
+      <feature id="ptolemy.feature" version="8.3.0"/>
    </features>
 
    <configurations>
