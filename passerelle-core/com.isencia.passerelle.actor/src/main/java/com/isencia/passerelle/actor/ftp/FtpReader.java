@@ -151,7 +151,7 @@ public class FtpReader extends TriggeredChannelSource {
 
   protected IReceiverChannel createChannel() {
     IReceiverChannel res = null;
-    res = new FtpReceiverChannel(new File(file), server, user, password, isBinaryTransfer, isPassiveMode, new TextLineMessageExtractor());
+    res = new FtpReceiverChannel(file, server, user, password, isBinaryTransfer, isPassiveMode, new TextLineMessageExtractor());
     return res;
   }
 }
