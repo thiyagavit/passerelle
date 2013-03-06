@@ -2,12 +2,15 @@ package com.isencia.message.ftp;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
 import junit.framework.TestCase;
+
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
+import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+
 import com.isencia.message.ChannelException;
 import com.isencia.message.generator.MessageTextLineGenerator;
 
@@ -19,15 +22,15 @@ public class FtpSenderChannelTest extends TestCase {
   protected void setUp() throws Exception {
     ftpServer = new FakeFtpServer();
 
-    FileSystem fileSystem = new WindowsFakeFileSystem();
-    fileSystem.add(new FileEntry("c:\\data\\file1.txt", "abcdef\r\n1234567890"));
+    FileSystem fileSystem = new UnixFakeFileSystem();
+    fileSystem.add(new FileEntry("/data/file1.txt", "abcdef\r\n1234567890"));
     ftpServer.setFileSystem(fileSystem);
 
-    UserAccount userAccount = new UserAccount("pol", "pingo", "c:\\data");
+    UserAccount userAccount = new UserAccount("pol", "pingo", "/data");
     ftpServer.addUserAccount(userAccount);
     ftpServer.start();
 
-    ftpSndChannel = new FtpSenderChannel("c:\\data\\file2.txt", "localhost", "pol", "pingo", false, true, new MessageTextLineGenerator());
+    ftpSndChannel = new FtpSenderChannel("/data/file2.txt", "localhost", "pol", "pingo", false, true, new MessageTextLineGenerator());
   }
 
   protected void tearDown() throws Exception {
@@ -60,8 +63,8 @@ public class FtpSenderChannelTest extends TestCase {
       fail("Msg send failed " + e.getMessage());
     }
     try {
-      assertTrue(ftpServer.getFileSystem().exists("c:\\data\\file2.txt"));
-      FileEntry fileEntry = (FileEntry) ftpServer.getFileSystem().getEntry("c:\\data\\file2.txt");
+      assertTrue(ftpServer.getFileSystem().exists("/data/file2.txt"));
+      FileEntry fileEntry = (FileEntry) ftpServer.getFileSystem().getEntry("/data/file2.txt");
       BufferedReader reader = new BufferedReader(new InputStreamReader(fileEntry.createInputStream()));
       assertEquals("hello", reader.readLine());
       assertEquals("world", reader.readLine());

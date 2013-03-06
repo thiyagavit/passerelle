@@ -1,12 +1,13 @@
 package com.isencia.message.ftp;
 
-import java.io.File;
 import junit.framework.TestCase;
+
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
+import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+
 import com.isencia.message.ChannelException;
 import com.isencia.message.NoMoreMessagesException;
 import com.isencia.message.extractor.TextLineMessageExtractor;
@@ -20,14 +21,14 @@ public class FtpReceiverChannelTest extends TestCase {
     super.setUp();
     ftpServer = new FakeFtpServer();
     
-    FileSystem fileSystem = new WindowsFakeFileSystem();
-    fileSystem.add(new FileEntry("c:\\data\\file1.txt", "abcdef\r\n1234567890"));
+    FileSystem fileSystem = new UnixFakeFileSystem();
+    fileSystem.add(new FileEntry("/data/file1.txt", "abcdef\r\n1234567890"));
     ftpServer.setFileSystem(fileSystem);
     
-    UserAccount userAccount = new UserAccount("pol", "pingo", "c:\\data");
+    UserAccount userAccount = new UserAccount("pol", "pingo", "/data");
     ftpServer.addUserAccount(userAccount);
     ftpServer.start();
-    ftpRcvChannel = new FtpReceiverChannel(new File("c:\\data\\file1.txt"), "localhost", "pol", "pingo", false, true, new TextLineMessageExtractor());
+    ftpRcvChannel = new FtpReceiverChannel("/data/file1.txt", "localhost", "pol", "pingo", false, true, new TextLineMessageExtractor());
   }
 
   protected void tearDown() throws Exception {
