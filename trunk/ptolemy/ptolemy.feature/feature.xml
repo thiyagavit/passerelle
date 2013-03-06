@@ -59,35 +59,35 @@ OR MODIFICATIONS.
          id="com.microstar"
          download-size="0"
          install-size="0"
-         version="1.2.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="diva"
          download-size="0"
          install-size="0"
-         version="7.0.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="ptolemy.core"
          download-size="0"
          install-size="0"
-         version="7.0.1.4"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="ptolemy.domains.and.actors"
          download-size="0"
          install-size="0"
-         version="7.0.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="ptolemy.gui"
          download-size="0"
          install-size="0"
-         version="7.0.1.1"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
