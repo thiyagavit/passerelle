@@ -18,14 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import junit.framework.Assert;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.Assert;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.model.FlowManager;
 
 /**
  * This is a simple "builder" class to specify and assert flow execution expectations :
