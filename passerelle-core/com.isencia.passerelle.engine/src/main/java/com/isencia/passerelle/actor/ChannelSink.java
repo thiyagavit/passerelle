@@ -132,6 +132,17 @@ public abstract class ChannelSink extends Sink {
     return res;
   }
 
+  @Override
+  protected void doStop() {
+    try {
+      closeChannel(getChannel());
+      getLogger().debug("{} - Closed : {}", getFullName(), getChannel());
+    } catch (ChannelException e) {
+      throw new RuntimeException(new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Sender channel not closed correctly.", this, e));
+    }
+    super.doStop();
+  }
+
   protected void doWrapUp() throws TerminationException {
     try {
       closeChannel(getChannel());

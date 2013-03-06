@@ -156,6 +156,17 @@ public abstract class ChannelSource extends Source {
     }
     return super.doPostFire();
   }
+  
+  @Override
+  protected void doStop() {
+    try {
+      closeChannel(getChannel());
+      getLogger().debug("{} - Closed : {}", getFullName(), getChannel());
+    } catch (ChannelException e) {
+      throw new RuntimeException(new TerminationException(ErrorCode.ACTOR_EXECUTION_ERROR, "Receiver channel not closed correctly.", this, e));
+    }
+    super.doStop();
+  }
 
   protected void doWrapUp() throws TerminationException {
     try {
