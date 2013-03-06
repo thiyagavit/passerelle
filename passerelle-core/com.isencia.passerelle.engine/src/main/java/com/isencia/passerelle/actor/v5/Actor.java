@@ -215,7 +215,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     List<Port> inputPortList = this.inputPortList();
     for (Port _p : inputPortList) {
       if (_p.isInput() && !(_p instanceof ControlPort)) {
-        if (PortMode.PULL.equals(_p.getMode())) {
+        if (_p.isBlocking()) {
           blockingInputHandlers.add(createPortHandler(_p));
           blockingInputFinishRequests.put(_p, Boolean.FALSE);
         }

@@ -25,12 +25,9 @@ import com.isencia.passerelle.ext.ExecutionTracer;
 import com.isencia.passerelle.ext.impl.DefaultExecutionTracer;
 
 /**
- * A utility to easily be able to use the Passerelle ExecutionTracer features from anywhere in a Passerelle application.
- * 
- * Remark that by default, no ExecutionTracers are registered. Each Passerelle application should decide for itself what
- * ExecutionTracer implementation should be used/registered.
- * 
- * In many cases, the com.isencia.passerelle.ext.impl.DefaultExecutionTracer is a good option.
+ * A utility to easily be able to use the Passerelle ExecutionTracer features from anywhere in a Passerelle application. Remark that by default, no
+ * ExecutionTracers are registered. Each Passerelle application should decide for itself what ExecutionTracer implementation should be used/registered. In many
+ * cases, the com.isencia.passerelle.ext.impl.DefaultExecutionTracer is a good option.
  * 
  * @author erwin
  */
@@ -74,9 +71,11 @@ public class ExecutionTracerService {
   public static void trace(Director source, String message, Level level) {
     try {
       ExecutionTracer tracer2 = (ExecutionTracer) source.getAttribute("_userTracer");
-      tracer2.trace(source, message, level);
-    } catch (Throwable t) {
-      // t.printStackTrace();
+      if (tracer2 != null) {
+        tracer2.trace(source, message, level);
+      }
+    } catch (Exception e) {
+      // e.printStackTrace();
     }
 
     try {
@@ -96,18 +95,19 @@ public class ExecutionTracerService {
           tracer.trace(source, message, level);
         }
       }
-    } catch (Throwable t) {
-      // t.printStackTrace();
+    } catch (Exception e) {
+      // e.printStackTrace();
     }
   }
 
   public static void trace(Actor source, String message, Level level) {
     try {
       ExecutionTracer tracer2 = (ExecutionTracer) source.getDirector().getAttribute("_userTracer");
-      if (tracer2 != null)
+      if (tracer2 != null) {
         tracer2.trace(source, message, level);
-    } catch (Throwable t) {
-      // t.printStackTrace();
+      }
+    } catch (Exception e) {
+      // e.printStackTrace();
     }
     try {
       // if a trace is already registered, we are not in the IDE, so no
@@ -128,8 +128,8 @@ public class ExecutionTracerService {
           tracer.trace(source, message, level);
         }
       }
-    } catch (Throwable t) {
-      // t.printStackTrace();
+    } catch (Exception e) {
+      // e.printStackTrace();
     }
   }
 }

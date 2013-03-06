@@ -583,7 +583,7 @@ public class FlowManager {
 
 		try {
 			executionListener.otherExceptionOccured();
-		} catch (Throwable e) {
+		} catch (Throwable e) { // NOSONAR - need to make sure any problem is wrapped in a PasserelleException
       throw new PasserelleException(ErrorCode.FLOW_EXECUTION_ERROR, flow, e);
 		}
 	}

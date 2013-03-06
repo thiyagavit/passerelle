@@ -257,9 +257,7 @@ public class ETDirector extends Director implements PasserelleDirector {
     Event _e = busyIteratingActors.get(actor);
     if (_e == null) {
       busyIteratingActors.put(actor, event);
-    } else if (_e == event) {
-      // do nothing, already registered
-    } else {
+    } else if (_e != event) {
       throw new IllegalArgumentException("Actor " + actor.getFullName() + " iterating other event " + _e + " i.o. given event " + event);
     }
   }

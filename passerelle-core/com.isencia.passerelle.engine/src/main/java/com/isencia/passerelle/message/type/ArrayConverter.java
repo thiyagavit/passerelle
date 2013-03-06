@@ -37,10 +37,10 @@ public class ArrayConverter extends ConverterBase {
 
 	protected boolean areTypesCompatible(Class fromType, Type toType) {
 		boolean res = (toType instanceof ArrayType);
-		if(res && fromType!=null) {
+//		if(res && fromType!=null) {
 			// check if contained type in the array is compatible with the fromType
 //			res = ((ArrayType)toType).getElementType().??
-		}
+//		}
 		return res;
 	}
 
