@@ -45,7 +45,7 @@ public class FtpReceiverChannel extends ReaderReceiverChannel {
 	private boolean passiveMode = true;
 	private String remote; //Remote file to read/write
 	private FTPClient ftp;
-	
+	private int port = 21;
 	
 	
 	/**
@@ -64,6 +64,23 @@ public class FtpReceiverChannel extends ReaderReceiverChannel {
 		this.binaryTransfer = isBinaryTransfer;
 		this.passiveMode = isPassiveMode;
 		ftp = new FTPClient();
+	}
+	
+	/**
+	 * Additional constructor that allows you to specify the port
+	 * @param destFile
+	 * @param server
+	 * @param port
+	 * @param username
+	 * @param password
+	 * @param isBinaryTransfer
+	 * @param isPassiveMode
+	 * @param extractor
+	 */
+	public FtpReceiverChannel(String destFile, String server, int port, String username, String password,
+			boolean isBinaryTransfer, boolean isPassiveMode, IMessageExtractor extractor) {
+		this(destFile, server, username, password, isBinaryTransfer, isPassiveMode, extractor);
+		this.port = port;
 	}
 
 	/**
@@ -85,7 +102,7 @@ public class FtpReceiverChannel extends ReaderReceiverChannel {
 		// CONNECT TO SERVER
 		try {
 			int reply;
-			ftp.connect(server);
+			ftp.connect(server, port);
 			logger.debug("Connected to " + server + ".");
 			
 			// After connection attempt, you should check the reply code to verify

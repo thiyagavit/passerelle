@@ -20,6 +20,7 @@ public class FtpReceiverChannelTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
     ftpServer = new FakeFtpServer();
+    ftpServer.setServerControlPort(0);
     
     FileSystem fileSystem = new UnixFakeFileSystem();
     fileSystem.add(new FileEntry("/data/file1.txt", "abcdef\r\n1234567890"));
@@ -28,7 +29,9 @@ public class FtpReceiverChannelTest extends TestCase {
     UserAccount userAccount = new UserAccount("pol", "pingo", "/data");
     ftpServer.addUserAccount(userAccount);
     ftpServer.start();
-    ftpRcvChannel = new FtpReceiverChannel("/data/file1.txt", "localhost", "pol", "pingo", false, true, new TextLineMessageExtractor());
+    
+    int port = ftpServer.getServerControlPort();
+    ftpRcvChannel = new FtpReceiverChannel("/data/file1.txt", "localhost", port, "pol", "pingo", false, true, new TextLineMessageExtractor());
   }
 
   protected void tearDown() throws Exception {
