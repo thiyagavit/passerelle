@@ -453,119 +453,119 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          id="com.isencia.passerelle.actor"
          download-size="0"
          install-size="0"
-         version="8.3.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.commons"
          download-size="0"
          install-size="0"
-         version="8.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.commons.ume"
          download-size="0"
          install-size="0"
-         version="8.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.defaulttypeconverterprovider"
          download-size="0"
          install-size="0"
-         version="8.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.engine"
          download-size="0"
          install-size="0"
-         version="8.3.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.domain.et"
          download-size="0"
          install-size="0"
-         version="8.3.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.editor.common"
          download-size="0"
          install-size="0"
-         version="8.3.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.actor"
          download-size="0"
          install-size="0"
-         version="8.3.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.common"
          download-size="0"
          install-size="0"
-         version="1.1.2.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.model"
          download-size="0"
          install-size="0"
-         version="8.3.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.model.impl"
          download-size="0"
          install-size="0"
-         version="8.3.3.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.scheduler"
          download-size="0"
          install-size="0"
-         version="1.1.1.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.process.service"
          download-size="0"
          install-size="0"
-         version="1.1.3.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.project.repository.api"
          download-size="0"
          install-size="0"
-         version="8.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.project.repository.impl.filesystem"
          download-size="0"
          install-size="0"
-         version="8.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.actor.conf"
          download-size="0"
          install-size="0"
-         version="8.1.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="com.isencia.passerelle.actor.help"
          download-size="0"
          install-size="0"
-         version="7.0.0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
