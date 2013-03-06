@@ -1,6 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.isencia</groupId>
+		<artifactId>tycho-parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
 	<groupId>com.isencia.passerelle</groupId>
 	<artifactId>parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
@@ -9,23 +15,9 @@
 	<name>Passerelle :: Parent</name>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<!-- versions -->
-		<tycho-version>0.16.0</tycho-version>
-		<jetty-version>6.1.22</jetty-version>
-		<jaxb2-plugin-version>0.8.2</jaxb2-plugin-version>
-		<jacoco-maven-plugin-version>0.6.0.201210061924</jacoco-maven-plugin-version>
-		<clean.plugin.version>2.5</clean.plugin.version>
-
-		<!-- JaCoCo -->
-		<common.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</common.jacoco.reportPath>
-		<!-- Sonar -->
-		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>${common.jacoco.reportPath}</sonar.jacoco.reportPath>
-		<sonar.surefire.reportsPath>../${project.artifactId}.test/target/surefire-reports/</sonar.surefire.reportsPath>
+		<target.execution.env>JavaSE-1.6</target.execution.env>
+		<target.compiler.compliance>1.6</target.compiler.compliance>
+		
 		<sonar.skippedModules>
 			com.microstar,
 			diva,
@@ -37,10 +29,9 @@
 			com.isencia.passerelle.commons.test,
 			com.isencia.passerelle.commons.ume.test,
 			com.isencia.passerelle.domain.et.test,
-			com.isencia.passerelle.engine.test
+			com.isencia.passerelle.engine.test,
+			com.isencia.passerelle.testsupport
 		</sonar.skippedModules>
-		<sonar.pdf.username>hudson</sonar.pdf.username>
-		<sonar.pdf.password>{MLKMJBHVG78T889876734658970!?KJ}</sonar.pdf.password>
 	</properties>
 
 	<modules>
@@ -59,39 +50,7 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<executions>
-					<execution>
-						<id>plugin-source</id>
-						<goals>
-							<goal>plugin-source</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-versions-plugin</artifactId>
-				<version>${tycho-version}</version>
-			</plugin>
+			<!-- override this plugin from parent, since more environments are needed -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -131,84 +90,6 @@
 					</environments>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin-version}</version>
-				<configuration>
-					<!-- destFile and dataFile point to coverage data file, one prop is 
-						used by agent goal, the other by report goal -->
-					<destFile>${common.jacoco.reportPath}</destFile>
-					<dataFile>${common.jacoco.reportPath}</dataFile>
-					<!-- since the coverage data file is used for all modules, append to 
-						it -->
-					<append>true</append>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<!-- sonar does the reporting, for report generation locally do the 
-						following: in plugin.test project execute mvn jacoco:prepare-agent tycho-surefire:test 
-						in plugin project execute mvn jacoco:report report is in plugin project/target/site/jacoco -->
-					<execution>
-						<id>report</id>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
-	
-	<profiles>
-		<profile>
-			<id>mr-proper</id>
-			<build>
-				<plugins>
-					<!-- 
-			Plugins for cleaning up before the build. 
-			The versions plugin will update the pom files based on the manifest. 
-			The clean plugin will also clean local p2 caching directories. 
-			It is advised to first run mvn clean and then mvn install
-			Calling mvn clean install will update the pom files too late to be taken into account in the build.
-			-->
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-versions-plugin</artifactId>
-						<version>${tycho-version}</version>
-						<executions>
-							<execution>
-								<id>update-pom</id>
-								<phase>clean</phase>
-								<goals>
-									<goal>update-pom</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-clean-plugin</artifactId>
-						<version>${clean.plugin.version}</version>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>${settings.localRepository}/.cache</directory>
-								</fileset>
-								<fileset>
-									<directory>${settings.localRepository}/.meta</directory>
-								</fileset>
-								<fileset>
-									<directory>${settings.localRepository}/p2</directory>
-								</fileset>
-							</filesets>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
