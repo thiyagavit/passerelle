@@ -4,7 +4,7 @@ Bundle-Name: Passerelle Test Support
 Bundle-SymbolicName: com.isencia.passerelle.testsupport
 Bundle-Version: 8.3.0
 Bundle-Vendor: ISENCIA
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.actor;version="7.0.0",
  com.isencia.passerelle.actor.v5;version="7.0.0",
  com.isencia.passerelle.core;version="7.0.0",

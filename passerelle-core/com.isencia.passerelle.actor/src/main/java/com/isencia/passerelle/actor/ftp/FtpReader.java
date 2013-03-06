@@ -14,9 +14,9 @@
  */
 package com.isencia.passerelle.actor.ftp;
 
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.BooleanToken;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.Parameter;
@@ -25,6 +25,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.message.IReceiverChannel;
 import com.isencia.message.extractor.TextLineMessageExtractor;
 import com.isencia.message.ftp.FtpReceiverChannel;
