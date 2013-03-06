@@ -111,7 +111,7 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
         // check for synchronization/stepping/... of this actor's
         // iterations
         // ExecutionControlStrategy.IterationPermission itrPerm = _director.requestNextIteration(getActor());
-        try {
+//        try {
           // NOTE: Possible race condition... actor.stop()
           // might be called before we get to this.
           // This will cause postfire() on the actor
@@ -131,12 +131,13 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
               iterate = doActorIterationWithoutEvents(workspace);
             }
           }
-        } finally {
+//        } 
+//        finally {
           // _director.iterationFinished(getActor(), itrPerm);
-        }
+//        }
       }
       logger.debug("{} - Clean termination of ProcessThread",getActor().getFullName());
-    } catch (Throwable t) {
+    } catch (Throwable t) { // NOSONAR - need to make sure any exception that breaks the run() loop is logged
       thrownWhenIterate = t;
       logger.debug(getActor().getFullName() + " - Error in ProcessThread " + t);
       //t.printStackTrace();

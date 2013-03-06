@@ -283,7 +283,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
     try {
       new EditorIcon(this, "_icon");
-    } catch (Throwable t) {
+    } catch (Throwable t) { // NOSONAR
       // ignore, probably means that we're on a server with no display
     }
 

@@ -144,7 +144,7 @@ public abstract class Filter extends Actor {
         if (matchFound) {
           try {
             outputOk.broadcast(token);
-          } catch (Throwable e) {
+          } catch (Exception e) {
             throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on OK output", this, message, e);
           }
           getLogger().debug("{} - Sent message OK  {}:", getFullName(), token);
@@ -152,7 +152,7 @@ public abstract class Filter extends Actor {
         } else {
           try {
             outputNotOk.broadcast(token);
-          } catch (Throwable e) {
+          } catch (Exception e) {
             throw new ProcessingException(ErrorCode.MSG_DELIVERY_FAILURE,"Error sending msg on NotOK output", this, message, e);
           }
           getLogger().debug("{} - Sent message NOT OK  {}:", getFullName(), token);

@@ -330,7 +330,7 @@ public class PortHandler {
         }
 
         LOGGER.debug("{} - ChannelHandler.{} - run() - exit", PortHandler.this.ioPort.getFullName(), channelIndex);
-      } catch (Throwable t) {
+      } catch (Throwable t) { // NOSONAR - need to make sure any exception that breaks the run() loop is logged
         LOGGER.error(PortHandler.this.ioPort.getFullName() + " - Error in ChannelHandler", t);
         throw new RuntimeException(t);
       } finally {

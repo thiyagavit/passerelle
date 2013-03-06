@@ -174,6 +174,15 @@ public class Port extends TypedIOPort {
   }
 
   /**
+   * 
+   * @return true if the Port will block calls to get msgs when none are available, or not.
+   * This is determined by the PortMode. If somehow no mode is set, default assumption is blocking.
+   */
+  public boolean isBlocking() {
+    return getMode()==null || getMode().isBlocking();
+  }
+  
+  /**
    * @return
    */
   public PortMode getMode() {
@@ -725,13 +734,14 @@ public class Port extends TypedIOPort {
         if (converted != null) {
           newToken = converted;
         }
-      } else {
+      } 
+//      else {
         // the far port is a Passerelle Port and expecting Passerelle
         // messages
         // now we just need to check if there's any need for conversions
         // on the body contents...
         // but how????
-      }
+//      }
     } else {
       // will normally not happen, but one never knows
       // that someone develops a plain Ptolemy actor,

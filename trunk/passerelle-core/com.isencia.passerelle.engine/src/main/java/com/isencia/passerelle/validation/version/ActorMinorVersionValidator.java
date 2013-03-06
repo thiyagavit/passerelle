@@ -41,16 +41,13 @@ public class ActorMinorVersionValidator implements ModelElementVersionValidation
       String versionedElementClassName = versionedElement.getClass().getName();
       // first check with the most recent version
       VersionSpecification mostRecentVersion = ActorVersionRegistry.getInstance().getMostRecentVersion(versionedElementClassName);
-      if (mostRecentVersion == null) {
-        // no registered version constraint, so any entered version is valid.
-      } else {
+      // if no registered version constraint, any entered version is valid. Else need to check it!
+      if (mostRecentVersion != null) {
         int res = compareVersions(mostRecentVersion, versionToBeValidated);
-        if (res==0) {
-          // all's well
-        } else if (res<0) {
+        if (res<0) {
           throw new ValidationException(ErrorCode.FLOW_VALIDATION_WARNING, "Required version " + versionToBeValidated + " -- Available version " + mostRecentVersion + " too old.",
               versionedElement, null);
-        } else {
+        } else if (res>0) {
           // This means the runtime has a more recent minor version than what's required for the element.
           // This may also lead to incompatibilities.
           // So need to check if any compatible version is available.

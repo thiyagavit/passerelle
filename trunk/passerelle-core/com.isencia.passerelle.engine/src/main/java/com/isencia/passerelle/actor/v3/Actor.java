@@ -25,12 +25,10 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListenerAdapter;
-import com.isencia.passerelle.core.PortMode;
-import com.isencia.passerelle.core.PasserelleException.Severity;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
@@ -179,15 +177,15 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor {
     List<Port> inputPortList = this.inputPortList();
     for (Port _p : inputPortList) {
       if (_p.isInput() && !(_p instanceof ControlPort)) {
-        if (PortMode.PUSH.equals(_p.getMode())) {
-          PortHandler pH = new PortHandler(_p);
+        if (_p.getMode().isBlocking()) {
+          blockingInputHandlers.add(createPortHandler(_p));
+          blockingInputFinishRequests.add(Boolean.FALSE);
+        } else {
+          PortHandler pH = createPortHandler(_p);
           MsgListener msgListener = new MsgListener(this, pH);
           pH.setListener(msgListener);
           pushingInputHandlers.add(pH);
           pushingInputFinishRequests.add(Boolean.FALSE);
-        } else {
-          blockingInputHandlers.add(new PortHandler(_p));
-          blockingInputFinishRequests.add(Boolean.FALSE);
         }
         isSource = false;
       }

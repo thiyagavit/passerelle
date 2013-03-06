@@ -44,8 +44,4 @@ public enum PortMode {
   public boolean isBlocking() {
     return blocking;
   }
-  
-  public boolean equals(PortMode other) {
-    return this.blocking==other.blocking;
-  }
 }

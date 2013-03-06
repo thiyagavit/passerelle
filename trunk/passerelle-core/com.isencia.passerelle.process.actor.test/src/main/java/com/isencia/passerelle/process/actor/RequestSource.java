@@ -45,7 +45,7 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
 public class RequestSource extends Actor {
 	private static final long serialVersionUID = 1L;
 
-private static final Logger LOGGER = LoggerFactory.getLogger(RequestSource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RequestSource.class);
 
   public Port output;
 

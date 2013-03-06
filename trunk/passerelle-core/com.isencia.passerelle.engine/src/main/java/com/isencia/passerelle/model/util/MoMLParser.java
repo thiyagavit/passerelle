@@ -933,7 +933,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
         _toplevel.setDeferringChangeRequests(_previousDeferStatus);
         _toplevel.executeChangeRequests();
       }
-    } catch (Throwable throwable) {
+    } catch (Throwable throwable) {// NOSONAR - ptolemy code; dangerous to change...
       // Ignore any exceptions here.
     }
 
@@ -1034,7 +1034,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
           base = new File(cwd).toURI().toURL();
           result = new URL(base, source);
           input = result.openStream();
-        } catch (Throwable throwable) {
+        } catch (Throwable throwable) { // NOSONAR - ptolemy code; dangerous to change...
           errorMessage.append("-- " + cwd + File.separator + source + "\n" + throwable.getMessage() + "\n");
         }
       }
@@ -5034,7 +5034,7 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
       if (input != null) {
         try {
           input.close();
-        } catch (Throwable throwable) {
+        } catch (Throwable throwable) { // NOSONAR - ptolemy code; dangerous to change...
           System.out.println("Ignoring failure to close stream " + "on " + _xmlFile);
           throwable.printStackTrace();
         }
@@ -5281,9 +5281,10 @@ public class MoMLParser extends ptolemy.moml.MoMLParser {
             // Handle deleting links in reverse order so that if
             // we copy and paste the undo/redo works out
             _undoContext.appendClosingUndoMoML("<group><unlink port=\"" + portName + "\" index=\"" + insertAt + "\" /></group>" + "\n");
-          } else {
+          } 
+//          else {
             // No change so do not need to generate any undo MoML
-          }
+//          }
         }
       }
     }
