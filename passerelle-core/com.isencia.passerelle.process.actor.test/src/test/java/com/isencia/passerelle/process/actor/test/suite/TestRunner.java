@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.process.actor.test;
+package com.isencia.passerelle.process.actor.test.suite;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;

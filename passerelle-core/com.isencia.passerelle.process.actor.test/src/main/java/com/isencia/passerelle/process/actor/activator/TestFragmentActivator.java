@@ -18,7 +18,7 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import com.isencia.passerelle.process.actor.test.TestRunner;
+import com.isencia.passerelle.process.actor.test.suite.TestRunner;
 
 public class TestFragmentActivator implements BundleActivator  {
 

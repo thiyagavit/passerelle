@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.process.actor;
+package com.isencia.passerelle.process.actor.v5;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -25,6 +25,10 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.Actor;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -80,7 +84,8 @@ public class RequestSource extends Actor {
     return LOGGER;
   }
 
-  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  @Override
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
       String extRef = ((StringToken)extRefParameter.getToken()).stringValue();
       Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);

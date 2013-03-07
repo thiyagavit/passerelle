@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.process.actor;
+package com.isencia.passerelle.process.actor.v5;
 
 import java.util.Arrays;
 
@@ -27,6 +27,10 @@ import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.Actor;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.ErrorCode;
@@ -107,11 +111,14 @@ public class DelimitedResultLineGenerator extends Actor {
     }
   }
 
-  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  @Override
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+
     ManagedMessage message = request.getMessage(input);
     if (message == null) {
       return;
     }
+
     try {
       Context processContext = null;
       if (message.getBodyContent() instanceof Context) {

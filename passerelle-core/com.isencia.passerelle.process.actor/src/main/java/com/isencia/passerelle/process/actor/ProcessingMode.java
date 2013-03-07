@@ -12,19 +12,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.process.actor.test;
+package com.isencia.passerelle.process.actor;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-public class AllTests {
-
-  public static Test suite() {
-    TestSuite suite = new TestSuite(AllTests.class.getName());
-    //$JUnit-BEGIN$
-    suite.addTestSuite(ProcessActorTest.class);
-    //$JUnit-END$
-    return suite;
-  }
-
+/**
+ * Identifies whether the actor will process a given ProcessRequest synchronously (all work done when the <code>process()</code> method returns) 
+ * or asynchronously (work done in background and will probably take longer than the return of the <code>process()</code> method invocation).
+ */
+public enum ProcessingMode {
+  SYNCHRONOUS, ASYNCHRONOUS;
 }
