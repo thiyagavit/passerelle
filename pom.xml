@@ -48,6 +48,21 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>nexus</id>
+			<name>Nexus Repository</name>
+			<url>https://ci-nexus.isencia.be/nexus/content/repositories/isencia-open-source/</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>nexus</id>
+			<name>Nexus Repository</name>
+			<url>https://ci-nexus.isencia.be/nexus/content/repositories/isencia-open-source/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 	<build>
 		<plugins>
 			<!-- override this plugin from parent, since more environments are needed -->
