@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.process.actor;
+package com.isencia.passerelle.process.actor.v5;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -26,6 +26,9 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.model.Context;
@@ -34,6 +37,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
@@ -62,7 +66,8 @@ public class TaskResultActor extends AsynchDelay {
     return LOGGER;
   }
 
-  public void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  @Override
+  protected void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage message = request.getMessage(input);
     String resultType = resultTypeParam.getExpression();
     if (message != null) {

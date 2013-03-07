@@ -22,6 +22,7 @@ public class EntityManagerImpl implements EntityManager {
   private Long keyGenerator = new Long(DateUtils.format(new Date(), "yyyyMMdd") + "000000000");
 
   private Map<Long, Case> casesById = new HashMap<Long, Case>();
+  private Map<Long, Context> contextsById = new HashMap<Long, Context>();
   private Map<Long, Request> requestsById = new HashMap<Long, Request>();
   private Map<String, Request> requestsByCorrelationId = new HashMap<String, Request>();
 
@@ -48,9 +49,12 @@ public class EntityManagerImpl implements EntityManager {
   }
 
   public Context persistContext(Context context) {
-    if (context != null && context.getId() == null) {
-      ((ContextImpl) context).setId(keyGenerator++);
-      persistRequest(context.getRequest());
+    if (context != null) {
+      if (context.getId() == null) {
+        ((ContextImpl) context).setId(keyGenerator++);
+        persistRequest(context.getRequest());
+      }
+      contextsById.put(context.getId(), context);
     }
     return context;
   }
@@ -88,6 +92,10 @@ public class EntityManagerImpl implements EntityManager {
 
   public Task getTask(Long taskId, boolean bypassCache) {
     return getTask(taskId);
+  }
+
+  public Context getContext(Long contextId) {
+    return contextsById.get(contextId);
   }
 
   public Context getContext(Context context) {
@@ -134,8 +142,8 @@ public class EntityManagerImpl implements EntityManager {
     return entity;
   }
 
-  public List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, 
-      Collection<Long> resultBlockIds, Collection<String> taskTypes, Collection<String> resultBlockTypes) {
+  public List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, Collection<Long> resultBlockIds, Collection<String> taskTypes,
+      Collection<String> resultBlockTypes) {
     return new ArrayList<ResultBlock>();
   }
 }
