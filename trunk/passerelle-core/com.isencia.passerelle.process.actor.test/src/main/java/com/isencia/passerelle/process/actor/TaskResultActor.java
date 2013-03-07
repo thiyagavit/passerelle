@@ -62,37 +62,32 @@ public class TaskResultActor extends AsynchDelay {
     return LOGGER;
   }
 
+  @Override
   public void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage message = request.getMessage(input);
+    Context processContext = getRequiredContextForMessage(message);
     String resultType = resultTypeParam.getExpression();
-    if (message != null) {
-      try {
-        EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
-        EntityManager entityManager = ServiceRegistry.getInstance().getEntityManager();
-        
-        Context processContext = (Context) message.getBodyContent();
-        Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
-        
-        task = (Task) entityManager.persistRequest(task);
-        
-        ResultBlock rb = entityFactory.createResultBlock(task, resultType);
+    try {
+      EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
+      EntityManager entityManager = ServiceRegistry.getInstance().getEntityManager();
+      Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
+      ResultBlock rb = entityFactory.createResultBlock(task, resultType);
 
-        String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
-        BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
-        String paramDef = null;
-        while ((paramDef = reader.readLine()) != null) {
-          String[] paramKeyValue = paramDef.split("=");
-          if (paramKeyValue.length == 2) {
-            entityFactory.createResultItem(rb, paramKeyValue[0], paramKeyValue[1], null);
-          } else {
-            ExecutionTracerService.trace(this, "Invalid mapping definition: " + paramDef);
-          }
+      String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
+      BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
+      String paramDef = null;
+      while ((paramDef = reader.readLine()) != null) {
+        String[] paramKeyValue = paramDef.split("=");
+        if (paramKeyValue.length == 2) {
+          entityFactory.createResultItem(rb, paramKeyValue[0], paramKeyValue[1], null);
+        } else {
+          ExecutionTracerService.trace(this, "Invalid mapping definition: " + paramDef);
         }
-        response.addOutputMessage(output, message);
-      } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);
       }
+      entityManager.persistRequest(task);
+      response.addOutputMessage(output, message);
+    } catch (Exception e) {
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);
     }
   }
-
 }

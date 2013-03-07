@@ -109,17 +109,8 @@ public class DelimitedResultLineGenerator extends Actor {
 
   public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage message = request.getMessage(input);
-    if (message == null) {
-      return;
-    }
+    Context processContext = getRequiredContextForMessage(message);
     try {
-      Context processContext = null;
-      if (message.getBodyContent() instanceof Context) {
-        processContext = (Context) message.getBodyContent();
-      } else {
-        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
-      }
-
       StringBuilder buffer = new StringBuilder();
       for (String resultName : resultNames) {
         if (REFID_NAME.equalsIgnoreCase(resultName)) {
@@ -133,7 +124,6 @@ public class DelimitedResultLineGenerator extends Actor {
           buffer.append(resultValue + delimiter);
         }
       }
-
       String msg = buffer.toString();
 
       ExecutionTracerService.trace(this, msg);
@@ -141,10 +131,8 @@ public class DelimitedResultLineGenerator extends Actor {
       ManagedMessage resultMsg = createMessageFromCauses(message);
       resultMsg.setBodyContent(msg, "text/plain");
       response.addOutputMessage(output, resultMsg);
-
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error constructing delimited result line", this, message, e);
     }
   }
-
 }

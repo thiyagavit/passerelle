@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.actor;
 
 import java.io.BufferedReader;
@@ -28,7 +28,6 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
@@ -39,7 +38,7 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
  * @author erwin
  */
 public class RequestSource extends Actor {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestSource.class);
 
@@ -82,12 +81,12 @@ public class RequestSource extends Actor {
 
   public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
-      String extRef = ((StringToken)extRefParameter.getToken()).stringValue();
+      String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
       Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);
-      String processType = ((StringToken)processTypeParameter.getToken()).stringValue();
-      String category = ((StringToken)categoryParameter.getToken()).stringValue();
-      String correlationID = ((StringToken)corrIDParameter.getToken()).stringValue();
-      String initiator = ((StringToken)initiatorParameter.getToken()).stringValue();
+      String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
+      String category = ((StringToken) categoryParameter.getToken()).stringValue();
+      String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
+      String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
       Request req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, category, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
@@ -104,8 +103,7 @@ public class RequestSource extends Actor {
       req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
       Context context = req.getProcessingContext();
       context.setStatus(Status.STARTED);
-      ManagedMessage message = createMessage(context, ManagedMessage.objectContentType);
-      response.addOutputMessage(output, message);
+      response.addOutputMessage(output, createMessageForContext(context));
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, null);
     } finally {

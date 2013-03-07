@@ -51,6 +51,7 @@ import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.message.MessageOutputContext;
 import com.isencia.passerelle.message.MessageProvider;
 import com.isencia.passerelle.message.internal.MessageContainer;
+import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.service.ContextRepository;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
@@ -101,8 +102,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // These collections maintain current processing containers between prefire/fire/postfire.
   // ========================================================================================
 
-  // TODO evaluate if these should not be managed centrally, e.g. attached to the <code>Director</code> or so, linked to the event queue i.c.o. an <code>ETDirector</code> etc
-  
+  // TODO evaluate if these should not be managed centrally, e.g. attached to the <code>Director</code> or so, linked to the event queue i.c.o. an
+  // <code>ETDirector</code> etc
+
   // This map contains all process requests for which some data has been received,
   // but still not all required data. They are mapped to their context ID (in string format, as stored in the msg header).
   private Map<String, ProcessRequest> incompleteProcessRequests = new ConcurrentHashMap<String, ProcessRequest>();
@@ -385,7 +387,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         Iterator<ManagedMessage> msgIterator = msgInputCtxt.getMsgIterator();
         while (msgIterator.hasNext()) {
           ManagedMessage managedMessage = (ManagedMessage) msgIterator.next();
-          String[] ctxtHdrs = ((MessageContainer) managedMessage).getHeader(ProcessActor.HEADER_PROC_CONTEXT);
+          String[] ctxtHdrs = ((MessageContainer) managedMessage).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
           if (ctxtHdrs != null && ctxtHdrs.length > 0) {
             for (String ctxtHdr : ctxtHdrs) {
               Long ctxtID = null;
@@ -414,7 +416,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         }
       }
       // if the context-less process request has something to process, let's do it as well!
-      if(contextLessProcessRequest.hasSomethingToProcess()) {
+      if (contextLessProcessRequest.hasSomethingToProcess()) {
         pendingProcessRequests.offer(new ProcessResponse(getActorContext(), contextLessProcessRequest));
       }
       // now check for any completely-defined context-scoped process requests
@@ -597,5 +599,54 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   protected Logger getLogger() {
     return LOGGER;
+  }
+
+  /**
+   * 
+   * @param context
+   * @return
+   * @throws MessageException
+   */
+  protected ManagedMessage createMessageForContext(Context context) throws MessageException {
+    SettableMessage message = (SettableMessage) createMessage(context, ManagedMessage.objectContentType);
+    if (context.getId() != null) {
+      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, Long.toString(context.getId()));
+    }
+    return message;
+  }
+  
+  @Override
+  public ManagedMessage createMessageFromCauses(ManagedMessage... causes) {
+    SettableMessage message = (SettableMessage)  super.createMessageFromCauses(causes);
+    for(ManagedMessage causeMsg : causes) {
+      // Normally we would only expect a msg to be related to one context,
+      // but one never knows what may happen with complex/concurrent workflows 
+      // where work could maybe be optimized via sharing/grouping...
+      String[] ctxtIDHdrs = ((SettableMessage) causeMsg).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+      for (String ctxtIDHdr : ctxtIDHdrs) {
+        message.addHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, ctxtIDHdr);
+      }
+    }
+    return message;
+  }
+  
+  protected Context getRequiredContextForMessage(ManagedMessage message) throws ProcessingException {
+    if(message==null) {
+      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No message received ", this, null);
+    }
+    String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+    if(ctxtHdrs==null || ctxtHdrs.length==0) {
+      return null;
+    }
+    ContextRepository contextRepository = ServiceRegistry.getInstance().getContextRepository();
+    if(contextRepository==null) {
+      throw new ProcessingException(ErrorCode.SYSTEM_CONFIGURATION_FATAL, "No ContextRepository registered in ServiceRegistry", this, message, null);
+    }
+    Context context = contextRepository.getContext(new Long(ctxtHdrs[0]));
+    if(context!=null) {
+      return context;
+    } else {
+      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
+    }
   }
 }

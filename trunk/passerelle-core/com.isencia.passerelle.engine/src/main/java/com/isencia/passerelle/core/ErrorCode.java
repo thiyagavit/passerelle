@@ -29,6 +29,8 @@ public class ErrorCode extends Enumerated<ErrorCode> {
   public static final ErrorCode ERROR = new ErrorCode("ERROR", "9998", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Undefined error");
   public static final ErrorCode FATAL = new ErrorCode("FATAL", "9999", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.FATAL, "Undefined fatal error");
   public static final ErrorCode ERROR_PROCESSING_FAILURE = new ErrorCode("ERROR_PROCESSING_FAILURE", "9900", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Error processing a previous error");
+  public static final ErrorCode SYSTEM_CONFIGURATION_ERROR = new ErrorCode("SYSTEM_CONFIGURATION_ERROR", "9908", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "System configuration error");
+  public static final ErrorCode SYSTEM_CONFIGURATION_FATAL = new ErrorCode("SYSTEM_CONFIGURATION_FATAL", "9909", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.FATAL, "System configuration fatal error");
 
   public static final ErrorCode MSG_CONSTRUCTION_ERROR = new ErrorCode("MSG_CONSTRUCTION_ERROR", "0100", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Message construction error");
   public static final ErrorCode MSG_DELIVERY_FAILURE = new ErrorCode("MSG_DELIVERY_FAILURE", "0110", ErrorCategory.PASS_TECHNICAL, ErrorCode.Severity.ERROR, "Message delivery failure");

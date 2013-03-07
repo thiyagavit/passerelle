@@ -56,6 +56,10 @@ public class ResultBlockImpl implements ResultBlock {
 		return id;
 	}
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+
 	public Attribute getAttribute(String name) {
 		return attributes.get(name);
 	}
