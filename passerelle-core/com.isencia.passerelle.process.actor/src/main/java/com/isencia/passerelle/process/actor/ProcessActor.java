@@ -25,11 +25,6 @@ import com.isencia.passerelle.actor.ProcessingException;
 public interface ProcessActor {
 
   /**
-   * Name of the msg header where the context ID(s) is/are stored, to which a msg is related
-   */
-  public final static String HEADER_PROC_CONTEXT = "__PSRL_PROC_CTXT";
-
-  /**
    * Method to indicate whether the given request will be processed synchronously or asynchronously. 
    * <p>
    * Actors that have asynchronous processing, should combine returning <code>ProcessingMode.ASYNCHRONOUS</code> here, with invoking

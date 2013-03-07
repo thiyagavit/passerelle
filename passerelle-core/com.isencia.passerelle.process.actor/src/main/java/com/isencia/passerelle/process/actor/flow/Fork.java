@@ -158,7 +158,7 @@ public class Fork extends DynamicNamedOutputPortsActor {
     List<Context> branches = new ArrayList<Context>();
     for (ManagedMessage branchMsg : messages) {
     	Context branchedCtx = (Context)branchMsg.getBodyContent();
-    	msg.addCauseID(branchedCtx.getId());
+    	msg.addCauseID(branchMsg.getID());
     	branches.add(branchedCtx);
     }
     mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);

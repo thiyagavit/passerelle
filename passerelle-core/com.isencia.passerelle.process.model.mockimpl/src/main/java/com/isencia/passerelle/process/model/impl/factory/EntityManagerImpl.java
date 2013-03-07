@@ -17,6 +17,7 @@ import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextImpl;
 import com.isencia.passerelle.process.model.impl.RequestImpl;
+import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 
 public class EntityManagerImpl implements EntityManager {
   private Long keyGenerator = new Long(DateUtils.format(new Date(), "yyyyMMdd") + "000000000");
@@ -44,6 +45,16 @@ public class EntityManagerImpl implements EntityManager {
       }
       requestsById.put(request.getId(), request);
       requestsByCorrelationId.put(request.getCorrelationId(), request);
+      if(request instanceof Task) {
+        Task t = (Task) request;
+        for(ResultBlock rb : t.getResultBlocks()) {
+          if(rb.getId() == null) {
+            ((ResultBlockImpl) rb).setId(keyGenerator++);
+          }
+        }
+      }
+      // and should also cascade for result items, context events etc???
+      // let's just not do that for this mock impl thing....
     }
     return request;
   }
