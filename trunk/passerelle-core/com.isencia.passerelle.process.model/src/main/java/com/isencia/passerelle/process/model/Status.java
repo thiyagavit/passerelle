@@ -23,7 +23,7 @@ package com.isencia.passerelle.process.model;
  */
 public enum Status {
 	// these are transient states
-	CREATED,STARTED,PROCESSING,PAUSED,
+	CREATED,STARTED,PROCESSING,PAUSED,DELAYED,RESUMED,
 	// these are final states
 	FINISHED,CANCELLED,TIMEOUT,ERROR,PENDING,INTERRUPTED;
 	
