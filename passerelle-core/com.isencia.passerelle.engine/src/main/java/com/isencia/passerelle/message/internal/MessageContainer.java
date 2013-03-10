@@ -114,6 +114,9 @@ public class MessageContainer implements ManagedMessage, SettableMessage {
   public MessageContainer copy() throws MessageException {
     MessageContainer res = new MessageContainer();
     res.headers = this.headers.copy();
+    Long msgVersion = getVersion();
+    msgVersion = (msgVersion!=null) ? (msgVersion + 1) : 1;
+    res.setHeader(ManagedMessage.SystemHeader.HEADER_VERSION, msgVersion.toString());
     res.setBodyContent(getBodyContent(), getBodyContentType());
     Iterator<Header> bodyHdrItr = getAllBodyHeaders().iterator();
     while (bodyHdrItr.hasNext()) {

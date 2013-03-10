@@ -28,10 +28,9 @@ import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.process.actor.DelimitedResultLineGenerator;
 import com.isencia.passerelle.process.actor.RequestSource;
 import com.isencia.passerelle.process.actor.TaskResultActor;
-import com.isencia.passerelle.process.actor.flow.Fork;
-import com.isencia.passerelle.process.actor.flow.Join;
+import com.isencia.passerelle.process.actor.forkjoin.Fork;
+import com.isencia.passerelle.process.actor.forkjoin.Join;
 import com.isencia.passerelle.process.actor.trial.ContextTracerConsole;
-import com.isencia.passerelle.process.actor.v5.BatchRequestSequenceSource;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 
 public class ProcessActorTest extends TestCase {
@@ -126,7 +125,7 @@ public class ProcessActorTest extends TestCase {
       portNamesBldr.append(","+portNames[i]);
     }
     
-    fork.outputPortNamesParameter.setToken(portNamesBldr.toString());
+    fork.outputPortCfgExt.outputPortNamesParameter.setToken(portNamesBldr.toString());
     
     TaskResultActor[] taskActors = new TaskResultActor[branchCount];
     for(int i = 0; i<branchCount;++i) {

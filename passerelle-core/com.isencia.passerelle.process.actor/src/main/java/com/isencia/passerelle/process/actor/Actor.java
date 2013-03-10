@@ -143,11 +143,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Process-aware actors that must support out-of-order multiple inputs for their processing contexts,
-   * require non-blocking input ports. This is implemented via the <code>MessageBuffer</code> & <code>MessageProvider</code> system.
+   * Process-aware actors that must support out-of-order multiple inputs for their processing contexts, require non-blocking input ports. This is implemented
+   * via the <code>MessageBuffer</code> & <code>MessageProvider</code> system.
    * <p>
-   * Via this method call, <code>Port</code>s sniff around a bit on their <code>Actor</code> to check if it wants to act as a <code>MessageBuffer</code> for the <code>Port</code>.
-   * So for process-aware actors, this call will return <code>true</code> for all data input ports that belong to this actor instance.
+   * Via this method call, <code>Port</code>s sniff around a bit on their <code>Actor</code> to check if it wants to act as a <code>MessageBuffer</code> for the
+   * <code>Port</code>. So for process-aware actors, this call will return <code>true</code> for all data input ports that belong to this actor instance.
    * </p>
    */
   public boolean acceptInputPort(Port p) {
@@ -161,8 +161,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Registers a <code>MessageProvider</code>, so the actor knows there's someone out there that may feed messages to it.
-   * This is important to allow the actor to determine when it can wrap-up.
+   * Registers a <code>MessageProvider</code>, so the actor knows there's someone out there that may feed messages to it. This is important to allow the actor
+   * to determine when it can wrap-up.
    */
   public boolean registerMessageProvider(MessageProvider provider) {
     getLogger().debug("{} - Registered msgprovider {}", getFullName(), provider);
@@ -170,8 +170,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Unregisters a <code>MessageProvider</code>, so the actor knows that it should not expect anything anymore from this one.
-   * This is important to allow the actor to determine when it can wrap-up.
+   * Unregisters a <code>MessageProvider</code>, so the actor knows that it should not expect anything anymore from this one. This is important to allow the
+   * actor to determine when it can wrap-up.
    */
   public boolean unregisterMessageProvider(MessageProvider provider) {
     getLogger().debug("{} - Unregistered msgprovider {}", getFullName(), provider);
@@ -179,11 +179,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * This method is called each time a message is received on receivers of the actor's input ports, 
-   * for the ports that have been accepted via <code>acceptInputPort()</code>.
+   * This method is called each time a message is received on receivers of the actor's input ports, for the ports that have been accepted via
+   * <code>acceptInputPort()</code>.
    * <p>
-   * In this way the ports/receivers are able to push messages directly into the common msg queue of the actor,
-   * i.o. forcing the actor to try to get its input messages from a number of <code>BlockingQueue</code>s, one for each blocking input port.
+   * In this way the ports/receivers are able to push messages directly into the common msg queue of the actor, i.o. forcing the actor to try to get its input
+   * messages from a number of <code>BlockingQueue</code>s, one for each blocking input port.
    * </p>
    */
   public void offer(MessageInputContext ctxt) throws PasserelleException {
@@ -233,9 +233,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Checks if any messages have been received since the previous iteration.
-   * If so, tries to aggregate them per <code>Context</code>.
-   * If a <code>ProcessRequest</code> has a complete set of messages, it is stored in a "pending-for-processing" queue.
+   * Checks if any messages have been received since the previous iteration. If so, tries to aggregate them per <code>Context</code>. If a
+   * <code>ProcessRequest</code> has a complete set of messages, it is stored in a "pending-for-processing" queue.
    */
   @Override
   protected boolean doPreFire() throws ProcessingException {
@@ -451,7 +450,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    * Does a check on the size of the <code>pushedMessages</code> queue, protected with a <code>msgLock</code>
    * 
    * @return true if this actor currently has msgs in its <code>pushedMessages</code> queue.
-   * @throws ProcessingException if the access to the queue fails, e.g. when the lock is not available within a reasonable time
+   * @throws ProcessingException
+   *           if the access to the queue fails, e.g. when the lock is not available within a reasonable time
    */
   protected boolean hasPushedMessages() throws ProcessingException {
     getLogger().trace("{} - hasPushedMessages() - entry", getFullName());
@@ -602,7 +602,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * 
    * @param context
    * @return
    * @throws MessageException
@@ -614,13 +613,13 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
     return message;
   }
-  
+
   @Override
   public ManagedMessage createMessageFromCauses(ManagedMessage... causes) {
-    SettableMessage message = (SettableMessage)  super.createMessageFromCauses(causes);
-    for(ManagedMessage causeMsg : causes) {
+    SettableMessage message = (SettableMessage) super.createMessageFromCauses(causes);
+    for (ManagedMessage causeMsg : causes) {
       // Normally we would only expect a msg to be related to one context,
-      // but one never knows what may happen with complex/concurrent workflows 
+      // but one never knows what may happen with complex/concurrent workflows
       // where work could maybe be optimized via sharing/grouping...
       String[] ctxtIDHdrs = ((SettableMessage) causeMsg).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
       for (String ctxtIDHdr : ctxtIDHdrs) {
@@ -629,24 +628,35 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
     return message;
   }
-  
+
   protected Context getRequiredContextForMessage(ManagedMessage message) throws ProcessingException {
-    if(message==null) {
+    if (message == null) {
       throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No message received ", this, null);
     }
     String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
-    if(ctxtHdrs==null || ctxtHdrs.length==0) {
+    if (ctxtHdrs == null || ctxtHdrs.length == 0) {
       return null;
     }
     ContextRepository contextRepository = ServiceRegistry.getInstance().getContextRepository();
-    if(contextRepository==null) {
+    if (contextRepository == null) {
       throw new ProcessingException(ErrorCode.SYSTEM_CONFIGURATION_FATAL, "No ContextRepository registered in ServiceRegistry", this, message, null);
     }
     Context context = contextRepository.getContext(new Long(ctxtHdrs[0]));
-    if(context!=null) {
+    if (context != null) {
       return context;
     } else {
       throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
     }
   }
+
+  @Override
+  protected String getAuditTrailMessage(ManagedMessage message, Port port) {
+    try {
+      Context processContext = getRequiredContextForMessage(message);
+      return port.getFullName() + " - msg for request " + processContext.getRequest().getId();
+    } catch (ProcessingException e) {
+      return super.getAuditTrailMessage(message, port);
+    }
+  }
+
 }
