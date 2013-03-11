@@ -43,9 +43,15 @@ public class ProcessActorTest extends TestCase {
 //    _testForkJoin(5,"0");
 //  }
 //
-//  public void testForkJoin5Branches_1_5s() throws Exception {
-//    _testForkJoin(5,"1","1","2","3","5");
-//  }
+  public void testForkJoin5Branches_1_5s() throws Exception {
+    _testForkJoin(5,"1","1","2","3","5");
+  }
+
+  public void testForkJoin100Branches_1s() throws Exception {
+    _testForkJoin(100,"1");
+  }
+
+
 //
 //  public void testForkJoin100Branches_1s() throws Exception {
 //    int branchCount = 100;
@@ -101,7 +107,7 @@ public class ProcessActorTest extends TestCase {
 //  }
   
   protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
-    Flow flow = new Flow("testForkJoin1",null);
+    Flow flow = new Flow("testForkJoin_"+branchCount,null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     

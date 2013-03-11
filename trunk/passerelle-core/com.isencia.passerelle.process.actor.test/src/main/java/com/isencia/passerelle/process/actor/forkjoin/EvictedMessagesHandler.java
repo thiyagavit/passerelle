@@ -7,7 +7,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
 
 /**
- * An <code>EvictedMessagesHandler</code> instance can be plugged in <code>MessageSequenceSource</code>s and other things maintaining message sets. 
+ * An <code>EvictedMessagesHandler</code> instance can be plugged in <code>MessageSequenceGenerator</code>s and other things maintaining message sets. 
  * The purpose is to be able to configure what must be done with message sets that have been evicted from the source's state storage,
  * before they had been completely processed, joined etc.
  * 
