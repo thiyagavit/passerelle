@@ -7,7 +7,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 /**
  * This is an implementation that can be set on an <code>Actor</code> (or other <code>NamedObj</code>) 
- * that is a <code>MessageSequenceSource</code>, and generates an exception for the <code>initialMsg</code> that is being evicted.
+ * that is a <code>MessageSequenceGenerator</code>, and generates an exception for the <code>initialMsg</code> that is being evicted.
  * 
  * @author erwin
  *
@@ -18,7 +18,7 @@ public class ErrorThrowingEvictedMessageHandler implements EvictedMessagesHandle
 
   /**
    * 
-   * @param container the <code>MessageSequenceSource</code> using this handler;
+   * @param container the <code>MessageSequenceGenerator</code> using this handler;
    * must be a model element, typically an <code>Actor</code>, for this type of handler.
    */
   public ErrorThrowingEvictedMessageHandler(NamedObj container) {

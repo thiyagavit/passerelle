@@ -24,12 +24,22 @@ import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
 
 /**
- * A Join should be used in a combination with a preceding Fork. Where the Fork is used to start multiple parallel branches, each with their own local copy of
- * the original Context, the Join is used to assemble and merge all results from the parallel branches. The Join expects all parallel branches to be connected
- * to the single mergeInput port. When the results of all parallel branches have been received, the merged context, i.e. containing the union of all executed
- * tasks and obtained results, is sent out via the output port.
+ * A <code>Join</code> should be used in a combination with a preceding {@link MessageSequenceGenerator}. 
+ * Where the {@link MessageSequenceGenerator} is used to generate multiple derived messages in a sequence, the <code>Join</code> is used to assemble and merge them again.
+ * <p>
+ * Two typical use cases can be distinguished :
+ * <ul>
+ * <li>The <code>MessageSequenceGenerator</code> is a <code>Fork</code> actor. Then the message sequence will be processed in actors in parallel branches. 
+ * The branches should all end up in a <code>Join</code> actor to merge the processing results into one output message.</li>
+ * <li>The <code>MessageSequenceGenerator</code> is a <code>Splitter</code> actor. Then the message sequence is sent through a single branch that is applying the same processing steps on each message sequentially.
+ * A <code>Join</code> actor can be used also in this case, to aggregate all results into one message again.</li>
+ * </ul>
+ * </p>
+ * <p> 
+ * When the results of all processing branches have been received, the aggregated message, typically containing the union of all executed tasks and obtained results, is sent out via the output port.
+ * </p>
  * 
- * @author delerw
+ * @author erwin
  */
 public class Join extends Actor {
   private static final long serialVersionUID = 1L;
@@ -78,7 +88,7 @@ public class Join extends Actor {
     if (forkNames.length == 1) {
       Entity fork = ((CompositeEntity) getContainer()).getEntity(forkNames[0]);
       if (fork != null) {
-        return ((Fork) fork).joinProcessedMessageInSequence(branchedMsg);
+        return ((Fork) fork).aggregateProcessedMessage(branchedMsg);
       }
     }
     return null;

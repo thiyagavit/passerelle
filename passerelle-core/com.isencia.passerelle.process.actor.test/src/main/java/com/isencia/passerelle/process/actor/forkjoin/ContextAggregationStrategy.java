@@ -9,15 +9,15 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
- * A <code>JoinStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages,
- * and merges their tasks and results.
+ * A <code>AggregationStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages,
+ * and aggregates their tasks and results.
  * 
  * @author erwin
  *
  */
-public class ContextJoinStrategy implements JoinStrategy {
+public class ContextAggregationStrategy implements AggregationStrategy {
 
-  public ManagedMessage joinMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
+  public ManagedMessage aggregateMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
     MessageContainer scopeMsg = (MessageContainer) initialMsg;
     ManagedMessage msg = scopeMsg.copy();
     Context mergedCtxt = (Context) scopeMsg.getBodyContent();
