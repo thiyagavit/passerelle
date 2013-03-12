@@ -26,6 +26,7 @@ package fr.soleil.passerelle.actor.tango.debug;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -58,6 +59,7 @@ import fr.soleil.passerelle.actor.PortUtilities;
 import fr.soleil.passerelle.util.AttrScalarPanel;
 import fr.soleil.passerelle.util.AttributeMultipleSpectrumPanel;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
@@ -106,10 +108,58 @@ public class MultipleSpectrumViewer extends Sink {
         if (isMockMode()) {
             mockPanel = new AttrScalarPanel();
         }
-        else {            
+        else {
             mainPanel = new AttributeMultipleSpectrumPanel();
         }
         super.doInitialize();
+    }
+
+    private double[] getDataFromPort(final ManagedMessage message) throws ProcessingException {
+        double[] xValues = null;
+        try {
+            final Object mydata = message.getBodyContent();
+
+            if (!(mydata instanceof TangoAttribute)) {
+                // Can be a String - Constant
+                try {
+                    String[] input = ((String) mydata).split(",");
+                    xValues = new double[input.length];
+                    for (int i = 0; i < xValues.length; i++) {
+                        xValues[i] = Double.valueOf(input[i]);
+                    }
+                }
+                catch (final ClassCastException e) {
+                    if (!mydata.getClass().isArray()) {
+                        throw new ProcessingExceptionWithLog(this,
+                                "Input message has not the good type (not "
+                                        + mydata.getClass().getName() + ")", this.getName(), null);
+                    }
+                    // Can be an array of Double - GetScanData
+                    // try/except si ce n'est pas du double
+                    xValues = Arrays.copyOf((double[]) mydata, ((double[]) mydata).length);
+                }
+            }
+            else {
+                TangoAttribute attribute = (TangoAttribute) mydata;
+                if (logger.isTraceEnabled()) {
+                    logger.trace(getInfo() + "" + attribute.getAttributeProxy().fullName());
+                }
+                xValues = (double[]) attribute.extractArray(double.class);
+            }
+        }
+        catch (final MessageException e) {
+            throw new ProcessingExceptionWithLog(this, "Cannot get input message", this.getName(),
+                    e);
+        }
+        catch (final DevFailed e) {
+            throw new DevFailedProcessingException(e, this);
+        }
+        catch (final Exception e) {
+            throw new ProcessingExceptionWithLog(this, "Cannot get input message", this.getName(),
+                    e);
+        }
+
+        return xValues;
     }
 
     @Override
@@ -119,7 +169,7 @@ public class MultipleSpectrumViewer extends Sink {
         if (logger.isTraceEnabled()) {
             logger.trace(getInfo() + " sendMessage() - entry");
         }
-        
+
         if (isMockMode()) {
             frame.setTitle("MOCK - Multiple Spectrum Viewer");
             mockPanel.setValue("MOCK");
@@ -130,63 +180,50 @@ public class MultipleSpectrumViewer extends Sink {
             }
             catch (final ConnectionException e1) {
                 e1.printStackTrace();
-                throw new ProcessingException("Cannot start panel", this.getName(), e1);
+                throw new ProcessingExceptionWithLog(this, "Cannot start panel", this.getName(), e1);
             }
         }
         else {
             try {
                 // get X input
-                String className = "";
-                if (!(outgoingMessage.getBodyContent() instanceof TangoAttribute)) {
-                    className = outgoingMessage.getBodyContent().getClass().getName();
-                    throw new ProcessingException("Input message must of type AttributeProxy (not "
-                            + className + ")", this.getName(), null);
-                }
-                TangoAttribute attributeX = (TangoAttribute) outgoingMessage.getBodyContent();
-                if (logger.isTraceEnabled()) {
-                    logger.trace(getInfo() + "" + attributeX.getAttributeProxy().fullName());
-                }
-                
-                TreeMap<String, Object> chartData = new TreeMap<String, Object>();                
+                double[] xValues = getDataFromPort(outgoingMessage);
+
+                TreeMap<String, Object> chartData = new TreeMap<String, Object>();
                 final List<Port> portList = PortUtilities.getOrderedInputPorts(this, Y, 1);
-                TangoAttribute attributeY;
                 for (int i = 0; i < portList.size(); i++) {
                     final Port inputPort = portList.get(i);
                     final ManagedMessage message = MessageHelper.getMessage(inputPort);
-                    if (!(message.getBodyContent() instanceof TangoAttribute)) {
-                        className = message.getBodyContent().getClass().getName();
-                        throw new ProcessingException(
-                                "Input message must of type AttributeProxy (not " + className + ")",
-                                this.getName(), null);
-                    }
-                    attributeY = (TangoAttribute) message.getBodyContent();
+                    double[] yValues = getDataFromPort(message);
 
                     double[][] data = new double[2][];
-                    data[0] = (double[]) attributeX.extractArray(double.class);
-                    data[1] = (double[]) attributeY.extractArray(double.class);
-                    chartData.put(attributeY.getAttributeProxy().name(), data);                    
+                    data[0] = Arrays.copyOf(xValues, xValues.length);
+                    data[1] = Arrays.copyOf(yValues, yValues.length);
+                    String trendName;
+                    if (message.getBodyContent() instanceof TangoAttribute) {
+                        trendName = ((TangoAttribute) message.getBodyContent()).getAttributeProxy()
+                                .name();
+                    }
+                    else {
+                        trendName = "Trend " + (i + 1);
+                    }
+                    chartData.put(trendName, data);
                 }
-                
+
                 mainPanel.addChartData(chartData);
             }
             catch (final MessageException e) {
-                e.printStackTrace();
-                throw new ProcessingException("Cannot get input message", this.getName(), e);
+                throw new ProcessingExceptionWithLog(this, "Cannot get input message",
+                        this.getName(), e);
             }
             catch (final PasserelleException e) {
-                e.printStackTrace();
-                throw new ProcessingException("Cannot get input message", this.getName(), e);
+                throw new ProcessingExceptionWithLog(this, "Cannot get input message",
+                        this.getName(), e);
             }
-            catch (final DevFailed e) {
-                e.printStackTrace();
-                throw new DevFailedProcessingException(e, this);
-            }
-            
             frame.setTitle("Multiple Spectrum Viewer");
             frame.getContentPane().add(mainPanel);
         }
 
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
 
