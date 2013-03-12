@@ -41,6 +41,7 @@ import ptolemy.actor.Manager.State;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
@@ -397,11 +398,32 @@ public class FlowManager {
 	 * @throws Exception
 	 */
   public static Flow readMoml(Reader in, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
-    final MoMLParser parser = new MoMLParser(null, versionSpec, classLoader);
+    return readMoml(in, null, versionSpec, classLoader);
+  }
+
+  /**
+   * 
+   * Read the Flow in MOML format from the given Reader, with given default version specification 
+   * and using the given ClassLoader to instantiate actors etc.
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p>
+   * 
+   * @param in
+   * @param workspace
+   * @param versionSpec
+   * @param classLoader
+   * @return
+   * @throws Exception
+   */
+  public static Flow readMoml(Reader in, Workspace workspace, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
+    final MoMLParser parser = new MoMLParser(workspace, versionSpec, classLoader);
     final Flow toplevel = (Flow) parser.parse(null, in);
-    // should no longer be necessary. A Flow and its handle are constructed together, during the parsing.
-//    final FlowHandle handle = new FlowHandle(0L, toplevel, null);
-//    toplevel.setHandle(handle);
     return toplevel;
   }
 
@@ -424,37 +446,82 @@ public class FlowManager {
 	}
 
 	/**
-	 * Read the Flow in MOML format from the given URL.
+   * Read the Flow in MOML format from the given URL.
 	 * 
-	 * @param in
-	 * @return the resulting flow
+	 * @param xmlFile
+	 * @param classLoader
+	 * @return
 	 * @throws Exception
 	 */
 	public static Flow readMoml(URL xmlFile, ClassLoader classLoader) throws Exception {
-		if (xmlFile == null)
-			return null;
-
-		String protocol = xmlFile.getProtocol();
-		if ("file".equals(protocol) || "jar".equals(protocol) || "bundleresource".equals(protocol)) {
-			// it's a local moml
-			MoMLParser parser = new MoMLParser(null, classLoader);
-			MoMLParser.purgeModelRecord(xmlFile);
-			Flow toplevel = (Flow) parser.parse(null, xmlFile);
-			final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), xmlFile);
-			toplevel.setHandle(handle);
-			return toplevel;
-		} else if ("http".equals(protocol) || "https".equals(protocol)) {
-			// it's probably/hopefully a REST url pointing towards a Passerelle
-			// Manager
-			if (restFacade == null) {
-				initRESTFacade();
-			}
-			FlowHandle flowHandle = restFacade.getRemoteFlowHandle(xmlFile);
-			return buildFlowFromHandle(flowHandle);
-		} else {
-			throw new IllegalArgumentException("Unsupported URL protocol " + protocol);
-		}
+		return readMoml(xmlFile, null, classLoader);
 	}
+
+  /**
+   * Read the Flow in MOML format from the given URL, with given default version specification 
+   * and using the given ClassLoader to instantiate actors etc.
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p>
+   * 
+   * @param xmlFile
+   * @param versionSpec
+   * @param classLoader
+   * @return
+   * @throws Exception
+   */
+  public static Flow readMoml(URL xmlFile, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
+    return readMoml(xmlFile, null, versionSpec, classLoader);
+  }
+  
+	/**
+   * Read the Flow in MOML format from the given URL, with given default version specification 
+   * and using the given ClassLoader to instantiate actors etc.
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p>
+   * 
+	 * @param xmlFile
+	 * @param versionSpec
+	 * @param workspace
+	 * @param classLoader
+	 * @return
+	 * @throws Exception
+	 */
+  public static Flow readMoml(URL xmlFile, Workspace workspace, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
+    if (xmlFile == null)
+      return null;
+
+    String protocol = xmlFile.getProtocol();
+    if ("file".equals(protocol) || "jar".equals(protocol) || "bundleresource".equals(protocol)) {
+      // it's a local moml
+      MoMLParser parser = new MoMLParser(workspace, versionSpec, classLoader);
+      MoMLParser.purgeModelRecord(xmlFile);
+      Flow toplevel = (Flow) parser.parse(null, xmlFile);
+      final FlowHandle handle = new FlowHandle(0L, toplevel.getFullName(), xmlFile);
+      toplevel.setHandle(handle);
+      return toplevel;
+    } else if ("http".equals(protocol) || "https".equals(protocol)) {
+      // it's probably/hopefully a REST url pointing towards a Passerelle Manager
+      if (restFacade == null) {
+        initRESTFacade();
+      }
+      FlowHandle flowHandle = restFacade.getRemoteFlowHandle(xmlFile);
+      return buildFlowFromHandle(flowHandle);
+    } else {
+      throw new IllegalArgumentException("Unsupported URL protocol " + protocol);
+    }
+  }
 
 	/**
 	 * For locally managed flows, saves the flow's moml on the given URL (which
