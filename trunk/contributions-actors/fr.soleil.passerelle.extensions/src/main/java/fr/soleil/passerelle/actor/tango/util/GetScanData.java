@@ -129,7 +129,7 @@ public class GetScanData extends AbstractGetScanData {
             for (i = 0; i < actuators.length; i++) {
                 double[] trajectory = realTrajectoryValues.get(actuators[i]);
                 if (trajectory != null) {
-                    System.out.println("trajectory " + Arrays.toString(trajectory));
+                   // System.out.println("trajectory " + Arrays.toString(trajectory));
                     sendOutputMsg(orderedActuatorPorts.get(i),
                             PasserelleUtil.createContentMessage(this, trajectory));
                     ExecutionTracerService.trace(this, "reading trajectory for actuator " + actuators[i]);
@@ -143,7 +143,7 @@ public class GetScanData extends AbstractGetScanData {
             }
         }
         else {
-            System.out.println("===============> actuators " + Arrays.toString(actuators));
+            //System.out.println("===============> actuators " + Arrays.toString(actuators));
 
             for (i = 0; i < actuators.length; i++) {
                 scanDataName = actuatorsSources.get(actuators[i]);
