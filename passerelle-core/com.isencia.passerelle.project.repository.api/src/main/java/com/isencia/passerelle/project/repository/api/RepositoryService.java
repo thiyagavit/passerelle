@@ -102,6 +102,13 @@ public interface RepositoryService {
 	 * @return exists a new version of the project in the repository
 	 */
 	boolean existNewProject(String projectCode);
+	
+	/**
+	 * 
+	 * @param flowCode
+	 * @return exists a new version of the project in the repository
+	 */
+	boolean existNewSubModel(String flowCode);
 
 	/**
 	 * 
