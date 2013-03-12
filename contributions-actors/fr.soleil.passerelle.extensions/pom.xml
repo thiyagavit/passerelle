@@ -109,10 +109,6 @@
 		</plugins>
 	</build>
 
-	<!-- <properties> -->
-	<!-- <maven.test.skip>true</maven.test.skip> -->
-	<!-- </properties> -->
-
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
@@ -209,6 +205,12 @@
 			<groupId>fr.esrf.atk</groupId>
 			<artifactId>ATKWidget</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>fr.soleil.lib.comete</groupId>
+			<artifactId>CometeSwing</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
