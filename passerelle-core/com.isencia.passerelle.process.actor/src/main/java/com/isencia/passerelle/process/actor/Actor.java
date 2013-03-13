@@ -381,7 +381,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       }
       ProcessRequest contextLessProcessRequest = new ProcessRequest();
       contextLessProcessRequest.setIterationCount(iterationCount);
-      while (!pushedMessages.isEmpty()) {
+      // Contrary to plain v5 Actors, we only want to handle one MessageInputContext per iteration.
+      // So no while loop here!
+      if (!pushedMessages.isEmpty()) {
         MessageInputContext msgInputCtxt = pushedMessages.poll();
         Iterator<ManagedMessage> msgIterator = msgInputCtxt.getMsgIterator();
         while (msgIterator.hasNext()) {
