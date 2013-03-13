@@ -1,5 +1,7 @@
 package com.isencia.passerelle.process.model.impl.factory;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +61,14 @@ public class EntityManagerImpl implements EntityManager {
 			}
 			// and should also cascade for result items, context events etc???
 			// let's just not do that for this mock impl thing....
+			if(request.getProcessingContext().isFinished()) {
+			  try {
+          new RequestExportTask(new File("C:/temp/testrequest.zip")).execute(request);
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+			}
 		}
 		return request;
 	}
@@ -70,6 +80,14 @@ public class EntityManagerImpl implements EntityManager {
 				persistRequest(context.getRequest());
 			}
 			contextsById.put(context.getId(), context);
+      if(context.isFinished()) {
+        try {
+          new RequestExportTask(new File("C:/temp/testrequest.zip")).execute(context.getRequest());
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
 		}
 		return context;
 	}

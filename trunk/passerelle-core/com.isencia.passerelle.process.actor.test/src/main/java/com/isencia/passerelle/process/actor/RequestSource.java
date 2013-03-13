@@ -105,7 +105,7 @@ public class RequestSource extends Actor {
       context.setStatus(Status.STARTED);
       response.addOutputMessage(output, createMessageForContext(context));
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, null);
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, e);
     } finally {
       requestFinish();
     }
