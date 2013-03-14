@@ -90,6 +90,11 @@ public abstract class ATangoDeviceActor extends ATangoActor {
         }
 
         if (!isMockMode() && createDeviceProxy) {
+            if(deviceName.isEmpty()){
+                throw new ValidationException(PasserelleException.Severity.FATAL,
+                        "Exception during validateInitialization - DeviceName must not be empty.", this, null);
+            }
+            
             try {
                 // see bug 22954 : The deviceProxy is still created here because the
                 // daughter classes need of it
@@ -103,7 +108,7 @@ public abstract class ATangoDeviceActor extends ATangoActor {
             }
             catch (final Exception e) {
                 throw new ValidationException(PasserelleException.Severity.FATAL,
-                        "Exception during doInit " + e.getMessage(), this, null);
+                        "Exception during validateInitialization " + e.getMessage(), this, null);
             }
         }
         super.validateInitialization();
