@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.7.2-SNAPSHOT</version>
+	<version>4.7.2</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -181,8 +181,6 @@
 			<artifactId>CurrentScanDataModel</artifactId>
 		</dependency>
 
-
-
 		<!-- Pour Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
@@ -209,11 +207,6 @@
 		<dependency>
 			<groupId>fr.soleil.lib.comete</groupId>
 			<artifactId>CometeSwing</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>TangORB</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>bsf</groupId>
