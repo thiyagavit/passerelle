@@ -22,8 +22,8 @@ public class ErrorCategory extends Enumerated<ErrorCode> {
   private static final char PREFIX_SEPARATOR = '_';
   
   public static final ErrorCategory PASS_ROOTCATEGORY = new ErrorCategory("PASS_ROOTCATEGORY", null, "PASS");
-  public static final ErrorCategory PASS_FUNCTIONAL = new ErrorCategory("PASS_FUNCTIONAL", PASS_ROOTCATEGORY, "FUNC");
-  public static final ErrorCategory PASS_TECHNICAL = new ErrorCategory("PASS_TECHNICAL", PASS_ROOTCATEGORY, "TECH");
+  public static final ErrorCategory FUNCTIONAL = new ErrorCategory("FUNCTIONAL", PASS_ROOTCATEGORY, "FUNC");
+  public static final ErrorCategory TECHNICAL = new ErrorCategory("TECHNICAL", PASS_ROOTCATEGORY, "TECH");
   
   /**
    * the (optional) parent category
