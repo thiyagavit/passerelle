@@ -63,8 +63,7 @@ public class ContextImpl implements Context {
     this.status = Status.CREATED;
     this.creationTS = new Date();
     this.request = request;
-
-    new ContextEventImpl(this, this.status.name());
+    new ContextStatusEventImpl(this);
   }
 
   public Long getId() {
@@ -82,17 +81,17 @@ public class ContextImpl implements Context {
   public boolean setStatus(Status status) {
     if (this.status != null && this.status.isFinalStatus()) {
       return false;
-    } else {
+    } else if (!this.status.equals(status)) {
       this.status = status;
-
+      new ContextStatusEventImpl(this);
       // Mark the end of processing
       if (status.isFinalStatus()) {
         endTS = new Date();
       }
-
       // TODO: should notify status listeners
-
       return true;
+    } else {
+      return false;
     }
   }
 

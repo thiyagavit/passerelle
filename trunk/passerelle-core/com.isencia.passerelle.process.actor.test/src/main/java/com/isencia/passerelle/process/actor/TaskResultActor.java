@@ -30,6 +30,7 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.factory.EntityManager;
@@ -71,8 +72,8 @@ public class TaskResultActor extends AsynchDelay {
       EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
       EntityManager entityManager = ServiceRegistry.getInstance().getEntityManager();
       Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
+      task.getProcessingContext().setStatus(Status.STARTED);
       ResultBlock rb = entityFactory.createResultBlock(task, resultType);
-
       String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
       String paramDef = null;
@@ -84,6 +85,7 @@ public class TaskResultActor extends AsynchDelay {
           ExecutionTracerService.trace(this, "Invalid mapping definition: " + paramDef);
         }
       }
+      task.getProcessingContext().setStatus(Status.FINISHED);
       entityManager.persistRequest(task);
       response.addOutputMessage(output, message);
     } catch (Exception e) {
