@@ -1,89 +1,83 @@
 package com.isencia.passerelle.process.model.impl.factory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import org.apache.commons.io.FileUtils;
 import com.isencia.passerelle.process.model.Attribute;
+import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 
 public class RequestExportTask {
 
-  private static final long serialVersionUID = 1L;
   public static final String NEWLINE = System.getProperty("line.separator");
-  private File outputFile;
+  public static final String TIMEZONE = "Europe/Brussels";
+  public static final String DATEFORMAT = "dd/MM/yyyy HH:mm:ss";
+  public static final String CREATION_DATE_ATTRIBUTE = "request.creationTS";
 
-  public RequestExportTask(File outputFile) {
-    this.outputFile = outputFile;
+  private File rootFolder;
+
+  public RequestExportTask(File rootFolder) {
+    if (!rootFolder.isDirectory()) {
+      throw new IllegalArgumentException(rootFolder + "must be a directory");
+    }
+    this.rootFolder = rootFolder;
   }
 
   public void execute(Request request) throws IOException {
-    Map<String, ResultBlock> rbMap = new HashMap<String, ResultBlock>();
+    if (!rootFolder.exists()) {
+      if (!rootFolder.mkdir()) {
+        throw new IOException("Unable to create " + rootFolder);
+      }
+    }
 
+    String requestFolderName = "ref_" + request.getCase().getId() + "_req_" + request.getId() + "__" + request.getType();
+    File requestFolder = new File(rootFolder, requestFolderName);
+    if (requestFolder.exists()) {
+      // maintain one backup of previous request dump
+      File requestBuFolder = new File(rootFolder, requestFolderName + "____bu");
+      if (requestBuFolder.exists()) {
+        FileUtils.deleteDirectory(requestBuFolder);
+      }
+      FileUtils.moveDirectory(requestFolder, requestBuFolder);
+    }
+
+    saveRequestAndContext(requestFolder, request);
+    
     for (com.isencia.passerelle.process.model.Task task : request.getProcessingContext().getTasks()) {
+      String taskFolderName = "task_" + task.getId() + "__" + task.getType();
+      File taskFolder = new File(requestFolder, taskFolderName);
+      saveRequestAndContext(taskFolder, task);
+      
       Collection<ResultBlock> resultBlocks = task.getResultBlocks();
       for (ResultBlock block : resultBlocks) {
-        ResultBlock temp = rbMap.get(block.getType());
-        if (temp != null) {
-          if (temp.getCreationTS().before(block.getCreationTS())) {
-            rbMap.put(block.getType(), block);
-          }
-        } else {
-          rbMap.put(block.getType(), block);
-        }
-      }
-    }
-    HashMap<String, File> files = createFiles(rbMap.values());
-    files.put("requestAttributes", writeFile("requestAttributes", buildRequestAttributes(request)));
-    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
-    try {
-      for (Map.Entry<String, File> file : files.entrySet()) {
-        createZipEntry(out, file.getKey() + ".properties", getBytesFromFile(file.getValue()));
-      }
-    } finally {
-      try {
-        out.close();
-      } catch (IOException e) {
+        String blockFileName = "block_" + block.getId() + "__" + block.getType();
+        File blockFile = new File(taskFolder, blockFileName + ".properties");
+        FileUtils.writeStringToFile(blockFile,  buildResultBlockDump(block));
       }
     }
   }
 
-  private HashMap<String, File> createFiles(Collection<ResultBlock> resultBlocks) {
-    HashMap<String, File> files = new HashMap<String, File>();
-    for (ResultBlock currentBlock : resultBlocks) {
-      File file = null;
-      try {
-        file = writeFile(currentBlock.getType(), buildResultBlock(currentBlock));
-      } catch (Exception e) {
-
-      }
-
-      if (file != null)
-        files.put(currentBlock.getType(), file);
+  protected void saveRequestAndContext(File rootFolder, Request request) throws IOException {
+    if (!rootFolder.mkdir()) {
+      throw new IOException("Unable to create " + rootFolder);
     }
-    return files;
+    File requestFile = new File(rootFolder, request.getType() + ".properties");
+    FileUtils.writeStringToFile(requestFile,  buildRequestWithAttributesDump(request));
+    File contextFile = new File(rootFolder, request.getType() + "__context.properties");
+    FileUtils.writeStringToFile(contextFile,  buildContextWithEventsDump(request.getProcessingContext()));
   }
-
-  public static final String TIMEZONE = "Europe/Brussels";
-  public static final String DATEFORMAT = "dd/MM/yyyy HH:mm:ss";
-  public static final String CREATION_DATE_ATTRIBUTE = "bgc.dar.test.creationdate";
 
   public static String generateDate(Date date) {
     if (date == null) {
@@ -99,31 +93,53 @@ public class RequestExportTask {
     }
   }
 
-  protected String buildRequestAttributes(Request request) {
+  protected String buildContextWithEventsDump(Context context) {
     StringBuilder builder = new StringBuilder();
+    builder.append("#id=" + context.getId() + NEWLINE);
+    builder.append("#status=" + context.getStatus() + NEWLINE);
+    builder.append("#creationTS=" + generateDate(context.getCreationTS()) + NEWLINE);
+    builder.append("#EVENTS:" + NEWLINE);
+    List<ContextEvent> ctxtEvents = context.getEvents();
+    for (ContextEvent ctxtEvent : ctxtEvents) {
+      builder.append("\n" + generateDate(context.getCreationTS()) + "|");
+      builder.append(ctxtEvent.getId() + "|");
+      builder.append(ctxtEvent.getTopic() + "|");
+      builder.append(ctxtEvent.getMessage());
+    }
+    return builder.toString();
+  }
+
+  protected String buildRequestWithAttributesDump(Request request) {
+    StringBuilder builder = new StringBuilder();
+    builder.append("#id=" + request.getId() + NEWLINE);
+    builder.append("#type=" + request.getType() + NEWLINE);
+    builder.append("#initiator=" + request.getInitiator() + NEWLINE);
+    builder.append("#executor=" + request.getExecutor() + NEWLINE);
+    builder.append("#creationTS=" + generateDate(request.getProcessingContext().getCreationTS()) + NEWLINE);
+    builder.append("#ATTRIBUTES:" + NEWLINE);
     for (Attribute attribute : request.getAttributes()) {
       builder.append(attribute.getName() + "=");
       builder.append(attribute.getValue() == null ? "" : attribute.getValue());
       builder.append(NEWLINE);
     }
-    builder.append(CREATION_DATE_ATTRIBUTE + "=");
-    builder.append(generateDate(request.getProcessingContext().getCreationTS()));
-    builder.append(NEWLINE);
     return builder.toString();
   }
 
-  protected String buildResultBlock(ResultBlock currentBlock) {
+  protected String buildResultBlockDump(ResultBlock currentBlock) {
     StringBuilder builder = new StringBuilder();
-    builder.append("task.type=" + currentBlock.getTask().getType() + NEWLINE);
-    builder.append("task.class=" + currentBlock.getTask().getClass().getName() + NEWLINE);
+    builder.append("#id=" + currentBlock.getId() + NEWLINE);
+    builder.append("#type=" + currentBlock.getType() + NEWLINE);
+    builder.append("#creationTS=" + generateDate(currentBlock.getCreationTS()) + NEWLINE);
+    builder.append("#task.id=" + currentBlock.getTask().getId() + NEWLINE);
+    builder.append("#task.type=" + currentBlock.getTask().getType() + NEWLINE);
     if (currentBlock.getColour() != null) {
-      builder.append("analysis=" + currentBlock.getColour() + NEWLINE);
+      builder.append("#analysis=" + currentBlock.getColour() + NEWLINE);
     }
-    List<ResultItem> list = new ArrayList<ResultItem>();
+    builder.append("#ITEMS:" + NEWLINE);
+    List<ResultItem<?>> list = new ArrayList<ResultItem<?>>();
     list.addAll(currentBlock.getAllItems());
-    Comparator<ResultItem> comparator = new Comparator<ResultItem>() {
-
-      public int compare(ResultItem arg0, ResultItem arg1) {
+    Comparator<ResultItem<?>> comparator = new Comparator<ResultItem<?>>() {
+      public int compare(ResultItem<?> arg0, ResultItem<?> arg1) {
         if (arg0.getName() == null) {
           return 0;
         }
@@ -131,7 +147,7 @@ public class RequestExportTask {
       }
     };
     Collections.sort(list, comparator);
-    for (ResultItem item : list) {
+    for (ResultItem<?> item : list) {
       builder.append(item.getName().replace(" ", "\\ ").replace("=", "\\=") + "=" + getStringValue(item) + NEWLINE);
       if (item.getColour() != null) {
         builder.append(item.getName().replace(" ", "\\ ").replace("=", "\\=") + "|analysis=" + item.getColour() + NEWLINE);
@@ -140,86 +156,30 @@ public class RequestExportTask {
     return builder.toString();
   }
 
-  protected File writeFile(String fileName, String contents) {
-    File file;
+  protected File writeFile(File file, String contents) throws IOException {
     FileWriter writer = null;
-
     try {
-      try {
-        file = File.createTempFile(fileName, ".properties");
-
-        writer = new FileWriter(file);
-        writer.write(contents);
-      } finally {
-        if (writer != null)
-          try {
-            writer.close();
-          } catch (IOException ioe) {
-          }
-      }
-      return file;
-    } catch (IOException e) {
-      return null;
+      writer = new FileWriter(file);
+      writer.write(contents);
+    } finally {
+      if (writer != null)
+        try {
+          writer.close();
+        } catch (IOException ioe) {
+        }
     }
+    return file;
   }
 
-  protected String getItemValue(ResultItem item) {
+  protected String getItemValue(ResultItem<?> item) {
     if (item == null)
       return null;
     return item.getValueAsString();
   }
 
-  protected String getStringValue(ResultItem item) {
+  protected String getStringValue(ResultItem<?> item) {
     if (item == null || item.getValueAsString() == null || item.getValueAsString().trim().length() == 0)
       return "";
     return item.getValueAsString();
-  }
-
-  private String increaseInt(String value) {
-    try {
-      return String.valueOf(Integer.parseInt(value) + 1);
-    } catch (Exception e) {
-      return "0";
-    }
-  }
-
-  private static void createZipEntry(ZipOutputStream out, String fileName, byte[] bytes) throws IOException {
-
-    out.putNextEntry(new ZipEntry(fileName));
-    out.write(bytes);
-  }
-
-  public static byte[] getBytesFromFile(File file) throws IOException {
-    InputStream is = new FileInputStream(file);
-
-    // Get the size of the file
-    long length = file.length();
-
-    // You cannot create an array using a long type.
-    // It needs to be an int type.
-    // Before converting to an int type, check
-    // to ensure that file is not larger than Integer.MAX_VALUE.
-    if (length > Integer.MAX_VALUE) {
-      // File is too large
-    }
-
-    // Create the byte array to hold the data
-    byte[] bytes = new byte[(int) length];
-
-    // Read in the bytes
-    int offset = 0;
-    int numRead = 0;
-    while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-      offset += numRead;
-    }
-
-    // Ensure all the bytes have been read in
-    if (offset < bytes.length) {
-      throw new IOException("Could not completely read file " + file.getName());
-    }
-
-    // Close the input stream and return bytes
-    is.close();
-    return bytes;
   }
 }

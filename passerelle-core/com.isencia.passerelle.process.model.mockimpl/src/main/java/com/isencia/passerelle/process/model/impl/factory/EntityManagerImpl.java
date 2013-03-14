@@ -11,7 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.atomic.AtomicLong;
+import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ErrorItem;
@@ -26,168 +27,178 @@ import com.isencia.passerelle.process.model.impl.RequestImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 
 public class EntityManagerImpl implements EntityManager {
-	private Long keyGenerator = new Long(DateUtils.format(new Date(), "yyyyMMdd") + "000000000");
 
-	private Map<Long, Case> casesById = new HashMap<Long, Case>();
-	private Map<Long, Context> contextsById = new HashMap<Long, Context>();
-	private Map<Long, Request> requestsById = new HashMap<Long, Request>();
-	private Map<String, Request> requestsByCorrelationId = new HashMap<String, Request>();
+  private static File BASEFOLDER;
+  private AtomicLong keyGenerator = new AtomicLong(Long.parseLong(DateUtils.format(new Date(), "yyyyMMdd") + "000000000"));
 
-	public Case persistCase(Case caze) {
-		if (caze != null) {
-			if (caze.getId() == null) {
-				((CaseImpl) caze).setId(keyGenerator++);
-			}
-			casesById.put(caze.getId(), caze);
-		}
-		return caze;
-	}
+  private Map<Long, Case> casesById = new HashMap<Long, Case>();
+  private Map<Long, Context> contextsById = new HashMap<Long, Context>();
+  private Map<Long, Request> requestsById = new HashMap<Long, Request>();
+  private Map<String, Request> requestsByCorrelationId = new HashMap<String, Request>();
 
-	public Request persistRequest(Request request) {
-		if (request != null) {
-			if (request.getId() == null) {
-				((RequestImpl) request).setId(keyGenerator++);
-				persistContext(request.getProcessingContext());
-			}
-			requestsById.put(request.getId(), request);
-			requestsByCorrelationId.put(request.getCorrelationId(), request);
-			if (request instanceof Task) {
-				Task t = (Task) request;
-				for (ResultBlock rb : t.getResultBlocks()) {
-					if (rb.getId() == null) {
-						((ResultBlockImpl) rb).setId(keyGenerator++);
-					}
-				}
-			}
-			// and should also cascade for result items, context events etc???
-			// let's just not do that for this mock impl thing....
-			if(request.getProcessingContext().isFinished()) {
-			  try {
-          new RequestExportTask(new File("C:/temp/testrequest.zip")).execute(request);
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-			}
-		}
-		return request;
-	}
+  static {
+    String baseFolderLocation = System.getProperty(IPropertyNames.APP_HOME, "C:/temp") + "/process_runs";
+    BASEFOLDER = new File(baseFolderLocation);
+    if (!BASEFOLDER.exists()) {
+      BASEFOLDER.mkdir();
+    }
+  }
 
-	public Context persistContext(Context context) {
-		if (context != null) {
-			if (context.getId() == null) {
-				((ContextImpl) context).setId(keyGenerator++);
-				persistRequest(context.getRequest());
-			}
-			contextsById.put(context.getId(), context);
-      if(context.isFinished()) {
-        try {
-          new RequestExportTask(new File("C:/temp/testrequest.zip")).execute(context.getRequest());
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+  public Case persistCase(Case caze) {
+    if (caze != null) {
+      if (caze.getId() == null) {
+        ((CaseImpl) caze).setId(keyGenerator.getAndIncrement());
+      }
+      casesById.put(caze.getId(), caze);
+    }
+    return caze;
+  }
+
+  public Request persistRequest(Request request) {
+    if (request != null) {
+      if (request.getId() == null) {
+        ((RequestImpl) request).setId(keyGenerator.getAndIncrement());
+        persistContext(request.getProcessingContext());
+      }
+      requestsById.put(request.getId(), request);
+      requestsByCorrelationId.put(request.getCorrelationId(), request);
+      if (request instanceof Task) {
+        Task t = (Task) request;
+        for (ResultBlock rb : t.getResultBlocks()) {
+          if (rb.getId() == null) {
+            ((ResultBlockImpl) rb).setId(keyGenerator.getAndIncrement());
+          }
         }
       }
-		}
-		return context;
-	}
+      // and should also cascade for result items, context events etc???
+      // let's just not do that for this mock impl thing....
+      if (request.getProcessingContext().isFinished()) {
+        writeRequestToFileSystem(request);
+      }
+    }
+    return request;
+  }
 
-	public ResultBlock mergeResultBlock(ResultBlock block) {
-		return block;
-	}
+  protected void writeRequestToFileSystem(Request request) {
+    if (!(request instanceof Task)) {
+      try {
+        new RequestExportTask(BASEFOLDER).execute(request);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	public Context mergeContext(Context context) {
-		return context;
-	}
+  public Context persistContext(Context context) {
+    if (context != null) {
+      if (context.getId() == null) {
+        ((ContextImpl) context).setId(keyGenerator.getAndIncrement());
+        persistRequest(context.getRequest());
+      }
+      contextsById.put(context.getId(), context);
+      if (context.isFinished()) {
+        writeRequestToFileSystem(context.getRequest());
+      }
+    }
+    return context;
+  }
 
-	public Context mergeWithBranchedContexts(Context context, Collection<Context> branches) {
-		for (Context branch : branches) {
-			context.join(branch);
-		}
-		return context;
-	}
+  public ResultBlock mergeResultBlock(ResultBlock block) {
+    return block;
+  }
 
-	public Case getCase(Long id) {
-		return casesById.get(id);
-	}
+  public Context mergeContext(Context context) {
+    return context;
+  }
 
-	public Request getRequest(Request request) {
-		return request;
-	}
+  public Context mergeWithBranchedContexts(Context context, Collection<Context> branches) {
+    for (Context branch : branches) {
+      context.join(branch);
+    }
+    return context;
+  }
 
-	public Request getRequest(Long requestId) {
-		return requestsById.get(requestId);
-	}
+  public Case getCase(Long id) {
+    return casesById.get(id);
+  }
 
-	public Task getTask(Long taskId) {
-		return (Task) requestsById.get(taskId);
-	}
+  public Request getRequest(Request request) {
+    return request;
+  }
 
-	public Task getTask(Long taskId, boolean bypassCache) {
-		return getTask(taskId);
-	}
+  public Request getRequest(Long requestId) {
+    return requestsById.get(requestId);
+  }
 
-	public Context getContext(Long contextId) {
-		return contextsById.get(contextId);
-	}
+  public Task getTask(Long taskId) {
+    return (Task) requestsById.get(taskId);
+  }
 
-	public Context getContext(Context context) {
-		return context;
-	}
+  public Task getTask(Long taskId, boolean bypassCache) {
+    return getTask(taskId);
+  }
 
-	public Context getContext(Context context, boolean bypassCache) {
-		return context;
-	}
+  public Context getContext(Long contextId) {
+    return contextsById.get(contextId);
+  }
 
-	public Request getRequest(String correlationId) {
-		return requestsByCorrelationId.get(correlationId);
-	}
+  public Context getContext(Context context) {
+    return context;
+  }
 
-	public Request persistCorrelatedRequest(Request request) {
-		return null;
-	}
+  public Context getContext(Context context, boolean bypassCache) {
+    return context;
+  }
 
-	public List<Task> getTasksForCase(Long caseId, Long excludedRequestId) {
-		return new ArrayList<Task>();
-	}
+  public Request getRequest(String correlationId) {
+    return requestsByCorrelationId.get(correlationId);
+  }
 
-	public List<Request> getRequestsForCase(Long caseId, Long excludedRequestId) {
-		return new ArrayList<Request>();
-	}
+  public Request persistCorrelatedRequest(Request request) {
+    return null;
+  }
 
-	public List<Request> getRequestsForCase(Request requestToExclude) {
-		return new ArrayList<Request>();
-	}
+  public List<Task> getTasksForCase(Long caseId, Long excludedRequestId) {
+    return new ArrayList<Task>();
+  }
 
-	public List<Request> getRequestsForCase(Request requestToExclude, Collection<String> requestTypes) {
-		return new ArrayList<Request>();
-	}
+  public List<Request> getRequestsForCase(Long caseId, Long excludedRequestId) {
+    return new ArrayList<Request>();
+  }
 
-	public List<Task> getTasksForContext(Context context) {
-		return context.getTasks();
-	}
+  public List<Request> getRequestsForCase(Request requestToExclude) {
+    return new ArrayList<Request>();
+  }
 
-	public List<ErrorItem> getErrorsForRequest(Long requestId) {
-		return new ArrayList<ErrorItem>();
-	}
+  public List<Request> getRequestsForCase(Request requestToExclude, Collection<String> requestTypes) {
+    return new ArrayList<Request>();
+  }
 
-	public <T extends Serializable> T refresh(T entity) {
-		return entity;
-	}
+  public List<Task> getTasksForContext(Context context) {
+    return context.getTasks();
+  }
 
-	public List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, Collection<Long> resultBlockIds,
-			Collection<String> taskTypes, Collection<String> resultBlockTypes) {
-		return new ArrayList<ResultBlock>();
-	}
+  public List<ErrorItem> getErrorsForRequest(Long requestId) {
+    return new ArrayList<ErrorItem>();
+  }
 
-	public List<Request> getRequestsByContextStatus(Status status) {
-		Collection<Context> contexts = contextsById.values();
-		Set<Request> requests = new HashSet<Request>();
-		for (Context context : contexts) {
-			if (context != null && status.equals(context.getStatus())) {
-				requests.add(context.getRequest());
-			}
-		}
-		return new ArrayList<Request>(requests);
-	}
+  public <T extends Serializable> T refresh(T entity) {
+    return entity;
+  }
+
+  public List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, Collection<Long> resultBlockIds, Collection<String> taskTypes,
+      Collection<String> resultBlockTypes) {
+    return new ArrayList<ResultBlock>();
+  }
+
+  public List<Request> getRequestsByContextStatus(Status status) {
+    Collection<Context> contexts = contextsById.values();
+    Set<Request> requests = new HashSet<Request>();
+    for (Context context : contexts) {
+      if (context != null && status.equals(context.getStatus())) {
+        requests.add(context.getRequest());
+      }
+    }
+    return new ArrayList<Request>(requests);
+  }
 }
