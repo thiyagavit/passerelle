@@ -18,6 +18,8 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.actor.control.Stop;
 import com.isencia.passerelle.actor.control.Timer;
 import com.isencia.passerelle.actor.control.Trigger;
@@ -76,6 +78,7 @@ import com.isencia.passerelle.actor.sequence.SequenceToArrayConverter;
 import com.isencia.passerelle.actor.sequence.SequenceTracker;
 import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
+import com.isencia.passerelle.validation.version.VersionSpecification;
 
 public class Activator implements BundleActivator {
 
@@ -92,7 +95,17 @@ public class Activator implements BundleActivator {
         Synchronizer.class, FtpFileWriter.class, FtpReader.class, FtpWriter.class, CommandExecutor.class, Console.class, Const.class, Counter.class, DevNullActor.class,
         ErrorConsole.class, TracerConsole.class, FileReader.class, FileWriter.class, MailReceiver.class, SMTPSender.class, MulticastReceiver.class, MulticastSender.class,
         SocketClientSender.class, SocketCltSndOptionsFactory.class, SocketServerReceiver.class, SocketServerRequestReplier.class, SocketSvrRcvOptionsFactory.class,
-        SocketSvrReqReplierOptionsFactory.class, ArrayToSequenceConverter.class, MessagesToArrayConverter.class, SequenceToArrayConverter.class, SequenceTracker.class), null);
+        SocketSvrReqReplierOptionsFactory.class, ArrayToSequenceConverter.class, MessagesToArrayConverter.class, SequenceToArrayConverter.class, SequenceTracker.class) {
+
+      @Override
+      public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
+        if (className.startsWith("be.isencia")) {
+          return super.getClass(className.replace("be.isencia", "com.isencia"), versionSpec);
+        }
+        return super.getClass(className, versionSpec);
+      }
+
+    }, null);
 
     try {
       Class<? extends BundleActivator> svcTester = (Class<? extends BundleActivator>) Class.forName("com.isencia.passerelle.actor.activator.TestFragmentActivator");
