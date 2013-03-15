@@ -19,8 +19,11 @@ import ptolemy.kernel.util.Location;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 
+import com.isencia.passerelle.editor.common.activator.Activator;
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.project.repository.api.MetaData;
+import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 public class PaletteBuilder implements Serializable {
   public static final String UTILITIES = "com.isencia.passerelle.actor.actorgroup.utilities";
@@ -250,8 +253,10 @@ public class PaletteBuilder implements Serializable {
     }
 
     try {
-      for (String actorClass : MomlClassRegistry.getAllActorClasses()) {
-
+      RepositoryService repositoryService = Activator.getDefault().getRepositoryService();
+      for (String actorClass : repositoryService.getAllSubmodels()) {
+        MetaData metaData = repositoryService.getSubmodelMetaData(actorClass);
+        String path = metaData != null ? metaData.getPath() : null;
         SubModelPaletteItemDefinition item = addSubModel(actorClass);
         if (submodels != null) {
           submodels.addPaletteItem(item);
