@@ -19,8 +19,6 @@ public class Activator implements BundleActivator {
 
   private static Activator plugin;
 
-  private ServiceRegistration apSvcReg;
-
   public static Activator getDefault() {
     return plugin;
   }
@@ -37,16 +35,9 @@ public class Activator implements BundleActivator {
     repoSvcTracker = new ServiceTracker(context, RepositoryService.class.getName(), null);
     repoSvcTracker.open();
 
-    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new ModelElementClassProvider() {
-      public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
-        return (Class<? extends NamedObj>) this.getClass().getClassLoader().loadClass(className);
-      }
-    }, null);
-
   }
 
   public void stop(BundleContext context) throws Exception {
-    apSvcReg.unregister();
     actorClassProviderTracker.close();
   }
 
