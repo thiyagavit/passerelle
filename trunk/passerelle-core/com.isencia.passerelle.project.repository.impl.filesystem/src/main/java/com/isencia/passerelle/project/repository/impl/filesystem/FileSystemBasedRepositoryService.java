@@ -301,4 +301,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     return true;
   }
 
+  public MetaData getSubmodelMetaData(String flowCode) {
+    return new MetaData(flowCode, null);
+  }
+
 }
