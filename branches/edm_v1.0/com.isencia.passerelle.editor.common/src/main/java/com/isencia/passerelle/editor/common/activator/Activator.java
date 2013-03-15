@@ -16,7 +16,6 @@ public class Activator implements BundleActivator {
   private ActorOrientedClassProviderTracker repoSvcTracker;
   private static Activator plugin;
 
-  private ServiceRegistration apSvcReg;
   public static Activator getDefault() {
     return plugin;
   }
@@ -29,17 +28,10 @@ public class Activator implements BundleActivator {
     plugin = this;
     repoSvcTracker = new ActorOrientedClassProviderTracker(context);
     repoSvcTracker.open();
-    
-    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new ModelElementClassProvider() {
-      public Class<? extends NamedObj> getClass(String className, VersionSpecification versionSpec) throws ClassNotFoundException {
-        return (Class<? extends NamedObj>) this.getClass().getClassLoader().loadClass(className);
-      }
-    }, null);
 
   }
 
   public void stop(BundleContext context) throws Exception {
-    apSvcReg.unregister();
     repoSvcTracker.close();
   }
 
