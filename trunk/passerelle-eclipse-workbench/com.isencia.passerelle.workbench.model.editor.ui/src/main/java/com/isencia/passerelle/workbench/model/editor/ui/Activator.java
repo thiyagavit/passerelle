@@ -9,8 +9,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.isencia.passerelle.editor.common.model.MomlClassRegistry;
-
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 /**
@@ -42,8 +40,6 @@ public class Activator extends AbstractUIPlugin {
     plugin = this;
     repoSvcTracker = new ServiceTracker(context, RepositoryService.class.getName(), null);
     repoSvcTracker.open();
-
-    MomlClassRegistry.setService(new MomlClassService());
 
     IPreferenceStore store = Activator.getDefault().getPreferenceStore();
     String submodelPath = store.getString(RepositoryService.SUBMODEL_ROOT);
