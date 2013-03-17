@@ -699,6 +699,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    <plugin
          id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86"
          os="win32"
+         ws="win32"
          arch="x86"
          download-size="0"
          install-size="0"
@@ -709,6 +710,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    <plugin
          id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86_64"
          os="win32"
+         ws="win32"
          arch="x86_64"
          download-size="0"
          install-size="0"
