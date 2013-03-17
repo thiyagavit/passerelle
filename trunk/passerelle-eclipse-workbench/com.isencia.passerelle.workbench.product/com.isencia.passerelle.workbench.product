@@ -71,11 +71,11 @@
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86" fragment="true"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86_64" fragment="true"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86" fragment="true"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86_64" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.cocoa.macosx.x86_64" fragment="true"  os="macosx" ws="cocoa" arch="x86_64"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86" fragment="true"  os="linux" ws="gtk" arch="x86"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86_64" fragment="true"  os="linux" ws="gtk" arch="x86_64"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86" fragment="true"  os="win32" ws="win32" arch="x86"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86_64" fragment="true"  os="win32" ws="win32" arch="x86_64"/>
       <plugin id="com.isencia.passerelle.workbench.model.ui"/>
       <plugin id="com.isencia.passerelle.workbench.starter"/>
       <plugin id="com.isencia.passerelle.workbench.util"/>
