@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.3.0" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.3.1" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
@@ -30,7 +30,6 @@
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -72,6 +71,11 @@
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86_64" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.model.editor.ui.win32.x86_64" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model.ui"/>
       <plugin id="com.isencia.passerelle.workbench.starter"/>
       <plugin id="com.isencia.passerelle.workbench.util"/>
