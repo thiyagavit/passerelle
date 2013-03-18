@@ -999,7 +999,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
   public JScrollPane getParameterScrollPane() {
     if (parameterScrollPane == null) {
       parameterScrollPane = new JScrollPane(getParameterFormPanel());
-      paremeterFormPanel.setName("parameters scroll");
+      parameterScrollPane.setName("parameters scroll");
     }
     return parameterScrollPane;
   }
