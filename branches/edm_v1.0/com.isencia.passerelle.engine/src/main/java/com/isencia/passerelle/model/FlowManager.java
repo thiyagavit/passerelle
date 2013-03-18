@@ -409,10 +409,18 @@ public class FlowManager {
   }
 
   /**
-   * Read the Flow in MOML format from the given Reader, using the given
-   * ClassLoader to instantiate actors etc.
+   * Read the Flow in MOML format from the given Reader
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p> 
    * 
    * @param in
+   * @param versionSpec
    * @return the resulting flow
    * @throws Exception
    */
