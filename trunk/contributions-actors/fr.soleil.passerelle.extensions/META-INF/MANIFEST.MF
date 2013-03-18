@@ -12,8 +12,6 @@ Require-Bundle: com.isencia.passerelle.engine;bundle-version="7.0.0",
  com.isencia.passerelle.actor;bundle-version="7.0.0",
  com.isencia.passerelle.commons;bundle-version="7.0.0",
  com.isencia.passerelle.commons.ume;bundle-version="7.0.0",
- com.isencia.passerelle.diagnosis;bundle-version="7.0.1",
- com.isencia.passerelle.diagnosis.impl;bundle-version="7.0.1",
  javax.persistence;bundle-version="2.0.1"
 Import-Package: TangoUnit,
  TangoUnitFactory,
@@ -307,3 +305,4 @@ Export-Package: fr.soleil.math,
  fr.soleil.passerelle.test,
  fr.soleil.passerelle.util,
  fr.soleil.ptolemy
+Bundle-Activator: fr.soleil.passerelle.actor.activator.Activator
