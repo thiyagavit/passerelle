@@ -110,8 +110,9 @@ public class FlowManager {
 			logger.error("Error during model execution", throwable);
 			if(delegateListeners!=null) {
 			  for (ExecutionListener delegateListener : delegateListeners) {
-			    if(delegateListener!=null)
-			      delegateListener.executionError(manager, throwable);
+			    if(delegateListener!=null) {
+            delegateListener.executionError(manager, throwable);
+          }
         }
 			}
 		}
@@ -119,8 +120,9 @@ public class FlowManager {
 		public void executionFinished(final ptolemy.actor.Manager manager) {
       if(delegateListeners!=null) {
         for (ExecutionListener delegateListener : delegateListeners) {
-          if(delegateListener!=null)
+          if(delegateListener!=null) {
             delegateListener.executionFinished(manager);
+          }
         }
       }
 			FlowManager.this.executionFinished(flow);
@@ -143,8 +145,9 @@ public class FlowManager {
 		public void managerStateChanged(ptolemy.actor.Manager manager) {
       if(delegateListeners!=null) {
         for (ExecutionListener delegateListener : delegateListeners) {
-          if(delegateListener!=null)
+          if(delegateListener!=null) {
             delegateListener.managerStateChanged(manager);
+          }
         }
       }
 		}
@@ -405,6 +408,25 @@ public class FlowManager {
     return toplevel;
   }
 
+  /**
+   * Read the Flow in MOML format from the given Reader, using the given
+   * ClassLoader to instantiate actors etc.
+   * 
+   * @param in
+   * @return the resulting flow
+   * @throws Exception
+   */
+  public static Flow readMoml(Reader in, VersionSpecification versionSpec) throws Exception {
+    ClassLoader classLoader = null;
+     try {
+       classLoader = Activator.class.getClassLoader();
+     } catch (final NoClassDefFoundError e) {
+       // Activator class not found, so not inside an OSGi container
+       classLoader = FlowManager.class.getClassLoader();
+     }
+     return readMoml(in, versionSpec, classLoader);
+  }
+  
 	/**
 	 * Read the Flow in MOML format from the given URL.
 	 * 
@@ -431,8 +453,9 @@ public class FlowManager {
 	 * @throws Exception
 	 */
 	public static Flow readMoml(URL xmlFile, ClassLoader classLoader) throws Exception {
-		if (xmlFile == null)
-			return null;
+		if (xmlFile == null) {
+      return null;
+    }
 
 		String protocol = xmlFile.getProtocol();
 		if ("file".equals(protocol) || "jar".equals(protocol) || "bundleresource".equals(protocol)) {
@@ -484,8 +507,9 @@ public class FlowManager {
 	public static Flow saveMomlParameterUpdates(Flow flow, Map<String, String> updatedParams) throws Exception {
 		applyParameterSettings(flow, updatedParams);
 		if (flow.getHandle().isRemote()) {
-			if (restFacade == null)
-				initRESTFacade();
+			if (restFacade == null) {
+        initRESTFacade();
+      }
 
 			FlowHandle updatedFlowhandle = restFacade.updateRemoteFlow(flow.getHandle(), updatedParams);
 			return buildFlowFromHandle(updatedFlowhandle);
