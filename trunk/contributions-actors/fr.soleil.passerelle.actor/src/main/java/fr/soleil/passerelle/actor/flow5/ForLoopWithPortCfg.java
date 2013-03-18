@@ -9,8 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.StringToken;
-import ptolemy.data.expr.Parameter;
-import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
@@ -32,6 +30,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.util.ExecutionTracerService;
+import com.isencia.passerelle.util.ptolemy.PortParameter;
 
 /**
  * A loop actor implementation based on the Passerelle v5 Actor API.
@@ -44,13 +43,16 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * The actor sends a first message immediately after receiving a loop "trigger"message. It expects to receive a "handled" msg when the loop has done its
  * iteration for a given step value. Only after receiving such a "handled" msg, the next step's value msg is sent out.
  * </p>
+ * <p>
+ * This variation allows to set configuration data via input ports.
+ * </p>
  * 
  * @author erwin
  */
-public class ForLoop extends Actor {
+public class ForLoopWithPortCfg extends Actor {
 
   private static final long serialVersionUID = 1L;
-  private final static Logger LOGGER = LoggerFactory.getLogger(ForLoop.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(ForLoopWithPortCfg.class);
 
   public static final String STEP_WIDTH_PARAM_NAME = "Step Width";
   public static final String END_VALUE_PARAM_NAME = "End Value";
@@ -65,17 +67,20 @@ public class ForLoop extends Actor {
   public Port outputPort;
   public Port endLoopPort;
   // Parameters
-  public Parameter startValueParam;
+  public PortParameter startValueParam;
   private double startValue;
-  public Parameter endValueParam;
+  public PortParameter endValueParam;
   private double endValue;
-  public Parameter stepWidthParam;
+  public PortParameter stepWidthParam;
   private double stepWidth;
   // simple flag to maintain the direction of the loop value range
   private boolean up;
   // number of steps in the loop
   private long stepNumber;
-
+  
+  // marker for first iteration
+  private volatile boolean firstIteration = true;
+  
   private BlockingQueue<Step> loopStepQueue = new LinkedBlockingQueue<Step>();
 
   /**
@@ -84,23 +89,24 @@ public class ForLoop extends Actor {
    * @throws ptolemy.kernel.util.IllegalActionException
    * @throws ptolemy.kernel.util.NameDuplicationException
    */
-  public ForLoop(final CompositeEntity container, final String name) throws IllegalActionException, NameDuplicationException {
+  public ForLoopWithPortCfg(final CompositeEntity container, final String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
 
-    triggerPort = PortFactory.getInstance().createInputPort(this, "trigger (start loop)", null);
-    triggerPort.setMultiport(false);
     handledPort = PortFactory.getInstance().createInputPort(this, "handled", PortMode.PUSH, null);
     handledPort.setMultiport(false);
     endLoopPort = PortFactory.getInstance().createOutputPort(this, END_LOOP_PORT_NAME);
     outputPort = PortFactory.getInstance().createOutputPort(this, OUTPUT_PORT_NAME);
 
-    startValueParam = new StringParameter(this, START_VALUE_PARAM_NAME);
-    startValueParam.setExpression("0");
-    endValueParam = new StringParameter(this, END_VALUE_PARAM_NAME);
-    endValueParam.setExpression("3");
-    stepWidthParam = new StringParameter(this, STEP_WIDTH_PARAM_NAME);
-    stepWidthParam.setExpression("1");
+    startValueParam = PortFactory.getInstance().createPortParameter(this, START_VALUE_PARAM_NAME, null);
+    startValueParam.setToken(new StringToken("0"));
+    endValueParam = PortFactory.getInstance().createPortParameter(this, END_VALUE_PARAM_NAME, null);
+    endValueParam.setToken(new StringToken("3"));
+    stepWidthParam = PortFactory.getInstance().createPortParameter(this, STEP_WIDTH_PARAM_NAME, null);
+    stepWidthParam.setToken(new StringToken("1"));
 
+    triggerPort = PortFactory.getInstance().createInputPort(this, "trigger (start loop)", null);
+    triggerPort.setMultiport(false);
+    
     final StringAttribute outputPortCardinal = new StringAttribute(outputPort, "_cardinal");
     outputPortCardinal.setExpression("SOUTH");
 
@@ -123,25 +129,6 @@ public class ForLoop extends Actor {
   }
 
   @Override
-  protected void doInitialize() throws InitializationException {
-    super.doInitialize();
-    try {
-      startValue = Double.valueOf(((StringToken) startValueParam.getToken()).stringValue());
-      endValue = Double.valueOf(((StringToken) endValueParam.getToken()).stringValue());
-    } catch (Exception e) {
-      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading loop start/end values", this, e);
-    }
-    up = (endValue - startValue >= 0);
-    final BigDecimal start = new BigDecimal(startValue);
-    final BigDecimal end = new BigDecimal(endValue);
-    final BigDecimal totalWidth = end.subtract(start, MathContext.DECIMAL32).abs();
-    final BigDecimal div = totalWidth.divide(new BigDecimal(stepWidth), MathContext.DECIMAL32);
-    stepNumber = (long) Math.floor(div.doubleValue()) + 1;
-    getLogger().debug("stepNumber {}", stepNumber);
-    loopStepQueue.clear();
-  }
-
-  @Override
   public void attributeChanged(final Attribute arg0) throws IllegalActionException {
     // check the stepWidth param on each change, so we can complain immediately if it has an invalid value
     if (arg0 == stepWidthParam) {
@@ -152,6 +139,46 @@ public class ForLoop extends Actor {
     } else {
       super.attributeChanged(arg0);
     }
+  }
+  
+  @Override
+  protected void doInitialize() throws InitializationException {
+    super.doInitialize();
+    
+    firstIteration = true;
+  }
+
+  /**
+   * In this actor impl, we need to obtain the loop config once, from the PortParameters,
+   * i.o. from simple parameters as in the plain ForLoop.
+   * For this purpose, this utility method is called from within the processing loop.
+   * But it should only do it's stuff one time.
+   * 
+   * @throws ProcessingException
+   */
+  protected void setLoopConfiguration() throws ProcessingException {
+    try {
+      startValueParam.setOnce();
+      endValueParam.setOnce();
+      stepWidthParam.setOnce();
+      
+      startValue = Double.valueOf(((StringToken) startValueParam.getToken()).stringValue());
+      endValue = Double.valueOf(((StringToken) endValueParam.getToken()).stringValue());
+      stepWidth = Double.valueOf(((StringToken) stepWidthParam.getToken()).stringValue());
+      if (stepWidth <= 0) {
+        throw new IllegalActionException(stepWidthParam, "Step Width must be positive");
+      }
+    } catch (Exception e) {
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error reading loop start/end values", this, e);
+    }
+    up = (endValue - startValue >= 0);
+    final BigDecimal start = new BigDecimal(startValue);
+    final BigDecimal end = new BigDecimal(endValue);
+    final BigDecimal totalWidth = end.subtract(start, MathContext.DECIMAL32).abs();
+    final BigDecimal div = totalWidth.divide(new BigDecimal(stepWidth), MathContext.DECIMAL32);
+    stepNumber = (long) Math.floor(div.doubleValue()) + 1;
+    getLogger().debug("stepNumber {}", stepNumber);
+    loopStepQueue.clear();
   }
 
   /**
@@ -170,6 +197,10 @@ public class ForLoop extends Actor {
    */
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    if(firstIteration) {
+      setLoopConfiguration();
+      firstIteration = false;
+    }
     ManagedMessage inputMsg = request.getMessage(triggerPort);
     if (inputMsg != null) {
       getLogger().debug("{} - received trigger msg {}", getFullName(), inputMsg);
