@@ -400,7 +400,35 @@ public class FlowManager {
   public static Flow readMoml(Reader in, VersionSpecification versionSpec, ClassLoader classLoader) throws Exception {
     return readMoml(in, null, versionSpec, classLoader);
   }
+  
 
+  /**
+   * Read the Flow in MOML format from the given Reader
+   * <p>
+   * The version specification will be used as default for all version-aware model elements,
+   * when the model itself does not contain an explicit version specification for an element.
+   * </p>
+   * <p>
+   * This is typically useful for code/tag version specs to allow an easy version-aware model parsing
+   * where all elements should consistently be loaded with a same tag.
+   * </p> 
+   * 
+   * @param in
+   * @param versionSpec
+   * @return the resulting flow
+   * @throws Exception
+   */
+  public static Flow readMoml(Reader in, VersionSpecification versionSpec) throws Exception {
+    ClassLoader classLoader = null;
+     try {
+       classLoader = Activator.class.getClassLoader();
+     } catch (final NoClassDefFoundError e) {
+       // Activator class not found, so not inside an OSGi container
+       classLoader = FlowManager.class.getClassLoader();
+     }
+     return readMoml(in, versionSpec, classLoader);
+  }
+  
   /**
    * 
    * Read the Flow in MOML format from the given Reader, with given default version specification 
