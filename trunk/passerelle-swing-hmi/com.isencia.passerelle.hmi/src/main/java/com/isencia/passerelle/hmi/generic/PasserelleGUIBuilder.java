@@ -142,8 +142,8 @@ public class PasserelleGUIBuilder {
 			PopupUtil.showError(new TextArea(), "Can not configure HMI", t.getLocalizedMessage());
 		}
 		try {
-			genericHMI.loadModel(modelToLoad, null);
 			displayFrame();
+      genericHMI.loadModel(modelToLoad, null);
 			// state transition must be done only after the frame has been
 			// displayed
 			StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
