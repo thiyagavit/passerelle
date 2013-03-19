@@ -44,7 +44,7 @@ public class ErrorCategory extends Enumerated<ErrorCode> {
    * @param parent the (optional) parent category
    * @param prefix a short category identifier that will be used to generate prefixes for error codes
    */
-  protected ErrorCategory(String name, ErrorCategory parent, String prefix) {
+  public ErrorCategory(String name, ErrorCategory parent, String prefix) {
     super(name);
     this.parent = parent;
     this.prefix = prefix;
