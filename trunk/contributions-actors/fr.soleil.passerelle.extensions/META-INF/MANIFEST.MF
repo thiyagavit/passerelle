@@ -2,22 +2,21 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil's Passerelle Actors/Extensions
 Bundle-SymbolicName: fr.soleil.passerelle.actor
-Bundle-Version: 4.5.1.qualifier
+Bundle-Version: 4.7.3.qualifier
 Bundle-Vendor: synchrotron soleil
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: com.isencia.passerelle.engine;bundle-version="7.0.0",
+Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.3.0",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
- com.isencia.passerelle.actor;bundle-version="7.0.0",
- com.isencia.passerelle.commons;bundle-version="7.0.0",
- com.isencia.passerelle.commons.ume;bundle-version="7.0.0",
+ com.isencia.passerelle.actor;bundle-version="8.3.0",
+ com.isencia.passerelle.commons;bundle-version="8.3.0",
+ com.isencia.passerelle.commons.ume;bundle-version="8.0.0",
  javax.persistence;bundle-version="2.0.1"
 Import-Package: TangoUnit,
  TangoUnitFactory,
- com.isencia.passerelle.doc.generator,
+ com.isencia.sherpa.commons,
  com.microstar.xml,
- doc.doclets,
  fr.esrf.Tango,
  fr.esrf.Tango.factory,
  fr.esrf.TangoApi,
@@ -174,7 +173,6 @@ Import-Package: TangoUnit,
  net.entropysoft.transmorph.utils,
  org.apache.bsf,
  org.apache.bsf.util,
- org.apache.commons.discovery.tools,
  org.apache.commons.lang;version="2.4.0",
  org.apache.commons.lang.builder;version="2.4.0",
  org.apache.commons.lang.enums;version="2.4.0",
