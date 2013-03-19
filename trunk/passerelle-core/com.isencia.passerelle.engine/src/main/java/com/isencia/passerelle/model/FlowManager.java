@@ -111,17 +111,19 @@ public class FlowManager {
 			logger.error("Error during model execution", throwable);
 			if(delegateListeners!=null) {
 			  for (ExecutionListener delegateListener : delegateListeners) {
-			    if(delegateListener!=null)
+			    if(delegateListener!=null) {
 			      delegateListener.executionError(manager, throwable);
-        }
-			}
+          }
+  			}
+  		}
 		}
 
 		public void executionFinished(final ptolemy.actor.Manager manager) {
       if(delegateListeners!=null) {
         for (ExecutionListener delegateListener : delegateListeners) {
-          if(delegateListener!=null)
+          if(delegateListener!=null) {
             delegateListener.executionFinished(manager);
+          }
         }
       }
 			FlowManager.this.executionFinished(flow);
@@ -144,8 +146,9 @@ public class FlowManager {
 		public void managerStateChanged(ptolemy.actor.Manager manager) {
       if(delegateListeners!=null) {
         for (ExecutionListener delegateListener : delegateListeners) {
-          if(delegateListener!=null)
+          if(delegateListener!=null) {
             delegateListener.managerStateChanged(manager);
+          }
         }
       }
 		}
@@ -579,8 +582,9 @@ public class FlowManager {
 	public static Flow saveMomlParameterUpdates(Flow flow, Map<String, String> updatedParams) throws Exception {
 		applyParameterSettings(flow, updatedParams);
 		if (flow.getHandle().isRemote()) {
-			if (restFacade == null)
+			if (restFacade == null) {
 				initRESTFacade();
+			}
 
 			FlowHandle updatedFlowhandle = restFacade.updateRemoteFlow(flow.getHandle(), updatedParams);
 			return buildFlowFromHandle(updatedFlowhandle);
