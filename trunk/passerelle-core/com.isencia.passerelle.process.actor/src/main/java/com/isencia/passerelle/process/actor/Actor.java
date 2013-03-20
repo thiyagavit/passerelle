@@ -119,6 +119,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // This can be useful for streaming-mode executions, where actors may be able to optimize their work
   // when they can process many msgs/events in one shot, i.o. one-by-one.
   public Parameter bufferTimeParameter;
+  
+  private ContextRepository contextRepository;
 
   /**
    * @param container
@@ -224,12 +226,25 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         break;
       }
     }
+    
+    contextRepository = ServiceRegistry.getInstance().getContextRepository();
+    if (contextRepository == null) {
+      // TODO check if we can not find a way to run models ico missing ContextRepository
+      // e.g. do as for plain v5 Actor : add all pushed msgs to a same ProcessRequest,
+      // or still try to generate context IDs in some way and just group per ID or ...
+      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "ContextRepository service not found", this, null);
+    }
+
     try {
       triggerFirstIteration();
     } catch (IllegalActionException e) {
       throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error triggering a fire iteration for source actor " + getFullName(), this, e);
     }
     getLogger().trace("{} - doInitialize() - exit", getFullName());
+  }
+  
+  protected ContextRepository getContextRepository() {
+    return contextRepository;
   }
 
   /**
@@ -365,13 +380,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    */
   protected void aggregatePushedMessages() throws ProcessingException {
     getLogger().trace("{} - checkPushedMessages() - entry", getFullName());
-    ContextRepository contextRepository = ServiceRegistry.getInstance().getContextRepository();
-    if (contextRepository == null) {
-      // TODO check if we can not find a way to run models ico missing ContextRepository
-      // e.g. do as for plain v5 Actor : add all pushed msgs to a same ProcessRequest,
-      // or still try to generate context IDs in some way and just group per ID or ...
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_FATAL, "ContextRepository service not found", this, null);
-    }
     int msgCtr = 0;
     try {
       if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
@@ -391,15 +399,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           String[] ctxtHdrs = ((MessageContainer) managedMessage).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
           if (ctxtHdrs != null && ctxtHdrs.length > 0) {
             for (String ctxtHdr : ctxtHdrs) {
-              Long ctxtID = null;
-              try {
-                ctxtID = new Long(ctxtHdr);
-              } catch (Exception e) {
-                throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Msg contains invalid context ID " + ctxtHdr, this, managedMessage, e);
-              }
               ProcessRequest processRequest = incompleteProcessRequests.get(ctxtHdr);
               if (processRequest == null) {
-                Context context = contextRepository.getContext(ctxtID);
+                Context context = contextRepository.getContext(ctxtHdr);
                 if (context != null) {
                   processRequest = new ProcessRequest();
                   processRequest.setIterationCount(iterationCount);
@@ -611,7 +613,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   protected ManagedMessage createMessageForContext(Context context) throws MessageException {
     SettableMessage message = (SettableMessage) createMessage(context, ManagedMessage.objectContentType);
     if (context.getId() != null) {
-      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, Long.toString(context.getId()));
+      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getContextRepositoryID());
     }
     return message;
   }
@@ -639,11 +641,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     if (ctxtHdrs == null || ctxtHdrs.length == 0) {
       return null;
     }
-    ContextRepository contextRepository = ServiceRegistry.getInstance().getContextRepository();
-    if (contextRepository == null) {
-      throw new ProcessingException(ErrorCode.SYSTEM_CONFIGURATION_FATAL, "No ContextRepository registered in ServiceRegistry", this, message, null);
-    }
-    Context context = contextRepository.getContext(new Long(ctxtHdrs[0]));
+    Context context = contextRepository.getContext(ctxtHdrs[0]);
     if (context != null) {
       return context;
     } else {

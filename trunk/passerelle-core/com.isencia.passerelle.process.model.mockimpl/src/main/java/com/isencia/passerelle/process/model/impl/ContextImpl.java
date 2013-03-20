@@ -35,6 +35,8 @@ public class ContextImpl implements Context {
 
   private Long id;
 
+  private String repositoryId;
+
   private Status status;
 
   private Request request;
@@ -72,6 +74,14 @@ public class ContextImpl implements Context {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getContextRepositoryID() {
+    return repositoryId;
+  }
+
+  public void setContextRepositoryID(String repositoryId) {
+    this.repositoryId = repositoryId;
   }
 
   public Status getStatus() {

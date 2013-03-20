@@ -103,6 +103,14 @@ public interface EntityManager {
 
 	Task getTask(Long taskId, boolean bypassCache);
 
+  /**
+   * Retrieve the context with the given identifier
+   * 
+   * @param id Context identifier
+   * @return The Context, null if not found
+   */
+  Context getContext(Long id);
+  
 	/**
 	 * Get the latest persisted version of a Context
 	 * 

@@ -56,11 +56,7 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
 @Table(name = "PAS_CONTEXT")
 public class ContextImpl implements Context {
 
-  public void setId(Long id) {
-		this.id = id;
-	}
-
-private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   @Id
   @Column(name = "ID", nullable = false, unique = true, updatable = false)
@@ -120,6 +116,9 @@ private static final long serialVersionUID = 1L;
 
   @Transient
   private List<Long> minimizedTasks = new ArrayList<Long>();
+  
+  @Transient
+  private String repositoryId;
 
   public static final String _ID = "id";
   public static final String _STATUS = "status";
@@ -144,6 +143,19 @@ private static final long serialVersionUID = 1L;
 
   public Long getId() {
     return id;
+  }
+  
+  // TODO triple-check if this is really needed and then remove it from this "real" entity impl and use another impl if Id must be mutable
+  public void setId(Long id) {
+    this.id = id;
+  }
+  
+  public String getContextRepositoryID() {
+    return repositoryId;
+  }
+  
+  public void setContextRepositoryID(String repositoryId) {
+    this.repositoryId = repositoryId;
   }
 
   public Status getStatus() {
