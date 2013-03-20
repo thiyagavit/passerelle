@@ -25,7 +25,7 @@ public class PasserelleIDEMain {
     try {
       if (args.length != 0) {
         new PasserelleGUIBuilder(args[0], true, true);
-        System.exit(0);
+        //System.exit(0);
       } else {
         // build GUI with model graph
         System.out.println("no model ");
