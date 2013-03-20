@@ -119,7 +119,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // This can be useful for streaming-mode executions, where actors may be able to optimize their work
   // when they can process many msgs/events in one shot, i.o. one-by-one.
   public Parameter bufferTimeParameter;
-  
+
   private ContextRepository contextRepository;
 
   /**
@@ -226,7 +226,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         break;
       }
     }
-    
+
     contextRepository = ServiceRegistry.getInstance().getContextRepository();
     if (contextRepository == null) {
       // TODO check if we can not find a way to run models ico missing ContextRepository
@@ -242,7 +242,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
     getLogger().trace("{} - doInitialize() - exit", getFullName());
   }
-  
+
   protected ContextRepository getContextRepository() {
     return contextRepository;
   }
@@ -626,8 +626,10 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       // but one never knows what may happen with complex/concurrent workflows
       // where work could maybe be optimized via sharing/grouping...
       String[] ctxtIDHdrs = ((SettableMessage) causeMsg).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
-      for (String ctxtIDHdr : ctxtIDHdrs) {
-        message.addHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, ctxtIDHdr);
+      if (ctxtIDHdrs != null) {
+        for (String ctxtIDHdr : ctxtIDHdrs) {
+          message.addHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, ctxtIDHdr);
+        }
       }
     }
     return message;
