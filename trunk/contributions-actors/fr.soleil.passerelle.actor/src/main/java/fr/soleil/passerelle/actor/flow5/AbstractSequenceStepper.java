@@ -192,7 +192,7 @@ public abstract class AbstractSequenceStepper extends Actor {
         if (getDirectorAdapter().isActorBusy(this)) {
           while (!stepQueue.isEmpty()) {
             // clear all busy work
-            ProcessResponse response = step.response;
+            ProcessResponse response = stepQueue.poll().response;
             if (response != null)
               processFinished(response.getContext(), response.getRequest(), response);
           }
