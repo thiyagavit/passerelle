@@ -31,7 +31,6 @@ import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -98,13 +97,13 @@ public class DelayWithExecutionTrace extends Actor {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in delay processing", this, e);
       }
 
-      if(PortMode.PUSH.equals(input.getMode())) {
+      if(input.isBlocking()) {
+        response.addOutputMessage(output, msg);
+      } else {
         // To make sure we send each outgoing msg right after its delay passed,
         // an explicit sendOutputMsg() must be done here, i.o. adding to the response object.
         // The response object is only processed, i.e. its contained msgs are only sent, when the process() method returns!
         sendOutputMsg(output, msg);
-      } else {
-        response.addOutputMessage(output, msg);
       }
     }
   }
