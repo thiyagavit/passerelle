@@ -103,6 +103,7 @@ public class RequestSource extends Actor {
       req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
       Context context = req.getProcessingContext();
       context.setStatus(Status.STARTED);
+      context = getContextRepository().storeContext(context);
       response.addOutputMessage(output, createMessageForContext(context));
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, e);

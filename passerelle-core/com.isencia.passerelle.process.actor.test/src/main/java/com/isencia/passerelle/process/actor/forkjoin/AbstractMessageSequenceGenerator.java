@@ -96,11 +96,14 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
           sequenceScopeMessages = new HashMap<Long, MsgTimeEntry>();
           sequenceTimeEntries = new LinkedList<MsgTimeEntry>();
           aggregationStrategy = new ContextAggregationStrategy();
-          evictedMessagesHandler = new ErrorThrowingEvictedMessageHandler(this);
+          if(evictedMessagesHandler==null) {
+            // has not been explicitly set, so take the default one
+            evictedMessagesHandler = new ErrorThrowingEvictedMessageHandler(this);
+          }
           
           maxRetentionCount = ((IntToken)maxRetentionCountParameter.getToken()).longValue();
           maxRetentionTime = ((IntToken)maxRetentionTimeParameter.getToken()).longValue();
-          // TODO activate eviction mechanism(s)
+          // TODO activate eviction-by-time mechanism(s)
         } catch (IllegalActionException e) {
           throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading retention parameters", this, e);
         } finally {

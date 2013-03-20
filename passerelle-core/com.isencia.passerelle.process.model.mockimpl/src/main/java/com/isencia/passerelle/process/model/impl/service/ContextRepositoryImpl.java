@@ -3,7 +3,11 @@
  */
 package com.isencia.passerelle.process.model.impl.service;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.impl.ContextImpl;
 import com.isencia.passerelle.process.model.impl.factory.EntityManagerImpl;
 import com.isencia.passerelle.process.model.service.ContextRepository;
 
@@ -14,21 +18,23 @@ import com.isencia.passerelle.process.model.service.ContextRepository;
 public class ContextRepositoryImpl implements ContextRepository {
   
   private EntityManagerImpl entityManager;
+  private Map<String, Context> contexts = new ConcurrentHashMap<String, Context>();
   
   /**
    * @param entityManager
    */
   public ContextRepositoryImpl(EntityManagerImpl entityManager) {
-    super();
     this.entityManager = entityManager;
   }
 
   public Context storeContext(Context context) {
+    ((ContextImpl)context).setContextRepositoryID(UUID.randomUUID().toString());
+    contexts.put(context.getContextRepositoryID(), context);
     return entityManager.persistContext(context);
   }
 
-  public Context getContext(Long id) {
-    return entityManager.getContext(id);
+  public Context getContext(String reposId) {
+    return contexts.get(reposId);
   }
 
 }

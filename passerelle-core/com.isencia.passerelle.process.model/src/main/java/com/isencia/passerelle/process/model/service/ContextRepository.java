@@ -19,19 +19,19 @@ import com.isencia.passerelle.process.model.Context;
 public interface ContextRepository {
 
   /**
-   * Store a context in the repository
+   * Store a <code>Context</code> in the repository
    * 
    * @param context
-   * @return
+   * @return the <code>Context</code> after its storage
    */
   Context storeContext(Context context);
 
   /**
-   * Retrieve the context with the given identifier
+   * Retrieve the <code>Context</code> with the given identifier
    * 
-   * @param id Context identifier
-   * @return The Context, null if not found
+   * @param reposId the <code>Context</code>'s repository identifier
+   * @return the Context, null if not found
    */
-  Context getContext(Long id);
+  Context getContext(String reposId);
 
 }
