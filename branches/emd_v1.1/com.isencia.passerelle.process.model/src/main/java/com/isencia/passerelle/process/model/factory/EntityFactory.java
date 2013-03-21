@@ -42,6 +42,8 @@ public interface EntityFactory {
   Request createRequest(Case requestCase, String initiator,String category, String type, String correlationId);
 
   Task createTask(Context parentContext, String initiator, String type);
+  
+  ResultBlock createResultBlock(Task task, String type, Date date);
 
   ResultBlock createResultBlock(Task task, String type);
 
