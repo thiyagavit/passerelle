@@ -113,7 +113,7 @@ public class PasserelleGUIBuilder {
 	public PasserelleGUIBuilder(final URL modelToLoad, final boolean showModelGraph) {
 	  this.showModelForms = true;
 		this.showModelGraph = showModelGraph;
-		loadModel(modelToLoad);
+		loadAndDisplayModel(modelToLoad);
 	}
 
 	public PasserelleGUIBuilder(final String modelToLoad, final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
@@ -130,10 +130,10 @@ public class PasserelleGUIBuilder {
 				url = new URL("file:/" + modelToLoad);
 			}
 		}
-		loadModel(url);
+		loadAndDisplayModel(url);
 	}
 
-	private void loadModel(final URL modelToLoad) {
+	private void loadAndDisplayModel(final URL modelToLoad) {
 		try {
 			buildGenericHMI(showModelForms,showModelGraph);
 		} catch (final Throwable t) {
@@ -143,7 +143,7 @@ public class PasserelleGUIBuilder {
 		}
 		try {
 			displayFrame();
-      genericHMI.loadModel(modelToLoad, null);
+			genericHMI.loadModel(modelToLoad, null);
 			// state transition must be done only after the frame has been
 			// displayed
 			StateMachine.getInstance().transitionTo(StateMachine.MODEL_OPEN);
@@ -155,9 +155,7 @@ public class PasserelleGUIBuilder {
 			System.err.println("ERROR: Unable to display model :" + modelToLoad);
 			t.printStackTrace();
 			PopupUtil.showError(new TextArea(), "error.file.open", t.getLocalizedMessage());
-		} finally {
-			displayFrame();
-		}
+		} 
 	}
 
 	private void buildGenericHMI(final boolean showModelForms,final boolean showModelGraph) throws PasserelleException, IOException, NameDuplicationException, IllegalActionException {
