@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT data-def ( (group | item)*)>
+<!ATTLIST data-def
+    name CDATA #REQUIRED
+    synonym CDATA #REQUIRED
+    concept CDATA #IMPLIED
+    version CDATA #IMPLIED
+>
+
+<!-- 
+==========================
+item
+========================== 
+-->
+<!ELEMENT item EMPTY>
+<!ATTLIST item 
+    key CDATA #REQUIRED
+>
+
+<!-- 
+==========================
+group
+========================== 
+-->
+<!ELEMENT group ( group*, item* )>
+<!ATTLIST group 
+    key CDATA #REQUIRED
+>
+
