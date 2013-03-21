@@ -28,7 +28,7 @@ public class PasserelleEditorMain {
         new PasserelleGUIBuilder(args[0], false, true);
       } else {
         // build GUI with model graph
-        System.out.println("no model ");
+       // System.out.println("no model ");
         new PasserelleGUIBuilder(false, true);
       }
     } catch (final Throwable t) {
