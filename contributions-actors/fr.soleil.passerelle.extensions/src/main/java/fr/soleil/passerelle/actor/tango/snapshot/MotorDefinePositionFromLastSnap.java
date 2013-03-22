@@ -14,8 +14,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration;
-import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration.EncoderType;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfiguration;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
@@ -35,68 +35,75 @@ public class MotorDefinePositionFromLastSnap extends ASnapExtractor {
     private MotorConfiguration conf;
 
     public MotorDefinePositionFromLastSnap(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
+            throws NameDuplicationException, IllegalActionException {
+        super(container, name);
 
-	attributeNameParam.setVisibility(Settable.EXPERT);
-	motorNameParam = new StringParameter(this, "Motor Name");
-	motorNameParam.setExpression("name");
+        attributeNameParam.setVisibility(Settable.EXPERT);
+        motorNameParam = new StringParameter(this, "Motor Name");
+        motorNameParam.setExpression("name");
 
-	contextIDParam = new StringParameter(this, "Context ID");
-	contextIDParam.setExpression("1");
+        contextIDParam = new StringParameter(this, "Context ID");
+        contextIDParam.setExpression("1");
     }
 
     @Override
     protected void doInitialize() throws InitializationException {
-	super.doInitialize();
-	if (!isMockMode()) {
-	    try {
-		definePosition = new TangoCommand(motorName, "DefinePosition");
-		conf = new MotorConfiguration(motorName);
-		conf.retrieveConfig();
-	    } catch (final DevFailed e) {
-		throw new DevFailedInitializationException(e, this);
-	    }
-	}
+        super.doInitialize();
+        if (!isMockMode()) {
+            try {
+                definePosition = new TangoCommand(motorName, "DefinePosition");
+                conf = new MotorConfiguration(motorName);
+                conf.retrieveConfig();
+            }
+            catch (final DevFailed e) {
+                throw new DevFailedInitializationException(e, this);
+            }
+        }
 
     }
 
     @Override
     protected void doFire(final ManagedMessage arg0) throws ProcessingException {
-	if (isMockMode()) {
-	    ExecutionTracerService.trace(this, "MOCK - " + motorName + " define position done");
-	    sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-	} else {
-	    try {
-		final String snapID = getGetSnapExtractor().getLastSnapID(contextID);
-		final String attributeName = motorName + "/position";
-		String position;
-		if (getExtractionType().equals(ExtractionType.READ)) {
-		    final String[] snapValues = getGetSnapExtractor().getReadValues(snapID, attributeName);
-		    position = snapValues[0];
-		} else {
-		    final String[] snapValues = getGetSnapExtractor().getWriteValues(snapID, attributeName);
-		    position = snapValues[1];
-		}
-		try {
-		    Double.parseDouble(position);
-		} catch (final NumberFormatException nfe) {
-		    throw new ProcessingException("the snapshot does not contains a number", position, null);
-		}
-		if (conf.getEncoder().equals(EncoderType.ABSOLUTE)) {
-		    ExecutionTracerService
-			    .trace(this, motorName + " has an absolute encoder, no define position done ");
-		    sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-		} else {
-		    definePosition.execute(position);
-		    ExecutionTracerService.trace(this, "define position on " + motorName + " with " + position);
-		    sendOutputMsg(output, PasserelleUtil.createContentMessage(this, position));
-		}
+        if (isMockMode()) {
+            ExecutionTracerService.trace(this, "MOCK - " + motorName + " define position done");
+            sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
+        } else {
+            try {
+                final String snapID = getGetSnapExtractor().getLastSnapID(contextID);
+                final String attributeName = motorName + "/position";
+                String position;
+                if (getExtractionType().equals(ExtractionType.READ)) {
+                    final String[] snapValues = getGetSnapExtractor().getReadValues(snapID,
+                            attributeName);
+                    position = snapValues[0];
+                } else {
+                    final String[] snapValues = getGetSnapExtractor().getWriteValues(snapID,
+                            attributeName);
+                    position = snapValues[1];
+                }
+                try {
+                    Double.parseDouble(position);
+                }
+                catch (final NumberFormatException nfe) {
+                    throw new ProcessingException("the snapshot does not contains a number",
+                            position, null);
+                }
+                if (conf.getEncoder().equals(EncoderType.ABSOLUTE)) {
+                    ExecutionTracerService.trace(this, motorName
+                            + " has an absolute encoder, no define position done ");
+                    sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
+                } else {
+                    definePosition.execute(position);
+                    ExecutionTracerService.trace(this, "define position on " + motorName + " with "
+                            + position);
+                    sendOutputMsg(output, PasserelleUtil.createContentMessage(this, position));
+                }
 
-	    } catch (final DevFailed e) {
-		throw new DevFailedProcessingException(e, this);
-	    }
-	}
+            }
+            catch (final DevFailed e) {
+                throw new DevFailedProcessingException(e, this);
+            }
+        }
     }
 
     @Override
@@ -104,18 +111,18 @@ public class MotorDefinePositionFromLastSnap extends ASnapExtractor {
      * @throws IllegalActionException
      */
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
-	if (attribute == contextIDParam) {
-	    contextID = PasserelleUtil.getParameterValue(contextIDParam);
-	} else if (attribute == motorNameParam) {
-	    motorName = PasserelleUtil.getParameterValue(motorNameParam);
-	} else {
-	    super.attributeChanged(attribute);
-	}
+        if (attribute == contextIDParam) {
+            contextID = PasserelleUtil.getParameterValue(contextIDParam);
+        } else if (attribute == motorNameParam) {
+            motorName = PasserelleUtil.getParameterValue(motorNameParam);
+        } else {
+            super.attributeChanged(attribute);
+        }
     }
 
     @Override
     protected String getExtendedInfo() {
-	return null;
+        return null;
     }
 
 }
