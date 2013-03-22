@@ -6,7 +6,15 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.soleil.passerelle.cdma.actor.activator.Activator
 Bundle-Vendor: Soleil
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.isencia.sherpa.commons,
+Import-Package: com.isencia.passerelle.actor;version="8.3.0",
+ com.isencia.passerelle.actor.eip;version="8.3.0",
+ com.isencia.passerelle.actor.v5;version="8.3.0",
+ com.isencia.passerelle.core;version="8.3.0",
+ com.isencia.passerelle.ext;version="8.3.0",
+ com.isencia.passerelle.ext.impl;version="8.3.0",
+ com.isencia.passerelle.message;version="8.3.0",
+ com.isencia.passerelle.util;version="8.3.0",
+ com.isencia.sherpa.commons,
  fr.soleil.nexus,
  org.cdma,
  org.cdma.dictionary,
@@ -20,7 +28,6 @@ Import-Package: com.isencia.sherpa.commons,
  org.slf4j;version="1.6.0"
 Require-Bundle: ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
- ptolemy.gui;bundle-version="7.0.1",
- com.isencia.passerelle.engine;bundle-version="8.3.0"
+ ptolemy.gui;bundle-version="7.0.1"
 Export-Package: fr.soleil.passerelle.cdma.actor
 Eclipse-RegisterBuddy: ptolemy.core
