@@ -20,9 +20,8 @@ import com.isencia.passerelle.model.FlowManager;
 import fr.soleil.passerelle.domain.BasicDirector;
 
 /**
- * This rule have to be used with the RuleClass annotation. Using this
- * annotation instead of Rule annotation allow to read only one time the moml
- * file.
+ * This rule have to be used with the RuleClass annotation. Using this annotation instead of Rule
+ * annotation allow to read only one time the moml file.
  * 
  * @author GRAMER
  * 
@@ -42,9 +41,8 @@ public class MomlRule extends ExternalResource {
         this.sequenceName = sequenceName;
     }
 
-    // TODO change signature (exception)
     @Override
-    public void before() throws Throwable {
+    public void before() throws Exception {
         reader = new InputStreamReader(getClass().getResourceAsStream(sequenceName));
         flowMgr = new FlowManager();
         original = FlowManager.readMoml(reader);
@@ -59,7 +57,8 @@ public class MomlRule extends ExternalResource {
         if (reader != null) {
             try {
                 reader.close();
-            } catch (final IOException e) {
+            }
+            catch (final IOException e) {
                 fail("cant close file: " + e.getMessage());
             }
         }
@@ -81,18 +80,14 @@ public class MomlRule extends ExternalResource {
     }
 
     /**
-     * this method allow to catch the messages which pass through by a port of
-     * an actor. @see MessageListener
+     * this method allow to catch the messages which pass through by a port of an actor. @see
+     * MessageListener
      * 
-     * @param actorName
-     *            the name of the actor in the sequence
-     * @param portName
-     *            the name of the port to spy
-     * @param receiver
-     *            the array which contains the caught messages.
-     *            ArrayBlockingQueue guaranteed a FIFO order
-     * @throws NullPointerException
-     *             if the actor or the port can not be found
+     * @param actorName the name of the actor in the sequence
+     * @param portName the name of the port to spy
+     * @param receiver the array which contains the caught messages. ArrayBlockingQueue guaranteed a
+     *            FIFO order
+     * @throws NullPointerException if the actor or the port can not be found
      */
     public void addMessageReceiver(final String actorName, final String portName,
             final ArrayBlockingQueue<String> receiver) {
