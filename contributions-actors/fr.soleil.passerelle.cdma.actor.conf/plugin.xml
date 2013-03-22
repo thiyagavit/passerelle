@@ -6,6 +6,7 @@
       <actorgroup
             id="fr.soleil.passerelle.cdma.actor.actorgroup"
             name="CDMA Actors"
+            parent="com.isencia.passerelle.actor.actorgroup.soleil"
             open="false">
       </actorgroup>
    </extension>
@@ -22,6 +23,12 @@
             group="fr.soleil.passerelle.cdma.actor.actorgroup"
             id="fr.soleil.passerelle.cdma.actor.CDMADataItemSelector"
             name="CDMADataItemSelector">
+      </actor>
+      <actor
+            class="fr.soleil.passerelle.cdma.actor.CDMAShapeFilter"
+            group="fr.soleil.passerelle.cdma.actor.actorgroup"
+            id="fr.soleil.passerelle.cdma.actor.CDMAShapeFilter"
+            name="CDMAShapeFilter">
       </actor>
       <actor
             class="fr.soleil.passerelle.cdma.actor.CDMADataSetSlicer"

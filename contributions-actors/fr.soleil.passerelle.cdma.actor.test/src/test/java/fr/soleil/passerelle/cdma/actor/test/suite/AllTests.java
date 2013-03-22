@@ -14,9 +14,10 @@
 */
 package fr.soleil.passerelle.cdma.actor.test.suite;
 
-import fr.soleil.passerelle.cdma.actor.test.CDMAActorItemRetrievalTest;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import fr.soleil.passerelle.cdma.actor.test.CDMAActorFilterTest;
+import fr.soleil.passerelle.cdma.actor.test.CDMAActorItemRetrievalTest;
 
 public class AllTests {
 
@@ -24,6 +25,7 @@ public class AllTests {
     TestSuite suite = new TestSuite(AllTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(CDMAActorItemRetrievalTest.class);
+    suite.addTestSuite(CDMAActorFilterTest.class);
     //$JUnit-END$
     return suite;
   }
