@@ -21,7 +21,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.actor.tango.control.motor.MotorConfiguration;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfiguration;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
@@ -85,7 +85,8 @@ public class DefineAllPositionsFromSnap extends Transformer {
                 getSnap = new TangoCommand(snapExtractorName, "GetSnap");
                 removeDynAttrs = new TangoCommand(snapExtractorName, "RemoveDynAttrs");
                 logger.debug(snapExtractorName);
-            } catch (final DevFailed e) {
+            }
+            catch (final DevFailed e) {
                 throw new DevFailedInitializationException(e, this);
             }
         }
@@ -155,7 +156,8 @@ public class DefineAllPositionsFromSnap extends Transformer {
                                         + " is not a GalilAxis, nothing done");
                             }
 
-                        } catch (final DevFailed e) {
+                        }
+                        catch (final DevFailed e) {
                             final String completeAttrName = (equipmentDeviceName == null) ? attributeName
                                     : equipmentDeviceName;
 
@@ -163,7 +165,8 @@ public class DefineAllPositionsFromSnap extends Transformer {
                                     + completeAttrName);
                             TangoToPasserelleUtil.getDevFailedString(e, this);
 
-                        } catch (final ProcessingException e) {
+                        }
+                        catch (final ProcessingException e) {
                             final String completeAttrName = (equipmentDeviceName == null) ? attributeName
                                     : equipmentDeviceName;
 
@@ -174,7 +177,8 @@ public class DefineAllPositionsFromSnap extends Transformer {
 
                     removeDynAttrs.execute(result[i + 1], result[i + 2]);
                 }
-            } catch (final DevFailed e) {
+            }
+            catch (final DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
             }
         }
@@ -204,16 +208,16 @@ public class DefineAllPositionsFromSnap extends Transformer {
     }
 
     /**
-     * temporarily cease execution for the specified number of milliseconds. Its
-     * the same as Thread.sleep(...) but Exception is caught
+     * temporarily cease execution for the specified number of milliseconds. Its the same as
+     * Thread.sleep(...) but Exception is caught
      * 
-     * @param millis
-     *            time to sleep
+     * @param millis time to sleep
      */
     private void sleep(final long millis) {
         try {
             Thread.sleep(100);
-        } catch (final InterruptedException e) {
+        }
+        catch (final InterruptedException e) {
         }
     }
 }
