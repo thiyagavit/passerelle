@@ -23,9 +23,12 @@ import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class KeyValueListMemorizerTest {
 
-    private static final String CLEAR_LIST_REGEX = "FATAL - list Name :\"[^\"]+\" is unknown";
-    private static final String TOO_MANY_ITT_REGEX = "FATAL - There are no more element in list name :\"[^\"]+\"";
-    private static final String GOTO_REGEX = "FATAL - list: \"[^\"]+\" invalid position value: [0-9]+. The list have [0-9]+ element\\(s\\)";
+    //private static final String CLEAR_LIST_REGEX = "FATAL - list Name :\"[^\"]+\" is unknown";
+    private static final String CLEAR_LIST_REGEX = "list Name :\"[^\"]+\" is unknown";
+    //private static final String TOO_MANY_ITT_REGEX = "FATAL - There are no more element in list name :\"[^\"]+\"";
+    private static final String TOO_MANY_ITT_REGEX = "There are no more element in list name :\"[^\"]+\"";
+    //private static final String GOTO_REGEX = "FATAL - list: \"[^\"]+\" invalid position value: [0-9]+. The list have [0-9]+ element\\(s\\)";
+    private static final String GOTO_REGEX = "list: \"[^\"]+\" invalid position value: [0-9]+. The list have [0-9]+ element\\(s\\)";
 
     private static final String MEMORIZER_NAME1 = "MemorizeList1";
 
@@ -370,6 +373,7 @@ public class KeyValueListMemorizerTest {
             moml.executeBlockingErrorLocally(props);
             failBecauseExceptionWasNotThrown(PasserelleException.class);
         } catch (final PasserelleException e) {
+            System.out.println("==>>>>>>>>>>>>>>>>clearListTest : " + e.getMessage());
             final Pattern pattern = Pattern.compile(CLEAR_LIST_REGEX);
             assertThat(pattern.matcher(e.getMessage()).find()).isTrue();
         }
