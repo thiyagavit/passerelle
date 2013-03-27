@@ -676,6 +676,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     getSite().getPage().closeEditor(PasserelleModelMultiPageEditor.this, save);
   }
 
+  private boolean isDisposed = false;
   public void dispose() {
 
     MoMLParser.purgeAllModelRecords();
@@ -689,6 +690,7 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     }
 
     super.dispose();
+	  this.isDisposed = true;
   }
 
   private IPartListener partListener = new IPartListener() {
@@ -961,6 +963,10 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     editor.setActorSelected(actorName, isSelected, colorCode);
   }
 
+  public void setPortSelected(String actorName, String portName, boolean selected, int colorCode) {
+	  editor.setPortSelected(actorName, portName, selected, colorCode);
+  }
+
   public void clearActorSelections() {
     editor.clearActorSelections();
   }
@@ -1120,6 +1126,10 @@ public class PasserelleModelMultiPageEditor extends MultiPageEditorPart implemen
     link.setTail(target);
     link.setRelation(relation);
     return link;
+  }
+
+  public boolean isDisposed() {
+	  return isDisposed;
   }
 
 }

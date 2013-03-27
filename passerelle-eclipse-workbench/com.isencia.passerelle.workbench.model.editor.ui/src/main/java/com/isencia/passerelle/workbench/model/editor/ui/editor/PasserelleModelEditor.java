@@ -98,6 +98,7 @@ import ptolemy.kernel.ComponentEntity;
 import com.isencia.passerelle.workbench.model.editor.ui.WorkbenchUtility;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.FileTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.PasserelleTemplateTransferDropTargetListener;
+import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.BreakpointAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CloseEditorAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CommitFlowAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CopyNodeAction;
@@ -114,6 +115,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.UpdateFlo
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.EditPartFactory;
+import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.DropFavouriteListener;
 import com.isencia.passerelle.workbench.model.ui.IPasserelleEditor;
@@ -551,6 +553,9 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		registry.registerAction(dynamicHelpAction);
 		getSelectionActions().add(dynamicHelpAction.getId());
 
+		BreakpointAction breakAction = new BreakpointAction(this, getParent());
+		registry.registerAction(breakAction);
+		getSelectionActions().add(breakAction.getId());
 		
 		ScreenshotAction screenshotAction = new ScreenshotAction(this);
 		screenshotAction.setText("Create screenshot from this workflow");
@@ -837,6 +842,25 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 			}
 		}
 	}
+	
+
+	public void setPortSelected(String actorName, String portName, boolean isSelected, int colorCode) {
+		
+		if (actorName==null) {
+			return;
+		}
+
+		final ComponentEntity sel = ModelUtils.findEntityByName(getContainer(), actorName);
+		GraphicalViewer gv = getGraphicalViewer();
+		final Map<?, ?> reg = gv.getEditPartRegistry();
+		final AbstractGraphicalEditPart part = (AbstractGraphicalEditPart)reg.get(sel);
+		if (part!=null && part.getFigure() instanceof ActorFigure) {
+			ActorFigure actorFig = (ActorFigure)part.getFigure();
+			actorFig.setPortColor(portName, isSelected, colorCode);
+			actorFig.repaint();
+		}
+	}
+
 	
 	private static class SpecialLineBorder extends LineBorder {
 
