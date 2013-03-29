@@ -20,6 +20,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 import org.osgi.framework.ServiceRegistration;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.moml.ErrorHandler;
 import com.isencia.passerelle.engine.activator.TestFragmentActivator;
 import com.isencia.passerelle.ext.ActorOrientedClassProvider;
 import com.isencia.passerelle.ext.impl.TestAocProvider;
@@ -32,9 +33,18 @@ import com.microstar.xml.XmlException;
 
 public class ActorOrientedClasstest extends TestCase {
 
+  private ErrorHandler errorHandler;
+
   @Override
   protected void setUp() throws Exception {
+    errorHandler = MoMLParser.getErrorHandler();
+    MoMLParser.setErrorHandler(null);
     MoMLParser.purgeAllModelRecords();
+  }
+  
+  @Override
+  protected void tearDown() throws Exception {
+    MoMLParser.setErrorHandler(errorHandler);
   }
 
   public void testRegisteringProviderAndParsingParentModel() throws Exception {
