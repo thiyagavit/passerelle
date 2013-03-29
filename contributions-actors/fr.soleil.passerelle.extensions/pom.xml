@@ -308,13 +308,12 @@
 		<!-- <artifactId>junit</artifactId> -->
 		<!-- <scope>test</scope> -->
 		<!-- </dependency> -->
-
-		<!--use for devFailedUtils in test -->
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
-			<scope>test</scope>
 		</dependency>
+		<!--use for devFailedUtils in test -->
+
 
 		<dependency>
 			<groupId>org.testng</groupId>
