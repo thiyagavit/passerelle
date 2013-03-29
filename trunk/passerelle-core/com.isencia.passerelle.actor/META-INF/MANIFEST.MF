@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Actor Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.actor
-Bundle-Version: 8.3.2.qualifier
+Bundle-Version: 8.4.0.qualifier
 Bundle-Activator: com.isencia.passerelle.actor.activator.Activator
 Bundle-Vendor: isencia
 Eclipse-RegisterBuddy: ptolemy.core

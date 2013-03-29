@@ -80,11 +80,11 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   private ErrorControlStrategy errorCtrlStrategy = new DefaultActorErrorControlStrategy();
   private boolean enforcedErrorCtrlStrategy;
 
-  public Parameter stopForUnhandledErrorParam = null;
-  public Parameter mockModeParam = null;
-  public Parameter expertModeParam = null;
-  public Parameter validateInitializationParam = null;
-  public Parameter validateIterationParam = null;
+  private Parameter stopForUnhandledErrorParam = null;
+  private Parameter mockModeParam = null;
+  private Parameter expertModeParam = null;
+  private Parameter validateInitializationParam = null;
+  private Parameter validateIterationParam = null;
 
   // Need some collection to maintain info about busy tasks
   // i.e. for slow actions done by actors.

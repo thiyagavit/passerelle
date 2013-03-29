@@ -14,13 +14,15 @@
 */
 package com.isencia.passerelle.engine.test;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import com.isencia.librarybuilder.LibraryBuilderTrial;
 import com.isencia.passerelle.actor.ActorApiTest;
 import com.isencia.passerelle.actor.ActorOrientedClasstest;
+import com.isencia.passerelle.actorproviders.ActorProviderTest;
+import com.isencia.passerelle.clone.CloneTest;
 import com.isencia.passerelle.validation.ModelValidationServiceTest;
 import com.isencia.passerelle.validation.VersionSpecificationTest;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class AllTests {
 
@@ -28,6 +30,8 @@ public class AllTests {
     TestSuite suite = new TestSuite(AllTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(ActorApiTest.class);
+    suite.addTestSuite(CloneTest.class);
+    suite.addTestSuite(ActorProviderTest.class);
     suite.addTestSuite(ActorOrientedClasstest.class);
     suite.addTestSuite(LibraryBuilderTrial.class);
     suite.addTestSuite(ModelValidationServiceTest.class);

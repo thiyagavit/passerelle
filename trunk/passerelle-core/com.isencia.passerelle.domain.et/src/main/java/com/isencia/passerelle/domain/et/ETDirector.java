@@ -89,6 +89,9 @@ public class ETDirector extends Director implements PasserelleDirector {
     eventHistoryParameter = new Parameter(this, KEEP_EVENT_HISTORY_PARAMNAME, BooleanToken.FALSE);
     new CheckBoxStyle(eventHistoryParameter, "check");
     
+    // to trigger the creation of our default adapter
+    getAdapter(null);
+    
     _attachText(
         "_iconDescription",
         "<svg>\n"
