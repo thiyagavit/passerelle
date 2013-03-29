@@ -95,12 +95,12 @@ public class Join extends Actor {
   }
 
   private ManagedMessage mergeMessage(ManagedMessage branchedMsg) throws ProcessingException {
-    String[] forkNames = ((MessageContainer) branchedMsg).getHeader(Fork.HEADER_SEQ_SRC);
+    String[] seqGeneratorNames = ((MessageContainer) branchedMsg).getHeader(MessageSequenceGenerator.HEADER_SEQ_SRC);
     // should be length 1
-    if (forkNames.length == 1) {
-      Entity fork = ((CompositeEntity) getContainer()).getEntity(forkNames[0]);
-      if (fork != null) {
-        return ((Fork) fork).aggregateProcessedMessage(branchedMsg);
+    if (seqGeneratorNames.length == 1) {
+      Entity seqGenerator = ((CompositeEntity) getContainer()).getEntity(seqGeneratorNames[0]);
+      if (seqGenerator != null) {
+        return ((MessageSequenceGenerator) seqGenerator).aggregateProcessedMessage(branchedMsg);
       }
     }
     return null;
