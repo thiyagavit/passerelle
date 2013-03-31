@@ -305,4 +305,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     return new MetaData(flowCode, null);
   }
 
+  public boolean knowledgeBaseHasFlow(String kbCode) {
+    return false;
+  }
+
 }
