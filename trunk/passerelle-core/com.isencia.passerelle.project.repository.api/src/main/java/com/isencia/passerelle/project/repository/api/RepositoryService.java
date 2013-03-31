@@ -154,4 +154,6 @@ public interface RepositoryService {
   void setSubmodelFolder(File folder);
   
   File getSubmodelFolder();
+  
+  boolean knowledgeBaseHasFlow(String kbCode);
 }
