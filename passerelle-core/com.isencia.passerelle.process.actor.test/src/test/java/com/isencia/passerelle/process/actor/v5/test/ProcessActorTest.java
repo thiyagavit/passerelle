@@ -25,17 +25,21 @@ import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.process.actor.v5.BatchRequestSequenceSource;
-import com.isencia.passerelle.process.actor.v5.DelimitedResultLineGenerator;
-import com.isencia.passerelle.process.actor.v5.TaskResultActor;
-import com.isencia.passerelle.process.actor.v5.RequestSource;
 import com.isencia.passerelle.process.actor.flow.Fork;
 import com.isencia.passerelle.process.actor.flow.Join;
+import com.isencia.passerelle.process.actor.flow.Splitter;
 import com.isencia.passerelle.process.actor.trial.ContextTracerConsole;
+import com.isencia.passerelle.process.actor.v5.BatchRequestSequenceSource;
+import com.isencia.passerelle.process.actor.v5.DelimitedResultLineGenerator;
+import com.isencia.passerelle.process.actor.v5.RequestSource;
+import com.isencia.passerelle.process.actor.v5.TaskResultActor;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 
 public class ProcessActorTest extends TestCase {
 
+  public void testSplitJoin5Branches_1s() throws Exception {
+    _testSplitJoin(5, "1");
+  }
   public void testForkJoin5Branches_1s() throws Exception {
     _testForkJoin(5,"1");
   }
@@ -54,7 +58,7 @@ public class ProcessActorTest extends TestCase {
   }
 
   public void testBatchSource() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
-    Flow flow = new Flow("testBatch",null);
+    Flow flow = new Flow("testBatchSource",null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     
@@ -78,7 +82,7 @@ public class ProcessActorTest extends TestCase {
   }
   
   public void testBatchSourceWithOverrides() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
-    Flow flow = new Flow("testBatch",null);
+    Flow flow = new Flow("testBatchSourceWithOverrides",null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     
@@ -102,7 +106,7 @@ public class ProcessActorTest extends TestCase {
   }
   
   protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
-    Flow flow = new Flow("testForkJoin1",null);
+    Flow flow = new Flow("testForkJoin"+branchCount,null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     
@@ -126,7 +130,7 @@ public class ProcessActorTest extends TestCase {
       portNamesBldr.append(","+portNames[i]);
     }
     
-    fork.outputPortNamesParameter.setToken(portNamesBldr.toString());
+    fork.outputPortCfgExt.outputPortNamesParameter.setToken(portNamesBldr.toString());
     
     TaskResultActor[] taskActors = new TaskResultActor[branchCount];
     for(int i = 0; i<branchCount;++i) {
@@ -149,4 +153,39 @@ public class ProcessActorTest extends TestCase {
     .assertFlow(flow);
   }
 
+  protected void _testSplitJoin(int branchCount, String taskTime) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException,
+      PasserelleException {
+    Flow flow = new Flow("testSplitJoin_" + branchCount, null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    RequestSource start = new RequestSource(flow, "start");
+    Splitter splitter = new Splitter(flow, "splitter");
+    TaskResultActor taskActor = new TaskResultActor(flow, "task");
+    Join join = new Join(flow, "join");
+    DelimitedResultLineGenerator lineGen = new DelimitedResultLineGenerator(flow, "lineGen");
+    ContextTracerConsole sink = new ContextTracerConsole(flow, "sink");
+    flow.connect(start, splitter);
+    flow.connect(splitter, taskActor);
+    flow.connect(taskActor, join);
+    flow.connect(join, lineGen);
+    flow.connect(lineGen, sink);
+
+    StringBuilder paramValues = new StringBuilder();
+    for (int i = 0; i < branchCount; ++i) {
+      paramValues.append(i + ",");
+    }
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("start.request parameters", "hello=world\ngoodbye=moon\nNA=" + paramValues);
+    props.put("splitter.Split src item", "NA");
+    props.put("lineGen.result item names", "requestID,task_says,goodbye");
+    props.put("task.Result items", "task_says=hello world");
+    props.put("task.time(s)", taskTime);
+
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgReceiptCount(join, (long) branchCount).expectMsgReceiptCount(sink, 1L)
+        .assertFlow(flow);
+  }
 }

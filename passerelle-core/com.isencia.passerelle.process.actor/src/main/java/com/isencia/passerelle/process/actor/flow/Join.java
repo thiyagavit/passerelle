@@ -1,6 +1,17 @@
-/**
- * 
- */
+/* Copyright 2013 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 package com.isencia.passerelle.process.actor.flow;
 
 import java.util.Iterator;
@@ -24,12 +35,22 @@ import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
 
 /**
- * A Join should be used in a combination with a preceding Fork. Where the Fork is used to start multiple parallel branches, each with their own local copy of
- * the original Context, the Join is used to assemble and merge all results from the parallel branches. The Join expects all parallel branches to be connected
- * to the single mergeInput port. When the results of all parallel branches have been received, the merged context, i.e. containing the union of all executed
- * tasks and obtained results, is sent out via the output port.
+ * A <code>Join</code> should be used in a combination with a preceding {@link MessageSequenceGenerator}. 
+ * Where the {@link MessageSequenceGenerator} is used to generate multiple derived messages in a sequence, the <code>Join</code> is used to assemble and merge them again.
+ * <p>
+ * Two typical use cases can be distinguished :
+ * <ul>
+ * <li>The <code>MessageSequenceGenerator</code> is a <code>Fork</code> actor. Then the message sequence will be processed in actors in parallel branches. 
+ * The branches should all end up in a <code>Join</code> actor to merge the processing results into one output message.</li>
+ * <li>The <code>MessageSequenceGenerator</code> is a <code>Splitter</code> actor. Then the message sequence is sent through a single branch that is applying the same processing steps on each message sequentially.
+ * A <code>Join</code> actor can be used also in this case, to aggregate all results into one message again.</li>
+ * </ul>
+ * </p>
+ * <p> 
+ * When the results of all processing branches have been received, the aggregated message, typically containing the union of all executed tasks and obtained results, is sent out via the output port.
+ * </p>
  * 
- * @author delerw
+ * @author erwin
  */
 public class Join extends Actor {
   private static final long serialVersionUID = 1L;
@@ -56,16 +77,19 @@ public class Join extends Actor {
   }
   
   @Override
-  protected void process(ActorContext actorcontext, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
+  public void process(ActorContext actorcontext, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
     Iterator<MessageInputContext> msgInputCtxtItr = procRequest.getAllInputContexts();
     while (msgInputCtxtItr.hasNext()) {
       MessageInputContext inputContext = (MessageInputContext) msgInputCtxtItr.next();
       if (!inputContext.isProcessed()) {
         if (mergeInput.getName().equals(inputContext.getPortName())) {
-          ManagedMessage branchedMsg = procRequest.getMessage(mergeInput);
-          ManagedMessage mergedMessage = mergeMessage(branchedMsg);
-          if (mergedMessage != null) {
-            procResponse.addOutputMessage(output, mergedMessage);
+          Iterator<ManagedMessage> msgIterator = inputContext.getMsgIterator();
+          while (msgIterator.hasNext()) {
+            ManagedMessage branchedMsg = msgIterator.next();
+            ManagedMessage mergedMessage = mergeMessage(branchedMsg);
+            if (mergedMessage != null) {
+              procResponse.addOutputMessage(output, mergedMessage);
+            }
           }
         }
       }
@@ -73,12 +97,12 @@ public class Join extends Actor {
   }
 
   private ManagedMessage mergeMessage(ManagedMessage branchedMsg) throws ProcessingException {
-    String[] forkNames = ((MessageContainer) branchedMsg).getHeader(Fork.FORK_ACTOR_HEADER_NAME);
+    String[] seqGeneratorNames = ((MessageContainer) branchedMsg).getHeader(MessageSequenceGenerator.HEADER_SEQ_SRC);
     // should be length 1
-    if (forkNames.length == 1) {
-      Entity fork = ((CompositeEntity) getContainer()).getEntity(forkNames[0]);
-      if (fork != null) {
-        return ((Fork) fork).mergeBranchedMessage(branchedMsg);
+    if (seqGeneratorNames.length == 1) {
+      Entity seqGenerator = ((CompositeEntity) getContainer()).getEntity(seqGeneratorNames[0]);
+      if (seqGenerator != null) {
+        return ((MessageSequenceGenerator) seqGenerator).aggregateProcessedMessage(branchedMsg);
       }
     }
     return null;
