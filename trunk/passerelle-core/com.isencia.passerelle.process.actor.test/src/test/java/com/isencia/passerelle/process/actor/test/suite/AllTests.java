@@ -24,6 +24,7 @@ public class AllTests {
     TestSuite suite = new TestSuite(AllTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(ProcessActorTest.class);
+    suite.addTestSuite(com.isencia.passerelle.process.actor.v5.test.ProcessActorTest.class);
     //$JUnit-END$
     return suite;
   }

@@ -167,7 +167,7 @@ public class BatchRequestSequenceSource extends Actor {
       }
     }
     super.offer(ctxt);
-  };
+  }
 
   protected void setReqAttrMaps(Request parentRequest) throws InitializationException, IOException {
     String[] paramNames = requestParamNamesParameter.getExpression().split(",");
