@@ -13,27 +13,34 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 public class Activator implements BundleActivator {
 
   private ServiceRegistration factoryServiceRegistration;
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   public void start(BundleContext bundleContext) throws Exception {
-    EntityFactoryImpl entityFactory = new EntityFactoryImpl();
-	factoryServiceRegistration = bundleContext.registerService(EntityFactory.class.getName(), entityFactory, null);
-	ServiceRegistry.getInstance().setEntityFactory(entityFactory);
+    if (ServiceRegistry.getInstance().getEntityFactory() == null) {
+      EntityFactoryImpl entityFactory = new EntityFactoryImpl();
+      factoryServiceRegistration = bundleContext.registerService(EntityFactory.class.getName(), entityFactory, null);
+      ServiceRegistry.getInstance().setEntityFactory(entityFactory);
+    }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   public void stop(BundleContext bundleContext) throws Exception {
-	  ServiceRegistry.getInstance().setEntityFactory(null);
+
     if (factoryServiceRegistration != null) {
+      ServiceRegistry.getInstance().setEntityFactory(null);
       factoryServiceRegistration.unregister();
     }
   }
