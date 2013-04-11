@@ -25,6 +25,7 @@ import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.process.actor.flow.CollectingEvictedMessageHandler;
 import com.isencia.passerelle.process.actor.flow.Fork;
 import com.isencia.passerelle.process.actor.flow.Join;
 import com.isencia.passerelle.process.actor.flow.Splitter;
@@ -34,11 +35,43 @@ import com.isencia.passerelle.process.actor.v5.DelimitedResultLineGenerator;
 import com.isencia.passerelle.process.actor.v5.RequestSource;
 import com.isencia.passerelle.process.actor.v5.TaskResultActor;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
+import com.isencia.passerelle.testsupport.actor.DevNullActor;
 
 public class ProcessActorTest extends TestCase {
 
+  public void testEvictionByCount() throws Exception {
+    Flow flow = new Flow("testEvictionByCount", null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new ETDirector(flow, "director"));
+
+    RequestSource start = new RequestSource(flow, "start");
+    BatchRequestSequenceSource batchStart = new BatchRequestSequenceSource(flow, "batchStart");
+    Fork fork = new Fork(flow, "fork");
+    CollectingEvictedMessageHandler evictedMessagesHandler = new CollectingEvictedMessageHandler();
+    fork.setEvictedMessagesHandler(evictedMessagesHandler);
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    fork.outputPortCfgExt.outputPortNamesParameter.setToken("p0,p1");
+    flow.connect(start, batchStart);
+    flow.connect(batchStart, fork);
+    flow.connect((IOPort) fork.getPort("p0"), sink.input);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("fork.maxRetentionCount", "1");
+    props.put("batchStart.Request parameter names", "NA");
+    props.put("batchStart.Request parameter values", "021234567,027654321,012345678");
+    props.put("batchStart.throttle interval (s)", "1");
+    flowMgr.executeBlockingLocally(flow, props);
+
+    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgSentCount(batchStart, 3L).expectMsgReceiptCount(sink, 3L).assertFlow(flow);
+
+    assertEquals("", 2, evictedMessagesHandler.evictedMessages.size());
+  }
+
   public void testSplitJoin5Branches_1s() throws Exception {
     _testSplitJoin(5, "1");
+  }
+  public void testSplitJoin0Branches_1s() throws Exception {
+    _testSplitJoin(0, "1");
   }
   public void testForkJoin5Branches_1s() throws Exception {
     _testForkJoin(5,"1");
@@ -53,8 +86,7 @@ public class ProcessActorTest extends TestCase {
   }
 
   public void testForkJoin100Branches_1s() throws Exception {
-    int branchCount = 100;
-    _testForkJoin(branchCount,"1");
+    _testForkJoin(100, "1");
   }
 
   public void testBatchSource() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
@@ -106,7 +138,7 @@ public class ProcessActorTest extends TestCase {
   }
   
   protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
-    Flow flow = new Flow("testForkJoin"+branchCount,null);
+    Flow flow = new Flow("testForkJoin_"+branchCount,null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow,"director"));
     
@@ -169,6 +201,7 @@ public class ProcessActorTest extends TestCase {
     flow.connect(splitter, taskActor);
     flow.connect(taskActor, join);
     flow.connect(join, lineGen);
+    flow.connect(splitter.outputNoSplit, sink.input);
     flow.connect(lineGen, sink);
 
     StringBuilder paramValues = new StringBuilder();
@@ -185,7 +218,10 @@ public class ProcessActorTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgReceiptCount(join, (long) branchCount).expectMsgReceiptCount(sink, 1L)
-        .assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount(start, 1L)
+      .expectMsgReceiptCount(join, (long) branchCount)
+      .expectMsgReceiptCount(sink, 1L)
+      .assertFlow(flow);
   }
 }

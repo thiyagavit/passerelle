@@ -70,7 +70,9 @@ public class ProcessActorTest extends TestCase {
   public void testSplitJoin5Branches_1s() throws Exception {
     _testSplitJoin(5, "1");
   }
-
+  public void testSplitJoin0Branches_1s() throws Exception {
+    _testSplitJoin(0, "1");
+  }
   public void testForkJoin5Branches_1s() throws Exception {
     _testForkJoin(5, "1");
   }
@@ -104,7 +106,11 @@ public class ProcessActorTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgSentCount(batchStart, 2L).expectMsgReceiptCount(sink, 2L).assertFlow(flow);
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(start, 1L)
+    .expectMsgSentCount(batchStart, 2L)
+    .expectMsgReceiptCount(sink, 2L)
+    .assertFlow(flow);
   }
 
   public void testBatchSourceWithOverrides() throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
@@ -124,12 +130,15 @@ public class ProcessActorTest extends TestCase {
     props.put("start.request parameters", "NA=01111111,01111112,01111113\r\nSERVICE=FIA,IDTV,FIA");
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgSentCount(batchStart, 3L).expectMsgReceiptCount(sink, 3L).assertFlow(flow);
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(start, 1L)
+    .expectMsgSentCount(batchStart, 3L)
+    .expectMsgReceiptCount(sink, 3L)
+    .assertFlow(flow);
   }
 
-  protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException,
-      PasserelleException {
-    Flow flow = new Flow("testForkJoin_" + branchCount, null);
+  protected void _testForkJoin(int branchCount, String... taskTimes) throws IllegalActionException, NameDuplicationException, FlowAlreadyExecutingException, PasserelleException {
+    Flow flow = new Flow("testForkJoin_"+branchCount,null);
     FlowManager flowMgr = new FlowManager();
     flow.setDirector(new ETDirector(flow, "director"));
 
@@ -169,7 +178,10 @@ public class ProcessActorTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgReceiptCount(join, (long) branchCount).expectMsgReceiptCount(sink, 1L)
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(start, 1L)
+    .expectMsgReceiptCount(join, (long) branchCount)
+    .expectMsgReceiptCount(sink, 1L)
         .assertFlow(flow);
   }
 
@@ -189,6 +201,7 @@ public class ProcessActorTest extends TestCase {
     flow.connect(splitter, taskActor);
     flow.connect(taskActor, join);
     flow.connect(join, lineGen);
+    flow.connect(splitter.outputNoSplit, sink.input);
     flow.connect(lineGen, sink);
 
     StringBuilder paramValues = new StringBuilder();
@@ -205,7 +218,10 @@ public class ProcessActorTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgSentCount(start, 1L).expectMsgReceiptCount(join, (long) branchCount).expectMsgReceiptCount(sink, 1L)
-        .assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount(start, 1L)
+      .expectMsgReceiptCount(join, (long) branchCount)
+      .expectMsgReceiptCount(sink, 1L)
+      .assertFlow(flow);
   }
 }
