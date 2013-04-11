@@ -14,12 +14,15 @@
 */
 package com.isencia.passerelle.process.actor.v5.test;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
 import ptolemy.actor.IOPort;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
@@ -39,6 +42,40 @@ import com.isencia.passerelle.testsupport.actor.DevNullActor;
 
 public class ProcessActorTest extends TestCase {
 
+  public void testForkJoinFromMOML() throws Exception {
+    Reader in = new InputStreamReader(getClass().getResourceAsStream("/testForkJoinV5.moml"));
+    Flow f = FlowManager.readMoml(in);
+    Map<String, String> props = new HashMap<String, String>();
+    FlowManager flowMgr = new FlowManager();
+    flowMgr.executeBlockingLocally(f, props);
+
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount("Fork.t1", 1L)
+      .expectMsgSentCount("Fork.t2", 1L)
+      .expectMsgSentCount("Fork.t3", 1L)
+      .expectMsgReceiptCount("Join.input", 3L)
+      .expectMsgReceiptCount("Tracer Console.input", 1L)
+      .assertFlow(f);
+  }
+  
+  public void testForkJoinFromMOMLWithClone() throws Exception {
+    Reader in = new InputStreamReader(getClass().getResourceAsStream("/testForkJoinV5.moml"));
+    Flow f = FlowManager.readMoml(in);
+    f = (Flow) f.clone(new Workspace());
+    f.setName("afterclone");
+    Map<String, String> props = new HashMap<String, String>();
+    FlowManager flowMgr = new FlowManager();
+    flowMgr.executeBlockingLocally(f, props);
+
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount("Fork.t1", 1L)
+      .expectMsgSentCount("Fork.t2", 1L)
+      .expectMsgSentCount("Fork.t3", 1L)
+      .expectMsgReceiptCount("Join.input", 3L)
+      .expectMsgReceiptCount("Tracer Console.input", 1L)
+      .assertFlow(f);
+  }  
+  
   public void testEvictionByCount() throws Exception {
     Flow flow = new Flow("testEvictionByCount", null);
     FlowManager flowMgr = new FlowManager();
