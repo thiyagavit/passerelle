@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -23,7 +24,8 @@ import com.isencia.passerelle.process.model.Identifiable;
  */
 @Entity
 @Table(name = "PAS_CLOBITEM")
-public class ClobItem implements Identifiable {
+public class ClobItem implements Identifiable, Serializable {
+	private static final long serialVersionUID = 7731827652936465986L;
 
 	@Id
 	@Column(name = "ID")
@@ -34,7 +36,6 @@ public class ClobItem implements Identifiable {
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
-	@SuppressWarnings("unused")
 	@Version
 	private int version;
 	
