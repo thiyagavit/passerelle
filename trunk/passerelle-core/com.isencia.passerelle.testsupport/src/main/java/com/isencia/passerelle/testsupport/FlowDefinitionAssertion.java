@@ -20,6 +20,8 @@ import junit.framework.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
+import ptolemy.actor.Receiver;
+import ptolemy.actor.TypedIOPort;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.util.Attribute;
 import com.isencia.passerelle.model.Flow;
@@ -94,11 +96,25 @@ public class FlowDefinitionAssertion {
 
   protected void assertRelations(Flow flow, Collection<Relation> expectedRelations) {
     for (Relation relation : expectedRelations) {
-      Port outputPort = flow.getPort(ModelUtils.getFullNameButWithoutModelName(flow, relation.from));
-      Port inputPort = flow.getPort(ModelUtils.getFullNameButWithoutModelName(flow, relation.to));
+      TypedIOPort outputPort = (TypedIOPort) flow.getPort(ModelUtils.getFullNameButWithoutModelName(flow, relation.from));
+      TypedIOPort inputPort = (TypedIOPort) flow.getPort(ModelUtils.getFullNameButWithoutModelName(flow, relation.to));
       Assert.assertNotNull("No port "+relation.from+" found in flow "+flow.getFullName(), outputPort);
       Assert.assertNotNull("No port "+relation.to+" found in flow "+flow.getFullName(), inputPort);
-      Assert.assertTrue(relation.from + " not connected to " + relation.to + " in flow "+flow.getFullName(), outputPort.connectedPortList().contains(inputPort));
+      Assert.assertTrue(relation.from + " not connected to " + relation.to + " in flow "+flow.getFullName(), outputPort.sinkPortList().contains(inputPort));
+      boolean linkedViaReceiver = false;
+      Receiver[][] remoteReceivers = outputPort.getRemoteReceivers();
+      for (Receiver[] receivers : remoteReceivers) {
+        for (Receiver receiver : receivers) {
+          linkedViaReceiver = inputPort.equals(receiver.getContainer());
+          if(linkedViaReceiver) {
+            break;
+          }
+        }
+        if(linkedViaReceiver) {
+          break;
+        }
+      }
+      Assert.assertTrue(relation.from + " not connected via a Receiver to " + relation.to + " in flow "+flow.getFullName(), linkedViaReceiver);
     }
   }
 
@@ -122,6 +138,12 @@ public class FlowDefinitionAssertion {
     return this;
   }
   
+  /**
+   * 
+   * @param from the NamedObj.getFullName() of the output port that must be connected to the <b>to</b> port
+   * @param to the NamedObj.getFullName() of the input port that must be connected to the <b>from</b> port
+   * @return
+   */
   public FlowDefinitionAssertion expectRelation(String from, String to) {
     expectedRelations.add(new Relation(from, to));
     return this;
