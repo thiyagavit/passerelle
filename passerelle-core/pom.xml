@@ -36,6 +36,7 @@
 		<module>com.isencia.passerelle.commons.ume.test</module>
 		<module>com.isencia.passerelle.domain.et.test</module>
 		<module>com.isencia.passerelle.engine.test</module>
+		<module>com.isencia.passerelle.editor.common</module>
 	</modules>
 
 </project>
