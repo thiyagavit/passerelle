@@ -49,7 +49,7 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class ValuesListGenerator extends Transformer {
 
-	private final static Logger logger = LoggerFactory.getLogger(ValuesListGenerator.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ValuesListGenerator.class);
 	
 	public Parameter valuesListParam;
 	String[] valuesList;
@@ -99,9 +99,11 @@ public class ValuesListGenerator extends Transformer {
 		super.doInitialize();
 	}
 	
+	protected Logger getLogger() {
+	    return LOGGER;
+	  }
 	protected void doFire(ManagedMessage message) throws ProcessingException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doFire() - entry");
+		getLogger().trace("{} doFire() - entry",getFullName());
 		
 		currentValue = valuesList[currentIndex];
 		ExecutionTracerService.trace(this, "Generating value :"+ currentValue);
@@ -113,12 +115,7 @@ public class ValuesListGenerator extends Transformer {
 		
 		sendOutputMsg(output,PasserelleUtil.createContentMessage(this, currentValue));
 		
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doFire() - exit");
+		getLogger().trace("{} doFire() - exit",getFullName());
 	}
 
-	protected String getExtendedInfo() {
-		return this.getName();
-	}
-	
 }
