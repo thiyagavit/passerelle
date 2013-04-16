@@ -1,7 +1,6 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
@@ -19,18 +18,43 @@ public abstract class Command {
 
     /**
      * Build a command
-     * 
-     * @param actor the actor which "run " the command. It's use to trace message in
-     *            ExecutorTracerService
-     * @param deviceName the name of device on which the command will be executed
+     *
+     * @param actor        the actor which "run " the command. It's use to trace message in
+     *                     ExecutorTracerService
+     * @param deviceName   the name of device on which the command will be executed
      * @param stateCommand the command use to know the state device
-     * 
+     *
      * @throws DevFailed if an tango error occurred (bad device name...)
      */
     public Command(Actor actor, String deviceName, TangoCommand stateCommand) throws DevFailed {
         this.deviceName = deviceName;
         this.actor = actor;
         this.stateCommand = stateCommand;
+    }
+
+    /**
+     * execute the command if the device is in particular state
+     *
+     * @param command the command to execute
+     * @param states  the states which "trig" the command
+     *
+     * @return true if the command has been executed, false otherwise
+     *
+     * @throws fr.esrf.Tango.DevFailed an tango error occurred (timeout , bad device name...)
+     * @throws fr.soleil.passerelle.util.ProcessingExceptionWithLog
+     *                                 if the device is particular state after the execution of
+     *                                 the command
+     */
+    public static boolean executeCmdAccordingState(Command command, DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+        boolean commandAsBeenExecuted = false;
+        DevState deviceState = command.getStateCommand().execute(DevState.class);
+        for (DevState state : states) {
+            if (state == deviceState) {
+                command.execute(states);
+                commandAsBeenExecuted = true;
+            }
+        }
+        return commandAsBeenExecuted;
     }
 
     /**
@@ -43,17 +67,13 @@ public abstract class Command {
     /**
      * execute the command and throw an ProcessingExceptionWithLog if device is in state defined by
      * parameter states
-     * 
+     *
      * @param states state array in which the device should not be after the execution of the
-     *            command
-     * 
-     * @return true if a specific action must be done after execution the command. It only usefull
-     *         for ON //TODO change this
-     * 
-     * @throws DevFailed if an tango error occurred ( timeout ...)
+     *               command
+     *
+     * @throws DevFailed                  if an tango error occurred ( timeout ...)
      * @throws ProcessingExceptionWithLog (if the device in if device is in state defined by
-     *             parameter states after the execution of the command)
+     *                                    parameter states after the execution of the command)
      */
-    public abstract boolean execute(DevState... states) throws DevFailed,
-            ProcessingExceptionWithLog;
+    public abstract void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog;
 }

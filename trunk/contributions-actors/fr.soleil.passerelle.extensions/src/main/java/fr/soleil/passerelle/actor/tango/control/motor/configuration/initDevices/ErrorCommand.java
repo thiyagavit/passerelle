@@ -18,7 +18,7 @@ public class ErrorCommand extends Command {
     }
 
     @Override
-    public boolean execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
         DevState deviceState = stateCommand.execute(DevState.class);
         for (DevState state : states) {
             if (state == deviceState) {
@@ -26,6 +26,5 @@ public class ErrorCommand extends Command {
                         + " is in  " + state + " state", null, null);
             }
         }
-        return false;
     }
 }

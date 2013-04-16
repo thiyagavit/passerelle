@@ -22,7 +22,7 @@ public class OnCommand extends Command {
     }
 
     @Override
-    public boolean execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
         ExecutionTracerService.trace(actor, "Motor is off, try to execute On command" + deviceName);
         command.execute();
 
@@ -39,6 +39,5 @@ public class OnCommand extends Command {
                 throw new ProcessingExceptionWithLog(actor, ON_ERROR_MSG, null, null);
             }
         }
-        return true;
     }
 }

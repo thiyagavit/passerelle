@@ -22,7 +22,7 @@ public class InitCommand extends Command {
     }
 
     @Override
-    public boolean execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
         ExecutionTracerService.trace(actor, "Init command executed on " + deviceName);
         command.execute();
 
@@ -39,6 +39,5 @@ public class InitCommand extends Command {
                 throw new ProcessingExceptionWithLog(actor, Init_ERROR_MSG, null, null);
             }
         }
-        return false;
     }
 }
