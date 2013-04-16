@@ -141,7 +141,7 @@ public abstract class ATangoDeviceActor extends ATangoActor {
      */
     protected final DeviceProxy getDeviceProxy() throws PasserelleException {
         if (deviceProxy == null) {
-            throw new InitializationException("field not initialized", deviceName, null);
+            throw new PasserelleException("field not initialized", deviceName, null);
         }
         return deviceProxy;
     }
