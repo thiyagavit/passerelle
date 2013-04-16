@@ -112,6 +112,7 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
             catch (final PasserelleException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
+                throw new ProcessingException("Invalide DeviceProxy " + e1.getMessage(), this,null);
             }
             try {
                 conf.initMotor(this);
