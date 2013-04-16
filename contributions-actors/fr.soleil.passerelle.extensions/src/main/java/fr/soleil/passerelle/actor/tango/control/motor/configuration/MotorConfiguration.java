@@ -1,19 +1,13 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration;
 
 import static fr.esrf.Tango.DevState.ALARM;
-import static fr.esrf.Tango.DevState.DISABLE;
 import static fr.esrf.Tango.DevState.FAULT;
-import static fr.esrf.Tango.DevState.MOVING;
-import static fr.esrf.Tango.DevState.OFF;
-import static fr.esrf.Tango.DevState.ON;
-import static fr.esrf.Tango.DevState.STANDBY;
 import static fr.esrf.Tango.DevState.UNKNOWN;
 
 import org.tango.utils.DevFailedUtils;
 
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
@@ -22,14 +16,7 @@ import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.ErrorCommand;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.InitCommand;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.MicroCodeCommand;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OnCommand;
 import fr.soleil.passerelle.tango.util.TangoAccess;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
@@ -192,48 +179,6 @@ public class MotorConfiguration {
             axisProxy.command_inout("MotorON");
             ExecutionTracerService.trace(actor, deviceName + " was Off, Switched On");
         }
-    }
-
-    public void initDevice(final Actor actor) throws ProcessingException {
-
-        try {
-            // 1 - Init the controlBox
-            String cbName = retrieveMyControlBox(); // TODO change this
-            TangoCommand stateCmd = new TangoCommand(cbName, "State");
-
-            executeCmdAccordingState(new InitCommand(actor, cbName, stateCmd), FAULT, UNKNOWN);
-            executeCmdAccordingState(new MicroCodeCommand(actor, cbName, stateCmd), ALARM);
-
-            // 2- Init the galil
-            stateCmd = new TangoCommand(deviceName, "State");
-
-            executeCmdAccordingState(new InitCommand(actor, deviceName, stateCmd), FAULT, UNKNOWN);
-            executeCmdAccordingState(new ErrorCommand(actor, deviceName, stateCmd), MOVING, DISABLE);
-            switchToOffAfterInit = executeCmdAccordingState(new OnCommand(actor, deviceName,
-                    stateCmd), OFF);
-
-            DevState galilState = stateCmd.execute(DevState.class);
-            if (galilState != STANDBY && galilState != ON) {
-                throw new ProcessingExceptionWithLog(actor, "Motor is " + galilState.toString()
-                        + " insteadof  StandBy or On", this, null);
-            }
-
-        }
-        catch (DevFailed e) {
-            throw new DevFailedProcessingException(e, PasserelleException.Severity.FATAL, actor);
-        }
-
-    }
-
-    private boolean executeCmdAccordingState(Command command, DevState... states) throws DevFailed,
-            ProcessingExceptionWithLog {
-        DevState deviceState = command.getStateCommand().execute(DevState.class);
-        for (DevState state : states) {
-            if (state == deviceState) {
-                return command.execute(states);
-            }
-        }
-        return false;
     }
 
     public EncoderType getEncoder() {
