@@ -35,7 +35,6 @@ public abstract class TransformerV5 extends Actor {
         super(container, name);
 
         input = PortFactory.getInstance().createInputPort(this, null);
-        //input.setMultiport(false);
         output = PortFactory.getInstance().createOutputPort(this);
 
 		_attachText("_iconDescription", "<svg>\n" +
