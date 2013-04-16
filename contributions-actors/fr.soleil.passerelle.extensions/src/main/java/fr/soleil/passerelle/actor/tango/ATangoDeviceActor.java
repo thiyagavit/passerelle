@@ -111,6 +111,7 @@ public abstract class ATangoDeviceActor extends ATangoActor {
                         "Exception during validateInitialization " + e.getMessage(), this, null);
             }
         }
+        
         super.validateInitialization();
 
         if (logger.isTraceEnabled()) {
