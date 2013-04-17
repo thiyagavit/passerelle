@@ -9,7 +9,7 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.actor.tango.control.motor.AGalilMotorActor;
+import fr.soleil.passerelle.actor.tango.control.motor.GalilMotorWithOffset;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.MoveNumericAttribute;
 import fr.soleil.passerelle.actor.tango.control.motor.dataProviders.AttributeDataProvider;
@@ -21,11 +21,11 @@ import fr.soleil.tango.clientapi.TangoCommand;
 //TODO deal with alias
 //TODO add logs
 
-public class DefineOffsetPositionWithLastHdbValue extends AGalilMotorActor {
+public class MoveGalilWithLastHdbValue extends GalilMotorWithOffset {
 
     private WaitStateTask waitTask;
 
-    public DefineOffsetPositionWithLastHdbValue(CompositeEntity container, String name)
+    public MoveGalilWithLastHdbValue(CompositeEntity container, String name)
             throws IllegalActionException, NameDuplicationException {
         super(container, name);
         final URL url = this.getClass().getResource(
