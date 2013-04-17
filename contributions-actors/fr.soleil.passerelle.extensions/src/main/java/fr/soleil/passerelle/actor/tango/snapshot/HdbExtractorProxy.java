@@ -10,23 +10,29 @@ public class HdbExtractorProxy {
     private TangoCommand GetNewestValue;
 
     /**
-     * Create a basic extract proxy with default tango command. You should use this constructor
-     * instead of default (which is used for tests)
+     * Create a basic HDB extractor proxy with default tango command. You should use this
+     * constructor instead of default (which is used for tests)
      * 
-     * @param snapExtractorName
+     * @param hdbExtractorName
      * 
      * @throws DevFailed
      */
-    public HdbExtractorProxy(final String snapExtractorName) throws DevFailed {
-        GetNewestValue = new TangoCommand(snapExtractorName, "GetNewestValue");
+    public HdbExtractorProxy(final String hdbExtractorName) throws DevFailed {
+        GetNewestValue = new TangoCommand(hdbExtractorName, "GetNewestValue");
     }
 
     /**
-     * create an empty proxy, it's useful for test to be able to mock Tango command
+     * create an empty proxy, it's useful for test to be able to mock the tango command
      */
     public HdbExtractorProxy() {
     }
 
+    /**
+     * define the tango command command used to get the newest value ( this method is use to mock
+     * the hdb extractor proxy)
+     * 
+     * @param getNewestValue
+     */
     public void setGetNewestValueCommad(TangoCommand getNewestValue) {
         GetNewestValue = getNewestValue;
     }
