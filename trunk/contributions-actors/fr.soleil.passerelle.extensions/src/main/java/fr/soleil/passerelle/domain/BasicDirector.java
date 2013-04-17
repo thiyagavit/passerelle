@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.BooleanToken;
+import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
@@ -60,7 +61,7 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
     DirectorAdapter adapter = getAdapter(null);
 
     if(adapter instanceof DefaultDirectorAdapter) {
-      ((DefaultDirectorAdapter)adapter).stopForUnhandledErrorParam.setToken(BooleanToken.TRUE);
+      ((Parameter)getAttribute(DirectorAdapter.STOP_FOR_UNHANDLED_ERROR_PARAM)).setToken(BooleanToken.TRUE);
     }
     
     propsFileParameter.setVisibility(Settable.EXPERT);
