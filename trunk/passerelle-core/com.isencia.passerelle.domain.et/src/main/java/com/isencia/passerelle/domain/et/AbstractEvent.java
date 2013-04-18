@@ -14,9 +14,14 @@
 */
 package com.isencia.passerelle.domain.et;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import ptolemy.kernel.util.NamedObj;
+import com.isencia.passerelle.core.Event;
 
 public abstract class AbstractEvent implements Event {
   
@@ -24,26 +29,64 @@ public abstract class AbstractEvent implements Event {
 
   private Date timeStamp;
   private long id;
+  private String topic;
   
-  protected AbstractEvent(Date timeStamp) {
-    this.timeStamp = timeStamp;
+  private Map<String, String> eventProperties =  new HashMap<String, String>();
+  
+  protected AbstractEvent(String topic, Date creationTS) {
+    this.topic = topic;
+    this.timeStamp = creationTS;
     this.id = idCounter.incrementAndGet();
   }
+  
+  protected AbstractEvent(NamedObj subject, String topic, Date creationTS) {
+    this(topic,creationTS);
+    eventProperties.put(SUBJECT, subject.getFullName());
+  }
 
+  protected long getId() {
+    return id;
+  }
+
+  public String getTopic() {
+    return topic;
+  }
+  
+  public Date getCreationTS() {
+    return timeStamp;
+  }
+
+  /**
+   * @return 0L as default duration
+   */
+  public Long getDuration() {
+    return 0L;
+  }
+  
+  public String getProperty(String propName) {
+    return eventProperties.get(propName);
+  }
+  
+  public String[] getPropertyNames() {
+    int size = eventProperties.size();
+    String[] result = new String[size];
+    eventProperties.keySet().toArray(result);
+    return result;
+  }
+  
   /**
    * 
    * @return a new Event with copied info, but new timestamp
    */
   public abstract Event copy();
-  
 
-  public Date getTimestamp() {
-    return timeStamp;
-  }
-  
-  protected long getId() {
-    return id;
-  }
+  /**
+   * 
+   * @param dateFormat
+   * @return a toString representation of the event, 
+   * where dates are formatted with the given dateFormat.
+   */
+  public abstract String toString(DateFormat dateFormat);
 
   @Override
   public String toString() {

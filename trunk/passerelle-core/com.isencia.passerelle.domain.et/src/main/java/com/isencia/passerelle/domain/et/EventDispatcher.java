@@ -17,6 +17,7 @@ package com.isencia.passerelle.domain.et;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import com.isencia.passerelle.core.Event;
 
 /**
  * @author delerw

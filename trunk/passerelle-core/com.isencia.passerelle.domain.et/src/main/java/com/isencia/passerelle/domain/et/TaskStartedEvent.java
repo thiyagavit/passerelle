@@ -18,6 +18,7 @@ package com.isencia.passerelle.domain.et;
 import java.text.DateFormat;
 import java.util.Date;
 import ptolemy.actor.Actor;
+import ptolemy.kernel.util.NamedObj;
 
 /**
  * @author delerw
@@ -25,6 +26,8 @@ import ptolemy.actor.Actor;
  */
 public class TaskStartedEvent<T> extends AbstractEvent {
   
+  public final static String TOPIC=TOPIC_PREFIX+"STARTED";
+
   private Actor taskOwner;
   private T task;
 
@@ -33,7 +36,7 @@ public class TaskStartedEvent<T> extends AbstractEvent {
   }
 
   protected TaskStartedEvent(T task, Actor taskOwner, Date timeStamp) {
-    super(timeStamp);
+    super((NamedObj) taskOwner, TOPIC, timeStamp);
     this.task = task;
     this.taskOwner = taskOwner;
   }
@@ -51,7 +54,7 @@ public class TaskStartedEvent<T> extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return dateFormat.format(getTimestamp()) + " " + getId() + "TaskStartedEvent [taskOwner=" + taskOwner.getFullName() 
+    return dateFormat.format(getCreationTS()) + " " + getId() + "TaskStartedEvent [taskOwner=" + taskOwner.getFullName() 
         + ", task=" + task + "]";
   }
 }

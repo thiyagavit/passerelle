@@ -17,7 +17,6 @@ package com.isencia.passerelle.domain.et;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-
 import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
 
