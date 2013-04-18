@@ -181,12 +181,6 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
         }
     }
 
-    @Override
-    protected String getExtendedInfo() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public String getMouvementType() {
         return mouvementType;
     }
