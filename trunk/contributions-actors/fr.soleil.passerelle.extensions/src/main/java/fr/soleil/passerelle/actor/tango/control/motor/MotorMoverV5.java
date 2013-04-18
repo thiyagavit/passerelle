@@ -28,7 +28,6 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
-import fr.soleil.passerelle.actor.tango.control.motor.dataProviders.AttributeDataProvider;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
@@ -36,9 +35,13 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
- * An base class actor that is able to move all equipments to a wanted position
+ * An base class actor that is able to move all equipments to a wanted position.
  * 
- * @author ABEILLE
+ * Input: the desired position
+ * 
+ * Output: The value of some motor's attributes. the number of output vary according to the
+ * outputList which is fill in the subclasses.
+ * 
  */
 @SuppressWarnings("serial")
 public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
@@ -46,7 +49,7 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
     private final static Logger logger = LoggerFactory.getLogger(MotorMoverV5.class);
     private static final String MOUVEMENT_TYPE = "Mouvement type";
     /**
-     * The names of ports added to this actor by subclass
+     * The names of ports added to this actor by the subclass
      */
     private final List<String> outputList;
     /**
@@ -62,7 +65,6 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
     protected String mouvementType;
     private List<TangoAttribute> attrList;
     private IMoveAction action;
-    private AttributeDataProvider positionDataProvider;
 
     public MotorMoverV5(final CompositeEntity container, final String name,
             final List<String> outputList) throws NameDuplicationException, IllegalActionException {
@@ -85,12 +87,9 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
         mouvementTypeParam.setExpression(mouvementType);
 
         action = createMoveAction();
-        positionDataProvider = createPositionDataProvider();
     }
 
     public abstract IMoveAction createMoveAction();
-
-    public abstract AttributeDataProvider createPositionDataProvider();
 
     @Override
     protected void doInitialize() throws InitializationException {
@@ -99,9 +98,6 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
                 action.setDeviceName(getDeviceName());
                 action.setActionName(mouvementType);
                 action.init();
-
-                positionDataProvider.setDeviceName(getDeviceName());
-                positionDataProvider.init(this);
 
                 attrList.clear();
                 for (int i = 0; i < outputList.size(); i++) {
@@ -141,7 +137,8 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
             }
         } else {
             try {
-                String desiredPosition = positionDataProvider.getData(this, request, input);
+                final String desiredPosition = (String) PasserelleUtil.getInputValue(request
+                        .getMessage(input));
                 ExecutionTracerService.trace(this, "Moving " + getDeviceName() + " to "
                         + desiredPosition);
 
@@ -162,7 +159,6 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
                             + currentPort.getFullName());
                     sendOutputMsg(currentPort, PasserelleUtil.createContentMessage(this, attHelper));
                 }
-
             }
             catch (final DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
