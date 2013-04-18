@@ -32,7 +32,7 @@ public class FlowExecutionEvent extends AbstractEvent {
   }
 
   public FlowExecutionEvent(CompositeActor target, FlowExecutionEventType eventType, Date timeStamp) {
-    super(timeStamp);
+    super(target, TOPIC_PREFIX+eventType.name(), timeStamp);
     this.target = target;
     this.eventType = eventType;
   }
@@ -50,6 +50,6 @@ public class FlowExecutionEvent extends AbstractEvent {
   }
 
   public String toString(DateFormat dateFormat) {
-    return dateFormat.format(getTimestamp()) + " " + getId() + " FlowExecutionEvent [eventType=" + eventType + ", target=" + target.getFullName() + "]";
+    return dateFormat.format(getCreationTS()) + " " + getId() + " FlowExecutionEvent [eventType=" + eventType + ", target=" + target.getFullName() + "]";
   }
 }

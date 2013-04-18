@@ -33,6 +33,7 @@ import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import com.isencia.passerelle.core.Event;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.domain.et.FlowExecutionEvent.FlowExecutionEventType;
