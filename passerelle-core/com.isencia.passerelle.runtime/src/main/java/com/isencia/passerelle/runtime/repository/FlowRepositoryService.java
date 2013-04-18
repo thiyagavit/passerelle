@@ -54,7 +54,7 @@ public interface FlowRepositoryService {
    * @return the handle to the created repository entry
    * @throws DuplicateEntryException if an entry with the same identifier already exists
    */
-  FlowHandle saveFlow(Flow flow) throws DuplicateEntryException;
+  FlowHandle commit(Flow flow) throws DuplicateEntryException;
   
   /**
    * Store the given Flow in the repository, if it does not exist yet,
@@ -67,7 +67,7 @@ public interface FlowRepositoryService {
    * @return the handle to the created repository entry
    * @throws DuplicateEntryException if an entry with the same identifier already exists
    */
-  FlowHandle saveFlow(String flowCode, Flow flow) throws DuplicateEntryException;
+  FlowHandle commit(String flowCode, Flow flow) throws DuplicateEntryException;
   
   /**
    * 
@@ -75,7 +75,54 @@ public interface FlowRepositoryService {
    * @return all versions of the Flow, that were stored in the repository for the given flowCode.
    * @throws EntryNotFoundException
    */
-  List<FlowHandle> deleteFlow(String flowCode) throws EntryNotFoundException;
+  List<FlowHandle> delete(String flowCode) throws EntryNotFoundException;
+  
+  /**
+   * Updates the Flow definition in the repository,
+   * using the Flow's name to identify the repository entry that must be updated.
+   * <p>
+   * In a versioned repository, this should increase the major version nr for the flow.
+   * </p>
+   * 
+   * @param updatedFlow
+   * @param activate true if the given flow should be directly set as the active revision;
+   *   false if the current active revision for the same flowCode should remain active.
+   * @return the handle to the updated repository entry
+   * @throws EntryNotFoundException when the flow's name does not correspond to a Flow entry in this repository
+   */
+  FlowHandle update(Flow updatedFlow, boolean activate) throws EntryNotFoundException;
+  
+  /**
+   * Updates the Flow definition in the repository,
+   * using the given FlowHandle to identify the repository entry that must be updated.
+   * <p>
+   * In a versioned repository, this should increase the major version nr for the flow.
+   * </p>
+   * 
+   * @param handle
+   * @param updatedFlow
+   * @param activate true if the given flow should be directly set as the active revision;
+   *   false if the current active revision for the same flowCode should remain active.
+   * @return the handle to the updated repository entry
+   * @throws EntryNotFoundException when the handle does not correspond to a Flow entry in this repository
+   */
+  FlowHandle update(FlowHandle handle, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
+  
+  /**
+   * Updates the Flow definition in the repository,
+   * using the given code to identify the repository entry that must be updated.
+   * <p>
+   * In a versioned repository, this should increase the major version nr for the flow.
+   * </p>
+   * 
+   * @param flowCode
+   * @param updatedFlow
+   * @param activate true if the given flow should be directly set as the active revision;
+   *   false if the current active revision for the same flowCode should remain active.
+   * @return the handle to the updated repository entry
+   * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
+   */
+  FlowHandle update(String flowCode, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
   
   /**
    * Returns the Flow stored in the repository for the given code, in the version that is currently activated.
@@ -105,54 +152,5 @@ public interface FlowRepositoryService {
    * @return the handle to the flow revision that was active before
    * @throws EntryNotFoundException
    */
-  FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException;
-  
-  /**
-   * Updates the Flow definition in the repository,
-   * using the Flow's name to identify the repository entry that must be updated.
-   * <p>
-   * In a versioned repository, this should increase the major version nr for the flow.
-   * </p>
-   * 
-   * @param updatedFlow
-   * @param activate true if the given flow should be directly set as the active revision;
-   *   false if the current active revision for the same flowCode should remain active.
-   * @return the handle to the updated repository entry
-   * @throws EntryNotFoundException when the flow's name does not correspond to a Flow entry in this repository
-   */
-  FlowHandle updateFlow(Flow updatedFlow, boolean activate) throws EntryNotFoundException;
-  
-  /**
-   * Updates the Flow definition in the repository,
-   * using the given FlowHandle to identify the repository entry that must be updated.
-   * <p>
-   * In a versioned repository, this should increase the major version nr for the flow.
-   * </p>
-   * 
-   * @param handle
-   * @param updatedFlow
-   * @param activate true if the given flow should be directly set as the active revision;
-   *   false if the current active revision for the same flowCode should remain active.
-   * @return the handle to the updated repository entry
-   * @throws EntryNotFoundException when the handle does not correspond to a Flow entry in this repository
-   */
-  FlowHandle updateFlow(FlowHandle handle, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
-  
-  /**
-   * Updates the Flow definition in the repository,
-   * using the given code to identify the repository entry that must be updated.
-   * <p>
-   * In a versioned repository, this should increase the major version nr for the flow.
-   * </p>
-   * 
-   * @param flowCode
-   * @param updatedFlow
-   * @param activate true if the given flow should be directly set as the active revision;
-   *   false if the current active revision for the same flowCode should remain active.
-   * @return the handle to the updated repository entry
-   * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
-   */
-  FlowHandle updateFlow(String flowCode, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
-  
-  
+  FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException;  
 }

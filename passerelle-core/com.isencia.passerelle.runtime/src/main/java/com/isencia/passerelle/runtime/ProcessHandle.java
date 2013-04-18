@@ -14,22 +14,22 @@
 */
 package com.isencia.passerelle.runtime;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import com.isencia.passerelle.core.Event;
+
+
 
 /**
+ * A light-weight handle on a Flow-based process execution.
+ * <p>
+ * </p>
+ * 
  * @author erwin
  *
  */
 public interface ProcessHandle {
-  
-  /**
-   * For context-aware executions, this returns the same as <code>getProcessingContextId()</code>.
-   * For executions without assigned <code>Context</code>s, this returns an id that can be used to
-   * uniquely identify the execution in any related actions, e.g. to obtain execution logs, pause/resume it etc.
-   * 
-   * @return the UUID of the process execution;
-   * 
-   */
-  String getExecutionId();
   
   /**
    * 
@@ -38,13 +38,43 @@ public interface ProcessHandle {
   FlowHandle getFlow();
   
   /**
-   * For non-context-aware executions, this returns null.<br/>
-   * For context-aware executions, the returned id can be used to retrieve 
+   * For context-aware executions, this can be used to retrieve 
    * the <code>Context</code> from the <code>ContextRepository</code> if needed.
-   * Remark that such retrieval can be a heavy operation and should only be attempted when really necessary. 
+   * <b>Remark that such retrieval can be a heavy operation and should only be attempted when really necessary.</b> 
+   * <br/>
+   * For process executions without assigned <code>Context</code>s, this returns an id that can be used to
+   * uniquely identify the execution in any related actions, e.g. to obtain execution logs, pause/resume it etc.
    * 
-   * @return the UUID for the processing context, or null if no context was assigned.
+   * @return the UUID of the process execution;
+   * 
    */
-  String getProcessingContextId();
-
+  String getProcessId();
+  
+  /**
+   * 
+   * @return the current execution status
+   */
+  ProcessExecutionStatus getExecutionStatus();
+  
+  ProcessHandle terminate();
+  ProcessHandle suspend();
+  ProcessHandle resume();
+  ProcessHandle step();
+  ProcessHandle signalEvent(Event event);
+  List<Event> getProcessEvents();
+  
+  /**
+   * Wait until the process has finished and return the final status.
+   * <p>
+   * If the process has not finished before the given maximum wait time,
+   * a TimeOutException is thrown.
+   * </p>
+   * @param time
+   * @param unit
+   * @return the final status
+   * 
+   * @throws InterruptedException when the waiting thread has been interrupted
+   * @throws TimeoutException when the process did not finish within the given maximum wait time
+   */
+  ProcessExecutionStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException;
 }
