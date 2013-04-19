@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import ptolemy.kernel.util.NamedObj;
@@ -67,11 +68,8 @@ public abstract class AbstractEvent implements Event {
     return eventProperties.get(propName);
   }
   
-  public String[] getPropertyNames() {
-    int size = eventProperties.size();
-    String[] result = new String[size];
-    eventProperties.keySet().toArray(result);
-    return result;
+  public Iterator<String> getPropertyNames() {
+    return eventProperties.keySet().iterator();
   }
   
   /**

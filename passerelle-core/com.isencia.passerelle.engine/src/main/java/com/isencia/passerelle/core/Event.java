@@ -17,6 +17,7 @@ package com.isencia.passerelle.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Events for Passerelle are light-weight objects that can e.g. be used for high-throughput CEP scenarios.
@@ -59,5 +60,5 @@ public interface Event extends Serializable {
   
   String getProperty(String propName);
   
-  String[] getPropertyNames();
+  Iterator<String> getPropertyNames();
 }

@@ -84,16 +84,18 @@ public interface FlowProcessingService {
   /**
    * 
    * @param processHandle
-   * @return the list of processing events, from oldest to newest
+   * @param maxCount
+   * @return the list of processing events, from newest to oldest and limited to the given maxCount
    */
-  List<Event> getProcessEvents(ProcessHandle processHandle);
+  List<Event> getProcessEvents(ProcessHandle processHandle, int maxCount);
   
   /**
    * 
    * @param processId
-   * @return the list of processing events, from oldest to newest
+   * @param maxCount
+   * @return the list of processing events, from newest to oldest and limited to the given maxCount
    */
-  List<Event> getProcessEvents(String processId);
+  List<Event> getProcessEvents(String processId, int maxCount);
 
   /**
    * 
