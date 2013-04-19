@@ -14,41 +14,14 @@
  */
 package com.isencia.passerelle.process.model;
 
-import java.io.Serializable;
-import java.util.Date;
 
 /**
- * Events for Passerelle are light-weight objects that can e.g. be used for high-throughput CEP scenarios.
- * <p>
- * This implies :
- * <ul>
- * <li>They have a (start) timestamp</li>
- * <li>They have an optional duration (i.e. could be 0)</li>
- * <li>They have a topic, just because that's easy to differentiate them, refer to them etc</li>
- * <li>They are not persisted entities or anything heavy like that...</li>
- * </ul>
- * </p>
- * Implementations can add "content" as necessary, besides the pure time info... <br/>
+ * TODO : This intermediate level should/could disappear, and the core.Event should be used directly for impls etc.
+ * But there are some pending dependencies on this interface that must be refactored first.
  * 
- * @author delerw
+ * @author erwin
+ * 
+ * @deprecated Refer to the interface {@link com.isencia.passerelle.core.Event} directly instead.
  */
-public interface Event extends Serializable {
-
-  /**
-   * @return the event's topic
-   */
-  String getTopic();
-
-  /**
-   * @return the creation timestamp of the event
-   */
-  Date getCreationTS();
-
-  /**
-   * When this event represents a temporary "situation", the duration identifies the time (in ms), from the creationTS, that the situation will remain the same.
-   * For the vast majority of items, this will be irrelevant, in which case it will just return 0.
-   * 
-   * @return the duration in ms
-   */
-  Long getDuration();
+public interface Event extends com.isencia.passerelle.core.Event {
 }

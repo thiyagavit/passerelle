@@ -3,7 +3,9 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 
@@ -76,4 +78,18 @@ public class ContextEventImpl implements ContextEvent {
 			.append(topic, rhsImpl.topic).toComparison();
 	}
 
+  public String getProperty(String propName) {
+    Serializable entryValue = getContext().getEntryValue(propName);
+    if(entryValue==null) {
+      return null;
+    } else if (entryValue instanceof String) {
+      return (String) entryValue;
+    } else {
+      return entryValue.toString();
+    }
+  }
+
+  public Iterator<String> getPropertyNames() {
+    return getContext().getEntryNames();
+  }
 }

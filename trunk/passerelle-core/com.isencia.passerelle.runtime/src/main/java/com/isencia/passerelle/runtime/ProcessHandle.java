@@ -61,7 +61,13 @@ public interface ProcessHandle {
   ProcessHandle resume();
   ProcessHandle step();
   ProcessHandle signalEvent(Event event);
-  List<Event> getProcessEvents();
+  
+  /**
+   * 
+   * @param maxCount
+   * @return the list of processing events, from newest to oldest
+   */
+  List<Event> getProcessEvents(int maxCount);
   
   /**
    * Wait until the process has finished and return the final status.

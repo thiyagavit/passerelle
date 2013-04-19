@@ -3,8 +3,9 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.io.Serializable;
 import java.util.Date;
-
+import java.util.Iterator;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -21,9 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-
 import org.apache.commons.lang.builder.CompareToBuilder;
-
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 
@@ -126,4 +125,18 @@ public class ContextEventImpl implements ContextEvent {
     return new CompareToBuilder().append(creationTS, rhsImpl.creationTS).append(topic, rhsImpl.topic).toComparison();
 	}
 
+  public String getProperty(String propName) {
+    Serializable entryValue = getContext().getEntryValue(propName);
+    if(entryValue==null) {
+      return null;
+    } else if (entryValue instanceof String) {
+      return (String) entryValue;
+    } else {
+      return entryValue.toString();
+    }
+  }
+
+  public Iterator<String> getPropertyNames() {
+    return getContext().getEntryNames();
+  }
 }
