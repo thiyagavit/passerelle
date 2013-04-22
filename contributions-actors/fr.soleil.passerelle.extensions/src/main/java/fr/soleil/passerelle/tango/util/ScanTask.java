@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.PasserelleException.Severity;
+
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
 import fr.soleil.salsa.api.SalsaAPI;
 import fr.soleil.salsa.entity.IConfig;
+import fr.soleil.salsa.entity.IScanStatus;
 import fr.soleil.salsa.entity.ScanState;
 import fr.soleil.salsa.exception.SalsaException;
 import fr.soleil.salsa.exception.SalsaLoggingException;
@@ -62,8 +64,9 @@ public class ScanTask implements Runnable {
 
 			if (currentSalsaApi.getScanState() == ScanState.ABORT) {
 				hasFailed = true;
+				final IScanStatus status = currentSalsaApi.getStatus();
 				exception = new PasserelleException(Severity.FATAL,
-						"The Scan has been interrupted", null, null);
+						"The Scan has been interrupted with status: " + status.getStatus(), null, null);
 			}
 
 		} catch (final SalsaException e) {
