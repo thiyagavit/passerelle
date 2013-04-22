@@ -1253,8 +1253,10 @@ public abstract class HMIBase implements ChangeListener {
             if (newModelName.contains(".moml")) {
               newModelName = newModelName.replace(".moml", "");
             }
+            final String oldName = model.getName();
             model.setName(newModelName);
             model.exportMoML(outputWriter);
+            model.setName(oldName);
           } finally {
             if (outputWriter != null) {
               outputWriter.flush();
