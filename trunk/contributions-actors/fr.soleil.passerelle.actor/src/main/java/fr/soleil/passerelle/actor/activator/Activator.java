@@ -18,6 +18,10 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import com.isencia.passerelle.ext.ModelElementClassProvider;
+import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
+import fr.soleil.passerelle.actor.flow5.ForLoop;
+import fr.soleil.passerelle.actor.flow5.ForLoopWithPortCfg;
+import fr.soleil.passerelle.actor.flow5.ValueListSplitter;
 
 /**
  * Registers the ActorProvider as an OSGi service.
@@ -28,11 +32,30 @@ import com.isencia.passerelle.ext.ModelElementClassProvider;
 public class Activator implements BundleActivator {
   @SuppressWarnings("rawtypes")
   private ServiceRegistration apSvcReg;
+  private BundleActivator testFragmentActivator;
   
   public void start(BundleContext context) throws Exception {
-    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new ActorProvider(), null);
+    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), 
+        new DefaultModelElementClassProvider(
+            ForLoop.class,
+            ForLoopWithPortCfg.class,
+            ValueListSplitter.class
+            ), 
+        null);
+    
+    try {
+      Class<? extends BundleActivator> svcTester = (Class<? extends BundleActivator>) Class.forName("fr.soleil.passerelle.actor.activator.TestFragmentActivator");
+      testFragmentActivator = svcTester.newInstance();
+      testFragmentActivator.start(context);
+    } catch (ClassNotFoundException e) {
+      // ignore, means the test fragment is not present...
+      // it's a dirty way to find out, but don't know how to discover fragment contribution in a better way...
+    }
   }
   public void stop(BundleContext context) throws Exception {
+    if (testFragmentActivator != null) {
+      testFragmentActivator.stop(context);
+    }
     apSvcReg.unregister();
   }
 }
