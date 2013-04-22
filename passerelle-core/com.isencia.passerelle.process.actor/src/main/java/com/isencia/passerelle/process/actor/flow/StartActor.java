@@ -83,10 +83,13 @@ public class StartActor extends Actor {
         context = constructNewRequestContextForFlow(flow, systemParameterMap, applicationParameterMap);
       }
       try {
-        ptolemy.data.expr.Parameter parameter = new ptolemy.data.expr.Parameter(flow, "requestId");
+        Parameter parameter = (Parameter) flow.getAttribute("requestId", Parameter.class);
+        if (parameter == null) {
+          parameter = new Parameter(flow, "requestId");
+        }
         parameter.setExpression(context.getRequest().getId().toString());
       } catch (Exception e) {
-        getLogger().warn(ErrorCode.ACTOR_EXECUTION_ERROR+" - Error setting requestId parameter", e);
+        getLogger().warn(ErrorCode.ACTOR_EXECUTION_ERROR + " - Error setting requestId parameter", e);
       }
       notifyStarted(context);
       ManagedMessage message = createMessage(context, ManagedMessage.objectContentType);
@@ -150,14 +153,14 @@ public class StartActor extends Actor {
     try {
       new Parameter(flow, "context", new ObjectToken(context));
     } catch (Exception e) {
-      getLogger().warn(ErrorCode.ACTOR_EXECUTION_ERROR+" - Error setting context parameter", e);
+      getLogger().warn(ErrorCode.ACTOR_EXECUTION_ERROR + " - Error setting context parameter", e);
     }
     putRequestIdOnMDC(context);
     return context;
   }
 
   protected void notifyStarted(Context context) {
-    if (!Status.STARTED.equals(context.getStatus())) {
+    if (!Status.STARTED.equals(context.getStatus()) && !Status.RESTARTED.equals(context.getStatus())) {
       context.setStatus(Status.STARTED);
     }
   }
