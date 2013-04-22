@@ -163,7 +163,7 @@ public class ContextImpl implements Context {
   }
 
   public boolean setStatus(Status status) {
-    if (this.status != null && this.status.isFinalStatus()) {
+    if (this.status != null && this.status.isFinalStatus() && !Status.RESTARTED.equals(status)) {
       return false;
     } else {
       this.status = status;
@@ -480,4 +480,5 @@ public class ContextImpl implements Context {
   public synchronized boolean isMinimized() {
     return minimized;
   }
+
 }

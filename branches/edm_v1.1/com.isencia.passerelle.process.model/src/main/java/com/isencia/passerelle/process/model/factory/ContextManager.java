@@ -93,6 +93,13 @@ public interface ContextManager {
 	 * @param context Context that started
 	 */
 	Context notifyTimeOut(Context context);
+	
+	/**
+	 * Notify listeners that the processing of the context has to be restarted.
+	 *
+	 * @param context Context that restarted
+	 */
+	Context notifyRestarted(Context context,Context taskContext);
 
 	/**
 	 * Notify listeners that the processing of the context
