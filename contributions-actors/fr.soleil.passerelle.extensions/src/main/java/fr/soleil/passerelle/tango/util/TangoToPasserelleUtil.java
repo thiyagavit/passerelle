@@ -7,10 +7,10 @@
  */
 package fr.soleil.passerelle.tango.util;
 
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;

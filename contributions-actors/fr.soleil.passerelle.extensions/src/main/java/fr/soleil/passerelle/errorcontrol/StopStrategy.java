@@ -9,11 +9,11 @@
 package fr.soleil.passerelle.errorcontrol;
 
 import ptolemy.actor.CompositeActor;
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**

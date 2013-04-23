@@ -1,5 +1,6 @@
 package fr.soleil.passerelle.errorcontrol;
 
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -8,7 +9,7 @@ import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
 import com.isencia.passerelle.actor.ValidationException;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
 import com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -35,7 +36,7 @@ public class DefaultErrorControlStrategy extends Attribute implements ErrorContr
 	 */
 	public DefaultErrorControlStrategy(Director container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container,name);
-		container.getAdapter(null).setErrorControlStrategy(this,false);
+		DirectorUtils.getAdapter(container, null).setErrorControlStrategy(this,false);
 	}
 
 	public void handleFireException(Actor a, ProcessingException e) throws IllegalActionException {

@@ -6,9 +6,10 @@ package fr.soleil.passerelle.control.tango;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ExecutionPrePostProcessor;
 
 /**
@@ -22,7 +23,7 @@ public class SamplePrePostProcessor extends AbstractExecutionPrePostProcessor im
 
 	public SamplePrePostProcessor(Director container, String name) throws IllegalActionException, NameDuplicationException {
 		super(container, name);
-		container.getAdapter(null).setExecutionPrePostProcessor(this);
+		DirectorUtils.getAdapter(container, null).setExecutionPrePostProcessor(this);
 	}
 
 	/* (non-Javadoc)

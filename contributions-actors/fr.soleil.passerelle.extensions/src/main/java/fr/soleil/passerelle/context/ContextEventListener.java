@@ -3,6 +3,7 @@ package fr.soleil.passerelle.context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.CompositeActor;
+import ptolemy.actor.Director;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Manager;
 import ptolemy.data.StringToken;
@@ -12,7 +13,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.FiringEventListener;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
@@ -43,7 +44,8 @@ public class ContextEventListener extends Attribute implements FiringEventListen
 
   public ContextEventListener(final Director container, final String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-    container.getAdapter(null).registerFiringEventListener(this);
+    
+    DirectorUtils.getAdapter(container,null).registerFiringEventListener(this);
 
     if (container.getAttribute(CONTEXT_NAME) == null) {
       new StringParameter(container, CONTEXT_NAME);
@@ -138,13 +140,13 @@ public class ContextEventListener extends Attribute implements FiringEventListen
           }
         } else {
           if (firtTurn) {
-            ExecutionTracerService.trace((com.isencia.passerelle.domain.cap.Director) e.getDirector(), "ERROR - context device is not alive");
+            ExecutionTracerService.trace(e.getDirector(), "ERROR - context device is not alive");
           }
         }
         if (!contextValidity) {
           // System.out.println("Context invalid, waiting");
           if (firtTurn) {
-            ExecutionTracerService.trace((com.isencia.passerelle.domain.cap.Director) e.getDirector(), "WAITING - CONTEXT INVALID");
+            ExecutionTracerService.trace(e.getDirector(), "WAITING - CONTEXT INVALID");
             firtTurn = false;
           }
           try {
@@ -171,12 +173,12 @@ public class ContextEventListener extends Attribute implements FiringEventListen
           // (Actor)null));
         }
       } else {
-        ExecutionTracerService.trace((com.isencia.passerelle.domain.cap.Director) e.getDirector(), "ERROR - context device is not alive");
+        ExecutionTracerService.trace(e.getDirector(), "ERROR - context device is not alive");
       }
 
       if (!contextValidity) {
         // stopping = true;
-        ExecutionTracerService.trace((com.isencia.passerelle.domain.cap.Director) e.getDirector(), "STOPPING - CONTEXT INVALID");
+        ExecutionTracerService.trace(e.getDirector(), "STOPPING - CONTEXT INVALID");
         // CompositeActor model = (CompositeActor) ((Director)
         // getContainer()).getContainer();
         try {
