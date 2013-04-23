@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/objenesis-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/powermock-reflect-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/powermock-module-testng-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/powermock-core-1.5.jar"/>
