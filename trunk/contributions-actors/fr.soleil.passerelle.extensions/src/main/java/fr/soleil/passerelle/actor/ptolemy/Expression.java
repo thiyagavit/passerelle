@@ -214,6 +214,7 @@ public class Expression extends DynamicPortsActor {
 
         Token t = null;
         String input = null;
+        int typeIndex = portNr -1;
         try {
             // put input in ptolemy type
             final Object inputValue = msg.getBodyContent();
@@ -242,20 +243,24 @@ public class Expression extends DynamicPortsActor {
             else {
                 input = inputValue.toString();
             }
-
+          
             if (inputTypes.length <= portNr) {
                 t = inputTypes[0].getTokenForString(input);
             }
             else {
-                t = inputTypes[portNr].getTokenForString(input);
+                // TAke care : port number start to 1 and inputTypes array start to 0
+                t = inputTypes[portNr-1].getTokenForString(input);
             }
         }
+        catch(final ArrayIndexOutOfBoundsException e){
+            throw new ProcessingExceptionWithLog(this,"Invalid configuration (see the input types number)", input, e);
+        }
         catch (final IllegalActionException e) {
-            throw new ProcessingException("input message is not correct", input, e);
+            throw new ProcessingExceptionWithLog(this,"input message is not correct", input, e);
             // t = Token.NIL;
         }
         catch (final MessageException e) {
-            throw new ProcessingException("cannot get input value", msg, e);
+            throw new ProcessingExceptionWithLog(this,"cannot get input value", msg, e);
             // t = Token.NIL;
         }
         catch (final DevFailed e) {
