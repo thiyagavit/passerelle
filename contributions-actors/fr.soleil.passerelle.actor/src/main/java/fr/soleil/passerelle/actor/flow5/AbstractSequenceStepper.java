@@ -74,10 +74,18 @@ public abstract class AbstractSequenceStepper extends Actor {
     return LOGGER;
   }
 
+  
+  // a temporary fix for usage with early Passerelle 8.3.x ; 
+  // to resolve an issue with PortMode.equals that led to ParameterPorts being accepted as msg provider for a MessageBuffer
+  @Override
+  public boolean acceptInputPort(Port p) {
+    return !(PortMode.AGNOSTIC == p.getMode()) && super.acceptInputPort(p);
+  }
+  
   @Override
   protected void doInitialize() throws InitializationException {
-    super.doInitialize();
     stepQueue.clear();
+    super.doInitialize();
   }
 
   /**
