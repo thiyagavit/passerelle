@@ -17,6 +17,7 @@ package com.isencia.passerelle.domain.et;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,8 +25,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.Event;
 
-public abstract class AbstractEvent implements Event {
+public abstract class AbstractEvent extends EventObject implements Event {
   
+  private static final long serialVersionUID = 6094980381771564552L;
+
   private static volatile AtomicLong idCounter = new AtomicLong(0);
 
   private Date timeStamp;
@@ -34,14 +37,11 @@ public abstract class AbstractEvent implements Event {
   
   private Map<String, String> eventProperties =  new HashMap<String, String>();
   
-  protected AbstractEvent(String topic, Date creationTS) {
+  protected AbstractEvent(NamedObj subject, String topic, Date creationTS) {
+    super(subject);
     this.topic = topic;
     this.timeStamp = creationTS;
     this.id = idCounter.incrementAndGet();
-  }
-  
-  protected AbstractEvent(NamedObj subject, String topic, Date creationTS) {
-    this(topic,creationTS);
     eventProperties.put(SUBJECT, subject.getFullName());
   }
 

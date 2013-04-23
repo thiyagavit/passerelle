@@ -38,6 +38,8 @@ import com.isencia.passerelle.core.Port;
  */
 public class SendEvent extends AbstractEvent {
   
+  private static final long serialVersionUID = -5847005338758243421L;
+
   private final static Logger LOGGER = LoggerFactory.getLogger(SendEvent.class);
 
   public final static String TOPIC=TOPIC_PREFIX+"SEND";

@@ -20,6 +20,8 @@ import ptolemy.actor.CompositeActor;
 
 public class FlowExecutionEvent extends AbstractEvent {
 
+  private static final long serialVersionUID = -1686815811270732410L;
+
   public enum FlowExecutionEventType {
     START,FINISH;
   }

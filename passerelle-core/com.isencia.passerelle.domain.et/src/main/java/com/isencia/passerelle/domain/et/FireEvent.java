@@ -21,6 +21,8 @@ import ptolemy.kernel.util.NamedObj;
 
 public class FireEvent extends AbstractEvent {
   
+  private static final long serialVersionUID = -6533792248319025034L;
+
   public final static String TOPIC=TOPIC_PREFIX+"FIRE";
 
   private Actor target;

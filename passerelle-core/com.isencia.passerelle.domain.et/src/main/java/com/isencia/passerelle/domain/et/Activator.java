@@ -22,10 +22,11 @@ import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
 
 public class Activator implements BundleActivator {
 
-  private ServiceRegistration apSvcReg;
+  private ServiceRegistration<ModelElementClassProvider> apSvcReg;
   
+  @SuppressWarnings("unchecked")
   public void start(BundleContext context) throws Exception {
-    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new DefaultModelElementClassProvider(ETDirector.class), null);
+    apSvcReg = (ServiceRegistration<ModelElementClassProvider>) context.registerService(ModelElementClassProvider.class.getName(), new DefaultModelElementClassProvider(ETDirector.class), null);
 
   }
 

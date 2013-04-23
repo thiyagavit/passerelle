@@ -41,7 +41,7 @@ public interface Event extends Serializable {
   public final static String SUBJECT = "com.isencia.passerelle.SUBJECT";
 
   /**
-   * @return the event's topic
+   * @return the event's fully-specified topic
    */
   String getTopic();
   

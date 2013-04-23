@@ -26,6 +26,8 @@ import ptolemy.kernel.util.NamedObj;
  */
 public class TaskStartedEvent<T> extends AbstractEvent {
   
+  private static final long serialVersionUID = 6544105600466662464L;
+
   public final static String TOPIC=TOPIC_PREFIX+"STARTED";
 
   private Actor taskOwner;
