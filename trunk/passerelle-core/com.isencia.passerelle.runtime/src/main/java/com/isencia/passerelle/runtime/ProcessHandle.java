@@ -14,10 +14,8 @@
 */
 package com.isencia.passerelle.runtime;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import com.isencia.passerelle.core.Event;
 
 
 
@@ -54,21 +52,14 @@ public interface ProcessHandle {
    * 
    * @return the current execution status
    */
-  ProcessExecutionStatus getExecutionStatus();
-  
-  ProcessHandle terminate();
-  ProcessHandle suspend();
-  ProcessHandle resume();
-  ProcessHandle step();
-  ProcessHandle signalEvent(Event event);
+  ProcessStatus getExecutionStatus();
   
   /**
-   * 
-   * @param maxCount
-   * @return the list of processing events, from newest to oldest
+   * Suspensions can  be caused by breakpoints and/or the end of a step execution.
+   * @return the names of the currently suspended Flow elements (typically actors)
    */
-  List<Event> getProcessEvents(int maxCount);
-  
+  String[] getSuspensionElements();
+
   /**
    * Wait until the process has finished and return the final status.
    * <p>
@@ -82,5 +73,5 @@ public interface ProcessHandle {
    * @throws InterruptedException when the waiting thread has been interrupted
    * @throws TimeoutException when the process did not finish within the given maximum wait time
    */
-  ProcessExecutionStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException;
+  ProcessStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException;
 }
