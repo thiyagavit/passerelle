@@ -51,6 +51,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Director;
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Manager;
@@ -77,7 +78,6 @@ import com.isencia.passerelle.diagnosis.actor.util.ServicesRegistry;
 import com.isencia.passerelle.diagnosis.impl.entities.EntityFactory;
 import com.isencia.passerelle.diagnosis.impl.entities.EntityManager;
 import com.isencia.passerelle.director.DirectorUtils;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
 import com.isencia.passerelle.ext.ExecutionTracer;
@@ -344,6 +344,11 @@ public abstract class HMIBase implements ChangeListener {
     ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
     ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
     ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
+    
+//    ServiceRegistry.getInstance().setEntityFactory(new EntityFactoryImpl());
+//    EntityManagerImpl entityManager = new EntityManagerImpl();
+//    ServiceRegistry.getInstance().setEntityManager(entityManager);
+//    ServiceRegistry.getInstance().setContextRepository(new ContextRepositoryImpl(entityManager));
   }
 
   /**
@@ -510,7 +515,7 @@ public abstract class HMIBase implements ChangeListener {
       case 0:
         result = true;
         if (getCurrentModel() != null && getCurrentModel().getManager() != null) {
-          ExecutionTracerService.trace((Director) getCurrentModel().getDirector(), "HMI shutting down. Stopping model execution for "
+          ExecutionTracerService.trace(getCurrentModel().getDirector(), "HMI shutting down. Stopping model execution for "
               + getCurrentModel().getName());
           try {
             getCurrentModel().getManager().stop();
@@ -998,7 +1003,7 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   public Director getDirector() {
-    return (Director) currentModel.getDirector();
+    return currentModel.getDirector();
   }
 
   public ModelBundle getHmiModelsDef() {
@@ -1611,7 +1616,7 @@ public abstract class HMIBase implements ChangeListener {
                     if (actor != null)
                       ExecutionTracerService.trace(actor, trace.getMessage());
                     else if (remoteFlow.getDirector().getName().contains(trace.getSource())) {
-                      ExecutionTracerService.trace((Director) remoteFlow.getDirector(), trace.getMessage());
+                      ExecutionTracerService.trace(remoteFlow.getDirector(), trace.getMessage());
                     }
                   }
                 }
