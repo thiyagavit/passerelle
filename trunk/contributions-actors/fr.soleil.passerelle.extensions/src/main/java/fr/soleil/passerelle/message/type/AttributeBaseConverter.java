@@ -15,13 +15,13 @@ package fr.soleil.passerelle.message.type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Director;
 import ptolemy.data.ArrayToken;
 import ptolemy.data.Token;
 import ptolemy.data.type.Type;
 import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.PasserelleToken;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;

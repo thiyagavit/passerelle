@@ -6,9 +6,10 @@ package fr.soleil.passerelle.control.tango;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.ExecutionPrePostProcessor;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
@@ -40,12 +41,7 @@ public class GeneralPrePostProcessor extends AbstractExecutionPrePostProcessor i
 	 * @see com.isencia.passerelle.ext.ExecutionPrePostProcessor#preProcess()
 	 */
 	public void doPreProcess() {
-	  boolean isMockMode=false;
-    try {
-      isMockMode = dir.getAdapter(null).isMockMode();
-    } catch (IllegalActionException e1) {
-      logger.debug("Error obtaining mock mode setting", e1);
-    }
+	  boolean isMockMode = DirectorUtils.getAdapter(dir, null).isMockMode();
 		if(isMockMode){
 			ExecutionTracerService.trace(dir,"MOCK- ###START SEQUENCE "+modelName +"###");
 		}else{
@@ -67,12 +63,7 @@ public class GeneralPrePostProcessor extends AbstractExecutionPrePostProcessor i
 	 * @see com.isencia.passerelle.ext.ExecutionPrePostProcessor#postProcess()
 	 */
 	public void doPostProcess() {
-    boolean isMockMode=false;
-    try {
-      isMockMode = dir.getAdapter(null).isMockMode();
-    } catch (IllegalActionException e1) {
-      logger.debug("Error obtaining mock mode setting", e1);
-    }
+    boolean isMockMode = DirectorUtils.getAdapter(dir, null).isMockMode();
     if(isMockMode){
 			ExecutionTracerService.trace(dir,"MOCK- ###END SEQUENCE "+modelName +"###");
 		}else{
