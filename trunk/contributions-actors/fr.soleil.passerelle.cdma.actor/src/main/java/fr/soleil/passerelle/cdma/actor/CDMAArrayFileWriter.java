@@ -14,27 +14,29 @@
 */
 package fr.soleil.passerelle.cdma.actor;
 
+import java.io.File;
 import org.cdma.engine.nexus.array.NexusArray;
+import org.cdma.engine.nexus.navigation.NexusDataItem;
+import org.cdma.engine.nexus.navigation.NexusDataset;
 import org.cdma.interfaces.IArray;
 import org.cdma.plugin.soleil.array.NxsArray;
+import org.cdma.plugin.soleil.internal.NexusDatasetImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import fr.soleil.nexus.AcquisitionData;
+import com.isencia.passerelle.core.ErrorCode;
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.message.ManagedMessage;
 import fr.soleil.nexus.DataItem;
 import fr.soleil.nexus.PathData;
-import fr.soleil.nexus.PathNexus;
 
 
 /**
@@ -68,13 +70,31 @@ public class CDMAArrayFileWriter extends Actor {
       NxsArray array = (NxsArray) msg.getBodyContent();
       IArray[] parts = array.getArrayParts();
       NexusArray nxsArr = (NexusArray) parts[0];
-      DataItem dataItem = nxsArr.getDataItem();
-      AcquisitionData writer = new AcquisitionData();
-//      PathGroup pathGroup = new PathGroup(PathNexus.splitStringPath("my/attr"));
-      writer.setFile("C:/temp/test.nxs");
-      writer.writeAttr("hello", array.getFactoryName(), PathNexus.ROOT_PATH);
+////      DataItem dataItem = nxsArr.getDataItem();
+//      AcquisitionData writer = new AcquisitionData();
+////      PathGroup pathGroup = new PathGroup(PathNexus.splitStringPath("my/attr"));
+//      writer.setFile("C:/temp/test.nxs");
+//      writer.writeAttr("hello", array.getFactoryName(), PathNexus.ROOT_PATH);
 //      writer.writeData(dataItem, PathData.Convert(dataItem.getPath()));
-      writer.finalize();
+//      writer.finalize();
+      
+      //NxsDataset nxsDataset = NxsDataset.instanciate(new URI("C:/temp/test.nxs"));
+      
+     // IFactory nxsFactory = Factory.getFactory("SoleilNeXus");
+      
+      NexusDataset nxsDataset = new NexusDatasetImpl(new File("C:/temp/test.nxs"),false);
+      DataItem item = new DataItem(nxsArr.getStorage());
+      item.setPath(PathData.ROOT_PATH);
+      NexusDataItem dataItem = new NexusDataItem(array.getFactoryName(),item,nxsDataset.getRootGroup(),nxsDataset);
+      dataItem.setParent(nxsDataset.getRootGroup());
+      dataItem.setName("mydataitem");
+//      NexusAttribute attr = new NexusAttribute(array.getFactoryName(), "hello", "world");
+      nxsDataset.getRootGroup().addDataItem(dataItem);
+      
+      
+      nxsDataset.getRootGroup().addStringAttribute("hello", "world");
+      
+      nxsDataset.save();
     } catch (Throwable e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "", this, e);
     }

@@ -16,9 +16,11 @@ package fr.soleil.passerelle.cdma.actor;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.logging.Level;
 import org.cdma.Factory;
 import org.cdma.interfaces.IDataset;
+import org.cdma.interfaces.IDatasource;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -64,6 +66,13 @@ public class CDMADataSetReader extends Actor {
   @Override
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
+    
+    List<IDatasource> list = Factory.getDatasources();
+    System.out.println("available plugins ");
+    for (IDatasource iDatasource : list) {
+      System.out.println("plugin name " + iDatasource.getFactoryName());
+    }
+
     Factory.getLogger().setLevel(Level.WARNING);
     Factory.setDictionariesFolder("C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_Dictionaries");
     Factory.setActiveView("DATA_REDUCTION");
