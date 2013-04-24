@@ -13,7 +13,7 @@
         </property>
         <property name="__directorAdapter" class="com.isencia.passerelle.ext.impl.DefaultDirectorAdapter">
         </property>
-        <property name="Stop for unhandled Error" class="ptolemy.data.expr.Parameter" value="false">
+        <property name="Stop for unhandled Error" class="ptolemy.data.expr.Parameter" value="true">
             <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
             </property>
         </property>
@@ -112,7 +112,7 @@
         <link port="CDMADataItemSelector.output" relation="relation2"/>
     </entity>
     <entity name="CDMADataSetSlicer" class="fr.soleil.passerelle.cdma.actor.CDMADataSetSlicer">
-        <property name="Slice rank" class="ptolemy.data.expr.Parameter" value="1">
+        <property name="Slice rank" class="ptolemy.data.expr.Parameter" value="2">
         </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
@@ -183,11 +183,17 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="[855.0, 345.0]">
         </property>
     </entity>
-    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+    <entity name="CDMAArrayFileWriter" class="fr.soleil.passerelle.cdma.actor.CDMAArrayFileWriter">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
-    </relation>
-    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[795.0, 410.0]">
+        </property>
+    </entity>
+    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -207,11 +213,19 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="relation_4" class="ptolemy.actor.TypedIORelation">
+    <relation name="relation_8" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="relation_8" class="ptolemy.actor.TypedIORelation">
+    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_9" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_4" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -228,7 +242,9 @@
     <link port="Dumper Before change.input" relation="relation"/>
     <link port="Dumper Before change.output" relation="relation_7"/>
     <link port="CDMAArrayValueModifier.input" relation="relation_7"/>
+    <link port="CDMAArrayValueModifier.output" relation="relation_9"/>
     <link port="CDMAArrayValueModifier.output" relation="relation_4"/>
     <link port="Dumper after change.input" relation="relation_4"/>
     <link port="Dumper after change.output" relation="relation_8"/>
+    <link port="CDMAArrayFileWriter.input" relation="relation_9"/>
 </entity>
