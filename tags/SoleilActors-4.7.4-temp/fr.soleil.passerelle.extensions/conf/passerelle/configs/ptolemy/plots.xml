@@ -1,0 +1,45 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE plot PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="plots" class="ptolemy.moml.EntityLibrary">
+  <configure>
+    <?moml
+      <group>
+<doc>Ptolemy plotters</doc>
+
+<entity name="SequencePlotter" class="ptolemy.actor.lib.gui.SequencePlotter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SequenceScope" class="ptolemy.actor.lib.gui.SequenceScope">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="XYPlotter" class="ptolemy.actor.lib.gui.XYPlotter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="XYScope" class="ptolemy.actor.lib.gui.XYScope">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="ArrayPlotter" class="ptolemy.actor.lib.gui.ArrayPlotter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="BarGraph" class="ptolemy.actor.lib.gui.BarGraph">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="HistogramPlotter" class="ptolemy.actor.lib.gui.HistogramPlotter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="RealTimePlotter" class="ptolemy.actor.lib.gui.RealTimePlotter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+      </group>
+    ?>
+  </configure>
+</entity>
