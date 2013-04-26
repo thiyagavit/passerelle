@@ -214,7 +214,7 @@ public class Expression extends DynamicPortsActor {
 
         Token t = null;
         String input = null;
-        int typeIndex = portNr -1;
+        
         try {
             // put input in ptolemy type
             final Object inputValue = msg.getBodyContent();
@@ -243,13 +243,15 @@ public class Expression extends DynamicPortsActor {
             else {
                 input = inputValue.toString();
             }
-          
-            if (inputTypes.length <= portNr) {
+            
+            final int typeIndex = portNr -1;
+            if (inputTypes.length <= typeIndex ) {
+                // Take the fisrt by default ! Good practice ?
                 t = inputTypes[0].getTokenForString(input);
             }
             else {
                 // TAke care : port number start to 1 and inputTypes array start to 0
-                t = inputTypes[portNr-1].getTokenForString(input);
+                t = inputTypes[typeIndex].getTokenForString(input);
             }
         }
         catch(final ArrayIndexOutOfBoundsException e){
