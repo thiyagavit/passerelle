@@ -14,10 +14,7 @@
 */
 package com.isencia.passerelle.runtime.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * A simple implementation of a version specification, based on a merge of OSGi-conventions and Ptolemy (which in turn seems to be based on JNLP).
@@ -38,7 +35,7 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
   private int major;
   private int minor;
   private int micro;
-  private List<String> qualifiers = new ArrayList<String>();
+  private String[] qualifiers = new String[0];
 
   /**
    * @param major
@@ -51,7 +48,7 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
     this.minor = minor;
     this.micro = micro;
     if (qualifiers != null) {
-      Collections.addAll(this.qualifiers, qualifiers);
+      this.qualifiers = qualifiers;
     }
   }
 
@@ -67,8 +64,20 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
     return micro;
   }
 
-  public Iterator<String> getQualifiers() {
-    return qualifiers.iterator();
+  public String[] getQualifiers() {
+    return Arrays.copyOf(qualifiers, qualifiers.length);
+  }
+  
+  public ThreeDigitVersionSpecification increaseMicro() {
+    return new ThreeDigitVersionSpecification(major, minor, micro+1);
+  }
+
+  public ThreeDigitVersionSpecification increaseMinor() {
+    return new ThreeDigitVersionSpecification(major, minor+1, micro);
+  }
+
+  public ThreeDigitVersionSpecification increaseMajor() {
+    return new ThreeDigitVersionSpecification(major+1, minor, micro);
   }
 
   public int compareTo(VersionSpecification otherVersSpec) {
@@ -85,17 +94,17 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
       result = micro - other.micro;
       if (result != 0)
         return result;
-      else if (qualifiers.size() > 0) {
-        if (other.qualifiers.size() > 0) {
-          int maxQualifierCount = Math.max(qualifiers.size(), other.qualifiers.size());
+      else if (qualifiers.length > 0) {
+        if (other.qualifiers.length > 0) {
+          int maxQualifierCount = Math.max(qualifiers.length, other.qualifiers.length);
           for (int i = 0; i < maxQualifierCount; ++i) {
             String myQualifier = "";
             String otherQualifier = "";
-            if (i < qualifiers.size()) {
-              myQualifier = qualifiers.get(i);
+            if (i < qualifiers.length) {
+              myQualifier = qualifiers[i];
             }
-            if (i < other.qualifiers.size()) {
-              otherQualifier = other.qualifiers.get(i);
+            if (i < other.qualifiers.length) {
+              otherQualifier = other.qualifiers[i];
             }
             int cmp = myQualifier.compareTo(otherQualifier);
             if (cmp > 0) {
@@ -108,7 +117,7 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
         } else {
           return 1;
         }
-      } else if (other.qualifiers.size() > 0) {
+      } else if (other.qualifiers.length > 0) {
         return -1;
       } else {
         return 0;
@@ -144,7 +153,7 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
       return false;
     if (minor != other.minor)
       return false;
-    if (!qualifiers.equals(other.qualifiers))
+    if (!Arrays.equals(qualifiers,other.qualifiers))
       return false;
     return true;
   }
@@ -161,7 +170,6 @@ public class ThreeDigitVersionSpecification extends VersionSpecification impleme
       }
       versionString = versionStrBldr.toString();
     }
-
     return versionString;
   }
 }

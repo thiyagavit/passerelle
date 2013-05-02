@@ -15,6 +15,7 @@
 package com.isencia.passerelle.runtime.repository;
 
 import com.isencia.passerelle.core.ErrorCode;
+import com.isencia.passerelle.model.Flow;
 
 /**
  * @author erwin
@@ -25,11 +26,9 @@ public class DuplicateEntryException extends RepositoryException {
   private static final long serialVersionUID = 7349254541339728923L;
 
   /**
-   * @param errorCode
-   * @param message
-   * @param rootException
+   * @param flow
    */
-  public DuplicateEntryException(ErrorCode errorCode, String message) {
-    super(errorCode, message, null);
+  public DuplicateEntryException(Flow flow) {
+    super(ErrorCode.FLOW_SAVING_ERROR_FUNC, "Flow already exists in the repository", flow, null);
   }
 }
