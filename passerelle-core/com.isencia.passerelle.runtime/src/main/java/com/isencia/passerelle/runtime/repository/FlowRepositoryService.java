@@ -14,7 +14,6 @@
 */
 package com.isencia.passerelle.runtime.repository;
 
-import java.util.List;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.FlowHandle;
 
@@ -75,22 +74,7 @@ public interface FlowRepositoryService {
    * @return all versions of the Flow, that were stored in the repository for the given flowCode.
    * @throws EntryNotFoundException
    */
-  List<FlowHandle> delete(String flowCode) throws EntryNotFoundException;
-  
-  /**
-   * Updates the Flow definition in the repository,
-   * using the Flow's name to identify the repository entry that must be updated.
-   * <p>
-   * In a versioned repository, this should increase the major version nr for the flow.
-   * </p>
-   * 
-   * @param updatedFlow
-   * @param activate true if the given flow should be directly set as the active revision;
-   *   false if the current active revision for the same flowCode should remain active.
-   * @return the handle to the updated repository entry
-   * @throws EntryNotFoundException when the flow's name does not correspond to a Flow entry in this repository
-   */
-  FlowHandle update(Flow updatedFlow, boolean activate) throws EntryNotFoundException;
+  FlowHandle[] delete(String flowCode) throws EntryNotFoundException;
   
   /**
    * Updates the Flow definition in the repository,
@@ -109,22 +93,6 @@ public interface FlowRepositoryService {
   FlowHandle update(FlowHandle handle, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
   
   /**
-   * Updates the Flow definition in the repository,
-   * using the given code to identify the repository entry that must be updated.
-   * <p>
-   * In a versioned repository, this should increase the major version nr for the flow.
-   * </p>
-   * 
-   * @param flowCode
-   * @param updatedFlow
-   * @param activate true if the given flow should be directly set as the active revision;
-   *   false if the current active revision for the same flowCode should remain active.
-   * @return the handle to the updated repository entry
-   * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
-   */
-  FlowHandle update(String flowCode, Flow updatedFlow, boolean activate) throws EntryNotFoundException;
-  
-  /**
    * Returns the Flow stored in the repository for the given code, in the version that is currently activated.
    * 
    * @param flowCode
@@ -134,9 +102,18 @@ public interface FlowRepositoryService {
   FlowHandle getActiveFlow(String flowCode) throws EntryNotFoundException;
   
   /**
+   * Returns the Flow stored in the repository for the given code, in the most recent version.
+   * 
+   * @param flowCode
+   * @return the most recent FlowHandle for the given code 
+   * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
+   */
+  FlowHandle getMostRecentFlow(String flowCode) throws EntryNotFoundException;
+  
+  /**
    * @return list of all Flow codes, for which Flows are stored in the repository.
    */
-  List<String> getAllFlowCodes();
+  String[] getAllFlowCodes();
   
   /**
    * 
@@ -144,7 +121,7 @@ public interface FlowRepositoryService {
    * @return handles for all flow versions in the repository for the given code
    * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
    */
-  List<FlowHandle> getAllFlowRevisions(String flowCode) throws EntryNotFoundException;
+  FlowHandle[] getAllFlowRevisions(String flowCode) throws EntryNotFoundException;
   
   /**
    * 
