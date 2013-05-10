@@ -75,6 +75,43 @@ public class FlowRepositoryTest1 extends TestCase {
     assertEquals("Committed flow not returned as active flow", commitHandle, activeHandle);
   }
 
+  public void testMostRecentFlowAfterCommit() throws Exception {
+    FlowHandle commitHandle = repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    FlowHandle mostRecentHandle = repositoryService.getMostRecentFlow(HELLO_CODE);
+    
+    assertEquals("Committed flow not returned as most recent flow", commitHandle, mostRecentHandle);
+  }
+  
+  public void testMostRecentAfterUpdateWithActivate() throws Exception {
+    FlowHandle commitHandle = repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    
+    Flow f = commitHandle.getFlow();
+    Map<String, String> paramOverrides = new HashMap<String, String>();
+    paramOverrides.put("Constant.value", "changed");
+    FlowManager.applyParameterSettings(f, paramOverrides );
+    
+    FlowHandle updatedHandle = repositoryService.update(commitHandle, f, true);
+    FlowHandle mostRecentHandle = repositoryService.getMostRecentFlow(HELLO_CODE);
+    
+    assertFalse("Most recent handle should not be the originally committed one", mostRecentHandle.equals(commitHandle));
+    assertEquals("Most recent handle should be the updated one", updatedHandle, mostRecentHandle);
+  }
+
+  public void testMostRecentAfterUpdateWithoutActivate() throws Exception {
+    FlowHandle commitHandle = repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    
+    Flow f = commitHandle.getFlow();
+    Map<String, String> paramOverrides = new HashMap<String, String>();
+    paramOverrides.put("Constant.value", "changed");
+    FlowManager.applyParameterSettings(f, paramOverrides );
+    
+    FlowHandle updatedHandle = repositoryService.update(commitHandle, f, false);
+    FlowHandle mostRecentHandle = repositoryService.getMostRecentFlow(HELLO_CODE);
+    
+    assertFalse("Most recent handle should not be the originally committed one", mostRecentHandle.equals(commitHandle));
+    assertEquals("Most recent handle should be the updated one", updatedHandle, mostRecentHandle);
+  }
+
   public void testGetAllFlowCodes() throws Exception {
     repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
     repositoryService.commit(HELLO_CODE2, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
@@ -90,7 +127,7 @@ public class FlowRepositoryTest1 extends TestCase {
     assertTrue("Repository should know "+HELLO_WORLD_FLOWNAME, codesAsList.contains(HELLO_WORLD_FLOWNAME));
   }
 
-  public void testUpdateAndActivateFlowRevision() throws Exception {
+  public void testUpdateAndActivation() throws Exception {
     repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
     FlowHandle activeHandle = repositoryService.getActiveFlow(HELLO_CODE);
     
@@ -104,6 +141,24 @@ public class FlowRepositoryTest1 extends TestCase {
     assertFalse("Updated handle should not be the previously active one", activeHandle.equals(updatedHandle));
     assertEquals("Code should remain the same for an update", activeHandle.getCode(), updatedHandle.getCode());
     assertTrue("Version must have increased after update", updatedHandle.getVersion().compareTo(activeHandle.getVersion())>0);
+  }
+
+  public void testUpdateWithoutActivation() throws Exception {
+    repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    FlowHandle activeHandle = repositoryService.getActiveFlow(HELLO_CODE);
+    
+    Flow f = activeHandle.getFlow();
+    Map<String, String> paramOverrides = new HashMap<String, String>();
+    paramOverrides.put("Constant.value", "changed");
+    FlowManager.applyParameterSettings(f, paramOverrides );
+    
+    FlowHandle updatedHandle = repositoryService.update(activeHandle, f, false);
+    FlowHandle activeHandle2 = repositoryService.getActiveFlow(HELLO_CODE);
+    
+    assertFalse("Updated handle should not be the previously active one", activeHandle.equals(updatedHandle));
+    assertEquals("Code should remain the same for an update", activeHandle.getCode(), updatedHandle.getCode());
+    assertTrue("Version must have increased after update", updatedHandle.getVersion().compareTo(activeHandle.getVersion())>0);
+    assertEquals("Active flow should not have changed", activeHandle, activeHandle2);
   }
 
   public Flow buildTrivialFlow(String flowName) throws Exception {

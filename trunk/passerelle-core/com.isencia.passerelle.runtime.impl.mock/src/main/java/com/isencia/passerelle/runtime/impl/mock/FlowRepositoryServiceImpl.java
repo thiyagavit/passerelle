@@ -138,7 +138,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
           flowHandle = new FlowHandleImpl(flowCode, destinationFile, vSpec);
           writeMetaData(flowCode, VERSION_MOSTRECENT, vSpec.toString());
           if(activate) {
-            flowHandle = activateFlowRevision(flowHandle);
+            activateFlowRevision(flowHandle);
           }
         } catch (IOException e) {
           throw new RuntimeException(e);
@@ -163,7 +163,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   public FlowHandle getActiveFlow(String flowCode) throws EntryNotFoundException {
     File flowRootFolder = new File(rootFolder, flowCode);
     if (!flowRootFolder.isDirectory()) {
-      throw new EntryNotFoundException(ErrorCode.FLOW_LOADING_ERROR, "Invalid flow code " + flowCode, null);
+      throw new EntryNotFoundException("Invalid flow code " + flowCode);
     } else {
       FlowHandle flow = null;
       Properties metaData = readMetaData(flowCode);
@@ -177,7 +177,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   public FlowHandle getMostRecentFlow(String flowCode) throws EntryNotFoundException {
     File flowRootFolder = new File(rootFolder, flowCode);
     if (!flowRootFolder.isDirectory()) {
-      throw new EntryNotFoundException(ErrorCode.FLOW_LOADING_ERROR, "Invalid flow code " + flowCode, null);
+      throw new EntryNotFoundException("Invalid flow code " + flowCode);
     } else {
       FlowHandle flow = null;
       Properties metaData = readMetaData(flowCode);
@@ -201,7 +201,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   public FlowHandle[] getAllFlowRevisions(String flowCode) throws EntryNotFoundException {
     File codeFolder = new File(rootFolder, flowCode);
     if (!codeFolder.isDirectory()) {
-      throw new EntryNotFoundException(ErrorCode.FLOW_LOADING_ERROR, "Invalid flow code " + flowCode, null);
+      throw new EntryNotFoundException("Invalid flow code " + flowCode);
     } else {
       ArrayList<FlowHandle> results = new ArrayList<FlowHandle>();
       File[] versionFolders = codeFolder.listFiles(new DirectoryFilter());
@@ -251,11 +251,11 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   private FlowHandle writeMetaData(String flowCode, String dataItemName, String dataItemValue) throws IOException, EntryNotFoundException {
     FlowHandle previouslyActive = null;
     Properties flowMetaDataProps = readMetaData(flowCode);
-    String activeVersion = flowMetaDataProps.getProperty(VERSION_ACTIVE);
+    String activeVersion = flowMetaDataProps.getProperty(dataItemName);
     if (activeVersion != null) {
       previouslyActive = readAndBuildFlowHandle(flowCode, activeVersion);
     }
-    flowMetaDataProps.setProperty(VERSION_ACTIVE, dataItemValue);
+    flowMetaDataProps.setProperty(dataItemName, dataItemValue);
     writeMetaData(flowCode, flowMetaDataProps);
     return previouslyActive;
   }
@@ -286,7 +286,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
     File flowRootFolder = new File(rootFolder, flowCode);
     File metaDataFile = new File(flowRootFolder, ".metadata");
     if (!flowRootFolder.isDirectory()) {
-      throw new EntryNotFoundException(ErrorCode.FLOW_LOADING_ERROR, "Flow not managed by this repository " + flowCode, null);
+      throw new EntryNotFoundException("Flow not managed by this repository " + flowCode);
     } else {
       if (metaDataFile.exists()) {
         Reader metaDataReader = null;
