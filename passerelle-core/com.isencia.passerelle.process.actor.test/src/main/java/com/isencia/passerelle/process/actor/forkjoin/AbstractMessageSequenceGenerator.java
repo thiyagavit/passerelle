@@ -32,7 +32,6 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 import com.isencia.passerelle.process.actor.Actor;
@@ -77,7 +76,6 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
     super(container, name);
     this.stateful = stateful;
     if (stateful) {
-      aggregationStrategy = new ContextAggregationStrategy();
       maxRetentionCountParameter = new Parameter(this,"maxRetentionCount", new IntToken(-1));
       maxRetentionCountParameter.setDisplayName("Max retention count");
       maxRetentionTimeParameter = new Parameter(this,"maxRetentionTime", new IntToken(-1));
@@ -95,7 +93,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
           msgSequences = new HashMap<Long, SequenceTrace>();
           sequenceScopeMessages = new HashMap<Long, MsgTimeEntry>();
           sequenceTimeEntries = new LinkedList<MsgTimeEntry>();
-          aggregationStrategy = new ContextAggregationStrategy();
+          aggregationStrategy = new ContextAggregationStrategy(getContextRepository());
           if(evictedMessagesHandler==null) {
             // has not been explicitly set, so take the default one
             evictedMessagesHandler = new ErrorThrowingEvictedMessageHandler(this);
@@ -173,11 +171,8 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
         Long scopeId = seqMsg.getSequenceID();
         Context branchedCtxt = null;
         if (sequenceScopeMessages.get(scopeId) != null) {
-          try {
-            branchedCtxt = (Context) sequenceScopeMessages.get(scopeId).message.getBodyContent();
-          } catch (MessageException e) {
-            getLogger().error("Error getting context for scope " + scopeId, e);
-          }
+          ManagedMessage seqScopeMsg = sequenceScopeMessages.get(scopeId).message;
+          branchedCtxt = getRequiredContextForMessage(seqScopeMsg);
         }
         ManagedMessage mergedMsg = null;
         if (branchedCtxt != null) {

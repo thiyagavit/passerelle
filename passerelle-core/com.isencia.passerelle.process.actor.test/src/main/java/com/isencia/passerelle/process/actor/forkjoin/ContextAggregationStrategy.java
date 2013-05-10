@@ -19,7 +19,9 @@ import java.util.List;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
+import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.service.ContextRepository;
 import com.isencia.passerelle.process.model.service.ServiceRegistry;
 
 /**
@@ -31,18 +33,42 @@ import com.isencia.passerelle.process.model.service.ServiceRegistry;
  */
 public class ContextAggregationStrategy implements AggregationStrategy {
 
+  private ContextRepository contextRepository;
+
+  public ContextAggregationStrategy(ContextRepository contextRepository) {
+    this.contextRepository = contextRepository;
+  }
+
   public ManagedMessage aggregateMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
     MessageContainer scopeMsg = (MessageContainer) initialMsg;
     ManagedMessage msg = scopeMsg.copy();
-    Context mergedCtxt = (Context) scopeMsg.getBodyContent();
+    Context mergedCtxt = getRequiredContextForMessage(scopeMsg);
+    if(mergedCtxt==null) {
+      // not a context-aware msg flow it would seem, so just return the initial msg
+      return initialMsg;
+    }
     List<Context> branches = new ArrayList<Context>();
     for (ManagedMessage branchMsg : otherMessages) {
-      Context branchedCtx = (Context)branchMsg.getBodyContent();
-      msg.addCauseID(branchMsg.getID());
-      branches.add(branchedCtx);
+      Context branchedCtx = getRequiredContextForMessage(branchMsg);
+      // if no branched context is found, there's nothing to merge... 
+      if(branchedCtx!=null) {
+        msg.addCauseID(branchMsg.getID());
+        branches.add(branchedCtx);
+      }
     }
     mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
     msg.setBodyContent(mergedCtxt, ManagedMessage.objectContentType);
     return msg;
+  }
+  
+  protected Context getRequiredContextForMessage(ManagedMessage message) {
+    if (message == null) {
+      return null;
+    }
+    String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+    if (ctxtHdrs == null || ctxtHdrs.length == 0) {
+      return null;
+    }
+    return contextRepository.getContext(ctxtHdrs[0]);
   }
 }
