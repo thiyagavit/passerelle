@@ -15,6 +15,7 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
+import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.actor.ActorContext;
 import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.actor.ProcessResponse;
@@ -103,6 +104,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
             }
             for (int i = 0; i < valueParts.length; ++i) {
               Context newOne = processContext.fork();
+              newOne = getContextRepository().storeContext(newOne);
               newOne.putEntry(splitOutItemName, valueParts[i]);
               MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message,
                   processContext.getRequest().getId(), // sequence ID
@@ -111,6 +113,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
               // enforce single Splitter name (so use setHeader i.o. addHeader)
               outputMsg.setHeader(HEADER_SEQ_SRC, getName());
               outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
+              ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getContextRepositoryID());
               procResponse.addOutputMessage(output, outputMsg);
             }
             doingSplit = true;
