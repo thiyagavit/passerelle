@@ -14,6 +14,8 @@
 */
 package com.isencia.passerelle.testsupport.actor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
@@ -32,6 +34,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 
 @SuppressWarnings("serial")
 public class TextSource extends Actor {
+  private final static Logger LOGGER = LoggerFactory.getLogger(TextSource.class);
 
   public Port output;
   public StringParameter textParameter;
@@ -43,6 +46,10 @@ public class TextSource extends Actor {
     textParameter = new StringParameter(this, "values");
     textParameter.setExpression("Hello,Goodbye");
     registerConfigurableParameter(textParameter);
+  }
+  
+  public Logger getLogger() {
+    return LOGGER;
   }
 
   @Override

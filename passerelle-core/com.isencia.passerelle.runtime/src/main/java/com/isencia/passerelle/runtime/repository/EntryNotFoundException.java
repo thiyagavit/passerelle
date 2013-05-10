@@ -24,6 +24,14 @@ public class EntryNotFoundException extends RepositoryException {
   private static final long serialVersionUID = -7997428299294386373L;
 
   /**
+   * 
+   * @param message
+   */
+  public EntryNotFoundException(String message) {
+    super(ErrorCode.FLOW_LOADING_ERROR, message, null);
+  }
+  
+  /**
    * @param errorCode
    * @param message
    * @param rootException

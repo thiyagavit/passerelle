@@ -108,4 +108,9 @@ public class FlowHandleImpl implements FlowHandle {
       return false;
     return true;
   }
+
+  @Override
+  public String toString() {
+    return "FlowHandleImpl [code=" + code + ", resourceLocation=" + resourceLocation + ", version=" + version + "]";
+  }
 }
