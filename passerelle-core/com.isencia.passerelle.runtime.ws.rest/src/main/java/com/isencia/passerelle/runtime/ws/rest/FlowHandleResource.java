@@ -20,6 +20,10 @@ public class FlowHandleResource implements FlowHandle {
     
   }
   
+  public FlowHandleResource(FlowHandle handle) {
+    this(handle.getResourceLocation(), handle.getCode(), handle.getRawFlowDefinition());
+  }
+  
   public FlowHandleResource(URL resourceLocation, String code, String rawFlowDefinition) {
     super();
     this.resourceLocation = resourceLocation;
@@ -53,4 +57,8 @@ public class FlowHandleResource implements FlowHandle {
     return rawFlowDefinition;
   }
 
+  @Override
+  public String toString() {
+    return "FlowHandleResource [resourceLocation=" + resourceLocation + ", code=" + code + ", rawFlowDefinition=" + rawFlowDefinition + "]";
+  }
 }

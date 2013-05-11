@@ -2,7 +2,7 @@ package com.isencia.passerelle.runtime.ws.rest;
 
 
 public class ErrorCode extends com.isencia.passerelle.core.ErrorCode {
-
+  private static final long serialVersionUID = 9096454991169573318L;
   public final static ErrorCode MISSING_PARAM = new ErrorCode("MISSING_PARAM", "1000", ErrorCategory.WS_REST_FUNCTIONAL, ErrorCode.Severity.WARNING,"Request contents error");
 
   public ErrorCode(String name, String code, ErrorCategory category, Severity severity, String description) {
