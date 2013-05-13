@@ -19,6 +19,8 @@ import com.isencia.passerelle.process.model.Task;
 // TODO: can't we simplify this now that we have an enum for the status?
 // TODO: should be moved to the model?
 public interface ContextManager {
+  
+  String REPORT_EVENT_TYPE = "REPORTED";
 
 	/**
 	 * 
@@ -109,6 +111,15 @@ public interface ContextManager {
 	 * @param entity
 	 */
 	Context notifyPendingCompletion(Context context);
+	
+	
+	/**
+	 * Persist an event to indicate that some kind of reporting was done on this context.
+	 * A report event can be signaled even when the context is finished.
+	 * @param ctx Context reported on
+	 * @return refreshed context
+	 */
+	Context notifyReportEvent(Context ctx);
 
 	/**
 	 * Subscribe the given callback to status change notifications of the given context
