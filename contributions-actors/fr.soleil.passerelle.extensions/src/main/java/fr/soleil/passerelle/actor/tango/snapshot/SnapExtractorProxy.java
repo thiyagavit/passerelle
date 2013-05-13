@@ -4,17 +4,45 @@ import org.apache.commons.lang.ArrayUtils;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.tango.clientapi.TangoCommand;
+import fr.soleil.util.SoleilUtilities;
 
 public class SnapExtractorProxy {
 
-    private final TangoCommand getSnapValues;
-    private final TangoCommand getSnapID;
-    private final TangoCommand getSnap;
+    public static final int ID_MIN = 0;
+    public static final String ERROR_SNAP_ID_INF_ZERO = "Error: snap id must not be negative";
+    public static final String ERROR_SNAP_ID_NAN = "Error: snap id must be a number";
 
-    public SnapExtractorProxy(final String snapExtractorName) throws DevFailed {
-        getSnapValues = new TangoCommand(snapExtractorName, "GetSnapValues");
-        getSnapID = new TangoCommand(snapExtractorName, "GetSnapID");
-        getSnap = new TangoCommand(snapExtractorName, "GetSnap");
+    private TangoCommand getSnapValues;
+    private TangoCommand getSnapValue;
+    private TangoCommand getSnapID;
+    private String snapExtractorName = "";
+
+    // private final TangoCommand getSnap;
+
+    public SnapExtractorProxy(boolean defaultConfig) throws DevFailed {
+        if (defaultConfig) {
+            snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
+
+            getSnapValues = new TangoCommand(snapExtractorName, "GetSnapValues");
+            getSnapID = new TangoCommand(snapExtractorName, "GetSnapID");
+            // getSnap = new TangoCommand(snapExtractorName, "GetSnap");
+        }
+    }
+
+    public String getName() {
+        return snapExtractorName;
+    }
+
+    public void setGetSnapValuesCommand(TangoCommand getSnapValues) {
+        this.getSnapValues = getSnapValues;
+    }
+
+    public void setGetSnapValueCommand(TangoCommand getSnapValue) {
+        this.getSnapValue = getSnapValue;
+    }
+
+    public void setGetSnapIDCommand(TangoCommand getSnapID) {
+        this.getSnapID = getSnapID;
     }
 
     /**
@@ -76,6 +104,20 @@ public class SnapExtractorProxy {
      */
     public String[] getSnapIDs(final String contextID, final String searchFilter) throws DevFailed {
         return getSnapID.execute(String[].class, contextID, searchFilter);
+    }
+
+    /**
+     * get the read and the write values of an attribute
+     * 
+     * @param snapID the
+     * @param attributeName the name of the attribute to extract
+     * @return a String array. The first cell contains the read value and the second the write value
+     * @throws DevFailed if the extraction failed (wrong id , attribute not found in snap, any tango
+     *             error...)
+     */
+    public String[] getSnapValue(String snapID, String attributeName) throws DevFailed {
+        final Object[] array = new Object[] { snapID, attributeName };
+        return getSnapValues.execute(String[].class, array);
     }
 
 }
