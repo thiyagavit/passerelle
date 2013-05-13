@@ -77,24 +77,6 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
         }
     }
 
-    /**
-     * It's a wrapper of attributeChanged that "convert" IllegalActionException in
-     * ValidationException. This method is design to be used in validateInitialization() method to
-     * do the static verification on parameters
-     * 
-     * @param attribute the parameter to check
-     * 
-     * @throws ValidationException if the parameter is invalid then a ValidationException is raised
-     */
-    protected void validateAttribute(Attribute attribute) throws ValidationException {
-        try {
-            attributeChanged(attribute);
-        }
-        catch (IllegalActionException e) {
-            throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
-        }
-    }
-
     /*
      * When not in mock mode, create the device proxy with the device name
      *
