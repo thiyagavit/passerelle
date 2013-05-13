@@ -97,16 +97,11 @@ public class MotorInitReferencePositionV2Test {
         props.put(ACTOR_NAME + "." + MotorInitReferencePositionV2.DEVICE_NAME, MOTOR_NAME);
 
         ArrayBlockingQueue<String> outPortMsgs = new ArrayBlockingQueue<String>(1);
-        ArrayBlockingQueue<String> noInitDoneMsgs = new ArrayBlockingQueue<String>(1);
-        moml.addMessageReceiver(ACTOR_NAME, MotorInitReferencePositionV2.NO_INIT_DONE_PORT_NAME,
-                noInitDoneMsgs);
         moml.addMessageReceiver(ACTOR_NAME, MotorInitReferencePositionV2.OUTPUT_PORT_NAME,
                 outPortMsgs);
         moml.executeBlockingErrorLocally(props);
 
         assertThat(outPortMsgs).hasSize(1);
         assertThat(outPortMsgs.poll()).isEqualTo("");
-        assertThat(noInitDoneMsgs).isEmpty();
-
     }
 }
