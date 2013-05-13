@@ -13,7 +13,9 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
+import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.Actor;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
@@ -25,6 +27,7 @@ public abstract class ATangoActorV5 extends Actor {
 
     private static final Logger logger = LoggerFactory.getLogger(ATangoActorV5.class);
     private static final String RECORD_DATA = "Record data";
+    public static final String OUTPUT_PORT_NAME = "output";
     public Port input;
     public Port output;
     /**
@@ -40,6 +43,7 @@ public abstract class ATangoActorV5 extends Actor {
 
         input = PortFactory.getInstance().createInputPort(this, null);
         output = PortFactory.getInstance().createOutputPort(this);
+        output.setName(OUTPUT_PORT_NAME);
 
         recordDataParam = new Parameter(this, RECORD_DATA, new BooleanToken(false));
         recordDataParam.setTypeEquals(BaseType.BOOLEAN);
@@ -84,4 +88,22 @@ public abstract class ATangoActorV5 extends Actor {
         return recordData;
     }
 
+    // TODO move to super class
+    /**
+     * It's a wrapper of attributeChanged that "convert" IllegalActionException in
+     * ValidationException. This method is design to be used in validateInitialization() method to
+     * do the static verification on parameters
+     * 
+     * @param attribute the parameter to check
+     * 
+     * @throws ValidationException if the parameter is invalid then a ValidationException is raised
+     */
+    protected void validateAttribute(Attribute attribute) throws ValidationException {
+        try {
+            attributeChanged(attribute);
+        }
+        catch (IllegalActionException e) {
+            throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
+        }
+    }
 }
