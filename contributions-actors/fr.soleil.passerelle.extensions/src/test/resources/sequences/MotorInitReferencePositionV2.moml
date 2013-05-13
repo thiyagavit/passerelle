@@ -15,6 +15,8 @@
     <entity name="MotorInitReferencePositionV2" class="fr.soleil.passerelle.actor.tango.control.MotorInitReferencePositionV2">
         <property name="Device Name" class="ptolemy.data.expr.StringParameter" value="test/motor/1-1">
         </property>
+        <property name="Should init controlBox and galilAxis devices" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
         <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
@@ -31,17 +33,7 @@
         </property>
         <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{55, 265}">
-        </property>
-    </entity>
-    <entity name="Tracer_2" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
-        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
-        </property>
-        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
-        </property>
-        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="[430.0, 345.0]">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[55.0, 285.0]">
         </property>
     </entity>
     <entity name="Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
@@ -51,7 +43,7 @@
         </property>
         <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{420, 285}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[420.0, 305.0]">
         </property>
     </entity>
     <relation name="relation" class="ptolemy.actor.TypedIORelation">
@@ -61,15 +53,15 @@
     <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
+        <vertex name="vertex" value="{0.0, 0.0}">
+        </vertex>
     </relation>
     <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
     <link port="MotorInitReferencePositionV2.input" relation="relation"/>
-    <link port="MotorInitReferencePositionV2.InitOK" relation="relation_2"/>
-    <link port="MotorInitReferencePositionV2.noInitDone" relation="relation_3"/>
+    <link port="MotorInitReferencePositionV2.output" relation="relation_2"/>
     <link port="Trigger.output" relation="relation"/>
-    <link port="Tracer_2.input" relation="relation_3"/>
     <link port="Tracer.input" relation="relation_2"/>
 </entity>
