@@ -6,7 +6,11 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitT
 import java.net.URL;
 
 import ptolemy.actor.Director;
+import ptolemy.data.BooleanToken;
+import ptolemy.data.expr.Parameter;
+import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
@@ -17,8 +21,7 @@ import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.Port;
-import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
@@ -33,16 +36,19 @@ import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements IActorFinalizer {
 
-    public static final String NO_INIT_DONE_PORT_NAME = "noInitDone";
-    public static String OUTPUT_PORT_NAME = "InitOK";
-    public final Port noInitDone;
     private final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
     private MotorConfigurationV2 conf;
     private WaitStateTask waitTask;
+
+    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+    @ParameterName(name = INIT_DEVICES)
+    public Parameter shouldInitDevicesParam;
+    private boolean shouldInitDevice = false;
 
     public MotorInitReferencePositionV2(CompositeEntity container, String name)
             throws IllegalActionException, NameDuplicationException {
@@ -67,8 +73,17 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
                 + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
                 + "\"/>\n" + "</svg>\n");
 
-        output.setName(OUTPUT_PORT_NAME);
-        noInitDone = PortFactory.getInstance().createOutputPort(this, NO_INIT_DONE_PORT_NAME);
+        shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
+                shouldInitDevice));
+        shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
+    }
+
+    @Override
+    public void attributeChanged(Attribute attribute) throws IllegalActionException {
+        if (attribute == shouldInitDevicesParam) {
+            shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
+        }
+        super.attributeChanged(attribute);
     }
 
     @Override
@@ -113,22 +128,24 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             try {
                 DeviceProxy dev = getDeviceProxy();
 
-                conf.initDevice(this);
+                if (shouldInitDevice) {
+                    conf.initDevice(this);
+                }
 
                 if (conf.getEncoder() == ABSOLUTE) {
-                    ExecutionTracerService.trace(this, deviceName
-                            + " has an absolute encoder, no need to initialize");
-                    response.addOutputMessage(noInitDone, createMessage());
+                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                            deviceName + " has an absolute encoder, no need to initialize", ctxt,
+                            null);
 
                 } else if (conf.getInitStrategy() == DP) {
-                    ExecutionTracerService.trace(this, deviceName
-                            + "  has no initialization strategy, must use DefinePosition");
-                    response.addOutputMessage(noInitDone, createMessage());
+                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                            deviceName
+                                    + "  has no initialization strategy, must use DefinePosition",
+                            ctxt, null);
 
                 } else if (!dev.status().contains(AXIS_NOT_INIT)) {
-                    ExecutionTracerService.trace(this, deviceName
-                            + " is already initialized, nothing done");
-                    response.addOutputMessage(output, createMessage());
+                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                            deviceName + " is already initialized, nothing done", ctxt, null);
 
                 } else { // run InitReferencePosition
                     runInitRefAndWaitEndMovement(deviceName, dev);
@@ -178,7 +195,8 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             Thread.sleep(1000);
         }
         catch (final InterruptedException e) {
-            // ignore
+            e.printStackTrace();
+            // TODO
         }
         waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
         waitTask.run();
