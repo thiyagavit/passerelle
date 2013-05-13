@@ -8,9 +8,8 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.util.Level;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.actor.tango.snapshot.HdbExtractorProxy;
+import fr.soleil.passerelle.actor.tango.archiving.HdbExtractorProxy;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
-import fr.soleil.util.SoleilUtilities;
 
 public class HdbAttributeDataProvider extends AttributeDataProvider {
     private String deviceName;
@@ -29,10 +28,9 @@ public class HdbAttributeDataProvider extends AttributeDataProvider {
 
     @Override
     public void init(Actor actor) throws DevFailed {
-        String hdbExtractor = SoleilUtilities.getDevicesFromClass("HdbExtractor")[0];
-        ExecutionTracerService.trace(actor, "using hdb Extractor " + hdbExtractor, Level.DEBUG);
-
-        extractorProxy = new HdbExtractorProxy(hdbExtractor);
+        extractorProxy = new HdbExtractorProxy(true);
+        ExecutionTracerService.trace(actor,
+                "using hdb Extractor " + extractorProxy.getHdbExtractorName(), Level.DEBUG);
     }
 
     @Override

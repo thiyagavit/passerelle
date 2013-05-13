@@ -12,7 +12,6 @@ import fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
-import fr.soleil.util.SoleilUtilities;
 
 public class SnapAttributeDataProvider extends AttributeDataProvider {
     private String completeAttributeName;
@@ -31,11 +30,9 @@ public class SnapAttributeDataProvider extends AttributeDataProvider {
 
     @Override
     public void init(Actor actor) throws DevFailed {
-        String snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
-        ExecutionTracerService.trace(actor, "using snap Extractor " + snapExtractorName,
+        extractorProxy = new SnapExtractorProxy(true);
+        ExecutionTracerService.trace(actor, "using snap Extractor " + extractorProxy.getName(),
                 Level.DEBUG);
-
-        extractorProxy = new SnapExtractorProxy(snapExtractorName);
     }
 
     @Override
