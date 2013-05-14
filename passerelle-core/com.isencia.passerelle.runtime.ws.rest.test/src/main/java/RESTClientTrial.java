@@ -1,6 +1,7 @@
 import javax.ws.rs.core.MediaType;
 import com.isencia.passerelle.runtime.ws.rest.CodeList;
 import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
+import com.isencia.passerelle.runtime.ws.rest.FlowHandleResources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
@@ -28,10 +29,18 @@ public class RESTClientTrial {
     FlowHandleResource handleResource = webResource.path("activeFlow").queryParam("code", "TTT").accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
     System.out.println("active flow "+handleResource);
     
-    Flow f = buildTrivialFlow("HiThere");
-    FlowHandleResource handleResource2 = webResource.queryParam("code", "MYCODE").type(MediaType.APPLICATION_XML).post(FlowHandleResource.class, f.exportMoML());
+    try {
+      Flow f = buildTrivialFlow("HiThere");
+      FlowHandleResource handleResource2 = webResource.queryParam("code", "MYCODE").type(MediaType.APPLICATION_XML).post(FlowHandleResource.class, f.exportMoML());
+      System.out.println("committed flow "+handleResource2.getResourceLocation());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    FlowHandleResources handleResources = webResource.queryParam("code", "MYCODE").type(MediaType.APPLICATION_XML).delete(FlowHandleResources.class);
     
-    System.out.println("committed flow "+handleResource2.getResourceLocation());
+    System.out.println("deleted "+ handleResources.getFlowHandles());
+    
   }
 
   public static Flow buildTrivialFlow(String flowName) throws Exception {

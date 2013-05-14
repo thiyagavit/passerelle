@@ -5,8 +5,7 @@ package com.isencia.passerelle.runtime.impl.mock;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import org.apache.commons.io.FileUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -31,12 +30,8 @@ public class FlowHandleImpl implements FlowHandle {
   }
 
   @Override
-  public URL getResourceLocation() {
-    try {
-      return resourceLocation.toURI().toURL();
-    } catch (MalformedURLException e) {
-      return null;
-    }
+  public URI getResourceLocation() {
+    return resourceLocation.toURI();
   }
 
   @Override
@@ -53,7 +48,7 @@ public class FlowHandleImpl implements FlowHandle {
   public Flow getFlow() {
     if (flow == null) {
       try {
-        flow = FlowManager.readMoml(getResourceLocation());
+        flow = FlowManager.readMoml(getResourceLocation().toURL());
       } catch (Exception e) {
         e.printStackTrace();
       }

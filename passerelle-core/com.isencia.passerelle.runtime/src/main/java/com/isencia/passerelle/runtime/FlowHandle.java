@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.runtime;
 
-import java.net.URL;
+import java.net.URI;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
@@ -32,9 +32,9 @@ public interface FlowHandle {
   
   /**
    * 
-   * @return the URL where the Flow handle/resource can be retrieved
+   * @return the URI where the Flow handle/resource can be retrieved
    */
-  URL getResourceLocation();
+  URI getResourceLocation();
 
   /**
    * @return the unique code identifying the Flow(Handle) in its repository
