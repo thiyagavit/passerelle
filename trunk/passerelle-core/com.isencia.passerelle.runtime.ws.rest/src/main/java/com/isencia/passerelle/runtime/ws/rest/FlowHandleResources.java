@@ -1,25 +1,40 @@
 package com.isencia.passerelle.runtime.ws.rest;
 
-import java.util.Arrays;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.UriBuilder;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.isencia.passerelle.runtime.FlowHandle;
 
 @XmlRootElement(name="FlowHandles")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class FlowHandleResources {
   
+  @XmlElement(type=FlowHandleResource.class, name="FlowHandle")
   private List<FlowHandle> flowHandles;
 
   
   public FlowHandleResources() {
   }
 
-  public FlowHandleResources(FlowHandle... flowHandles) {
-    this.flowHandles = Arrays.asList(flowHandles);
+  public FlowHandleResources(UriBuilder uriBldr, FlowHandle... flowHandles) {
+    this.flowHandles = new ArrayList<FlowHandle>();
+    for(FlowHandle handle : flowHandles) {
+      FlowHandleResource fhRes = null;
+      if (uriBldr != null) {
+        URI resLoc = uriBldr.clone().path(FlowRepositoryServiceRESTFacade.class).path("{code}").queryParam("version", "{version}").build(handle.getCode(), handle.getVersion());
+        fhRes = new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition());
+      } else {
+        fhRes = new FlowHandleResource(handle);
+      }
+      this.flowHandles.add(fhRes);
+    }
   }
 
-  @XmlElement(type=FlowHandleResource.class, name="FlowHandle")
   public List<FlowHandle> getFlowHandles() {
     return flowHandles;
   }

@@ -71,7 +71,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   public FlowHandle commit(String flowCode, Flow flow) throws DuplicateEntryException {
     File newFlowFolder = new File(rootFolder, flowCode);
     if (newFlowFolder.exists()) {
-      throw new DuplicateEntryException(flow);
+      throw new DuplicateEntryException(flowCode);
     } else {
       FlowHandle flowHandle = null;
       VersionSpecification vSpec = new ThreeDigitVersionSpecification(1, 0, 0);

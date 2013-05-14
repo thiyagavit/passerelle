@@ -21,5 +21,8 @@ Import-Package: com.isencia.passerelle.core;version="8.4.0",
  org.slf4j;version="1.6.0",
  ptolemy.kernel.util;version="7.0.1"
 JAX-RS-Alias: /rest
-JAX-RS-Classes: com.isencia.passerelle.runtime.ws.rest.RestTest,com.isencia.passerelle.runtime.ws.rest.EntryNotFoundExceptionMapper,com.isencia.passerelle.runtime.ws.rest.InvalidRequestExceptionMapper
+JAX-RS-Classes: com.isencia.passerelle.runtime.ws.rest.FlowRepositoryServiceRESTFacade,
+ com.isencia.passerelle.runtime.ws.rest.DuplicateEntryExceptionMapper,
+ com.isencia.passerelle.runtime.ws.rest.EntryNotFoundExceptionMapper,
+ com.isencia.passerelle.runtime.ws.rest.InvalidRequestExceptionMapper
 Export-Package: com.isencia.passerelle.runtime.ws.rest

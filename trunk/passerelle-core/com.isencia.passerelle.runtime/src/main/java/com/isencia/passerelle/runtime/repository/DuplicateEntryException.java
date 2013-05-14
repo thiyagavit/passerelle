@@ -26,9 +26,16 @@ public class DuplicateEntryException extends RepositoryException {
   private static final long serialVersionUID = 7349254541339728923L;
 
   /**
+   * @param flowCode
+   */
+  public DuplicateEntryException(String flowCode) {
+    super(ErrorCode.FLOW_SAVING_ERROR_FUNC, "Flow "+flowCode+" already exists in the repository", null);
+  }
+  /**
+   * @param flowCode
    * @param flow
    */
-  public DuplicateEntryException(Flow flow) {
-    super(ErrorCode.FLOW_SAVING_ERROR_FUNC, "Flow already exists in the repository", flow, null);
+  public DuplicateEntryException(String flowCode, Flow flow) {
+    super(ErrorCode.FLOW_SAVING_ERROR_FUNC, "Flow "+flowCode+" already exists in the repository", flow, null);
   }
 }

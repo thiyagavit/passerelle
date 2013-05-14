@@ -43,7 +43,7 @@ public class FlowRepositoryTest1 extends TestCase {
       assertEquals("Wrong flow code", HELLO_CODE, handle.getCode());
       assertEquals("Wrong version spec", VersionSpecification.parse("1.0.0"), handle.getVersion());
       assertNotNull("Flow's commit resource location should be not-null", handle.getResourceLocation());
-      String resourceLocationAsString = handle.getResourceLocation().toURI().getPath().toString();
+      String resourceLocationAsString = handle.getResourceLocation().getPath().toString();
       assertTrue("resource location "+resourceLocationAsString+" must be inside repo root folder "+REPOS_ROOTFOLDER, resourceLocationAsString.startsWith(REPOS_ROOTFOLDER));
       assertEquals("Wrong flow name", HELLO_WORLD_FLOWNAME, handle.getFlow().getName());
       assertNotNull("Committed flow shas lost its director", handle.getFlow().getDirector());
