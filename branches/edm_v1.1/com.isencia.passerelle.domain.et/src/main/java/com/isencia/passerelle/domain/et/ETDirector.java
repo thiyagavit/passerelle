@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
+import ptolemy.actor.Initializable;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.actor.util.Time;
@@ -33,6 +34,7 @@ import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.domain.et.FlowExecutionEvent.FlowExecutionEventType;
@@ -141,7 +143,16 @@ public class ETDirector extends Director implements PasserelleDirector {
         + "style=\"fill:black;stroke:white\"/>\n"
         + "</svg>\n");
   }
-
+  
+  @Override
+  public Object clone(Workspace workspace) throws CloneNotSupportedException {
+    List<Initializable> oldInitializables = this._initializables;
+    this._initializables = null;
+    Object clone = super.clone(workspace);
+    this._initializables = oldInitializables;
+    return clone;
+  }
+  
   @SuppressWarnings("unchecked")
   @Override
   public void preinitialize() throws IllegalActionException {
