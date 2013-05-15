@@ -76,6 +76,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         outputPorts = new Port[2];
         outputPorts[READ_PORT] = PortFactory.getInstance().createOutputPort(this, READ_PORT_LABEL);
         // createPort(WRITE_PORT, WRITE_PORT_LABEL);
+
         // deletePort(WRITE_PORT, WRITE_PORT_LABEL);
 
         extractionTypeParam = new StringParameter(this, EXTRACTION_TYPE_LABEL);
