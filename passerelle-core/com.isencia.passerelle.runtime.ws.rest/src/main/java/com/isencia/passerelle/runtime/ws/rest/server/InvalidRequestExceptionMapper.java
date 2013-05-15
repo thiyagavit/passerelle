@@ -1,10 +1,12 @@
-package com.isencia.passerelle.runtime.ws.rest;
+package com.isencia.passerelle.runtime.ws.rest.server;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import com.isencia.passerelle.core.ErrorCode;
+import com.isencia.passerelle.runtime.ws.rest.ErrorInfo;
+import com.isencia.passerelle.runtime.ws.rest.InvalidRequestException;
 
 @Provider
 public class InvalidRequestExceptionMapper implements ExceptionMapper<InvalidRequestException> {

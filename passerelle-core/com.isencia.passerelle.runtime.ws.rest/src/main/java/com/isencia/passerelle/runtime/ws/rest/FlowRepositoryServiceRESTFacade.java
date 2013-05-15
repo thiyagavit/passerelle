@@ -10,6 +10,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -49,7 +50,7 @@ public class FlowRepositoryServiceRESTFacade {
       FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
       if (uriInfo != null) {
         URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(flowCode);
-        return new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition());
+        return new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
       } else {
         return new FlowHandleResource(handle);
       }
@@ -62,7 +63,13 @@ public class FlowRepositoryServiceRESTFacade {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
-      return new FlowHandleResource(getFlowRepositoryService().getMostRecentFlow(flowCode));
+      FlowHandle handle = getFlowRepositoryService().getMostRecentFlow(flowCode);
+      if (uriInfo != null) {
+        URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(flowCode);
+        return new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
+      } else {
+        return new FlowHandleResource(handle);
+      }
     }
   }
 
@@ -118,9 +125,22 @@ public class FlowRepositoryServiceRESTFacade {
   @PUT
   @Path("/{code}")
   @Consumes({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML })
-  public FlowHandle update(FlowHandle handle, String rawFlowDefinition, boolean activate) {
-    // TODO Auto-generated method stub
-    return null;
+  public FlowHandle update(@PathParam("code") String flowCode, String rawFlowDefinition, @QueryParam("activate") boolean activate) throws InvalidRequestException, EntryNotFoundException {
+    if (flowCode == null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
+    } else if (rawFlowDefinition == null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
+    } else {
+      FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
+      Flow updatedFlow = null;
+      try {
+        updatedFlow = FlowManager.readMoml(new StringReader(rawFlowDefinition));
+      } catch (Exception e) {
+        throw new InvalidRequestException(ErrorCode.ERROR, "");
+      }
+      return new FlowHandleResource(getFlowRepositoryService().update(handle, updatedFlow, activate))
+      ;
+    }
   }
 
   public FlowRepositoryService getFlowRepositoryService() {

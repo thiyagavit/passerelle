@@ -27,7 +27,7 @@ public class FlowHandleResources {
       FlowHandleResource fhRes = null;
       if (uriBldr != null) {
         URI resLoc = uriBldr.clone().path(FlowRepositoryServiceRESTFacade.class).path("{code}").queryParam("version", "{version}").build(handle.getCode(), handle.getVersion());
-        fhRes = new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition());
+        fhRes = new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
       } else {
         fhRes = new FlowHandleResource(handle);
       }
