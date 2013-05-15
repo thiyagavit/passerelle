@@ -126,8 +126,12 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
       throw new EntryNotFoundException(ErrorCode.FLOW_SAVING_ERROR_FUNC, "Flow code unknown " + flowCode, null);
     } else {
       FlowHandle flowHandle = null;
-      VersionSpecification vSpec = ((ThreeDigitVersionSpecification)handle.getVersion()).increaseMinor();
+      ThreeDigitVersionSpecification vSpec = ((ThreeDigitVersionSpecification)handle.getVersion()).increaseMinor();
       File versionFolder = new File(flowRootFolder, vSpec.toString());
+      while(versionFolder.exists()) {
+        vSpec = vSpec.increaseMinor();
+        versionFolder = new File(flowRootFolder, vSpec.toString());
+      }
       versionFolder.mkdirs();
       File destinationFile = new File(versionFolder, updatedFlow.getName() + ".moml");
       if ((!destinationFile.exists() || destinationFile.canWrite())) {
