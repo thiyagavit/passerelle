@@ -1,4 +1,4 @@
-package com.isencia.passerelle.runtime.ws.rest.activator;
+package com.isencia.passerelle.runtime.ws.rest.server.activator;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -64,5 +64,4 @@ public class Activator implements BundleActivator {
       }
     };
   }
-
 }
