@@ -13,7 +13,7 @@ import fr.esrf.TangoApi.DeviceProxy;
 
 public class MoveNumericAttributeTest {
 
-    public static String MOTOR_NAME = "test/motor/1";
+    public static String MOTOR_NAME = "test/motor/1-1";
     public static String POSITION_ATTR = "position";
     public DeviceProxy motor;
     public MoveNumericAttribute mover;
