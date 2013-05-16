@@ -1,4 +1,4 @@
-package com.isencia.passerelle.runtime.ws.rest;
+package com.isencia.passerelle.runtime.ws.rest.server;
 
 import java.io.StringReader;
 import java.net.URI;
@@ -20,7 +20,12 @@ import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
-import com.isencia.passerelle.runtime.ws.rest.activator.Activator;
+import com.isencia.passerelle.runtime.ws.rest.CodeList;
+import com.isencia.passerelle.runtime.ws.rest.ErrorCode;
+import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
+import com.isencia.passerelle.runtime.ws.rest.FlowHandleResources;
+import com.isencia.passerelle.runtime.ws.rest.InvalidRequestException;
+import com.isencia.passerelle.runtime.ws.rest.server.activator.Activator;
 
 /**
  * A REST service provider (or root resource) mapped on the FlowRepositoryService interface.
@@ -29,7 +34,7 @@ import com.isencia.passerelle.runtime.ws.rest.activator.Activator;
  * 
  * @author erwin
  */
-@Path("/flows")
+@Path("flows")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public class FlowRepositoryServiceRESTFacade {
 
@@ -42,7 +47,7 @@ public class FlowRepositoryServiceRESTFacade {
   }
 
   @GET
-  @Path("/{code}")
+  @Path("{code}")
   public FlowHandle getActiveFlow(@PathParam("code") String flowCode) throws EntryNotFoundException, InvalidRequestException {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
@@ -58,7 +63,7 @@ public class FlowRepositoryServiceRESTFacade {
   }
 
   @GET
-  @Path("/{code}/mostRecent")
+  @Path("{code}/mostRecent")
   public FlowHandle getMostRecentFlow(@PathParam("code") String flowCode) throws EntryNotFoundException, InvalidRequestException {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
@@ -74,17 +79,17 @@ public class FlowRepositoryServiceRESTFacade {
   }
 
   @GET
-  @Path("/{code}/all")
+  @Path("{code}/all")
   public FlowHandleResources getAllFlowRevisions(@PathParam("code") String flowCode) throws EntryNotFoundException, InvalidRequestException {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
-      return new FlowHandleResources(uriInfo.getBaseUriBuilder(), getFlowRepositoryService().getAllFlowRevisions(flowCode));
+      return new FlowHandleResources(uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class), getFlowRepositoryService().getAllFlowRevisions(flowCode));
     }
   }
 
   @POST
-  @Path("/{code}/activate")
+  @Path("{code}/activate")
   public FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException, InvalidRequestException {
     if (handle == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
@@ -94,7 +99,7 @@ public class FlowRepositoryServiceRESTFacade {
   }
 
   @POST
-  @Path("/{code}")
+  @Path("{code}")
   @Consumes({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML })
   public FlowHandle commit(@PathParam("code") String flowCode, String rawFlowDefinition) throws DuplicateEntryException, InvalidRequestException {
     if (flowCode == null) {
@@ -113,17 +118,17 @@ public class FlowRepositoryServiceRESTFacade {
   }
 
   @DELETE
-  @Path("/{code}")
+  @Path("{code}")
   public FlowHandleResources delete(@PathParam("code") String flowCode) throws InvalidRequestException, EntryNotFoundException {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
-      return new FlowHandleResources(uriInfo.getBaseUriBuilder(), getFlowRepositoryService().delete(flowCode));
+      return new FlowHandleResources(uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class), getFlowRepositoryService().delete(flowCode));
     }
   }
 
   @PUT
-  @Path("/{code}")
+  @Path("{code}")
   @Consumes({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML })
   public FlowHandle update(@PathParam("code") String flowCode, String rawFlowDefinition, @QueryParam("activate") boolean activate) throws InvalidRequestException, EntryNotFoundException {
     if (flowCode == null) {
