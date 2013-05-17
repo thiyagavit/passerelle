@@ -57,4 +57,9 @@ public class ErrorInfo {
   public Severity getSeverity() {
     return severity;
   }
+
+  @Override
+  public String toString() {
+    return "ErrorInfo [severity=" + severity + ", code=" + code + ", description=" + description + ", extraInfo=" + extraInfo + "]";
+  }
 }
