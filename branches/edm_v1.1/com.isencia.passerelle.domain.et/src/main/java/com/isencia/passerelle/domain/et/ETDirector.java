@@ -234,6 +234,26 @@ public class ETDirector extends Director implements PasserelleDirector {
     }
     getAdapter(null).getExecutionPrePostProcessor().postProcess();
     super.wrapup();
+    boolean needEventLog = ((BooleanToken)eventHistoryParameter.getToken()).booleanValue();
+
+    if(needEventLog) {
+      System.err.println(getFullName()+" - Event History");
+      for (Event evt : getEventHistory()) {
+        System.err.println(evt);
+      }
+      System.err.println(getFullName()+" - Event Errors");
+      for (EventError evtErr : getEventErrors()) {
+        System.err.println(evtErr);
+      }
+      System.err.println(getFullName()+" - Unhandled Events");
+      for (Event evt : getUnhandledEvents()) {
+        System.err.println(evt);
+      }
+      System.err.println(getFullName()+" - Pending Events");
+      for (Event evt : getPendingEvents()) {
+        System.err.println(evt);
+      }
+    }
     
     dispatcher.shutdown();
   }
