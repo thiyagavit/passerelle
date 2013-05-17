@@ -29,6 +29,7 @@ public class FlowRepositoryTest1 extends TestCase {
   private static final String REPOS_ROOTFOLDER = "/C:/temp/testFlowRepos";
   FlowRepositoryService repositoryService;
   File repositoryRootFolder;
+  
   @Override
   protected void setUp() throws Exception {
     repositoryRootFolder = new File(REPOS_ROOTFOLDER);

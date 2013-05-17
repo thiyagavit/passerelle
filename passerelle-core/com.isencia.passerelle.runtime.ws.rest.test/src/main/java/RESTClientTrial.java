@@ -23,21 +23,21 @@ public class RESTClientTrial {
     client.addFilter(new LoggingFilter());
     WebResource webResource = client.resource("http://localhost/rest/flows");
     
-    CodeList codeList = webResource.path("allCodes").accept(MediaType.APPLICATION_JSON).get(CodeList.class);
+    CodeList codeList = webResource.accept(MediaType.APPLICATION_JSON).get(CodeList.class);
     System.out.println("all codes "+codeList.getCodes());
 
-    FlowHandleResource handleResource = webResource.path("activeFlow").queryParam("code", "TTT").accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
+    FlowHandleResource handleResource = webResource.path("HELLO").accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
     System.out.println("active flow "+handleResource);
     
     try {
       Flow f = buildTrivialFlow("HiThere");
-      FlowHandleResource handleResource2 = webResource.queryParam("code", "MYCODE").type(MediaType.APPLICATION_XML).post(FlowHandleResource.class, f.exportMoML());
+      FlowHandleResource handleResource2 = webResource.path("MYCODE").type(MediaType.APPLICATION_XML).post(FlowHandleResource.class, f.exportMoML());
       System.out.println("committed flow "+handleResource2.getResourceLocation());
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    FlowHandleResources handleResources = webResource.queryParam("code", "MYCODE").type(MediaType.APPLICATION_XML).delete(FlowHandleResources.class);
+    FlowHandleResources handleResources = webResource.path("MYCODE").type(MediaType.APPLICATION_XML).delete(FlowHandleResources.class);
     
     System.out.println("deleted "+ handleResources.getFlowHandles());
     

@@ -1,5 +1,6 @@
-package com.isencia.passerelle.runtime.ws.rest.server.activator;
+package com.isencia.passerelle.runtime.test.activator;
 
+import java.util.List;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -10,15 +11,15 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 
 public class Activator implements BundleActivator {
-
-  static final String SERVICE_FILTER = "(&("+Constants.OBJECTCLASS+"="+FlowRepositoryService.class.getName()+")(type=FILE))";
   
-  private static BundleContext context;
+  static final String SERVICE_FILTER = "(&("+Constants.OBJECTCLASS+"="+FlowRepositoryService.class.getName()+"))";
+
+	private static BundleContext context;
   private static Activator instance;
   
   private ServiceTracker<Object, Object> flowReposSvcTracker;
 
-  private FlowRepositoryService flowReposSvc;
+  private List<FlowRepositoryService> flowReposSvcs;
 
   public void start(BundleContext bundleContext) throws Exception {
     Activator.context = bundleContext;
@@ -38,18 +39,18 @@ public class Activator implements BundleActivator {
     return instance;
   }
   
-  public FlowRepositoryService getFlowReposSvc() {
-    return flowReposSvc;
+  public List<FlowRepositoryService> getFlowReposSvc() {
+    return flowReposSvcs;
   }
 
   private ServiceTrackerCustomizer<Object, Object> createSvcTrackerCustomizer() {
     return new ServiceTrackerCustomizer<Object, Object>() {
       public void removedService(ServiceReference<Object> ref, Object svc) {
         synchronized (Activator.this) {
-          if (svc != Activator.this.flowReposSvc) {
+          if (!Activator.this.flowReposSvcs.contains(svc)) {
             return;
           } else {
-            Activator.this.flowReposSvc = null;
+            Activator.this.flowReposSvcs.remove(svc);
           }
           context.ungetService(ref);
         }
@@ -61,8 +62,8 @@ public class Activator implements BundleActivator {
       public Object addingService(ServiceReference<Object> ref) {
         Object svc = context.getService(ref);
         synchronized (Activator.this) {
-          if (Activator.this.flowReposSvc == null) {
-            Activator.this.flowReposSvc = (FlowRepositoryService) svc;
+          if (!Activator.this.flowReposSvcs.contains(svc)) {
+           Activator.this.flowReposSvcs.add((FlowRepositoryService) svc);
           }
         }
         return svc;

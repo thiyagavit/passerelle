@@ -1,6 +1,7 @@
 package com.isencia.passerelle.runtime.impl.mock.activator;
 
 import java.io.File;
+import java.util.Hashtable;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -18,7 +19,9 @@ public class Activator implements BundleActivator {
     File defaultRootFolderPath = new File(userHome, ".passerelle/passerelle-repository");
     String rootFolderPath      = System.getProperty("com.isencia.passerelle.repository.root", defaultRootFolderPath.getAbsolutePath());
     repoSvc = new FlowRepositoryServiceImpl(rootFolderPath);
-    repoSvcReg = (ServiceRegistration<FlowRepositoryService>) context.registerService(FlowRepositoryService.class.getName(), repoSvc, null);
+    Hashtable<String, String> svcProps = new Hashtable<String, String>();
+    svcProps.put("type", "FILE");
+    repoSvcReg = (ServiceRegistration<FlowRepositoryService>) context.registerService(FlowRepositoryService.class.getName(), repoSvc, svcProps);
 
     plugin = this;
   }

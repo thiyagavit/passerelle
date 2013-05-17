@@ -14,7 +14,10 @@ import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 import com.isencia.passerelle.runtime.ws.rest.CodeList;
+import com.isencia.passerelle.runtime.ws.rest.ErrorInfo;
+import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
@@ -32,8 +35,8 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
 
   public void init(Dictionary<String, String> configuration) {
     try {
-      String debugStr = configuration.get("com.isencia.passerelle.runtime.ws.rest.client.debug");
-      String resourceURLStr = configuration.get("com.isencia.passerelle.runtime.ws.rest.client.resourceURL");
+      String debugStr = configuration.get("debug");
+      String resourceURLStr = configuration.get("resourceURL");
       boolean debug = Boolean.parseBoolean(debugStr);
       restClient = Client.create();
       if (debug) {
@@ -77,14 +80,28 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
 
   @Override
   public FlowHandle getActiveFlow(String flowCode) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      FlowHandleResource handleResource = flowReposResource.path(flowCode).accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
+      return new FlowHandleImpl(handleResource);
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(flowCode);
+    }
   }
 
   @Override
   public FlowHandle getMostRecentFlow(String flowCode) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      FlowHandleResource handleResource = flowReposResource.path(flowCode).path("mostRecent").accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
+      return new FlowHandleImpl(handleResource);
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(flowCode);
+    }
   }
 
   @Override
