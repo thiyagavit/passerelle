@@ -26,7 +26,8 @@ public class FlowHandleResources {
     for(FlowHandle handle : flowHandles) {
       FlowHandleResource fhRes = null;
       if (uriBldr != null) {
-        URI resLoc = uriBldr.clone().path("{code}").queryParam("version", "{version}").build(handle.getCode(), handle.getVersion());
+//        URI resLoc = uriBldr.clone().path("{code}").queryParam("version", "{version}").build(handle.getCode(), handle.getVersion());
+        URI resLoc = uriBldr.clone().path("{code}").build(handle.getCode());
         fhRes = new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
       } else {
         fhRes = new FlowHandleResource(handle);

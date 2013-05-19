@@ -1,11 +1,14 @@
 package com.isencia.passerelle.runtime.test.activator;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
@@ -19,7 +22,9 @@ public class Activator implements BundleActivator {
   
   private ServiceTracker<Object, Object> flowReposSvcTracker;
 
-  private List<FlowRepositoryService> flowReposSvcs;
+  private List<FlowRepositoryService> flowReposSvcs = new ArrayList<FlowRepositoryService>();
+
+  private ServiceRegistration<?> testCmdProvider;
 
   public void start(BundleContext bundleContext) throws Exception {
     Activator.context = bundleContext;
@@ -27,9 +32,13 @@ public class Activator implements BundleActivator {
     Filter filter = context.createFilter(SERVICE_FILTER);
     flowReposSvcTracker = new ServiceTracker<Object, Object>(bundleContext, filter, createSvcTrackerCustomizer());
     flowReposSvcTracker.open();
+    
+    testCmdProvider = context.registerService(CommandProvider.class.getName(), new TestRunner(), null);
+
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
+    testCmdProvider.unregister();
     flowReposSvcTracker.close();
     Activator.context = null;
     Activator.instance = null;

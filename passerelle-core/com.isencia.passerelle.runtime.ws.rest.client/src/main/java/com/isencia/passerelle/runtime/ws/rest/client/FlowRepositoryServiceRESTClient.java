@@ -16,6 +16,7 @@ import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 import com.isencia.passerelle.runtime.ws.rest.CodeList;
 import com.isencia.passerelle.runtime.ws.rest.ErrorInfo;
 import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
+import com.isencia.passerelle.runtime.ws.rest.FlowHandleResources;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -56,33 +57,51 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
 
   @Override
   public FlowHandle commit(Flow flow) throws DuplicateEntryException {
-    // TODO Auto-generated method stub
-    return null;
+    return commit(flow.getName(), flow);
   }
 
   @Override
   public FlowHandle commit(String flowCode, Flow flow) throws DuplicateEntryException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      return flowReposResource.path(flowCode).type(MediaType.APPLICATION_XML).post(FlowHandleResource.class, flow.exportMoML());
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new DuplicateEntryException(flowCode);
+    }
   }
 
   @Override
   public FlowHandle[] delete(String flowCode) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      FlowHandleResources handleResources = flowReposResource.path(flowCode).delete(FlowHandleResources.class);
+      return handleResources.getFlowHandles().toArray(new FlowHandle[0]);
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(flowCode);
+    }
   }
 
   @Override
   public FlowHandle update(FlowHandle handle, Flow updatedFlow, boolean activate) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      return flowReposResource.path(handle.getCode()).queryParam("activate", Boolean.toString(activate)).type(MediaType.APPLICATION_XML)
+          .put(FlowHandleResource.class, updatedFlow.exportMoML());
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(handle.getCode());
+    }
   }
 
   @Override
   public FlowHandle getActiveFlow(String flowCode) throws EntryNotFoundException {
     try {
-      FlowHandleResource handleResource = flowReposResource.path(flowCode).accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
-      return new FlowHandleImpl(handleResource);
+      return flowReposResource.path(flowCode).get(FlowHandleResource.class);
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
@@ -94,8 +113,7 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
   @Override
   public FlowHandle getMostRecentFlow(String flowCode) throws EntryNotFoundException {
     try {
-      FlowHandleResource handleResource = flowReposResource.path(flowCode).path("mostRecent").accept(MediaType.APPLICATION_JSON).get(FlowHandleResource.class);
-      return new FlowHandleImpl(handleResource);
+      return flowReposResource.path(flowCode).path("mostRecent").get(FlowHandleResource.class);
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
@@ -106,7 +124,7 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
 
   @Override
   public String[] getAllFlowCodes() {
-    CodeList codeList = flowReposResource.accept(MediaType.APPLICATION_JSON).get(CodeList.class);
+    CodeList codeList = flowReposResource.get(CodeList.class);
     if (codeList != null && codeList.getCodes() != null) {
       return codeList.getCodes().toArray(new String[0]);
     } else {
@@ -116,14 +134,27 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
 
   @Override
   public FlowHandle[] getAllFlowRevisions(String flowCode) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      FlowHandleResources handleResources = flowReposResource.path(flowCode).get(FlowHandleResources.class);
+      return handleResources.getFlowHandles().toArray(new FlowHandle[0]);
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(flowCode);
+    }
   }
 
   @Override
   public FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      return flowReposResource.path(handle.getCode()).path("activate").post(FlowHandleResource.class, new FlowHandleResource(handle));
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(handle.getCode());
+    }
   }
 
 }

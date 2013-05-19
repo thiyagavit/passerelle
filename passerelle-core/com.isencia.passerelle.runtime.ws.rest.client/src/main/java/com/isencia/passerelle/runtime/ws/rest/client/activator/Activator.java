@@ -30,16 +30,6 @@ public class Activator implements BundleActivator {
         context.registerService(FlowRepositoryService.class.getName(), repoSvc, svcProps);
 
     plugin = this;
-    
-    
-    String[] allFlowCodes = repoSvc.getAllFlowCodes();
-    System.out.println("Flow codes :"+Arrays.toString(allFlowCodes));
-    FlowHandle flow = repoSvc.getActiveFlow(allFlowCodes[0]);
-    System.out.println("Active flow :"+flow);
-    flow = repoSvc.getMostRecentFlow(allFlowCodes[0]);
-    System.out.println("Most recent flow :"+flow);
-    flow = repoSvc.getMostRecentFlow("polleke");
-    System.out.println("Most recent flow :"+flow);
   }
 
   public void stop(BundleContext context) throws Exception {
