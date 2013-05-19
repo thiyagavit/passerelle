@@ -61,6 +61,15 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
       throw new IllegalArgumentException(rootFolder.getPath() + " is not a folder");
     }
   }
+  
+  public void clearRepository() {
+    try {
+      FileUtils.deleteDirectory(rootFolder);
+      rootFolder.mkdirs();
+    } catch (IOException e) {
+      LOGGER.error("Failed to clear repository directory", e);
+    }
+  }
 
   @Override
   public FlowHandle commit(Flow flow) throws DuplicateEntryException {

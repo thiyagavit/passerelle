@@ -52,13 +52,8 @@ public class FlowRepositoryServiceRESTFacade {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
-      FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
-      if (uriInfo != null) {
-        URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(flowCode);
-        return new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
-      } else {
-        return new FlowHandleResource(handle);
-      }
+      FlowHandle localHandle = getFlowRepositoryService().getActiveFlow(flowCode);
+      return buildRemoteHandle(localHandle);
     }
   }
 
@@ -68,13 +63,8 @@ public class FlowRepositoryServiceRESTFacade {
     if (flowCode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
-      FlowHandle handle = getFlowRepositoryService().getMostRecentFlow(flowCode);
-      if (uriInfo != null) {
-        URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(flowCode);
-        return new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
-      } else {
-        return new FlowHandleResource(handle);
-      }
+      FlowHandle localHandle = getFlowRepositoryService().getMostRecentFlow(flowCode);
+      return buildRemoteHandle(localHandle);
     }
   }
 
@@ -94,7 +84,8 @@ public class FlowRepositoryServiceRESTFacade {
     if (handle == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
     } else {
-      return getFlowRepositoryService().activateFlowRevision(handle);
+      FlowHandle localHandle = getFlowRepositoryService().activateFlowRevision(handle);
+      return buildRemoteHandle(localHandle);
     }
   }
 
@@ -113,7 +104,8 @@ public class FlowRepositoryServiceRESTFacade {
       } catch (Exception e) {
         throw new InvalidRequestException(ErrorCode.ERROR, "");
       }
-      return new FlowHandleResource(getFlowRepositoryService().commit(flowCode, flow));
+      FlowHandle localHandle = getFlowRepositoryService().commit(flowCode, flow);
+      return buildRemoteHandle(localHandle);
     }
   }
 
@@ -143,12 +135,21 @@ public class FlowRepositoryServiceRESTFacade {
       } catch (Exception e) {
         throw new InvalidRequestException(ErrorCode.ERROR, "");
       }
-      return new FlowHandleResource(getFlowRepositoryService().update(handle, updatedFlow, activate))
-      ;
+      FlowHandle localHandle = getFlowRepositoryService().update(handle, updatedFlow, activate);
+      return buildRemoteHandle(localHandle);
     }
   }
 
-  public FlowRepositoryService getFlowRepositoryService() {
+  private FlowRepositoryService getFlowRepositoryService() {
     return Activator.getInstance().getFlowReposSvc();
+  }
+
+  private FlowHandle buildRemoteHandle(FlowHandle localHandle) {
+    if (uriInfo != null) {
+      URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(localHandle.getCode());
+      return new FlowHandleResource(resLoc, localHandle.getCode(), localHandle.getRawFlowDefinition(), localHandle.getVersion());
+    } else {
+      return new FlowHandleResource(localHandle);
+    }
   }
 }
