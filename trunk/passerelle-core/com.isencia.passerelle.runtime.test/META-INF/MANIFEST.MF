@@ -18,5 +18,5 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.4.0",
  com.isencia.passerelle.testsupport;bundle-version="8.4.0",
  com.isencia.passerelle.runtime;bundle-version="8.4.0",
- com.isencia.passerelle.runtime.impl.mock;bundle-version="8.4.0",
+ com.isencia.passerelle.runtime.repos.impl.filesystem;bundle-version="8.4.0",
  org.junit
