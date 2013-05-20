@@ -11,7 +11,7 @@ import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.runtime.FlowHandle;
-import com.isencia.passerelle.runtime.impl.mock.FlowRepositoryServiceImpl;
+import com.isencia.passerelle.runtime.repos.impl.filesystem.FlowRepositoryServiceImpl;
 import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
