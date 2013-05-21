@@ -38,6 +38,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.ext.ConfigurationExtender;
@@ -61,18 +62,18 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
    * The collection of parameters that are meant to be available to a model configurer tool. The actor's parameters that are not in this collection are not
    * meant to be configurable, but are only meant to be used during model assembly (in addition to the public ones).
    */
-  private Collection<Parameter> configurableParameters = new HashSet<Parameter>();
+  private Collection<Parameter> configurableParameters;
 
   /**
    * The collection of listeners for FiringEvents. If the collection is empty, no events are generated. If non-empty, inside the ProcessThread.run(), lots of
    * events are generated for each transition in the iteration of an actor.
    */
-  private Collection<FiringEventListener> firingEventListeners = Collections.synchronizedSet(new HashSet<FiringEventListener>());
+  private Collection<FiringEventListener> firingEventListeners;
 
   /**
    * The collection of error collectors, to which the Director forwards any reported errors. If the collection is empty, reported errors are logged.
    */
-  private Collection<ErrorCollector> errorCollectors = Collections.synchronizedSet(new HashSet<ErrorCollector>());
+  private Collection<ErrorCollector> errorCollectors;
 
   private DefaultExecutionControlStrategy execCtrlStrategy = new DefaultExecutionControlStrategy();
   private ExecutionPrePostProcessor execPrePostProcessor = new DefaultExecutionPrePostProcessor();
@@ -94,11 +95,11 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   // be handling several tasks concurrently.
   // The taskHandle could be used to link to any domain-specific task entity.
   // The startTime could be used for internal CEP, timeout mgmt etc.
-  private ConcurrentMap<Object, Actor> busyTaskActors = new ConcurrentHashMap<Object, Actor>();
+  private ConcurrentMap<Object, Actor> busyTaskActors;
 
   // maintains which actors have already indicated that they're no longer
   // participating in the current model execution
-  private ConcurrentLinkedQueue<Actor> activeActors = new ConcurrentLinkedQueue<Actor>();
+  private ConcurrentLinkedQueue<Actor> activeActors;
 
   /**
    * @param container
@@ -110,6 +111,8 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
     super(container, name);
     LOGGER = LoggerFactory.getLogger(container.getClass().getName() + "." + this.getClass().getName());
 
+    init();
+    
     if (container.getAttribute(STOP_FOR_UNHANDLED_ERROR_PARAM) != null) {
       stopForUnhandledErrorParam = (Parameter) container.getAttribute(STOP_FOR_UNHANDLED_ERROR_PARAM);
     } else {
@@ -154,6 +157,21 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
       new CheckBoxStyle(validateIterationParam, "style");
       registerConfigurableParameter(validateIterationParam);
     }
+  }
+  
+  protected void init() {
+    configurableParameters = new HashSet<Parameter>();
+    firingEventListeners = Collections.synchronizedSet(new HashSet<FiringEventListener>());
+    errorCollectors = Collections.synchronizedSet(new HashSet<ErrorCollector>());
+    busyTaskActors = new ConcurrentHashMap<Object, Actor>();
+    activeActors = new ConcurrentLinkedQueue<Actor>();
+  }
+
+  @Override
+  public Object clone(Workspace workspace) throws CloneNotSupportedException {
+    DefaultDirectorAdapter clonedAdapter = (DefaultDirectorAdapter)  super.clone(workspace);
+    clonedAdapter.init();
+    return clonedAdapter;
   }
 
   public void addErrorCollector(ErrorCollector errCollector) {
@@ -360,14 +378,15 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
       LOGGER.info("notifyActorStartedTask() - Extra task {} passed for busy actor {}", task, actor.getFullName());
     }
     if (task == null) {
-      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorStartedTask() - Null task passed for actor {}", actor.getFullName());
+      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode() + " - notifyActorStartedTask() - Null task passed for actor {}", actor.getFullName());
       // no task differentiation possible, so just use the actor itself as key
       task = actor;
     }
     Actor actor2 = busyTaskActors.putIfAbsent(task, actor);
     if (actor2 != null) {
-      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorStartedTask() - Task {} passed for actor {}, but already linked with actor {}", 
-          new Object[]{task, actor.getFullName(), actor2.getFullName()});
+      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()
+          + " - notifyActorStartedTask() - Task {} passed for actor {}, but already linked with actor {}",
+          new Object[] { task, actor.getFullName(), actor2.getFullName() });
     } else {
       LOGGER.debug("notifyActorStartedTask() - Task {} started for actor {}", task, actor.getFullName());
     }
@@ -377,22 +396,25 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
 
   public void notifyActorFinishedTask(Actor actor, Object task) throws IllegalArgumentException {
     if (!isActorBusy(actor)) {
-      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorFinishedTask() - Task {} passed for non-busy actor {}", task, actor.getFullName());
+      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode() + " - notifyActorFinishedTask() - Task {} passed for non-busy actor {}", task,
+          actor.getFullName());
     }
     if (task == null) {
-      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorFinishedTask() - Null task passed for actor {}", actor.getFullName());
+      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode() + " - notifyActorFinishedTask() - Null task passed for actor {}", actor.getFullName());
       // no task differentiation possible, so just use the actor itself as key
       task = actor;
     }
     if (actor == busyTaskActors.get(task)) {
       boolean removed = busyTaskActors.remove(task, actor);
-      if(removed) {
+      if (removed) {
         LOGGER.debug("notifyActorFinishedTask() - Task {} finished for actor {}", task, actor.getFullName());
       } else {
-        LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorFinishedTask() - Removal failed for task {} and actor {}", task, actor.getFullName());
+        LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode() + " - notifyActorFinishedTask() - Removal failed for task {} and actor {}", task,
+            actor.getFullName());
       }
     } else {
-      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode()+" - notifyActorFinishedTask() - Task {} was not linked with actor {}", task, actor.getFullName());
+      LOGGER.error(ErrorCode.FLOW_STATE_ERROR.getFormattedCode() + " - notifyActorFinishedTask() - Task {} was not linked with actor {}", task,
+          actor.getFullName());
     }
     // TODO : could be interesting to generate events for this?
     // enqueueEvent(new TaskFinishedEvent(task, actor));
