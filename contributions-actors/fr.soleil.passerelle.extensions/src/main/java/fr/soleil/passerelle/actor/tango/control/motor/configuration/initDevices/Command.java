@@ -52,6 +52,7 @@ public abstract class Command {
             if (state == deviceState) {
                 command.execute(states);
                 commandAsBeenExecuted = true;
+                break;
             }
         }
         return commandAsBeenExecuted;
