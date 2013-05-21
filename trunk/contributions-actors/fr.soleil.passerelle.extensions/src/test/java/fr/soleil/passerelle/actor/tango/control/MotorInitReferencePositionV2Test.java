@@ -68,6 +68,8 @@ public class MotorInitReferencePositionV2Test {
 
     @Deprecated
     @Test(expectedExceptions = IllegalActionException.class)
+    // Test attributeChange 
+    // Deprecated: should be tested by the ATangoDeviceActorV5 class
     public void when_deviceName_parameter_is_empty_before_start_then_an_excpetion_is_raised()
             throws IllegalActionException {
         MotorInitReferencePositionV2 actor = (MotorInitReferencePositionV2) moml
