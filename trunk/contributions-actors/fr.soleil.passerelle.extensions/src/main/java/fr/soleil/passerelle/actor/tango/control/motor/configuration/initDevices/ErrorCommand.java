@@ -9,7 +9,7 @@ import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
  * raise an exception if the device is in particularly state eg: In the case of motor
- * initialisation, an error must be raise if the motor is disable or moving
+ * initialisation, an error must be raise if the motor is disable (security is enabled) or moving
  */
 public class ErrorCommand extends Command {
 
@@ -20,11 +20,7 @@ public class ErrorCommand extends Command {
     @Override
     public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
         DevState deviceState = stateCommand.execute(DevState.class);
-        for (DevState state : states) {
-            if (state == deviceState) {
-                throw new ProcessingExceptionWithLog(actor, "Error device " + deviceName
-                        + " is in  " + state + " state", null, null);
-            }
-        }
+        throw new ProcessingExceptionWithLog(actor, "Error device " + deviceName + " is in  "
+                + deviceState + " state", null, null);
     }
 }
