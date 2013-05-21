@@ -26,12 +26,12 @@ public class OnCommand extends Command {
         ExecutionTracerService.trace(actor, "Motor is off, try to execute On command" + deviceName);
         command.execute();
 
-        try {
-            Thread.sleep(200);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();// TODO log
-        }
+//        try {
+//            Thread.sleep(200);
+//        }
+//        catch (InterruptedException e) {
+//            e.printStackTrace();// TODO log
+//        }
 
         DevState deviceState = stateCommand.execute(DevState.class);
         for (DevState state : states) {
