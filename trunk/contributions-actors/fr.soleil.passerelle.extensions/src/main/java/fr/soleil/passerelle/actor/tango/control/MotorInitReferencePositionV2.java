@@ -154,9 +154,10 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
                     final DevState currentState = TangoAccess.getCurrentState(deviceName);
 
                     // check init has been correctly executed
+                    final String status = dev.status();
                     if (currentState.equals(DevState.FAULT) || currentState.equals(DevState.ALARM)
-                            && dev.status().contains(AXIS_NOT_INIT)) {
-                        final String status = dev.status();
+                            && status.contains(AXIS_NOT_INIT)) {
+                        
                         ExecutionTracerService.trace(this, deviceName
                                 + " has not been correcty inialized: " + status);
                         throw new ProcessingExceptionWithLog(this,
@@ -206,7 +207,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     }
 
     private void stopMotor() {
-        if (!isMockMode()) {
+        if (!isMockMode()) {          
             if (waitTask != null) {
                 waitTask.cancel();
             }
@@ -226,27 +227,13 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     }
 
     @Override
-    protected void doStop() { // TODO send STOP ??
+    protected void doStop() {         
         stopMotor();
         super.doStop();
     }
 
     @Override
     public void doFinalAction() {
-        if (!isMockMode()) {
-            try {
-                // bug 22954
-                if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
-                    ExecutionTracerService.trace(this, "motor has been stop");
-                }
-            }
-            catch (final DevFailed e) {
-                TangoToPasserelleUtil.getDevFailedString(e, this);
-            }
-            catch (final Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+        stopMotor();   
     }
 }
