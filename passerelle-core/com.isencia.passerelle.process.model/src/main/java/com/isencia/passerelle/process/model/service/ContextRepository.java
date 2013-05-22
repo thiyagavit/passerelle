@@ -29,9 +29,9 @@ public interface ContextRepository {
   /**
    * Retrieve the <code>Context</code> with the given identifier
    * 
-   * @param reposId the <code>Context</code>'s repository identifier
+   * @param processContextId the <code>Context</code>'s repository identifier
    * @return the Context, null if not found
    */
-  Context getContext(String reposId);
+  Context getContext(String processContextId);
 
 }
