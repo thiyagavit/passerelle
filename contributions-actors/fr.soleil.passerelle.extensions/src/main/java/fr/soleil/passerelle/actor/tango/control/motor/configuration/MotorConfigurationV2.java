@@ -60,20 +60,20 @@ public class MotorConfigurationV2 {
      * 
      * @param proxy the proxy of the motor.
      * @param deviceName the motor that we want to find the cb
-     * @param isTestEnv flag that indicate if we are un test or production environment
+     * @param useSimulatedMotor flag that indicate if we are in test or production environment
      * 
      * @throws fr.esrf.Tango.DevFailed if the deviceProxy to the motor can not be created of
      *             Devfailed is raised
      */
-    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName, boolean isTestEnv)
-            throws DevFailed {
+    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName,
+            boolean useSimulatedMotor) throws DevFailed {
         this.deviceName = deviceName;
 
         if (proxy == null) {
             DevFailedUtils.throwDevFailed("axis proxy can not be null");
         }
         axisProxy = proxy;
-        controlBoxDeviceClass = isTestEnv ? "SimulatedControlBox" : "ControlBox";
+        controlBoxDeviceClass = useSimulatedMotor ? "SimulatedControlBox" : "ControlBox";
         switchToOffAfterInit = false;
 
     }
