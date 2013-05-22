@@ -30,7 +30,6 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class MotorConfigurationV2 {
 
@@ -59,26 +58,24 @@ public class MotorConfigurationV2 {
      * class device is not same than real. So we add a boolean to specify which class name should be
      * be used to find the cb
      * 
+     * @param proxy the proxy of the motor.
      * @param deviceName the motor that we want to find the cb
      * @param isTestEnv flag that indicate if we are un test or production environment
      * 
      * @throws fr.esrf.Tango.DevFailed if the deviceProxy to the motor can not be created of
      *             Devfailed is raised
      */
-    public MotorConfigurationV2(final String deviceName, boolean isTestEnv) throws DevFailed {
+    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName, boolean isTestEnv)
+            throws DevFailed {
         this.deviceName = deviceName;
-        axisProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
+
+        if (proxy == null) {
+            DevFailedUtils.throwDevFailed("axis proxy can not be null");
+        }
+        axisProxy = proxy;
         controlBoxDeviceClass = isTestEnv ? "SimulatedControlBox" : "ControlBox";
         switchToOffAfterInit = false;
 
-    }
-
-    /**
-     * Retrieve the controlBox (cb) of one device in production environment. @see
-     * MotorConfiguration(final String deviceName, boolean isTestEnv)
-     */
-    public MotorConfigurationV2(final String deviceName) throws DevFailed {
-        this(deviceName, false);
     }
 
     public boolean isSwitchToOffAfterInit() {
