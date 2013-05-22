@@ -13,6 +13,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.Settable;
 
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -42,6 +43,7 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements IActorFinalizer {
 
     private final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
+    private final String USE_SIMULATED_MOTOR = "Use simulated motor";
     private MotorConfigurationV2 conf;
     private WaitStateTask waitTask;
 
@@ -49,6 +51,10 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     @ParameterName(name = INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
+
+    @ParameterName(name = USE_SIMULATED_MOTOR)
+    public Parameter useSimulatedMotorParam;
+    private boolean useSimulatedMotor = false;
 
     public MotorInitReferencePositionV2(CompositeEntity container, String name)
             throws IllegalActionException, NameDuplicationException {
@@ -76,12 +82,19 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
         shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
                 shouldInitDevice));
         shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
+
+        useSimulatedMotorParam = new Parameter(this, USE_SIMULATED_MOTOR, new BooleanToken(
+                useSimulatedMotor));
+        useSimulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
+        useSimulatedMotorParam.setVisibility(Settable.EXPERT);
     }
 
     @Override
     public void attributeChanged(Attribute attribute) throws IllegalActionException {
         if (attribute == shouldInitDevicesParam) {
             shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
+        } else if (attribute == useSimulatedMotorParam) {
+            useSimulatedMotor = PasserelleUtil.getParameterBooleanValue(useSimulatedMotorParam);
         }
         super.attributeChanged(attribute);
     }
@@ -105,7 +118,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             dev.command_query("MotorON");
             dev.command_query("InitializeReferencePosition");
 
-            conf = new MotorConfigurationV2(dev, getDeviceName(), true);
+            conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
             conf.retrieveFullConfig();
 
         }

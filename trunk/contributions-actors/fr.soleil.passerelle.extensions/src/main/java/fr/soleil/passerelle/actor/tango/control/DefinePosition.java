@@ -12,6 +12,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.Settable;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
@@ -39,17 +40,23 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 public class DefinePosition extends ATangoDeviceActorV5 {
 
-    private static final String DEFINE_POSITION_CMD_NAME = "DefinePosition";
+    public static final String DEFINE_POSITION_CMD_NAME = "DefinePosition";
     public static final String OFFSET_PORT_NAME = "offset";
-    public static String OUTPUT_PORT_NAME = "InitOK";
+    public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
+    public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
+    public static final String OUTPUT_PORT_NAME = "InitOK";
     public final Port offsetPort;
-    private final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
+
     private MotorConfigurationV2 conf;
 
     public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
     @ParameterName(name = INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
+
+    @ParameterName(name = USE_SIMULATED_MOTOR)
+    public Parameter useSimulatedMotorParam;
+    private boolean useSimulatedMotor = false;
 
     public DefinePosition(CompositeEntity container, String name) throws IllegalActionException,
             NameDuplicationException {
@@ -75,20 +82,25 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 + "\"/>\n" + "</svg>\n");
 
         output.setName(OUTPUT_PORT_NAME);
-        // noInitDonePort = PortFactory.getInstance().createOutputPort(this,
-        // NO_INIT_DONE_PORT_NAME);
         offsetPort = PortFactory.getInstance().createInputPort(this, OFFSET_PORT_NAME, null);
 
         input.setName("position");
         shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
                 shouldInitDevice));
         shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
+
+        useSimulatedMotorParam = new Parameter(this, USE_SIMULATED_MOTOR, new BooleanToken(
+                useSimulatedMotor));
+        useSimulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
+        useSimulatedMotorParam.setVisibility(Settable.EXPERT);
     }
 
     @Override
     public void attributeChanged(Attribute attribute) throws IllegalActionException {
         if (attribute == shouldInitDevicesParam) {
             shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
+        } else if (attribute == useSimulatedMotorParam) {
+            useSimulatedMotor = PasserelleUtil.getParameterBooleanValue(useSimulatedMotorParam);
         }
         super.attributeChanged(attribute);
     }
