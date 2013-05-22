@@ -105,7 +105,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             dev.command_query("MotorON");
             dev.command_query("InitializeReferencePosition");
 
-            conf = new MotorConfigurationV2(getDeviceName(), true);
+            conf = new MotorConfigurationV2(dev, getDeviceName(), true);
             conf.retrieveFullConfig();
 
         }
@@ -157,7 +157,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
                     final String status = dev.status();
                     if (currentState.equals(DevState.FAULT) || currentState.equals(DevState.ALARM)
                             && status.contains(AXIS_NOT_INIT)) {
-                        
+
                         ExecutionTracerService.trace(this, deviceName
                                 + " has not been correcty inialized: " + status);
                         throw new ProcessingExceptionWithLog(this,
@@ -207,7 +207,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     }
 
     private void stopMotor() {
-        if (!isMockMode()) {          
+        if (!isMockMode()) {
             if (waitTask != null) {
                 waitTask.cancel();
             }
@@ -227,13 +227,13 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     }
 
     @Override
-    protected void doStop() {         
+    protected void doStop() {
         stopMotor();
         super.doStop();
     }
 
     @Override
     public void doFinalAction() {
-        stopMotor();   
+        stopMotor();
     }
 }

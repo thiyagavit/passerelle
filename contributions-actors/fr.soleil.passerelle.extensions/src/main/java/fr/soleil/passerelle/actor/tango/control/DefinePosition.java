@@ -41,9 +41,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
 
     private static final String DEFINE_POSITION_CMD_NAME = "DefinePosition";
     public static final String OFFSET_PORT_NAME = "offset";
-    // public static final String NO_INIT_DONE_PORT_NAME = "noInitDone";
     public static String OUTPUT_PORT_NAME = "InitOK";
-    // public final Port noInitDonePort;
     public final Port offsetPort;
     private final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
     private MotorConfigurationV2 conf;
@@ -104,9 +102,8 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             final DeviceProxy dev = getDeviceProxy();
             dev.command_query(DEFINE_POSITION_CMD_NAME);
 
-            conf = new MotorConfigurationV2(getDeviceName(), true);
+            conf = new MotorConfigurationV2(dev, getDeviceName(), true);
             conf.retrieveFullConfig();
-
         }
         catch (DevFailed devFailed) {
             throw new DevFailedValidationException(devFailed, this);
