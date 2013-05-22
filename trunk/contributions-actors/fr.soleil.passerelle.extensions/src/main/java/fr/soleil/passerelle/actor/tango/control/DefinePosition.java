@@ -148,62 +148,56 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             try {
                 DeviceProxy dev = getDeviceProxy();
 
-                if (!dev.status().contains(AXIS_NOT_INIT)) {
-                    ExecutionTracerService.trace(this, "Warning: " + deviceName
-                            + " is already initialized, nothing done");
-                } else {
-                    if (shouldInitDevice) {
-                        conf.initDevice(this);
-                    }
-
-                    // run DefinePosition
-                    try {
-                        double position = 0;
-                        double offset = 0;
-
-                        position = Double.parseDouble((String) PasserelleUtil.getInputValue(request
-                                .getMessage(input)));
-
-                        String offsetAsString = ((String) PasserelleUtil.getInputValue(request
-                                .getMessage(offsetPort))).trim();
-
-                        if (!offsetAsString.isEmpty()) {
-                            offset = Double.parseDouble(offsetAsString);
-
-                            // set the offset
-                            dev.write_attribute(new DeviceAttribute("offset", offset));
-                        }
-
-                        // set the position
-                        DeviceData value = new DeviceData();
-                        value.insert(position);
-                        dev.command_inout(DEFINE_POSITION_CMD_NAME, value);
-
-                        raiseExceptionIfDefinePositionFailed(dev, context);
-
-                        // if the motor was off before the init, we switch it to off again
-                        if (conf.isSwitchToOffAfterInit()) {
-                            dev.command_inout("MotorOff");
-                        }
-
-                        StringBuilder msg = new StringBuilder(deviceName);
-                        msg.append("define position applied with position: ");
-                        msg.append(position);
-                        if (!offsetAsString.isEmpty()) {
-                            msg.append(" ; offset: ");
-                            msg.append(offset);
-                        }
-                        ExecutionTracerService.trace(this, msg.toString());
-                        response.addOutputMessage(output, createMessage());
-
-                    }
-                    catch (NumberFormatException e) {
-                        throw new ProcessingExceptionWithLog(this,
-                                PasserelleException.Severity.FATAL,
-                                "Error: position or offset is not a number", context, null);
-                    }
+                if (shouldInitDevice) {
+                    conf.initDevice(this);
                 }
+
+                // run DefinePosition
+
+                double position = 0;
+                double offset = 0;
+
+                position = Double.parseDouble((String) PasserelleUtil.getInputValue(request
+                        .getMessage(input)));
+
+                String offsetAsString = ((String) PasserelleUtil.getInputValue(request
+                        .getMessage(offsetPort))).trim();
+
+                if (!offsetAsString.isEmpty()) {
+                    offset = Double.parseDouble(offsetAsString);
+
+                    // set the offset
+                    dev.write_attribute(new DeviceAttribute("offset", offset));
+                }
+
+                // set the position
+                DeviceData value = new DeviceData();
+                value.insert(position);
+                dev.command_inout(DEFINE_POSITION_CMD_NAME, value);
+
+                raiseExceptionIfDefinePositionFailed(dev, context);
+
+                // if the motor was off before the init, we switch it to off again
+                if (conf.isSwitchToOffAfterInit()) {
+                    dev.command_inout("MotorOff");
+                }
+
+                StringBuilder msg = new StringBuilder(deviceName);
+                msg.append("define position applied with position: ");
+                msg.append(position);
+                if (!offsetAsString.isEmpty()) {
+                    msg.append(" ; offset: ");
+                    msg.append(offset);
+                }
+                ExecutionTracerService.trace(this, msg.toString());
+                response.addOutputMessage(output, createMessage());
+
             }
+            catch (NumberFormatException e) {
+                throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                        "Error: position or offset is not a number", context, null);
+            }
+
             catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
             }
