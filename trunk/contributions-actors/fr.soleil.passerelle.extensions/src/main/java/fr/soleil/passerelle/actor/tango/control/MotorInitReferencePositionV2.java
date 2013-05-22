@@ -125,8 +125,9 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             if (conf.getEncoder() == ABSOLUTE) {
                 throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
                         + " has an absolute encoder, no need to initialize", this, null);
+            }
 
-            } else if (conf.getInitStrategy() == DP) {
+            if (conf.getInitStrategy() == DP) {
                 throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
                         + "  has no initialization strategy, must use DefinePosition", this, null);
             }
