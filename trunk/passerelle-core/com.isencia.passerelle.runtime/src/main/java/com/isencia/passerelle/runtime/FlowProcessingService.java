@@ -27,69 +27,74 @@ import com.isencia.passerelle.model.FlowNotExecutingException;
  *
  */
 public interface FlowProcessingService {
+  
+  enum StartMode {
+    NORMAL, DEBUG, STEP;
+  }
 
   /**
-   * Start a process in normal mode, typically executing in one shot until the end.
+   * Start a process in the specified mode.
+   * <p>
+   * This method should run the model in a non-blocking way, i.e. should return swiftly with the created <code>ProcessHandle</code>
+   * while the process may keep on running in the background for a longer period of time.
+   * </p>
+   * <p>
+   * The optional listener will be notified of all detailed <code>ProcessEvent</code>s.
+   * Remark that in the absence of a listener, steps/resume may still be triggered via <code>step()</code> and <code>resume()</code>, 
+   * and status info may be obtained via iteratively invoking <code>refresh(Processhandle)</code>.
+   * <br/>
+   * But such a "polling" approach is not desirable. A listener-based approach is almost always more efficient and more powerful.
+   * </p>
+   * <p>
+   * In <b>NORMAL</b> mode, the execution will typically run in one shot until the end.
+   * </p>
    * <p>
    * Via a <code>suspend()</code> request, the execution can be suspended.
    * After which it can be continued again via <code>resume()</code>, or per <code>step()</code> etc.
    * </p>
    * <p>
-   * The optional listener will be notified of all detailed <code>ProcessEvent</code>s.
-   * Remark that in the absence of a listener, status info may be obtained via 
-   * iteratively invoking <code>refresh(Processhandle)</code>.
-   * <br/>
-   * But such a "polling" approach is not desirable. A listener-based approach is almost always more efficient and more powerful.
+   * In <b>STEP</b> mode, actor iterations are done one-by-one, each time a <code>step()</code> has been requested.
+   * Via <code>resume()</code>, the execution can continue as in <b>NORMAL</b> mode.
    * </p>
-   * @param flowHandle
-   * @param parameterOverrides can be null
-   * @param listener can be null
-   * @return
-   */
-  ProcessHandle start(FlowHandle flowHandle, Map<String, String> parameterOverrides, ProcessListener listener);
-  
-  /**
-   * Start a process in stepping mode, i.e. where actor iterations are done one-by-one,
-   * each time a <code>step()</code> has been requested.
    * <p>
-   * The optional listener will be notified of all detailed <code>ProcessEvent</code>s.
-   * Remark that in the absence of a listener, steps may still be triggered via <code>step()</code>,
-   * and status info may be obtained via iteratively invoking <code>refresh(Processhandle)</code>.
-   * <br/>
-   * But such a "polling" approach is not desirable. A listener-based approach is almost always more efficient and more powerful.
-   * </p>
-   *   
-   * @param flowHandle
-   * @param parameterOverrides can be null
-   * @param listener can be null
-   * @return
-   */
-  ProcessHandle startStep(FlowHandle flowHandle, Map<String, String> parameterOverrides, ProcessListener listener);
-  
-  /**
-   * Start a process in debug mode, with one or more breakpoints.
-   * <p>
+   * In <b>DEBUG</b> mode, the execution will suspend when one of the specified break points is reached.
+   * After which it can be continued again via <code>resume()</code>, or per <code>step()</code> etc.
+   * <br/> 
    * Breakpoints must refer to named elements in the running process : actors and/or ports.
-   * <br/> The names given should be the full hierarchic names, without the flow's name.
+   * <br/> 
+   * The names given should be the full hierarchic names, without the flow's name.
    * E.g. in a HelloWorld model with a Constant actor connected to a Console, valid breakpoints could be :
+   * <ul>
+   * <li>Constant</li>
+   * <li>Console.input</li>
+   * <li>etc.</li>
+   * </ul>
    * </p>
    * <p>
-   * The optional listener will be notified of all detailed <code>ProcessEvent</code>s.
-   * Remark that in the absence of a listener, steps/resume may still be triggered via <code>step()</code> and <code>resume()</code>,
-   * and status info may be obtained via iteratively invoking <code>refresh(Processhandle)</code>.
-   * <br/>
-   * But such a "polling" approach is not desirable. A listener-based approach is almost always more efficient and more powerful.
+   * The optional <code>processContextId</code> identifies a <code>com.isencia.passerelle.process.model.Context</code> that is being processed across one or more flow executions.
+   * Such <code>Context</code> instances and their <code>processContextId</code> are typically created outside of the Passerelle runtime services. 
+   * For simple processes, each flow execution typically corresponds to one Context which ends up in a final status. 
+   * For more complex processes, several consecutive Passerelle flow executions may be involved that are linked through delegation/redirection, sharing a same Context.
    * </p>
-   * 
+   * <p>
+   * When the <code>processContextId</code> is null, simple models may just run without a formal <code>Context</code>, i.e. by assigning a simple arbitrary execution ID for the <code>ProcessHandle</code>.
+   * More formal execution situations may choose to generate a new <code>Context</code> internally when needed/appropriate.
+   * This choice can be made either in implementations of this service, or by specialised actors used in the flows.
+   * </p>
+   * <p>
+   * Remark that loading a complete <code>Context</code> in memory, via the com.isencia.passerelle.process.model.service.ContextRepository.getContext()</code>, can be a costly operation.
+   * So when detailed <code>Context</code> data is not absolutely required, it is preferable to just pass the <code>processContextId</code> around.
+   * </p>
+   * @param mode
    * @param flowHandle
-   * @param parameterOverrides can be null
+   * @param processContextId can be null : for context-aware executions, this can be used to set/share the <code>Context</code> for a flow execution. 
+   * @param parameterOverrides can be null : overridden values of flow/actor parameters
    * @param listener can be null
-   * @param breakpointNames names of the Flow elements (ports and/or actors) 
-   * where the process should place a breakpoint
+   * @param breakpointNames optional names of the Flow elements (ports and/or actors) where the process should place a breakpoint, if started in DEBUG mode
    * @return
    */
-  ProcessHandle startDebug(FlowHandle flowHandle, Map<String, String> parameterOverrides, ProcessListener listener, String... breakpointNames);
-  
+  ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener, String... breakpointNames);
+
   /**
    * Terminate a running process through a termination event.
    * <p>

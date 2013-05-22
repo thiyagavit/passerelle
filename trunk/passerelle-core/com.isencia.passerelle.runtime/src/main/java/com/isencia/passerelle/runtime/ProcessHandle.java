@@ -40,13 +40,13 @@ public interface ProcessHandle {
    * the <code>Context</code> from the <code>ContextRepository</code> if needed.
    * <b>Remark that such retrieval can be a heavy operation and should only be attempted when really necessary.</b> 
    * <br/>
-   * For process executions without assigned <code>Context</code>s, this returns an id that can be used to
+   * For the rare process executions without assigned <code>Context</code>s, this returns an id that can be used to
    * uniquely identify the execution in any related actions, e.g. to obtain execution logs, pause/resume it etc.
    * 
    * @return the UUID of the process execution;
    * 
    */
-  String getProcessId();
+  String getProcessContextId();
   
   /**
    * 
