@@ -21,6 +21,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -121,6 +122,14 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
             conf.retrieveFullConfig();
 
+            if (conf.getEncoder() == ABSOLUTE) {
+                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
+                        + " has an absolute encoder, no need to initialize", this, null);
+
+            } else if (conf.getInitStrategy() == DP) {
+                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
+                        + "  has no initialization strategy, must use DefinePosition", this, null);
+            }
         }
         catch (DevFailed devFailed) {
             throw new DevFailedValidationException(devFailed, this);
@@ -141,26 +150,16 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             try {
                 DeviceProxy dev = getDeviceProxy();
 
-                if (shouldInitDevice) {
-                    conf.initDevice(this);
-                }
+                if (!dev.status().contains(AXIS_NOT_INIT)) {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName
+                            + " is already initialized, nothing done");
 
-                if (conf.getEncoder() == ABSOLUTE) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            deviceName + " has an absolute encoder, no need to initialize", ctxt,
-                            null);
+                } else {
+                    if (shouldInitDevice) {
+                        conf.initDevice(this);
+                    }
 
-                } else if (conf.getInitStrategy() == DP) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            deviceName
-                                    + "  has no initialization strategy, must use DefinePosition",
-                            ctxt, null);
-
-                } else if (!dev.status().contains(AXIS_NOT_INIT)) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            deviceName + " is already initialized, nothing done", ctxt, null);
-
-                } else { // run InitReferencePosition
+                    // run InitReferencePosition
                     runInitRefAndWaitEndMovement(deviceName, dev);
 
                     // Bug 22954
