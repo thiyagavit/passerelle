@@ -17,6 +17,7 @@ import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrow
 
 import org.tango.utils.DevFailedUtils;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -34,12 +35,21 @@ public class MotorConfigurationV2InitConfigTest {
     public static final String MOTOR_1_1 = "test/motor/1-1";
     public static final DbDatum DP_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "DP");
     public static final DbDatum OTHER_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "LDWP");
-    private static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0);
-    private static final DbDatum INIT_POS_IS_2 = new DbDatum(AXIS_INIT_POSITION_PROPERTY, 2);
+    public static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0);
+    public static final DbDatum INIT_POS_IS_2 = new DbDatum(AXIS_INIT_POSITION_PROPERTY, 2);
+
+    private DeviceProxy proxyMotor11;
+    private DeviceProxy proxyMotor22;
 
     private static void putProperties(String deviceName, DbDatum... properties) throws DevFailed {
         DeviceProxy motorProxy = new DeviceProxy(deviceName);
         motorProxy.put_property(properties);
+    }
+
+    @BeforeClass
+    public void setUp() throws DevFailed {
+        proxyMotor11 = new DeviceProxy(MOTOR_1_1);
+        proxyMotor22 = new DeviceProxy(MOTOR_2_2);
     }
 
     @AfterClass
@@ -49,14 +59,14 @@ public class MotorConfigurationV2InitConfigTest {
 
     @Test
     public void should_retrieve_the_controlBox_2_for_the_motor_2_2() throws DevFailed {
-        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_2_2, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         config.retrieveMyControlBox();
         assertThat(config.getControlBoxName()).isEqualTo("test/cb/2");
     }
 
     @Test
     public void should_retrieve_the_controlBox_1_for_the_motor_1_1() throws DevFailed {
-        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_1_1, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
         config.retrieveMyControlBox();
         assertThat(config.getControlBoxName()).isEqualTo("test/cb/1");
     }
@@ -67,7 +77,7 @@ public class MotorConfigurationV2InitConfigTest {
         final String deviceName = "test/gs/1";
         try {
             // TODO change device Name
-            config = new MotorConfigurationV2(deviceName, true);
+            config = new MotorConfigurationV2(new DeviceProxy(deviceName), deviceName, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -98,7 +108,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
 
         }
         catch (DevFailed devFailed) {
@@ -130,7 +140,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -154,7 +164,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -187,7 +197,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_2_2, strategy, NO_ENCODER, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -212,7 +222,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, OTHER_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -234,7 +244,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, DP_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -260,7 +270,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, OTHER_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(MOTOR_2_2, true);
+            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
