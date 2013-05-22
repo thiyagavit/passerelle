@@ -19,6 +19,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -114,8 +115,19 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             final DeviceProxy dev = getDeviceProxy();
             dev.command_query(DEFINE_POSITION_CMD_NAME);
 
-            conf = new MotorConfigurationV2(dev, getDeviceName(), true);
+            conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
             conf.retrieveFullConfig();
+
+            if (conf.getEncoder() == ABSOLUTE) {
+                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
+                        + " has an absolute encoder, no need to initialize", this, null);
+            }
+
+            if (conf.getInitStrategy() != DP) {
+                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
+                        + "  has an initialization strategy, must use ReferenceInitPosition", this,
+                        null);
+            }
         }
         catch (DevFailed devFailed) {
             throw new DevFailedValidationException(devFailed, this);
@@ -136,28 +148,15 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             try {
                 DeviceProxy dev = getDeviceProxy();
 
-                if (shouldInitDevice) {
-                    conf.initDevice(this);
-                }
+                if (!dev.status().contains(AXIS_NOT_INIT)) {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName
+                            + " is already initialized, nothing done");
+                } else {
+                    if (shouldInitDevice) {
+                        conf.initDevice(this);
+                    }
 
-                if (conf.getEncoder() == ABSOLUTE) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            deviceName + " has an absolute encoder, no need to initialize",
-                            context, null);
-
-                } else if (conf.getInitStrategy() != DP) {
-                    throw new ProcessingExceptionWithLog(
-                            this,
-                            PasserelleException.Severity.FATAL,
-                            deviceName
-                                    + "  has an initialization strategy, must use ReferenceInitPosition",
-                            context, null);
-
-                } else if (!dev.status().contains(AXIS_NOT_INIT)) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            deviceName + " is already initialized, nothing done", context, null);
-
-                } else { // run DefinePosition
+                    // run DefinePosition
                     try {
                         double position = 0;
                         double offset = 0;
@@ -204,7 +203,6 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                                 "Error: position or offset is not a number", context, null);
                     }
                 }
-
             }
             catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
@@ -213,7 +211,6 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
                         e.getMessage(), context, e);
             }
-
         }
     }
 
