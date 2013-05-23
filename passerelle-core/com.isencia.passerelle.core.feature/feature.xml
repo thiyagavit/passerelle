@@ -427,8 +427,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.apache.xerces" version="2.9.0" match="greaterOrEqual"/>
       <import plugin="org.apache.xml.serializer" version="2.7.1" match="greaterOrEqual"/>
       <import plugin="com.isencia.sherpa.commons.reduced" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="activation" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="mail" version="1.4.0" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.collections"/>
       <import plugin="org.jdom"/>
       <import plugin="org.eclipse.osgi"/>
@@ -447,6 +445,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="javax.persistence" version="2.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help"/>
       <import feature="ptolemy.feature" version="8.3.0"/>
+      <import plugin="javax.mail"/>
    </requires>
 
    <plugin
