@@ -14,6 +14,7 @@
 */
 package com.isencia.passerelle.runtime.test.activator;
 
+import com.isencia.passerelle.runtime.test.FlowRepositoryTest1;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

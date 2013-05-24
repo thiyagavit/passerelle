@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.test.FlowRepositoryTest1;
 
 public class TestRunner implements CommandProvider {
 

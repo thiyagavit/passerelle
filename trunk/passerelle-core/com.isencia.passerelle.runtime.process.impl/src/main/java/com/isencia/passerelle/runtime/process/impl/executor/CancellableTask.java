@@ -12,16 +12,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime.ws.rest;
+package com.isencia.passerelle.runtime.process.impl.executor;
 
-import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.PasserelleException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.RunnableFuture;
 
-public class InvalidRequestException extends PasserelleException {
-  private static final long serialVersionUID = -242270602480944226L;
-
-  public InvalidRequestException(ErrorCode errorCode, String parameterName) {
-    super(errorCode, parameterName, (Throwable)null);
-  }
-
+/**
+ * @see JCIP 7.1.7, Listing 7.12
+ * 
+ * @author erwin
+ */
+public interface CancellableTask<T> extends Callable<T> {
+  void cancel();
+  RunnableFuture<T> newFutureTask();
 }

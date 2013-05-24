@@ -14,9 +14,9 @@ Import-Package: org.apache.commons.io,
  ptolemy.actor;version="7.0.1",
  ptolemy.kernel;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
-Bundle-ActivationPolicy: lazy
 Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.4.0",
  com.isencia.passerelle.testsupport;bundle-version="8.4.0",
  com.isencia.passerelle.runtime;bundle-version="8.4.0",
  com.isencia.passerelle.runtime.repos.impl.filesystem;bundle-version="8.4.0",
- org.junit
+ org.junit,
+ com.isencia.passerelle.runtime.process.impl;bundle-version="8.4.0"

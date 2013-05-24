@@ -17,7 +17,6 @@ package com.isencia.passerelle.runtime;
 import java.util.List;
 import java.util.Map;
 import com.isencia.passerelle.core.Event;
-import com.isencia.passerelle.model.FlowNotExecutingException;
 
 /**
  * A service interface for everything related to executing a flow,
