@@ -80,6 +80,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         // deletePort(WRITE_PORT, WRITE_PORT_LABEL);
 
         extractionTypeParam = new StringParameter(this, EXTRACTION_TYPE_LABEL);
+
         for (ExtractionTypeV2 extractionType : ExtractionTypeV2.values()) {
             extractionTypeParam.addChoice(extractionType.getDescription());
         }
@@ -116,7 +117,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             if (attributeName.isEmpty()) {
                 throw new IllegalActionException(ERROR_ATTR_NAME_PARAM_EMPTY);
             }
-        } else if (attribute == extractionTypeParam) {
+        }
+        else if (attribute == extractionTypeParam) {
             // throws IllegalActionException if invalid
             extractionType = ExtractionTypeV2.fromDescription(PasserelleUtil
                     .getParameterValue(extractionTypeParam));
@@ -141,10 +143,12 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                     createPort(WRITE_PORT, WRITE_PORT_LABEL);
                     break;
             }
-        } else if (attribute == throwExceptionOnErrorParam) {
+        }
+        else if (attribute == throwExceptionOnErrorParam) {
             throwExceptionOnError = ((BooleanToken) throwExceptionOnErrorParam.getToken())
                     .booleanValue();
-        } else {
+        }
+        else {
             super.attributeChanged(attribute);
         }
     }
@@ -157,9 +161,9 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         try {
             if (extractor == null) {// FIXME == null if we are in prod env
                 extractor = new SnapExtractorProxy(true);
-                ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(),
-                        Level.DEBUG);
             }
+            ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(),
+                    Level.DEBUG);
         }
         catch (DevFailed e) {
             throw new DevFailedValidationException(e, this);
@@ -190,7 +194,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             if (outputPorts[portIndex] == null) {
                 outputPorts[portIndex] = PortFactory.getInstance().createOutputPort(this, name);
 
-            } else if (outputPorts[portIndex].getContainer() == null) {
+            }
+            else if (outputPorts[portIndex].getContainer() == null) {
                 outputPorts[portIndex].setContainer(this);
             }
         }
@@ -270,7 +275,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         catch (DevFailed e) {
             if (throwExceptionOnError) {
                 throw new DevFailedProcessingException(e, this);
-            } else {
+            }
+            else {
                 sendOutputMsg(outputPorts[READ_PORT], createMessage());
                 sendOutputMsg(outputPorts[WRITE_PORT], createMessage());
             }
@@ -287,7 +293,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         catch (DevFailed e) {
             if (throwExceptionOnError) {
                 throw new DevFailedProcessingException(e, this);
-            } else {
+            }
+            else {
                 sendOutputMsg(outputPorts[WRITE_PORT], createMessage());
             }
         }
@@ -303,9 +310,29 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         catch (DevFailed e) {
             if (throwExceptionOnError) {
                 throw new DevFailedProcessingException(e, this);
-            } else {
-
+            }
+            else {
                 sendOutputMsg(outputPorts[READ_PORT], createMessage());
+            }
+        }
+    }
+
+    private void extractAndSendReadOrWriteValue(boolean read, String snapID)
+            throws ProcessingException, DevFailedProcessingException {
+        int portName = (read) ? READ_PORT : WRITE_PORT;
+        try {
+            String[] snapValues = (read) ? 
+                    extractor.getReadValues(snapID, attributeName)
+                    : extractor.getWriteValues(snapID, attributeName);
+            sendOutputMsg(outputPorts[portName],
+                    PasserelleUtil.createContentMessage(this, snapValues[0]));
+        }
+        catch (DevFailed e) {
+            if (throwExceptionOnError) {
+                throw new DevFailedProcessingException(e, this);
+            }
+            else {
+                sendOutputMsg(outputPorts[portName], createMessage());
             }
         }
     }
