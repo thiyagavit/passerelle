@@ -29,7 +29,7 @@ import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
 public class ProcessHandleImpl implements ProcessHandle {
   
   private FlowHandle flowHandle;
-  private String processContextID;
+  private String processContextId;
   private ProcessStatus status;
 
   /**
@@ -37,7 +37,7 @@ public class ProcessHandleImpl implements ProcessHandle {
    * @param fetFuture.getStatus()
    */
   public ProcessHandleImpl(FlowExecutionFuture fetFuture) {
-    this.processContextID = fetFuture.getProcessContextID();
+    this.processContextId = fetFuture.getProcessContextId();
     this.status = fetFuture.getStatus();
     this.flowHandle = fetFuture.getFlowHandle();
   }
@@ -49,7 +49,7 @@ public class ProcessHandleImpl implements ProcessHandle {
 
   @Override
   public String getProcessContextId() {
-    return processContextID;
+    return processContextId;
   }
 
   @Override
@@ -73,7 +73,7 @@ public class ProcessHandleImpl implements ProcessHandle {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((processContextID == null) ? 0 : processContextID.hashCode());
+    result = prime * result + ((processContextId == null) ? 0 : processContextId.hashCode());
     result = prime * result + ((status == null) ? 0 : status.hashCode());
     return result;
   }
@@ -87,10 +87,10 @@ public class ProcessHandleImpl implements ProcessHandle {
     if (getClass() != obj.getClass())
       return false;
     ProcessHandleImpl other = (ProcessHandleImpl) obj;
-    if (processContextID == null) {
-      if (other.processContextID != null)
+    if (processContextId == null) {
+      if (other.processContextId != null)
         return false;
-    } else if (!processContextID.equals(other.processContextID))
+    } else if (!processContextId.equals(other.processContextId))
       return false;
     if (status != other.status)
       return false;
@@ -99,6 +99,6 @@ public class ProcessHandleImpl implements ProcessHandle {
 
   @Override
   public String toString() {
-    return "ProcessHandleImpl [flowHandle=" + flowHandle.getCode() + ", processContextID=" + processContextID + ", status=" + status + "]";
+    return "ProcessHandleImpl [flowHandle=" + flowHandle.getCode() + ", processContextID=" + processContextId + ", status=" + status + "]";
   }
 }

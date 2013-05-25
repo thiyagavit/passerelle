@@ -23,15 +23,15 @@ import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.FlowProcessingService;
 import com.isencia.passerelle.runtime.FlowProcessingService.StartMode;
 import com.isencia.passerelle.runtime.ProcessHandle;
+import com.isencia.passerelle.runtime.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.FlowProcessingServiceImpl;
 import com.isencia.passerelle.runtime.repos.impl.filesystem.FlowRepositoryServiceImpl;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 import com.isencia.passerelle.testsupport.actor.Const;
+import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;
 
 public class FlowProcessingTest1 extends TestCase {
-  private static final String HELLO_WORLD_FLOWNAME = "HelloWorld";
-  private static final String HELLO_CODE = "HELLO";
 
   private static final File userHome              = new File(System.getProperty("user.home"));
   private static final File defaultRootFolderPath = new File(userHome, ".passerelle/passerelle-repository");
@@ -65,26 +65,60 @@ public class FlowProcessingTest1 extends TestCase {
   }
 
   public final void testStartAndCheckProcessHandle() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    FlowHandle flowHandle = repositoryService.commit("testStartAndCheckProcessHandle", buildTrivialFlow("testStartAndCheckProcessHandle"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     assertNotNull("Process handle must be not-null", procHandle);
     assertNotNull("Process handle must have a non-null process context ID", procHandle.getProcessContextId());
     assertNotNull("Process status must be not-null", procHandle.getExecutionStatus());
     assertNotNull("Process's flow must be not-null", procHandle.getFlow());
-    assertEquals("Process's flow code must be as defined", HELLO_CODE, procHandle.getFlow().getCode());
+    assertEquals("Process's flow code must be as defined", "testStartAndCheckProcessHandle", procHandle.getFlow().getCode());
+    // wait a bit before allowing a next setup(), to ensure that the asynch start() can still do its thing
+    Thread.sleep(500);
+  }
+
+  public final void testGetHandle() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testGetHandle", buildDelay2sFlow("testGetHandle"));
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+    ProcessHandle procHandle2 = processingService.getHandle(procHandle.getProcessContextId());
+    assertEquals("Process handle from start() should be equal to one returned by getHandle()", procHandle, procHandle2);
+    // wait a bit before allowing a next setup(), to ensure that the asynch start() can still do its thing
+    Thread.sleep(500);
+  }
+
+  public final void testRefresh() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testRefresh", buildTrivialFlow("testRefresh"));
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+    assertNotNull("Process handle must be not-null", procHandle);
+    Thread.sleep(500);
+    procHandle = processingService.refresh(procHandle);
+    assertEquals("Process should have finished OK", ProcessStatus.FINISHED, procHandle.getExecutionStatus());
+  }
+
+  // with this one, we hope to invoke terminate before the actual execution has started
+  public final void testTerminateImmediately() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testTerminateImmediately", buildDelay2sFlow("testTerminateImmediately"));
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+    ProcessHandle procHandle2 = processingService.terminate(procHandle);
+    // this is a bit risky, as we can not strictly be certain that the process was indeed terminated/canceled before its start...
+    assertTrue("Process should have terminated", procHandle2.getExecutionStatus().isFinalStatus());
     // then we just let it die
+    Thread.sleep(200);
+    ProcessHandle procHandle3 = processingService.refresh(procHandle2);
+    assertTrue("Process should have terminated", procHandle3.getExecutionStatus().isFinalStatus());
   }
 
-  public final void testGetHandle() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  public final void testRefresh() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  public final void testTerminate() {
-    fail("Not yet implemented"); // TODO
+  // with this one, we hope to invoke terminate when the actual execution has started
+  public final void testTerminateAfterSomeTime() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testTerminateAfterSomeTime", buildDelay2sFlow("testTerminateAfterSomeTime"));
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+    Thread.sleep(100);
+    ProcessHandle procHandle2 = processingService.refresh(procHandle);
+    assertEquals("Process should have started", ProcessStatus.ACTIVE, procHandle2.getExecutionStatus());
+    processingService.terminate(procHandle);
+    // then we just let it die
+    Thread.sleep(1000);
+    ProcessHandle procHandle3 = processingService.refresh(procHandle2);
+    assertTrue("Process should have terminated", procHandle3.getExecutionStatus().isFinalStatus());
   }
 
   public final void testGetProcessEventsProcessHandleInt() {
@@ -101,6 +135,19 @@ public class FlowProcessingTest1 extends TestCase {
     Const source = new Const(flow, "Constant");
     DevNullActor sink = new DevNullActor(flow, "sink");
     flow.connect(source, sink);
+
+    return flow;
+  }
+
+  public Flow buildDelay2sFlow(String flowName) throws Exception {
+    Flow flow = new Flow(flowName, null);
+    flow.setDirector(new Director(flow, "director"));
+    Const source = new Const(flow, "Constant");
+    Delay delay = new Delay(flow, "delay");
+    delay.timeParameter.setExpression("2");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    flow.connect(source, delay);
+    flow.connect(delay, sink);
 
     return flow;
   }
