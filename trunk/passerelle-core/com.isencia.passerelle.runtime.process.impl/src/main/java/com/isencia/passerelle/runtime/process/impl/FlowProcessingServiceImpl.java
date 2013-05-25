@@ -58,7 +58,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
       processContextId = UUID.randomUUID().toString();
     }
 
-    LOGGER.info("Context {} - Starting execution of flow {}", processContextId, flowHandle.getCode());
+    LOGGER.debug("Context {} - Submitting execution of flow {}", processContextId, flowHandle.getCode());
 
     FlowExecutionTask fet = new FlowExecutionTask(mode, flowHandle, processContextId, parameterOverrides, listener, breakpointNames);
     FlowExecutionFuture fetFuture = (FlowExecutionFuture) flowExecutor.submit(fet);

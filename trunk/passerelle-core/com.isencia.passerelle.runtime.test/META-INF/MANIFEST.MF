@@ -12,6 +12,7 @@ Import-Package: org.apache.commons.io,
  org.osgi.util.tracker;version="1.5.0",
  org.slf4j;version="1.6.0",
  ptolemy.actor;version="7.0.1",
+ ptolemy.data.expr;version="7.0.1",
  ptolemy.kernel;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
 Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.4.0",

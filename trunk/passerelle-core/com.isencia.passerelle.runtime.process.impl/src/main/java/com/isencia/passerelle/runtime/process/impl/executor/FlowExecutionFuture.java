@@ -46,8 +46,8 @@ public final class FlowExecutionFuture extends FutureTask<ProcessStatus> {
     return super.cancel(mayInterruptIfRunning);
   }
   
-  public String getProcessContextID() {
-    return fet.getProcessContextID();
+  public String getProcessContextId() {
+    return fet.getProcessContextId();
   }
   
   public ProcessStatus getStatus() {
