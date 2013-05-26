@@ -97,7 +97,7 @@ public interface FlowProcessingService {
   /**
    * Terminate a running process through a termination event.
    * <p>
-   * Implementations may or may not block until the process is effectively dead.
+   * Implementations may or may not block until the process is effectively dead, and should clearly document their choice.
    * Any registered <code>ProcessListener</code>s will be notified when the termination is done.
    * </p>
    * @param processHandle

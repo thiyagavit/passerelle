@@ -11,35 +11,39 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.runtime.process.impl;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
 
 /**
- * 
  * @author erwin
- *
  */
 public class ProcessHandleImpl implements ProcessHandle {
-  
+
   private FlowHandle flowHandle;
   private String processContextId;
   private ProcessStatus status;
+  private WeakReference<FlowExecutionFuture> fetRef;
 
   /**
-   * 
-   * @param fetFuture.getStatus()
+   * @param fetFuture
+   *          .getStatus()
    */
   public ProcessHandleImpl(FlowExecutionFuture fetFuture) {
     this.processContextId = fetFuture.getProcessContextId();
     this.status = fetFuture.getStatus();
     this.flowHandle = fetFuture.getFlowHandle();
+    this.fetRef = new WeakReference<FlowExecutionFuture>(fetFuture);
   }
 
   @Override
@@ -64,9 +68,18 @@ public class ProcessHandleImpl implements ProcessHandle {
   }
 
   @Override
-  public ProcessStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException {
-    // TODO Auto-generated method stub
-    return null;
+  public ProcessStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException, FlowNotExecutingException, ExecutionException {
+    FlowExecutionFuture fet = fetRef.get();
+    if (fet != null) {
+      try {
+        status = fet.get(time, unit);
+      } catch (CancellationException e) {
+        status = fet.getStatus();
+      }
+      return status;
+    } else {
+      throw new FlowNotExecutingException(getFlow().getCode());
+    }
   }
 
   @Override
