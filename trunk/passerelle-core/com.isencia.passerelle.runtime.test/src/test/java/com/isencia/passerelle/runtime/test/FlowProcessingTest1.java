@@ -157,8 +157,8 @@ public class FlowProcessingTest1 extends TestCase {
     assertTrue("Process should have terminated", procHandle3.getExecutionStatus().isFinalStatus());
   }
 
-  public final void testWaitForTermination() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitForTermination", buildDelay2sFlow("testWaitForTermination"));
+  public final void testWaitUntilFinished() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinished", buildDelay2sFlow("testWaitUntilFinished"));
     long startTime = new Date().getTime();
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     ProcessStatus status = procHandle.waitUntilFinished(3, TimeUnit.SECONDS);
@@ -179,8 +179,8 @@ public class FlowProcessingTest1 extends TestCase {
     }
   }
 
-  public final void testWaitNotLongEnoughForTermination() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitNotLongEnoughForTermination", buildDelay2sFlow("testWaitNotLongEnoughForTermination"));
+  public final void testWaitNotLongEnoughUntilFinished() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testWaitNotLongEnoughUntilFinished", buildDelay2sFlow("testWaitNotLongEnoughUntilFinished"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     try {
       procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
@@ -190,8 +190,8 @@ public class FlowProcessingTest1 extends TestCase {
     }
   }
 
-  public final void testWaitForTerminationOfFlowWithError() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitForTerminationOfFlowWithError", buildPreInitErrorFlow("testWaitForTerminationOfFlowWithError"));
+  public final void testWaitUntilFinishedOfFlowWithError() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinishedOfFlowWithError", buildPreInitErrorFlow("testWaitUntilFinishedOfFlowWithError"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     try {
       procHandle.waitUntilFinished(3, TimeUnit.SECONDS);
