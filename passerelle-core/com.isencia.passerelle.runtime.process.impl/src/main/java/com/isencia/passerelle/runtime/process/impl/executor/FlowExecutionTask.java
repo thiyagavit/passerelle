@@ -44,6 +44,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   private volatile ProcessStatus status;
   private volatile boolean canceled;
   private volatile boolean busy;
+  private volatile boolean suspended;
   private Manager manager;
 
   public FlowExecutionTask(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
@@ -53,6 +54,10 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     this.flowHandle = flowHandle;
     this.processContextId = processContextId;
     status = ProcessStatus.IDLE;
+  }
+
+  public RunnableFuture<ProcessStatus> newFutureTask() {
+    return new FlowExecutionFuture(this);
   }
 
   /**
@@ -76,6 +81,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
    */
   @Override
   public ProcessStatus call() throws Exception {
+    LOGGER.trace("call() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     try {
       Flow flow = flowHandle.getFlow();
       synchronized (this) {
@@ -98,6 +104,9 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         throw new PasserelleException(ErrorCode.FLOW_EXECUTION_ERROR, flowHandle.toString(), e);
       }
     }
+    if(LOGGER.isTraceEnabled()) {
+      LOGGER.trace("call() exit - Context {} - Flow {} - Final Status {}", new Object[]{processContextId, flowHandle.getCode(), status});
+    }
     return status;
   }
 
@@ -105,6 +114,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
    * Cancel the flow execution in a clean way.
    */
   public synchronized void cancel() {
+    LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     canceled = true;
     if (busy) {
       LOGGER.warn("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
@@ -116,10 +126,28 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     }
   }
 
-  public RunnableFuture<ProcessStatus> newFutureTask() {
-    return new FlowExecutionFuture(this);
+  public synchronized boolean suspend() {
+    LOGGER.trace("suspend() - Context {} - Flow {}", processContextId, flowHandle.getCode());
+    suspended = true;
+    if(busy) {
+      manager.pause();
+      return true;
+    } else {
+      return false;
+    }
   }
-
+  
+  public synchronized boolean resume() {
+    LOGGER.trace("resume() - Context {} - Flow {}", processContextId, flowHandle.getCode());
+    suspended = false;
+    if(busy && Manager.PAUSED.equals(manager.getState())) {
+      manager.resume();
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   /**
    * @return the current flow execution status
    */
@@ -168,6 +196,9 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
       }
       if (oldStatus != status) {
         LOGGER.debug("Context {} - Execution state change of flow {} : {}", new Object[] { processContextId, getFlowHandle().getCode(), status });
+      }
+      if (suspended && ProcessStatus.ACTIVE.equals(status)) {
+        manager.pause();
       }
     }
   }
