@@ -43,7 +43,6 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   // client code may still like to obtain execution info a while after the execution has already finished
   // so when is a good moment for removal???
   private Map<String, FlowExecutionFuture> flowExecutions = new ConcurrentHashMap<String, FlowExecutionFuture>();
-//  private Map<FlowHandle, Set<ProcessHandle>> executionHandles = Collections.synchronizedMap(new HashMap<FlowHandle, Set<ProcessHandle>>());
 
   private ExecutorService flowExecutor;
 
@@ -69,14 +68,6 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
     if(!procHandle.getExecutionStatus().isFinalStatus()) {
       flowExecutions.put(processContextId, fetFuture);
-//    Set<ProcessHandle> procHandles = executionHandles.get(flowHandle);
-//    if (procHandles == null) {
-//      synchronized (executionHandles) {
-//        procHandles = new HashSet<ProcessHandle>();
-//        executionHandles.put(flowHandle, procHandles);
-//      }
-//    }
-//    procHandles.add(procHandle);
     }
 
     return procHandle;
@@ -122,14 +113,26 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
-    // TODO Auto-generated method stub
-    return null;
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    if(fet==null) {
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+    } else {
+      // TODO check if we can/need to do something with the boolean result...
+      fet.suspend();
+      return new ProcessHandleImpl(fet);
+    }
   }
 
   @Override
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
-    // TODO Auto-generated method stub
-    return null;
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    if(fet==null) {
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+    } else {
+      // TODO check if we can/need to do something with the boolean result...
+      fet.resume();
+      return new ProcessHandleImpl(fet);
+    }
   }
 
   @Override
