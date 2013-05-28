@@ -7,6 +7,11 @@ import junit.framework.TestCase;
 // we get dramatic JVM crashes then with illegal access errors...
 // in order to retry this you need to add cloning & objenesis to the target
 public class CloneViaClonerTest extends TestCase {
+	
+	public void testNeedToFixThis() {
+		// TODO Auto-generated method stub
+
+	}
   
 //  public void testFlowClone() throws Exception {
 //    Flow flow = new Flow("testHelloPasserelle",null);
