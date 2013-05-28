@@ -7,6 +7,11 @@ import junit.framework.TestCase;
 // but it can not work as not all ptolemy elements are serializable (e.g. the ptolemy.actor.util.Time)
 public class CloneViaSHBCloningTest extends TestCase {
   
+	public void testNeedToFixThis() {
+		// TODO Auto-generated method stub
+
+	}
+	
 //  @SuppressWarnings("unchecked")
 //  public static<T> T deepCopyBySerialization(T source) throws IOException, ClassNotFoundException {
 //    if (source == null)
