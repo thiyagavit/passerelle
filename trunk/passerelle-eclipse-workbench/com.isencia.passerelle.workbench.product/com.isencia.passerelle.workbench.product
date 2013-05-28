@@ -55,7 +55,6 @@
    </license>
 
    <plugins>
-      <plugin id="activation"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.isencia.passerelle.actor"/>
       <plugin id="com.isencia.passerelle.actor.conf"/>
@@ -85,10 +84,10 @@
       <plugin id="com.teaminabox.eclipse.wiki"/>
       <plugin id="com.thoughtworks.xstream"/>
       <plugin id="diva"/>
+      <plugin id="javax.mail"/>
       <plugin id="javax.servlet"/>
       <plugin id="javax.servlet.jsp"/>
       <plugin id="javax.xml"/>
-      <plugin id="mail"/>
       <plugin id="org.apache.ant"/>
       <plugin id="org.apache.commons.beanutils"/>
       <plugin id="org.apache.commons.codec"/>
