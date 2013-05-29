@@ -327,7 +327,7 @@ public class DefaultDirectorAdapter extends Attribute implements DirectorAdapter
   }
 
   public void notifyFiringEventListeners(FiringEvent event) {
-    if (event != null && event.getDirector().equals(this)) {
+    if (event != null && event.getDirector().equals(getContainer())) {
       synchronized (firingEventListeners) {
         for (Iterator<FiringEventListener> listenerItr = firingEventListeners.iterator(); listenerItr.hasNext();) {
           FiringEventListener listener = listenerItr.next();
