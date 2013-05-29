@@ -21,7 +21,7 @@ package com.isencia.passerelle.process.model;
  * 
  * @author erwin
  * 
- * @deprecated Refer to the interface {@link com.isencia.passerelle.core.Event} directly instead.
+ * @deprecated Refer to the interface {@link com.isencia.passerelle.runtime.Event} directly instead.
  */
-public interface Event extends com.isencia.passerelle.core.Event {
+public interface Event extends com.isencia.passerelle.runtime.Event {
 }

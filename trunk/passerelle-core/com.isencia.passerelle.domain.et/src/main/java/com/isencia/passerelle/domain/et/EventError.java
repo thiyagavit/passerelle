@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.domain.et;
 
-import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * Simple container class for an event and the exception that happened while

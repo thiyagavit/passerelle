@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.runtime.process;
 
-import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * 

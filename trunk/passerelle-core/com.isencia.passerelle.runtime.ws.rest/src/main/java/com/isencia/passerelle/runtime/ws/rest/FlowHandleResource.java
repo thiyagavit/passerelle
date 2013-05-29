@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.runtime.repository.FlowHandle;
+import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
 @XmlRootElement(name="FlowHandle")

@@ -12,14 +12,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime;
+package com.isencia.passerelle.runtime.process;
 
 import java.util.List;
 import java.util.Map;
-import com.isencia.passerelle.core.Event;
-import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
-import com.isencia.passerelle.runtime.process.ProcessListener;
-import com.isencia.passerelle.runtime.repository.FlowHandle;
+import com.isencia.passerelle.runtime.Event;
+import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.ProcessHandle;
 
 /**
  * A service interface for everything related to executing a flow,

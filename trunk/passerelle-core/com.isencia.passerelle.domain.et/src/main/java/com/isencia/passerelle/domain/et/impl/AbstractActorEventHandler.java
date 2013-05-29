@@ -20,9 +20,9 @@ import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Manager;
 import ptolemy.kernel.util.IllegalActionException;
-import com.isencia.passerelle.core.Event;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.domain.et.EventHandler;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * @author delerw

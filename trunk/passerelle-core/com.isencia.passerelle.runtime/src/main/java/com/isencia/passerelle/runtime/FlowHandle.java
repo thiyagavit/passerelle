@@ -12,10 +12,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime.repository;
+package com.isencia.passerelle.runtime;
 
 import java.net.URI;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
 /**
  * A light-weight handle on Passerelle Flows.

@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-package com.isencia.passerelle.core;
+package com.isencia.passerelle.runtime;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime;
+package com.isencia.passerelle.runtime.process;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import com.isencia.passerelle.runtime.process.ProcessEvent;
 
 /**
  * @author erwin

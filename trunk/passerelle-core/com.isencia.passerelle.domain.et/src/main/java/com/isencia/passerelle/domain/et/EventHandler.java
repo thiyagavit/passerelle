@@ -15,7 +15,7 @@
 
 package com.isencia.passerelle.domain.et;
 
-import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * Contract for concrete event handlers.
