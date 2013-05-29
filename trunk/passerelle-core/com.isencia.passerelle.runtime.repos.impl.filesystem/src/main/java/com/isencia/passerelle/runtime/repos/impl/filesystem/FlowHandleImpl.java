@@ -20,7 +20,7 @@ import java.net.URI;
 import org.apache.commons.io.FileUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
 /**

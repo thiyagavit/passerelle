@@ -24,14 +24,14 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.core.Event;
-import com.isencia.passerelle.runtime.FlowHandle;
-import com.isencia.passerelle.runtime.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.FlowProcessingService;
 import com.isencia.passerelle.runtime.ProcessHandle;
-import com.isencia.passerelle.runtime.ProcessListener;
+import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
+import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionTask;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutor;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 
 public class FlowProcessingServiceImpl implements FlowProcessingService {
 

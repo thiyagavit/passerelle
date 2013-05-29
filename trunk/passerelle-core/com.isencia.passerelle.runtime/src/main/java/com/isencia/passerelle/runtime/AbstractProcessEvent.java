@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import com.isencia.passerelle.runtime.process.ProcessEvent;
 
 /**
  * @author erwin
@@ -27,6 +28,8 @@ import java.util.Map;
  */
 public abstract class AbstractProcessEvent implements ProcessEvent {
 
+  private static final long serialVersionUID = 411059590003641225L;
+  
   private Date timeStamp;
   private String topic;
   

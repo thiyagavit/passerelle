@@ -15,7 +15,6 @@
 package com.isencia.passerelle.runtime.repository;
 
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.runtime.FlowHandle;
 
 /**
  * This interface offers operations to manage Flows in a repository.
