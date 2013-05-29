@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime;
+package com.isencia.passerelle.runtime.process;
 
 import com.isencia.passerelle.core.Event;
 

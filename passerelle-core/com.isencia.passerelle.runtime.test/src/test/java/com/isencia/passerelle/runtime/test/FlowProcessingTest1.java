@@ -17,6 +17,8 @@ package com.isencia.passerelle.runtime.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -25,14 +27,14 @@ import org.apache.commons.io.FileUtils;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.runtime.FlowHandle;
-import com.isencia.passerelle.runtime.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.FlowProcessingService;
 import com.isencia.passerelle.runtime.FlowProcessingService.StartMode;
 import com.isencia.passerelle.runtime.ProcessHandle;
-import com.isencia.passerelle.runtime.ProcessStatus;
+import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
+import com.isencia.passerelle.runtime.process.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.FlowProcessingServiceImpl;
 import com.isencia.passerelle.runtime.repos.impl.filesystem.FlowRepositoryServiceImpl;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 import com.isencia.passerelle.testsupport.actor.Const;
 import com.isencia.passerelle.testsupport.actor.Delay;
@@ -201,6 +203,18 @@ public class FlowProcessingTest1 extends TestCase {
     }
   }
   
+  public final void testStartWithParameterOverrides() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testStartWithParameterOverrides", buildDelay1sFlow("testStartWithParameterOverrides"));
+    Map<String,String> overrides = new HashMap<String, String>();
+    overrides.put("delay.time(s)", "3");
+    long startTime = new Date().getTime();
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, overrides, null);
+    ProcessStatus status = procHandle.waitUntilFinished(5, TimeUnit.SECONDS);
+    long endTime = new Date().getTime();
+    assertTrue("Process should have terminated", status.isFinalStatus());
+    assertTrue("Process should last for at least 1s", (endTime - startTime) > 3000);
+  }
+
   public final void testSuspendResume() throws Exception {
     FlowHandle flowHandle = repositoryService.commit("testSuspendResume", buildMultiDelay1sFlow("testSuspendResume"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);

@@ -19,7 +19,7 @@ import java.util.Hashtable;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 import com.isencia.passerelle.runtime.ws.rest.client.FlowRepositoryServiceRESTClient;
 

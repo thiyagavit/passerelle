@@ -18,8 +18,8 @@ import java.util.concurrent.FutureTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.runtime.FlowHandle;
-import com.isencia.passerelle.runtime.ProcessStatus;
+import com.isencia.passerelle.runtime.process.ProcessStatus;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 
 /**
  * 

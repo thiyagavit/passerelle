@@ -17,6 +17,9 @@ package com.isencia.passerelle.runtime;
 import java.util.List;
 import java.util.Map;
 import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
+import com.isencia.passerelle.runtime.process.ProcessListener;
+import com.isencia.passerelle.runtime.repository.FlowHandle;
 
 /**
  * A service interface for everything related to executing a flow,

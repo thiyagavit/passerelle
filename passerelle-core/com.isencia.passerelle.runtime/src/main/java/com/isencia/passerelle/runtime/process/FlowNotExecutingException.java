@@ -13,7 +13,7 @@
    limitations under the License.
 */
 
-package com.isencia.passerelle.runtime;
+package com.isencia.passerelle.runtime.process;
 
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.ErrorCode;
