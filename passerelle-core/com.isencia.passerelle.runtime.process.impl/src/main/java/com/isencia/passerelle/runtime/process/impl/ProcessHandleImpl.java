@@ -19,11 +19,11 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
-import com.isencia.passerelle.runtime.repository.FlowHandle;
 
 /**
  * @author erwin

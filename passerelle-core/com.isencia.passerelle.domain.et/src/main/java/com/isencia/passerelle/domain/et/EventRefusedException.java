@@ -17,8 +17,8 @@ package com.isencia.passerelle.domain.et;
 
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.Event;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * @author delerw

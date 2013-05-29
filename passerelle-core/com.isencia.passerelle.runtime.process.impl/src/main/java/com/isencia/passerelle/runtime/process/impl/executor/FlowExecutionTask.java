@@ -31,10 +31,10 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.runtime.FlowProcessingService.StartMode;
+import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
-import com.isencia.passerelle.runtime.repository.FlowHandle;
+import com.isencia.passerelle.runtime.process.FlowProcessingService.StartMode;
 
 /**
  * @author erwin

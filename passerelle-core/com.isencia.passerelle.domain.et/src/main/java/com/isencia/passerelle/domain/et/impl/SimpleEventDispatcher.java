@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.domain.et.AbstractEvent;
 import com.isencia.passerelle.domain.et.EventDispatchReporter;
 import com.isencia.passerelle.domain.et.EventDispatcher;

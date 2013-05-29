@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
-import com.isencia.passerelle.runtime.repository.FlowHandle;
 
 
 

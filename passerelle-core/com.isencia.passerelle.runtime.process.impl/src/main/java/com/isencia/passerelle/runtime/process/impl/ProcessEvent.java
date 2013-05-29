@@ -15,7 +15,7 @@
 package com.isencia.passerelle.runtime.process.impl;
 
 import java.util.Date;
-import com.isencia.passerelle.runtime.AbstractProcessEvent;
+import com.isencia.passerelle.runtime.process.AbstractProcessEvent;
 
 /**
  * @author erwin

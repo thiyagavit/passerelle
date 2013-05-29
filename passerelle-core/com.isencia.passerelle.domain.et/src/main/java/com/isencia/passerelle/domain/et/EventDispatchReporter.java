@@ -16,7 +16,7 @@
 package com.isencia.passerelle.domain.et;
 
 import java.util.List;
-import com.isencia.passerelle.core.Event;
+import com.isencia.passerelle.runtime.Event;
 
 /**
  * Contract for obtaining a report on the execution of a model
