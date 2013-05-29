@@ -134,6 +134,12 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
       return new ProcessHandleImpl(fet);
     }
   }
+  
+  @Override
+  public ProcessHandle resume(ProcessHandle processHandle, String suspendedElement) throws FlowNotExecutingException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
   @Override
   public ProcessHandle step(ProcessHandle processHandle) throws FlowNotExecutingException {

@@ -58,8 +58,12 @@ public interface FlowProcessingService {
    * Via <code>resume()</code>, the execution can continue as in <b>NORMAL</b> mode.
    * </p>
    * <p>
-   * In <b>DEBUG</b> mode, the execution will suspend when one of the specified break points is reached.
-   * After which it can be continued again via <code>resume()</code>, or per <code>step()</code> etc.
+   * In <b>DEBUG</b> mode, the execution may (partially) suspend on one or more of the specified break points.
+   * After which it can be continued again via one of the <code>resume()</code> methods, or per <code>step()</code> etc.
+   * <br/>
+   * Similar to the debugging of multi-threaded Java applications, breakpoints may block only part of a flow execution. 
+   * E.g. when a flow has parallel branches, and is executed in a multi-threaded mode, an actor breakpoint may only suspend the branch containing the actor
+   * while other branches continue, until reaching a Join actor or other synchronization/blocking/termination elements. 
    * <br/> 
    * Breakpoints must refer to named elements in the running process : actors and/or ports.
    * <br/> 
@@ -119,12 +123,24 @@ public interface FlowProcessingService {
   ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException;
   
   /**
+   * Resume all suspended elements and continue the execution until next breakpoint(s) are reached
+   * or until the end of no breakpoints are encountered anymore.
    * 
    * @param processHandle
    * @return the updated processHandle
    * @throws FlowNotExecutingException when the process identified by the handle was not (or no longer) running
    */
   ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException;
+  
+  /**
+   * Resume at the given suspendedElement. Other suspended elements will remain suspended.
+   * 
+   * @param processHandle
+   * @param suspendedElement
+   * @return
+   * @throws FlowNotExecutingException
+   */
+  ProcessHandle resume(ProcessHandle processHandle, String suspendedElement) throws FlowNotExecutingException;
   
   /**
    * 

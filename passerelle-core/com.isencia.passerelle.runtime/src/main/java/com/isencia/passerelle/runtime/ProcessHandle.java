@@ -61,7 +61,7 @@ public interface ProcessHandle {
    * Suspensions can  be caused by breakpoints and/or the end of a step execution.
    * @return the names of the currently suspended Flow elements (typically actors)
    */
-  String[] getSuspensionElements();
+  String[] getSuspendedElements();
 
   /**
    * Wait until the process has finished and return the final status.

@@ -62,7 +62,7 @@ public class ProcessHandleImpl implements ProcessHandle {
   }
 
   @Override
-  public String[] getSuspensionElements() {
+  public String[] getSuspendedElements() {
     // TODO Auto-generated method stub
     return null;
   }
