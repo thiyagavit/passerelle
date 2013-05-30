@@ -42,11 +42,27 @@ public class FlowHandleResource implements FlowHandle {
   @XmlTransient
   private Flow flow;
   
-  public FlowHandleResource() {
+  /**
+   * Builds a REST resource wrapper around a given local handle,
+   * copying all contents except the Flow.
+   * @param handle
+   * @return
+   */
+  public static FlowHandleResource buildFlowHandleResource(FlowHandle handle) {
+    return new FlowHandleResource(handle.getResourceLocation(), handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
   }
   
-  public FlowHandleResource(FlowHandle handle) {
-    this(handle.getResourceLocation(), handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
+  /**
+   * Builds a compacted REST resource wrapper around a given local handle,
+   * copying all contents except the raw definition and the Flow.
+   * @param handle
+   * @return
+   */
+  public static FlowHandleResource buildCompactFlowHandleResource(FlowHandle handle) {
+    return new FlowHandleResource(handle.getResourceLocation(), handle.getCode(), null, handle.getVersion());
+  }
+  
+  public FlowHandleResource() {
   }
   
   public FlowHandleResource(URI resourceLocation, String code, String rawFlowDefinition, VersionSpecification versionSpec) {

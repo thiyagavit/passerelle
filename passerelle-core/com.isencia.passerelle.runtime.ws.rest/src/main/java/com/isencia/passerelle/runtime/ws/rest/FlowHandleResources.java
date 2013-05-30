@@ -42,9 +42,9 @@ public class FlowHandleResources {
       if (uriBldr != null) {
 //        URI resLoc = uriBldr.clone().path("{code}").queryParam("version", "{version}").build(handle.getCode(), handle.getVersion());
         URI resLoc = uriBldr.clone().path("{code}").build(handle.getCode());
-        fhRes = new FlowHandleResource(resLoc, handle.getCode(), handle.getRawFlowDefinition(), handle.getVersion());
+        fhRes = new FlowHandleResource(resLoc, handle.getCode(), null, handle.getVersion());
       } else {
-        fhRes = new FlowHandleResource(handle);
+        fhRes = FlowHandleResource.buildCompactFlowHandleResource(handle);
       }
       this.flowHandles.add(fhRes);
     }

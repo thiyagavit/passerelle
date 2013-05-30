@@ -20,4 +20,3 @@ Import-Package: com.isencia.passerelle.core;version="8.4.0",
  ptolemy.kernel;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
 Export-Package: com.isencia.passerelle.runtime.process.impl
-Service-Component: OSGI-INF/component.xml

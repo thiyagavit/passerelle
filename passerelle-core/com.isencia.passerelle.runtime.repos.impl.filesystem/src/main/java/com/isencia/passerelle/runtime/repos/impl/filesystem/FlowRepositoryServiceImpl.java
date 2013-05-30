@@ -65,6 +65,7 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
   }
 
   public FlowRepositoryServiceImpl(File rootFolder) {
+    LOGGER.info("Creating FlowRepositoryService on folder {}", rootFolder);
     this.rootFolder = rootFolder;
     if (!rootFolder.exists()) {
       rootFolder.mkdirs();
@@ -209,6 +210,28 @@ public class FlowRepositoryServiceImpl implements FlowRepositoryService {
       flow = readAndBuildFlowHandle(flowRootFolder.getName(), new File(flowRootFolder, mostRecentVersion));
       return flow;
     }
+  }
+  
+  @Override
+  public FlowHandle getFlowVersion(String flowCode, VersionSpecification version) throws EntryNotFoundException {
+    File flowRootFolder = new File(rootFolder, flowCode);
+    if (!flowRootFolder.isDirectory()) {
+      throw new EntryNotFoundException("Invalid flow code " + flowCode);
+    } else {
+      FlowHandle flow = null;
+      String requestedVersion = version.toString();
+      flow = readAndBuildFlowHandle(flowRootFolder.getName(), new File(flowRootFolder, requestedVersion));
+      if(flow==null) {
+        throw new EntryNotFoundException("Version " + requestedVersion + " not found for flow code " + flowCode);
+      } else {
+        return flow;
+      }
+    }
+  }
+  
+  @Override
+  public FlowHandle loadFlowHandleWithContent(FlowHandle handle) throws EntryNotFoundException {
+    return getFlowVersion(handle.getCode(), handle.getVersion());
   }
 
   @Override
