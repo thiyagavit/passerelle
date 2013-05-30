@@ -489,11 +489,11 @@ public class EtDomainModelExecutionsTest extends TestCase {
 
     Map<String, String> props = new HashMap<String, String>();
     props.put("src.values", "pol,pel,pingo");
-    props.put("delay1.time(s)", "1");
-    props.put("delay1_1.time(s)", "1");
-    props.put("delay1_2.time(s)", "1");
-    props.put("delay2_1.time(s)", "1");
-    props.put("delay2_2.time(s)", "1");
+    props.put("delay1.time(ms)", "100");
+    props.put("delay1_1.time(ms)", "100");
+    props.put("delay1_2.time(ms)", "100");
+    props.put("delay2_1.time(ms)", "100");
+    props.put("delay2_2.time(ms)", "100");
     props.put("delay1.Buffer time (ms)", "10");
     props.put("delay1_1.Buffer time (ms)", "10");
     props.put("delay1_2.Buffer time (ms)", "10");

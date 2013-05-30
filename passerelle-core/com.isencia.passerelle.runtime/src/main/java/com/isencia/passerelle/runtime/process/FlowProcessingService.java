@@ -60,11 +60,16 @@ public interface FlowProcessingService {
    * <p>
    * In <b>DEBUG</b> mode, the execution may (partially) suspend on one or more of the specified break points.
    * After which it can be continued again via one of the <code>resume()</code> methods, or per <code>step()</code> etc.
-   * <br/>
+   * </p>
+   * <p>
+   * <em>THIS IS THE DESIRED FUTURE :</em>
    * Similar to the debugging of multi-threaded Java applications, breakpoints may block only part of a flow execution. 
    * E.g. when a flow has parallel branches, and is executed in a multi-threaded mode, an actor breakpoint may only suspend the branch containing the actor
    * while other branches continue, until reaching a Join actor or other synchronization/blocking/termination elements. 
-   * <br/> 
+   * <br/>
+   * <em>BUT FOR NOW :</em>
+   * Upon reaching a breakpoint, the model execution is completely suspended, similarly as via an explicit suspend() call.
+   * </p>
    * Breakpoints must refer to named elements in the running process : actors and/or ports.
    * <br/> 
    * The names given should be the full hierarchic names, without the flow's name.

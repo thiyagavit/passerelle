@@ -6,7 +6,8 @@ Bundle-Version: 8.4.0.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: ptolemy.core
-Import-Package: com.isencia.passerelle.core;version="8.4.0",
+Import-Package: com.isencia.passerelle.actor;version="8.4.0",
+ com.isencia.passerelle.core;version="8.4.0",
  com.isencia.passerelle.director;version="8.3.0",
  com.isencia.passerelle.ext;version="8.3.0",
  com.isencia.passerelle.ext.impl;version="8.3.0",

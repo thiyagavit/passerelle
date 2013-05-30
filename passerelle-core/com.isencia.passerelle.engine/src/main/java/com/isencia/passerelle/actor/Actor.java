@@ -24,8 +24,11 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Director;
+import ptolemy.actor.FiringEvent;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.TypedAtomicActor;
+import ptolemy.actor.FiringEvent.FiringEventType;
 import ptolemy.actor.process.ProcessDirector;
 import ptolemy.actor.process.TerminateProcessException;
 import ptolemy.data.IntToken;
@@ -163,6 +166,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   private final static Logger AUDITLOGGER = LoggerFactory.getLogger("audit");
 
+  // A simple cache for all event types, so we don't need to construct new
+  // ones for every iteration. Will only be set when the actor is being debugged.
+  private Map<FiringEventType,FiringEvent> firingEventCache;
+
   private ActorStatistics statistics;
 
   private ErrorControlStrategy errorControlStrategy;
@@ -296,6 +303,55 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     return DirectorUtils.getAdapter(getDirector(), null);
   }
 
+  /**
+   * Allow public access to flag indicating whether this actor 
+   * is currently a "debugging target". I.e. whether DebugListeners are registered,
+   * as is typically the case when a breakpoint has been set for this actor. 
+   * @return true if this actor is part of a debugging configuration, e.g.
+   * a breakpoint has been set for it.
+   */
+  public boolean isDebugged() {
+    return _debugging;
+  }
+  
+  /**
+   * Override this method as "interceptor" to ensure FiringEvents are also sent to DebugListeners,
+   * so Passerelle can implement its breakpoint mechanism on top of Ptolemy's related features.
+   * <br/>
+   * A second goal is to optimize event instance creation by using a cache of pre-constructed events per type,
+   * i.o. ptolemy's default approach of creating new events per recording request.
+   */
+  @Override
+  public void recordFiring(FiringEventType type) {
+    if(isDebugged()) {
+      initializeEventCacheIfStillNeeded();
+      FiringEvent firingEvent = firingEventCache.get(type);
+      if(firingEvent!=null) {
+        event(firingEvent);
+        getDirectorAdapter().notifyFiringEventListeners(firingEvent);
+      }
+    }
+    // TODO check with ptolemy if we can not move the event cache down to them
+    // for the moment this call always creates a new event instance before checking
+    // if there are listeners that are interested at all...
+    super.recordFiring(type);
+  }
+  
+  protected void initializeEventCacheIfStillNeeded() {
+    if (firingEventCache == null) {
+      Director director = getDirector();
+      firingEventCache = new HashMap<FiringEventType, FiringEvent>();
+      firingEventCache.put(FiringEvent.BEFORE_ITERATE, new FiringEvent(director, this, FiringEvent.BEFORE_ITERATE));
+      firingEventCache.put(FiringEvent.BEFORE_PREFIRE, new FiringEvent(director, this, FiringEvent.BEFORE_PREFIRE));
+      firingEventCache.put(FiringEvent.AFTER_PREFIRE, new FiringEvent(director, this, FiringEvent.AFTER_PREFIRE));
+      firingEventCache.put(FiringEvent.BEFORE_FIRE, new FiringEvent(director, this, FiringEvent.BEFORE_FIRE));
+      firingEventCache.put(FiringEvent.AFTER_FIRE, new FiringEvent(director, this, FiringEvent.AFTER_FIRE));
+      firingEventCache.put(FiringEvent.BEFORE_POSTFIRE, new FiringEvent(director, this, FiringEvent.BEFORE_POSTFIRE));
+      firingEventCache.put(FiringEvent.AFTER_POSTFIRE, new FiringEvent(director, this, FiringEvent.AFTER_POSTFIRE));
+      firingEventCache.put(FiringEvent.AFTER_ITERATE, new FiringEvent(director, this, FiringEvent.AFTER_ITERATE));
+    }
+  }
+  
   /**
    * @return the execution statistics of this actor
    */
