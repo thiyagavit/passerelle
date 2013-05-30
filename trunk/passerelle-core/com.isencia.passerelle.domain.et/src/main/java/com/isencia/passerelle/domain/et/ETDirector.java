@@ -87,7 +87,7 @@ public class ETDirector extends Director implements PasserelleDirector {
     super(container, name);
 
     dispatchThreadsParameter = new Parameter(this, NR_OF_DISPATCH_THREADS_PARAMNAME, new IntToken(1));
-    dispatchTimeoutParameter = new Parameter(this, DISPATCH_TIMEOUT_PARAMNAME, new IntToken(1000));
+    dispatchTimeoutParameter = new Parameter(this, DISPATCH_TIMEOUT_PARAMNAME, new IntToken(100));
     
     eventHistoryParameter = new Parameter(this, KEEP_EVENT_HISTORY_PARAMNAME, BooleanToken.FALSE);
     new CheckBoxStyle(eventHistoryParameter, "check");

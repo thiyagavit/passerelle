@@ -19,6 +19,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.IOPort;
+import ptolemy.actor.IOPortEvent;
 import ptolemy.actor.IORelation;
 import ptolemy.actor.NoRoomException;
 import ptolemy.actor.NoTokenException;
@@ -136,6 +137,17 @@ public class Port extends TypedIOPort {
   }
   
   /**
+   * Allow public access to flag indicating whether this actor 
+   * is currently a "debugging target". I.e. whether DebugListeners are registered,
+   * as is typically the case when a breakpoint has been set for this actor. 
+   * @return true if this actor is part of a debugging configuration, e.g.
+   * a breakpoint has been set for it.
+   */
+  public boolean isDebugged() {
+    return _debugging;
+  }
+
+  /**
    * 
    * @return the execution statistics of this port
    */
@@ -242,6 +254,12 @@ public class Port extends TypedIOPort {
     if (_debugging) {
       _debug("broadcast " + token);
     }
+    
+    if(isDebugged()) {
+      event(new IOPortEvent(this, IOPortEvent.SEND,
+                IOPortEvent.ALLCHANNELS, true, token));
+    }
+    
     try {
       _workspace.getReadAccess();
       _checkType(token);
@@ -290,6 +308,12 @@ public class Port extends TypedIOPort {
     if (_debugging) {
       _debug("broadcast token array of length " + vectorLength);
     }
+    
+    if(isDebugged()) {
+      event(new IOPortEvent(this, IOPortEvent.SEND,
+                IOPortEvent.ALLCHANNELS, true, tokenArray, vectorLength));
+    }
+    
     Token token = null;
     try {
       _workspace.getReadAccess();
@@ -348,6 +372,12 @@ public class Port extends TypedIOPort {
     if (_debugging) {
       _debug("send to channel " + channelIndex + ": " + token);
     }
+    
+    if(isDebugged()) {
+      event(new IOPortEvent(this, IOPortEvent.SEND,
+                IOPortEvent.ALLCHANNELS, true, token));
+    }
+    
     try {
       try {
         _workspace.getReadAccess();
@@ -412,6 +442,12 @@ public class Port extends TypedIOPort {
     if (_debugging) {
       _debug("send to channel " + channelIndex + " token array of length " + vectorLength);
     }
+
+    if(isDebugged()) {
+      event(new IOPortEvent(this, IOPortEvent.SEND,
+                IOPortEvent.ALLCHANNELS, true, tokenArray, vectorLength));
+    }
+
     Token token = null;
     try {
       try {
@@ -499,6 +535,10 @@ public class Port extends TypedIOPort {
       Token localToken = localReceivers[channelIndex][j].get();
       if (token == null) {
         token = localToken;
+        if(isDebugged()) {
+          event(new IOPortEvent(this, IOPortEvent.GET_END,
+              channelIndex, true, token));
+        }
       }
     }
     if (token == null) {
@@ -562,6 +602,19 @@ public class Port extends TypedIOPort {
     if (retArray == null) {
       throw new NoTokenException(this, "get: No token array " + "to return.");
     }
+    
+    if(isDebugged()) {
+      event(new IOPortEvent(this, IOPortEvent.GET_END,
+          channelIndex, true, retArray, vectorLength));
+    }
+    
+    int index = 1;
+    while (index < localReceivers[channelIndex].length) {
+        // Read and discard data from other channels in the group.
+        localReceivers[channelIndex][index].getArray(vectorLength);
+        index++;
+    }
+
     if (_debugging) {
       _debug("get vector from channel " + channelIndex + " of length " + vectorLength);
     }

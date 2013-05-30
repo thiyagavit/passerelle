@@ -14,10 +14,13 @@
  */
 package com.isencia.passerelle.runtime.process.impl.executor;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.RunnableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +28,20 @@ import ptolemy.actor.CompositeActor;
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.Manager.State;
 import ptolemy.data.expr.Parameter;
+import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.Entity;
+import ptolemy.kernel.Port;
 import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.process.FlowProcessingService.StartMode;
 import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
-import com.isencia.passerelle.runtime.process.FlowProcessingService.StartMode;
+import com.isencia.passerelle.runtime.process.impl.debug.ActorBreakpointListener;
+import com.isencia.passerelle.runtime.process.impl.debug.PortBreakpointListener;
 
 /**
  * @author erwin
@@ -46,7 +53,9 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   private final static Map<State, ProcessStatus> STATUS_MAPPING = new HashMap<Manager.State, ProcessStatus>();
 
   private final FlowHandle flowHandle;
+  private final StartMode mode;
   private final Map<String, String> parameterOverrides;
+  private final Set<String> breakpointNames;
   private final String processContextId;
   private volatile ProcessStatus status;
   private volatile boolean canceled;
@@ -56,16 +65,14 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
 
   public FlowExecutionTask(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
       String... breakpointNames) {
+    this.mode = mode;
     if (flowHandle == null)
       throw new IllegalArgumentException("FlowHandle can not be null");
     this.flowHandle = flowHandle;
-    if (parameterOverrides != null) {
-      this.parameterOverrides = new HashMap<String, String>(parameterOverrides);
-    } else {
-      this.parameterOverrides = null;
-    }
     this.processContextId = processContextId;
     status = ProcessStatus.IDLE;
+    this.parameterOverrides = (parameterOverrides != null) ? new HashMap<String, String>(parameterOverrides) : null;
+    this.breakpointNames = (breakpointNames!=null) ? new HashSet<String>(Arrays.asList(breakpointNames)) : null; 
   }
 
   public RunnableFuture<ProcessStatus> newFutureTask() {
@@ -95,22 +102,31 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   public ProcessStatus call() throws Exception {
     LOGGER.trace("call() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     try {
-      Flow flow = flowHandle.getFlow();
-      applyParameterSettings(flow, parameterOverrides);
+      applyParameterSettings(flowHandle, parameterOverrides);
+      boolean debug = false;
+      if(StartMode.DEBUG.equals(mode)) {
+        debug = setBreakpoints(flowHandle, breakpointNames);
+      }
       synchronized (this) {
+        Flow flow = flowHandle.getFlow();
         manager = new Manager(flow.workspace(), processContextId);
         manager.addExecutionListener(this);
         flow.setManager(manager);
         busy = true;
       }
       if (!canceled) {
-        LOGGER.info("Context {} - Starting execution of flow {}", processContextId, flowHandle.getCode());
+        if(!debug) {
+          LOGGER.info("Context {} - Starting execution of flow {}", processContextId, flowHandle.getCode());
+        } else {
+          LOGGER.info("Context {} - Starting DEBUG execution of flow {}", processContextId, flowHandle.getCode());
+        }
         manager.execute();
         // Just to be sure that for blocking executes,
         // we don't miss the final manager state changes before returning.
         managerStateChanged(manager);
       }
     } catch (Exception e) {
+      executionError(manager, e);
       if (e.getCause() instanceof PasserelleException) {
         throw ((PasserelleException) e.getCause());
       } else {
@@ -130,33 +146,35 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     canceled = true;
     if (busy) {
-      LOGGER.warn("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
+      LOGGER.info("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
       manager.finish();
     } else {
-      LOGGER.warn("Context {} - Canceling execution of flow {} before it started", processContextId, flowHandle.getCode());
+      LOGGER.info("Context {} - Canceling execution of flow {} before it started", processContextId, flowHandle.getCode());
       status = ProcessStatus.INTERRUPTED;
       manager = null;
     }
   }
 
   public synchronized boolean suspend() {
-    LOGGER.trace("suspend() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     suspended = true;
     if (busy) {
+      LOGGER.info("Context {} - Suspending execution of flow {}", processContextId, flowHandle.getCode());
       manager.pause();
       return true;
     } else {
+      LOGGER.debug("Context {} - IGNORE suspending execution of flow {}", processContextId, flowHandle.getCode());
       return false;
     }
   }
 
   public synchronized boolean resume() {
-    LOGGER.trace("resume() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     suspended = false;
-    if (busy && Manager.PAUSED.equals(manager.getState())) {
+    if ( busy && (Manager.PAUSED.equals(manager.getState()) || Manager.PAUSED_ON_BREAKPOINT.equals(manager.getState())) ) {
+      LOGGER.info("Context {} - Resuming execution of flow {}", processContextId, flowHandle.getCode());
       manager.resume();
       return true;
     } else {
+      LOGGER.debug("Context {} - IGNORE resuming execution of flow {}", processContextId, flowHandle.getCode());
       return false;
     }
   }
@@ -208,18 +226,20 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         status = ProcessStatus.INTERRUPTED;
       }
       if (oldStatus != status) {
-        LOGGER.debug("Context {} - Execution state change of flow {} : {}", new Object[] { processContextId, getFlowHandle().getCode(), status });
-      }
-      // This handles the case where a suspend() call was done right after the (asynch) start,
-      // before the actual execution was effectively already started.
-      // The behaviour
-      if (suspended && ProcessStatus.ACTIVE.equals(status)) {
-        manager.pause();
+        LOGGER.info("Context {} - Execution state change of flow {} : {}", new Object[] { processContextId, getFlowHandle().getCode(), status });
+        // This handles the case where a suspend() call was done right after the (asynch) start,
+        // before the actual execution was effectively already started.
+        // The behaviour
+        if (suspended && ProcessStatus.ACTIVE.equals(status)) {
+          LOGGER.info("Context {} - Suspended at startup for Flow {}", processContextId, flowHandle.getCode());
+          manager.pause();
+        }
       }
     }
   }
 
-  protected void applyParameterSettings(Flow flow, Map<String, String> props) throws PasserelleException {
+  protected void applyParameterSettings(FlowHandle flowHandle, Map<String, String> props) throws PasserelleException {
+    Flow flow = flowHandle.getFlow();
     if(props!=null) {
       Iterator<Entry<String, String>> propsItr = props.entrySet().iterator();
       while (propsItr.hasNext()) {
@@ -232,7 +252,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         if (nameParts.length == 1 && !flow.attributeList().isEmpty()) {
           try {
             final Parameter p = (Parameter) flow.getAttribute(nameParts[0], Parameter.class);
-            setParameter(flow, p, propName, propValue);
+            setParameter(flowHandle, p, propName, propValue);
           } catch (final IllegalActionException e1) {
             throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flow, e1);
           }
@@ -249,7 +269,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
                 ptolemy.actor.Director d = ((CompositeActor) e).getDirector();
                 if (d != null) {
                   Parameter p = (Parameter) d.getAttribute(nameParts[nameParts.length - 1], Parameter.class);
-                  setParameter(flow, p, propName, propValue);
+                  setParameter(flowHandle, p, propName, propValue);
                 }
               } catch (IllegalActionException e1) {
                 throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flow, e1);
@@ -259,7 +279,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
               if (e != null) {
                 try {
                   Parameter p = (Parameter) e.getAttribute(nameParts[nameParts.length - 1], Parameter.class);
-                  setParameter(flow, p, propName, propValue);
+                  setParameter(flowHandle, p, propName, propValue);
                 } catch (IllegalActionException e1) {
                   throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flow, e1);
                 }
@@ -273,14 +293,37 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     }
   }
 
-  private void setParameter(Flow flow, final Parameter p, String propName, String propValue) throws PasserelleException {
+  private void setParameter(FlowHandle flowHandle, final Parameter p, String propName, String propValue) throws PasserelleException {
     if (p != null) {
       p.setExpression(propValue);
       p.setPersistent(true);
-      LOGGER.info("Context {} - Override parameter {} : {}", new Object[] { processContextId, propName, propValue });
+      LOGGER.info("Context {} - Flow {} - Override parameter {} : {}", new Object[] { processContextId, flowHandle.getCode(), propName, propValue });
     } else {
-      throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flow, null);
+      throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flowHandle.getFlow(), null);
     }
+  }
+  
+  protected boolean setBreakpoints(FlowHandle flowHandle, Set<String> breakpointNames) {
+    Flow flow = flowHandle.getFlow();
+    boolean breakpointsDefined = false;
+    for (String breakpointName : breakpointNames) {
+      ComponentEntity entity = flow.getEntity(breakpointName);
+      if(entity!=null) {
+        entity.addDebugListener(new ActorBreakpointListener());
+        LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+        breakpointsDefined = true;
+      } else {
+        Port port = flow.getPort(breakpointName);
+        if(port!=null) {
+          port.addDebugListener(new PortBreakpointListener());
+          LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+          breakpointsDefined = true;
+        } else {
+          LOGGER.warn("Context {} - Flow {} - Breakpoint not found ", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+        }
+      }
+    }
+    return breakpointsDefined;
   }
 
   static {

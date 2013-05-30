@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
@@ -82,16 +83,16 @@ public class FlowProcessingTest1 extends TestCase {
     super.tearDown();
   }
 
-   public final void testStartAndCheckProcessHandle() throws Exception {
-     FlowHandle flowHandle = repositoryService.commit("testStartAndCheckProcessHandle", buildTrivialFlow("testStartAndCheckProcessHandle"));
-     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
-     assertNotNull("Process handle must be not-null", procHandle);
-     assertNotNull("Process handle must have a non-null process context ID", procHandle.getProcessContextId());
-     assertNotNull("Process status must be not-null", procHandle.getExecutionStatus());
-     assertNotNull("Process's flow must be not-null", procHandle.getFlow());
-     assertEquals("Process's flow code must be as defined", "testStartAndCheckProcessHandle", procHandle.getFlow().getCode());
-   }
-
+//   public final void testStartAndCheckProcessHandle() throws Exception {
+//     FlowHandle flowHandle = repositoryService.commit("testStartAndCheckProcessHandle", buildTrivialFlow("testStartAndCheckProcessHandle"));
+//     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+//     assertNotNull("Process handle must be not-null", procHandle);
+//     assertNotNull("Process handle must have a non-null process context ID", procHandle.getProcessContextId());
+//     assertNotNull("Process status must be not-null", procHandle.getExecutionStatus());
+//     assertNotNull("Process's flow must be not-null", procHandle.getFlow());
+//     assertEquals("Process's flow code must be as defined", "testStartAndCheckProcessHandle", procHandle.getFlow().getCode());
+//   }
+//
   public final void testStartFlowWithPreinitError() throws Exception {
     FlowHandle flowHandle = repositoryService.commit("testStartFlowWithPreinitError", buildPreInitErrorFlow("testStartFlowWithPreinitError"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
@@ -116,8 +117,16 @@ public class FlowProcessingTest1 extends TestCase {
     assertEquals("Process should have finished in ERROR", ProcessStatus.ERROR, procHandle.getExecutionStatus());
   }
 
+  public final void testStartETFlowWithWrapupError() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testStartETFlowWithWrapupError", buildWrapupErrorFlowET("testStartETFlowWithWrapupError"));
+    ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
+    Thread.sleep(500);
+    procHandle = processingService.refresh(procHandle);
+    assertEquals("Process should have finished in ERROR", ProcessStatus.ERROR, procHandle.getExecutionStatus());
+  }
+
   public final void testGetHandle() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testGetHandle", buildDelay1sFlow("testGetHandle"));
+    FlowHandle flowHandle = repositoryService.commit("testGetHandle", buildDelay100msFlow("testGetHandle"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     ProcessHandle procHandle2 = processingService.getHandle(procHandle.getProcessContextId());
     assertEquals("Process handle from start() should be equal to one returned by getHandle()", procHandle, procHandle2);
@@ -134,7 +143,7 @@ public class FlowProcessingTest1 extends TestCase {
 
   // with this one, we hope to invoke terminate before the actual execution has started
   public final void testTerminateImmediately() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testTerminateImmediately", buildDelay1sFlow("testTerminateImmediately"));
+    FlowHandle flowHandle = repositoryService.commit("testTerminateImmediately", buildDelay100msFlow("testTerminateImmediately"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     ProcessHandle procHandle2 = processingService.terminate(procHandle);
     // this is a bit risky, as we can not strictly be certain that the process was indeed terminated/canceled before its start...
@@ -147,34 +156,34 @@ public class FlowProcessingTest1 extends TestCase {
 
   // with this one, we hope to invoke terminate when the actual execution has started
   public final void testTerminateAfterSomeTime() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testTerminateAfterSomeTime", buildDelay1sFlow("testTerminateAfterSomeTime"));
+    FlowHandle flowHandle = repositoryService.commit("testTerminateAfterSomeTime", buildDelay100msFlow("testTerminateAfterSomeTime"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     Thread.sleep(100);
     ProcessHandle procHandle2 = processingService.refresh(procHandle);
     assertEquals("Process should have started", ProcessStatus.ACTIVE, procHandle2.getExecutionStatus());
     processingService.terminate(procHandle);
     // then we just let it die
-    Thread.sleep(1000);
+    Thread.sleep(500);
     ProcessHandle procHandle3 = processingService.refresh(procHandle2);
     assertTrue("Process should have terminated", procHandle3.getExecutionStatus().isFinalStatus());
   }
 
   public final void testWaitUntilFinished() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinished", buildDelay1sFlow("testWaitUntilFinished"));
+    FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinished", buildDelay100msFlow("testWaitUntilFinished"));
     long startTime = new Date().getTime();
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
-    ProcessStatus status = procHandle.waitUntilFinished(3, TimeUnit.SECONDS);
+    ProcessStatus status = procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
     long endTime = new Date().getTime();
     assertTrue("Process should have terminated", status.isFinalStatus());
-    assertTrue("Process should last for at least 1s", (endTime - startTime) > 1000);
+    assertTrue("Process should last for at least 100ms", (endTime - startTime) > 100);
   }
 
   public final void testWaitForTerminatedProcess() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitForTerminatedProcess", buildDelay1sFlow("testWaitForTerminatedProcess"));
+    FlowHandle flowHandle = repositoryService.commit("testWaitForTerminatedProcess", buildDelay100msFlow("testWaitForTerminatedProcess"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     processingService.terminate(procHandle);
     try {
-      ProcessStatus status = procHandle.waitUntilFinished(3, TimeUnit.SECONDS);
+      ProcessStatus status = procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
       assertEquals("Process should be INTERRUPTED", ProcessStatus.INTERRUPTED, status);
     } catch (FlowNotExecutingException e) {
       // this is also possible
@@ -182,10 +191,10 @@ public class FlowProcessingTest1 extends TestCase {
   }
 
   public final void testWaitNotLongEnoughUntilFinished() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testWaitNotLongEnoughUntilFinished", buildDelay1sFlow("testWaitNotLongEnoughUntilFinished"));
+    FlowHandle flowHandle = repositoryService.commit("testWaitNotLongEnoughUntilFinished", buildDelay100msFlow("testWaitNotLongEnoughUntilFinished"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     try {
-      procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
+      procHandle.waitUntilFinished(50, TimeUnit.MILLISECONDS);
       fail("waitUntilFinished should have gone in timeout");
     } catch (TimeoutException e) {
       // this is as it should be
@@ -196,7 +205,7 @@ public class FlowProcessingTest1 extends TestCase {
     FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinishedOfFlowWithError", buildPreInitErrorFlow("testWaitUntilFinishedOfFlowWithError"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     try {
-      procHandle.waitUntilFinished(3, TimeUnit.SECONDS);
+      procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
       fail("Process should have caused an ExecutionException");
     } catch (ExecutionException e) {
       assertTrue("Error cause should be an InitializationException", e.getCause() instanceof InitializationException);
@@ -204,33 +213,87 @@ public class FlowProcessingTest1 extends TestCase {
   }
   
   public final void testStartWithParameterOverrides() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testStartWithParameterOverrides", buildDelay1sFlow("testStartWithParameterOverrides"));
+    FlowHandle flowHandle = repositoryService.commit("testStartWithParameterOverrides", buildDelay100msFlow("testStartWithParameterOverrides"));
     Map<String,String> overrides = new HashMap<String, String>();
-    overrides.put("delay.time(s)", "3");
+    overrides.put("delay.time(ms)", "200");
     long startTime = new Date().getTime();
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, overrides, null);
-    ProcessStatus status = procHandle.waitUntilFinished(5, TimeUnit.SECONDS);
+    ProcessStatus status = procHandle.waitUntilFinished(1, TimeUnit.SECONDS);
     long endTime = new Date().getTime();
     assertTrue("Process should have terminated", status.isFinalStatus());
-    assertTrue("Process should last for at least 1s", (endTime - startTime) > 3000);
+    assertTrue("Process should last for at least 200ms", (endTime - startTime) > 200);
   }
 
   public final void testSuspendResume() throws Exception {
-    FlowHandle flowHandle = repositoryService.commit("testSuspendResume", buildMultiDelay1sFlow("testSuspendResume"));
+    FlowHandle flowHandle = repositoryService.commit("testSuspendResume", buildMultiDelay100msFlow("testSuspendResume"));
     ProcessHandle procHandle = processingService.start(StartMode.NORMAL, flowHandle, null, null, null);
     //an immediate suspend could happen BEFORE the model is already executing (as the start is an asynchronous)
     //this is OK as the processingService will maintain the suspension indicator and will suspend the execution
     //as soon as possible after its actual start.
     ProcessHandle suspendHandle = processingService.suspend(procHandle);
-    // need to wait > 1s here as the Delay actor in the test model REALLY blocks for its configured delay (1s)
-    Thread.sleep(1100);
+    // need to wait > 100ms here as the Delay actor in the test model REALLY blocks for its configured delay
+    Thread.sleep(200);
     suspendHandle = processingService.refresh(suspendHandle);
     assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, suspendHandle.getExecutionStatus());
     ProcessHandle resumeHandle = processingService.resume(suspendHandle);
     Thread.sleep(100);
     resumeHandle = processingService.refresh(resumeHandle);
     assertEquals("Process should be RESUMED", ProcessStatus.ACTIVE, resumeHandle.getExecutionStatus());
-    resumeHandle.waitUntilFinished(5, TimeUnit.SECONDS);
+    resumeHandle.waitUntilFinished(1, TimeUnit.SECONDS);
+  }  
+
+  public final void testActorBreakpointResume() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testActorBreakpointResume", buildMultiDelay100msFlow("testActorBreakpointResume"));
+    ProcessHandle procHandle = processingService.start(StartMode.DEBUG, flowHandle, null, null, null, "delay1");
+    // need to wait a bit here as the Delay actor in the test model REALLY blocks for its configured delay (1s)
+    Thread.sleep(200);
+    procHandle = processingService.refresh(procHandle);
+    assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    ProcessHandle resumeHandle = processingService.resume(procHandle);
+    Thread.sleep(100);
+    resumeHandle = processingService.refresh(resumeHandle);
+    assertEquals("Process should be RESUMED", ProcessStatus.ACTIVE, resumeHandle.getExecutionStatus());
+    try {
+      resumeHandle.waitUntilFinished(1, TimeUnit.SECONDS);
+    } catch (Exception e) {
+      fail("Process should have terminated normally in < 1 s");
+    }
+  }  
+
+  public final void testInputPortBreakpointResume() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testInputPortBreakpointResume", buildMultiDelay100msFlow("testInputPortBreakpointResume"));
+    ProcessHandle procHandle = processingService.start(StartMode.DEBUG, flowHandle, null, null, null, "delay1.input");
+    // need to wait a bit here as the Delay actor in the test model REALLY blocks for its configured delay (1s)
+    Thread.sleep(200);
+    procHandle = processingService.refresh(procHandle);
+    assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    ProcessHandle resumeHandle = processingService.resume(procHandle);
+    Thread.sleep(100);
+    resumeHandle = processingService.refresh(resumeHandle);
+    assertEquals("Process should be RESUMED", ProcessStatus.ACTIVE, resumeHandle.getExecutionStatus());
+    try {
+      resumeHandle.waitUntilFinished(1, TimeUnit.SECONDS);
+    } catch (Exception e) {
+      fail("Process should have terminated normally in < 1 s");
+    }
+  }  
+
+  public final void testOutputPortBreakpointResume() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testOutputPortBreakpointResume", buildMultiDelay100msFlow("testOutputPortBreakpointResume"));
+    ProcessHandle procHandle = processingService.start(StartMode.DEBUG, flowHandle, null, null, null, "const.output");
+    // need to wait a bit here as the Delay actor in the test model REALLY blocks for its configured delay (1s)
+    Thread.sleep(200);
+    procHandle = processingService.refresh(procHandle);
+    assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    ProcessHandle resumeHandle = processingService.resume(procHandle);
+    Thread.sleep(100);
+    resumeHandle = processingService.refresh(resumeHandle);
+    assertEquals("Process should be RESUMED", ProcessStatus.ACTIVE, resumeHandle.getExecutionStatus());
+    try {
+      resumeHandle.waitUntilFinished(1, TimeUnit.SECONDS);
+    } catch (Exception e) {
+      fail("Process should have terminated normally in < 1 s");
+    }
   }  
 
   // public final void testGetProcessEventsProcessHandleInt() {
@@ -243,17 +306,18 @@ public class FlowProcessingTest1 extends TestCase {
 
   protected Flow buildTrivialFlow(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
-    flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
     DevNullActor sink = new DevNullActor(flow, "sink");
+    sink.logReceivedMessages.setExpression("true");
     flow.connect(source, sink);
     return flow;
   }
 
   protected Flow buildPreInitErrorFlow(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
-    flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
     ExceptionGenerator excGen = new ExceptionGenerator(flow, "excGen");
     excGen.preInitExcParameter.setExpression("true");
     DevNullActor sink = new DevNullActor(flow, "sink");
@@ -264,8 +328,8 @@ public class FlowProcessingTest1 extends TestCase {
 
   protected Flow buildProcessErrorFlow(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
-    flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
     ExceptionGenerator excGen = new ExceptionGenerator(flow, "excGen");
     excGen.processExcParameter.setExpression("true");
     DevNullActor sink = new DevNullActor(flow, "sink");
@@ -277,7 +341,7 @@ public class FlowProcessingTest1 extends TestCase {
   protected Flow buildWrapupErrorFlow(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
     flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    Const source = new Const(flow, "const");
     ExceptionGenerator excGen = new ExceptionGenerator(flow, "excGen");
     excGen.wrapupExcParameter.setExpression("true");
     DevNullActor sink = new DevNullActor(flow, "sink");
@@ -286,28 +350,40 @@ public class FlowProcessingTest1 extends TestCase {
     return flow;
   }
 
-  protected Flow buildDelay1sFlow(String flowName) throws Exception {
+  protected Flow buildWrapupErrorFlowET(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
-    flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
+    ExceptionGenerator excGen = new ExceptionGenerator(flow, "excGen");
+    excGen.wrapupExcParameter.setExpression("true");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    flow.connect(source, excGen);
+    flow.connect(excGen, sink);
+    return flow;
+  }
+
+  protected Flow buildDelay100msFlow(String flowName) throws Exception {
+    Flow flow = new Flow(flowName, null);
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
     Delay delay = new Delay(flow, "delay");
-    delay.timeParameter.setExpression("1");
+    delay.timeParameter.setExpression("100");
     DevNullActor sink = new DevNullActor(flow, "sink");
     flow.connect(source, delay);
     flow.connect(delay, sink);
     return flow;
   }
 
-  protected Flow buildMultiDelay1sFlow(String flowName) throws Exception {
+  protected Flow buildMultiDelay100msFlow(String flowName) throws Exception {
     Flow flow = new Flow(flowName, null);
-    flow.setDirector(new Director(flow, "director"));
-    Const source = new Const(flow, "Constant");
+    flow.setDirector(new ETDirector(flow, "director"));
+    Const source = new Const(flow, "const");
     Delay delay1 = new Delay(flow, "delay1");
     Delay delay2 = new Delay(flow, "delay2");
     Delay delay3 = new Delay(flow, "delay3");
-    delay1.timeParameter.setExpression("1");
-    delay2.timeParameter.setExpression("1");
-    delay3.timeParameter.setExpression("1");
+    delay1.timeParameter.setExpression("100");
+    delay2.timeParameter.setExpression("100");
+    delay3.timeParameter.setExpression("100");
     DevNullActor sink = new DevNullActor(flow, "sink");
     flow.connect(source, delay1);
     flow.connect(delay1, delay2);

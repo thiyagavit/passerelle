@@ -32,6 +32,8 @@ import com.isencia.passerelle.core.ErrorCode;
 /**
  * Simple actor for testing, that mocks some work for each incoming msg,
  * by blocking for a configurable delay and then just forwarding the received msg.
+ * The delay is split in a sequence of segments of 100ms. 
+ * Inbetween segments, the actor checks if a shutdown has been requested.
  * 
  * @author erwin
  */
@@ -55,7 +57,7 @@ public class Delay extends Forwarder {
   public Delay(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
     super(container, name);
 
-    timeParameter = new Parameter(this, "time(s)", new IntToken(1));
+    timeParameter = new Parameter(this, "time(ms)", new IntToken(1000));
     timeParameter.setTypeEquals(BaseType.INT);
     registerConfigurableParameter(timeParameter);
   }
@@ -66,8 +68,9 @@ public class Delay extends Forwarder {
     try {
       int time = ((IntToken)timeParameter.getToken()).intValue();
       if (time > 0) {
-        for (int i = 0; i < time; ++i) {
-          Thread.sleep(1000);
+        int count = time/100;
+        for (int i = 0; i < count; ++i) {
+          Thread.sleep(100);
           if (isFinishRequested() || fireInterrupted || flowExecutionStopped) {
             break;
           }
