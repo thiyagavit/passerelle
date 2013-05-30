@@ -23,6 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
@@ -47,7 +48,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   private ExecutorService flowExecutor;
 
   public FlowProcessingServiceImpl(int maxConcurrentProcesses) {
-    LOGGER.info("Creating flow executor for {} max concurrent processes", maxConcurrentProcesses);
+    LOGGER.info("Creating FlowProcessingService for {} max concurrent processes", maxConcurrentProcesses);
     this.maxConcurrentProcesses = maxConcurrentProcesses;
     flowExecutor = new FlowExecutor(maxConcurrentProcesses, maxConcurrentProcesses, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
   }
@@ -75,14 +76,14 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle addBreakpoints(ProcessHandle processHandle, String... extraBreakpoints) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO implement signalEvent()
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ProcessHandle removeBreakpoints(ProcessHandle processHandle, String... breakpointsToRemove) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO implement removeBreakpoints()
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -135,10 +136,14 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
     }
   }
   
+  /**
+   * TODO : implement partial suspensions (cfr doc for <code>start()</code> method).
+   * 
+   * Until then this method just delegates to the plain <code>resume(processHandle)</code>
+   */
   @Override
   public ProcessHandle resume(ProcessHandle processHandle, String suspendedElement) throws FlowNotExecutingException {
-    // TODO Auto-generated method stub
-    return null;
+    return resume(processHandle);
   }
 
   @Override
@@ -149,20 +154,19 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle signalEvent(ProcessHandle processHandle, Event event) throws FlowNotExecutingException {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO implement signalEvent()
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public List<Event> getProcessEvents(ProcessHandle processHandle, int maxCount) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO implement getProcessEvents()
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public List<Event> getProcessEvents(String processId, int maxCount) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO implement getProcessEvents()
+    throw new UnsupportedOperationException();
   }
-
 }

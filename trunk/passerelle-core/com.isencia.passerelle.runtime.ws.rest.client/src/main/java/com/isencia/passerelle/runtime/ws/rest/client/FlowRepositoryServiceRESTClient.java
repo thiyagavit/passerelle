@@ -24,6 +24,7 @@ import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.repository.VersionSpecification;
 import com.isencia.passerelle.runtime.ws.rest.CodeList;
 import com.isencia.passerelle.runtime.ws.rest.ErrorInfo;
 import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
@@ -132,6 +133,23 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
       throw new EntryNotFoundException(flowCode);
     }
   }
+  
+  @Override
+  public FlowHandle getFlowVersion(String flowCode, VersionSpecification version) throws EntryNotFoundException {
+    try {
+      return flowReposResource.path(flowCode).path(version.toString()).get(FlowHandleResource.class);
+    } catch (UniformInterfaceException e) {
+      LOGGER.error("REST call exception", e);
+      ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
+      LOGGER.error(errorInfo.toString());
+      throw new EntryNotFoundException(flowCode);
+    }
+  }
+  
+  @Override
+  public FlowHandle loadFlowHandleWithContent(FlowHandle handle) throws EntryNotFoundException {
+    return getFlowVersion(handle.getCode(), handle.getVersion());
+  }
 
   @Override
   public String[] getAllFlowCodes() {
@@ -159,7 +177,7 @@ public class FlowRepositoryServiceRESTClient implements FlowRepositoryService {
   @Override
   public FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException {
     try {
-      return flowReposResource.path(handle.getCode()).path("activate").post(FlowHandleResource.class, new FlowHandleResource(handle));
+      return flowReposResource.path(handle.getCode()).path("activate").post(FlowHandleResource.class, FlowHandleResource.buildFlowHandleResource(handle));
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);

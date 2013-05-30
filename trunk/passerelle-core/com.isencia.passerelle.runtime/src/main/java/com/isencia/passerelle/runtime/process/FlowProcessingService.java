@@ -30,7 +30,7 @@ import com.isencia.passerelle.runtime.ProcessHandle;
 public interface FlowProcessingService {
   
   enum StartMode {
-    NORMAL, DEBUG, STEP;
+    RUN, DEBUG, STEP;
   }
 
   /**
@@ -47,7 +47,7 @@ public interface FlowProcessingService {
    * But such a "polling" approach is not desirable. A listener-based approach is almost always more efficient and more powerful.
    * </p>
    * <p>
-   * In <b>NORMAL</b> mode, the execution will typically run in one shot until the end.
+   * In <b>RUN</b> mode, the execution will typically run in one shot until the end.
    * </p>
    * <p>
    * Via a <code>suspend()</code> request, the execution can be suspended.

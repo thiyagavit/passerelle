@@ -16,29 +16,24 @@ package com.isencia.passerelle.runtime.process.impl.activator;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import com.isencia.passerelle.runtime.process.FlowProcessingService;
+import com.isencia.passerelle.runtime.process.impl.FlowProcessingServiceImpl;
 
 public class Activator implements BundleActivator {
 
-	private static BundleContext context;
+	private FlowProcessingService processSvc;
+	private ServiceRegistration<FlowProcessingService> processSvcreg;
 
-	static BundleContext getContext() {
-		return context;
+	// TODO make max concurrent runs configurable
+	public void start(BundleContext context) throws Exception {
+	  processSvc = new FlowProcessingServiceImpl(3);
+	  processSvcreg = (ServiceRegistration<FlowProcessingService>) context.registerService(FlowProcessingService.class.getName(), processSvc, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.context = null;
+	public void stop(BundleContext context) throws Exception {
+	  processSvcreg.unregister();
+	  processSvc = null;
 	}
 
 }

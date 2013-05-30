@@ -25,6 +25,11 @@ import com.isencia.passerelle.runtime.FlowHandle;
  * <br/>
  * A FlowHandle allows to obtain its associated Flow, and/or metadata like the identifying "code",
  * version info etc.
+ * <br/>
+ * For environments with high throughputs and/or large models, it may be beneficial to use
+ * "compacted" FlowHandles as much as possible. These have only the necessary metadata but not
+ * the actual Flow nor raw flow definition XML/MOML.
+ * Only when really needed should the flow definition be retrieved via <code>loadFlowHandleWithContent</code>.
  * </p>
  * <p>
  * The repository may be able to maintain different versions for the Flows,
@@ -109,6 +114,25 @@ public interface FlowRepositoryService {
    * @throws EntryNotFoundException when the code does not correspond to a Flow entry in this repository
    */
   FlowHandle getMostRecentFlow(String flowCode) throws EntryNotFoundException;
+
+  /**
+   * Returns the Flow stored in the repository for the given code and version.
+   * 
+   * @param flowCode
+   * @param version
+   * @return the FlowHandle for the given code and version 
+   * @throws EntryNotFoundException when the combination of code and version does not correspond to a Flow entry in this repository
+   */
+  FlowHandle getFlowVersion(String flowCode, VersionSpecification version) throws EntryNotFoundException;
+  
+  /**
+   * 
+   * @param handle a handle that may be a "compacted" one, i.e. without the actual flow definition
+   * but just with code/version/location metadata.
+   * @return the handle with the raw flow definition filled in
+   * @throws EntryNotFoundException
+   */
+  FlowHandle loadFlowHandleWithContent(FlowHandle handle) throws EntryNotFoundException;
   
   /**
    * @return list of all Flow codes, for which Flows are stored in the repository.

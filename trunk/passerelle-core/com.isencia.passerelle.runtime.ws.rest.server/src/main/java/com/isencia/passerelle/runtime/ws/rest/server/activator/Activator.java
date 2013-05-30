@@ -21,29 +21,37 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 
 public class Activator implements BundleActivator {
 
-  static final String SERVICE_FILTER = "(&("+Constants.OBJECTCLASS+"="+FlowRepositoryService.class.getName()+")(type=FILE))";
+  static final String FLOWREPOS_SERVICE_FILTER = "(&("+Constants.OBJECTCLASS+"="+FlowRepositoryService.class.getName()+")(type=FILE))";
+  static final String FLOWPROC_SERVICE_FILTER = "("+Constants.OBJECTCLASS+"="+FlowProcessingService.class.getName()+")";
   
   private static BundleContext context;
   private static Activator instance;
   
-  private ServiceTracker<Object, Object> flowReposSvcTracker;
+  private ServiceTracker<Object, Object> flowRepositorySvcTracker;
+  private ServiceTracker<Object, Object> flowProcessingSvcTracker;
 
-  private FlowRepositoryService flowReposSvc;
+  private FlowRepositoryService flowRepositorySvc;
+  private FlowProcessingService flowProcessingSvc;
 
   public void start(BundleContext bundleContext) throws Exception {
     Activator.context = bundleContext;
     Activator.instance = this;
-    Filter filter = context.createFilter(SERVICE_FILTER);
-    flowReposSvcTracker = new ServiceTracker<Object, Object>(bundleContext, filter, createSvcTrackerCustomizer());
-    flowReposSvcTracker.open();
+    Filter reposSvcFilter = context.createFilter(FLOWREPOS_SERVICE_FILTER);
+    Filter processSvcFilter = context.createFilter(FLOWPROC_SERVICE_FILTER);
+    flowRepositorySvcTracker = new ServiceTracker<Object, Object>(bundleContext, reposSvcFilter, createSvcTrackerCustomizer());
+    flowProcessingSvcTracker = new ServiceTracker<Object, Object>(bundleContext, processSvcFilter, createSvcTrackerCustomizer());
+    flowRepositorySvcTracker.open();
+    flowProcessingSvcTracker.open();
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
-    flowReposSvcTracker.close();
+    flowRepositorySvcTracker.close();
+    flowProcessingSvcTracker.close();
     Activator.context = null;
     Activator.instance = null;
   }
@@ -53,17 +61,23 @@ public class Activator implements BundleActivator {
   }
   
   public FlowRepositoryService getFlowReposSvc() {
-    return flowReposSvc;
+    return flowRepositorySvc;
+  }
+
+  public FlowProcessingService getFlowProcessingSvc() {
+    return flowProcessingSvc;
   }
 
   private ServiceTrackerCustomizer<Object, Object> createSvcTrackerCustomizer() {
     return new ServiceTrackerCustomizer<Object, Object>() {
       public void removedService(ServiceReference<Object> ref, Object svc) {
         synchronized (Activator.this) {
-          if (svc != Activator.this.flowReposSvc) {
-            return;
+          if (svc == Activator.this.flowRepositorySvc) {
+            Activator.this.flowRepositorySvc = null;
+          } else if(svc == Activator.this.flowProcessingSvc) {
+            Activator.this.flowProcessingSvc = null;
           } else {
-            Activator.this.flowReposSvc = null;
+            return;
           }
           context.ungetService(ref);
         }
@@ -75,9 +89,11 @@ public class Activator implements BundleActivator {
       public Object addingService(ServiceReference<Object> ref) {
         Object svc = context.getService(ref);
         synchronized (Activator.this) {
-          if (Activator.this.flowReposSvc == null) {
-            Activator.this.flowReposSvc = (FlowRepositoryService) svc;
-          }
+          if ((svc instanceof FlowRepositoryService) && (Activator.this.flowRepositorySvc == null)) {
+            Activator.this.flowRepositorySvc = (FlowRepositoryService) svc;
+          } else if ((svc instanceof FlowProcessingService) && (Activator.this.flowProcessingSvc == null)) {
+            Activator.this.flowProcessingSvc = (FlowProcessingService) svc;
+          } 
         }
         return svc;
       }

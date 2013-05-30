@@ -9,6 +9,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: com.isencia.passerelle.core;version="8.4.0",
  com.isencia.passerelle.model;version="8.4.0",
  com.isencia.passerelle.runtime;version="8.4.0",
+ com.isencia.passerelle.runtime.process;version="8.4.0",
  com.isencia.passerelle.runtime.repository;version="8.4.0",
  com.isencia.passerelle.runtime.ws.rest,
  com.isencia.sherpa.commons,
@@ -19,6 +20,7 @@ Import-Package: com.isencia.passerelle.core;version="8.4.0",
  org.osgi.util.tracker;version="1.5.0"
 JAX-RS-Alias: /rest
 JAX-RS-Classes: com.isencia.passerelle.runtime.ws.rest.server.FlowRepositoryServiceRESTFacade,
+ com.isencia.passerelle.runtime.ws.rest.server.FlowProcessingServiceRESTFacade,
  com.isencia.passerelle.runtime.ws.rest.server.DuplicateEntryExceptionMapper,
  com.isencia.passerelle.runtime.ws.rest.server.EntryNotFoundExceptionMapper,
  com.isencia.passerelle.runtime.ws.rest.server.InvalidRequestExceptionMapper

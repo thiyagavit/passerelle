@@ -26,7 +26,6 @@ public class Activator implements BundleActivator {
 
   private FlowRepositoryService repoSvc;
   private ServiceRegistration<FlowRepositoryService> repoSvcReg;
-  private static Activator plugin;
 
   public void start(BundleContext context) throws Exception {
     File userHome              = new File(System.getProperty("user.home"));
@@ -36,8 +35,6 @@ public class Activator implements BundleActivator {
     Hashtable<String, String> svcProps = new Hashtable<String, String>();
     svcProps.put("type", "FILE");
     repoSvcReg = (ServiceRegistration<FlowRepositoryService>) context.registerService(FlowRepositoryService.class.getName(), repoSvc, svcProps);
-
-    plugin = this;
   }
 
   public void stop(BundleContext context) throws Exception {
@@ -47,9 +44,5 @@ public class Activator implements BundleActivator {
   
   public FlowRepositoryService getRepositoryService() {
     return repoSvc;
-  }
-  
-  public static Activator getDefault() {
-    return plugin;
   }
 }

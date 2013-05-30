@@ -27,6 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -34,6 +35,7 @@ import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.repository.VersionSpecification;
 import com.isencia.passerelle.runtime.ws.rest.CodeList;
 import com.isencia.passerelle.runtime.ws.rest.ErrorCode;
 import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
@@ -67,7 +69,31 @@ public class FlowRepositoryServiceRESTFacade {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
       FlowHandle localHandle = getFlowRepositoryService().getActiveFlow(flowCode);
-      return buildRemoteHandle(localHandle);
+      return buildRemoteHandle(localHandle, false);
+    }
+  }
+
+  @GET
+  @Path("{code}/{version}")
+  public FlowHandle getFlowVersion(@PathParam("code") String flowCode, @PathParam("version") String version) throws EntryNotFoundException, InvalidRequestException {
+    if (flowCode == null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
+    } else if (version == null) {
+      return getActiveFlow(flowCode);
+    } else {
+      VersionSpecification versionSpec = null;
+      try {
+        versionSpec = VersionSpecification.parse(version);
+      } catch (Exception e) {
+        throw new InvalidRequestException(ErrorCode.INVALID_PARAM, "version");
+      }
+      FlowHandle localHandle = null;
+      if(versionSpec!=null) {
+        localHandle = getFlowRepositoryService().getFlowVersion(flowCode, versionSpec);
+      } else {
+        localHandle = getFlowRepositoryService().getActiveFlow(flowCode);
+      }
+      return buildRemoteHandle(localHandle, true);
     }
   }
 
@@ -78,7 +104,7 @@ public class FlowRepositoryServiceRESTFacade {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "code");
     } else {
       FlowHandle localHandle = getFlowRepositoryService().getMostRecentFlow(flowCode);
-      return buildRemoteHandle(localHandle);
+      return buildRemoteHandle(localHandle, true);
     }
   }
 
@@ -94,12 +120,12 @@ public class FlowRepositoryServiceRESTFacade {
 
   @POST
   @Path("{code}/activate")
-  public FlowHandle activateFlowRevision(FlowHandle handle) throws EntryNotFoundException, InvalidRequestException {
+  public FlowHandle activateFlowRevision(FlowHandleResource handle) throws EntryNotFoundException, InvalidRequestException {
     if (handle == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
     } else {
       FlowHandle localHandle = getFlowRepositoryService().activateFlowRevision(handle);
-      return buildRemoteHandle(localHandle);
+      return buildRemoteHandle(localHandle, false);
     }
   }
 
@@ -119,7 +145,7 @@ public class FlowRepositoryServiceRESTFacade {
         throw new InvalidRequestException(ErrorCode.ERROR, "");
       }
       FlowHandle localHandle = getFlowRepositoryService().commit(flowCode, flow);
-      return buildRemoteHandle(localHandle);
+      return buildRemoteHandle(localHandle, false);
     }
   }
 
@@ -150,7 +176,7 @@ public class FlowRepositoryServiceRESTFacade {
         throw new InvalidRequestException(ErrorCode.ERROR, "");
       }
       FlowHandle localHandle = getFlowRepositoryService().update(handle, updatedFlow, activate);
-      return buildRemoteHandle(localHandle);
+      return buildRemoteHandle(localHandle, false);
     }
   }
 
@@ -158,12 +184,18 @@ public class FlowRepositoryServiceRESTFacade {
     return Activator.getInstance().getFlowReposSvc();
   }
 
-  private FlowHandle buildRemoteHandle(FlowHandle localHandle) {
+  private FlowHandle buildRemoteHandle(FlowHandle localHandle, boolean specifyVersionInURI) {
     if (uriInfo != null) {
-      URI resLoc = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}").build(localHandle.getCode());
+      UriBuilder uriBldr = uriInfo.getBaseUriBuilder().path(FlowRepositoryServiceRESTFacade.class).path("{code}");
+      URI resLoc = null;
+//      if(specifyVersionInURI) {
+//        resLoc = uriBldr.path("{version}").build(localHandle.getCode(), localHandle.getVersion());
+//      } else {
+        resLoc = uriBldr.build(localHandle.getCode());
+//      }
       return new FlowHandleResource(resLoc, localHandle.getCode(), localHandle.getRawFlowDefinition(), localHandle.getVersion());
     } else {
-      return new FlowHandleResource(localHandle);
+      return FlowHandleResource.buildFlowHandleResource(localHandle);
     }
   }
 }

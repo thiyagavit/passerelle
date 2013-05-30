@@ -162,9 +162,32 @@ public class FlowRepositoryTest1 extends TestCase {
     FlowManager.applyParameterSettings(f, paramOverrides);
 
     FlowHandle updatedHandle = repositoryService.update(activeHandle, f, true);
+    FlowHandle activeHandle2 = repositoryService.getActiveFlow(HELLO_CODE);
 
     assertFalse("Updated handle should not be the previously active one", activeHandle.equals(updatedHandle));
+    assertEquals("Updated handle should be the new active one", activeHandle2,updatedHandle);
     assertEquals("Code should remain the same for an update", activeHandle.getCode(), updatedHandle.getCode());
+    assertTrue("Version must have increased after update", updatedHandle.getVersion().compareTo(activeHandle.getVersion()) > 0);
+  }
+
+  public void testUpdateAndLaterActivation() throws Exception {
+    repositoryService.commit(HELLO_CODE, buildTrivialFlow(HELLO_WORLD_FLOWNAME));
+    FlowHandle activeHandle = repositoryService.getActiveFlow(HELLO_CODE);
+
+    Flow f = activeHandle.getFlow();
+    Map<String, String> paramOverrides = new HashMap<String, String>();
+    paramOverrides.put("Constant.value", "changed");
+    FlowManager.applyParameterSettings(f, paramOverrides);
+
+    FlowHandle updatedHandle = repositoryService.update(activeHandle, f, false);
+
+    FlowHandle previouslyActiveHandle = repositoryService.activateFlowRevision(updatedHandle);
+    FlowHandle activeHandle2 = repositoryService.getActiveFlow(HELLO_CODE);
+    
+    assertFalse("Updated handle should not be the previously active one", activeHandle.equals(updatedHandle));
+    assertEquals("Previously active handle should be the originally committed one", activeHandle,previouslyActiveHandle);
+    assertEquals("Updated handle should be the new active one", activeHandle2,updatedHandle);
+    assertEquals("Code should remain the same for an update followed by an activation", activeHandle.getCode(), updatedHandle.getCode());
     assertTrue("Version must have increased after update", updatedHandle.getVersion().compareTo(activeHandle.getVersion()) > 0);
   }
 

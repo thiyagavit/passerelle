@@ -56,6 +56,8 @@ public interface FlowHandle {
 
   /**
    * @return the flow definition in its raw format, typically a MOML/XML.
+   * This may be empty for "compacted" handles, in which case the full contents can
+   * be explicitly loaded via FlowRepositoryService.loadFlowHandleWithContent.
    */
   String getRawFlowDefinition();
 }
