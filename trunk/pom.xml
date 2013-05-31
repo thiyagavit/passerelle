@@ -54,13 +54,13 @@
 			<uniqueVersion>false</uniqueVersion>
 			<id>nexus</id>
 			<name>Nexus Repository</name>
-			<url>https://ci-nexus.isencia.be/nexus/content/repositories/isencia-oss-trunk-release/</url>
+			<url>${nexus.base.url}/content/repositories/isencia-oss-trunk-release/</url>
 		</repository>
 		<snapshotRepository>
 			<uniqueVersion>true</uniqueVersion>
 			<id>nexus</id>
 			<name>Nexus Repository</name>
-			<url>https://ci-nexus.isencia.be/nexus/content/repositories/isencia-oss-trunk-snapshot/</url>
+			<url>${nexus.base.url}/content/repositories/isencia-oss-trunk-snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 	
