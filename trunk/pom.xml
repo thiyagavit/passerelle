@@ -17,6 +17,7 @@
 	<properties>
 		<target.execution.env>JavaSE-1.6</target.execution.env>
 		<target.compiler.compliance>1.6</target.compiler.compliance>
+		<passerelle-target-p2-repo>file:///${project.basedir}/../../com.isencia.passerelle.gettingstarted/target/p2repo</passerelle-target-p2-repo>
 		
 		<sonar.skippedModules>
 			com.microstar,
@@ -44,7 +45,7 @@
 		<repository>
 			<id>passerelle-p2-repo</id>
 			<layout>p2</layout>
-			<url>file:///${project.basedir}/../../com.isencia.passerelle.gettingstarted/target/p2repo</url>
+			<url>${passerelle-target-p2-repo}</url>
 		</repository>
 	</repositories>
 
