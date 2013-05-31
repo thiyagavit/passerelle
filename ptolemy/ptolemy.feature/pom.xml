@@ -10,7 +10,7 @@
 	
 	<groupId>com.isencia.passerelle</groupId>
 	<artifactId>ptolemy.feature</artifactId>
-	<version>8.3.0</version>
+	<version>7.0.1</version>
 	<packaging>eclipse-feature</packaging>
 	
 	<name>Passerelle :: Ptolemy :: ptolemy.feature</name>
