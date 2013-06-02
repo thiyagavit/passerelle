@@ -43,7 +43,7 @@ import com.isencia.passerelle.runtime.ws.rest.server.activator.Activator;
  * @author erwin
  */
 @Path("processes")
-@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public class FlowProcessingServiceRESTFacade {
   
   @GET
@@ -79,7 +79,7 @@ public class FlowProcessingServiceRESTFacade {
         String[] breakpointNames = breakPointStr!=null ? breakPointStr.split(",") : null;
         ProcessHandle localHandle = getFlowProcessingService().start(_mode, handle, processContextId, null, null, breakpointNames);
         return buildRemoteHandle(localHandle);
-      } catch (IllegalArgumentException e) {
+      } catch (Exception e) {
         throw new InvalidRequestException(ErrorCode.INVALID_PARAM, "mode");
       }
     }
