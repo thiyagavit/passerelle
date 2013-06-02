@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.runtime.ws.rest.server;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,6 +24,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
+import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.process.FlowProcessingService.StartMode;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
@@ -50,9 +51,20 @@ public class FlowProcessingServiceRESTFacade {
     return "hello";
   }
   
+  /**
+   * 
+   * @param mode
+   * @param flowHandle
+   * @param processContextId
+   * @param breakPointStr comma-separated concatenated string of actor/port names for breakpoints
+   * @return
+   * @throws EntryNotFoundException
+   * @throws InvalidRequestException
+   */
   @POST
   @Path("{mode}")
-  public ProcessHandle start(@PathParam("mode") String mode, FlowHandleResource flowHandle, @QueryParam("processContextId") String processContextId) throws EntryNotFoundException, InvalidRequestException {
+  public ProcessHandle start(@PathParam("mode") String mode, FlowHandleResource flowHandle, 
+      @QueryParam("processContextId") String processContextId, @QueryParam("breakpoints") String breakPointStr) throws EntryNotFoundException, InvalidRequestException {
     if (flowHandle == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
     } if (mode == null) {
@@ -61,9 +73,11 @@ public class FlowProcessingServiceRESTFacade {
       try {
         // (re)load the flowhandle contents based on code and version
         // this allows to send compact handles around, without the complete raw flow definition
+        // and we only load the content (which could be a large MOML/XML) at the moment it's really needed.
         FlowHandle handle = getFlowRepositoryService().loadFlowHandleWithContent(flowHandle);
         StartMode _mode = StartMode.valueOf(mode);
-        ProcessHandle localHandle = getFlowProcessingService().start(_mode, handle, processContextId, null, null);
+        String[] breakpointNames = breakPointStr!=null ? breakPointStr.split(",") : null;
+        ProcessHandle localHandle = getFlowProcessingService().start(_mode, handle, processContextId, null, null, breakpointNames);
         return buildRemoteHandle(localHandle);
       } catch (IllegalArgumentException e) {
         throw new InvalidRequestException(ErrorCode.INVALID_PARAM, "mode");
@@ -71,6 +85,69 @@ public class FlowProcessingServiceRESTFacade {
     }
   }
 
+  @GET
+  @Path("{processContextId}")
+  public ProcessHandle getHandle(@PathParam("processContextId") String processContextId) throws FlowNotExecutingException, InvalidRequestException {
+    if(processContextId==null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "processContextId");
+    } else {
+      ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
+      if(localHandle!=null) {
+        return buildRemoteHandle(localHandle);
+      } else {
+        return null;
+      }
+    }
+  }
+
+  @DELETE
+  @Path("{processContextId}")
+  public ProcessHandle terminate(@PathParam("processContextId") String processContextId) throws FlowNotExecutingException, InvalidRequestException {
+    if(processContextId==null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "processContextId");
+    } else {
+      ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
+      if(localHandle!=null) {
+        localHandle = getFlowProcessingService().terminate(localHandle);
+        return buildRemoteHandle(localHandle);
+      } else {
+        throw new FlowNotExecutingException(processContextId);
+      }
+    }
+  }
+
+  @POST
+  @Path("{processContextId}/suspend")
+  public ProcessHandle suspend(@PathParam("processContextId") String processContextId) throws FlowNotExecutingException, InvalidRequestException {
+    if(processContextId==null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "processContextId");
+    } else {
+      ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
+      if(localHandle!=null) {
+        localHandle = getFlowProcessingService().suspend(localHandle);
+        return buildRemoteHandle(localHandle);
+      } else {
+        throw new FlowNotExecutingException(processContextId);
+      }
+    }
+  }
+  
+  @POST
+  @Path("{processContextId}/resume")
+  public ProcessHandle resume(@PathParam("processContextId") String processContextId) throws FlowNotExecutingException, InvalidRequestException {
+    if(processContextId==null) {
+      throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "processContextId");
+    } else {
+      ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
+      if(localHandle!=null) {
+        localHandle = getFlowProcessingService().resume(localHandle);
+        return buildRemoteHandle(localHandle);
+      } else {
+        throw new FlowNotExecutingException(processContextId);
+      }
+    }
+  }
+  
   private ProcessHandle buildRemoteHandle(ProcessHandle localHandle) {
     return new ProcessHandleResource(localHandle);
   }

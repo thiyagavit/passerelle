@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.core;version="8.4.0",
  com.isencia.passerelle.model;version="8.4.0",
  com.isencia.passerelle.runtime;version="8.4.0",
+ com.isencia.passerelle.runtime.process;version="8.4.0",
  com.isencia.passerelle.runtime.repository;version="8.4.0",
  com.isencia.passerelle.runtime.ws.rest,
  com.isencia.sherpa.commons,
