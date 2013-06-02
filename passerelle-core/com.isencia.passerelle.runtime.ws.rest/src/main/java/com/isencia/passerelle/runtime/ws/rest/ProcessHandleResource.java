@@ -21,8 +21,8 @@ import java.util.concurrent.TimeoutException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
