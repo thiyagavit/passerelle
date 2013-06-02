@@ -17,7 +17,9 @@ package com.isencia.passerelle.runtime.test.activator;
 import java.util.List;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
+import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.test.FlowProcessingTest1;
 import com.isencia.passerelle.runtime.test.FlowRepositoryTest1;
 
 public class TestRunner implements CommandProvider {
@@ -26,6 +28,7 @@ public class TestRunner implements CommandProvider {
     StringBuffer buffer = new StringBuffer();
     buffer.append("\n---Passerelle flow repos tests---\n");
     buffer.append("\trunFlowReposTests\n");
+    buffer.append("\trunFlowProcTests\n");
     return buffer.toString();
   }
 
@@ -35,6 +38,14 @@ public class TestRunner implements CommandProvider {
     for (FlowRepositoryService flowRepositoryService : reposSvcs) {
       FlowRepositoryTest1.repositoryService = flowRepositoryService;
       junit.textui.TestRunner.run(FlowRepositoryTest1.class);
+    }
+  }
+  public void _runFlowProcTests(CommandInterpreter ci) {
+    FlowProcessingTest1.repositoryService = Activator.getInstance().getLocalReposSvc();
+    List<FlowProcessingService> procSvcs = Activator.getInstance().getFlowProcSvc();
+    for (FlowProcessingService flowProcService : procSvcs) {
+      FlowProcessingTest1.processingService = flowProcService;
+      junit.textui.TestRunner.run(FlowProcessingTest1.class);
     }
   }
 }

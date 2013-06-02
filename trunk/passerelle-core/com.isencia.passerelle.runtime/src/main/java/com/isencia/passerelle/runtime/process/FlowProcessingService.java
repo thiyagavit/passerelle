@@ -209,7 +209,7 @@ public interface FlowProcessingService {
   ProcessHandle getHandle(String processId);
   
   /**
-   * 
+   * TODO check if we should not remove this, as getHandle() basically does the same
    * @param processHandle
    * @return the refreshed handle, i.e. with updated status info
    */

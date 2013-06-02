@@ -147,6 +147,12 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     canceled = true;
     if (busy) {
       LOGGER.info("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
+      // to ensure that the status is directly returned as stopping,
+      // even when the manager.finish() is done asynchronously,
+      // we explicitly set the state already here.
+      // TODO check if it's not better to override the finish method in our Manager
+      // to set the state in there, same as for pause/resume...
+      status = ProcessStatus.STOPPING;
       manager.finish();
     } else {
       LOGGER.info("Context {} - Canceling execution of flow {} before it started", processContextId, flowHandle.getCode());

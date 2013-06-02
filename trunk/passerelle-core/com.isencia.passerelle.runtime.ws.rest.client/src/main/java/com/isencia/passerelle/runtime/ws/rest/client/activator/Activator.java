@@ -20,21 +20,25 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import com.isencia.passerelle.runtime.FlowHandle;
+import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.ws.rest.client.FlowProcessingServiceRESTClient;
 import com.isencia.passerelle.runtime.ws.rest.client.FlowRepositoryServiceRESTClient;
 
 public class Activator implements BundleActivator {
 
   private FlowRepositoryServiceRESTClient repoSvc;
+  private FlowProcessingServiceRESTClient procSvc;
   private ServiceRegistration<FlowRepositoryService> repoSvcReg;
+  private ServiceRegistration<FlowProcessingService> procSvcReg;
   private static Activator plugin;
 
   public void start(BundleContext context) throws Exception {
     String debugStr      = System.getProperty("com.isencia.passerelle.runtime.ws.rest.client.debug", "false");
-    String resourceRootURL      = System.getProperty("com.isencia.passerelle.runtime.ws.rest.client.resourceURL", "http://localhost/rest/flows");
+    String resourceRootURL      = System.getProperty("com.isencia.passerelle.runtime.ws.rest.client.resourceURL", "http://localhost/rest");
     Hashtable<String, String> svcProps = new Hashtable<String, String>();
     svcProps.put("debug", debugStr);
-    svcProps.put("resourceURL", resourceRootURL);
+    svcProps.put("resourceURL", resourceRootURL+"/flows");
     svcProps.put("type", "REST");
     
     repoSvc = new FlowRepositoryServiceRESTClient();
@@ -43,16 +47,29 @@ public class Activator implements BundleActivator {
     repoSvcReg = (ServiceRegistration<FlowRepositoryService>) 
         context.registerService(FlowRepositoryService.class.getName(), repoSvc, svcProps);
 
+    svcProps.put("resourceURL", resourceRootURL+"/processes");
+    
+    procSvc = new FlowProcessingServiceRESTClient();
+    procSvc.init(svcProps);
+    
+    procSvcReg = (ServiceRegistration<FlowProcessingService>) 
+        context.registerService(FlowProcessingService.class.getName(), procSvc, svcProps);
     plugin = this;
   }
 
   public void stop(BundleContext context) throws Exception {
     repoSvcReg.unregister();
+    procSvcReg.unregister();
+    procSvc = null;
     repoSvc = null;
   }
   
   public FlowRepositoryService getRepositoryService() {
     return repoSvc;
+  }
+  
+  public FlowProcessingService getProcessingService() {
+    return procSvc;
   }
   
   public static Activator getDefault() {
