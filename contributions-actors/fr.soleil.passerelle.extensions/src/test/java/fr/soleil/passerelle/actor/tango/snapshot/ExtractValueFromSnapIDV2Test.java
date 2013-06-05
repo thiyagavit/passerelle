@@ -28,9 +28,6 @@ import com.isencia.passerelle.model.FlowAlreadyExecutingException;
 import com.isencia.passerelle.model.FlowManager;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2;
-import fr.soleil.passerelle.actor.tango.snapshot.ExtractionTypeV2;
-import fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy;
 import fr.soleil.passerelle.testUtils.MessageListener;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
@@ -71,9 +68,9 @@ public class ExtractValueFromSnapIDV2Test {
     public void should_have_readPort_by_default() throws IllegalActionException {
         // pre-condition, we check the actor is well configured by default
         assertThat(
-                ExtractionTypeV2.fromDescription(PasserelleUtil
+                ExtractionType.fromDescription(PasserelleUtil
                         .getParameterValue(actor.extractionTypeParam))).isEqualTo(
-                ExtractionTypeV2.READ);
+                ExtractionType.READ);
 
         assertThat(actor.outputPorts[ExtractValueFromSnapIDV2.READ_PORT].getContainer()).isSameAs(
                 actor);
@@ -87,12 +84,12 @@ public class ExtractValueFromSnapIDV2Test {
         // Given an actor with extraction type to read (we check the actor is well configured by
         // default)
         assertThat(
-                ExtractionTypeV2.fromDescription(PasserelleUtil
+                ExtractionType.fromDescription(PasserelleUtil
                         .getParameterValue(actor.extractionTypeParam))).isEqualTo(
-                ExtractionTypeV2.READ);
+                ExtractionType.READ);
 
         // When we change the extraction type to write
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.WRITE.getName());
 
         // then read port is removed from the actor and write port is added
         assertThat(actor.outputPorts[READ_PORT].getContainer()).isNull();
@@ -106,12 +103,12 @@ public class ExtractValueFromSnapIDV2Test {
         // Given an actor with extraction type to read (we check the actor is well configured by
         // default)
         assertThat(
-                ExtractionTypeV2.fromDescription(PasserelleUtil
+                ExtractionType.fromDescription(PasserelleUtil
                         .getParameterValue(actor.extractionTypeParam))).isEqualTo(
-                ExtractionTypeV2.READ);
+                ExtractionType.READ);
 
         // When we change the extraction type to read_write
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ_WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ_WRITE.getName());
 
         // then read port and write port are added
         assertThat(actor.outputPorts[READ_PORT].getContainer()).isSameAs(actor);
@@ -138,7 +135,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
 
         ArrayBlockingQueue<String> receiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[READ_PORT].addDebugListener(new MessageListener(receiver));
@@ -165,7 +162,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.WRITE.getName());
 
         ArrayBlockingQueue<String> receiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[WRITE_PORT].addDebugListener(new MessageListener(receiver));
@@ -192,7 +189,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ_WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ_WRITE.getName());
 
         ArrayBlockingQueue<String> writeReceiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[WRITE_PORT].addDebugListener(new MessageListener(writeReceiver));
@@ -224,7 +221,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
 
         flowMgr.executeBlockingErrorLocally(flow, props);
     }
@@ -250,7 +247,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2."
                 + ExtractValueFromSnapIDV2.THROW_EXCEPTION_ON_ERROR_LABEL, "false");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
 
         ArrayBlockingQueue<String> receiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[READ_PORT].addDebugListener(new MessageListener(receiver));
@@ -280,7 +277,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2."
                 + ExtractValueFromSnapIDV2.THROW_EXCEPTION_ON_ERROR_LABEL, "false");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.WRITE.getName());
 
         ArrayBlockingQueue<String> receiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[WRITE_PORT].addDebugListener(new MessageListener(receiver));
@@ -310,7 +307,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2."
                 + ExtractValueFromSnapIDV2.THROW_EXCEPTION_ON_ERROR_LABEL, "false");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ_WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ_WRITE.getName());
 
         ArrayBlockingQueue<String> writeReceiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[WRITE_PORT].addDebugListener(new MessageListener(writeReceiver));
@@ -342,7 +339,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.WRITE.getName());
 
         flowMgr.executeBlockingErrorLocally(flow, props);
     }
@@ -367,7 +364,7 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionTypeV2.READ_WRITE.getDescription());
+        actor.extractionTypeParam.setToken(ExtractionType.READ_WRITE.getName());
 
         flowMgr.executeBlockingErrorLocally(flow, props);
     }
