@@ -16,6 +16,9 @@ package com.isencia.passerelle.runtime.process;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
@@ -104,6 +107,30 @@ public interface FlowProcessingService {
    * @return
    */
   ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener, String... breakpointNames);
+
+  /**
+   * Wait until the process has finished and return the final status.
+   * <p>
+   * If the process has not finished before the given maximum wait time,
+   * a TimeOutException is thrown.
+   * <br/>
+   * If the process has already finished and its information can still be retrieved,
+   * the call will return immediately with the final status.
+   * <br/>
+   * If no execution information can be found, a FlowNotExecutingException will be thrown.
+   * </p>
+   * @param processHandle
+   * @param time
+   * @param unit
+   * @return the handle with a final status
+   * 
+   * @throws FlowNotExecutingException when no process execution information was found.
+   * @throws ExecutionException when there was an error executing the process; 
+   *  Typically <code>getCause()</code> will contain a <code>PasserelleException</code> with concrete error info.
+   * @throws InterruptedException when the waiting thread has been interrupted
+   * @throws TimeoutException when the process did not finish within the given maximum wait time
+   */
+  ProcessHandle waitUntilFinished(ProcessHandle processHandle, long time, TimeUnit unit) throws FlowNotExecutingException, ExecutionException, TimeoutException, InterruptedException;
 
   /**
    * Terminate a running process through a termination event.

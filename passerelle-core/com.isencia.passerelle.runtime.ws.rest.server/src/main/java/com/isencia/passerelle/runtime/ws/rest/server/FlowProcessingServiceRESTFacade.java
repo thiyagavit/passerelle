@@ -14,6 +14,10 @@
 */
 package com.isencia.passerelle.runtime.ws.rest.server;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,7 +25,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
@@ -45,12 +54,15 @@ import com.isencia.passerelle.runtime.ws.rest.server.activator.Activator;
 @Path("processes")
 @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public class FlowProcessingServiceRESTFacade {
-  
-  @GET
-  public String getHello() {
-    return "hello";
-  }
-  
+  private static final String PROCESS_CONTEXT_ID = "___processContextId";
+
+  private static final String BREAKPOINTS = "___breakpoints";
+
+  private final static Logger LOGGER = LoggerFactory.getLogger(FlowProcessingServiceRESTFacade.class);
+
+  @Context
+  UriInfo uriInfo;
+
   /**
    * 
    * @param mode
@@ -64,12 +76,15 @@ public class FlowProcessingServiceRESTFacade {
   @POST
   @Path("{mode}")
   public ProcessHandle start(@PathParam("mode") String mode, FlowHandleResource flowHandle, 
-      @QueryParam("processContextId") String processContextId, @QueryParam("breakpoints") String breakPointStr) throws EntryNotFoundException, InvalidRequestException {
+      @QueryParam(PROCESS_CONTEXT_ID) String processContextId, @QueryParam(BREAKPOINTS) String breakPointStr) throws EntryNotFoundException, InvalidRequestException {
     if (flowHandle == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_CONTENT, "flow definition");
     } if (mode == null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "mode");
     } else {
+      if(LOGGER.isInfoEnabled()) {
+        LOGGER.info("Context {} - Submitting {} request for flow {}", new Object[]{processContextId, mode, flowHandle.getCode()});
+      }
       try {
         // (re)load the flowhandle contents based on code and version
         // this allows to send compact handles around, without the complete raw flow definition
@@ -77,7 +92,20 @@ public class FlowProcessingServiceRESTFacade {
         FlowHandle handle = getFlowRepositoryService().loadFlowHandleWithContent(flowHandle);
         StartMode _mode = StartMode.valueOf(mode);
         String[] breakpointNames = breakPointStr!=null ? breakPointStr.split(",") : null;
-        ProcessHandle localHandle = getFlowProcessingService().start(_mode, handle, processContextId, null, null, breakpointNames);
+        
+        Map<String, String> parameterOverrides = new HashMap<String, String>();
+        MultivaluedMap<String,String> queryParameters = uriInfo.getQueryParameters();
+        for(Entry<String,List<String>> qP : queryParameters.entrySet()) {
+          String paramName = qP.getKey();
+          List<String> paramValueList = qP.getValue();
+          String paramValue = ((paramValueList!=null) && (paramValueList.size()>0)) ? paramValueList.get(0) : null;
+          if(!PROCESS_CONTEXT_ID.equals(paramName)
+              && !BREAKPOINTS.equals(paramName)
+              && paramValue!=null) {
+            parameterOverrides.put(paramName, paramValue);
+          }
+        }
+        ProcessHandle localHandle = getFlowProcessingService().start(_mode, handle, processContextId, parameterOverrides, null, breakpointNames);
         return buildRemoteHandle(localHandle);
       } catch (Exception e) {
         throw new InvalidRequestException(ErrorCode.INVALID_PARAM, "mode");
@@ -91,6 +119,7 @@ public class FlowProcessingServiceRESTFacade {
     if(processContextId==null) {
       throw new InvalidRequestException(ErrorCode.MISSING_PARAM, "processContextId");
     } else {
+      LOGGER.info("Context {} - Getting execution handle", processContextId);
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
         return buildRemoteHandle(localHandle);
@@ -108,6 +137,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
+        LOGGER.info("Context {} - Terminating execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
         localHandle = getFlowProcessingService().terminate(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
@@ -124,6 +154,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
+        LOGGER.info("Context {} - Suspending execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
         localHandle = getFlowProcessingService().suspend(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
@@ -140,6 +171,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
+        LOGGER.info("Context {} - Resuming execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
         localHandle = getFlowProcessingService().resume(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
@@ -151,12 +183,10 @@ public class FlowProcessingServiceRESTFacade {
   private ProcessHandle buildRemoteHandle(ProcessHandle localHandle) {
     return new ProcessHandleResource(localHandle);
   }
-
   private FlowProcessingService getFlowProcessingService() {
     return Activator.getInstance().getFlowProcessingSvc();
   }
   private FlowRepositoryService getFlowRepositoryService() {
     return Activator.getInstance().getFlowReposSvc();
   }
-
 }

@@ -31,8 +31,10 @@ import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
 public class Activator implements BundleActivator {
 
   // this one can optionally get an extra filter on the type of service
-  static final String REPOS_SERVICE_FILTER = "(&(" + Constants.OBJECTCLASS + "=" + FlowRepositoryService.class.getName() + "))";
-  static final String PROC_SERVICE_FILTER = "(" + Constants.OBJECTCLASS + "=" + FlowProcessingService.class.getName() + ")";
+  static final String REPOS_SERVICE_FILTER = "(&(" + Constants.OBJECTCLASS + "=" + FlowRepositoryService.class.getName() 
+      + ")(type=REST))";
+  static final String PROC_SERVICE_FILTER = "(&(" + Constants.OBJECTCLASS + "=" + FlowProcessingService.class.getName() 
+      + ")(type=REST))";
 
   private static BundleContext context;
   private static Activator instance;

@@ -70,12 +70,6 @@ public class ProcessHandleResource implements ProcessHandle {
   }
 
   @Override
-  public ProcessStatus waitUntilFinished(long time, TimeUnit unit) throws FlowNotExecutingException, ExecutionException, TimeoutException, InterruptedException {
-    // TODO implement waitUntilFinished
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

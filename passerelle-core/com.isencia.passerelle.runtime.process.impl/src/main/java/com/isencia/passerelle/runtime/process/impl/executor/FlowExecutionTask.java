@@ -124,6 +124,8 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         // Just to be sure that for blocking executes,
         // we don't miss the final manager state changes before returning.
         managerStateChanged(manager);
+      } else {
+        LOGGER.info("Context {} - Canceled execution of flow {} before start", processContextId, flowHandle.getCode());
       }
     } catch (Exception e) {
       executionError(manager, e);
@@ -304,28 +306,31 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
       p.setExpression(propValue);
       p.setPersistent(true);
       LOGGER.info("Context {} - Flow {} - Override parameter {} : {}", new Object[] { processContextId, flowHandle.getCode(), propName, propValue });
-    } else {
-      throw new PasserelleException(ErrorCode.FLOW_CONFIGURATION_ERROR, "Inconsistent parameter definition " + propName, flowHandle.getFlow(), null);
+    } else if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Context {} - Flow {} - Unknown parameter, no override : {} ", 
+          new Object[] { processContextId, flowHandle.getCode(), propName });
     }
   }
   
   protected boolean setBreakpoints(FlowHandle flowHandle, Set<String> breakpointNames) {
     Flow flow = flowHandle.getFlow();
     boolean breakpointsDefined = false;
-    for (String breakpointName : breakpointNames) {
-      ComponentEntity entity = flow.getEntity(breakpointName);
-      if(entity!=null) {
-        entity.addDebugListener(new ActorBreakpointListener());
-        LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
-        breakpointsDefined = true;
-      } else {
-        Port port = flow.getPort(breakpointName);
-        if(port!=null) {
-          port.addDebugListener(new PortBreakpointListener());
+    if(breakpointNames!=null) {
+      for (String breakpointName : breakpointNames) {
+        ComponentEntity entity = flow.getEntity(breakpointName);
+        if(entity!=null) {
+          entity.addDebugListener(new ActorBreakpointListener());
           LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
           breakpointsDefined = true;
         } else {
-          LOGGER.warn("Context {} - Flow {} - Breakpoint not found ", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+          Port port = flow.getPort(breakpointName);
+          if(port!=null) {
+            port.addDebugListener(new PortBreakpointListener());
+            LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+            breakpointsDefined = true;
+          } else {
+            LOGGER.warn("Context {} - Flow {} - Breakpoint not found ", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
+          }
         }
       }
     }

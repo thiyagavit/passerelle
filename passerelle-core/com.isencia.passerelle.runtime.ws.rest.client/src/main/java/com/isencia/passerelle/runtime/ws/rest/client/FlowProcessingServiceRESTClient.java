@@ -17,6 +17,14 @@ package com.isencia.passerelle.runtime.ws.rest.client;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +48,16 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
  */
 public class FlowProcessingServiceRESTClient implements FlowProcessingService {
 
+  private static final String BREAKPOINTS = "___breakpoints";
+
   private final static Logger LOGGER = LoggerFactory.getLogger(FlowProcessingServiceRESTClient.class);
 
   private boolean configured = false;
 
   private Client restClient;
   private WebResource flowProcResource;
+  
+  private ScheduledExecutorService pollingService = Executors.newSingleThreadScheduledExecutor();
 
   public void init(Dictionary<String, String> configuration) {
     try {
@@ -72,13 +84,71 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
   @Override
   public ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
       String... breakpointNames) {
+    LOGGER.info("Context {} - Submitting start request for flow {}", processContextId, flowHandle.getCode());
     try {
-      return flowProcResource.path(mode.name()).type(MediaType.APPLICATION_XML).post(ProcessHandleResource.class, FlowHandleResource.buildFlowHandleResource(flowHandle));
+      WebResource pathPart = flowProcResource.path(mode.name());
+      if(parameterOverrides!=null && !parameterOverrides.isEmpty()) {
+        for (Entry<String, String> parameterOverride : parameterOverrides.entrySet()) {
+          pathPart = pathPart.queryParam(parameterOverride.getKey(), parameterOverride.getValue());
+        }
+      }
+      if (StartMode.DEBUG.equals(mode) && breakpointNames!=null) {
+        StringBuilder breakPointStr = new StringBuilder();
+        for (String breakPoint : breakpointNames) {
+          if(breakPointStr.length()>0) {
+            breakPointStr.append(",");
+          }
+          breakPointStr.append(breakPoint);
+        }
+        return pathPart.queryParam(BREAKPOINTS, breakPointStr.toString()).type(MediaType.APPLICATION_XML).post(ProcessHandleResource.class, FlowHandleResource.buildFlowHandleResource(flowHandle));
+      } else {
+        return pathPart.type(MediaType.APPLICATION_XML).post(ProcessHandleResource.class, FlowHandleResource.buildFlowHandleResource(flowHandle));
+      }
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
       LOGGER.error(errorInfo.toString());
       throw new IllegalArgumentException();
+    }
+  }
+  
+  @Override
+  public ProcessHandle waitUntilFinished(final ProcessHandle processHandle, final long time, final TimeUnit unit) throws FlowNotExecutingException, TimeoutException, InterruptedException, ExecutionException {
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Context {} - waitUntilFinished {} {}", new Object[]{processHandle.getProcessContextId(), time, unit});
+    }
+    ProcessHandle ph = refresh(processHandle);
+    if(ph.getExecutionStatus().isFinalStatus()) {
+      return ph;
+    } else if(time>0) {
+      // stupid polling system as a first basic implementation
+      final long pollingDelayTime = time/2 + 1;
+      final long nextWaitTime = time - pollingDelayTime;
+      ScheduledFuture<ProcessHandle> schedule = pollingService.schedule(new Callable<ProcessHandle>() {
+        @Override
+        public ProcessHandle call() throws Exception {
+          return waitUntilFinished(processHandle, nextWaitTime , unit);
+        }
+      }, pollingDelayTime, unit);
+      // Add an extra wait unit to avoid issues for calls where time==1 
+      // (as pollingDelayTime also becomes 1 then, and then timeouts become very probable on the schedule.get())
+      try {
+        return schedule.get(time+1, unit);
+      } catch (ExecutionException e) {
+        if(e.getCause() instanceof FlowNotExecutingException) {
+          throw (FlowNotExecutingException) e.getCause();
+        } else if(e.getCause() instanceof InterruptedException) {
+          throw (InterruptedException) e.getCause();
+        } else if(e.getCause() instanceof TimeoutException) {
+          throw (TimeoutException) e.getCause();
+        } else if(e.getCause() instanceof ExecutionException) {
+          throw (ExecutionException) e.getCause();
+        } else {
+          throw e;
+        }
+      }
+    } else {
+        throw new TimeoutException("Timeout waitUntilFinished "+processHandle.getProcessContextId());
     }
   }
   
@@ -97,11 +167,15 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
   
   @Override
   public ProcessHandle refresh(ProcessHandle processHandle) {
-    return getHandle(processHandle.getProcessContextId());
+    LOGGER.info("Context {} - Refreshing execution status of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
+    ProcessHandle ph = getHandle(processHandle.getProcessContextId());
+    LOGGER.debug("Context {} - Execution status : {}", ph.getProcessContextId(), ph.getExecutionStatus());
+    return ph;
   }
 
   @Override
   public ProcessHandle terminate(ProcessHandle processHandle) throws FlowNotExecutingException {
+    LOGGER.info("Context {} - Terminating execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
     try {
       return flowProcResource.path(processHandle.getProcessContextId()).delete(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
@@ -114,6 +188,7 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
 
   @Override
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
+    LOGGER.info("Context {} - Suspending execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
     try {
       return flowProcResource.path(processHandle.getProcessContextId()).path("suspend").post(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
@@ -126,6 +201,7 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
   
   @Override
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
+    LOGGER.info("Context {} - Resuming execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
     try {
       return flowProcResource.path(processHandle.getProcessContextId()).path("resume").post(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
