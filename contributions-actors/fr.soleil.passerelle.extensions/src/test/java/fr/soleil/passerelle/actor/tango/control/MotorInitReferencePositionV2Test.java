@@ -1,11 +1,9 @@
 package fr.soleil.passerelle.actor.tango.control;
 
-import static fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5.ERROR_DEVICE_NAME_EMPTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_TYPE_PROPERTY;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -13,8 +11,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.core.PasserelleException;
 
@@ -64,33 +60,6 @@ public class MotorInitReferencePositionV2Test {
     @AfterMethod
     public void clean() {
         moml.after();
-    }
-
-    @Deprecated
-    @Test(expectedExceptions = IllegalActionException.class)
-    // Test attributeChange 
-    // Deprecated: should be tested by the ATangoDeviceActorV5 class
-    public void when_deviceName_parameter_is_empty_before_start_then_an_excpetion_is_raised()
-            throws IllegalActionException {
-        MotorInitReferencePositionV2 actor = (MotorInitReferencePositionV2) moml
-                .getEntity(ACTOR_NAME);
-
-        actor.deviceNameParam.setToken("");
-    }
-
-    @Deprecated
-    @Test()
-    public void when_deviceName_parameter_is_empty_then_validateInitialization_raises_an_exception() {
-        final HashMap<String, String> props = new HashMap<String, String>();
-        props.put(ACTOR_NAME + "." + MotorInitReferencePositionV2.DEVICE_NAME, "");
-
-        try {
-            moml.executeBlockingErrorLocally(props);
-            failBecauseExceptionWasNotThrown(PasserelleException.class);
-        }
-        catch (PasserelleException e) {
-            assertThat(e).hasMessageContaining(ERROR_DEVICE_NAME_EMPTY);
-        }
     }
 
     @Test
