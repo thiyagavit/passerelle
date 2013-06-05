@@ -13,36 +13,18 @@ public class SnapExtractorProxy {
     public static final String ERROR_SNAP_ID_NAN = "Error: snap id must be a number";
 
     private TangoCommand getSnapValues;
-    private TangoCommand getSnapValue;
     private TangoCommand getSnapID;
     private String snapExtractorName = "";
 
-    // private final TangoCommand getSnap;
+    public SnapExtractorProxy() throws DevFailed {
+        snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
 
-    public SnapExtractorProxy(boolean defaultConfig) throws DevFailed {
-        if (defaultConfig) {
-            snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
-
-            getSnapValues = new TangoCommand(snapExtractorName, "GetSnapValues");
-            getSnapID = new TangoCommand(snapExtractorName, "GetSnapID");
-            // getSnap = new TangoCommand(snapExtractorName, "GetSnap");
-        }
+        getSnapValues = new TangoCommand(snapExtractorName, "GetSnapValues");
+        getSnapID = new TangoCommand(snapExtractorName, "GetSnapID");
     }
 
     public String getName() {
         return snapExtractorName;
-    }
-
-    public void setGetSnapValuesCommand(TangoCommand getSnapValues) {
-        this.getSnapValues = getSnapValues;
-    }
-
-    public void setGetSnapValueCommand(TangoCommand getSnapValue) {
-        this.getSnapValue = getSnapValue;
-    }
-
-    public void setGetSnapIDCommand(TangoCommand getSnapID) {
-        this.getSnapID = getSnapID;
     }
 
     /**
