@@ -65,7 +65,7 @@ public class MotorConfigurationV2InitMotorTest {
     }
 
     @Test
-    public void when_all_is_ok_then_devices_should_be_init() throws DevFailed, ProcessingException {
+    public void shoudl_init_devices() throws DevFailed, ProcessingException {
         config.retrieveFullConfig();
         config.initDevice(null);
 

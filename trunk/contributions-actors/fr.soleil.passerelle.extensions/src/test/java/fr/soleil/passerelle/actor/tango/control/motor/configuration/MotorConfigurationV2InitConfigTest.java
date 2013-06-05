@@ -10,6 +10,9 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.Motor
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY_IS_NaN;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_TYPE_PROPERTY;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.NO_CONTROL_BOX_ATTACHED_TO;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
@@ -35,7 +38,11 @@ public class MotorConfigurationV2InitConfigTest {
     public static final String MOTOR_1_1 = "test/motor/1-1";
     public static final DbDatum DP_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "DP");
     public static final DbDatum OTHER_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "LDWP");
-    public static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0);
+
+    public static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, NONE.ordinal());
+    public static final DbDatum ABSOLUTE_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY,
+            ABSOLUTE.ordinal());
+
     public static final DbDatum INIT_POS_IS_2 = new DbDatum(AXIS_INIT_POSITION_PROPERTY, 2);
 
     private DeviceProxy proxyMotor11;
@@ -275,8 +282,95 @@ public class MotorConfigurationV2InitConfigTest {
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
         }
-        // if exeception is raised the test failed
+        // if exception is raised the test failed
         config.retrieveConfig();
     }
 
+    @Test(expectedExceptions = MotorConfigurationException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE + ".*")
+    public void when_init_strategy_is_DP_then_initRefPosition_cant_be_apply() throws Exception {
+        MotorConfigurationV2 config = null;
+        try {
+            putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
+            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config.retrieveConfig();
+        }
+        catch (DevFailed devFailed) {
+            fail("Can not create configuration");
+        }
+
+        config.assertInitRefPosBeApplyOnMotor();
+    }
+
+    @Test(expectedExceptions = MotorConfigurationException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER + ".*")
+    public void when_encoder_is_absolute_then_initRefPosition_cant_be_apply() throws Exception {
+        MotorConfigurationV2 config = null;
+        try {
+            putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, OTHER_INIT_TYPE);
+            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config.retrieveConfig();
+        }
+        catch (DevFailed devFailed) {
+            fail("Can not create configuration");
+        }
+
+        config.assertInitRefPosBeApplyOnMotor();
+    }
+
+    @Test(expectedExceptions = MotorConfigurationException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE + ".*")
+    public void when_init_strategy_is_OTHER_then_DefinePosition_cant_be_apply() throws Exception {
+        MotorConfigurationV2 config = null;
+        try {
+            putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
+            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config.retrieveConfig();
+        }
+        catch (DevFailed devFailed) {
+            fail("Can not create configuration");
+        }
+
+        config.assertDefinePositionCanBeApplyOnMotor();
+    }
+
+    @Test
+    public void when_encoder_is_not_absolute_and_init_strategie_is_not_DP_then_initRef_can_be_apply()
+            throws Exception {
+
+        putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
+        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+        config.retrieveConfig();
+
+        // if exception is raised the test failed
+        config.assertInitRefPosBeApplyOnMotor();
+    }
+
+    @Test(expectedExceptions = MotorConfigurationException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER + ".*")
+    public void when_encoder_is_absolute_then_definePostion_cant_be_apply() throws Exception {
+        MotorConfigurationV2 config = null;
+        try {
+            putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, DP_INIT_TYPE);
+            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config.retrieveConfig();
+        }
+        catch (DevFailed devFailed) {
+            fail("Can not create configuration");
+        }
+
+        config.assertInitRefPosBeApplyOnMotor();
+    }
+
+    @Test
+    public void when_encoder_is_not_absolute_and_init_strategie_is_not_OTHER_then_DefinePosition_can_be_apply()
+            throws Exception {
+
+        putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
+        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+        config.retrieveConfig();
+
+        // if exception is raised the test failed
+        config.assertDefinePositionCanBeApplyOnMotor();
+    }
 }
