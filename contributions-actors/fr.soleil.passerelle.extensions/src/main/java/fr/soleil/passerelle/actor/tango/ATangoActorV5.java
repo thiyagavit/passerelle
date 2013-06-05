@@ -13,9 +13,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
-import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.Actor;
-import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
@@ -86,24 +84,5 @@ public abstract class ATangoActorV5 extends Actor {
      */
     public boolean isRecordData() {
         return recordData;
-    }
-
-    // TODO move to super class
-    /**
-     * It's a wrapper of attributeChanged that "convert" IllegalActionException in
-     * ValidationException. This method is design to be used in validateInitialization() method to
-     * do the static verification on parameters
-     * 
-     * @param attribute the parameter to check
-     * 
-     * @throws ValidationException if the parameter is invalid then a ValidationException is raised
-     */
-    protected void validateAttribute(Attribute attribute) throws ValidationException {
-        try {
-            attributeChanged(attribute);
-        }
-        catch (IllegalActionException e) {
-            throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
-        }
     }
 }
