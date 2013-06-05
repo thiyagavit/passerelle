@@ -74,7 +74,7 @@ public class GetSnapID extends Transformer {
     protected void doInitialize() throws InitializationException {
         if (!isMockMode()) {
             try {
-                extractor = new SnapExtractorProxy(true);
+                extractor = new SnapExtractorProxy();
             }
             catch (final DevFailed e) {
                 throw new DevFailedInitializationException(e, this);
