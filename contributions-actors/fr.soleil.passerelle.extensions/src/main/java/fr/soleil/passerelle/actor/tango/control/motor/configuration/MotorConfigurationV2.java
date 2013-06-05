@@ -100,7 +100,7 @@ public class MotorConfigurationV2 {
      */
     public void retrieveFullConfig() throws DevFailed {
         retrieveMyControlBox();
-        retrieveConfig();
+        retrieveProperties();
     }
 
     /**
@@ -108,7 +108,7 @@ public class MotorConfigurationV2 {
      * 
      * @throws DevFailed
      */
-    public void retrieveConfig() throws DevFailed {
+    public void retrieveProperties() throws DevFailed {
         // TODO add AxisInitPosition (test is Number) ?
         final String[] props = { AXIS_ENCODER_TYPE_PROPERTY, AXIS_INIT_TYPE_PROPERTY };
         final DbDatum[] datum = axisProxy.get_property(props);

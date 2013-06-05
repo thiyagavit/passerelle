@@ -123,7 +123,7 @@ public class MotorConfigurationV2InitConfigTest {
         }
 
         try {
-            config.retrieveConfig();
+            config.retrieveProperties();
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
@@ -153,7 +153,7 @@ public class MotorConfigurationV2InitConfigTest {
             fail("Can not create configuration");
         }
 
-        config.retrieveConfig();
+        config.retrieveProperties();
         assertThat(config.getEncoder()).isEqualTo(expected);
     }
 
@@ -178,7 +178,7 @@ public class MotorConfigurationV2InitConfigTest {
         }
 
         try {
-            config.retrieveConfig();
+            config.retrieveProperties();
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
@@ -210,7 +210,7 @@ public class MotorConfigurationV2InitConfigTest {
             fail("Can not create configuration");
         }
 
-        config.retrieveConfig();
+        config.retrieveProperties();
         assertThat(config.getInitStrategy()).isEqualTo(expected);
     }
 
@@ -236,7 +236,7 @@ public class MotorConfigurationV2InitConfigTest {
         }
 
         try {
-            config.retrieveConfig();
+            config.retrieveProperties();
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
@@ -257,7 +257,7 @@ public class MotorConfigurationV2InitConfigTest {
             fail("Can not create configuration");
         }
         // if exeception is raised the test failed
-        config.retrieveConfig();
+        config.retrieveProperties();
     }
 
     @DataProvider(name = "validInitPosProvider")
@@ -283,7 +283,7 @@ public class MotorConfigurationV2InitConfigTest {
             fail("Can not create configuration");
         }
         // if exception is raised the test failed
-        config.retrieveConfig();
+        config.retrieveProperties();
     }
 
     @Test(expectedExceptions = MotorConfigurationException.class, expectedExceptionsMessageRegExp = "(?s).*"
@@ -293,7 +293,7 @@ public class MotorConfigurationV2InitConfigTest {
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
             config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-            config.retrieveConfig();
+            config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -309,7 +309,7 @@ public class MotorConfigurationV2InitConfigTest {
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, OTHER_INIT_TYPE);
             config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-            config.retrieveConfig();
+            config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -325,7 +325,7 @@ public class MotorConfigurationV2InitConfigTest {
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
             config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-            config.retrieveConfig();
+            config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -340,7 +340,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
         MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-        config.retrieveConfig();
+        config.retrieveProperties();
 
         // if exception is raised the test failed
         config.assertInitRefPosBeApplyOnMotor();
@@ -353,7 +353,7 @@ public class MotorConfigurationV2InitConfigTest {
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, DP_INIT_TYPE);
             config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-            config.retrieveConfig();
+            config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -368,7 +368,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
         MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
-        config.retrieveConfig();
+        config.retrieveProperties();
 
         // if exception is raised the test failed
         config.assertDefinePositionCanBeApplyOnMotor();
