@@ -61,20 +61,27 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
         deviceNameParam.setExpression(deviceName);
     }
 
-    /*
-     * @throws IllegalActionException
-     */
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
         if (attribute == deviceNameParam) {
             // deviceName is trimmed by getParameterValue
-            deviceName = PasserelleUtil.getParameterValue(deviceNameParam);
-            if (deviceName.isEmpty()) {
-                throw new IllegalActionException(ERROR_DEVICE_NAME_EMPTY);
-            }
+            deviceName = extractDeviceName();
         } else {
             super.attributeChanged(attribute);
         }
+    }
+
+    /**
+     * extract from parameter and check if the deviceName is correct (ie not empty)
+     * 
+     * @throws IllegalActionException if the deviceName is invalid
+     */
+    private String extractDeviceName() throws IllegalActionException {
+        String dname = PasserelleUtil.getParameterValue(deviceNameParam);
+        if (dname.isEmpty()) {
+            throw new IllegalActionException(ERROR_DEVICE_NAME_EMPTY);
+        }
+        return dname;
     }
 
     /*
@@ -90,9 +97,9 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
         }
 
         if (!isMockMode() && createDeviceProxy) {
-            validateAttribute(deviceNameParam);
-
             try {
+                deviceName = extractDeviceName();
+
                 // see bug 22954 : The deviceProxy is still created here because the daughter
                 // classes need of it
                 deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
@@ -102,11 +109,11 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
             catch (final DevFailed e) {
                 throw new DevFailedValidationException(e, this);
             }
-            catch (Exception e) {
-                new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e); // TODO
-                                                                                                   // add
-                                                                                                   // LOG
+            catch (IllegalActionException e) {
+                throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(),
+                        this, e); // TODO
             }
+
         }
         super.validateInitialization();
 
