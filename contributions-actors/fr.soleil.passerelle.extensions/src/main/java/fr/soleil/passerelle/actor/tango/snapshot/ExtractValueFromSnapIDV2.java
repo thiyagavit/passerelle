@@ -1,5 +1,7 @@
 package fr.soleil.passerelle.actor.tango.snapshot;
 
+import static fr.soleil.passerelle.util.PasserelleUtil.createContentMessage;
+
 import java.net.URL;
 
 import org.slf4j.Logger;
@@ -59,7 +61,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
     @ParameterName(name = EXTRACTION_TYPE_LABEL)
     public Parameter extractionTypeParam;
-    private ExtractionTypeV2 extractionType;
+    private ExtractionType extractionType;
 
     @ParameterName(name = THROW_EXCEPTION_ON_ERROR_LABEL)
     public Parameter throwExceptionOnErrorParam;
@@ -75,16 +77,13 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
         outputPorts = new Port[2];
         outputPorts[READ_PORT] = PortFactory.getInstance().createOutputPort(this, READ_PORT_LABEL);
-        // createPort(WRITE_PORT, WRITE_PORT_LABEL);
-
-        // deletePort(WRITE_PORT, WRITE_PORT_LABEL);
 
         extractionTypeParam = new StringParameter(this, EXTRACTION_TYPE_LABEL);
 
-        for (ExtractionTypeV2 extractionType : ExtractionTypeV2.values()) {
-            extractionTypeParam.addChoice(extractionType.getDescription());
+        for (ExtractionType extractionType : ExtractionType.values()) {
+            extractionTypeParam.addChoice(extractionType.getName());
         }
-        extractionTypeParam.setExpression(ExtractionTypeV2.READ.getDescription());
+        extractionTypeParam.setExpression(ExtractionType.READ.getName());
 
         throwExceptionOnErrorParam = new Parameter(this, THROW_EXCEPTION_ON_ERROR_LABEL,
                 new BooleanToken(throwExceptionOnError));
@@ -117,10 +116,9 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             if (attributeName.isEmpty()) {
                 throw new IllegalActionException(ERROR_ATTR_NAME_PARAM_EMPTY);
             }
-        }
-        else if (attribute == extractionTypeParam) {
+        } else if (attribute == extractionTypeParam) {
             // throws IllegalActionException if invalid
-            extractionType = ExtractionTypeV2.fromDescription(PasserelleUtil
+            extractionType = ExtractionType.fromDescription(PasserelleUtil
                     .getParameterValue(extractionTypeParam));
 
             switch (extractionType) {
@@ -143,12 +141,10 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                     createPort(WRITE_PORT, WRITE_PORT_LABEL);
                     break;
             }
-        }
-        else if (attribute == throwExceptionOnErrorParam) {
+        } else if (attribute == throwExceptionOnErrorParam) {
             throwExceptionOnError = ((BooleanToken) throwExceptionOnErrorParam.getToken())
                     .booleanValue();
-        }
-        else {
+        } else {
             super.attributeChanged(attribute);
         }
     }
@@ -160,7 +156,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
         try {
             if (extractor == null) {// FIXME == null if we are in prod env
-                extractor = new SnapExtractorProxy(true);
+                extractor = new SnapExtractorProxy();
             }
             ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(),
                     Level.DEBUG);
@@ -194,8 +190,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             if (outputPorts[portIndex] == null) {
                 outputPorts[portIndex] = PortFactory.getInstance().createOutputPort(this, name);
 
-            }
-            else if (outputPorts[portIndex].getContainer() == null) {
+            } else if (outputPorts[portIndex].getContainer() == null) {
                 outputPorts[portIndex].setContainer(this);
             }
         }
@@ -247,10 +242,10 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
         switch (extractionType) {
             case READ:
-                extractAndSendReadValue(snapID);
+                extractAndSendReadOrWriteValue(true, snapID);
                 break;
             case WRITE:
-                extractAndSendWriteValue(snapID);
+                extractAndSendReadOrWriteValue(false, snapID);
                 break;
             case READ_WRITE:
                 extractAndSendReadAndWriteValues(snapID);
@@ -258,7 +253,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
             default:// should not append
                 new ProcessingException(Severity.FATAL, "Unknown extration type: "
-                        + extractionType.getDescription(), this, null);
+                        + extractionType.getName(), this, null);
         }
     }
 
@@ -268,71 +263,34 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             String[] snapReadAndWriteValues = extractor.getSnapValue(snapID, attributeName);
 
             sendOutputMsg(outputPorts[READ_PORT],
-                    PasserelleUtil.createContentMessage(this, snapReadAndWriteValues[0]));
+                    createContentMessage(this, snapReadAndWriteValues[0]));
             sendOutputMsg(outputPorts[WRITE_PORT],
-                    PasserelleUtil.createContentMessage(this, snapReadAndWriteValues[1]));
+                    createContentMessage(this, snapReadAndWriteValues[1]));
         }
         catch (DevFailed e) {
             if (throwExceptionOnError) {
                 throw new DevFailedProcessingException(e, this);
-            }
-            else {
+            } else {
                 sendOutputMsg(outputPorts[READ_PORT], createMessage());
                 sendOutputMsg(outputPorts[WRITE_PORT], createMessage());
-            }
-        }
-    }
-
-    private void extractAndSendWriteValue(String snapID) throws ProcessingException,
-            DevFailedProcessingException {
-        try {
-            String[] snapWriteValues = extractor.getWriteValues(snapID, attributeName);
-            sendOutputMsg(outputPorts[WRITE_PORT],
-                    PasserelleUtil.createContentMessage(this, snapWriteValues[0]));
-        }
-        catch (DevFailed e) {
-            if (throwExceptionOnError) {
-                throw new DevFailedProcessingException(e, this);
-            }
-            else {
-                sendOutputMsg(outputPorts[WRITE_PORT], createMessage());
-            }
-        }
-    }
-
-    private void extractAndSendReadValue(String snapID) throws ProcessingException,
-            DevFailedProcessingException {
-        try {
-            String[] snapReadValues = extractor.getReadValues(snapID, attributeName);
-            sendOutputMsg(outputPorts[READ_PORT],
-                    PasserelleUtil.createContentMessage(this, snapReadValues[0]));
-        }
-        catch (DevFailed e) {
-            if (throwExceptionOnError) {
-                throw new DevFailedProcessingException(e, this);
-            }
-            else {
-                sendOutputMsg(outputPorts[READ_PORT], createMessage());
             }
         }
     }
 
     private void extractAndSendReadOrWriteValue(boolean read, String snapID)
             throws ProcessingException, DevFailedProcessingException {
-        int portName = (read) ? READ_PORT : WRITE_PORT;
+        int portIndex = (read) ? READ_PORT : WRITE_PORT;
         try {
-            String[] snapValues = (read) ? 
-                    extractor.getReadValues(snapID, attributeName)
+            String[] snapValues = (read) ? extractor.getReadValues(snapID, attributeName)
                     : extractor.getWriteValues(snapID, attributeName);
-            sendOutputMsg(outputPorts[portName],
-                    PasserelleUtil.createContentMessage(this, snapValues[0]));
+
+            sendOutputMsg(outputPorts[portIndex], createContentMessage(this, snapValues[0]));
         }
         catch (DevFailed e) {
             if (throwExceptionOnError) {
                 throw new DevFailedProcessingException(e, this);
-            }
-            else {
-                sendOutputMsg(outputPorts[portName], createMessage());
+            } else {
+                sendOutputMsg(outputPorts[portIndex], createMessage());
             }
         }
     }
@@ -345,7 +303,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         this.extractor = extractor;
     }
 
-    public ExtractionTypeV2 getExtractionType() {
+    public ExtractionType getExtractionType() {
         return extractionType;
     }
 }

@@ -108,7 +108,7 @@ public abstract class ASnapExtractor extends Transformer {
                 throw new DevFailedInitializationException(e, this);
             }
             try {
-                extractor = new SnapExtractorProxy(true);
+                extractor = new SnapExtractorProxy();
             }
             catch (final DevFailed e) {
                 throw new DevFailedInitializationException(e, this);
