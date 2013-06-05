@@ -51,7 +51,7 @@ public class ExtractValueFromHDBTest {
     }
 
     @Test(expectedExceptions = IllegalActionException.class, expectedExceptionsMessageRegExp = ExtractValueFromHDB.ERROR_COMPLETE_ATTR_NAME_IS_EMPTY)
-    public void when_completeAttrName_parameter_is_empty_then_throw_exception()
+    public void when_completeAttrName_parameter_is_empty_then_attributeChanged_throws_exception()
             throws IllegalActionException {
 
         // here we just need a dummy proxy
@@ -63,7 +63,7 @@ public class ExtractValueFromHDBTest {
     }
 
     @Test(expectedExceptions = IllegalActionException.class, expectedExceptionsMessageRegExp = "(?s).*Unknown extraction description: \"foo bar\".*")
-    public void when_extrationType_parameter_is_not_valid_then_throw_exception()
+    public void when_extrationType_parameter_is_not_valid_then_attributeChanged_throws_exception()
             throws IllegalActionException {
         // here we just need a dummy proxy
         HdbExtractorProxy mockedProxy = mock(HdbExtractorProxy.class);
@@ -71,6 +71,37 @@ public class ExtractValueFromHDBTest {
 
         actor.extractionTypeParam.setToken("foo bar");
         actor.attributeChanged(actor.extractionTypeParam);
+    }
+
+    @Test(expectedExceptions = PasserelleException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + ExtractValueFromHDB.ERROR_COMPLETE_ATTR_NAME_IS_EMPTY + ".*")
+    public void when_completeAttrName_parameter_is_empty_then_validateInitialization_throws_expcetion()
+            throws FlowAlreadyExecutingException, PasserelleException {
+        HdbExtractorProxy mockedProxy = mock(HdbExtractorProxy.class);
+
+        actor.setExtractorProxy(mockedProxy);
+
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(COMPLETE_ATTR_NAME_PARAM, "");
+        props.put(EXTRACTION_TYPE_PARAM, ExtractValueFromHDB.ExtractionType.LASTED.getDescription());
+        props.put(THROW_EXCEPTION_ON_ERROR_PARAM, "true");
+
+        moml.executeBlockingErrorLocally(props);
+    }
+
+    @Test(expectedExceptions = PasserelleException.class, expectedExceptionsMessageRegExp = "(?s).*Unknown extraction description: \"foo bar\".*")
+    public void when_extrationType_parameter_is_not_valid_then_validateInitialization_throws_exception()
+            throws PasserelleException {
+        HdbExtractorProxy mockedProxy = mock(HdbExtractorProxy.class);
+
+        actor.setExtractorProxy(mockedProxy);
+
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(COMPLETE_ATTR_NAME_PARAM, "domain/family/member");
+        props.put(EXTRACTION_TYPE_PARAM, "foo bar");
+        props.put(THROW_EXCEPTION_ON_ERROR_PARAM, "true");
+
+        moml.executeBlockingErrorLocally(props);
     }
 
     @Test
