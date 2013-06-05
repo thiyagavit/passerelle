@@ -30,7 +30,7 @@ public class SnapAttributeDataProvider extends AttributeDataProvider {
 
     @Override
     public void init(Actor actor) throws DevFailed {
-        extractorProxy = new SnapExtractorProxy(true);
+        extractorProxy = new SnapExtractorProxy();
         ExecutionTracerService.trace(actor, "using snap Extractor " + extractorProxy.getName(),
                 Level.DEBUG);
     }
