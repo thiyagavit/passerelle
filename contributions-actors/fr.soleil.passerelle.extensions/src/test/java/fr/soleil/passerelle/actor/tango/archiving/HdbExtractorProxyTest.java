@@ -48,7 +48,8 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
     }
 
     @Test
-    public void test_extractor_return_a_correct_format_to_getLastScalarAttrValue() throws DevFailed {
+    public void test_extractorpProxy_return_a_correct_format_to_getLastScalarAttrValue()
+            throws DevFailed {
         String expectedValue = " -10.686";
         HdbExtractorProxy proxy = new HdbExtractorProxy(false);
 
