@@ -14,14 +14,8 @@
  */
 package com.isencia.passerelle.runtime.process.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
-import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
 
@@ -33,7 +27,6 @@ public class ProcessHandleImpl implements ProcessHandle {
   private FlowHandle flowHandle;
   private String processContextId;
   private ProcessStatus status;
-  private WeakReference<FlowExecutionFuture> fetRef;
 
   /**
    * @param fetFuture
@@ -43,7 +36,6 @@ public class ProcessHandleImpl implements ProcessHandle {
     this.processContextId = fetFuture.getProcessContextId();
     this.status = fetFuture.getStatus();
     this.flowHandle = fetFuture.getFlowHandle();
-    this.fetRef = new WeakReference<FlowExecutionFuture>(fetFuture);
   }
 
   @Override
@@ -65,21 +57,6 @@ public class ProcessHandleImpl implements ProcessHandle {
   public String[] getSuspendedElements() {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  @Override
-  public ProcessStatus waitUntilFinished(long time, TimeUnit unit) throws TimeoutException, InterruptedException, FlowNotExecutingException, ExecutionException {
-    FlowExecutionFuture fet = fetRef.get();
-    if (fet != null) {
-      try {
-        status = fet.get(time, unit);
-      } catch (CancellationException e) {
-        status = fet.getStatus();
-      }
-      return status;
-    } else {
-      throw new FlowNotExecutingException(getFlow().getCode());
-    }
   }
 
   @Override

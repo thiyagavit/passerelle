@@ -17,13 +17,15 @@ package com.isencia.passerelle.runtime.process.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
@@ -96,6 +98,21 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   public ProcessHandle refresh(ProcessHandle processHandle) {
     FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     return fet!=null ? new ProcessHandleImpl(fet) : processHandle;
+  }
+
+  @Override
+  public ProcessHandle waitUntilFinished(ProcessHandle processHandle, long time, TimeUnit unit) throws TimeoutException, InterruptedException, FlowNotExecutingException, ExecutionException {
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    if (fet != null) {
+      try {
+        fet.get(time, unit);
+      } catch (CancellationException e) {
+        // ignore, it will be reflected in the status of the handle
+      }
+      return new ProcessHandleImpl(fet);
+    } else {
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+    }
   }
 
   /**
