@@ -29,6 +29,8 @@
     <entity name="DefinePosition" class="fr.soleil.passerelle.actor.tango.control.DefinePosition">
         <property name="Device Name" class="ptolemy.data.expr.StringParameter" value="test/motor/1-1">
         </property>
+        <property name="Use simulated motor" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
         <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
