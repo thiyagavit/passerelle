@@ -8,6 +8,8 @@ import static fr.esrf.Tango.DevState.OFF;
 import static fr.esrf.Tango.DevState.ON;
 import static fr.esrf.Tango.DevState.STANDBY;
 import static fr.esrf.Tango.DevState.UNKNOWN;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType.ABSOLUTE;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.DP;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.OTHER;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command.executeCmdAccordingState;
 
@@ -30,17 +32,25 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
+import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
+//TODO CHANGE TO THOWS MotorConfigurationException anywhere
 public class MotorConfigurationV2 {
 
-    public static final String NO_CONTROL_BOX_ATTACHED_TO = "No control box attached to ";
     public static final String AXIS_ENCODER_TYPE_PROPERTY = "AxisEncoderType";
     public static final String AXIS_INIT_TYPE_PROPERTY = "AxisInitType";
     public static final String AXIS_INIT_POSITION_PROPERTY = "AxisInitPosition";
+
+    // Errors messages
+    public static final String DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE = "  has an initialization strategy, must use ReferenceInitPosition";
+    public static final String INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE = "  has no initialization strategy, must use DefinePosition";
+    public static final String INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER = " has an absolute encoder, no need to initialize";
+    public static final String NO_CONTROL_BOX_ATTACHED_TO = "No control box attached to ";
     public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
             + " does not exist or is not an integer";
     public static final String AXIS_INIT_POSITION_PROPERTY_IS_NaN = AXIS_INIT_POSITION_PROPERTY
             + " does not exist or is not a number";
+
     private final String deviceName;
     private final DeviceProxy axisProxy;
     private final String controlBoxDeviceClass;
@@ -70,7 +80,7 @@ public class MotorConfigurationV2 {
         this.deviceName = deviceName;
 
         if (proxy == null) {
-            DevFailedUtils.throwDevFailed("axis proxy can not be null");
+            proxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
         }
         axisProxy = proxy;
         controlBoxDeviceClass = useSimulatedMotor ? "SimulatedControlBox" : "ControlBox";
@@ -174,6 +184,30 @@ public class MotorConfigurationV2 {
         }
         catch (DevFailed e) {
             throw new DevFailedProcessingException(e, PasserelleException.Severity.FATAL, actor);
+        }
+    }
+
+    public void assertDefinePositionCanBeApplyOnMotor() throws MotorConfigurationException {
+        assertEncoderIsValidForInitalization();
+
+        if (initStrategy != DP) {
+            throw new MotorConfigurationException(deviceName
+                    + DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE);
+        }
+    }
+
+    public void assertInitRefPosBeApplyOnMotor() throws MotorConfigurationException {
+        assertEncoderIsValidForInitalization();
+        if (initStrategy != OTHER) {
+            throw new MotorConfigurationException(deviceName
+                    + INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE);
+        }
+    }
+
+    public void assertEncoderIsValidForInitalization() throws MotorConfigurationException {
+        if (encoder == ABSOLUTE) {
+            throw new MotorConfigurationException(deviceName
+                    + INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER);
         }
     }
 
