@@ -1,8 +1,5 @@
 package fr.soleil.passerelle.actor.tango.control;
 
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType.ABSOLUTE;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.DP;
-
 import java.net.URL;
 
 import ptolemy.data.BooleanToken;
@@ -24,6 +21,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
+import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
@@ -32,6 +30,7 @@ import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
@@ -39,6 +38,20 @@ import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
+/**
+ * this actor initialize the devices (cb and Galil) according to shouldInitDevice parameter and run
+ * an DefinePosition on the motor specified by DeviceName parameter. To be able to initialize a
+ * motor, it must be in On or StandBy state. So if the motor is OFF before the beginning of the
+ * initialization we switch it to On then we initialize it and to finish we switch it to Off again.
+ * 
+ * If the deviceName is Empty then an IllegalActionException or a ValidateException is thrown.
+ * 
+ * if the device has not the following commands: InitializeReferencePosition and MotorOn then an
+ * IllegalActionException or a ValidateException is thrown
+ * 
+ * If an error occurred during the initialization of the motor then an ProcessingException is thrown
+ * 
+ */
 public class DefinePosition extends ATangoDeviceActorV5 {
 
     public static final String DEFINE_POSITION_CMD_NAME = "DefinePosition";
@@ -46,15 +59,23 @@ public class DefinePosition extends ATangoDeviceActorV5 {
     public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
     public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
     public static final String OUTPUT_PORT_NAME = "InitOK";
+    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+
     public final Port offsetPort;
 
     private MotorConfigurationV2 conf;
 
-    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+    /**
+     * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
+     * execute InitializeReferencePosition
+     */
     @ParameterName(name = INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
 
+    /**
+     * flag to indicate whether the actor must use the simulated devices
+     */
     @ParameterName(name = USE_SIMULATED_MOTOR)
     public Parameter useSimulatedMotorParam;
     private boolean useSimulatedMotor = false;
@@ -118,22 +139,17 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
             conf.retrieveFullConfig();
 
-            if (conf.getEncoder() == ABSOLUTE) {
-                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
-                        + " has an absolute encoder, no need to initialize", this, null);
-            }
-
-            if (conf.getInitStrategy() != DP) {
-                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
-                        + "  has an initialization strategy, must use ReferenceInitPosition", this,
-                        null);
-            }
+            conf.assertDefinePositionCanBeApplyOnMotor();
         }
         catch (DevFailed devFailed) {
             throw new DevFailedValidationException(devFailed, this);
         }
         catch (PasserelleException e) {
             throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+        }
+        catch (MotorConfigurationException e) {
+            throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, e.getMessage(), this,
+                    e);
         }
     }
 
@@ -155,19 +171,28 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 // run DefinePosition
 
                 double position = 0;
-                double offset = 0;
+                String offset = "";
 
                 position = Double.parseDouble((String) PasserelleUtil.getInputValue(request
                         .getMessage(input)));
 
-                String offsetAsString = ((String) PasserelleUtil.getInputValue(request
-                        .getMessage(offsetPort))).trim();
+                // // if port is Connected
+                // if (!offsetPort.isExhausted()) {
+                // offset = ((String) PasserelleUtil.getInputValue(request.getMessage(offsetPort)))
+                // .trim();
 
-                if (!offsetAsString.isEmpty()) {
-                    offset = Double.parseDouble(offsetAsString);
+                // if port is Connected
 
-                    // set the offset
-                    dev.write_attribute(new DeviceAttribute("offset", offset));
+                ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
+                if (offsetManagedMsg != null) {
+                    offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
+                    // message is not empty
+                    if (!offset.isEmpty()) {
+
+                        // set the offset
+                        dev.write_attribute(new DeviceAttribute("offset", Double
+                                .parseDouble(offset)));
+                    }
                 }
 
                 // set the position
@@ -185,7 +210,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 StringBuilder msg = new StringBuilder(deviceName);
                 msg.append("define position applied with position: ");
                 msg.append(position);
-                if (!offsetAsString.isEmpty()) {
+                if (!offset.isEmpty()) {
                     msg.append(" ; offset: ");
                     msg.append(offset);
                 }
