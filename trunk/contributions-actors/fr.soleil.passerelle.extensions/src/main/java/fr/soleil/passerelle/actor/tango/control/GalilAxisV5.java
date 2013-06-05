@@ -16,14 +16,22 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
 
 import com.isencia.passerelle.actor.InitializationException;
+import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
+import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.DeviceAttribute;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorMoverV5;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
@@ -31,8 +39,10 @@ import fr.soleil.passerelle.actor.tango.control.motor.actions.MoveNumericAttribu
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
+import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 /**
  * Move a motor and output the reached position. This class check in ValidateInitialization if the
@@ -47,13 +57,16 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
 
     public static final String MOTOR_NAME_LABEL = "Motor name";
     public static final String SIMULATED_MOTOR_LABEL = "Simulated Motor";
-    public static final String SIMULATED_MOTOR_CLASS = "fr.soleil.deviceservers.simulated.motor.SimulatedMotor";
+    public static final String OFFSET_PORT_NAME = "offset";
+    public static final String SIMULATED_MOTOR_CLASS = "SimulatedMotor";
     public static final String REAL_MOTOR_CLASS = "GalilAxis";
     protected static List<String> attributeList = new ArrayList<String>();
 
     @ParameterName(name = SIMULATED_MOTOR_LABEL)
     public Parameter simulatedMotorParam;
     private boolean simulatedMotor;
+
+    public Port offsetPort;
 
     static {
         attributeList.add("position");
@@ -80,6 +93,8 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
                 + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
                 + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
                 + "\"/>\n" + "</svg>\n");
+
+        offsetPort = PortFactory.getInstance().createInputPort(this, OFFSET_PORT_NAME, null);
 
         mouvementTypeParam.setVisibility(Settable.EXPERT);
         mouvementTypeParam.addChoice("position");
@@ -119,6 +134,47 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
             ExecutionTracerService.trace(this, e);
             throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
         }
+    }
+
+    @Override
+    protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
+            throws ProcessingException {
+
+        // apply offset if
+
+        String offset = "";
+
+        ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
+
+        // if port is Connected
+        if (offsetManagedMsg != null) {
+            offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
+            // message is not empty
+            if (!offset.isEmpty()) {
+
+                // set the offset
+                try {
+                    getDeviceProxy().write_attribute(
+                            new DeviceAttribute("offset", Double.parseDouble(offset)));
+
+                    ExecutionTracerService.trace(this, "apply offset " + offset);
+                }
+                catch (NumberFormatException e) {
+                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                            "Error: offset is not a number", ctxt, null);
+                }
+                catch (DevFailed e) {
+                    throw new DevFailedProcessingException(e, this);
+                }
+                catch (PasserelleException e) {
+                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                            e.getMessage(), ctxt, e);
+                }
+            }
+        }
+        // call super class to execute movement
+        super.process(ctxt, request, response);
+
     }
 
     @Override

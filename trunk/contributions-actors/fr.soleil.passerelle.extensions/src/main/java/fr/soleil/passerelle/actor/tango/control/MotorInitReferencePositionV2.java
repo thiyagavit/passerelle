@@ -1,8 +1,5 @@
 package fr.soleil.passerelle.actor.tango.control;
 
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType.ABSOLUTE;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.DP;
-
 import java.net.URL;
 
 import ptolemy.actor.Director;
@@ -31,6 +28,7 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
@@ -41,18 +39,42 @@ import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
+/**
+ * this actor initialize the devices (cb and Galil) according to shouldInitDevice parameter and run
+ * an InitializeReferencePosition on the motor specified by DeviceName parameter. To be able to
+ * initialize a motor, it must be in On or StandBy state. So if the motor is OFF before the
+ * beginning of the initialization we switch it to On then we initialize it and to finish we switch
+ * it to Off again.
+ * 
+ * If the deviceName is Empty then an IllegalActionException or a ValidateException is thrown.
+ * 
+ * if the device has not the following commands: InitializeReferencePosition and MotorOn then an
+ * IllegalActionException or a ValidateException is thrown
+ * 
+ * If an error occurred during the initialization of the motor then an ProcessingException is thrown
+ * 
+ */
 public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements IActorFinalizer {
 
-    private final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
-    private final String USE_SIMULATED_MOTOR = "Use simulated motor";
+    public static final String INITIALIZE_REFERENCE_POSITION = "InitializeReferencePosition";
+    public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
+    public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
+    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+
     private MotorConfigurationV2 conf;
     private WaitStateTask waitTask;
 
-    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+    /**
+     * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
+     * execute InitializeReferencePosition
+     */
     @ParameterName(name = INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
 
+    /**
+     * flag to indicate whether the actor must use the simulated devices
+     */
     @ParameterName(name = USE_SIMULATED_MOTOR)
     public Parameter useSimulatedMotorParam;
     private boolean useSimulatedMotor = false;
@@ -117,26 +139,21 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             // test if commands exists, otherwise this device is not a motor
             final DeviceProxy dev = getDeviceProxy();
             dev.command_query("MotorON");
-            dev.command_query("InitializeReferencePosition");
+            dev.command_query(INITIALIZE_REFERENCE_POSITION);
 
             conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
             conf.retrieveFullConfig();
-
-            if (conf.getEncoder() == ABSOLUTE) {
-                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
-                        + " has an absolute encoder, no need to initialize", this, null);
-            }
-
-            if (conf.getInitStrategy() == DP) {
-                throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, getDeviceName()
-                        + "  has no initialization strategy, must use DefinePosition", this, null);
-            }
+            conf.assertInitRefPosBeApplyOnMotor();
         }
         catch (DevFailed devFailed) {
             throw new DevFailedValidationException(devFailed, this);
         }
         catch (PasserelleException e) {
             throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+        }
+        catch (MotorConfigurationException e) {
+            throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, e.getMessage(), this,
+                    e);
         }
     }
 
@@ -201,7 +218,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     }
 
     private void runInitRefAndWaitEndMovement(String deviceName, DeviceProxy dev) throws DevFailed {
-        dev.command_inout("InitializeReferencePosition");
+        dev.command_inout(INITIALIZE_REFERENCE_POSITION);
         ExecutionTracerService.trace(this, "initializing reference position of " + deviceName);
         // since I am not sure that the device motor switch immediately to the moving state, do a
         // little sleep
