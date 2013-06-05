@@ -17,6 +17,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -86,15 +87,10 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
     public void attributeChanged(Attribute attribute) throws IllegalActionException {
 
         if (attribute == completeAttributeNameParam) {
-            completeAttributeName = PasserelleUtil.getParameterValue(completeAttributeNameParam);
-            if (completeAttributeName.isEmpty()) {
-                throw new IllegalActionException(ERROR_COMPLETE_ATTR_NAME_IS_EMPTY);
-            }
+            completeAttributeName = extractAndValidateCompleteAttrName();
 
         } else if (attribute == extractionTypeParam) {
-            // throw an IllegalActionException if extraction is unknown
-            extractionType = ExtractionType.fromDescription(PasserelleUtil.getParameterValue(
-                    extractionTypeParam).trim());
+            extractionType = extractAndValidateExtrationType();
 
         } else if (attribute == throwExceptionOnErrorParam) {
             throwExceptionOnError = ((BooleanToken) throwExceptionOnErrorParam.getToken())
@@ -104,13 +100,27 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
         }
     }
 
+    private ExtractionType extractAndValidateExtrationType() throws IllegalActionException {
+        // throw an IllegalActionException if extraction is unknown
+        return ExtractionType.fromDescription(PasserelleUtil.getParameterValue(extractionTypeParam)
+                .trim());
+    }
+
+    private String extractAndValidateCompleteAttrName() throws IllegalActionException {
+        String completeAttrName = PasserelleUtil.getParameterValue(completeAttributeNameParam);
+        if (completeAttrName.isEmpty()) {
+            throw new IllegalActionException(ERROR_COMPLETE_ATTR_NAME_IS_EMPTY);
+        }
+        return completeAttrName;
+    }
+
     @Override
     protected void validateInitialization() throws ValidationException {
-        validateAttribute(completeAttributeNameParam);
-        validateAttribute(extractionTypeParam);
-        // TODO Do a function exists to get all param ???
 
         try {
+            completeAttributeName = extractAndValidateCompleteAttrName();
+
+            extractionType = extractAndValidateExtrationType();
             if (extractorProxy == null) {// FIXME == null if we are in prod env
                 extractorProxy = new HdbExtractorProxy(true);
                 ExecutionTracerService.trace(this,
@@ -119,6 +129,9 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
         }
         catch (DevFailed e) {
             throw new DevFailedValidationException(e, this);
+        }
+        catch (IllegalActionException e) {
+            throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
         }
         super.validateInitialization();
     }
