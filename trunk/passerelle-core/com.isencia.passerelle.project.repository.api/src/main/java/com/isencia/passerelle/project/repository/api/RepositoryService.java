@@ -155,5 +155,7 @@ public interface RepositoryService {
   
   File getSubmodelFolder();
   
+  Image getImage(String code);
+  
   boolean knowledgeBaseHasFlow(String kbCode);
 }

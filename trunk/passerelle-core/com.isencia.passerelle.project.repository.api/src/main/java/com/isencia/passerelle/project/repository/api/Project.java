@@ -1,5 +1,7 @@
 package com.isencia.passerelle.project.repository.api;
 
+import java.io.Serializable;
+
 import com.isencia.passerelle.model.Flow;
 
 /**
@@ -13,7 +15,7 @@ import com.isencia.passerelle.model.Flow;
  * @author delerw
  *
  */
-public interface Project {
+public interface Project extends Serializable{
 	
   MetaData getMetaData();
   
