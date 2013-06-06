@@ -48,7 +48,7 @@ public class MotorConfigurationV2 {
     public static final String NO_CONTROL_BOX_ATTACHED_TO = "No control box attached to ";
     public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
             + " does not exist or is not an integer";
-    public static final String AXIS_INIT_POSITION_PROPERTY_IS_NaN = AXIS_INIT_POSITION_PROPERTY
+    public static final String AXIS_INIT_POSITION_PROPERTY_IS_NAN = AXIS_INIT_POSITION_PROPERTY
             + " does not exist or is not a number";
 
     private final String deviceName;
@@ -128,7 +128,7 @@ public class MotorConfigurationV2 {
             }
         }
         catch (NumberFormatException e) {
-            DevFailedUtils.throwDevFailed(AXIS_INIT_POSITION_PROPERTY_IS_NaN);
+            DevFailedUtils.throwDevFailed(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
         }
     }
 
