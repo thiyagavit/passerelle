@@ -109,7 +109,6 @@ public class MotorConfigurationV2 {
      * @throws DevFailed
      */
     public void retrieveProperties() throws DevFailed {
-        // TODO add AxisInitPosition (test is Number) ?
         final String[] props = { AXIS_ENCODER_TYPE_PROPERTY, AXIS_INIT_TYPE_PROPERTY };
         final DbDatum[] datum = axisProxy.get_property(props);
 
@@ -139,21 +138,21 @@ public class MotorConfigurationV2 {
      * @throws DevFailed
      */
     public void retrieveMyControlBox() throws DevFailed {
-        String controlBoxName = null;
+        String cbName = null;
         final DeviceData dd = axisProxy.get_adm_dev().command_inout("QueryDevice");
         final String[] devices = dd.extractStringArray();
         for (final String device : devices) {
             final String[] classAndDevice = device.split("::");
             if (classAndDevice[0].equals(controlBoxDeviceClass)) {
-                controlBoxName = classAndDevice[1];
+                cbName = classAndDevice[1];
                 break;
             }
         }
-        if (controlBoxName == null) {
+        if (cbName == null) {
             Except.throw_exception("TANGO_ERROR", NO_CONTROL_BOX_ATTACHED_TO + deviceName,
                     "MotorConfiguration.retrieveMyControlBox");
         }
-        this.controlBoxName = controlBoxName;
+        controlBoxName = cbName;
     }
 
     public void initDevice(final Actor actor) throws ProcessingException {
