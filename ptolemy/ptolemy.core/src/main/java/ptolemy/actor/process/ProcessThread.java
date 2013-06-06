@@ -210,13 +210,10 @@ public class ProcessThread extends PtolemyThread {
         } catch (Throwable t) {
             thrownWhenIterate = t;
         } finally {
-            // Let the director know that this thread stopped.
             // This is synchronized to prevent a race condition
             // where the director might conclude before the
             // call to wrapup() below.
             synchronized (_director) {
-                _director.removeThread(this);
-
                 try {
                     // NOTE: Deadlock risk here.
                     // Holding a lock on the _director during wrapup()
@@ -231,7 +228,14 @@ public class ProcessThread extends PtolemyThread {
                 } catch (IllegalActionException e) {
                     thrownWhenWrapup = e;
                 } finally {
-                    _debug("-- Thread stopped.");
+                  // Let the director know that this thread stopped.
+                  // This must occur after the call to wrapup above.
+                  synchronized (_director) {
+                      _director.removeThread(this);
+                  }
+                  if (_debugging) {
+                      _debug("-- Thread stopped.");
+                  }
 
                     boolean rethrow = false;
 
