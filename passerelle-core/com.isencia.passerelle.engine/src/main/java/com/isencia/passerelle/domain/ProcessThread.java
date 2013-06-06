@@ -142,13 +142,10 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
       logger.debug(getActor().getFullName() + " - Error in ProcessThread " + t);
       //t.printStackTrace();
     } finally {
-      // Let the director know that this thread stopped.
       // This is synchronized to prevent a race condition
       // where the director might conclude before the
       // call to wrapup() below.
       synchronized (_director) {
-        _director.removeThread(this);
-
         try {
           // NOTE: Deadlock risk here if wrapup is done inside
           // a block synchronized on the _director, as it used to be.
@@ -164,7 +161,14 @@ public class ProcessThread extends ptolemy.actor.process.ProcessThread {
         } catch (IllegalActionException e) {
           thrownWhenWrapup = e;
         } finally {
-          _debug("-- Thread stopped.");
+          // Let the director know that this thread stopped.
+          // This must occur after the call to wrapup above.
+          synchronized (_director) {
+              _director.removeThread(this);
+          }
+          if (_debugging) {
+            _debug("-- Thread stopped.");
+        }
 
           boolean rethrow = false;
 
