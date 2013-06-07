@@ -22,6 +22,7 @@ import ptolemy.actor.CompositeActor;
 import com.isencia.passerelle.core.IEventLog;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
+import com.isencia.passerelle.project.repository.api.Image;
 import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
@@ -308,5 +309,10 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
   public boolean knowledgeBaseHasFlow(String kbCode) {
     return false;
   }
+
+public Image getImage(String code) {
+	// TODO Auto-generated method stub
+	return null;
+}
 
 }
