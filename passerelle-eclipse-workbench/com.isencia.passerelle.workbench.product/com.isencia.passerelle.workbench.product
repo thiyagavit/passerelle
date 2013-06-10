@@ -66,6 +66,7 @@
       <plugin id="com.isencia.passerelle.engine"/>
       <plugin id="com.isencia.passerelle.project.repository.api"/>
       <plugin id="com.isencia.passerelle.project.repository.impl.filesystem"/>
+      <plugin id="com.isencia.passerelle.runtime"/>
       <plugin id="com.isencia.passerelle.workbench"/>
       <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
