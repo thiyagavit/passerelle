@@ -35,16 +35,17 @@ import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
- * @author delerw
+ * @author erwin
  */
 public class MultiInputsTracerConsole extends Actor {
   private static final long serialVersionUID = 1L;
-  public Parameter chopLengthParam;
-  private long counter;
-
-  InputPortSetterBuilder inputPortBldr;
   private static final String INPUT_PORTNAMES = "Input port names (comma-separated)";
-  public StringParameter inputPortNamesParameter = null;
+
+  public Parameter chopLengthParam;
+  public InputPortSetterBuilder inputPortBldr;
+  public StringParameter inputPortNamesParameter;
+
+  private long counter;
 
   /**
    * @param container
