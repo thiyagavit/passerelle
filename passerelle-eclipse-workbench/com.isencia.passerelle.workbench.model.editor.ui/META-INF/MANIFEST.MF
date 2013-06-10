@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Ui Plug-in
+Bundle-Name: Passerelle workbench editor ui plug-in
 Bundle-SymbolicName: com.isencia.passerelle.workbench.model.editor.ui; singleton:=true
 Bundle-Version: 8.4.0
 Bundle-Activator: com.isencia.passerelle.workbench.model.editor.ui.Activator
