@@ -8,7 +8,7 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitT
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY_IS_NaN;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY_IS_NAN;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_TYPE_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER;
@@ -240,7 +240,7 @@ public class MotorConfigurationV2InitConfigTest {
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
-            assertThat(DevFailedUtils.toString(e)).contains(AXIS_INIT_POSITION_PROPERTY_IS_NaN);
+            assertThat(DevFailedUtils.toString(e)).contains(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
         }
     }
 
