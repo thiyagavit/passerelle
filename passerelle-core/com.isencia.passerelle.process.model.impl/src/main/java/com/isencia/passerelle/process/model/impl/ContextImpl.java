@@ -397,6 +397,11 @@ public class ContextImpl implements Context {
 
       // merge context entries
       entries.putAll(contextToMerge.entries);
+      
+      // Status.RESTARTED should be overwritten in case other status is found
+      if(Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(other.getStatus())){
+        this.setStatus(other.getStatus());
+      }
 
     } finally {
       lock.unlock();
