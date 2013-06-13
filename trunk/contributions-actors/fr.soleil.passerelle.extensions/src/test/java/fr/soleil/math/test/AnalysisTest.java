@@ -34,7 +34,7 @@ public class AnalysisTest {
     public void centroid() {
         final BeamProfiles functions = new BeamProfiles();
         final double[] x = functions.createLine(250);
-        final double expectedCentroid = 125;
+        final double expectedCentroid = 186.98740644484573;
         final double[] y = functions.createSigmoid(250, 1);
 
         /*
