@@ -12,7 +12,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime.process;
+package com.isencia.passerelle.runtime.process.impl.event;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,10 +25,12 @@ import java.util.Map;
  * @author erwin
  *
  */
-public abstract class AbstractProcessEvent implements ProcessEvent {
-
+public class ProcessEvent implements com.isencia.passerelle.runtime.process.ProcessEvent {
   private static final long serialVersionUID = 411059590003641225L;
   
+  public final static String BREAKPOINTS = "___breakpoints";
+  
+  private String processContextId;
   private Date timeStamp;
   private String topic;
   
@@ -36,12 +38,17 @@ public abstract class AbstractProcessEvent implements ProcessEvent {
   private Kind kind;
   private Detail detail;
   
-  protected AbstractProcessEvent(Kind kind, Detail detail, Date creationTS) {
-    this.topic = TOPIC_PREFIX+kind.name()+"/"+detail.name();
-    this.timeStamp = creationTS;
-    
+  public ProcessEvent(String processContextId, Kind kind, Detail detail) {
+    this.processContextId = processContextId;
+    this.topic = TOPIC_PREFIX + processContextId + "/" + kind.name()+"/"+detail.name();
+    this.timeStamp = new Date();
     this.kind = kind;
     this.detail = detail;
+  }
+  
+  @Override
+  public String getProcessContextId() {
+    return processContextId;
   }
 
   public String getTopic() {
@@ -65,6 +72,14 @@ public abstract class AbstractProcessEvent implements ProcessEvent {
   
   public Iterator<String> getPropertyNames() {
     return eventProperties.keySet().iterator();
+  }
+  
+  protected String putProperty(String propName, String propValue) {
+    return eventProperties.put(propName, propValue);
+  }
+  
+  protected String removeProperty(String propName) {
+    return eventProperties.remove(propName);
   }
   
   @Override

@@ -257,6 +257,9 @@ public class FlowProcessingTest1 extends TestCase {
     Thread.sleep(500);
     procHandle = processingService.refresh(procHandle);
     assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    assertNotNull("Should have one suspended element", procHandle.getSuspendedElements());
+    assertEquals("Should have one suspended element", procHandle.getSuspendedElements().length, 1);
+    assertEquals("Suspended element should be delay1", "delay1", procHandle.getSuspendedElements()[0]);
     ProcessHandle resumeHandle = processingService.resume(procHandle);
     Thread.sleep(100);
     resumeHandle = processingService.refresh(resumeHandle);
@@ -275,6 +278,9 @@ public class FlowProcessingTest1 extends TestCase {
     Thread.sleep(200);
     procHandle = processingService.refresh(procHandle);
     assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    assertNotNull("Should have one suspended element", procHandle.getSuspendedElements());
+    assertEquals("Should have one suspended element", procHandle.getSuspendedElements().length, 1);
+    assertEquals("Suspended element should be delay1", "delay1.input", procHandle.getSuspendedElements()[0]);
     ProcessHandle resumeHandle = processingService.resume(procHandle);
     Thread.sleep(100);
     resumeHandle = processingService.refresh(resumeHandle);
@@ -293,6 +299,9 @@ public class FlowProcessingTest1 extends TestCase {
     Thread.sleep(200);
     procHandle = processingService.refresh(procHandle);
     assertEquals("Process should be SUSPENDED", ProcessStatus.SUSPENDED, procHandle.getExecutionStatus());
+    assertNotNull("Should have one suspended element", procHandle.getSuspendedElements());
+    assertEquals("Should have one suspended element", procHandle.getSuspendedElements().length, 1);
+    assertEquals("Suspended element should be delay1", "const.output", procHandle.getSuspendedElements()[0]);
     ProcessHandle resumeHandle = processingService.resume(procHandle);
     Thread.sleep(100);
     resumeHandle = processingService.refresh(resumeHandle);

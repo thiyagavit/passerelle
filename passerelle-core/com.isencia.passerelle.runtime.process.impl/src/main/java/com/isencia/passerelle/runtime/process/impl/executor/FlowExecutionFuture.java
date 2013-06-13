@@ -62,6 +62,11 @@ public final class FlowExecutionFuture extends FutureTask<ProcessStatus> {
     return fet.getStatus();
   }
   
+  public String[] getSuspendedElements() {
+    return fet.getSuspendedElements();
+  }
+
+  
   public FlowHandle getFlowHandle() {
     return fet.getFlowHandle();
   }

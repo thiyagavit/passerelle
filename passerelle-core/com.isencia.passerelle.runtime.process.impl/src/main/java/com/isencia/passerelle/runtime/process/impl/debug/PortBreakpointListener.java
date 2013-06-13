@@ -16,6 +16,7 @@ package com.isencia.passerelle.runtime.process.impl.debug;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionTask;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPortEvent;
 import ptolemy.kernel.Port;
@@ -27,6 +28,14 @@ public class PortBreakpointListener implements DebugListener {
   private static final int BREAKPOINT_EVENT_TYPE_INPUT_PORT = IOPortEvent.GET_END;
   private static final int BREAKPOINT_EVENT_TYPE_OUTPUT_PORT = IOPortEvent.SEND;
 
+  private FlowExecutionTask fet;
+  private String name;
+  
+  public PortBreakpointListener(String name, FlowExecutionTask fet) {
+    this.fet = fet;
+    this.name = name;
+  }
+
   @Override
   public void event(DebugEvent event) {
     if (event instanceof IOPortEvent) {
@@ -35,6 +44,9 @@ public class PortBreakpointListener implements DebugListener {
           || (BREAKPOINT_EVENT_TYPE_OUTPUT_PORT == pe.getEventType())) {
         Port p = pe.getPort();
         LOGGER.info("Suspend on breakpoint {}", p.getFullName());
+        if(fet!=null) {
+          fet.addSuspendedElement(name);
+        }
         ((CompositeActor)p.toplevel()).getManager().pauseOnBreakpoint(p.getFullName());
       }
     }

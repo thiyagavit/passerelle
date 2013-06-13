@@ -40,8 +40,6 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(FlowProcessingServiceImpl.class);
 
-  private int maxConcurrentProcesses = 10;
-
   // TODO find some method to determine when an entry can be removed here...
   // client code may still like to obtain execution info a while after the execution has already finished
   // so when is a good moment for removal???
@@ -51,7 +49,6 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   public FlowProcessingServiceImpl(int maxConcurrentProcesses) {
     LOGGER.info("Creating FlowProcessingService for {} max concurrent processes", maxConcurrentProcesses);
-    this.maxConcurrentProcesses = maxConcurrentProcesses;
     flowExecutor = new FlowExecutor(maxConcurrentProcesses, maxConcurrentProcesses, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
   }
 
