@@ -12,25 +12,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime.process.impl;
+package com.isencia.passerelle.runtime.process.impl.event;
 
-import java.util.Date;
-import com.isencia.passerelle.runtime.process.AbstractProcessEvent;
 
-/**
- * @author erwin
- *
- */
-public class ProcessEvent extends AbstractProcessEvent {
-  private static final long serialVersionUID = -6809094843226793224L;
+public class ResumeEvent extends ProcessEvent {
 
-  /**
-   * @param kind
-   * @param detail
-   * @param creationTS
-   */
-  public ProcessEvent(Kind kind, Detail detail, Date creationTS) {
-    super(kind, detail, creationTS);
+  public ResumeEvent(String processContextId) {
+    super(processContextId, Kind.RESUME, Detail.CLIENT_REQUEST);
   }
 
+  public ResumeEvent(String processContextId, String breakpointName) {
+    this(processContextId);
+    this.putProperty(BREAKPOINTS, breakpointName);
+  }
 }

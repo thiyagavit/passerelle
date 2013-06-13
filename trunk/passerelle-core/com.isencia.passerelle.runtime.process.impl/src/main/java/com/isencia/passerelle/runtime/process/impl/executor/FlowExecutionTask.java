@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.RunnableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   private volatile boolean canceled;
   private volatile boolean busy;
   private volatile boolean suspended;
+  private volatile Set<String> suspendedElements = new ConcurrentSkipListSet<String>();
   private Manager manager;
 
   public FlowExecutionTask(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
@@ -193,6 +195,18 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   public ProcessStatus getStatus() {
     return status;
   }
+  
+  public String[] getSuspendedElements() {
+    return suspendedElements.toArray(new String[suspendedElements.size()]);
+  };
+  
+  public boolean addSuspendedElement(String elementName) {
+    return suspendedElements.add(elementName);
+  }
+  
+  public boolean removeSuspendedElement(String elementName) {
+    return suspendedElements.remove(elementName);
+  }
 
   /**
    * Updates the flow execution status to <code>ProcessStatus.ERROR</code>
@@ -319,13 +333,13 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
       for (String breakpointName : breakpointNames) {
         ComponentEntity entity = flow.getEntity(breakpointName);
         if(entity!=null) {
-          entity.addDebugListener(new ActorBreakpointListener());
+          entity.addDebugListener(new ActorBreakpointListener(breakpointName, this));
           LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
           breakpointsDefined = true;
         } else {
           Port port = flow.getPort(breakpointName);
           if(port!=null) {
-            port.addDebugListener(new PortBreakpointListener());
+            port.addDebugListener(new PortBreakpointListener(breakpointName, this));
             LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
             breakpointsDefined = true;
           } else {
@@ -349,5 +363,5 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     STATUS_MAPPING.put(Manager.EXITING, ProcessStatus.STOPPING);
     STATUS_MAPPING.put(Manager.CORRUPTED, ProcessStatus.ERROR);
     STATUS_MAPPING.put(Manager.THROWING_A_THROWABLE, ProcessStatus.ERROR);
-  };
+  }
 }

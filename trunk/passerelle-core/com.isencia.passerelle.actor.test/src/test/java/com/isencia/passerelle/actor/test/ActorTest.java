@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import ptolemy.actor.Manager;
 import ptolemy.actor.Manager.State;
+import ptolemy.data.StringToken;
 import com.isencia.passerelle.actor.control.Stop;
 import com.isencia.passerelle.actor.control.Trigger;
 import com.isencia.passerelle.actor.convert.HeaderModifier;
@@ -35,11 +36,14 @@ import com.isencia.passerelle.actor.general.CommandExecutor;
 import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.actor.general.DevNullActor;
 import com.isencia.passerelle.actor.v5.Actor;
+import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.FlowNotExecutingException;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
+import com.isencia.passerelle.testsupport.actor.MapBasedRouter;
+import com.isencia.passerelle.testsupport.actor.MapSource;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
 import com.isencia.passerelle.testsupport.actor.TextSource;
 
@@ -242,6 +246,30 @@ public class ActorTest extends TestCase {
     new FlowStatisticsAssertion()
     .expectMsgSentCount(source, 1L)
     .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
+
+  public void testMapTestActors() throws Exception {
+    Flow flow = new Flow("testMapTestActors", null);
+    Director d = new Director(flow,"director");
+    MapSource src = new MapSource(flow, "src");
+    MapBasedRouter router = new MapBasedRouter(flow, "router");
+    router.outputPortCfgExt.outputPortNamesParameter.setToken(new StringToken("1,2"));
+    DevNullActor sink1 = new DevNullActor(flow, "sink1");
+    DevNullActor sink2 = new DevNullActor(flow, "sink2");
+    flow.connect(src, router);
+    flow.connect((Port)router.getPort("1"), sink1.input);
+    flow.connect((Port)router.getPort("2"), sink2.input);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("src.entries", "pol=2");
+    props.put("router.key", "pol");
+    new FlowManager().executeBlockingLocally(flow, props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(src, 1L)
+    .expectMsgReceiptCount(sink1, 0L)
+    .expectMsgReceiptCount(sink2, 1L)
     .assertFlow(flow);
   }
 

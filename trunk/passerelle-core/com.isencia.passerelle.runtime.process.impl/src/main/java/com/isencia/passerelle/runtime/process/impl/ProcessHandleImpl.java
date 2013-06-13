@@ -27,6 +27,7 @@ public class ProcessHandleImpl implements ProcessHandle {
   private FlowHandle flowHandle;
   private String processContextId;
   private ProcessStatus status;
+  private String[] suspendedElements;
 
   /**
    * @param fetFuture
@@ -36,6 +37,7 @@ public class ProcessHandleImpl implements ProcessHandle {
     this.processContextId = fetFuture.getProcessContextId();
     this.status = fetFuture.getStatus();
     this.flowHandle = fetFuture.getFlowHandle();
+    this.suspendedElements = fetFuture.getSuspendedElements();
   }
 
   @Override
@@ -55,8 +57,7 @@ public class ProcessHandleImpl implements ProcessHandle {
 
   @Override
   public String[] getSuspendedElements() {
-    // TODO Auto-generated method stub
-    return null;
+    return suspendedElements;
   }
 
   @Override

@@ -20,7 +20,7 @@ import com.isencia.passerelle.runtime.Event;
  * An event interface as a basis for all specific events related to flow process executions.
  * It reuses some concepts from eclipse's DebugEvent, e.g. the <i>kind</i> and <i>detail</i>.
  * <p>
- * Topics of ProcessEvents are of the format <code>com/isencia/passerelle/process/[KIND]/[DETAIL]/...</code>.
+ * Topics of ProcessEvents are of the format <code>com/isencia/passerelle/process/[PROCESS ID]/[KIND]/[DETAIL]/...</code>.
  * </p>
  * 
  * @author erwin
@@ -107,4 +107,9 @@ public interface ProcessEvent extends Event {
    * @see org.eclipse.debug.core.DebugEvent.getDetail()
    */
   Detail getDetail();
+  
+  /**
+   * @return the id of the process to which this event is related
+   */
+  String getProcessContextId();
 }
