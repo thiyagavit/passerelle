@@ -6,6 +6,7 @@ Bundle-Version: 8.4.0.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.actor;version="8.3.0",
+ com.isencia.passerelle.actor.eip;version="8.3.0",
  com.isencia.passerelle.actor.v5;version="8.3.0",
  com.isencia.passerelle.core;version="8.3.0",
  com.isencia.passerelle.message;version="8.3.0",
