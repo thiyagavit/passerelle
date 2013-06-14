@@ -20,7 +20,8 @@ import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.validation.version.VersionSpecification;
 
 /**
- * @author delerw
+ * @author erwin
+ * @deprecated since v8.4 use DefaultModelElementClassProvider in your activator i.o. this approach
  *
  */
 public class ActorProvider implements ModelElementClassProvider {
