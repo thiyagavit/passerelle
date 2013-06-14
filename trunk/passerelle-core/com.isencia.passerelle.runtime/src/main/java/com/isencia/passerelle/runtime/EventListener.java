@@ -12,9 +12,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package com.isencia.passerelle.runtime.process;
+package com.isencia.passerelle.runtime;
 
-import com.isencia.passerelle.runtime.Event;
 
 /**
  * 
@@ -24,7 +23,7 @@ import com.isencia.passerelle.runtime.Event;
  * @author erwin
  *
  */
-public interface ProcessListener {
+public interface EventListener extends java.util.EventListener{
   
   /**
    * 

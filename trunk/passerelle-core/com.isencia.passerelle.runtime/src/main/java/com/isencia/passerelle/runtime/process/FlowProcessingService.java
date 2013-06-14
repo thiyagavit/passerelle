@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import com.isencia.passerelle.runtime.Event;
+import com.isencia.passerelle.runtime.EventListener;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
@@ -106,7 +107,7 @@ public interface FlowProcessingService {
    * @param breakpointNames optional names of the Flow elements (ports and/or actors) where the process should place a breakpoint, if started in DEBUG mode
    * @return
    */
-  ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener, String... breakpointNames);
+  ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, EventListener listener, String... breakpointNames);
 
   /**
    * Wait until the process has finished and return the final status.

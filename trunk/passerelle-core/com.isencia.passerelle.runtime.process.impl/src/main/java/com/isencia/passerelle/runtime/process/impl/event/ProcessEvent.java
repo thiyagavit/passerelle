@@ -17,6 +17,7 @@ package com.isencia.passerelle.runtime.process.impl.event;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
  * @author erwin
  *
  */
-public class ProcessEvent implements com.isencia.passerelle.runtime.process.ProcessEvent {
+public class ProcessEvent extends EventObject implements com.isencia.passerelle.runtime.process.ProcessEvent {
   private static final long serialVersionUID = 411059590003641225L;
   
   public final static String BREAKPOINTS = "___breakpoints";
@@ -39,6 +40,7 @@ public class ProcessEvent implements com.isencia.passerelle.runtime.process.Proc
   private Detail detail;
   
   public ProcessEvent(String processContextId, Kind kind, Detail detail) {
+    super(processContextId);
     this.processContextId = processContextId;
     this.topic = TOPIC_PREFIX + processContextId + "/" + kind.name()+"/"+detail.name();
     this.timeStamp = new Date();
