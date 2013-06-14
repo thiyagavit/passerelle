@@ -14,8 +14,11 @@
  */
 package com.isencia.passerelle.runtime.process.impl;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,11 +30,11 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.runtime.Event;
+import com.isencia.passerelle.runtime.EventListener;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.FlowProcessingService;
-import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionFuture;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutionTask;
 import com.isencia.passerelle.runtime.process.impl.executor.FlowExecutor;
@@ -40,13 +43,26 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(FlowProcessingServiceImpl.class);
 
+  // the thread pool to launch flow execution tasks
+  private ExecutorService flowExecutor;
+
   // TODO find some method to determine when an entry can be removed here...
   // client code may still like to obtain execution info a while after the execution has already finished
   // so when is a good moment for removal???
   private Map<String, FlowExecutionFuture> flowExecutions = new ConcurrentHashMap<String, FlowExecutionFuture>();
-
-  private ExecutorService flowExecutor;
-
+  
+  // The set of listeners that are potentially interested in all ProcessEvents.
+  // Remark that in an OSGi app, which is the preferred runtime platform, we expect to have one such listener
+  // that will be an adapter towards the OSGi EventAdmin service.
+  // But in non-OSGi-apps, all listeners may be registered directly here.
+  // This is a slowly changing collection, normally only modified at application start-up/shutdown,
+  // when such general listers will register/unregister themselves (or via OSGi DS injection etc)
+  private Set<EventListener> generalEventListeners = Collections.synchronizedSet(new HashSet<EventListener>());
+  
+  /**
+   * 
+   * @param maxConcurrentProcesses
+   */
   public FlowProcessingServiceImpl(int maxConcurrentProcesses) {
     LOGGER.info("Creating FlowProcessingService for {} max concurrent processes", maxConcurrentProcesses);
     flowExecutor = new FlowExecutor(maxConcurrentProcesses, maxConcurrentProcesses, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
@@ -54,7 +70,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, 
-      ProcessListener listener, String... breakpointNames) {
+      EventListener listener, String... breakpointNames) {
     
     if (processContextId == null) {
       processContextId = UUID.randomUUID().toString();

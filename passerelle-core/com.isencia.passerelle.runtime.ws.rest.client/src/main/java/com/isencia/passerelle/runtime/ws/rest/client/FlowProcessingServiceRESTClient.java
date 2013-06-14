@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.runtime.Event;
+import com.isencia.passerelle.runtime.EventListener;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.FlowProcessingService;
-import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.ws.rest.ErrorInfo;
 import com.isencia.passerelle.runtime.ws.rest.FlowHandleResource;
 import com.isencia.passerelle.runtime.ws.rest.ProcessHandleResource;
@@ -82,7 +82,7 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
 
   // TODO finish this : handle all arguments ; better error handling
   @Override
-  public ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
+  public ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, EventListener listener,
       String... breakpointNames) {
     LOGGER.info("Context {} - Submitting start request for flow {}", processContextId, flowHandle.getCode());
     try {

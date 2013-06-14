@@ -37,9 +37,9 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.runtime.EventListener;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.process.FlowProcessingService.StartMode;
-import com.isencia.passerelle.runtime.process.ProcessListener;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 import com.isencia.passerelle.runtime.process.impl.debug.ActorBreakpointListener;
 import com.isencia.passerelle.runtime.process.impl.debug.PortBreakpointListener;
@@ -65,7 +65,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   private volatile Set<String> suspendedElements = new ConcurrentSkipListSet<String>();
   private Manager manager;
 
-  public FlowExecutionTask(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, ProcessListener listener,
+  public FlowExecutionTask(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, EventListener listener,
       String... breakpointNames) {
     this.mode = mode;
     if (flowHandle == null)
