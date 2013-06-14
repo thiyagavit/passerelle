@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Engine Test
 Bundle-SymbolicName: com.isencia.passerelle.engine.test
-Bundle-Version: 8.2.0
+Bundle-Version: 8.4.0.qualifier
 Bundle-Vendor: ISENCIA
 Fragment-Host: com.isencia.passerelle.engine;bundle-version="8.1.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
