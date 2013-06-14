@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests for example actors
 Bundle-SymbolicName: com.isencia.passerelle.actor.examples.test
-Bundle-Version: 1.0.0
+Bundle-Version: 8.4.0.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: com.isencia.passerelle.testsupport;bundle-version="8.0.0",
