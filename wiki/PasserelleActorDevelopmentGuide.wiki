@@ -42,8 +42,7 @@ So here we go :
     * "OSGI Service Platform - Core Specification", which can be obtained from "http://www.osgi.org"
     * "OSGi and Equinox", by J. Mc Affer et al.
     * Many authors writing blogs with OSGi introductions, some of them referenced from "http://www.osgi.org/Links/BasicEducation"
-  # *Ptolemy II*, "an open-source software framework supporting experimentation with actor-oriented design", created at U.C. Berkeley
-by the "CHESS" research group of a.o. Professor E.A. Lee. Ptolemy comes with a couple of extensive guides, of which the following one is the perfect introduction :
+  # *Ptolemy II*, "an open-source software framework supporting experimentation with actor-oriented design", created at U.C. Berkeley by the "CHESS" research group of a.o. Professor E.A. Lee. Ptolemy comes with a couple of extensive guides, of which the following one is the perfect introduction :
     * Volume 1 : Introduction to Ptolemy II, by Chr. Brooks et al.
 
 ----
@@ -178,12 +177,9 @@ For example, in a model named "HelloWorld", with a source actor named "Constant"
 The "named" nature of model elements is a core aspect of Ptolemy and thus of Passerelle. In fact "ptolemy.kernel.util.NamedObj" is the base class of almost all Ptolemy/Passerelle classes. A second aspect, inherited from Ptolemy, is the native support fot hierarchical structures. Passerelle elements can be contained in parent elements and can act as containers themselves as well. For example, actors can be contained in composite actors which can be contained in further composite actors etc. Actors contain ports and attributes. Ports are contained in their respective actors, but can contain attributes themselves. Etc.
 
 Among these types of hierarchical model elements, actors are special as they can perform work during a model execution. To achieve this, actors must execute a predefined lifecycle, expressed via an API defined by "ptolemy.actor.Executable". As a consequence, an actor has following main phases in its lifecycle :
-  # Construction : this is where the actor is constructed as a Java object, after which it is linked into the containing model.\\
-  After construction the actor is in an "idle" state, unable to perform any work yet.\\
-  # Ready but idle : When a model has been parsed, all actors are constructed and linked as defined. I.e. the model is "live" in memory.\\
-  But until the model is started for execution, nothing is happening yet in any actor.
-  # Execution initialization : at the start of a model execution, all actors get the opportunity to perform some initialization logic, \\
-  via an invocation of their _initialize()_ method. This is where required resources should be configured and/or acquired etc.
+  # Construction : this is where the actor is constructed as a Java object, after which it is linked into the containing model. After construction the actor is in an "idle" state, unable to perform any work yet.
+  # Ready but idle : When a model has been parsed, all actors are constructed and linked as defined. I.e. the model is "live" in memory. But until the model is started for execution, nothing is happening yet in any actor.
+  # Execution initialization : at the start of a model execution, all actors get the opportunity to perform some initialization logic, via an invocation of their _initialize()_ method. This is where required resources should be configured and/or acquired etc.
   # Firing iterations : this is the main "active" time of an actor, where it repeatedly iterates between waiting for inputs, performing its processing logic and sending results on its output(s). Each iteration consists of three parts : _prefire(), fire(), postfire()_. 
   # Execution wrapping up : By returning a boolean _false_ from its postfire(), an actor indicates that it has finished its work as part of the executing model. The execution engine will then stop iterating that actor, and will invoke its _wrapup()_, where any post-execution cleanup can be done, resources can be released etc.
   # Ready but idle again : an actor should be capable of being "re-executed", starting again from a clean initial state. A parsed model may remain present in the application's memory space, and it may be used for several consecutive executions. So an actor must return to a clean state before a next execution, by a combination of logic contained in _wrapup()_ and _initialize()_.
@@ -920,10 +916,12 @@ But the actual design/definition of the sequences was then still done using the 
 Since Passerelle v5.5, the Passerelle Manager has been extended with a web-based graphical editor.
 And with Passerelle v7.x, a functioning eclipse RCP Passerelle workbench has been added.
 Both these tools now fully exploit OSGi and eclipse plugin features to develop and use Passerelle actors.
+
 Furthermore these OSGi/eclipse-based tools have become the prefered ones to develop and execute actors and models, which has an impact on the approach to develop actors :
   * actors must be developed in eclipse plugins
   * the actors must be exposed via specific Passerelle extension points
   * the editor's actor palette is constructed based on the actors registered via the extension points
+  * the actor implementation classes are loaded via a ModelElementClassProvider that must be registered as an OSGi service
 
 This section will explain the development approach using eclipse's PDE as development tool.
 
@@ -932,8 +930,56 @@ TODO
 
 ==== Creating an actor plugin project in eclipse ====
 
--- required MANIFEST entries
+An actor plugin project can be easily started using the normal eclipse PDE wizard to create a plugin project.
+
+A typical bundle MANIFEST is similar to the following (taken from the bundle _com.isencia.passerelle.actor.examples_ ) :
+{{{
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Actor dvp Examples
+Bundle-SymbolicName: com.isencia.passerelle.actor.examples
+Bundle-Version: n.n.n
+Bundle-Vendor: ISENCIA
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-RegisterBuddy: ptolemy.core
+Import-Package: com.isencia.passerelle.actor;version="x.x.x",
+ com.isencia.passerelle.actor.v5;version="x.x.x",
+ com.isencia.passerelle.core;version="x.x.x",
+ com.isencia.passerelle.ext;version="x.x.x",
+ com.isencia.passerelle.message;version="x.x.x",
+ com.isencia.passerelle.util;version="x.x.x",
+ com.isencia.passerelle.validation.version;version="x.x.x",
+ com.isencia.sherpa.commons,
+ org.osgi.framework;version="1.3.0",
+ org.slf4j,
+ ptolemy.actor,
+ ptolemy.actor.gui,
+ ptolemy.actor.gui.style,
+ ptolemy.data,
+ ptolemy.data.expr,
+ ptolemy.data.type,
+ ptolemy.gui,
+ ptolemy.kernel,
+ ptolemy.kernel.util,
+ ptolemy.moml
+ ... any extra dependencies you may need for your custom actors ...
+Export-Package: com.isencia.passerelle.actor.examples
+Bundle-Activator: com.isencia.passerelle.actor.examples.activator.Activator
+}}}
+
+Important elements in there are :
+  * Your bundle's symbolic name, following normal Java package/project naming conventions
+  * Your bundle's version : replace n.n.n with your actual version
+  * Eclipse-RegisterBuddy : Equinox-specific setting to allow Ptolemy's MomlParser to "see" your actor classes. Needed until a natively OSGi-enabled Ptolemy becomes available.
+  * Passerelle dependencies : replace x.x.x version with your actual Passerelle versions
+  * Export-Packages : list all your actor packages.
+  * Bundle-Activator : if you use an Activator to register your actor classes (alternatively you could use OSGi Declarative Services) 
+
 -- registering actors as extensions
+
+==== Adding your new actor plugin(s) to your RCP workbench ====
+
+
 
 == Specialized topics ==
 
@@ -942,9 +988,6 @@ TODO
 - Error handling
 -- Passerelle exceptions per action method
 --- what to put in the exception's context
--- Error output port
--- ErrorControlStrategy
--- ErrorCollector
 - Parameter visibility/configurability levels
 -- config-tool
 -- IDE
