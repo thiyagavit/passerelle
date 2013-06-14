@@ -9,6 +9,8 @@ PasserelleActorDevelopmentGuide : This guide presents an overview of the technol
 Then it describes the actor lifecycle, actor development APIs and types of actors. For each major actor type, a complete example is developed.
 Finally, some advanced topics are discussed.
 
+PasserelleActorPackagingGuide : This guide describes the concrete setup of an actor development project and how to package and deploy your new actors in the RCP workbench.
+
 PasserelleUnitTestingGuide : Introducing the usage of Passerelle's test support tools, for unit-testing actors and simple flows.
 
 = User guides =
