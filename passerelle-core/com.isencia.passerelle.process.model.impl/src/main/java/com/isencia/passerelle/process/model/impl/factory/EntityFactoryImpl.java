@@ -109,4 +109,8 @@ public class EntityFactoryImpl implements EntityFactory {
   public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
   }
+
+  public Request createRequest(Case requestCase, String initiator, String executor, String category, String type, String correlationId) {
+    return new MainRequestImpl(requestCase, initiator,executor, type, correlationId, category);
+  }
 }

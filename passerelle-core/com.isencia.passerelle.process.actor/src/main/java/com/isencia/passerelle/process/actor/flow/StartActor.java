@@ -136,7 +136,7 @@ public class StartActor extends Actor {
       } else {
         caze = ServiceRegistry.getInstance().getEntityManager().getCase(refId);
       }
-      req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, getCategory(), processType, jobID);
+      req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator,toplevel().getName(), getCategory(), processType, jobID);
       if (systemParameterMap != null) {
         for (Map.Entry<String, String> entry : systemParameterMap.entrySet()) {
           addSystemAttribute(req, entry);

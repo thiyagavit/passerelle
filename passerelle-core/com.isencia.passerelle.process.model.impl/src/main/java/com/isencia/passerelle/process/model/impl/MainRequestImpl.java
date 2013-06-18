@@ -18,6 +18,9 @@ public class MainRequestImpl extends RequestImpl {
   public MainRequestImpl(Case requestCase, String initiator, String type, String correlationId, String category) {
     super(requestCase, initiator, type, correlationId, category);
   }
+  public MainRequestImpl(Case requestCase, String initiator,String executor, String type, String correlationId, String category) {
+    super(requestCase, initiator,executor, type, correlationId, category);
+  }
 
   public MainRequestImpl(Case requestCase, String initiator, String type, String correlationId) {
     super(requestCase, initiator, type, correlationId);

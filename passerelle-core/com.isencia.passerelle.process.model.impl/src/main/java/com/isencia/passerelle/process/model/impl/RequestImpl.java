@@ -151,6 +151,12 @@ private static final long serialVersionUID = 1L;
     this.correlationId = correlationId;
     this.category = category;
   }
+  public RequestImpl(Case requestCase, String initiator,String executor, String type, String correlationId, String category) {
+    this(requestCase, initiator, type,correlationId,category);
+    this.correlationId = correlationId;
+    this.category = category;
+    this.executor = executor;
+  }
 
   public Long getId() {
     return id;
