@@ -1,10 +1,13 @@
 package com.isencia.passerelle.actor.forkjoin.test;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import ptolemy.data.StringToken;
 import junit.framework.TestCase;
 import com.isencia.passerelle.actor.forkjoin.Join;
+import com.isencia.passerelle.actor.general.TracerConsole;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
@@ -96,9 +99,22 @@ public class ForkJoinTest extends TestCase {
     .assertFlow(flow);
   }
 
-//  public void testForkJoinET1() throws Exception {
-//    Flow flow = new Flow("testForkJoin1", null);
-//    ETDirector d = new ETDirector(flow,"director");
-//  }
+  public void testForkJoinInSubModel() throws Exception {
+    Reader in = new InputStreamReader(getClass().getResourceAsStream("/testSubModelForkJoin.moml"));
+    Flow flow = FlowManager.readMoml(in);
+    
+    MapSource src = (MapSource) flow.getEntity("RequestSource");
+    TracerConsole sink = (TracerConsole) flow.getEntity("Tracer Console");
+    Join join = (Join) flow.getEntity("ForkJoinSubModel.Join");
+    
+    Map<String, String> props = new HashMap<String, String>();
+    new FlowManager().executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(src, 1L)
+    .expectMsgReceiptCount(join, 3L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
 
 }

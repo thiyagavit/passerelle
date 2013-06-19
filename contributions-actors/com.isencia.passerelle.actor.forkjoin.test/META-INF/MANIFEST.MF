@@ -11,6 +11,7 @@ Require-Bundle: com.isencia.passerelle.actor.forkjoin;bundle-version="8.4.0",
  ptolemy.core;bundle-version="7.0.1"
 Import-Package: com.isencia.passerelle.actor.dynaport;version="8.3.0",
  com.isencia.passerelle.actor.eip;version="8.3.0",
+ com.isencia.passerelle.actor.general;version="8.4.0",
  com.isencia.passerelle.domain.et;version="8.3.0",
  com.isencia.passerelle.testsupport,
  com.isencia.passerelle.testsupport.actor,
