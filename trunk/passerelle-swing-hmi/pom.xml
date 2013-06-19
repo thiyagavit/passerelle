@@ -8,22 +8,12 @@
 		<version>8.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>ptolemy</artifactId>
+	<artifactId>hmi</artifactId>
 	<packaging>pom</packaging>
-	<name>Passerelle :: Ptolemy :: parent</name>
+	<name>Passerelle :: HMI :: parent</name>
 
-	<properties>
-		<!-- ptolemy versions are final, no re-deploy in nexus -->
-		<deploy.plugin.skip>true</deploy.plugin.skip>
-	</properties>
-	
 	<modules>
-		<module>com.microstar</module>
-		<module>diva</module>
-		<module>ptolemy.core</module>
-		<module>ptolemy.domains.and.actors</module>
-		<module>ptolemy.gui</module>
-		<module>ptolemy.feature</module>
+		<module>com.isencia.passerelle.hmi.definition</module>
 	</modules>
 
 </project>
