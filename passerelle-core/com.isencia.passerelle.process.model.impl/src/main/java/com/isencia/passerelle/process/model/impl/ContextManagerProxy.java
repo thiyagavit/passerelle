@@ -5,15 +5,13 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
-import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ContextManager;
 
@@ -80,7 +78,7 @@ public class ContextManagerProxy extends ServiceTracker {
     return delegate.notifyError(context, cause);
   }
 
-  public static Context notifyError(Context context, ErrorItem errEvt) {
+  public static Context notifyError(Context context, ContextErrorEvent errEvt) {
     return delegate.notifyError(context, errEvt);
   }
 
