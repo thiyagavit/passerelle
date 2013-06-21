@@ -46,6 +46,8 @@ import com.isencia.passerelle.runtime.ws.rest.server.activator.Activator;
 /**
  * A REST service provider (or root resource) mapped on the FlowRepositoryService interface.
  * <p>
+ * The methods map functionally to the similarly-named methods in the FlowRepositoryService interface,
+ * but parameter and return types are adapted for REST-based communication.
  * </p>
  * 
  * @author erwin
