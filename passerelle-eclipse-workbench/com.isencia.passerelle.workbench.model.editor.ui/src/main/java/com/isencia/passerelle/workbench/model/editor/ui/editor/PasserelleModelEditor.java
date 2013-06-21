@@ -15,7 +15,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LineBorder;
@@ -62,7 +61,6 @@ import org.eclipse.gef.ui.rulers.RulerComposite;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -70,16 +68,15 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.ActionFactory;
@@ -100,7 +97,6 @@ import com.isencia.passerelle.workbench.model.editor.ui.dnd.FileTransferDropTarg
 import com.isencia.passerelle.workbench.model.editor.ui.dnd.PasserelleTemplateTransferDropTargetListener;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.BreakpointAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CloseEditorAction;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CommitFlowAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CopyNodeAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CreateSubModelAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.CutNodeAction;
@@ -111,9 +107,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.PasteNode
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RenameAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.RouterFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ScreenshotAction;
-import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.UpdateFlowAction;
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.ViewAttributesAction;
-import com.isencia.passerelle.workbench.model.editor.ui.editpart.AbstractBaseEditPart;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.EditPartFactory;
 import com.isencia.passerelle.workbench.model.editor.ui.figure.ActorFigure;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
@@ -125,7 +119,8 @@ import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		                           implements IPasserelleEditor, 
-		                                      ITabbedPropertySheetPageContributor {
+		                                      ITabbedPropertySheetPageContributor,
+		                                      IReusableEditor {
 
 	// Static things
 	private static Logger logger = LoggerFactory.getLogger(PasserelleModelEditor.class);
@@ -674,9 +669,8 @@ public class PasserelleModelEditor extends    GraphicalEditorWithFlyoutPalette
 		return true;
 	}
 
-	protected void setInput(IEditorInput input) {
+	public void setInput(IEditorInput input) {
 		superSetInput(input);
-		setDiagram(model);
 	}
 
 	public void setDiagram(CompositeActor diagram) {
