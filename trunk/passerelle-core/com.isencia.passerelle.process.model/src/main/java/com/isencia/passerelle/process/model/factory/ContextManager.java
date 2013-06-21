@@ -7,9 +7,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
+import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Task;
 
 /**
@@ -80,7 +80,7 @@ public interface ContextManager {
    * @param context Context that finished with an error
    * @param event The error event that happened during processing
    */
-  Context notifyError(Context context, ContextErrorEvent event);
+  Context notifyError(Context context, ErrorItem event);
 
 	/**
 	 * Notify listeners that the processing of the context was cancelled.
