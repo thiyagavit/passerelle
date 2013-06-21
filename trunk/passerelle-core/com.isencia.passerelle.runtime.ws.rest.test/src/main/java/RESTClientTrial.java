@@ -51,9 +51,9 @@ public class RESTClientTrial {
       e.printStackTrace();
     }
 
-    FlowHandleResources handleResources = webResource.path("MYCODE").type(MediaType.APPLICATION_XML).delete(FlowHandleResources.class);
+//    FlowHandleResources handleResources = webResource.path("MYCODE").type(MediaType.APPLICATION_XML).delete(FlowHandleResources.class);
     
-    System.out.println("deleted "+ handleResources.getFlowHandles());
+//    System.out.println("deleted "+ handleResources.getFlowHandles());
     
   }
 

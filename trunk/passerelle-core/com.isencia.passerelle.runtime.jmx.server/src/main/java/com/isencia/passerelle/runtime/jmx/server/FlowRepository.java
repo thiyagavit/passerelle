@@ -1,3 +1,17 @@
+/* Copyright 2013 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
 package com.isencia.passerelle.runtime.jmx.server;
 
 import java.io.StringReader;
@@ -13,7 +27,13 @@ import com.isencia.passerelle.runtime.jmx.server.activator.Activator;
 import com.isencia.passerelle.runtime.repository.DuplicateEntryException;
 import com.isencia.passerelle.runtime.repository.EntryNotFoundException;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
+import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
+/**
+ * 
+ * @author erwin
+ *
+ */
 public class FlowRepository implements FlowRepositoryMXBean {
 
   private FlowRepositoryService getFlowRepositoryService() {
@@ -26,29 +46,34 @@ public class FlowRepository implements FlowRepositoryMXBean {
   }
 
   @Override
-  public FlowHandleBean getActiveFlow(String flowCode) {
-    FlowHandleBean result = null;
-    try {
-      FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
-      result = FlowHandleBean.buildCompactFlowHandleBean(handle);
-    } catch (EntryNotFoundException e) {
-      // just return null
-    }
-    return result;
+  public FlowHandleBean getActiveFlow(String flowCode) throws EntryNotFoundException {
+    FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
+    return FlowHandleBean.buildCompactFlowHandleBean(handle);
   }
 
   @Override
-  public FlowHandleBean getMostRecentFlow(String flowCode) {
-    FlowHandleBean result = null;
+  public FlowHandleBean getFlowVersion(String flowCode, String version) throws EntryNotFoundException {
+    VersionSpecification versionSpec = null;
     try {
-      FlowHandle handle = getFlowRepositoryService().getMostRecentFlow(flowCode);
-      result = FlowHandleBean.buildCompactFlowHandleBean(handle);
-    } catch (EntryNotFoundException e) {
-      // just return null
+      versionSpec = VersionSpecification.parse(version);
+    } catch (Exception e) {
+      throw new EntryNotFoundException(ErrorCode.INVALID_PARAM, "version", null);
     }
-    return result;
+    FlowHandle localHandle = null;
+    if (versionSpec != null) {
+      localHandle = getFlowRepositoryService().getFlowVersion(flowCode, versionSpec);
+    } else {
+      localHandle = getFlowRepositoryService().getActiveFlow(flowCode);
+    }
+    return FlowHandleBean.buildFlowHandleBean(localHandle);
   }
-  
+
+  @Override
+  public FlowHandleBean getMostRecentFlow(String flowCode) throws EntryNotFoundException {
+    FlowHandle handle = getFlowRepositoryService().getMostRecentFlow(flowCode);
+    return FlowHandleBean.buildCompactFlowHandleBean(handle);
+  }
+
   @Override
   public FlowHandleBean[] getAllFlowRevisions(String flowCode) throws EntryNotFoundException {
     FlowHandle[] allFlowRevisions = getFlowRepositoryService().getAllFlowRevisions(flowCode);
@@ -84,13 +109,13 @@ public class FlowRepository implements FlowRepositoryMXBean {
     FlowHandle localHandle = getFlowRepositoryService().commit(flowCode, flow);
     return FlowHandleBean.buildCompactFlowHandleBean(localHandle);
   }
-  
+
   @Override
   public FlowHandleBean[] delete(String flowCode) throws EntryNotFoundException {
     FlowHandle[] allFlowRevisions = getFlowRepositoryService().delete(flowCode);
     return convertToFlowHandleBeans(allFlowRevisions);
   }
-  
+
   @Override
   public FlowHandleBean update(String flowCode, String rawFlowDefinition, boolean activate) throws EntryNotFoundException {
     FlowHandle handle = getFlowRepositoryService().getActiveFlow(flowCode);
@@ -99,7 +124,7 @@ public class FlowRepository implements FlowRepositoryMXBean {
       updatedFlow = FlowManager.readMoml(new StringReader(rawFlowDefinition));
     } catch (Exception e) {
       // TODO : add JMX-supported exception handling
-//      throw new InvalidRequestException(ErrorCode.ERROR, "");
+      e.printStackTrace();
     }
     FlowHandle localHandle = getFlowRepositoryService().update(handle, updatedFlow, activate);
     return FlowHandleBean.buildFlowHandleBean(localHandle);
