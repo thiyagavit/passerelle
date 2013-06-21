@@ -113,7 +113,7 @@ public class StartActor extends Actor {
     if (systemParameterMap != null) {
       initiator = systemParameterMap.get(RepositoryService.USER_ID);
       jobID = systemParameterMap.get(RepositoryService.JOB_ID);
-      processType = systemParameterMap.get("com.isencia.passerelle.edm.processtype");
+      processType = systemParameterMap.get(com.isencia.passerelle.process.common.util.Constants.REQUEST_TYPE_ATTRIBUTE);
       if (processType == null)
         processType = systemParameterMap.get(RepositoryService.FLOW_NAME);
       reference = systemParameterMap.get(RepositoryService.REFERENCE);
