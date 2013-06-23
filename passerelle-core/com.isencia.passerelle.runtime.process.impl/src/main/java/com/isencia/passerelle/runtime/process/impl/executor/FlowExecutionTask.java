@@ -147,27 +147,31 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
    * Cancel the flow execution in a clean way.
    */
   public synchronized void cancel() {
-    LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
-    canceled = true;
-    if (busy) {
-      LOGGER.info("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
-      // to ensure that the status is directly returned as stopping,
-      // even when the manager.finish() is done asynchronously,
-      // we explicitly set the state already here.
-      // TODO check if it's not better to override the finish method in our Manager
-      // to set the state in there, same as for pause/resume...
-      status = ProcessStatus.STOPPING;
-      manager.finish();
+    if(!status.isFinalStatus()) {
+      LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
+      canceled = true;
+      if (busy) {
+        LOGGER.info("Context {} - Canceling execution of flow {}", processContextId, flowHandle.getCode());
+        // to ensure that the status is directly returned as stopping,
+        // even when the manager.finish() is done asynchronously,
+        // we explicitly set the state already here.
+        // TODO check if it's not better to override the finish method in our Manager
+        // to set the state in there, same as for pause/resume...
+        status = ProcessStatus.STOPPING;
+        manager.finish();
+      } else {
+        LOGGER.info("Context {} - Canceling execution of flow {} before it started", processContextId, flowHandle.getCode());
+        status = ProcessStatus.INTERRUPTED;
+        manager = null;
+      }
     } else {
-      LOGGER.info("Context {} - Canceling execution of flow {} before it started", processContextId, flowHandle.getCode());
-      status = ProcessStatus.INTERRUPTED;
-      manager = null;
+      LOGGER.trace("Context {} - Ignoring canceling execution of flow {} that is already done", processContextId, flowHandle.getCode());
     }
   }
 
   public synchronized boolean suspend() {
-    suspended = true;
     if (busy) {
+      suspended = true;
       LOGGER.info("Context {} - Suspending execution of flow {}", processContextId, flowHandle.getCode());
       manager.pause();
       return true;
@@ -178,8 +182,8 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   }
 
   public synchronized boolean resume() {
-    suspended = false;
     if ( busy && (Manager.PAUSED.equals(manager.getState()) || Manager.PAUSED_ON_BREAKPOINT.equals(manager.getState())) ) {
+      suspended = false;
       LOGGER.info("Context {} - Resuming execution of flow {}", processContextId, flowHandle.getCode());
       manager.resume();
       return true;
@@ -215,6 +219,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   public void executionError(ptolemy.actor.Manager manager, Throwable throwable) {
     LOGGER.warn("Context " + processContextId + " - Execution error of flow " + getFlowHandle().getCode(), throwable);
     status = ProcessStatus.ERROR;
+    busy = false;
   }
 
   /**
@@ -231,6 +236,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         LOGGER.warn("Context {} - Execution interrupted of flow {}", processContextId, getFlowHandle().getCode());
         status = ProcessStatus.INTERRUPTED;
       }
+      busy = false;
     }
   }
 
@@ -256,6 +262,9 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
           LOGGER.info("Context {} - Suspended at startup for Flow {}", processContextId, flowHandle.getCode());
           manager.pause();
         }
+      }
+      if(status.isFinalStatus()) {
+        busy = false;
       }
     }
   }
