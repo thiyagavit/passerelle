@@ -72,7 +72,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   public ProcessHandle start(StartMode mode, FlowHandle flowHandle, String processContextId, Map<String, String> parameterOverrides, 
       EventListener listener, String... breakpointNames) {
     
-    if (processContextId == null) {
+    if (processContextId == null || processContextId.trim().length()==0) {
       processContextId = UUID.randomUUID().toString();
     }
 

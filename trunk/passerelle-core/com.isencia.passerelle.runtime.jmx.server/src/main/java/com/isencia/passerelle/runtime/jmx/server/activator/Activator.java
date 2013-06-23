@@ -10,6 +10,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import com.isencia.passerelle.runtime.jmx.server.FlowProcessor;
 import com.isencia.passerelle.runtime.jmx.server.FlowRepository;
 import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.repository.FlowRepositoryService;
@@ -20,6 +21,8 @@ public class Activator implements BundleActivator {
   static final String FLOWPROC_SERVICE_FILTER = "("+Constants.OBJECTCLASS+"="+FlowProcessingService.class.getName()+")";
   
   static final String FLOWREPOS_MXBEAN_NAME = "com.isencia.passerelle.runtime:type=FlowRepository";
+  static final String FLOWPROCESSOR_MXBEAN_NAME = "com.isencia.passerelle.runtime:type=FlowProcessor";
+  
   private static BundleContext context;
   private static Activator instance;
   
@@ -29,7 +32,8 @@ public class Activator implements BundleActivator {
   private FlowRepositoryService flowRepositorySvc;
   private FlowProcessingService flowProcessingSvc;
   private MBeanServer mbeanServer;
-  private ObjectName mxbeanName;
+  private ObjectName flowReposMxbeanName;
+  private ObjectName flowProcMxbeanName;
 
   public void start(BundleContext bundleContext) throws Exception {
     Activator.context = bundleContext;
@@ -42,14 +46,18 @@ public class Activator implements BundleActivator {
     flowProcessingSvcTracker.open();
     
     FlowRepository flowReposMXB = new FlowRepository();
+    FlowProcessor flowProcMXB = new FlowProcessor();
     mbeanServer = ManagementFactory.getPlatformMBeanServer();
-    mxbeanName = new ObjectName(FLOWREPOS_MXBEAN_NAME);
-    mbeanServer.registerMBean(flowReposMXB, mxbeanName);
+    flowReposMxbeanName = new ObjectName(FLOWREPOS_MXBEAN_NAME);
+    mbeanServer.registerMBean(flowReposMXB, flowReposMxbeanName);
+    flowProcMxbeanName = new ObjectName(FLOWPROCESSOR_MXBEAN_NAME);
+    mbeanServer.registerMBean(flowProcMXB, flowProcMxbeanName);
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
     if(mbeanServer!=null) {
-      mbeanServer.unregisterMBean(mxbeanName);
+      mbeanServer.unregisterMBean(flowReposMxbeanName);
+      mbeanServer.unregisterMBean(flowProcMxbeanName);
     }
     flowRepositorySvcTracker.close();
     flowProcessingSvcTracker.close();
