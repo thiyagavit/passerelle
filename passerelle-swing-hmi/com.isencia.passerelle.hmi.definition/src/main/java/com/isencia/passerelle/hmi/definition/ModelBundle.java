@@ -90,6 +90,15 @@ public class ModelBundle implements Serializable {
     }
     return recentModelKeysList;
   }
+  
+  public void setReorderedRecentModelsList(List<String> recentModelList) {
+    recentModelKeysList.clear();
+    for (String newModelKey : recentModelList) {
+      if(recentModels.keySet().contains(newModelKey)) {
+        recentModelKeysList.add(newModelKey);
+      }
+    }
+  }
 
   public Map<String, Model> getRecentModels() {
     if (recentModels == null) {
@@ -183,5 +192,4 @@ public class ModelBundle implements Serializable {
     buffer.append("]");
     return buffer.toString();
   }
-
 }
