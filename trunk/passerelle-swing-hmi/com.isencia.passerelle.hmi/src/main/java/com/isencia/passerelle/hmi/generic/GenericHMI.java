@@ -861,6 +861,19 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
       }
     }
   }
+  
+  private class RecentModelsManagementOpener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final RecentModelsManagementDialog dialog = new RecentModelsManagementDialog(getDialogHookComponent(), getHmiModelsDef() );
+      dialog.setVisible(true);
+      final ModelBundle filterSettingsFromDialog = dialog.getRecentModelsConfig();
+      if (filterSettingsFromDialog != null) {
+        setHmiModelsDef(filterSettingsFromDialog);
+        saveAndApplySettings();
+      }
+    }
+  }
 
   private void saveAndApplySettings() {
     final String def = ModelBundle.generateDef(hmiDef);
@@ -879,8 +892,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         }
       }
     }
-    // refresh current form
-    showModelForm(null);
+    recreateModelsMenu(modelsSubMenu);
   }
 
   public boolean isAnnotionAuthorizedForEditor(final TextAttribute p) {
@@ -966,6 +978,11 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         graphPrefsMenuItem.addActionListener(new GraphPreferencesOpener());
         prefsMenu.add(graphPrefsMenuItem);
       }
+      final JMenuItem manageRecentModelsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_MANAGE_RECENTMODELS), HMIMessages.getString(
+          HMIMessages.MENU_MANAGE_RECENTMODELS + HMIMessages.KEY).charAt(0));
+      manageRecentModelsMenuItem.addActionListener(new RecentModelsManagementOpener());
+      prefsMenu.add(manageRecentModelsMenuItem);
+
       menuBar.add(prefsMenu);
 
     }

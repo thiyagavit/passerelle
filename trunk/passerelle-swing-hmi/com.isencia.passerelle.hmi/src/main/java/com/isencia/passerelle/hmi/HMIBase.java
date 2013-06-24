@@ -201,7 +201,7 @@ public abstract class HMIBase implements ChangeListener {
   private ModelStopper modelStopper;
   private ModelSuspender modelSuspender;
 
-  private JMenu modelsSubMenu;
+  protected JMenu modelsSubMenu;
   private boolean changeImpactEnabled = true;
 
   /**
