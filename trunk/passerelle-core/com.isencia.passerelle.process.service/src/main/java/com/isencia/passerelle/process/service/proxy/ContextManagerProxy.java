@@ -12,12 +12,12 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.isencia.passerelle.process.model.factory.ContextManager;
-import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
+import com.isencia.passerelle.process.model.ContextProcessingCallback;
+import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.factory.ContextManager;
 
 /**
  * @author puidir
@@ -87,8 +87,8 @@ public class ContextManagerProxy extends ServiceTracker {
 		return delegate.notifyStarted(context);
 	}
 
-  public static Context notifyError(Context context, ContextErrorEvent errEvt) {
-    return delegate.notifyError(context, errEvt);
+  public static Context notifyError(Context context, ErrorItem errorItem) {
+    return delegate.notifyError(context, errorItem);
   }
   
 	public static Context notifyError(Context context, Throwable cause) {
