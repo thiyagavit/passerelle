@@ -83,45 +83,78 @@ public class CDMAActorItemRetrievalTest extends TestCase {
     return flow;
   }
   
+  protected Flow _buildAndRunBasicItemRetrievalFlowOlof(String testName, String itemName, boolean useLogicalLookup) throws Exception {
+    Flow flow = new Flow(testName,null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new ETDirector(flow,"director"));
+    
+    CDMADataSetReader source = new CDMADataSetReader(flow,NXS_READER);
+    CDMADataItemSelector itemSelector = new CDMADataItemSelector(flow, "ItemSelector");
+    DevNullActor sink = new DevNullActor(flow, SINK);
+    DevNullActor errorSink = new DevNullActor(flow, ERROR_SINK);
+    
+    flow.connect(source, itemSelector);
+    flow.connect(itemSelector, sink);
+    flow.connect(itemSelector.errorPort, errorSink.input);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("NxsReader.DataSet URI", "C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/RhA1000.nxs");
+    props.put("ItemSelector.Item name",itemName);
+    props.put("ItemSelector.Logical selection mode",Boolean.toString(useLogicalLookup));
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    return flow;
+  }
   
-  public void testPhysicalPathToItem() throws Exception {
+  public void testPhysicalPathToItemOlof() throws Exception {
     new FlowStatisticsAssertion()
     .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
     .expectMsgReceiptCount(SINK_INPUT, 1L)
     .expectMsgReceiptCount(ERROR_SINK_INPUT, 0L)
     .assertFlow(
-    _buildAndRunBasicItemRetrievalFlow("testPhysicalPathToItem","Flyscan_01_8p8mgml/scan_data/channel1",false)
+    _buildAndRunBasicItemRetrievalFlowOlof("testPhysicalPathToItemOlof","Result/Raw data/Raw data",false)
     );
   }
 
-  public void testLogicalPathToItem() throws Exception {
-    new FlowStatisticsAssertion()
-    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
-    .expectMsgReceiptCount(SINK_INPUT, 1L)
-    .expectMsgReceiptCount(ERROR_SINK_INPUT, 0L)
-    .assertFlow(
-    _buildAndRunBasicItemRetrievalFlow("testLogicalPathToItem","scan:data:images",true)
-    );
-  }
-
-  public void testPhysicalPathToItemNotFound() throws Exception {
-    new FlowStatisticsAssertion()
-    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
-    .expectMsgReceiptCount(SINK_INPUT, 0L)
-    .expectMsgReceiptCount(ERROR_SINK_INPUT, 1L)
-    .assertFlow(
-        // skip a group level
-    _buildAndRunBasicItemRetrievalFlow("testPhysicalPathToItemNotFound","Flyscan_01_8p8mgml/channel1",false)
-    );
-  }
-
-  public void testLogicalPathToItemNotFound() throws Exception {
-    new FlowStatisticsAssertion()
-    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
-    .expectMsgReceiptCount(SINK_INPUT, 0L)
-    .expectMsgReceiptCount(ERROR_SINK_INPUT, 1L)
-    .assertFlow(
-    _buildAndRunBasicItemRetrievalFlow("testLogicalPathToItemNotFound","scan:data:somethingThatDoesNotExist",true)
-    );
-  }
+  
+//  public void testPhysicalPathToItem() throws Exception {
+//    new FlowStatisticsAssertion()
+//    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
+//    .expectMsgReceiptCount(SINK_INPUT, 1L)
+//    .expectMsgReceiptCount(ERROR_SINK_INPUT, 0L)
+//    .assertFlow(
+//    _buildAndRunBasicItemRetrievalFlow("testPhysicalPathToItem","Flyscan_01_8p8mgml/scan_data/channel1",false)
+//    );
+//  }
+//
+//  public void testLogicalPathToItem() throws Exception {
+//    new FlowStatisticsAssertion()
+//    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
+//    .expectMsgReceiptCount(SINK_INPUT, 1L)
+//    .expectMsgReceiptCount(ERROR_SINK_INPUT, 0L)
+//    .assertFlow(
+//    _buildAndRunBasicItemRetrievalFlow("testLogicalPathToItem","scan:data:images",true)
+//    );
+//  }
+//
+//  public void testPhysicalPathToItemNotFound() throws Exception {
+//    new FlowStatisticsAssertion()
+//    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
+//    .expectMsgReceiptCount(SINK_INPUT, 0L)
+//    .expectMsgReceiptCount(ERROR_SINK_INPUT, 1L)
+//    .assertFlow(
+//        // skip a group level
+//    _buildAndRunBasicItemRetrievalFlow("testPhysicalPathToItemNotFound","Flyscan_01_8p8mgml/channel1",false)
+//    );
+//  }
+//
+//  public void testLogicalPathToItemNotFound() throws Exception {
+//    new FlowStatisticsAssertion()
+//    .expectMsgSentCount(NXS_READER_OUTPUT, 1L)
+//    .expectMsgReceiptCount(SINK_INPUT, 0L)
+//    .expectMsgReceiptCount(ERROR_SINK_INPUT, 1L)
+//    .assertFlow(
+//    _buildAndRunBasicItemRetrievalFlow("testLogicalPathToItemNotFound","scan:data:somethingThatDoesNotExist",true)
+//    );
+//  }
 }
