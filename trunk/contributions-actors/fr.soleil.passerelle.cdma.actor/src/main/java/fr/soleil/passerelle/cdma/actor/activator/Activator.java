@@ -12,6 +12,7 @@ import fr.soleil.passerelle.cdma.actor.CDMADataItemSelector;
 import fr.soleil.passerelle.cdma.actor.CDMADataSetReader;
 import fr.soleil.passerelle.cdma.actor.CDMADataSetSlicer;
 import fr.soleil.passerelle.cdma.actor.CDMAFactoryLister;
+import fr.soleil.passerelle.cdma.actor.CDMAShapeFilter;
 
 public class Activator implements BundleActivator {
 
@@ -34,7 +35,8 @@ public class Activator implements BundleActivator {
 		         CDMAArrayValueModifier.class,
 		         CDMAArrayValueDumper.class,
 		         CDMAArrayFileWriter.class,
-		         CDMAFactoryLister.class
+		         CDMAFactoryLister.class,
+		         CDMAShapeFilter.class
 		         ), 
 		    null);
 
