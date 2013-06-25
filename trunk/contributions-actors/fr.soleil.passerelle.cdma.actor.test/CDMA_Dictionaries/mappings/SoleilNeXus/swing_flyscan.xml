@@ -68,6 +68,7 @@
       <call>HarvestEquipmentAttributes</call>
       <call>SelectNodeByRegionAttribute</call>
     </attribute>
+    <attribute name="interpretation" value="spectrum"/>
   </item>
   <item key="spectrums_xia">
     <path>/{NXentry}/{NXdata}/channel*</path>
@@ -78,6 +79,7 @@
       <call>HarvestEquipmentAttributes</call>
       <call>SelectNodeByRegionAttribute</call>
     </attribute>
+    <attribute name="interpretation" value="spectrum"/>
   </item>
   <item key="images">
     <path>/{NXentry}/{NXdata}/channel*</path>
@@ -87,6 +89,7 @@
       <path>/{NXentry}/{NXinstrument}/{NXdetector}</path>
       <call>HarvestEquipmentAttributes</call>
     </attribute>
+    <attribute name="interpretation" value="image"/>
   </item>
   <item key="comments">
     <path>/{NXentry}/{NXsample}/comments/data</path>

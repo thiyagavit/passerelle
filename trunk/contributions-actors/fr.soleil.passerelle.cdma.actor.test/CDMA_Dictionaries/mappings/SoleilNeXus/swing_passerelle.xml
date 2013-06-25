@@ -67,6 +67,7 @@
       <path>/{NXinstrument}/{NXdetector}</path>
       <call>HarvestEquipmentAttributes</call>
     </attribute>
+    <attribute name="interpretation" value="image"/>
   </item>
   <item key="comments">
     <path>/{NXsample}/comments/data</path>

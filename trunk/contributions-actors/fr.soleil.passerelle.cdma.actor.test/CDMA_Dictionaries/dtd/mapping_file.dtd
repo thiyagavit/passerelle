@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF8"?>
 <!ELEMENT map-def (item*)>
 <!ATTLIST map-def
     name CDATA #REQUIRED
@@ -39,6 +39,7 @@ dataset_model
 <!ELEMENT attribute ( (path | call)* )>
 <!ATTLIST attribute
     name CDATA #REQUIRED
+    value CDATA #IMPLIED
 >
     
 
