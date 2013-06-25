@@ -96,7 +96,7 @@
   <dataset-model name="samba_quickexafs">
     <criteria>
       <if exist="true" target="/{NXentry}/{NXdata}/DeltaTheta"/>
-      <if exist="true" target="/{NXentry}/{NXdata}/channel0_RAW"/>
+      <if exist="true" target="/{NXentry}/{NXdata}/channel0"/>
     </criteria>
     
     <parameters>

@@ -45,10 +45,12 @@
     <item key="spectrums">
         <path>/{NXentry}/{NXdata}/channel*</path>
         <call>DataItemStacker</call>
+        <attribute name="interpretation" value="spectrum"/>
     </item>
     <item key="images">
         <path>/{NXentry}/{NXdata}/*image*</path>
         <call>DataItemStacker</call>
+        <attribute name="interpretation" value="image"/>
     </item>
     <item key="comments">
         <path>/{NXentry}/{NXsample}/comments/data</path>

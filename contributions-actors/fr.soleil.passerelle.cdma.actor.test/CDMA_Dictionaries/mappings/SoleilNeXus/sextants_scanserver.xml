@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map-def SYSTEM "../../dtd/mapping_file.dtd">
-<map-def name="SWING" version="1.0.0">
-    <item key="camera">
-        <path>/{NXinstrument}/{NXdetector}</path>
-    </item>
+<map-def name="SEXTANTS" version="1.0.0">
+  <item key="acquisition_sequence">
+    <path>/</path>
+    <call>CreateVirtualItem</call>
+  </item>
     <item key="dark">
         <path>/{NXinstrument}/{NXdetector}/intensityBlack</path>
     </item>
@@ -37,10 +38,10 @@
     <item key="energy">
         <path>/{NXinstrument}/{NXmonochromator}/energy</path>
     </item>
-    <item key="spectrums">
-        <path>/{NXdata}/data*</path>
-        <call>DataItemStacker</call>
-        <attribute name="interpretation" value="spectrum"/>
+    <item key="images">
+        <path>/{NXdata}/data_01</path>
+	    <call>HarvestSignalAttributes</call>
+	    <attribute name="interpretation" value="image"/>
     </item>
     <item key="comments">
         <path>/{NXsample}/comments/data</path>

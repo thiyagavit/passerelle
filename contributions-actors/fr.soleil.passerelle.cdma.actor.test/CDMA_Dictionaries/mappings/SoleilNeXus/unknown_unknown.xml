@@ -39,6 +39,7 @@
     </item>
     <item key="images">
         <path>/{NXentry}/{NXdata}/xpad1</path>
+        <attribute name="interpretation" value="image"/>
     </item>
     <item key="comments">
         <path>/{NXentry}/{NXsample}/comments/data</path>

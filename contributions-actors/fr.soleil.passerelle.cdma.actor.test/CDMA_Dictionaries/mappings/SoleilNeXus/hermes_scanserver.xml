@@ -9,6 +9,7 @@
   <item key="images">
     <path>/{NXdata}/data_03</path>
     <call>HarvestEquipmentAttributes</call>
+    <attribute name="interpretation" value="image"/>
   </item>
   <item key="x_position">
     <path>/{NXdata}/time_1</path>
