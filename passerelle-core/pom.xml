@@ -37,6 +37,7 @@
 		<module>com.isencia.passerelle.project.repository.api</module>
 		<module>com.isencia.passerelle.project.repository.impl.filesystem</module>
 		<module>com.isencia.passerelle.runtime</module>
+		<module>com.isencia.passerelle.runtime.process.impl</module>
 		<module>com.isencia.passerelle.testsupport</module>
 	</modules>
 
