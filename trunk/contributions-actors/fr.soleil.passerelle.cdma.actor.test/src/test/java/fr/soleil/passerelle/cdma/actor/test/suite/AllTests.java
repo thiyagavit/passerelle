@@ -25,7 +25,7 @@ public class AllTests {
     TestSuite suite = new TestSuite(AllTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(CDMAActorItemRetrievalTest.class);
-    suite.addTestSuite(CDMAActorFilterTest.class);
+//    suite.addTestSuite(CDMAActorFilterTest.class);
     //$JUnit-END$
     return suite;
   }
