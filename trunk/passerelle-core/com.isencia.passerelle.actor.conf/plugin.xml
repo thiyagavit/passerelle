@@ -267,7 +267,7 @@
 		<actorgroup id="com.isencia.passerelle.actor.actorgroup.msg" name="Msg sequences" open="false"
 			parent="com.isencia.passerelle.actor.actorgroup.general">
 		</actorgroup>
-		<actorgroup id="com.isencia.passerelle.actor.actorgroup.submodels" name="Shared Submodels" open="false" priority="0">
+		<actorgroup id="com.isencia.passerelle.actor.actorgroup.submodels" name="Submodels" open="false" priority="0">
 		</actorgroup>
 	</extension>
 </fragment>

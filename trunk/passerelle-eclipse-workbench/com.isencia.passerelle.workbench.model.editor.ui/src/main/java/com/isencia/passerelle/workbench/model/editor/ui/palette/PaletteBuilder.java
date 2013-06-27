@@ -125,8 +125,6 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
       if (e instanceof PaletteDrawer) {
         PaletteContainer favoritesContainer = (PaletteDrawer) e;
 
-        PaletteGroup group = PaletteBuilder.getInstance().getPaletteGroup(UTILITIES);
-        if (group != null && !favoritesContainer.getLabel().equals(group.getName())) {
           containers.append(favoritesContainer.getLabel());
           containers.append(",");
           StringBuffer entries = new StringBuffer();
@@ -144,7 +142,6 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
 
               }
             }
-          }
           addFavoriteGroup(favoritesContainer.getLabel(), favoritesContainer);
 
           ModelUtils.getFavouritesStore().putValue(favoritesContainer.getLabel(), entries.toString());
@@ -234,7 +231,7 @@ public class PaletteBuilder extends com.isencia.passerelle.editor.common.model.P
     this.parent = parent;
     if (paletteRoot == null) {
       paletteRoot = new PaletteRoot();
-      paletteRoot.addAll(createCategories(paletteRoot, parent, PaletteBuilder.getInstance().getPaletteGroup(PaletteBuilder.UTILITIES)));
+      paletteRoot.addAll(createCategories(paletteRoot, parent, null));
 
     }
 
