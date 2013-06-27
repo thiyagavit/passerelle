@@ -26,7 +26,6 @@ import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 public class PaletteBuilder implements Serializable {
-  public static final String UTILITIES = "com.isencia.passerelle.actor.actorgroup.utilities";
   public static final String SUBMODELS = "com.isencia.passerelle.actor.actorgroup.submodels";
   List<PaletteGroup> paletteGroups;
   List<PaletteGroup> editablePaletteGroups;
@@ -65,7 +64,9 @@ public class PaletteBuilder implements Serializable {
     if (editablePaletteGroups == null) {
       editablePaletteGroups = new ArrayList<PaletteGroup>();
       for (PaletteGroup group : paletteGroups) {
-        if (!UTILITIES.equals(group.getId()) && !SUBMODELS.equals(group.getId()) && group.getParent() == null && group.isAuthorized()) {
+        if (
+//            !UTILITIES.equals(group.getId()) && 
+            !SUBMODELS.equals(group.getId()) && group.getParent() == null && group.isAuthorized()) {
           editablePaletteGroups.add(group);
         }
       }
