@@ -1,8 +1,6 @@
 package com.isencia.passerelle.workbench;
 
 import java.util.HashSet;
-
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -18,12 +16,14 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
+import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.handlers.ShowKeyAssistHandler;
+import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
@@ -38,11 +38,11 @@ import org.eclipse.ui.views.IViewDescriptor;
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	// Actions - important to allocate these only in makeActions, and then use
-	// them
-	// in the fill methods. This ensures that the actions aren't recreated
-	// when fillActionBars is called with FILL_PROXY.
+  // them
+  // in the fill methods. This ensures that the actions aren't recreated
+  // when fillActionBars is called with FILL_PROXY.
 
-	// File Actions
+  // File Actions
 	private IContributionItem newWizardShortList;
 	private IWorkbenchAction closeAction;
 	private IWorkbenchAction createSubmodelAction;
@@ -87,6 +87,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction updateSoftware;
 	private IWorkbenchAction checkUpdates;
 	private IWorkbenchAction keyAssist;
+  private CommandAction restartAction;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -115,6 +116,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(saveAllAction);
 		exitAction = ActionFactory.QUIT.create(window);
 		register(exitAction);
+		
+    restartAction = new CommandAction(window, IWorkbenchCommandConstants.FILE_RESTART);
+    restartAction.setId("restart");
+    restartAction.setText("Restart");
+    restartAction.setToolTipText("Restart the workbench");
+    register(restartAction);
 
 		// Import - Export
 		importAction = ActionFactory.IMPORT.create(window);
@@ -269,6 +276,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(importAction);
 		fileMenu.add(exportAction);
 		fileMenu.add(new Separator());
+    fileMenu.add(restartAction);
 		fileMenu.add(exitAction);
 		// Edit
 		editMenu.add(undoAction);
