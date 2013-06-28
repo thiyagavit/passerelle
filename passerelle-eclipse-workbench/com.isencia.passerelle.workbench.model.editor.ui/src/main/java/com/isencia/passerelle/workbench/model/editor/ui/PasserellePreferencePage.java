@@ -2,14 +2,23 @@ package com.isencia.passerelle.workbench.model.editor.ui;
 
 import java.io.File;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.eclipse.ui.progress.UIJob;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 import com.isencia.passerelle.workbench.util.DialogUtils;
 
@@ -52,27 +61,39 @@ public class PasserellePreferencePage extends FieldEditorPreferencePage implemen
     if (result) {
       String newSubmodelRoot = Activator.getDefault().getPreferenceStore().getString(RepositoryService.SUBMODEL_ROOT);
       if (submodelPath != null && !submodelPath.equalsIgnoreCase(newSubmodelRoot)) {
-        MessageBox dialog = new MessageBox(getFieldEditorParent().getShell(), SWT.ICON_WARNING | SWT.OK);
-        dialog.setText("Submodel configuration change");
-        dialog.setMessage("You must restart the workbench after changing the submodel root!");
-        DialogUtils.centerDialog(getShell(), dialog.getParent());
-        dialog.open();
+        if (getContainer() instanceof IWorkbenchPreferenceContainer) {
+          IWorkbenchPreferenceContainer container = (IWorkbenchPreferenceContainer) getContainer();
+          UIJob job = new UIJob("Restart request") {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
+              // make sure they really want to do this
+              int really = new MessageDialog(null, "Submodel configuration change", null,
+                  "Changing the submodel root will require restarting the workbench to complete the change.  Restart now?", MessageDialog.QUESTION,
+                  new String[] { "Yes", "No" }, 1).open();
+              if (really == Window.OK) {
+                PlatformUI.getWorkbench().restart();
+              }
+              return Status.OK_STATUS;
+            }
+          };
+          job.setSystem(true);
+          container.registerUpdateJob(job);
+        }
       }
     }
     return result;
   }
-  
+
   @Override
   public void setValid(boolean b) {
     super.setValid(b);
-    if(!b) {
+    if (!b) {
       if (StringUtils.isNotEmpty(subModelRoot.getErrorMessage())) {
         MessageBox dialog = new MessageBox(getFieldEditorParent().getShell(), SWT.ICON_ERROR | SWT.OK);
         dialog.setText("Submodel configuration error");
         dialog.setMessage("Submodel Root " + subModelRoot.getErrorMessage());
         DialogUtils.centerDialog(getShell(), dialog.getParent());
         dialog.open();
-      }       
+      }
     }
   }
 }
