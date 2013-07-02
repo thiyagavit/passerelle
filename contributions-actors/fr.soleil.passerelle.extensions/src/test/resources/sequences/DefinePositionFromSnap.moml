@@ -41,7 +41,7 @@
         </property>
     </entity>
     <entity name="extract_Position" class="fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2">
-        <property name="Attribute to extract" class="ptolemy.data.expr.StringParameter" value="test/motor/1-1/position">
+        <property name="Attribute to extract" class="ptolemy.data.expr.StringParameter" value="">
         </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
@@ -49,7 +49,7 @@
         </property>
         <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="[325.0, 285.0]">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{325.0, 285.0}">
         </property>
     </entity>
     <entity name="extract_Offset" class="fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2">
