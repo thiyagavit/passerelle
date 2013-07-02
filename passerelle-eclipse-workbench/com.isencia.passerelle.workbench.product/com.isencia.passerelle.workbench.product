@@ -25,11 +25,11 @@
       startupMessageRect="7,0,400,20"
       startupForegroundColor="F5F5F5" />
    <launcher name="PasserelleWorkBench">
-      <linux icon="/com.isencia.passerelle.workbench/icons/passerelle.xpm"/>
-      <macosx icon="/com.isencia.passerelle.workbench/icons/passerelle.icns"/>
+      <linux icon="icons/passerelle.xpm"/>
+      <macosx icon="icons/passerelle.icns"/>
       <solaris/>
       <win useIco="true">
-         <ico path="/com.isencia.passerelle.workbench/icons/passerelle.ico"/>
+         <ico path="icons/passerelle.ico"/>
          <bmp/>
       </win>
    </launcher>
