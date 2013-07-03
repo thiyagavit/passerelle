@@ -113,6 +113,11 @@ public interface RepositoryService {
    * @return an array of the codes for all submodels in the Repository
    */  
   String[] getAllSubmodels();
+  /**
+   * 
+   * @return an array of the metadata for all submodels in the Repository, this avoids double call
+   */  
+  MetaData[] getAllSubmodelMetaData();
 	
 	
 	/**

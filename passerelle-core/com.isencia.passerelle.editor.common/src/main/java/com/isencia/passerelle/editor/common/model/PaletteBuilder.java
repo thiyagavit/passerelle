@@ -255,12 +255,10 @@ public class PaletteBuilder implements Serializable {
 
     try {
       RepositoryService repositoryService = Activator.getDefault().getRepositoryService();
-      for (String actorClass : repositoryService.getAllSubmodels()) {
-        MetaData metaData = repositoryService.getSubmodelMetaData(actorClass);
-        String path = metaData != null ? metaData.getPath() : null;
+      for (MetaData metaData : repositoryService.getAllSubmodelMetaData()) {
 
-        PaletteGroup group = getPaletteGroup(actorGroups, groups, path, submodels);
-        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, actorClass);
+        PaletteGroup group = getPaletteGroup(actorGroups, groups, metaData.getPath(), submodels);
+        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData.getCode());
         if (group != null) {
           group.addPaletteItem(item);
         }
