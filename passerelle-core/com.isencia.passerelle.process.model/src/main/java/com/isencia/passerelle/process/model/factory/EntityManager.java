@@ -199,4 +199,11 @@ public interface EntityManager {
 	 */
 	List<ResultBlock> getResultBlocks(Long caseId, Long requestId, Long taskId, Collection<Long> resultBlockIds,
 			Collection<String> taskTypes, Collection<String> resultBlockTypes);
+	
+	 /**
+	 * useful method to check whether the number of tasks have changed since last call
+   * @param context
+   * @return
+   */
+	long getTaskCountForContext(Context context);
 }
