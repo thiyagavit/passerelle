@@ -69,7 +69,7 @@ public class MotorConfigurationV2 {
      * be used to find the cb
      * 
      * @param proxy the proxy of the motor.
-     * @param deviceName the motor that we want to find the cb
+     * @param deviceName the motor name that we want to find the cb
      * @param useSimulatedMotor flag that indicate if we are in test or production environment
      * 
      * @throws fr.esrf.Tango.DevFailed if the deviceProxy to the motor can not be created of
