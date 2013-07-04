@@ -238,9 +238,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
     @Override
     protected void validateInitialization() throws ValidationException {
         try {
-            // FIXME this is org
-            // attributeName =extractAndValidateAtrributeName();
-            validateAtrributeName();
+            attributeName = extractAndValidateAtrributeName();
+
             if (extractor == null) {// FIXME extractor== null if we are in prod env
                 extractor = new SnapExtractorProxy();
             }
