@@ -48,11 +48,31 @@ public class ExtractValueFromSnapIDV2Test {
 
     @Test(expectedExceptions = IllegalActionException.class, expectedExceptionsMessageRegExp = "(?s).*"
             + ExtractValueFromSnapIDV2.ERROR_ATTR_NAME_PARAM_EMPTY + ".*")
-    public void when_attributeName_param_is_empty_then_throw_exception()
+    public void when_attributeName_param_is_empty_then_attributeChanged_raises_an_exception()
             throws IllegalActionException {
 
         actor.attributeNameParam.setToken("");
         actor.attributeChanged(actor.attributeNameParam);
+    }
+
+    @Test(expectedExceptions = PasserelleException.class, expectedExceptionsMessageRegExp = "(?s).*"
+            + ExtractValueFromSnapIDV2.ERROR_ATTR_NAME_PARAM_EMPTY + ".*")
+    public void when_attributeName_parameter_is_empty_then_validateInitialization_raises_an_exception()
+            throws PasserelleException, NameDuplicationException, IllegalActionException {
+
+        SnapExtractorProxy dummyProxy = mock(SnapExtractorProxy.class);
+        actor.setGetSnapExtractor(dummyProxy);
+
+        Const constant = new Const(flow, "Constant");
+        flow.connect(constant.output, actor.inputPort);
+
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("Constant.value", "12");
+        props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL, "");
+
+        actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
+
+        flowMgr.executeBlockingErrorLocally(flow, props);
     }
 
     @Test(expectedExceptions = IllegalActionException.class, expectedExceptionsMessageRegExp = "(?s).*Unknown extraction description: \"foo bar\".*")
@@ -135,7 +155,11 @@ public class ExtractValueFromSnapIDV2Test {
         props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.ATTRIBUTE_NAME_LABEL,
                 "domain/family/member/attr");
 
-        actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
+        props.put("ExtractValueFromSnapIDV2." + ExtractValueFromSnapIDV2.EXTRACTION_TYPE_LABEL,
+                ExtractionType.READ.getName());
+
+        // FIXME uncomment
+        // actor.extractionTypeParam.setToken(ExtractionType.READ.getName());
 
         ArrayBlockingQueue<String> receiver = new ArrayBlockingQueue<String>(1);
         actor.outputPorts[READ_PORT].addDebugListener(new MessageListener(receiver));
