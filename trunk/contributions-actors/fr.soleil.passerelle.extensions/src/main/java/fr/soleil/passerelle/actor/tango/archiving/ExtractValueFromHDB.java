@@ -1,5 +1,9 @@
 package fr.soleil.passerelle.actor.tango.archiving;
 
+import static fr.soleil.passerelle.actor.tango.archiving.HdbExtractorProxy.DATE_FORMAT;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +26,7 @@ import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.util.Level;
+import com.isencia.passerelle.util.ptolemy.DateTimeParameter;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoActorV5;
@@ -29,17 +34,47 @@ import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
+@SuppressWarnings("serial")
 public class ExtractValueFromHDB extends ATangoActorV5 {
 
-    private HdbExtractorProxy extractorProxy;
+    /**
+     * the label of parameter
+     * {@link fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.dateParam}
+     */
+    public static final String DATE_PARAM_NAME = "timestamp";
 
+    /**
+     * the label of the parameter
+     * {@link fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.completeAttributeNameParam}
+     */
     public static final String COMPLETE_ATTR_NAME = "Complete attribute Name";
-    public static final String ERROR_COMPLETE_ATTR_NAME_IS_EMPTY = COMPLETE_ATTR_NAME
-            + " must not be empty";
 
+    /**
+     * the label of the parameter
+     * {@link fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.extractionTypeParam}
+     */
     public static final String EXTRACTION_TYPE = "Extraction type";
 
+    /**
+     * the label of the parameter
+     * {@link fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.throwExceptionOnErrorParam}
+     */
     public static final String THROW_EXCEPTION_ON_ERROR = "Throw exception On Error";
+
+    /**
+     * the formater used for the (@link
+     * fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.dateParam) parameter
+     * 
+     * it's public for testing reason
+     */
+    public static final SimpleDateFormat DATE_PARAMETER_FORMAT = new SimpleDateFormat(
+            "dd MMM yyyy HH:mm:ss");
+
+    /**
+     * the error message when complete attribute name is empty
+     */
+    public static final String ERROR_COMPLETE_ATTR_NAME_IS_EMPTY = COMPLETE_ATTR_NAME
+            + " must not be empty";
 
     /**
      * the Complete Attribute Name to extract
@@ -47,6 +82,13 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
     @ParameterName(name = COMPLETE_ATTR_NAME)
     public Parameter completeAttributeNameParam;
     private String completeAttributeName = "domain/family/member/attribute_name";
+
+    /**
+     * the nearest date of the value to extract (only needed when ExtractionType is Nearest)
+     */
+    @ParameterName(name = DATE_PARAM_NAME)
+    public DateTimeParameter dateParam;
+    private Date date;
 
     /**
      * the way to extract the attribute value. Can only be:
@@ -60,9 +102,18 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
     public Parameter extractionTypeParam;
     private ExtractionType extractionType;
 
+    /**
+     * flag that indicate how manage error happening during extraction. If it's true then an
+     * exception is raise, otherwise an empty message is send to output port
+     */
     @ParameterName(name = THROW_EXCEPTION_ON_ERROR)
     public Parameter throwExceptionOnErrorParam;
     private boolean throwExceptionOnError = true;
+
+    /**
+     * the proxy use to communicate with the HDB extraction device
+     */
+    private HdbExtractorProxy extractorProxy;
 
     public ExtractValueFromHDB(CompositeEntity container, String name)
             throws NameDuplicationException, IllegalActionException {
@@ -81,6 +132,9 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
                 new BooleanToken(throwExceptionOnError));
         throwExceptionOnErrorParam.setTypeEquals(BaseType.BOOLEAN);
 
+        dateParam = new DateTimeParameter(this, DATE_PARAM_NAME);
+        dateParam.setExpression(DATE_PARAMETER_FORMAT.format(new Date()));
+
     }
 
     @Override
@@ -88,6 +142,9 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
 
         if (attribute == completeAttributeNameParam) {
             completeAttributeName = extractAndValidateCompleteAttrName();
+
+        } else if (attribute == dateParam) {
+            date = extractAndValidateDate();
 
         } else if (attribute == extractionTypeParam) {
             extractionType = extractAndValidateExtrationType();
@@ -100,12 +157,41 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
         }
     }
 
+    /**
+     * extract the date from the parameter and ensure that match the date format
+     * 
+     * @return the date as an Object
+     * @throws IllegalActionException is thrown if the date format is invalid
+     */
+    private Date extractAndValidateDate() throws IllegalActionException {
+        Date result;
+        result = dateParam.getDateValue();
+
+        // if the date format is not valid the method dateParam.getDateValue() returns null
+        if (result == null) {
+            throw new IllegalActionException(this, "date must be filled");
+        }
+        return result;
+    }
+
+    /**
+     * extract the ExtractionType from the parameter and ensure its valid
+     * 
+     * @return the ExtractionType as an Enum instance
+     * @throws IllegalActionException is thrown if the ExtractionType is unknown
+     */
     private ExtractionType extractAndValidateExtrationType() throws IllegalActionException {
         // throw an IllegalActionException if extraction is unknown
         return ExtractionType.fromDescription(PasserelleUtil.getParameterValue(extractionTypeParam)
                 .trim());
     }
 
+    /**
+     * extract the complete attribute name and ensure is not empty
+     * 
+     * @return the complete attribute name
+     * @throws IllegalActionException is thrown if he complete attribute name is empty
+     */
     private String extractAndValidateCompleteAttrName() throws IllegalActionException {
         String completeAttrName = PasserelleUtil.getParameterValue(completeAttributeNameParam);
         if (completeAttrName.isEmpty()) {
@@ -119,9 +205,10 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
 
         try {
             completeAttributeName = extractAndValidateCompleteAttrName();
-
+            date = extractAndValidateDate();
             extractionType = extractAndValidateExtrationType();
-            if (extractorProxy == null) {// FIXME == null if we are in prod env
+            if (extractorProxy == null) {// FIXME == null if we are in prod env otherwise we are in
+                                         // test env=> use a mock
                 extractorProxy = new HdbExtractorProxy(true);
                 ExecutionTracerService.trace(this,
                         "using hdb Extractor " + extractorProxy.getHdbExtractorName(), Level.DEBUG);
@@ -140,31 +227,49 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
     protected void process(ActorContext context, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
 
-        switch (extractionType) {// TODO remove switch => implements extract value in Enum
+        switch (extractionType) {
             case LASTED:
                 extractLastedValue(context, request, response);
                 break;
-            // TODO implement nearest value
-            default:// should not append
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL,
-                        "Unknown extraction type \"" + extractionType.getDescription() + "\"",
-                        this, null);
-        }
 
+            case NEAREST:
+                extractNearestValue(context, request, response);
+                break;
+
+            default: // should not happen
+                new ProcessingExceptionWithLog(this, Severity.FATAL, "Unknown extraction type \""
+                        + extractionType.getDescription() + "\"", this, null);
+
+        }
     }
 
-    private void extractLastedValue(ActorContext context, ProcessRequest request,
+    /**
+     * extract the nearest value from the hdb and send it on output port
+     * 
+     * if an error occurred during extraction there are 2 possibilities
+     * <ul>
+     * <li>throwExceptionOnError = false ==> an exception is raised</li>
+     * <li>throwExceptionOnError = true ==> an empty message is sent on output port</li>
+     * </ul>
+     * 
+     * @param provided by process method see it for more details
+     * @param provided by process method see it for more details
+     * @param provided by process method see it for more details
+     * @throws ProcessingException is thrown if an error occurred during extraction and
+     *             throwExceptionOnError = false
+     */
+    private void extractNearestValue(ActorContext context, ProcessRequest request,
             ProcessResponse response) throws ProcessingException {
 
         try {
-            int index = completeAttributeName.lastIndexOf("/");
+            // TODO manage alias ???
+            String formatedDate = DATE_FORMAT.format(date);
+            String extractedValue = extractorProxy.getNearestScalarAttrValue(completeAttributeName,
+                    formatedDate);
 
-            // TODO change this to use an api + manage alias ???
-            String deviceName = completeAttributeName.substring(0, index);
-            String attributeName = completeAttributeName.substring(index + 1);
+            ExecutionTracerService.trace(this, "The nearest value of " + completeAttributeName
+                    + " at " + formatedDate + " is \"" + extractedValue + "\"");
 
-            String extractedValue = extractorProxy
-                    .getLastScalarAttrValue(deviceName, attributeName);
             sendOutputMsg(output, PasserelleUtil.createContentMessage(this, extractedValue));
         }
         catch (DevFailed devFailed) {
@@ -178,15 +283,80 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
 
     }
 
+    /**
+     * extract the lasted value from the hdb and send it on output port
+     * 
+     * if an error occurred during extraction there are 2 possibilities
+     * <ul>
+     * <li>throwExceptionOnError = false ==> an exception is raised</li>
+     * <li>throwExceptionOnError = true ==> an empty message is sent on output port</li>
+     * </ul>
+     * 
+     * @param provided by process method see it for more details
+     * @param provided by process method see it for more details
+     * @param provided by process method see it for more details
+     * @throws ProcessingException is thrown if an error occurred during extraction and
+     *             throwExceptionOnError = false
+     */
+    private void extractLastedValue(ActorContext context, ProcessRequest request,
+            ProcessResponse response) throws ProcessingException {
+
+        try {
+            // TODO c manage alias ???
+
+            String extractedValue = extractorProxy.getLastScalarAttrValue(completeAttributeName);
+
+            ExecutionTracerService.trace(this, "The lasted value of " + completeAttributeName
+                    + " is \"" + extractedValue + "\"");
+
+            sendOutputMsg(output, PasserelleUtil.createContentMessage(this, extractedValue));
+        }
+        catch (DevFailed devFailed) {
+            if (throwExceptionOnError) {
+                throw new ProcessingExceptionWithLog(this, completeAttributeName
+                        + " is not in Hdb or can not be read: ", context, devFailed);
+            } else {
+                sendOutputMsg(output, PasserelleUtil.createContentMessage(this, ""));
+            }
+        }
+
+    }
+
+    /**
+     * this method is only used in test to use an mock of HdbExtractorProxy
+     * 
+     * @param extractorProxy the proxy use to extract value from hdb
+     */
     public void setExtractorProxy(HdbExtractorProxy extractorProxy) {
         this.extractorProxy = extractorProxy;
     }
 
+    /**
+     * this ennum contains the different extraction strategies of hdb values
+     * 
+     * @author gramer
+     * 
+     */
     public static enum ExtractionType {
-        LASTED("Lasted Value"), NEAREST("Nearest Value");
+        /**
+         * the Lasted Value contains in hdb
+         */
+        LASTED("Lasted Value"),
+        /**
+         * Nearest Value from a specify date contains in hdb
+         */
+        NEAREST("Nearest Value");
 
+        /**
+         * the description of the enum instance. It's use as possible value for parameter
+         * {@link fr.soleil.passerelle.actor.tango.archiving.ExtractValueFromHDB.extractionTypeParam}
+         */
         private String descprition;
 
+        /**
+         * a hashMap that map descprition to the associated Enum instance. It use to build Enum from
+         * a String
+         */
         private static final Map<String, ExtractionType> DescriptionMap = new HashMap<String, ExtractionType>();
         static {
             for (final ExtractionType operation : values()) {
@@ -202,6 +372,13 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
             return descprition;
         }
 
+        /**
+         * build enum from the descprition
+         * 
+         * @param desc the descprition use to build the enum
+         * @return the enum associated to the descprition
+         * @throws IllegalActionException is thrown if no enum match the descprition
+         */
         public static ExtractionType fromDescription(final String desc)
                 throws IllegalActionException {
             final ExtractionType value = DescriptionMap.get(desc);
