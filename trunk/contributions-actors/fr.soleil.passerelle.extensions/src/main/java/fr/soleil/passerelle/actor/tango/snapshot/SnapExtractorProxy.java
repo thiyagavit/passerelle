@@ -9,7 +9,7 @@ import fr.soleil.util.SoleilUtilities;
 public class SnapExtractorProxy {
 
     public static final int ID_MIN = 0;
-    public static final String ERROR_SNAP_ID_INF_ZERO = "Error: snap id must not be negative";
+    public static final String ERROR_SNAP_ID_INF_ID_MIN = "Error: snap id must not be negative";
     public static final String ERROR_SNAP_ID_NAN = "Error: snap id must be a number";
 
     private TangoCommand getSnapValues;
