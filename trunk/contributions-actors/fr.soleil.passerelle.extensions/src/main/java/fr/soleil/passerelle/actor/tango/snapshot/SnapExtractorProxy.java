@@ -60,7 +60,7 @@ public class SnapExtractorProxy {
     }
 
     /**
-     * Get last snap for a context
+     * Get last snap id for a context
      * 
      * @param contextID
      * 
