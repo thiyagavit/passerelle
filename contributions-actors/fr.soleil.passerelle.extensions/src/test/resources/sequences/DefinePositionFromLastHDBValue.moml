@@ -5,7 +5,7 @@
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
-        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="true">
+        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
         </property>
@@ -27,7 +27,7 @@
         </property>
         <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="[280.0, 265.0]">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[280.0, 260.0]">
         </property>
     </entity>
     <entity name="Trigger" class="com.isencia.passerelle.actor.control.Trigger">
