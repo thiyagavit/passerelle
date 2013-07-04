@@ -35,34 +35,122 @@ import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
+/**
+ * Allow to extract an attribute from the snapshot database.
+ * 
+ * The id of the snaphot is provided by the input port "snapid" and the attribute by the parameter
+ * "attribute name". The attribute name must be complete (ie domain/family/member/attrName) and not
+ * empy
+ * 
+ * The parameter ExtractionType is used to select which part of the attribute must be extracted :
+ * <ul>
+ * <li>the read part, in this case the actor have only one output port: "read value"</li>
+ * <li>the write part, in this case the actor have only one output port: "write value"</li>
+ * <li>the read and write part, in this case the actor have the 2 previous port</li>
+ * </ul>
+ * 
+ * if an error occurred during extraction, then there are 2 possibilities:
+ * 
+ * <ul>
+ * <li>
+ * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+ * is true then an exception is throw</li>
+ * <li>
+ * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+ * is false then an empty message is send to outport</li>
+ * </ul>
+ * 
+ * the outport are dynamically changed when the extraction type changed ({@link
+ * fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.attributeChanged(Attribute)}
+ * thanks to field
+ * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts} and
+ * methods {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.createPort(int,
+ * String)}, {@link
+ * fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.deletePort(int, String)}
+ * 
+ * @author gramer
+ * 
+ */
 @SuppressWarnings("serial")
 public class ExtractValueFromSnapIDV2 extends Actor {
 
+    /**
+     * the index of read port in
+     * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
+     */
     public static final int READ_PORT = 0;
+
+    /**
+     * the index of write port in
+     * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
+     */
     public static final int WRITE_PORT = 1;
 
+    /**
+     * the label of write port
+     */
     public static final String WRITE_PORT_LABEL = "write value";
+
+    /**
+     * the label of read port
+     */
     public static final String READ_PORT_LABEL = "read value";
+
+    /**
+     * the label of throw on error parameter
+     */
     public static final String THROW_EXCEPTION_ON_ERROR_LABEL = "Throw exception On Error";
+    /**
+     * the label of extratiobnType parameter
+     */
     public static final String EXTRACTION_TYPE_LABEL = "Extraction type";
+    /**
+     * the label of attribute Name parameter
+     */
     public static final String ATTRIBUTE_NAME_LABEL = "Attribute to extract";
+
+    /**
+     * the error message when attribute Name parameter is empty (its used for unit test)
+     */
     public static final String ERROR_ATTR_NAME_PARAM_EMPTY = ATTRIBUTE_NAME_LABEL
             + " can not be empty";
 
     private final static Logger logger = LoggerFactory.getLogger(ExtractValueFromSnapIDV2.class);
+
+    /**
+     * Manage all request to the snapshot db see
+     * {@link fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy} for more details
+     */
     private SnapExtractorProxy extractor;
 
+    /**
+     * the complete name (ie domain/family/member/attrName) of the attribute to extract
+     */
     @ParameterName(name = ATTRIBUTE_NAME_LABEL)
     public Parameter attributeNameParam;
     private String attributeName;
 
+    /**
+     * Array that contains the out ports of the actor
+     */
     public Port[] outputPorts;
+
+    /**
+     * the input port of the actor. You must send the snapId (integer >0)
+     */
     public Port inputPort;
 
+    /**
+     * the Extraction type param indicate which part of the attribute will be extracted
+     * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractionType} for more details
+     */
     @ParameterName(name = EXTRACTION_TYPE_LABEL)
     public Parameter extractionTypeParam;
     private ExtractionType extractionType;
 
+    /**
+     * flag that indicate if we must raise an exception if the extraction failed
+     */
     @ParameterName(name = THROW_EXCEPTION_ON_ERROR_LABEL)
     public Parameter throwExceptionOnErrorParam;
     private boolean throwExceptionOnError = true;
@@ -112,10 +200,8 @@ public class ExtractValueFromSnapIDV2 extends Actor {
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
         if (attribute == attributeNameParam) {
-            attributeName = PasserelleUtil.getParameterValue(attributeNameParam);
-            if (attributeName.isEmpty()) {
-                throw new IllegalActionException(ERROR_ATTR_NAME_PARAM_EMPTY);
-            }
+            attributeName = extractAndValidateAtrributeName();
+
         } else if (attribute == extractionTypeParam) {
             // throws IllegalActionException if invalid
             extractionType = ExtractionType.fromDescription(PasserelleUtil
@@ -151,11 +237,11 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
     @Override
     protected void validateInitialization() throws ValidationException {
-        validateAttribute(attributeNameParam);
-        validateAttribute(extractionTypeParam);
-
         try {
-            if (extractor == null) {// FIXME == null if we are in prod env
+            // FIXME this is org
+            // attributeName =extractAndValidateAtrributeName();
+            validateAtrributeName();
+            if (extractor == null) {// FIXME extractor== null if we are in prod env
                 extractor = new SnapExtractorProxy();
             }
             ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(),
@@ -164,27 +250,42 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         catch (DevFailed e) {
             throw new DevFailedValidationException(e, this);
         }
-    }
-
-    // TODO move to super class
-    /**
-     * It's a wrapper of attributeChanged that "convert" IllegalActionException in
-     * ValidationException. This method is design to be used in validateInitialization() method to
-     * do the static verification on parameters
-     * 
-     * @param attribute the parameter to check
-     * 
-     * @throws ValidationException if the parameter is invalid then a ValidationException is raised
-     */
-    protected void validateAttribute(Attribute attribute) throws ValidationException {
-        try {
-            attributeChanged(attribute);
-        }
         catch (IllegalActionException e) {
             throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
         }
+        super.validateInitialization();
     }
 
+    public String extractAndValidateAtrributeName() throws IllegalActionException {
+        String attrName = PasserelleUtil.getParameterValue(attributeNameParam);
+        if (attrName.isEmpty()) {
+            throw new IllegalActionException(ERROR_ATTR_NAME_PARAM_EMPTY);
+        }
+        return attrName;
+    }
+
+    public void validateAtrributeName() throws IllegalActionException {
+        if (attributeName.isEmpty()) {
+            throw new IllegalActionException(ERROR_ATTR_NAME_PARAM_EMPTY);
+        }
+    }
+
+    /**
+     * create a port and add it to the actor. If the actor has already this port, then nothing
+     * happen
+     * 
+     * @param portIndex the index of port must equals to
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT}
+     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT}
+     * @param name the label of the port. Must be equals to
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL}
+     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT_LABEL}
+     * 
+     * @throws IllegalActionException is thrown port already exists. Normally this should never
+     *             happen because we test if the port already exist
+     */
     private void createPort(final int portIndex, String name) throws IllegalActionException {
         try {
             if (outputPorts[portIndex] == null) {
@@ -194,12 +295,28 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                 outputPorts[portIndex].setContainer(this);
             }
         }
-        catch (NameDuplicationException e) {
+        catch (NameDuplicationException e) { // normally that should not happen
             throw new IllegalActionException(e.getNameable1(), e.getNameable2(), e,
-                    "Error: can create read port");
+                    "Error: can create " + name + " port");
         }
     }
 
+    /**
+     * delete a port and remove it from the actor. If the actor has not this port, then nothing
+     * happen
+     * 
+     * @param portIndex the index of port. Must equals to
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT}
+     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT}
+     * @param name the label of the port. Must be equals to
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL}
+     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT_LABEL}
+     * 
+     * @throws IllegalActionException is thrown port not exists. Normally this should never happen
+     *             because we test if the port not exists.
+     */
     private void deletePort(final int portIndex, final String name) throws IllegalActionException {
         if (outputPorts[portIndex] != null) {
             try {
@@ -221,12 +338,20 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         extractAndSendValues(snapID);
     }
 
+    /**
+     * throw an exception if the snapID is not an integer >
+     * {@link fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy.ID_MIN}
+     * 
+     * @param snapID the snapId to check
+     * @throws ProcessingException is thrown if the snapID is not an integer >=
+     *             {@link fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy.ID_MIN}
+     */
     private void checkSnapIdIsAnInt(String snapID) throws ProcessingException {
         try {
             int snapIDAsInt = Integer.parseInt(snapID);
             if (snapIDAsInt < SnapExtractorProxy.ID_MIN) {
                 throw new ProcessingException(Severity.FATAL,
-                        SnapExtractorProxy.ERROR_SNAP_ID_INF_ZERO, this, null);
+                        SnapExtractorProxy.ERROR_SNAP_ID_INF_ID_MIN, this, null);
             }
         }
         catch (NumberFormatException e) {
@@ -235,6 +360,20 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         }
     }
 
+    /**
+     * extract the attribute value(s) and send it (their) on output port(s). If the extraction
+     * failed an
+     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     * is true then an exception is thrown, otherwise an empty message is sent
+     * 
+     * @param snapID the ID of the snapshot
+     * @throws ProcessingException is thrown if
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     *             is true and an error occurred during extraction
+     * @throws IllegalArgumentException if the snap id is invalid see {@link
+     *             fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.
+     *             checkSnapIdIsAnInt(String)} for more details
+     */
     protected void extractAndSendValues(final String snapID) throws ProcessingException,
             IllegalArgumentException {
 
@@ -251,12 +390,26 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                 extractAndSendReadAndWriteValues(snapID);
                 break;
 
-            default:// should not append
+            default:// should not happen
                 new ProcessingException(Severity.FATAL, "Unknown extration type: "
                         + extractionType.getName(), this, null);
         }
     }
 
+    /**
+     * extract the read and the write value of the attribute and send it to the output ports. If the
+     * extraction failed an
+     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     * is true then an exception is thrown, otherwise an empty message is sent
+     * 
+     * @param snapID the id of the snapshot
+     * @throws ProcessingException is thrown if
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     *             is true and an error occurred during extraction
+     * @throws DevFailedProcessingException is thrown if
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     *             is true and an error occurred during extraction
+     */
     private void extractAndSendReadAndWriteValues(final String snapID) throws ProcessingException,
             DevFailedProcessingException {
         try {
@@ -277,6 +430,22 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         }
     }
 
+    /**
+     * extract the read or wirte part of the attribute according to the read parameter and send
+     * extracted value on the ouptport.If the extraction failed an
+     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     * is true then an exception is thrown, otherwise an empty message is sent
+     * 
+     * @param read flag that indicate which part must be extracted. if its true then the read part
+     *            is extracted write part otherwise
+     * @param snapID the id of the snaphot
+     * @throws ProcessingException is thrown if
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     *             is true and an error occurred during extraction
+     * @throws DevFailedProcessingException is thrown if
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
+     *             is true and an error occurred during extraction
+     */
     private void extractAndSendReadOrWriteValue(boolean read, String snapID)
             throws ProcessingException, DevFailedProcessingException {
         int portIndex = (read) ? READ_PORT : WRITE_PORT;
@@ -299,6 +468,11 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         return extractor;
     }
 
+    /**
+     * utility method used only for tests. That allow us to mock the extractor
+     * 
+     * @param extractor
+     */
     public void setGetSnapExtractor(SnapExtractorProxy extractor) {
         this.extractor = extractor;
     }
