@@ -315,4 +315,9 @@ public Image getImage(String code) {
 	return null;
 }
 
+public MetaData[] getAllSubmodelMetaData() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 }
