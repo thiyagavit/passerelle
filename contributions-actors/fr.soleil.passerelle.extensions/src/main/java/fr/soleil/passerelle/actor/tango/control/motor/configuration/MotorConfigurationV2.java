@@ -118,7 +118,7 @@ public class MotorConfigurationV2 {
         catch (NumberFormatException e) {
             DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT);
         }
-        initStrategy = InitType.getValueIfContains(datum[1].extractString());
+        initStrategy = InitType.getValuefromString(datum[1].extractString());
 
         try {
             if (initStrategy == OTHER) {
