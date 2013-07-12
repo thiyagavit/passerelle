@@ -89,7 +89,7 @@ public class MotorConfiguration {
         catch (NumberFormatException e) {
             DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_AN_INT);
         }
-        initStrategy = InitType.getValueIfContains(datum[1].extractString());
+        initStrategy = InitType.getValuefromString(datum[1].extractString());
     }
 
     public String retrieveMyControlBox() throws DevFailed {

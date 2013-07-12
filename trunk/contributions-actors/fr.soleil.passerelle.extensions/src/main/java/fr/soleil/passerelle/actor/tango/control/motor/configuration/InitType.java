@@ -20,11 +20,18 @@ public enum InitType {
     // LSBWD, LSFWD, FH, FI, DP;
     DP, OTHER;
 
-    public static InitType getValueIfContains(String compare) {
+    /**
+     * build the enum from a string. if the string is empty or equals to DP then the enum is DP,
+     * otherwise it's OTHER
+     * 
+     * @param value the string value
+     * @return
+     */
+    public static InitType getValuefromString(String value) {
         InitType initStrategy;
-        compare = compare.trim();
+        value = value.trim();
 
-        if (compare.isEmpty() || compare.equalsIgnoreCase(DP.toString())) {
+        if (value.isEmpty() || value.equalsIgnoreCase(DP.toString())) {
             initStrategy = DP;
         } else {
             initStrategy = OTHER;
