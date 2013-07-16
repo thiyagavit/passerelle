@@ -116,7 +116,7 @@ public class PasserelleGUIBuilder {
 		loadAndDisplayModel(modelToLoad);
 	}
 
-	public PasserelleGUIBuilder(final boolean showModelForms, final String modelToLoad,  final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
+	public PasserelleGUIBuilder(final String modelToLoad,  final boolean showModelForms, final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
 	        this.showModelForms = showModelForms;
 		this.showModelGraph = showModelGraph;
 		this.standalone = standalone;
