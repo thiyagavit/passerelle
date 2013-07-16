@@ -7,33 +7,41 @@ import com.isencia.passerelle.hmi.PopupUtil;
 
 public class PasserelleIDEMain {
 
-  public static void main(final String args[]) {
-    // look & feel
-    try {
-      UIManager.put("swing.boldMetal", Boolean.FALSE);
-      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-    } catch (final ClassNotFoundException e) {
-      e.printStackTrace();
-    } catch (final InstantiationException e) {
-      e.printStackTrace();
-    } catch (final IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (final UnsupportedLookAndFeelException e) {
-      e.printStackTrace();
-    }
+    public static void main(final String args[]) {
+        // look & feel
+        try {
+            UIManager.put("swing.boldMetal", Boolean.FALSE);
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (final ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (final InstantiationException e) {
+            e.printStackTrace();
+        } catch (final IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (final UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
-    try {
-      if (args.length != 0) {
-        new PasserelleGUIBuilder(args[0], true, true);
-      } else {
-        // build GUI with model graph
-       // System.out.println("no model ");
-        new PasserelleGUIBuilder(true, true, true);
-      }
-    } catch (final Throwable t) {
-      t.printStackTrace();
-      System.err.println("ERROR: Sequence file not found:" + args[0]);
-      PopupUtil.showError(new TextArea(), "Not found: " + args[0]);
+        try {
+            final int argSize = args.length;
+            if (argSize == 1) {
+                if(args[0].endsWith(".moml")){
+                    new PasserelleGUIBuilder(true, args[0], true, true);
+                }
+                else {
+                    new PasserelleGUIBuilder(Boolean.valueOf(args[0]),  true, true);
+                }
+            } else if (argSize == 2) {
+                new PasserelleGUIBuilder(Boolean.valueOf(args[1]), args[0],  true, true);
+            } else {
+                // build GUI with model graph
+                // System.out.println("no model ");
+                new PasserelleGUIBuilder(true, true, true);
+            }
+        } catch (final Throwable t) {
+            t.printStackTrace();
+            System.err.println("ERROR: Sequence file not found:" + args[0]);
+            PopupUtil.showError(new TextArea(), "Not found: " + args[0]);
+        }
     }
-  }
 }

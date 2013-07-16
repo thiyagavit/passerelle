@@ -67,13 +67,13 @@ public class PasserelleGUIBuilder {
 	private boolean toolbarVisible = true;
 
 	private boolean standalone;
-	private final boolean showModelGraph;
-  private final boolean showModelForms;
+	private final boolean showModelGraph;	
+	private final boolean showModelForms;
 
 	private View graphView;
 
 	public PasserelleGUIBuilder(final boolean showModelGraph, final boolean standalone) {
-	  this.showModelForms = true;
+	        this.showModelForms = true;
 		this.showModelGraph = showModelGraph;
 		this.standalone = standalone;
 		try {
@@ -116,8 +116,8 @@ public class PasserelleGUIBuilder {
 		loadAndDisplayModel(modelToLoad);
 	}
 
-	public PasserelleGUIBuilder(final String modelToLoad, final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
-    this.showModelForms = true;
+	public PasserelleGUIBuilder(final boolean showModelForms, final String modelToLoad,  final boolean showModelGraph, final boolean standalone) throws MalformedURLException {
+	        this.showModelForms = showModelForms;
 		this.showModelGraph = showModelGraph;
 		this.standalone = standalone;
 		URL url = null;
