@@ -26,13 +26,13 @@ public class PasserelleIDEMain {
             final int argSize = args.length;
             if (argSize == 1) {
                 if(args[0].endsWith(".moml")){
-                    new PasserelleGUIBuilder(true, args[0], true, true);
+                    new PasserelleGUIBuilder(args[0], true, true, true);
                 }
                 else {
-                    new PasserelleGUIBuilder(Boolean.valueOf(args[0]),  true, true);
+                    new PasserelleGUIBuilder(Boolean.valueOf(args[0]), true, true);
                 }
             } else if (argSize == 2) {
-                new PasserelleGUIBuilder(Boolean.valueOf(args[1]), args[0],  true, true);
+                new PasserelleGUIBuilder( args[0], Boolean.valueOf(args[1]),true, true);
             } else {
                 // build GUI with model graph
                 // System.out.println("no model ");

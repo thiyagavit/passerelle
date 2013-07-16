@@ -25,7 +25,7 @@ public class PasserelleEditorMain {
     try {
       // build GUI without model graph
       if (args.length != 0) {
-        new PasserelleGUIBuilder(true, args[0],  false, true);
+        new PasserelleGUIBuilder(args[0], true,  false, true);
       } else {
         // build GUI with model graph
        // System.out.println("no model ");
