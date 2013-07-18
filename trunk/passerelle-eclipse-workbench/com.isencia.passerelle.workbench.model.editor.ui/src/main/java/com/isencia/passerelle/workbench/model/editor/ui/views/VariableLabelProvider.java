@@ -184,7 +184,12 @@ public class VariableLabelProvider extends ColumnLabelProvider {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 	}
 
+	private final Color lightGrey = new Color(null, 240,240,240);
 
+	public Color getBackground(Object element) {
+		if (element instanceof GeneralAttribute) return lightGrey;
+		return null;
+	}
 
 	public void dispose() {
 		super.dispose();
@@ -193,5 +198,7 @@ public class VariableLabelProvider extends ColumnLabelProvider {
         boldFont.dispose();
         if (ticked!=null)   ticked.dispose();
         if (unticked!=null) unticked.dispose();
-	}
+		lightGrey.dispose();
+}
+
 }
