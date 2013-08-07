@@ -18,8 +18,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.Page;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.DragSupportBuilder;
+import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorPalettePage;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorTreeViewerPage;
+import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
 public class PasserelleDiagramEditor extends DiagramEditor {
 
@@ -37,6 +39,17 @@ public class PasserelleDiagramEditor extends DiagramEditor {
     // this.getGraphicalViewer().addDropTargetListener(new PasserelleTemplateTransferDropTargetListener(this.getGraphicalViewer()));
 
     getRefreshBehavior().refresh();
+    
+    getSite().getShell().getDisplay().asyncExec(new Runnable() {
+      public void run() {
+        try {
+          EclipseUtils.getActivePage().showView(ActorAttributesView.ID);
+        } catch (Throwable ignored) {
+          ignored.printStackTrace();
+        }
+      }
+    });
+
   }
 
   public Object getAdapter(@SuppressWarnings("rawtypes") Class type) {

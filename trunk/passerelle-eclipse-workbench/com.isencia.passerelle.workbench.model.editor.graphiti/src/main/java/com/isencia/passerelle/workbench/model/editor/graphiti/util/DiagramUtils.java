@@ -75,7 +75,7 @@ public class DiagramUtils {
    * 
    * @return The currently active Shell.
    */
-  private static Shell getShell() {
+  public static Shell getShell() {
     return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
   }
 }

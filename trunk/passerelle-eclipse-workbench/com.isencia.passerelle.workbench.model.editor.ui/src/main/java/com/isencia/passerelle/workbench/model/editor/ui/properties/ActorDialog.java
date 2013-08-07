@@ -4,16 +4,21 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewSite;
-
 import ptolemy.kernel.util.NamedObj;
-
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 
 public class ActorDialog extends Dialog {
 	
 	private IViewSite site;
 	private NamedObj actor;
+	
+  public ActorDialog(Shell  shell, NamedObj actor) {
+    super(shell);
+    this.actor = actor;
+  }
+
 	public ActorDialog(IViewSite site, NamedObj actor) {
 		super(site.getShell());
 		this.site = site;
