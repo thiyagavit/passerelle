@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.ui.internal.parts.IShapeEditPart;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -30,7 +32,6 @@ import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.Director;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
@@ -38,7 +39,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
-
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.editor.common.utils.ParameterUtils;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
@@ -56,350 +56,358 @@ import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
 /**
- * Optional replacement for PropertiesView which renders the actor properties
- * more simply but with more customizable rules.
+ * Optional replacement for PropertiesView which renders the actor properties more simply but with more customizable rules.
  * 
  * @author gerring
- * 
  */
-public class ActorAttributesView extends ViewPart implements
-		ISelectionListener, CommandStackEventListener {
+public class ActorAttributesView extends ViewPart implements ISelectionListener, CommandStackEventListener {
 
-	@Override
-	public void setSite(IWorkbenchPartSite site) {
-		// TODO Auto-generated method stub
-		super.setSite(site);
-	}
+  @Override
+  public void setSite(IWorkbenchPartSite site) {
+    // TODO Auto-generated method stub
+    super.setSite(site);
+  }
 
-	private NamedObj dialogActor;
+  private NamedObj dialogActor;
 
-	public void setActor(NamedObj actor) {
-		this.dialogActor = actor;
-	}
+  public void setActor(NamedObj actor) {
+    this.dialogActor = actor;
+  }
 
-	private static Logger logger = LoggerFactory.getLogger(ActorAttributesView.class);
+  private static Logger logger = LoggerFactory.getLogger(ActorAttributesView.class);
 
-	public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView"; //$NON-NLS-1$
+  public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView"; //$NON-NLS-1$
 
-	private TableViewer viewer;
-	private NamedObj actor;
-	private boolean addedListener = false;
-	private IWorkbenchPart part;
+  private TableViewer viewer;
+  private NamedObj actor;
+  private boolean addedListener = false;
+  private IWorkbenchPart part;
 
-	private VariableEditingSupport valueColumnEditor;
+  private VariableEditingSupport valueColumnEditor;
 
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (part instanceof PasserelleModelMultiPageEditor) {
-			this.part = part;
-			if (updateSelection(selection)) return;
-			clear();
-		}
-	}
+  public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+    if ((part instanceof PasserelleModelMultiPageEditor) || (part instanceof IDiagramEditor)) {
+      this.part = part;
+      if (updateSelection(selection))
+        return;
+      clear();
+    }
+  }
 
-	protected boolean updateSelection(final ISelection selection) {
+  @SuppressWarnings("restriction")
+  protected boolean updateSelection(final ISelection selection) {
 
-		if (!(selection instanceof StructuredSelection)) return false;
+    if (!(selection instanceof StructuredSelection))
+      return false;
 
-		final Object sel = ((StructuredSelection) selection).getFirstElement();
-		if (sel instanceof AbstractBaseEditPart) {
-			final List<Attribute> parameterList = new ArrayList<Attribute>();
-			if (this.dialogActor == null)
-				this.actor = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
-			else
-				this.actor = this.dialogActor;
+    final Object sel = ((StructuredSelection) selection).getFirstElement();
+    if (sel instanceof AbstractBaseEditPart) {
+      if (this.dialogActor == null)
+        this.actor = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
+      else
+        this.actor = this.dialogActor;
+    } else if (sel instanceof IShapeEditPart) {
+      IShapeEditPart selectedShapePart = (IShapeEditPart) sel;
+      PictogramElement pictogramElement = selectedShapePart.getPictogramElement();
+      Object selectedActor = ((IDiagramEditor) part).getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
 
-			if (this.actor instanceof NamedObj) {
+      if (this.dialogActor == null)
+        this.actor = (NamedObj) selectedActor;
+      else
+        this.actor = this.dialogActor;
+    }
 
-				if (!addedListener && part instanceof PasserelleModelMultiPageEditor) {
-					// ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
-					// addedListener = true;
-				}
-				Class filter = null;
-				if (this.actor instanceof TextAttribute) {
-					filter = StringAttribute.class;
-				} else {
-					filter = Parameter.class;
-				}
-				Iterator parameterIterator = actor.attributeList(filter).iterator();
-				boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
-				while (parameterIterator.hasNext()) {
-					Attribute parameter = (Attribute) parameterIterator.next();
-					
-					if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(actor,(Parameter) parameter,expert))) {
-						parameterList.add(parameter);
-					}
-				}
+    if (this.actor instanceof NamedObj) {
+      final List<Attribute> parameterList = new ArrayList<Attribute>();
 
-			}
-			createTableModel(parameterList);
-			return true;
-		}
-		return false;
-	}
+      if (!addedListener && part instanceof PasserelleModelMultiPageEditor) {
+        // ((PasserelleModelMultiPageEditor)part).getEditor().getEditDomain().getCommandStack().addCommandStackEventListener(this);
+        // addedListener = true;
+      }
+      Class filter = null;
+      if (this.actor instanceof TextAttribute) {
+        filter = StringAttribute.class;
+      } else {
+        filter = Parameter.class;
+      }
+      Iterator parameterIterator = actor.attributeList(filter).iterator();
+      boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
+      while (parameterIterator.hasNext()) {
+        Attribute parameter = (Attribute) parameterIterator.next();
 
-	private void createTableModel(final List<Attribute> parameterList) {
+        if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(actor, (Parameter) parameter, expert))) {
+          parameterList.add(parameter);
+        }
+      }
+      createTableModel(parameterList);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-		if (parameterList != null)
-			Collections.sort(parameterList, new NamedObjComparator());
-		try {
-			viewer.setContentProvider(new IStructuredContentProvider() {
-				public void dispose() {
+  private void createTableModel(final List<Attribute> parameterList) {
 
-				}
+    if (parameterList != null)
+      Collections.sort(parameterList, new NamedObjComparator());
+    try {
+      viewer.setContentProvider(new IStructuredContentProvider() {
+        public void dispose() {
 
-				public void inputChanged(Viewer viewer, Object oldInput,
-						Object newInput) {
-				}
+        }
 
-				public Object[] getElements(Object inputElement) {
-					if (parameterList == null) return new Parameter[] {};
-					final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
-					
-					final Director director = actor instanceof Actor
-					                        ? (Director)((Actor)actor).getDirector()
-					                        : null;
-					
-					boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
-					if (actor instanceof Actor && expert)
-						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteBuilder.getInstance().getType(actor.getClass())));
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        }
 
-					if (actor instanceof Actor && director!=null && expert)
-						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
+        public Object[] getElements(Object inputElement) {
+          if (parameterList == null)
+            return new Parameter[] {};
+          final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
 
-					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteBuilder.getInstance().getType(actor.getName())));
-					ret.addAll(parameterList);
-					return ret.toArray(new Object[ret.size()]);
-				}
-			});
+          final Director director = actor instanceof Actor ? (Director) ((Actor) actor).getDirector() : null;
 
-			viewer.setInput(new Object());
-			viewer.refresh();
-		} catch (Exception e) {
-            logger.error("Cannot set input", e);
-		}
-	}
+          boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
+          if (actor instanceof Actor && expert)
+            ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.TYPE, PaletteBuilder.getInstance().getType(actor.getClass())));
 
-	public void clear() {
-		this.actor = null;
-		if (part != null && part instanceof PasserelleModelMultiPageEditor) {
-			((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain()
-					.getCommandStack().removeCommandStackEventListener(this);
-		}
-		this.part = null;
-		this.addedListener = false;
-		createTableModel(null);
-	}
+          if (actor instanceof Actor && director != null && expert)
+            ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
 
-	/**
-	 * Create contents of the view part.
-	 * 
-	 * @param parent
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
+          ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME, PaletteBuilder.getInstance().getType(actor.getName())));
+          ret.addAll(parameterList);
+          return ret.toArray(new Object[ret.size()]);
+        }
+      });
 
-		this.viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		
+      viewer.setInput(new Object());
+      viewer.refresh();
+    } catch (Exception e) {
+      logger.error("Cannot set input", e);
+    }
+  }
 
-		viewer.getTable().setLinesVisible(true);
-		viewer.getTable().setHeaderVisible(true);
+  public void clear() {
+    this.actor = null;
+    if (part != null && part instanceof PasserelleModelMultiPageEditor) {
+      ((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
+    }
+    this.part = null;
+    this.addedListener = false;
+    createTableModel(null);
+  }
 
-		createColumns(viewer);
-		viewer.setUseHashlookup(true);
-		viewer.setColumnProperties(new String[] { "Property", "Value" });
+  /**
+   * Create contents of the view part.
+   * 
+   * @param parent
+   */
+  @Override
+  public void createPartControl(Composite parent) {
 
-		createActions();
-		createPopupMenu();
-		if (getSite() != null)
-			getSite().getWorkbenchWindow().getSelectionService()
-					.addSelectionListener(this);
+    this.viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
-		viewer.getTable().addKeyListener(new KeyListener() {
+    viewer.getTable().setLinesVisible(true);
+    viewer.getTable().setHeaderVisible(true);
 
-			public void keyReleased(KeyEvent e) {
-			}
+    createColumns(viewer);
+    viewer.setUseHashlookup(true);
+    viewer.setColumnProperties(new String[] { "Property", "Value" });
 
-			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == SWT.F1) {
-					try {
-						showHelpSelectedParameter();
-					} catch (IllegalActionException e1) {
+    createActions();
+    createPopupMenu();
+    if (getSite() != null)
+      getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
 
-					}
-				}
-				if (e.character == SWT.DEL) {
-					try {
-						deleteSelectedParameter();
-					} catch (IllegalActionException e1) {
-						logger.error("Cannot delete ", e1);
-					}
-				}
-			}
-		});
+    viewer.getTable().addKeyListener(new KeyListener() {
 
-		try {
-			this.part = EclipseUtils.getActivePage().getActiveEditor();
-			updateSelection(EclipseUtils.getActivePage().getSelection());
+      public void keyReleased(KeyEvent e) {
+      }
 
-		} catch (Throwable ignored) {
-			// There might not be a selection or page.
-		}
-	}
+      public void keyPressed(KeyEvent e) {
+        if (e.keyCode == SWT.F1) {
+          try {
+            showHelpSelectedParameter();
+          } catch (IllegalActionException e1) {
 
-	private void createColumns(final TableViewer viewer) {
+          }
+        }
+        if (e.character == SWT.DEL) {
+          try {
+            deleteSelectedParameter();
+          } catch (IllegalActionException e1) {
+            logger.error("Cannot delete ", e1);
+          }
+        }
+      }
+    });
 
-		final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT, 0);
+    try {
+      this.part = EclipseUtils.getActivePage().getActiveEditor();
+      updateSelection(EclipseUtils.getActivePage().getSelection());
 
-		name.getColumn().setText("Property");
-		name.getColumn().setWidth(200);
-		name.setLabelProvider(new PropertyLabelProvider());
-		final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT, 1);
+    } catch (Throwable ignored) {
+      // There might not be a selection or page.
+    }
+  }
 
-		value.getColumn().setText("Value");
-		value.getColumn().setWidth(700);
-		value.setLabelProvider(new VariableLabelProvider(this));
-		this.valueColumnEditor = new VariableEditingSupport(this, viewer);
-		value.setEditingSupport(valueColumnEditor);
-	}
-	
-	public boolean canEditAttribute(final Object attribute) {
-		return valueColumnEditor.canEdit(attribute);
-	}
+  private void createColumns(final TableViewer viewer) {
 
-	/**
-	 * Create the actions.
-	 */
-	private void createActions() {
-		// Create the actions
-	}
+    final TableViewerColumn name = new TableViewerColumn(viewer, SWT.LEFT, 0);
 
-	/**
-	 * Initialize the menu.
-	 */
-	private void createPopupMenu() {
-		MenuManager menuMan = new MenuManager();
+    name.getColumn().setText("Property");
+    name.getColumn().setWidth(200);
+    name.setLabelProvider(new PropertyLabelProvider());
+    final TableViewerColumn value = new TableViewerColumn(viewer, SWT.LEFT, 1);
 
-		menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_obj.gif")) {
-			public void run() {
-				(new DeleteAttributeHandler()).run(null);
-			}
-		});
-		menuMan.add(new Separator());
-		menuMan.add(new Action("Help", Activator.getImageDescriptor("icons/help.gif")) {
-			public void run() {
-				try {
-					showHelpSelectedParameter();
-				} catch (IllegalActionException e) {
-				}
-			}
-		});
-		menuMan.add(new Action("Help Contents", Activator.getImageDescriptor("icons/help.gif")) {
-			public void run() {
-				WorkbenchHelpSystem.getInstance().displayHelp();
-			}
-		});
+    value.getColumn().setText("Value");
+    value.getColumn().setWidth(700);
+    value.setLabelProvider(new VariableLabelProvider(this));
+    this.valueColumnEditor = new VariableEditingSupport(this, viewer);
+    value.setEditingSupport(valueColumnEditor);
+  }
 
-		viewer.getControl().setMenu(menuMan.createContextMenu(viewer.getControl()));
-	}
+  public boolean canEditAttribute(final Object attribute) {
+    return valueColumnEditor.canEdit(attribute);
+  }
 
-	@Override
-	public void setFocus() {
-		if (!viewer.getTable().isDisposed()) {
-			viewer.getTable().setFocus();
-		}
-	}
+  /**
+   * Create the actions.
+   */
+  private void createActions() {
+    // Create the actions
+  }
 
-	public void dispose() {
-		getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
-		if (part != null && part instanceof PasserelleModelMultiPageEditor) {
-			((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
-		}
-		super.dispose();
-	}
+  /**
+   * Initialize the menu.
+   */
+  private void createPopupMenu() {
+    MenuManager menuMan = new MenuManager();
 
-	public void stackChanged(CommandStackEvent event) {
-		viewer.refresh();
-	}
-	
-	public void refresh() {
-		viewer.refresh();
-	}
+    menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_obj.gif")) {
+      public void run() {
+        (new DeleteAttributeHandler()).run(null);
+      }
+    });
+    menuMan.add(new Separator());
+    menuMan.add(new Action("Help", Activator.getImageDescriptor("icons/help.gif")) {
+      public void run() {
+        try {
+          showHelpSelectedParameter();
+        } catch (IllegalActionException e) {
+        }
+      }
+    });
+    menuMan.add(new Action("Help Contents", Activator.getImageDescriptor("icons/help.gif")) {
+      public void run() {
+        WorkbenchHelpSystem.getInstance().displayHelp();
+      }
+    });
 
-	public String getActorName() {
-		return actor.getName();
-	}
+    viewer.getControl().setMenu(menuMan.createContextMenu(viewer.getControl()));
+  }
 
-	public Class getActorClass() {
-		if (actor == null) {
-			return null;
-		}
-		return actor.getClass();
-	}
+  @Override
+  public void setFocus() {
+    if (!viewer.getTable().isDisposed()) {
+      viewer.getTable().setFocus();
+    }
+  }
 
-	public void setActorName(final GeneralAttribute element, String name) {
-		if (ModelUtils.isNameLegal(name)) {
-			element.setValue(name);
-			final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
-			try {
-			final RenameCommand cmd = new RenameCommand(viewer,actor,element);
-			ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
-			ed.refreshActions();
-			} catch (Exception ne) {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(),
-						"Invalid Name", ne.getMessage());
-			}
-		} else {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(),
-					"Invalid Name", "The name '" + name
-							+ "' is not allowed.\n\n"
-							+ "Names should not contain '.'");
-		}
+  public void dispose() {
+    getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
+    if (part != null && part instanceof PasserelleModelMultiPageEditor) {
+      ((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
+    }
+    super.dispose();
+  }
 
-	}
+  public void stackChanged(CommandStackEvent event) {
+    viewer.refresh();
+  }
 
-	public void deleteSelectedParameter() throws IllegalActionException {
+  public void refresh() {
+    viewer.refresh();
+  }
 
-		final ISelection sel = viewer.getSelection();
-		if (sel != null && sel instanceof StructuredSelection) {
-			final StructuredSelection s = (StructuredSelection) sel;
-			final Object o = s.getFirstElement();
-			if (o instanceof String)
-				return; // Cannot delete name
-			if (o instanceof Attribute) {
-				setAttributeValue(o, null);
-			}
-		}
-	}
+  public String getActorName() {
+    return actor.getName();
+  }
 
-	public void showHelpSelectedParameter() throws IllegalActionException {
+  public Class getActorClass() {
+    if (actor == null) {
+      return null;
+    }
+    return actor.getClass();
+  }
 
-		final ISelection sel = viewer.getSelection();
-		if (sel != null && sel instanceof StructuredSelection) {
-			final StructuredSelection s = (StructuredSelection) sel;
-			final Object o = s.getFirstElement();
-			String contextId = HelpUtils.getContextId(o);
-			if (contextId != null) {
-// TODO revert this when using context specific help				
-//				WorkbenchHelp.displayHelp(contextId);
-				WorkbenchHelpSystem.getInstance().displayHelpResource(contextId);
-			}
+  public void setActorName(final GeneralAttribute element, String name) {
+    if (ModelUtils.isNameLegal(name)) {
+      element.setValue(name);
+      if (part != null && part instanceof PasserelleModelMultiPageEditor) {
+        final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
+        try {
+          final RenameCommand cmd = new RenameCommand(viewer, actor, element);
+          ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
+          ed.refreshActions();
+        } catch (Exception ne) {
+          MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", ne.getMessage());
+        }
+      }
+    } else {
+      MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", "The name '" + name + "' is not allowed.\n\n"
+          + "Names should not contain '.'");
+    }
 
-		}
-	}
+  }
 
-	public void setAttributeValue(Object element, Object value)
-			throws IllegalActionException {
+  public void deleteSelectedParameter() throws IllegalActionException {
 
-		final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
-		final AttributeCommand cmd = new AttributeCommand(viewer, element,
-				value);
-		ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
-		ed.refreshActions();
-    ed.getEditor().refresh();
-	}
+    final ISelection sel = viewer.getSelection();
+    if (sel != null && sel instanceof StructuredSelection) {
+      final StructuredSelection s = (StructuredSelection) sel;
+      final Object o = s.getFirstElement();
+      if (o instanceof String)
+        return; // Cannot delete name
+      if (o instanceof Attribute) {
+        setAttributeValue(o, null);
+      }
+    }
+  }
 
-	public ColumnViewer getViewer() {
-		return this.viewer;
-	}
+  public void showHelpSelectedParameter() throws IllegalActionException {
+
+    final ISelection sel = viewer.getSelection();
+    if (sel != null && sel instanceof StructuredSelection) {
+      final StructuredSelection s = (StructuredSelection) sel;
+      final Object o = s.getFirstElement();
+      String contextId = HelpUtils.getContextId(o);
+      if (contextId != null) {
+        // TODO revert this when using context specific help
+        // WorkbenchHelp.displayHelp(contextId);
+        WorkbenchHelpSystem.getInstance().displayHelpResource(contextId);
+      }
+
+    }
+  }
+
+  public void setAttributeValue(Object element, Object value) throws IllegalActionException {
+    final AttributeCommand cmd = new AttributeCommand(viewer, element, value);
+    if (this.part instanceof PasserelleModelMultiPageEditor) {
+      final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
+      ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
+      ed.refreshActions();
+      ed.getEditor().refresh();
+    } else if (this.part instanceof IDiagramEditor) {
+      // System.out.println(element + "=" + value);
+      if (element instanceof Parameter) {
+        ((Parameter) element).setExpression(value.toString());
+      }
+      // IDiagramEditor ed = (IDiagramEditor) this.part;
+      // ed.getEditingDomain().getCommandStack().execute(cmd);
+    }
+  }
+
+  public ColumnViewer getViewer() {
+    return this.viewer;
+  }
 }
