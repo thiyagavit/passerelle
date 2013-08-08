@@ -121,7 +121,7 @@ public class PasserelleDiagramEditor extends DiagramEditor {
     }
 
     public Object getNewObject() {
-      return new ActorCreateFeatureFromPaletteItemDefinition(getDiagramTypeProvider().getFeatureProvider());
+      return new ModelElementCreateFeatureFromPaletteItemDefinition(selected, getDiagramTypeProvider().getFeatureProvider());
     }
   }
 

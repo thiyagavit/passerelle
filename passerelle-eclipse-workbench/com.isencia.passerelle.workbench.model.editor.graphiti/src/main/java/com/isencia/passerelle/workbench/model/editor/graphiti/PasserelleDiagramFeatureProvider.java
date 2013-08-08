@@ -15,6 +15,7 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
+import ptolemy.actor.Director;
 import ptolemy.kernel.Relation;
 import com.isencia.passerelle.actor.Actor;
 
@@ -43,6 +44,8 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
       return new ActorAddFeature(this);
     } else if (context.getNewObject() instanceof Relation) {
       return new ConnectionAddFeature(this);
+    } else if (context.getNewObject() instanceof Director) {
+      return new DirectorAddFeature(this);
     }
     return super.getAddFeature(context);
   }
