@@ -7,7 +7,7 @@ import org.eclipse.osgi.util.NLS;
  *
  */
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "com.isencia.passerelle.workbench.model.editor.graphiti"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 	public static String CreateDiagramWizard_DiagramNameField;
 	public static String CreateDiagramWizard_DiagramTypeField;
 	public static String CreateDiagramWizard_ErrorOccuredTitle;
