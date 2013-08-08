@@ -5,6 +5,7 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
@@ -54,10 +55,10 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
       if (bo instanceof Actor) {
         Actor actor = (Actor) bo;
          final ActorAttributesView view = (ActorAttributesView)EclipseUtils.getActivePage().findView(ActorAttributesView.ID);
-         IViewSite site = (IViewSite) view.getSite();
-         ActorDialog dialog = new ActorDialog(site, actor);
+         ActorDialog dialog = new ActorDialog((IWorkbenchPart)getDiagramEditor(), actor);
          dialog.open();
 //         this.updatePictogramElement(pes[0]);
+          this.hasDoneChanges = true;
 
         // String currentName = actor.getName();
         // // ask user for a new class name
