@@ -43,8 +43,8 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
       if (updateSelectedEntity(selection)) {
         return;
       }
-      clear();
     }
+    clear();
   }
 
   @SuppressWarnings("restriction")
@@ -66,12 +66,12 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
         }
       }
 
-      if (selectedEntity == null) {
-        return false;
-      } else {
+//      if (selectedEntity == null) {
+//        return false;
+//      } else {
         viewer.createTableModel(part, selectedEntity);
         return true;
-      }
+//      }
     }
   }
 
@@ -96,6 +96,7 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
   }
 
   public void dispose() {
+    viewer.createTableModel(part, null);
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
     if (part != null && part instanceof PasserelleModelMultiPageEditor) {
       ((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(viewer);
