@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
 import org.eclipse.graphiti.platform.IDiagramEditor;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Director;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.ChangeListener;
+import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.StringAttribute;
@@ -48,7 +51,7 @@ import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class ActorAttributesTableViewer extends TableViewer implements CommandStackEventListener {
+public class ActorAttributesTableViewer extends TableViewer implements CommandStackEventListener, ChangeListener {
 
   private static Logger LOGGER = LoggerFactory.getLogger(ActorAttributesTableViewer.class);
 
@@ -63,7 +66,7 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     this.actorSourcePart = actorSourcePart;
     getTable().setLinesVisible(true);
     getTable().setHeaderVisible(true);
-    
+
     createColumns();
     setUseHashlookup(true);
     setColumnProperties(new String[] { "Property", "Value" });
@@ -94,9 +97,16 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
   }
 
   public void createTableModel(final IWorkbenchPart selectedEntitySourcePart, final NamedObj selectedEntity) {
+    if (this.entity != null) {
+      this.entity.removeChangeListener(this);
+    }
     this.actorSourcePart = selectedEntitySourcePart;
     this.entity = selectedEntity;
-    
+
+    if (this.entity != null) {
+      this.entity.addChangeListener(this);
+    }
+
     final List<Attribute> parameterList = new ArrayList<Attribute>();
     if (selectedEntity != null) {
       Class filter = null;
@@ -114,15 +124,18 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
           parameterList.add(parameter);
         }
       }
+
     }
 
     Collections.sort(parameterList, new NamedObjComparator());
-    
+
     try {
       setContentProvider(new IStructuredContentProvider() {
-        public void dispose() {}
+        public void dispose() {
+        }
 
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        }
 
         public Object[] getElements(Object inputElement) {
           if (entity == null) {
@@ -152,6 +165,8 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
       LOGGER.error("Cannot set input", e);
     }
   }
+  
+  
 
   public void stackChanged(CommandStackEvent event) {
     refresh();
@@ -217,43 +232,38 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
   public void setActorName(final GeneralAttribute element, String name) {
     if (ModelUtils.isNameLegal(name)) {
       element.setValue(name);
-      if (actorSourcePart != null && actorSourcePart instanceof PasserelleModelMultiPageEditor) {
-        final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.actorSourcePart;
-        try {
-          final RenameCommand cmd = new RenameCommand(this, entity, element);
-          ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
-          ed.refreshActions();
-        } catch (Exception ne) {
-          MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", ne.getMessage());
-        }
+      try {
+        final RenameCommand cmd = new RenameCommand(this, entity, element);
+        executeMethodOnEditorCommandStack(cmd);
+      } catch (Exception ne) {
+        MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", ne.getMessage());
       }
     } else {
       MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", "The name '" + name + "' is not allowed.\n\n"
           + "Names should not contain '.'");
     }
-
   }
 
   public void setAttributeValue(Object element, Object value) throws IllegalActionException {
+    executeMethodOnEditorCommandStack(new AttributeCommand(this, element, value));
+  }
+
+  private void executeMethodOnEditorCommandStack(final Command cmd) {
+    // TODO make sure the editors are change listeners on the passerelle model,
+    // then the explicit refresh calls should no longer be done here.
     if (this.actorSourcePart instanceof PasserelleModelMultiPageEditor) {
-      final AttributeCommand cmd = new AttributeCommand(this, element, value);
       final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.actorSourcePart;
       ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
-      ed.refreshActions();
+      ed.getEditorSite().getActionBars().getToolBarManager().update(true);
       ed.getEditor().refresh();
     } else if (this.actorSourcePart instanceof PasserelleModelEditor) {
-      final AttributeCommand cmd = new AttributeCommand(this, element, value);
       final PasserelleModelEditor ed = (PasserelleModelEditor) this.actorSourcePart;
       ed.getEditDomain().getCommandStack().execute(cmd);
       ed.getEditorSite().getActionBars().getToolBarManager().update(true);
       ed.refresh();
     } else if (this.actorSourcePart instanceof IDiagramEditor) {
-      // System.out.println(element + "=" + value);
-      if (element instanceof Parameter) {
-        ((Parameter) element).setExpression(value.toString());
-      }
-      // IDiagramEditor ed = (IDiagramEditor) this.part;
-      // ed.getEditingDomain().getCommandStack().execute(cmd);
+      cmd.execute();
+      ((IDiagramEditor) this.actorSourcePart).refresh();
     }
   }
 
@@ -284,6 +294,16 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     });
 
     getControl().setMenu(menuMan.createContextMenu(getControl()));
+  }
+
+  @Override
+  public void changeExecuted(ChangeRequest change) {
+    refresh();
+  }
+
+  @Override
+  public void changeFailed(ChangeRequest change, Exception exception) {
+    refresh();
   }
 
 }

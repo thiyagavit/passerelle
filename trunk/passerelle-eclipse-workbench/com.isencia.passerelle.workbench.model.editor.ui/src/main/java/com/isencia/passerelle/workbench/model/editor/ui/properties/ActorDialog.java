@@ -25,7 +25,8 @@ public class ActorDialog extends Dialog {
 
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite)super.createDialogArea(parent);
-		this.viewer = new ActorAttributesTableViewer(actor,part,composite,SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		this.viewer = new ActorAttributesTableViewer(actor,part,composite,
+		    SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 	  data.heightHint = 200;
 	  viewer.getTable().setLayoutData(data);
@@ -37,6 +38,12 @@ public class ActorDialog extends Dialog {
 		super.create();
 		getShell().setText("Edit Attributes of '"+actor.getDisplayName()+"'");
 		viewer.createTableModel(part, actor);
+	}
+	
+	@Override
+	public boolean close() {
+	  viewer.createTableModel(part, null);
+	  return super.close();
 	}
 	
 	protected void createButtonsForButtonBar(Composite parent) {
