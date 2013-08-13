@@ -4,9 +4,8 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
-import com.isencia.passerelle.actor.Actor;
+import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
@@ -31,7 +30,7 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
 
   @Override
   public String getDescription() {
-    return "Change the name and/or parameters for an actor";
+    return "Configure an actor or director";
   }
 
   @Override
@@ -40,7 +39,7 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
     PictogramElement[] pes = context.getPictogramElements();
     if (pes != null && pes.length == 1) {
       String boCategory = Graphiti.getPeService().getPropertyValue(pes[0], "__BO_CATEGORY");
-      if ("ACTOR".equals(boCategory)) {
+      if ("ACTOR".equals(boCategory) || "DIRECTOR".equals(boCategory)) {
         ret = true;
       }
     }
@@ -52,10 +51,10 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
     PictogramElement[] pes = context.getPictogramElements();
     if (pes != null && pes.length == 1) {
       Object bo = getBusinessObjectForPictogramElement(pes[0]);
-      if (bo instanceof Actor) {
-        Actor actor = (Actor) bo;
+      if (bo instanceof NamedObj) {
+        NamedObj modelElement = (NamedObj) bo;
          final ActorAttributesView view = (ActorAttributesView)EclipseUtils.getActivePage().findView(ActorAttributesView.ID);
-         ActorDialog dialog = new ActorDialog((IWorkbenchPart)getDiagramEditor(), actor);
+         ActorDialog dialog = new ActorDialog((IWorkbenchPart)getDiagramEditor(), modelElement);
          dialog.open();
 //         this.updatePictogramElement(pes[0]);
           this.hasDoneChanges = true;

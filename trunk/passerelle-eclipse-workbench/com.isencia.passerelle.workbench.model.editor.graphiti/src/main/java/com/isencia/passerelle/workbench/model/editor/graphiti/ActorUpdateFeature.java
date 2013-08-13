@@ -7,13 +7,17 @@ import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.util.IColorConstant;
 import ptolemy.data.expr.Parameter;
+import ptolemy.kernel.Port;
 import com.isencia.passerelle.actor.Actor;
 
 public class ActorUpdateFeature extends AbstractUpdateFeature {
@@ -128,19 +132,20 @@ public class ActorUpdateFeature extends AbstractUpdateFeature {
     Object bo = getBusinessObjectForPictogramElement(pe);
     if((pe instanceof ContainerShape) && (bo instanceof Actor)) {
       ContainerShape cs = (ContainerShape) pe;
-      Actor a = (Actor) bo;
+      Actor addedActor = (Actor) bo;
       
+      List<Port> inputPortsInShape = new ArrayList<Port>();
+      List<Port> outputPortsInShape = new ArrayList<Port>();
       for (Shape shape : cs.getChildren()) {
         String boCategory = Graphiti.getPeService().getPropertyValue(shape, "__BO_CATEGORY");
-        String boName = Graphiti.getPeService().getPropertyValue(shape, "__BO_NAME");
         if("ACTOR".equals(boCategory)) {
           Text text = (Text) shape.getGraphicsAlgorithm();
-          text.setValue(a.getName());
+          text.setValue(addedActor.getName());
           result = true;
-          Graphiti.getPeService().setPropertyValue(shape, "__BO_NAME",a.getName());
+          Graphiti.getPeService().setPropertyValue(shape, "__BO_NAME",addedActor.getName());
         } else if("PARAMETER".equals(boCategory)) {
           Text text = (Text) shape.getGraphicsAlgorithm();
-          Parameter param = a.getConfigurableParameter(boName);
+          Parameter param = (Parameter) getBusinessObjectForPictogramElement(shape);
           String pName = param.getDisplayName();
           String pVal = param.getExpression();
           pName = (pName.length()>12) ? pName.substring(0, 12) : pName;
@@ -148,7 +153,24 @@ public class ActorUpdateFeature extends AbstractUpdateFeature {
           text.setValue(pName + " : " + pVal);
           Graphiti.getPeService().setPropertyValue(shape, "__BO_VALUE",param.getExpression());
           result = true;
+        } else if("INPUT".equals(boCategory)) {
+          Port p = (Port) getBusinessObjectForPictogramElement(shape);
+          if(p!=null) {
+            inputPortsInShape.add(p);
+          }
+        } else if("OUTPUT".equals(boCategory)) {
+          Port p = (Port) getBusinessObjectForPictogramElement(shape);
+          if(p!=null) {
+            outputPortsInShape.add(p);
+          }
         }
+      }
+      List<Port> inputPortsInActor = addedActor.inputPortList();
+      List<Port> outputPortsInActor = addedActor.outputPortList();
+      // TODO check if we should care about port "replacement", i.e. when in the model an old port is gone
+      // but a new one has been added. This may impact the graphical model as the connections may need to be updated?
+      if(inputPortsInActor.size() != inputPortsInShape.size()) {
+        
       }
     }
     return result;

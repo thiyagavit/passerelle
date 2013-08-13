@@ -83,12 +83,6 @@ public class DirectorAddFeature extends AbstractAddShapeFeature {
       roundedRectangle.setLineWidth(2);
       gaService.setLocationAndSize(roundedRectangle, SHAPE_X_OFFSET, 0, width, height);
 
-      // if added Class has no resource we add it to the resource
-      // of the diagram
-      // in a real scenario the business model would have its own resource
-      // if (addedActor.eResource() == null) {
-      // getDiagram().eResource().getContents().add(addedActor);
-      // }
       // create link and wire it
       link(containerShape, addedDirector, "DIRECTOR");
     }

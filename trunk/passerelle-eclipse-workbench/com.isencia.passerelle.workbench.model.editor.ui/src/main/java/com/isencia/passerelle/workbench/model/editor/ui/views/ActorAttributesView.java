@@ -96,6 +96,8 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
   }
 
   public void dispose() {
+    // TODO find an alternative way to clear the selection
+    // this current approach leads to Widget disposed errors when closing down the workbench
     viewer.createTableModel(part, null);
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
     if (part != null && part instanceof PasserelleModelMultiPageEditor) {
