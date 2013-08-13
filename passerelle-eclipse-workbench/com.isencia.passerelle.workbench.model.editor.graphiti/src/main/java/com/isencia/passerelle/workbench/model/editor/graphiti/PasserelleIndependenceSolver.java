@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import ptolemy.actor.CompositeActor;
+import ptolemy.actor.Director;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.Port;
@@ -77,10 +78,16 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
   public void setTopLevel(CompositeActor topLevel) {
     this.topLevel = topLevel;
     // now we need to visit all children to register them in the boMap...
+    Director director = topLevel.getDirector();
+    registerDirector(director);
     registerEntities(topLevel);
     getRegisteredUUID(topLevel);
   }
 
+  private void registerDirector(Director director) {
+    registerAttributes(director);
+    getRegisteredUUID(director);
+  }
   private void registerEntities(CompositeEntity entityHolder) {
     @SuppressWarnings("unchecked")
     List<Entity> entities = entityHolder.entityList();
