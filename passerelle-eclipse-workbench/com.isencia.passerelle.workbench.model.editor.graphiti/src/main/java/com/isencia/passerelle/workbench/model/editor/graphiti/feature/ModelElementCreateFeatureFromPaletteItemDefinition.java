@@ -7,7 +7,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.model.Flow;
-import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramFlowRepository;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.DiagramFlowRepository;
 import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramUtils;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 

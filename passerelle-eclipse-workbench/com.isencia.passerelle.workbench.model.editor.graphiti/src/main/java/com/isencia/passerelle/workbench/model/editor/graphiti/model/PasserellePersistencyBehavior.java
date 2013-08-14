@@ -17,7 +17,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramFlowRepository;
 
 public class PasserellePersistencyBehavior extends DefaultPersistencyBehavior {
 
