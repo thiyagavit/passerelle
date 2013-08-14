@@ -1,4 +1,4 @@
-package com.isencia.passerelle.workbench.model.editor.graphiti;
+package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
@@ -6,6 +6,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.ui.IWorkbenchPart;
 import ptolemy.kernel.util.NamedObj;
+import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramFeatureProvider;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;

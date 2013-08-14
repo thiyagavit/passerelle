@@ -5,7 +5,6 @@ package com.isencia.passerelle.workbench.model.editor.graphiti;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
-import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
@@ -22,6 +21,15 @@ import ptolemy.actor.Director;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorAddFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorCollapseFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorConfigureFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorUpdateFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionAddFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionCreateFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.DirectorAddFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementMoveFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 
 /**
  * @author delerw
@@ -52,11 +60,6 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
       return new DirectorAddFeature(this);
     }
     return super.getAddFeature(context);
-  }
-
-  @Override
-  public ICreateFeature[] getCreateFeatures() {
-    return new ICreateFeature[] { new ActorCreateFeature(this) };
   }
 
   @Override
@@ -92,6 +95,6 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-    return new ICustomFeature[] { new ActorConfigureFeature(this) };
+    return new ICustomFeature[] { new ActorConfigureFeature(this), new ActorCollapseFeature(this) };
   }
 }

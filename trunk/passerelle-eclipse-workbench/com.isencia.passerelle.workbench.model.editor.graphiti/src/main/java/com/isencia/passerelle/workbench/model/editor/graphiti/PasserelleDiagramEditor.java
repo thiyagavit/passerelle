@@ -17,6 +17,8 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.Page;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCreateFeatureFromPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserellePersistencyBehavior;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.DragSupportBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorPalettePage;

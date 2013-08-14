@@ -1,20 +1,21 @@
-package com.isencia.passerelle.workbench.model.editor.graphiti;
+package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import ptolemy.kernel.util.Location;
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
-import com.isencia.passerelle.editor.common.model.SubModelPaletteItemDefinition;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramFlowRepository;
 import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramUtils;
 import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 
+/**
+ * Creates a new model element based on a drag-n-drop from the Passerelle palette, after prompting the user for the name.
+ * @author erwin
+ *
+ */
 public class ModelElementCreateFeatureFromPaletteItemDefinition extends AbstractCreateFeature {
 
   private static final String TITLE = "Create actor";
