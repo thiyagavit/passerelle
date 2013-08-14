@@ -1,4 +1,4 @@
-package com.isencia.passerelle.workbench.model.editor.graphiti.util;
+package com.isencia.passerelle.workbench.model.editor.graphiti.model;
 
 import java.util.HashMap;
 import java.util.Map;
