@@ -1,4 +1,4 @@
-package com.isencia.passerelle.workbench.model.editor.graphiti;
+package com.isencia.passerelle.workbench.model.editor.graphiti.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;

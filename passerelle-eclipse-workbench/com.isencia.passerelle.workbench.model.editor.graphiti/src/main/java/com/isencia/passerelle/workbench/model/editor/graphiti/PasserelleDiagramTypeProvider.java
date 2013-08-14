@@ -11,6 +11,7 @@ import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.ui.part.EditorPart;
 import com.isencia.passerelle.model.Flow;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 import com.isencia.passerelle.workbench.model.editor.graphiti.util.DiagramFlowRepository;
 
 /**

@@ -25,17 +25,8 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
 
   public static final String ID = "com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView"; //$NON-NLS-1$
 
-  private NamedObj dialogActor;
   private ActorAttributesTableViewer viewer;
   private IWorkbenchPart part;
-
-  public void setActor(NamedObj actor) {
-    this.dialogActor = actor;
-  }
-
-  public void clear() {
-    viewer.clear();
-  }
 
   public void selectionChanged(IWorkbenchPart part, ISelection selection) {
     if ((part instanceof PasserelleModelMultiPageEditor) || (part instanceof IDiagramEditor)) {
@@ -44,34 +35,28 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
         return;
       }
     }
-    clear();
+    
+    viewer.clear();
   }
 
   @SuppressWarnings("restriction")
   protected boolean updateSelectedEntity(final ISelection selection) {
-
     if (!(selection instanceof StructuredSelection)) {
+      viewer.clear();
       return false;
     } else {
-      NamedObj selectedEntity = dialogActor;
-      if (selectedEntity == null) {
-        final Object sel = ((StructuredSelection) selection).getFirstElement();
-        if (sel instanceof AbstractBaseEditPart) {
-          selectedEntity = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
-        } else if (sel instanceof IShapeEditPart) {
-          IShapeEditPart selectedShapePart = (IShapeEditPart) sel;
-          PictogramElement pictogramElement = selectedShapePart.getPictogramElement();
-          Object selectedActor = ((IDiagramEditor) part).getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
-          selectedEntity = (NamedObj) selectedActor;
-        }
+      NamedObj selectedEntity = null;
+      final Object sel = ((StructuredSelection) selection).getFirstElement();
+      if (sel instanceof AbstractBaseEditPart) {
+        selectedEntity = (NamedObj) ((AbstractBaseEditPart) sel).getModel();
+      } else if (sel instanceof IShapeEditPart) {
+        IShapeEditPart selectedShapePart = (IShapeEditPart) sel;
+        PictogramElement pictogramElement = selectedShapePart.getPictogramElement();
+        Object selectedActor = ((IDiagramEditor) part).getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
+        selectedEntity = (NamedObj) selectedActor;
       }
-
-//      if (selectedEntity == null) {
-//        return false;
-//      } else {
-        viewer.createTableModel(part, selectedEntity);
-        return true;
-//      }
+      viewer.createTableModel(part, selectedEntity);
+      return true;
     }
   }
 
@@ -82,7 +67,7 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
    */
   @Override
   public void createPartControl(Composite parent) {
-    this.viewer = new ActorAttributesTableViewer(dialogActor, part, parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+    this.viewer = new ActorAttributesTableViewer(null, part, parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
     if (getSite() != null)
       getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
@@ -96,13 +81,8 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
   }
 
   public void dispose() {
-    // TODO find an alternative way to clear the selection
-    // this current approach leads to Widget disposed errors when closing down the workbench
-    viewer.createTableModel(part, null);
+    viewer.dispose();
     getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
-    if (part != null && part instanceof PasserelleModelMultiPageEditor) {
-      ((PasserelleModelMultiPageEditor) part).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(viewer);
-    }
     super.dispose();
   }
 

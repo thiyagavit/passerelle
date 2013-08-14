@@ -27,7 +27,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.actor.Director;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.ChangeListener;
@@ -51,7 +50,87 @@ import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
-public class ActorAttributesTableViewer extends TableViewer implements CommandStackEventListener, ChangeListener {
+public class ActorAttributesTableViewer extends TableViewer implements CommandStackEventListener {
+
+  public static final class AttributesContentProvider implements IStructuredContentProvider, ChangeListener {
+    private final static Attribute[] EMPTY_ATTRS = new Attribute[0];
+    private Object[] attributes;
+    private NamedObj entity;
+    private final TableViewer viewer;
+
+    public AttributesContentProvider(TableViewer viewer, NamedObj entity) {
+      this.attributes = buildAttributes(entity);
+      this.entity = entity;
+      this.viewer = viewer;
+    }
+
+    private Object[] buildAttributes(NamedObj entity) {
+      if (entity == null) {
+        return EMPTY_ATTRS;
+      } else {
+        entity.addChangeListener(this);
+        final List<Attribute> attrList = new ArrayList<Attribute>();
+        Class<?> filter = null;
+        if (entity instanceof TextAttribute) {
+          filter = StringAttribute.class;
+        } else {
+          filter = Parameter.class;
+        }
+        @SuppressWarnings("unchecked")
+        Iterator<Attribute> parameterIterator = entity.attributeList(filter).iterator();
+        boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
+        while (parameterIterator.hasNext()) {
+          Attribute parameter = parameterIterator.next();
+          if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(entity, (Parameter) parameter, expert))) {
+            attrList.add(parameter);
+          }
+        }
+        Collections.sort(attrList, new NamedObjComparator());
+        boolean addExpertElements = (entity instanceof Actor && expert);
+        final List<Object> ret = addExpertElements ? new ArrayList<Object>(attrList.size() + 3) : new ArrayList<Object>(attrList.size() + 1);
+        if (addExpertElements){
+          ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.TYPE, PaletteBuilder.getInstance().getType(entity.getClass())));
+          ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, entity.getClass().getName()));
+        }
+        ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME, PaletteBuilder.getInstance().getType(entity.getName())));
+        ret.addAll(attrList);
+        return ret.toArray(new Object[ret.size()]);
+      }
+    }
+
+    public void dispose() {
+      if (entity != null) {
+        entity.removeChangeListener(this);
+      }
+    }
+
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      if (entity != null) {
+        entity.removeChangeListener(this);
+      }
+      if(newInput instanceof NamedObj) {
+        entity = (NamedObj) newInput;
+        attributes = buildAttributes(entity);
+      } else {
+        entity = null;
+        attributes = buildAttributes(null);
+      }
+    }
+
+    public Object[] getElements(Object inputElement) {
+      return attributes;
+    }
+
+    @Override
+    public void changeExecuted(ChangeRequest change) {
+      viewer.refresh();
+    }
+
+    @Override
+    public void changeFailed(ChangeRequest change, Exception exception) {
+      viewer.refresh();
+    }
+  }
 
   private static Logger LOGGER = LoggerFactory.getLogger(ActorAttributesTableViewer.class);
 
@@ -66,23 +145,18 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     this.actorSourcePart = actorSourcePart;
     getTable().setLinesVisible(true);
     getTable().setHeaderVisible(true);
-
     createColumns();
     setUseHashlookup(true);
     setColumnProperties(new String[] { "Property", "Value" });
-
     createPopupMenu();
     getTable().addKeyListener(new KeyListener() {
-
       public void keyReleased(KeyEvent e) {
       }
-
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.F1) {
           try {
             showHelpSelectedParameter();
           } catch (IllegalActionException e1) {
-
           }
         }
         if (e.character == SWT.DEL) {
@@ -94,79 +168,22 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
         }
       }
     });
+    setContentProvider(new AttributesContentProvider(this, entity));
   }
 
   public void createTableModel(final IWorkbenchPart selectedEntitySourcePart, final NamedObj selectedEntity) {
-    if (this.entity != null) {
-      this.entity.removeChangeListener(this);
-    }
     this.actorSourcePart = selectedEntitySourcePart;
     this.entity = selectedEntity;
-
-    if (this.entity != null) {
-      this.entity.addChangeListener(this);
-    }
-
-    final List<Attribute> parameterList = new ArrayList<Attribute>();
-    if (selectedEntity != null) {
-      Class filter = null;
-      if (selectedEntity instanceof TextAttribute) {
-        filter = StringAttribute.class;
-      } else {
-        filter = Parameter.class;
-      }
-      Iterator parameterIterator = selectedEntity.attributeList(filter).iterator();
-      boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
-      while (parameterIterator.hasNext()) {
-        Attribute parameter = (Attribute) parameterIterator.next();
-
-        if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(selectedEntity, (Parameter) parameter, expert))) {
-          parameterList.add(parameter);
-        }
-      }
-
-    }
-
-    Collections.sort(parameterList, new NamedObjComparator());
-
+    setContentProvider(new AttributesContentProvider(this, selectedEntity));
     try {
-      setContentProvider(new IStructuredContentProvider() {
-        public void dispose() {
-        }
-
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        public Object[] getElements(Object inputElement) {
-          if (entity == null) {
-            return new Parameter[] {};
-          } else {
-            final List<Object> ret = new ArrayList<Object>(parameterList.size() + 1);
-
-            final Director director = entity instanceof Actor ? (Director) ((Actor) entity).getDirector() : null;
-
-            boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
-            if (entity instanceof Actor && expert)
-              ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.TYPE, PaletteBuilder.getInstance().getType(entity.getClass())));
-
-            if (entity instanceof Actor && director != null && expert)
-              ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, entity.getClass().getName()));
-
-            ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME, PaletteBuilder.getInstance().getType(entity.getName())));
-            ret.addAll(parameterList);
-            return ret.toArray(new Object[ret.size()]);
-          }
-        }
-      });
-
-      setInput(new Object());
-      refresh();
+      if (getControl() != null && !getControl().isDisposed()) {
+        setInput(entity);
+        refresh();
+      }
     } catch (Exception e) {
       LOGGER.error("Cannot set input", e);
     }
   }
-  
-  
 
   public void stackChanged(CommandStackEvent event) {
     refresh();
@@ -176,18 +193,28 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     if (actorSourcePart != null && actorSourcePart instanceof PasserelleModelMultiPageEditor) {
       ((PasserelleModelMultiPageEditor) actorSourcePart).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
     }
-    createTableModel(null, null);
+    this.actorSourcePart = null;
+    this.entity = null;
+    if (getControl() != null && !getControl().isDisposed()) {
+      setInput(null);
+      refresh();
+    }
+  }
+
+  public void dispose() {
+    if (actorSourcePart != null && actorSourcePart instanceof PasserelleModelMultiPageEditor) {
+      ((PasserelleModelMultiPageEditor) actorSourcePart).getEditor().getEditDomain().getCommandStack().removeCommandStackEventListener(this);
+    }
+    this.actorSourcePart = null;
+    this.entity = null;
   }
 
   private void createColumns() {
-
     final TableViewerColumn name = new TableViewerColumn(this, SWT.LEFT, 0);
-
     name.getColumn().setText("Property");
     name.getColumn().setWidth(200);
     name.setLabelProvider(new PropertyLabelProvider());
     final TableViewerColumn value = new TableViewerColumn(this, SWT.LEFT, 1);
-
     value.getColumn().setText("Value");
     value.getColumn().setWidth(700);
     value.setLabelProvider(new VariableLabelProvider(this));
@@ -200,7 +227,6 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
   }
 
   public void deleteSelectedParameter() throws IllegalActionException {
-
     final ISelection sel = getSelection();
     if (sel != null && sel instanceof StructuredSelection) {
       final StructuredSelection s = (StructuredSelection) sel;
@@ -214,7 +240,6 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
   }
 
   public void showHelpSelectedParameter() throws IllegalActionException {
-
     final ISelection sel = getSelection();
     if (sel != null && sel instanceof StructuredSelection) {
       final StructuredSelection s = (StructuredSelection) sel;
@@ -225,7 +250,6 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
         // WorkbenchHelp.displayHelp(contextId);
         WorkbenchHelpSystem.getInstance().displayHelpResource(contextId);
       }
-
     }
   }
 
@@ -272,7 +296,6 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
    */
   private void createPopupMenu() {
     MenuManager menuMan = new MenuManager();
-
     menuMan.add(new Action("Delete Attribute", Activator.getImageDescriptor("icons/delete_obj.gif")) {
       public void run() {
         (new DeleteAttributeHandler()).run(null);
@@ -292,18 +315,6 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
         WorkbenchHelpSystem.getInstance().displayHelp();
       }
     });
-
     getControl().setMenu(menuMan.createContextMenu(getControl()));
   }
-
-  @Override
-  public void changeExecuted(ChangeRequest change) {
-    refresh();
-  }
-
-  @Override
-  public void changeFailed(ChangeRequest change, Exception exception) {
-    refresh();
-  }
-
 }

@@ -1,4 +1,4 @@
-package com.isencia.passerelle.workbench.model.editor.graphiti;
+package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 
 import java.util.ArrayList;
 import java.util.List;
