@@ -1,0 +1,46 @@
+#summary The why and the how of migrating towards a Graphiti-based model editor
+#labels Phase-Implementation,Phase-Design
+
+= Moving the Passerelle editor to Graphiti =
+
+== Drivers ==
+  * The look-n-feel of the current editor is not optimal
+  * Connection routing is primitive
+  * Actor configuration not possible via double-click and config dialog.
+  * Ptolemy/Passerelle models, stored in MOML files, don't have explicit support for advanced layout, decorations etc.
+  * GEF-based implementation leaves lots of technical issues and decisions to the editor development.
+  * Code base has evolved through several developers and learning curves.
+As a consequence of these two facts, the implementation still had some annoying issues, and code was not ideal to fix/maintain/extend.
+
+
+  * Graphiti offers a higher level of abstraction, based on proven requirements for feature-sets of graphical model editors.
+It combines this with a nice approach, APIs and patterns to implement custom editors.
+  * It allows to separate advanced graphical modeling features from the underlying "business objects", a Passerelle flow with actors, director etc, in our case.
+  * Many nice-to-have features are supported out-of-the-box or through simple customizations.
+  * Active Graphiti community
+  * Even though it's still not at a 1.x release level (current version for Eclipse Kepler is 0.10), it has been proven :
+-  * at SAP, the original source of graphiti development
+-  * in nice use cases like the eclipse BPMN2 modeler, JBPM5 modeler by JBoss/RedHat and others
+
+
+== Approach ==
+
+=== High-level choices ===
+  * Pilot for a basic model editor
+  * Passerelle workbench will package the existing and the new editor together during a migration period
+  * Existing Actor Palette tree-view and Actor Attributes view should work with both editors
+  * We will use Graphiti with a non-EMF business model. 
+I.e. the Ptolemy/Passerelle flow, actors, director, relations etc are directly used as business model, as in the existing GEF-based editor.
+But Graphiti adds a graphical model (EMF-based) with support for advanced layout mechanisms, decorations etc.
+
+=== Some details ===
+
+
+== The pilot ==
+
+=== Scope ===
+
+=== Design ===
+
+=== Lessons learned ===
+

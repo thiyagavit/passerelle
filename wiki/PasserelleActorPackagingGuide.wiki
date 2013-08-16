@@ -150,7 +150,7 @@ public class Activator implements BundleActivator {
 
 Remark that the above is also valid for when you want to add other types of model elements like new Director implementations.
 
-== Adding your new actor plugin(s) to your RCP workbench ==
+== Packaging your new actor plugin(s) for your RCP workbench ==
 
 To be able to add a new actor bundle to your RCP workbench, two extra things are required :
   * Define the palette-related meta-data for your new actors, mainly :
@@ -266,5 +266,18 @@ limitations under the License.
 Once this is ready, we can simply export our new actor package e.g. to a .zip archive from the feature editor :
 
 http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/ActorFeatureExport.jpg
+
+The result could be e.g. a _exampleactors.zip_ containing the _actor_ and _actor.conf_ bundles.
+
+== Adding a new actor package to your workbench ==
+
+The v8.4.0 workbench contains the required eclipse plugins to enable the update UI menu items.
+From the menu _Software>Install New Software..._ the standard eclipse extensions installation wizard is opened.
+There you can _Add..._ the exported zip-file as an archive-based repository.
+
+Remark that no category was configured in our example, so you should deselect "Group items by category" to see your actor feature.
+From there you can select it and follow the normal installation flow.
+
+When the installation is done, your new actors should appear in the actor palette and are ready for use!
 
 
