@@ -4,42 +4,60 @@
 = Moving the Passerelle editor to Graphiti =
 
 == Drivers ==
+=== As is ===
   * The look-n-feel of the current editor is not optimal
   * Connection routing is primitive
   * Actor configuration not possible via double-click and config dialog.
   * Ptolemy/Passerelle models, stored in MOML files, don't have explicit support for advanced layout, decorations etc.
   * GEF-based implementation leaves lots of technical issues and decisions to the editor development.
   * Code base has evolved through several developers and learning curves.
-    As a consequence of these two facts, the implementation still had some annoying issues, and code was not ideal to fix/maintain/extend.
+  * As a consequence of these two last facts, the implementation still had some annoying issues, and code was not ideal to fix/maintain/extend.
 
-
-  * Graphiti offers a higher level of abstraction, based on proven requirements for feature-sets of graphical model editors.
-    It combines this with a nice approach, APIs and patterns to implement custom editors.
+=== To be ===
+  * Graphiti offers a higher level of abstraction, based on proven requirements for feature-sets of graphical model editors. It combines this with a nice approach, APIs and patterns to implement custom editors.
+  * It is built on top of GEF and EMF, so the underlying platform is very similar to the current editor. No weird new dependencies or frameworks are needed.
   * It allows to separate advanced graphical modeling features from the underlying "business objects", a Passerelle flow with actors, director etc, in our case.
   * Many nice-to-have features are supported out-of-the-box or through simple customizations.
   * Active Graphiti community
   * Even though it's still not at a 1.x release level (current version for Eclipse Kepler is 0.10), it has been proven :
     * at SAP, the original source of graphiti development
-    * in nice use cases like the eclipse BPMN2 modeler, JBPM5 modeler by JBoss/RedHat and others
-
+    * in nice use cases like the eclipse BPMN2 modeler, JBPM5 modeler by JBoss and others
 
 == Approach ==
-
 === High-level choices ===
-  * Pilot for a basic model editor
+  * Do a pilot for a basic model editor on Graphiti
   * Passerelle workbench will package the existing and the new editor together during a migration period
   * Existing Actor Palette tree-view and Actor Attributes view should work with both editors
   * We will use Graphiti with a non-EMF business model. 
     I.e. the Ptolemy/Passerelle flow, actors, director, relations etc are directly used as business model, as in the existing GEF-based editor.
     But Graphiti adds a graphical model (EMF-based) with support for advanced layout mechanisms, decorations etc.
-
+  
 === Some details ===
-
+  * No actors in the default Graphiti/GEF palette. Actors are dragged-n-dropped from the custom Actor palette tree-view.
+  * A model is stored in two files now, a moml and an XMI file with the graphical model. 
+  * Modeling elements supported in MOML should correctly reflect what has been defined in the graphical model. E.g. actor locations should be consistent.
+  * As the workbench will initially contain both editors, there is a risk that someone directly edits the moml file using the old editor. 
+  This will lead to inconsistencies with the graphical model.
+  It should be possible to regenerate/update the moml file from the graphical model file and vice-versa.
 
 == The pilot ==
 
 === Scope ===
+  * Learn graphiti
+  * Focus on features and on overall look-n-feel; not on graphical details of each actor shape
+  * Continuous refactoring during learning to ensure pilot code is the right basis for future extensions. I.e. no throw-away code at the end of the pilot!
+  * Some impact on existing code-base is acceptable (and should fix & refactor where appropriate)
+  * Tests for compatibility of new generated MOMLs with old editor and runtimes    
+  * Collect feedback from DAWN about 
+    * breaking changes/impact
+    * inspiration for extra features
+
 
 === Design ===
 
 === Lessons learned ===
+
+== Roadmap ==
+
+  * Add support for configurable actor shape contents via a graphiti-compatible replacement for IActorFigureProvider
+  
