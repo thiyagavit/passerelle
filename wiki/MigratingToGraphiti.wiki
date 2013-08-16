@@ -39,13 +39,13 @@ Their tutorial example (also documented in their on-line help available when you
   
 === Some details ===
   * No actors in the default Graphiti/GEF palette. Actors are dragged-n-dropped from the custom Actor palette tree-view.
-  * A model is stored in two files now, a MOML and an XMI file with the graphical model. The new editor will also generate&update the MOML file when saving a model.
+  * A model will be stored in two files, a MOML and an XMI file with the graphical model. So the new editor will also generate&update the MOML file when saving a model.
   * Modeling elements supported in MOML should correctly reflect what has been defined in the graphical model. E.g. actor locations should be consistent.
   * As the workbench will initially contain both editors, there is a risk that someone directly edits the moml file using the old editor. 
     * This will lead to inconsistencies with the graphical model.
     * So it would be good to be able to reconcile/regenerate/update the moml file from the graphical model file and vice-versa.
   * Graphiti uses _Diagrams_ containing hierarchical _Shapes_ and _GraphicsAlgorithms_ to build graphical representations of model elements. This encapsulates the GEF/draw2d _Canvas_, _Figures_ etc. 
-  * Typical editor actions like drag-n-drop, moving, copy/paste, delete etc are implement via Graphiti _Features_ . These can be linked to standard key strokes, context menus etc.
+  * Typical editor actions like drag-n-drop, moving, copy/paste, delete etc are implemented via Graphiti _Features_ . These can be linked to standard key strokes, context menus etc.
   * Actor shapes should be overridable/configurable, within a standardized actor shape container. The container defines selection, layout boundaries, port locations etc.
   * By default Graphiti uses an on-demand update feature to apply "business model" changes to the graphical model. I.e. it marks model elements as "changed" and the user must trigger an update manually.
   * Graphiti itself is based on EMF, including its command framework. 
@@ -103,7 +103,7 @@ Overall, the pilot implementation will follow the Graphiti architecture. This im
     * Graphiti's _DiagramEditor_ must be extended for our needs.
     * The editor is registered in our plugin as an extension on _org.eclipse.ui.editors_
     * Some elements may change into "behaviours", when upgrading to Graphiti 0.10, where extending the _DiagramEditor_ has become more modular.
-    * This integration will require code modifications around the palette and attributes view, wherever they are currently tightly coupled to the old _PasserelleModel(MultiPage)Editor_ or _PasserelleModelEditor_.
+    * This integration will require code modifications around the palette and attributes view, wherever they are currently tightly coupled to the old _PasserelleModel(MultiPage)Editor_.
     * The editor is also the driver for saving models, i.e. where our _PasserellePersistencyBehavior_ must be plugged in.
   * _com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleToolBehaviorProvider_ 
     * It drives custom features in context menu and in context buttons
@@ -134,6 +134,7 @@ A very basic editor is working :
   * Submodels and drill-down : TO BE DONE
   * Direct editing of actor name : TO BE DONE
   * Decorators : TO BE DONE
+  * Graphical/tree outline view : TO BE DONE
 
 As a simple teaser, two screenshots of a same model :
   * The Graphiti-based "Hello World" with some heavy bendpoint steering, and the extensible context buttons pop-up for a selected actor :
