@@ -113,8 +113,30 @@ It is important to know that for each open diagram/flow, separate instances of m
 Finally, a new wizard is added : _com.isencia.passerelle.workbench.model.editor.graphiti.wizard.CreateDiagramWizard_
   * The wizard is registered in our plugin as an extension on _org.eclipse.ui.newWizards_
 
-  
 The pilot is developed in one new bundle _com.isencia.passerelle.workbench.model.editor.graphiti_.
+
+=== Status ===
+What's the current status of the pilot? A very basic editor is working :
+  * Wizard to create a new model from scratch : OK
+  * D-n-D from Actor palette tree-view : OK
+  * Actor configuration via double-click and/or attributes view : OK
+  * Connecting ports : OK
+  * Moving, reconfiguring should update underlying flow/MOML : OK
+  * Free addition of bendpoints : OK
+  * Collapse/Expand actors : IN PROGRESS
+    * a first basic effect is working, hiding/showing parameters and minimizing actor shape
+    * but nice shape adjustment to be finished
+  * Running the model from inside the Graphiti editor : TO BE DONE
+    * For the moment you can run from the MOML editor, i.e. the moml is correctly generated/maintained and works fine.
+  * Submodels : TO BE DONE
+
+As a simple teaser, two screenshots of a same model :
+  * The Graphiti-based "Hello World" with some heavy bendpoint steering :
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/Graphiti-based_HelloWorld.png
+
+  * The accompanying MOML file as opened in the GEF-based editor :
+http://svn.codespot.com/a/eclipselabs.org/passerelle/wiki/img/Gef-based_HelloWorld.png
+
 
 === Lessons learned ===
 
