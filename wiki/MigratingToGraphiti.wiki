@@ -19,8 +19,8 @@ It combines this with a nice approach, APIs and patterns to implement custom edi
   * Many nice-to-have features are supported out-of-the-box or through simple customizations.
   * Active Graphiti community
   * Even though it's still not at a 1.x release level (current version for Eclipse Kepler is 0.10), it has been proven :
--  * at SAP, the original source of graphiti development
--  * in nice use cases like the eclipse BPMN2 modeler, JBPM5 modeler by JBoss/RedHat and others
+  * * at SAP, the original source of graphiti development
+  * * in nice use cases like the eclipse BPMN2 modeler, JBPM5 modeler by JBoss/RedHat and others
 
 
 == Approach ==
@@ -43,4 +43,3 @@ But Graphiti adds a graphical model (EMF-based) with support for advanced layout
 === Design ===
 
 === Lessons learned ===
-
