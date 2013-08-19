@@ -2,6 +2,8 @@ package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.ui.IWorkbenchPart;
@@ -37,9 +39,11 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
   @Override
   public boolean canExecute(ICustomContext context) {
     boolean ret = false;
-    PictogramElement[] pes = context.getPictogramElements();
-    if (pes != null && pes.length == 1) {
-      String boCategory = Graphiti.getPeService().getPropertyValue(pes[0], "__BO_CATEGORY");
+    PictogramElement pe = context.getInnerPictogramElement();
+    GraphicsAlgorithm ga = context.getInnerGraphicsAlgorithm();
+    // prevent double click action on actor's name's Text field
+    if (pe != null && !(ga instanceof Text)) {
+      String boCategory = Graphiti.getPeService().getPropertyValue(pe, "__BO_CATEGORY");
       if ("ACTOR".equals(boCategory) || "DIRECTOR".equals(boCategory)) {
         ret = true;
       }

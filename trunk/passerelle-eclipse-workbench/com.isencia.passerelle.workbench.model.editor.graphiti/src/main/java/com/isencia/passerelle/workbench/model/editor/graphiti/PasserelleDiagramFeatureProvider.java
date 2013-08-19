@@ -5,15 +5,18 @@ package com.isencia.passerelle.workbench.model.editor.graphiti;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
+import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
@@ -24,6 +27,7 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorAddFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorCollapseFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorConfigureFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementNameDirectEditFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorUpdateFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionAddFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionCreateFeature;
@@ -65,6 +69,16 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
   @Override
   public ICreateConnectionFeature[] getCreateConnectionFeatures() {
     return new ICreateConnectionFeature[] { new ConnectionCreateFeature(this) };
+  }
+
+  @Override
+  public IDirectEditingFeature getDirectEditingFeature(IDirectEditingContext context) {
+    PictogramElement pe = context.getPictogramElement();
+    Object bo = getBusinessObjectForPictogramElement(pe);
+    if (bo instanceof NamedObj) {
+      return new ModelElementNameDirectEditFeature(this);
+    }
+    return super.getDirectEditingFeature(context);
   }
 
   @Override

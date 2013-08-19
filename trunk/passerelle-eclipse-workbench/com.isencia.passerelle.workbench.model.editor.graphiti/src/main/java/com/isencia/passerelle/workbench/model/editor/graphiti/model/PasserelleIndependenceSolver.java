@@ -79,7 +79,9 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
     this.topLevel = topLevel;
     // now we need to visit all children to register them in the boMap...
     Director director = topLevel.getDirector();
-    registerDirector(director);
+    if(director!=null) {
+      registerDirector(director);
+    }
     registerEntities(topLevel);
     getRegisteredUUID(topLevel);
   }
