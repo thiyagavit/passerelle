@@ -13,8 +13,8 @@ import com.isencia.passerelle.workbench.model.ui.command.CreateComponentCommand;
 
 /**
  * Creates a new model element based on a drag-n-drop from the Passerelle palette, after prompting the user for the name.
+ * 
  * @author erwin
- *
  */
 public class ModelElementCreateFeatureFromPaletteItemDefinition extends AbstractCreateFeature {
 
@@ -35,13 +35,14 @@ public class ModelElementCreateFeatureFromPaletteItemDefinition extends Abstract
   }
 
   public Object[] create(ICreateContext context) {
+    // !!actor name can now be set via direct editing after D-n-D
     // ask user for actor name
-    String actorName = DiagramUtils.askString(TITLE, USER_QUESTION, "");
-    if (actorName == null || actorName.trim().length() == 0) {
-      return EMPTY;
-    }
+    // String actorName = DiagramUtils.askString(TITLE, USER_QUESTION, "");
+    // if (actorName == null || actorName.trim().length() == 0) {
+    // return EMPTY;
+    // }
 
-    return create(context, actorName);
+    return create(context, selectedActorTemplate.getName());
   }
 
   public Object[] create(ICreateContext context, String actorName) {
@@ -50,23 +51,17 @@ public class ModelElementCreateFeatureFromPaletteItemDefinition extends Abstract
       Flow flow = DiagramFlowRepository.getFlowForDiagram(d);
 
       // create actor
-      selectedActorTemplate.getClazz();
       CreateComponentCommand create = new CreateComponentCommand(null, flow);
       create.setName(actorName);
       create.setClazz(selectedActorTemplate.getClazz());
-
       create.setLocation(new double[] { context.getX(), context.getY() });
       create.setLabel("add actor");
-
       create.execute();
       NamedObj result = create.getChild();
-//      Const constActor = new Const(flow, actorName);
-//      double[] locations = new double[] {context.getX(), context.getY()};
-//      new Location(constActor, "_location").setLocation(locations);
-
       // do the add
       addGraphicalRepresentation(context, result);
-
+      // activate direct editing after object creation
+      getFeatureProvider().getDirectEditingInfo().setActive(true);
       // return newly created business object(s)
       return new Object[] { result };
     } catch (Exception e) {

@@ -38,8 +38,6 @@ public class PasserelleDiagramEditor extends DiagramEditor {
   public void createPartControl(Composite parent) {
     super.createPartControl(parent);
 
-    // this.getGraphicalViewer().addDropTargetListener(new PasserelleTemplateTransferDropTargetListener(this.getGraphicalViewer()));
-
     getRefreshBehavior().refresh();
     
     getSite().getShell().getDisplay().asyncExec(new Runnable() {
@@ -51,7 +49,6 @@ public class PasserelleDiagramEditor extends DiagramEditor {
         }
       }
     });
-
   }
 
   public Object getAdapter(@SuppressWarnings("rawtypes") Class type) {
@@ -59,7 +56,6 @@ public class PasserelleDiagramEditor extends DiagramEditor {
       ActorTreeViewerPage actorTreeViewPage = new ActorTreeViewerPage(getActionRegistry(), new MyDragSupportBuilder());
       return actorTreeViewPage;
     }
-
     return super.getAdapter(type);
   }
 

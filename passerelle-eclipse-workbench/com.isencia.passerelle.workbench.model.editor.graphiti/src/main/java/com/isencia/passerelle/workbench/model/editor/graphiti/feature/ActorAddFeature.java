@@ -3,6 +3,7 @@ package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
@@ -12,12 +13,13 @@ import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
-import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.ICreateService;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
@@ -41,9 +43,9 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
   private static final IColorConstant PORT_BACKGROUND = IColorConstant.WHITE;
   private static final IColorConstant ERRORPORT_BACKGROUND = IColorConstant.RED;
   private static final IColorConstant CONTROLPORT_BACKGROUND = IColorConstant.BLUE;
-  
+
   private static final Map<Class<? extends Port>, IColorConstant> portColours;
-  
+
   static {
     portColours = new HashMap<Class<? extends Port>, IColorConstant>();
     portColours.put(ErrorPort.class, ERRORPORT_BACKGROUND);
@@ -53,13 +55,13 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
   public ActorAddFeature(IFeatureProvider fp) {
     super(fp);
   }
-  
+
   protected void link(PictogramElement pe, Object businessObject, String category) {
     super.link(pe, businessObject);
     // add property on the graphical model element, identifying the associated passerelle model element
     // so we can easily distinguish and identify them later on for updates etc
-    if(businessObject instanceof NamedObj) {
-      Graphiti.getPeService().setPropertyValue(pe, "__BO_NAME", ((NamedObj)businessObject).getName());
+    if (businessObject instanceof NamedObj) {
+      Graphiti.getPeService().setPropertyValue(pe, "__BO_NAME", ((NamedObj) businessObject).getName());
     }
     Graphiti.getPeService().setPropertyValue(pe, "__BO_CATEGORY", category);
     Graphiti.getPeService().setPropertyValue(pe, "__BO_CLASS", businessObject.getClass().getName());
@@ -85,13 +87,14 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
 
     // CONTAINER SHAPE WITH ROUNDED RECTANGLE
     IPeCreateService peCreateService = Graphiti.getPeCreateService();
+    ICreateService createService = Graphiti.getCreateService();
+    IGaService gaService = Graphiti.getGaService();
     ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
 
     // define a default size for the shape
     int width = 100;
     int height = 60;
-    IGaService gaService = Graphiti.getGaService();
-    
+
     Rectangle invisibleRectangle; // need to access it later
 
     {
@@ -121,7 +124,7 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
       Shape shape = peCreateService.createShape(containerShape, false);
 
       // create and set graphics algorithm
-      Polyline polyline = gaService.createPolyline(shape, new int[] { SHAPE_X_OFFSET, 20, SHAPE_X_OFFSET+width, 20 });
+      Polyline polyline = gaService.createPolyline(shape, new int[] { SHAPE_X_OFFSET, 20, SHAPE_X_OFFSET + width, 20 });
       polyline.setForeground(manageColor(ACTOR_FOREGROUND));
       polyline.setLineWidth(2);
     }
@@ -141,8 +144,18 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
 
       // create link and wire it
       link(shape, addedActor, "ACTOR");
+
+      // provide information to support direct-editing directly
+      // after object creation (must be activated additionally)
+      IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+      // set container shape for direct editing after object creation
+      directEditingInfo.setMainPictogramElement(containerShape);
+      // set shape and graphics algorithm where the editor for
+      // direct editing shall be opened after object creation
+      directEditingInfo.setPictogramElement(shape);
+      directEditingInfo.setGraphicsAlgorithm(text);
     }
-    
+
     // SHAPES for basic configurable parameters (other parameters will be in the Configure dialogue, but not shown by default in the actor shape)
     {
       int pIndex = 0;
@@ -153,59 +166,57 @@ public class ActorAddFeature extends AbstractAddShapeFeature {
         // create and set text graphics algorithm
         String pName = param.getDisplayName();
         String pVal = param.getExpression();
-        pName = (pName.length()>12) ? pName.substring(0, 12) : pName;
-        pVal = (pVal.length()>12) ? pVal.substring(0, 12) : pVal;
-        
+        pName = (pName.length() > 12) ? pName.substring(0, 12) : pName;
+        pVal = (pVal.length() > 12) ? pVal.substring(0, 12) : pVal;
+
         Text text = gaService.createText(shape, pName + " : " + pVal);
-//        IUiLayoutService uil = GraphitiUi.getUiLayoutService();
-//        IDimension dim = uil.calculateTextSize(text.getValue(), text.getFont());
-        
+        // IUiLayoutService uil = GraphitiUi.getUiLayoutService();
+        // IDimension dim = uil.calculateTextSize(text.getValue(), text.getFont());
+
         text.setForeground(manageColor(PARAM_FOREGROUND));
         text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
         // vertical alignment has as default value "center"
         text.setFont(gaService.manageFont(getDiagram(), IGaService.DEFAULT_FONT, 6));
-        gaService.setLocationAndSize(text, SHAPE_X_OFFSET + 5, 22 + 20*pIndex++, width, 20);
+        gaService.setLocationAndSize(text, SHAPE_X_OFFSET + 5, 22 + 20 * pIndex++, width, 20);
 
         // create link and wire it
         link(shape, param, "PARAMETER");
         Graphiti.getPeService().setPropertyValue(shape, "__BO_VALUE", param.getExpression());
       }
     }
-    
+
     // SHAPES FOR PORTS
     {
       // add output port anchor
       int pIndex = 0;
       for (Port p : (List<Port>) addedActor.outputPortList()) {
-        BoxRelativeAnchor anchor = peCreateService.createBoxRelativeAnchor(containerShape);
-        anchor.setRelativeWidth(1);
-        anchor.setRelativeHeight(0.2*(1 + pIndex++));
+        FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
+        anchor.setLocation(createService.createPoint(15 + width, 10 + (pIndex++) * 12));
         anchor.setReferencedGraphicsAlgorithm(invisibleRectangle);
-        link(anchor,p, "OUTPUT");
+        link(anchor, p, "OUTPUT");
         // assign a rectangle graphics algorithm for the box relative anchor
         // note, that the rectangle is inside the border of the rectangle shape
-        final Polygon portShape = gaService.createPlainPolygon(anchor, new int[] {0,0,12,6,0,12});
+        final Polygon portShape = gaService.createPlainPolygon(anchor, new int[] { 0, 0, 12, 6, 0, 12 });
         portShape.setForeground(manageColor(PORT_FOREGROUND));
         IColorConstant portColour = portColours.get(p.getClass());
-        portColour = portColour!=null ? portColour : PORT_BACKGROUND;
+        portColour = portColour != null ? portColour : PORT_BACKGROUND;
         portShape.setBackground(manageColor(portColour));
         portShape.setLineWidth(1);
         gaService.setLocationAndSize(portShape, -12, -6, 12, 12);
       }
       pIndex = 0;
       for (Port p : (List<Port>) addedActor.inputPortList()) {
-        BoxRelativeAnchor anchor = peCreateService.createBoxRelativeAnchor(containerShape);
-        anchor.setRelativeWidth(0);
-        anchor.setRelativeHeight(0.2*(1 + pIndex++));
+        FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
+        anchor.setLocation(createService.createPoint(0, 10 + (pIndex++) * 12));
         anchor.setUseAnchorLocationAsConnectionEndpoint(true);
         anchor.setReferencedGraphicsAlgorithm(invisibleRectangle);
-        link(anchor,p, "INPUT");
+        link(anchor, p, "INPUT");
         // assign a rectangle graphics algorithm for the box relative anchor
         // note, that the rectangle is inside the border of the rectangle shape
-        final Polygon portShape = gaService.createPlainPolygon(anchor, new int[] {0,0,12,6,0,12});
+        final Polygon portShape = gaService.createPlainPolygon(anchor, new int[] { 0, 0, 12, 6, 0, 12 });
         portShape.setForeground(manageColor(PORT_FOREGROUND));
         IColorConstant portColour = portColours.get(p.getClass());
-        portColour = portColour!=null ? portColour : PORT_BACKGROUND;
+        portColour = portColour != null ? portColour : PORT_BACKGROUND;
         portShape.setBackground(manageColor(portColour));
         portShape.setLineWidth(1);
         gaService.setLocationAndSize(portShape, 0, -6, 12, 12);
