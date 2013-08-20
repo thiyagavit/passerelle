@@ -1,18 +1,33 @@
-/**
- * 
- */
+/* Copyright 2013 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 package com.isencia.passerelle.workbench.model.editor.graphiti;
 
 import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.ICopyFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
+import org.eclipse.graphiti.features.IPasteFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.ICopyContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
+import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
@@ -27,12 +42,14 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorAddFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorCollapseFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorConfigureFeature;
-import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementNameDirectEditFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ActorUpdateFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionAddFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionCreateFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.DirectorAddFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCopyFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementMoveFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementNameDirectEditFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementPasteFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 
 /**
@@ -100,6 +117,16 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
       return super.getMoveShapeFeature(context);
     }
   }
+  
+  @Override
+  public ICopyFeature getCopyFeature(ICopyContext context) {
+      return new ModelElementCopyFeature(this);
+  }
+  
+  @Override
+  public IPasteFeature getPasteFeature(IPasteContext context) {
+      return new ModelElementPasteFeature(this);
+   } 
 
   @Override
   public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {

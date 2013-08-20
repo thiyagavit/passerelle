@@ -286,6 +286,8 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
       ed.getEditorSite().getActionBars().getToolBarManager().update(true);
       ed.refresh();
     } else if (this.actorSourcePart instanceof IDiagramEditor) {
+      // TODO eventually this must be migrated to the graphiti/EMF command stack
+      // at this stage a direct execution is the only option, but this prevents undo/redo...
       cmd.execute();
       ((IDiagramEditor) this.actorSourcePart).refresh();
     }
