@@ -1,3 +1,17 @@
+/* Copyright 2013 - iSencia Belgium NV
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
 package com.isencia.passerelle.workbench.model.editor.graphiti.feature;
 
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -10,8 +24,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramFeatureProvider;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.ActorDialog;
-import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
-import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 
 public class ActorConfigureFeature extends AbstractCustomFeature {
 
@@ -20,7 +32,7 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
   public ActorConfigureFeature(PasserelleDiagramFeatureProvider fp) {
     super(fp);
   }
-  
+
   @Override
   public PasserelleDiagramFeatureProvider getFeatureProvider() {
     return (PasserelleDiagramFeatureProvider) super.getFeatureProvider();
@@ -58,25 +70,9 @@ public class ActorConfigureFeature extends AbstractCustomFeature {
       Object bo = getBusinessObjectForPictogramElement(pes[0]);
       if (bo instanceof NamedObj) {
         NamedObj modelElement = (NamedObj) bo;
-         final ActorAttributesView view = (ActorAttributesView)EclipseUtils.getActivePage().findView(ActorAttributesView.ID);
-         ActorDialog dialog = new ActorDialog((IWorkbenchPart)getDiagramEditor(), modelElement);
-         dialog.open();
-//         this.updatePictogramElement(pes[0]);
-          this.hasDoneChanges = true;
-
-        // String currentName = actor.getName();
-        // // ask user for a new class name
-        // String newName = DiagramUtils.askString(getName(), getDescription(), currentName);
-        // if (newName != null && !newName.equals(currentName)) {
-        // this.hasDoneChanges = true;
-        // try {
-        // actor.setName(newName);
-        // } catch (Exception e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
-        // this.updatePictogramElement(pes[0]);
-        // }
+        ActorDialog dialog = new ActorDialog((IWorkbenchPart) getDiagramEditor(), modelElement);
+        dialog.open();
+        this.hasDoneChanges = true;
       }
     }
   }
