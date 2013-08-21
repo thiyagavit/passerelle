@@ -30,9 +30,12 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.Page;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCreateFeatureFromPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserellePersistencyBehavior;
+import com.isencia.passerelle.workbench.model.editor.graphiti.outline.DiagramEditorOutlinePage;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.DragSupportBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorAttributesView;
 import com.isencia.passerelle.workbench.model.editor.ui.views.ActorPalettePage;
@@ -46,6 +49,10 @@ public class PasserelleDiagramEditor extends DiagramEditor {
   @Override
   protected DefaultPersistencyBehavior createPersistencyBehavior() {
     return new PasserellePersistencyBehavior(this);
+  }
+  
+  public PasserelleIndependenceSolver getIndependenceSolver() {
+    return ((PasserelleDiagramTypeProvider)getDiagramTypeProvider()).getIndependenceSolver();
   }
 
   @Override
@@ -66,13 +73,17 @@ public class PasserelleDiagramEditor extends DiagramEditor {
   }
 
   public Object getAdapter(@SuppressWarnings("rawtypes") Class type) {
+    if (IContentOutlinePage.class.equals(type)) {
+        DiagramEditorOutlinePage outlinePage = new DiagramEditorOutlinePage(this);
+        return outlinePage;
+    }
     if (type == ActorPalettePage.class || type == Page.class) {
       ActorTreeViewerPage actorTreeViewPage = new ActorTreeViewerPage(getActionRegistry(), new MyDragSupportBuilder());
       return actorTreeViewPage;
     }
     return super.getAdapter(type);
   }
-
+  
   private class MyDragSupportBuilder implements DragSupportBuilder {
     @Override
     public void addDragSupport(TreeViewer treeViewer) {

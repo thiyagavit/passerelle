@@ -67,10 +67,6 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
     setIndependenceSolver(dtp.getIndependenceSolver());
   }
 
-  public PasserelleIndependenceSolver getPasserelleIndependenceSolver() {
-    return (PasserelleIndependenceSolver) getIndependenceSolver();
-  }
-
   @Override
   public IAddFeature getAddFeature(IAddContext context) {
     if (context.getNewObject() instanceof Actor) {
