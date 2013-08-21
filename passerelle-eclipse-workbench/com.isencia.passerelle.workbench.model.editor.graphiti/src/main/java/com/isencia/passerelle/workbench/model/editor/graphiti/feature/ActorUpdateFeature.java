@@ -31,6 +31,11 @@ import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.Port;
 import com.isencia.passerelle.actor.Actor;
 
+/**
+ * TODO support changing port counts for dynamic port actors
+ * @author erwin
+ *
+ */
 public class ActorUpdateFeature extends AbstractUpdateFeature {
 
   public ActorUpdateFeature(IFeatureProvider fp) {

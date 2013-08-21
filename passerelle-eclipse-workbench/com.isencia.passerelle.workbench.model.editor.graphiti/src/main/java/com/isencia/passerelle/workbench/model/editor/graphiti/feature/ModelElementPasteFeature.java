@@ -107,7 +107,6 @@ public class ModelElementPasteFeature extends AbstractPasteFeature {
       }
     }
     
-    @SuppressWarnings("unchecked")
     List<Attribute> attrs = no.attributeList();
     for (Attribute attribute : attrs) {
       cleanUUIDs(attribute);
