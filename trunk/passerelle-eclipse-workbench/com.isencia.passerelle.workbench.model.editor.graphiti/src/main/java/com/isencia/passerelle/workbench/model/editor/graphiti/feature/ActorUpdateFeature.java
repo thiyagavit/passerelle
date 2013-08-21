@@ -136,6 +136,7 @@ public class ActorUpdateFeature extends AbstractUpdateFeature {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean update(IUpdateContext context) {
     boolean result = false;

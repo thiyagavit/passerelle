@@ -28,8 +28,6 @@ import ptolemy.kernel.Entity;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;

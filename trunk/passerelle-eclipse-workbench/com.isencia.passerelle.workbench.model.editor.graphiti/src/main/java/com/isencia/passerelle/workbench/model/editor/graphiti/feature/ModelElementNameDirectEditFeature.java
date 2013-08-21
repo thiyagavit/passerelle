@@ -22,6 +22,7 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
+import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -82,12 +83,11 @@ public class ModelElementNameDirectEditFeature extends AbstractDirectEditingFeat
     PictogramElement pe = context.getPictogramElement();
     NamedObj bo = (NamedObj) getBusinessObjectForPictogramElement(pe);
     try {
-      bo.setName(value);
-    } catch (NameDuplicationException e) {
-      // TODO show error to user
-      // although duplicate names should have been blocked by the checkValueValid() method
-      e.printStackTrace();
-    } catch (IllegalActionException e) {
+      RenameCommand cmd = new RenameCommand(bo, value);
+      if(cmd.canExecute()) {
+        cmd.execute();
+      }
+    } catch (Exception e) {
       // TODO show error to user
       e.printStackTrace();
     }

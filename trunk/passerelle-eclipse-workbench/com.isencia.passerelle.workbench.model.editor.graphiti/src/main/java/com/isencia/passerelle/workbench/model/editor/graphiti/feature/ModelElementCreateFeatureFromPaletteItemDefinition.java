@@ -54,6 +54,7 @@ public class ModelElementCreateFeatureFromPaletteItemDefinition extends Abstract
     return create(context, selectedActorTemplate.getName());
   }
 
+  @SuppressWarnings("unchecked")
   public Object[] create(ICreateContext context, String actorName) {
     try {
       Diagram d = getFeatureProvider().getDiagramTypeProvider().getDiagram();

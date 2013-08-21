@@ -37,7 +37,17 @@
       name="Passerelle model editor">
       <diagramType id="com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramType">
       </diagramType>
+      <imageProvider
+            id="com.isencia.passerelle.workbench.model.editor.graphiti.ImageProvider">
+      </imageProvider>
     </diagramTypeProvider>
+  </extension>
+
+  <extension point="org.eclipse.graphiti.ui.imageProviders">
+    <imageProvider
+      class="com.isencia.passerelle.workbench.model.editor.graphiti.ImageProvider"
+      id="com.isencia.passerelle.workbench.model.editor.graphiti.ImageProvider">
+    </imageProvider>
   </extension>
   
   <extension point="org.eclipse.ui.editors">
