@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.workbench.model.editor.graphiti.model;
 
 import java.util.HashMap;
@@ -93,7 +93,7 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
     this.topLevel = topLevel;
     // now we need to visit all children to register them in the boMap...
     Director director = topLevel.getDirector();
-    if(director!=null) {
+    if (director != null) {
       registerDirector(director);
     }
     registerEntities(topLevel);
@@ -104,6 +104,7 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
     registerAttributes(director);
     getRegisteredUUID(director);
   }
+
   private void registerEntities(CompositeEntity entityHolder) {
     @SuppressWarnings("unchecked")
     List<Entity> entities = entityHolder.entityList();
@@ -146,5 +147,13 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
         getRegisteredUUID(a);
       }
     }
+  }
+
+  public boolean removeBusinessObject(Object bo) {
+    if (bo instanceof NamedObj) {
+      String uuid = getRegisteredUUID((NamedObj) bo);
+      return boMap.remove(uuid) != null;
+    }
+    return false;
   }
 }

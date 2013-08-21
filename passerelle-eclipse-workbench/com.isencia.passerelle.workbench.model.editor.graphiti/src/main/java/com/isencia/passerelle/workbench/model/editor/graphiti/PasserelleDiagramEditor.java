@@ -11,13 +11,14 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.workbench.model.editor.graphiti;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.gef.dnd.TemplateTransfer;
 import org.eclipse.gef.requests.CreationFactory;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.util.TransferDragSourceListener;
@@ -32,7 +33,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
+import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCreateFeatureFromPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.DiagramFlowRepository;
+import com.isencia.passerelle.workbench.model.editor.graphiti.model.FlowChangeListener;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserellePersistencyBehavior;
 import com.isencia.passerelle.workbench.model.editor.graphiti.outline.DiagramEditorOutlinePage;
@@ -45,14 +49,48 @@ import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;
 public class PasserelleDiagramEditor extends DiagramEditor {
 
   public final static String EDITOR_ID = "com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramEditor";
+  private Flow flow;
+  private FlowChangeListener flowChangeListener;
+
+  /**
+   * @return the flow that is open in this editor instance; Can be null if no Flow is opened yet somehow.
+   */
+  public Flow getFlow() {
+    if (flow == null) {
+      try {
+        Diagram diagram = getDiagramTypeProvider().getDiagram();
+        flow = DiagramFlowRepository.getFlowForDiagram(diagram);
+      } catch (NullPointerException e) {
+        // ignore, means somehow the flow is not linked yet
+      }
+    }
+    return flow;
+  }
 
   @Override
   protected DefaultPersistencyBehavior createPersistencyBehavior() {
     return new PasserellePersistencyBehavior(this);
   }
-  
+
+  @Override
+  protected void registerBusinessObjectsListener() {
+    flowChangeListener = new FlowChangeListener(this);
+    Flow f = getFlow();
+    if (f != null) {
+      f.addChangeListener(flowChangeListener);
+    }
+  }
+
+  @Override
+  protected void unregisterBusinessObjectsListener() {
+    Flow f = getFlow();
+    if (f != null) {
+      f.removeChangeListener(flowChangeListener);
+    }
+  }
+
   public PasserelleIndependenceSolver getIndependenceSolver() {
-    return ((PasserelleDiagramTypeProvider)getDiagramTypeProvider()).getIndependenceSolver();
+    return ((PasserelleDiagramTypeProvider) getDiagramTypeProvider()).getIndependenceSolver();
   }
 
   @Override
@@ -60,7 +98,7 @@ public class PasserelleDiagramEditor extends DiagramEditor {
     super.createPartControl(parent);
 
     getRefreshBehavior().refresh();
-    
+
     getSite().getShell().getDisplay().asyncExec(new Runnable() {
       public void run() {
         try {
@@ -74,8 +112,8 @@ public class PasserelleDiagramEditor extends DiagramEditor {
 
   public Object getAdapter(@SuppressWarnings("rawtypes") Class type) {
     if (IContentOutlinePage.class.equals(type)) {
-        DiagramEditorOutlinePage outlinePage = new DiagramEditorOutlinePage(this);
-        return outlinePage;
+      DiagramEditorOutlinePage outlinePage = new DiagramEditorOutlinePage(this);
+      return outlinePage;
     }
     if (type == ActorPalettePage.class || type == Page.class) {
       ActorTreeViewerPage actorTreeViewPage = new ActorTreeViewerPage(getActionRegistry(), new MyDragSupportBuilder());
@@ -83,7 +121,7 @@ public class PasserelleDiagramEditor extends DiagramEditor {
     }
     return super.getAdapter(type);
   }
-  
+
   private class MyDragSupportBuilder implements DragSupportBuilder {
     @Override
     public void addDragSupport(TreeViewer treeViewer) {
@@ -121,7 +159,7 @@ public class PasserelleDiagramEditor extends DiagramEditor {
         }
       }
       event.doit = doit;
-   }
+    }
 
     public void dragSetData(DragSourceEvent event) {
       event.data = TemplateTransfer.getInstance().getTemplate();

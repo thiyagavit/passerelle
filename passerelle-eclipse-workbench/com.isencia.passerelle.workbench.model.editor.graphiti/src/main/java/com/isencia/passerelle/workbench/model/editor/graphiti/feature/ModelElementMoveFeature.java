@@ -45,8 +45,6 @@ public class ModelElementMoveFeature extends DefaultMoveShapeFeature {
       if(cmd.canExecute()) {
         cmd.execute();
       }
-    } else {
-      super.postMoveShape(context);
     }
   }
 }

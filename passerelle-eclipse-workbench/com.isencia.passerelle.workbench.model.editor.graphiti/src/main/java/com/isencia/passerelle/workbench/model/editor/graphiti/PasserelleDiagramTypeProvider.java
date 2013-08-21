@@ -69,5 +69,4 @@ public class PasserelleDiagramTypeProvider extends AbstractDiagramTypeProvider {
   public PasserelleIndependenceSolver getIndependenceSolver() {
     return independenceSolver;
   }
-
 }
