@@ -53,7 +53,7 @@
   <extension point="org.eclipse.ui.editors">
  	  <editor
           class="com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramEditor"
-          contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+          contributorClass="com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramEditorActionBarContributor"
           default="true"
           extensions="pdml"
           icon="icons/model.gif"

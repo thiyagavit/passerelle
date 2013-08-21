@@ -23,6 +23,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -43,6 +47,21 @@ import com.isencia.passerelle.workbench.model.editor.graphiti.Messages;
 
 @SuppressWarnings("restriction")
 public class FileService {
+
+  public static IFile getMomlFileForDiagram(IFile diagramFile) {
+    IFile momlFile = null;
+    IContainer fileContainer = diagramFile.getParent();
+    String diagramFileName = diagramFile.getName();
+    String momlFileName = diagramFileName.replace(".pdml", ".moml");
+    if (fileContainer instanceof IFolder) {
+      momlFile = ((IFolder) fileContainer).getFile(momlFileName);
+    } else if (fileContainer instanceof IProject) {
+      momlFile = ((IProject) fileContainer).getFile(momlFileName);
+    } else {
+      throw new RuntimeException("Unable to save MOML file : Diagram file " + diagramFile + " not in a IFolder nor in a IProject");
+    }
+    return momlFile;
+  }
 
 	/**
 	 * @since 0.9
