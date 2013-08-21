@@ -17,6 +17,7 @@ package com.isencia.passerelle.workbench.model.editor.graphiti;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICopyFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
+import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
@@ -25,6 +26,7 @@ import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICopyContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IPasteContext;
@@ -47,6 +49,7 @@ import com.isencia.passerelle.workbench.model.editor.graphiti.feature.Connection
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ConnectionCreateFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.DirectorAddFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCopyFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementDeleteFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementMoveFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementNameDirectEditFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementPasteFeature;
@@ -77,6 +80,11 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
       return new DirectorAddFeature(this);
     }
     return super.getAddFeature(context);
+  }
+  
+  @Override
+  public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+    return new ModelElementDeleteFeature(this);
   }
 
   @Override
