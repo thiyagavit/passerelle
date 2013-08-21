@@ -58,7 +58,7 @@ public class ModelRunner implements IApplication {
    * 
    * @param modelPath
    */
-  public void runModel(final String modelPath, final boolean doSystemExit) throws Exception {
+  public void runModel(String modelPath, final boolean doSystemExit) throws Exception {
 
     if (!Platform.isRunning())
       throw new Exception("ModelRunner is designed to be used with an eclipse application!");
@@ -102,7 +102,8 @@ public class ModelRunner implements IApplication {
           }
 
           notifyModelChangeStart();
-
+          // to support launch from new graphiti-based editor
+          modelPath = modelPath.replace(".pdml", ".moml");
           reader = new FileReader(modelPath);
 
           // In debug mode the same model can be run in the
