@@ -22,11 +22,9 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
-import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
 
 public class ModelElementNameDirectEditFeature extends AbstractDirectEditingFeature {
 
