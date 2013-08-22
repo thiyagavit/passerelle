@@ -118,6 +118,24 @@ The pilot is developed in one new bundle _com.isencia.passerelle.workbench.model
 === Status ===
 What's the current status of the pilot? 
 
+==== August 22, 2013 ====
+  * Running the model from inside the Graphiti editor : OK
+  * Graphical/tree outline view : OK
+  * Direct editing of actor name : OK
+  * Misc things :
+    * Copy/paste : OK
+    * Delete : IN PROGRESS
+      * This requires an adaptation of complex lookup logic from the Swing-based (or GEF-based) editor, to find all related objects that must also be deleted automatically.
+      * E.g. when deleting an actor, all its incoming/outgoing connections must also be deleted
+      * A first simple implementation is working.
+    * !FlowChangeListener to automatically update the diagram for flow changes done from elsewhere : OK
+      * This removes the need for manual/on-demand update synchronization in the diagram as was described previously.
+    * Automatically reopen the same model when restarting the workbench : OK
+  * New/discovered things :
+    * Undo/redo support : IN PROGRESS
+      * Undo/redo currently only works on the diagram model, not yet towards the linked flow (i.e. as stored in the moml file).
+
+
 ==== August 16, 2013 ====
 A very basic editor is working :
   * Wizard to create a new model from scratch : OK
