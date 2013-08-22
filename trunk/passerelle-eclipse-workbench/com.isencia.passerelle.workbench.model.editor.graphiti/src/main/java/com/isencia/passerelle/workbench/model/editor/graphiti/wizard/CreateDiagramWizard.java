@@ -39,6 +39,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.isencia.passerelle.workbench.model.editor.graphiti.Messages;
 import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramEditor;
+import com.isencia.passerelle.workbench.model.editor.graphiti.input.PasserelleEditorInput;
 import com.isencia.passerelle.workbench.model.editor.graphiti.util.FileService;
 
 /**
@@ -134,7 +135,7 @@ public class CreateDiagramWizard extends BasicNewResourceWizard {
 
 		FileService.createEmfFileForDiagram(uri, diagram);
 		String providerId = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
-		DiagramEditorInput editorInput = new DiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
+		DiagramEditorInput editorInput = new PasserelleEditorInput(EcoreUtil.getURI(diagram), providerId);
 		
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(editorInput, editorID);
