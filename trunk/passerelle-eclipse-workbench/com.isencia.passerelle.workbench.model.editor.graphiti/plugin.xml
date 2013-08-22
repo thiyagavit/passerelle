@@ -42,7 +42,12 @@
       </imageProvider>
     </diagramTypeProvider>
   </extension>
-
+  
+   <extension point="org.eclipse.ui.elementFactories" id=".PasserelleEditorInputFactory" name="Passerelle editor input factory">
+      <factory class="com.isencia.passerelle.workbench.model.editor.graphiti.input.PasserelleEditorInputFactory" id="com.isencia.passerelle.workbench.model.editor.graphiti.input.PasserelleEditorInputFactory">
+      </factory>
+   </extension>
+  
   <extension point="org.eclipse.graphiti.ui.imageProviders">
     <imageProvider
       class="com.isencia.passerelle.workbench.model.editor.graphiti.ImageProvider"
