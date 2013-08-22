@@ -21,6 +21,8 @@ import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.graphiti.ui.editor.IDiagramEditorInput;
 import org.eclipse.jface.util.TransferDragSourceListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -30,11 +32,14 @@ import org.eclipse.swt.dnd.DragSourceAdapter;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import com.isencia.passerelle.editor.common.model.PaletteItemDefinition;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementCreateFeatureFromPaletteItemDefinition;
+import com.isencia.passerelle.workbench.model.editor.graphiti.input.PasserelleEditorInputFactory;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.DiagramFlowRepository;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.FlowChangeListener;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
@@ -52,6 +57,14 @@ public class PasserelleDiagramEditor extends DiagramEditor {
   private Flow flow;
   private FlowChangeListener flowChangeListener;
 
+  @Override
+  protected DiagramEditorInput convertToDiagramEditorInput(IEditorInput input) throws PartInitException {
+    IEditorInput newInput = PasserelleEditorInputFactory.adaptToDiagramEditorInput(input);
+    if (!(newInput instanceof IDiagramEditorInput)) {
+      throw new PartInitException("Unknown editor input: " + input); //$NON-NLS-1$
+    }
+    return (DiagramEditorInput) newInput;
+  }
   /**
    * @return the flow that is open in this editor instance; Can be null if no Flow is opened yet somehow.
    */
