@@ -4,12 +4,16 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ptolemy.kernel.util.ChangeListener;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.Settable;
 import ptolemy.kernel.util.ValueListener;
 
 public class FlowChangeListener implements ChangeListener, ValueListener {
+  
+  private final static Logger LOGGER = LoggerFactory.getLogger(FlowChangeListener.class);
   
   private IDiagramEditor editor;
 
@@ -27,6 +31,8 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
    */
   @Override
   public void valueChanged(Settable settable) {
+    LOGGER.trace("valueChanged entry for {}",settable);
+    
     final PictogramElement[] dirtyPes = getDiagramTypeProvider().getNotificationService().calculateRelatedPictogramElements(new Object[]{settable});
     
     // Do an asynchronous update in the UI thread.
@@ -52,6 +58,8 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
 
   @Override
   public void changeExecuted(ChangeRequest change) {
+    LOGGER.trace("changeExecuted entry for {}",change);
+    ;
     // Do an asynchronous update in the UI thread.
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {

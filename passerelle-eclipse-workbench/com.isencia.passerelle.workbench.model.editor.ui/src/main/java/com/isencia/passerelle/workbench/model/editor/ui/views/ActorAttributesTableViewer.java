@@ -45,6 +45,7 @@ import com.isencia.passerelle.workbench.model.editor.ui.editor.PasserelleModelMu
 import com.isencia.passerelle.workbench.model.editor.ui.editor.actions.DeleteAttributeHandler;
 import com.isencia.passerelle.workbench.model.editor.ui.palette.PaletteBuilder;
 import com.isencia.passerelle.workbench.model.editor.ui.properties.NamedObjComparator;
+import com.isencia.passerelle.workbench.model.ui.EntityNameAttribute;
 import com.isencia.passerelle.workbench.model.ui.GeneralAttribute;
 import com.isencia.passerelle.workbench.model.ui.command.AttributeCommand;
 import com.isencia.passerelle.workbench.model.ui.command.RenameCommand;
@@ -88,11 +89,11 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
         Collections.sort(attrList, new NamedObjComparator());
         boolean addExpertElements = (entity instanceof Actor && expert);
         final List<Object> ret = addExpertElements ? new ArrayList<Object>(attrList.size() + 3) : new ArrayList<Object>(attrList.size() + 1);
-        if (addExpertElements){
+        if (addExpertElements) {
           ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.TYPE, PaletteBuilder.getInstance().getType(entity.getClass())));
           ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, entity.getClass().getName()));
         }
-        ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME, PaletteBuilder.getInstance().getType(entity.getName())));
+        ret.add(new EntityNameAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME, entity));
         ret.addAll(attrList);
         return ret.toArray(new Object[ret.size()]);
       }
@@ -108,7 +109,7 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
       if (entity != null) {
         entity.removeChangeListener(this);
       }
-      if(newInput instanceof NamedObj) {
+      if (newInput instanceof NamedObj) {
         entity = (NamedObj) newInput;
         attributes = buildAttributes(entity);
       } else {
@@ -123,12 +124,20 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
 
     @Override
     public void changeExecuted(ChangeRequest change) {
-      viewer.refresh();
+      Display.getDefault().asyncExec(new Runnable() {
+        public void run() {
+          viewer.refresh();
+        }
+      });
     }
 
     @Override
     public void changeFailed(ChangeRequest change, Exception exception) {
-      viewer.refresh();
+      Display.getDefault().asyncExec(new Runnable() {
+        public void run() {
+          viewer.refresh();
+        }
+      });
     }
   }
 
@@ -152,6 +161,7 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     getTable().addKeyListener(new KeyListener() {
       public void keyReleased(KeyEvent e) {
       }
+
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.F1) {
           try {
@@ -257,7 +267,7 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
     if (ModelUtils.isNameLegal(name)) {
       element.setValue(name);
       try {
-        final RenameCommand cmd = new RenameCommand(this, entity, element);
+        final RenameCommand cmd = new RenameCommand(this, entity, name, element);
         executeMethodOnEditorCommandStack(cmd);
       } catch (Exception ne) {
         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Invalid Name", ne.getMessage());
