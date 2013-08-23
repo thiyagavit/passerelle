@@ -57,6 +57,11 @@ public class PasserelleDiagramTypeProvider extends AbstractDiagramTypeProvider {
     }
     independenceSolver.setTopLevel(flow);
   }
+  
+  @Override
+  public boolean isAutoUpdateAtRuntimeWhenEditorIsSaved() {
+    return true;
+  }
 
   @Override
   public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
