@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.process.model.service;
 
+import com.isencia.passerelle.process.model.factory.ContextManager;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
@@ -16,6 +17,13 @@ public class ServiceRegistry {
 	private EntityFactory entityFactory;
 	private EntityManager entityManager;
 	private HistoricalDataProvider historicalDataProvider;
+	private ContextManager contextManager;
+
+  private static ServiceRegistry _instance = new ServiceRegistry();
+
+  public static ServiceRegistry getInstance() {
+    return _instance;
+  }
 
 	public HistoricalDataProvider getHistoricalDataProvider() {
 		return historicalDataProvider;
@@ -23,12 +31,6 @@ public class ServiceRegistry {
 
 	public void setHistoricalDataProvider(HistoricalDataProvider historicalDataProvider) {
 		this.historicalDataProvider = historicalDataProvider;
-	}
-
-	private static ServiceRegistry _instance = new ServiceRegistry();
-
-	public static ServiceRegistry getInstance() {
-		return _instance;
 	}
 
 	/**
@@ -61,4 +63,19 @@ public class ServiceRegistry {
 		this.entityManager = entityManager;
 	}
 
+	/**
+	 * @return the contextManager service
+	 */
+  public ContextManager getContextManager() {
+    return contextManager;
+  }
+
+  /**
+   * 
+   * @param contextManager
+   *          the contextManager service to set
+   */
+  public void setContextManager(ContextManager contextManager) {
+    this.contextManager = contextManager;
+  }
 }
