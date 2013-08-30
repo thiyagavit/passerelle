@@ -598,6 +598,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     actor.incompleteProcessRequests = new ConcurrentHashMap<String, ProcessRequest>();
     actor.pendingProcessRequests = new LinkedBlockingQueue<ProcessResponse>();
     actor.finishedProcessResponses = new LinkedBlockingQueue<ProcessResponse>();
+    actor.msgQLock = new ReentrantLock();
+    actor.msgQNonEmpty = actor.msgQLock.newCondition();
     return actor;
   }
 
