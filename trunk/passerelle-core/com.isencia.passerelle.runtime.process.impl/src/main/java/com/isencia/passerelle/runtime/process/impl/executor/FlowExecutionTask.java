@@ -74,7 +74,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     this.processContextId = processContextId;
     status = ProcessStatus.IDLE;
     this.parameterOverrides = (parameterOverrides != null) ? new HashMap<String, String>(parameterOverrides) : null;
-    this.breakpointNames = (breakpointNames!=null) ? new HashSet<String>(Arrays.asList(breakpointNames)) : null; 
+    this.breakpointNames = (breakpointNames != null) ? new HashSet<String>(Arrays.asList(breakpointNames)) : null;
   }
 
   public RunnableFuture<ProcessStatus> newFutureTask() {
@@ -106,7 +106,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     try {
       applyParameterSettings(flowHandle, parameterOverrides);
       boolean debug = false;
-      if(StartMode.DEBUG.equals(mode)) {
+      if (StartMode.DEBUG.equals(mode)) {
         debug = setBreakpoints(flowHandle, breakpointNames);
       }
       synchronized (this) {
@@ -117,7 +117,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
         busy = true;
       }
       if (!canceled) {
-        if(!debug) {
+        if (!debug) {
           LOGGER.info("Context {} - Starting execution of flow {}", processContextId, flowHandle.getCode());
         } else {
           LOGGER.info("Context {} - Starting DEBUG execution of flow {}", processContextId, flowHandle.getCode());
@@ -147,7 +147,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
    * Cancel the flow execution in a clean way.
    */
   public synchronized void cancel() {
-    if(!status.isFinalStatus()) {
+    if (!status.isFinalStatus()) {
       LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
       canceled = true;
       if (busy) {
@@ -170,10 +170,16 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   }
 
   public synchronized boolean suspend() {
-    if (busy) {
+    if (!status.isFinalStatus()) {
+      LOGGER.trace("cancel() - Context {} - Flow {}", processContextId, flowHandle.getCode());
       suspended = true;
-      LOGGER.info("Context {} - Suspending execution of flow {}", processContextId, flowHandle.getCode());
-      manager.pause();
+      if (busy) {
+        LOGGER.info("Context {} - Suspending execution of flow {}", processContextId, flowHandle.getCode());
+        manager.pause();
+      } else {
+        LOGGER.info("Context {} - Suspending execution of flow {} before it started", processContextId, flowHandle.getCode());
+        status = ProcessStatus.SUSPENDED;
+      }
       return true;
     } else {
       LOGGER.debug("Context {} - IGNORE suspending execution of flow {}", processContextId, flowHandle.getCode());
@@ -182,7 +188,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   }
 
   public synchronized boolean resume() {
-    if ( busy && (Manager.PAUSED.equals(manager.getState()) || Manager.PAUSED_ON_BREAKPOINT.equals(manager.getState())) ) {
+    if (busy && (Manager.PAUSED.equals(manager.getState()) || Manager.PAUSED_ON_BREAKPOINT.equals(manager.getState()))) {
       suspended = false;
       LOGGER.info("Context {} - Resuming execution of flow {}", processContextId, flowHandle.getCode());
       manager.resume();
@@ -199,15 +205,15 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   public ProcessStatus getStatus() {
     return status;
   }
-  
+
   public String[] getSuspendedElements() {
     return suspendedElements.toArray(new String[suspendedElements.size()]);
   };
-  
+
   public boolean addSuspendedElement(String elementName) {
     return suspendedElements.add(elementName);
   }
-  
+
   public boolean removeSuspendedElement(String elementName) {
     return suspendedElements.remove(elementName);
   }
@@ -263,7 +269,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
           manager.pause();
         }
       }
-      if(status.isFinalStatus()) {
+      if (status.isFinalStatus()) {
         busy = false;
       }
     }
@@ -271,14 +277,14 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
 
   protected void applyParameterSettings(FlowHandle flowHandle, Map<String, String> props) throws PasserelleException {
     Flow flow = flowHandle.getFlow();
-    if(props!=null) {
+    if (props != null) {
       Iterator<Entry<String, String>> propsItr = props.entrySet().iterator();
       while (propsItr.hasNext()) {
         Entry<String, String> element = propsItr.next();
         String propName = element.getKey();
         String propValue = element.getValue();
         String[] nameParts = propName.split("[\\.]");
-  
+
         // set model parameters
         if (nameParts.length == 1 && !flow.attributeList().isEmpty()) {
           try {
@@ -330,24 +336,23 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
       p.setPersistent(true);
       LOGGER.info("Context {} - Flow {} - Override parameter {} : {}", new Object[] { processContextId, flowHandle.getCode(), propName, propValue });
     } else if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Context {} - Flow {} - Unknown parameter, no override : {} ", 
-          new Object[] { processContextId, flowHandle.getCode(), propName });
+      LOGGER.debug("Context {} - Flow {} - Unknown parameter, no override : {} ", new Object[] { processContextId, flowHandle.getCode(), propName });
     }
   }
-  
+
   protected boolean setBreakpoints(FlowHandle flowHandle, Set<String> breakpointNames) {
     Flow flow = flowHandle.getFlow();
     boolean breakpointsDefined = false;
-    if(breakpointNames!=null) {
+    if (breakpointNames != null) {
       for (String breakpointName : breakpointNames) {
         ComponentEntity entity = flow.getEntity(breakpointName);
-        if(entity!=null) {
+        if (entity != null) {
           entity.addDebugListener(new ActorBreakpointListener(breakpointName, this));
           LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
           breakpointsDefined = true;
         } else {
           Port port = flow.getPort(breakpointName);
-          if(port!=null) {
+          if (port != null) {
             port.addDebugListener(new PortBreakpointListener(breakpointName, this));
             LOGGER.info("Context {} - Flow {} - Set breakpoint {}", new Object[] { processContextId, flowHandle.getCode(), breakpointName });
             breakpointsDefined = true;
