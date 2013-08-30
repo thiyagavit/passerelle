@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
@@ -16,7 +16,7 @@ public class RequestImpl implements Request {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
-	private Map<String, Attribute> requestAttributes = new HashMap<String, Attribute>();
+	private Map<String, Attribute> requestAttributes = new ConcurrentHashMap<String, Attribute>();
 	private CaseImpl requestCase;
 	private String correlationId;
 	private String type;

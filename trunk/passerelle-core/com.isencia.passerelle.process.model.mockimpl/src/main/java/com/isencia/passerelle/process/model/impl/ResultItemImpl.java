@@ -5,15 +5,13 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -44,7 +42,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 	private String name;
 	protected String value;
 	private String unit;
-	private Map<String, AttributeImpl> attributes = new HashMap<String, AttributeImpl>();
+	private Map<String, AttributeImpl> attributes = new ConcurrentHashMap<String, AttributeImpl>();
 	private ResultBlockImpl resultBlock;
 	private String colour;
 	private Integer level;

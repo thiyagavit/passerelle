@@ -50,7 +50,7 @@ public class CaseImpl implements Case {
 		return requestCopies;
 	}
 
-	public void addRequest(Request request) {
+	public synchronized void addRequest(Request request) {
 		this.requests.add(request);
 	}
 

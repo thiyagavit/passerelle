@@ -201,4 +201,8 @@ public class EntityManagerImpl implements EntityManager {
     }
     return new ArrayList<Request>(requests);
   }
+
+  public long getTaskCountForContext(Context context) {
+    return context.getTasks().size();
+  }
 }

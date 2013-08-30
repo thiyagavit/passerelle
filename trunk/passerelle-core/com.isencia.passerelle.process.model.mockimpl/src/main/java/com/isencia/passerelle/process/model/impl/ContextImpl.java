@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
@@ -45,7 +46,7 @@ public class ContextImpl implements Context {
 
   private List<ContextEvent> events = new ArrayList<ContextEvent>();
 
-  private Map<String, Serializable> entries = new HashMap<String, Serializable>();
+  private Map<String, Serializable> entries = new ConcurrentHashMap<String, Serializable>();
 
   private Date creationTS;
 
@@ -131,7 +132,7 @@ public class ContextImpl implements Context {
     }
   }
 
-  public void addTask(Task task) {
+  public synchronized void addTask(Task task) {
     this.tasks.add(task);
   }
 
@@ -139,7 +140,7 @@ public class ContextImpl implements Context {
     return Collections.unmodifiableList(tasks);
   }
 
-  void addEvent(ContextEvent event) {
+  synchronized void addEvent(ContextEvent event) {
     events.add(event);
   }
 
