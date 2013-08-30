@@ -11,10 +11,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
@@ -35,7 +34,7 @@ public class ResultBlockImpl implements ResultBlock {
 	private String colour;
 	private Date creationTS;
 	private String type;
-	private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
+	private Map<String, ResultItem<?>> resultItems = new ConcurrentHashMap<String, ResultItem<?>>();
 
 	public ResultBlockImpl() {
 	}
