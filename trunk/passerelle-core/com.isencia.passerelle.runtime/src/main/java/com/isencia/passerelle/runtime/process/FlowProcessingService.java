@@ -157,7 +157,7 @@ public interface FlowProcessingService {
   
   /**
    * Resume all suspended elements and continue the execution until next breakpoint(s) are reached
-   * or until the end of no breakpoints are encountered anymore.
+   * or until the end if no breakpoints are encountered anymore.
    * 
    * @param processHandle
    * @return the updated processHandle
@@ -199,7 +199,7 @@ public interface FlowProcessingService {
 
   /**
    * Signal an <code>Event</code> to the running process identified by the handle.
-   * These can be pure events, or may also pass more complex data (e.g. use input) into a running process.
+   * These can be pure events, or may also pass more complex data (e.g. user input) into a running process.
    * 
    * @param processHandle
    * @param event
