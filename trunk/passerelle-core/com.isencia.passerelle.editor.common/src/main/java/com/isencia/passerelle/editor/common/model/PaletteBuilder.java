@@ -65,8 +65,8 @@ public class PaletteBuilder implements Serializable {
       editablePaletteGroups = new ArrayList<PaletteGroup>();
       for (PaletteGroup group : paletteGroups) {
         if (
-//            !UTILITIES.equals(group.getId()) && 
-            !SUBMODELS.equals(group.getId()) && group.getParent() == null && group.isAuthorized()) {
+        // !UTILITIES.equals(group.getId()) &&
+        !SUBMODELS.equals(group.getId()) && group.getParent() == null && group.isAuthorized()) {
           editablePaletteGroups.add(group);
         }
       }
@@ -232,6 +232,7 @@ public class PaletteBuilder implements Serializable {
             String colorAttribute = configurationElement.getAttribute("color");
             String idAttribute = configurationElement.getAttribute("id");
             String iconAttribute = configurationElement.getAttribute("icon");
+            String priorityAttribute = configurationElement.getAttribute("priority");
             String iconLocationAttribute = configurationElement.getAttribute("iconClass");
             final String bundleId = configurationElement.getDeclaringExtension().getContributor().getName();
 
@@ -243,6 +244,13 @@ public class PaletteBuilder implements Serializable {
 
               if (clazz != null && group != null) {
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId);
+                if (priorityAttribute != null) {
+                  try {
+                    item.setPriority(Integer.parseInt(priorityAttribute));
+                  } catch (Exception e2) {
+
+                  }
+                }
                 group.addPaletteItem(item);
                 actorBundleMap.put(clazz.getName(), bundleId);
                 paletteItemMap.put(item.getClazz().getName(), item);

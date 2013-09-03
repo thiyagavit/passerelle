@@ -24,8 +24,7 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     return new HashCodeBuilder().append(getClazz()).append(id).hashCode();
   }
 
-  
-  public PaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color, Class clazz,String bundleId) {
+  public PaletteItemDefinition(Object icon, PaletteGroup group, String id, String name, String color, Class clazz, String bundleId) {
     this.group = group;
     this.id = id;
     this.icon = icon;
@@ -47,7 +46,7 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
   }
 
   private String bundleId;
-  
+
   public String getBundleId() {
     return bundleId;
   }
@@ -110,6 +109,16 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     this.color = color;
   }
 
+  private int priority = 0;
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
   private String id;
   private String name;
   private String color;
@@ -125,6 +134,10 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
   }
 
   public int compareTo(PaletteItemDefinition arg0) {
+    if (this.priority != arg0.getPriority()) {
+      return -(new Integer(this.priority).compareTo(arg0.getPriority()));
+    }
+
     if (this.name == null) {
       return 0;
     }
