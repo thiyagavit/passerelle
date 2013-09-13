@@ -25,4 +25,11 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>dictionaries_google</name>
+			<type>2</type>
+			<location>C:/data/workspaces/CDMA/dictionaries_google</location>
+		</link>
+	</linkedResources>
 </projectDescription>
