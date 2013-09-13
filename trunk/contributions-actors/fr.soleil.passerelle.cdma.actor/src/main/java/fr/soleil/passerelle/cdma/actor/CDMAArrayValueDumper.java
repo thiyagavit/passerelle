@@ -14,8 +14,10 @@
 */
 package fr.soleil.passerelle.cdma.actor;
 
+import java.util.Arrays;
 import org.cdma.interfaces.IArray;
 import org.cdma.interfaces.IArrayIterator;
+import org.cdma.interfaces.IDataItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.IntToken;
@@ -74,10 +76,20 @@ public class CDMAArrayValueDumper extends Actor {
       int wrapLength = ((IntToken)wrapLengthParam.getToken()).intValue();
       int chopLength = ((IntToken)chopLengthParam.getToken()).intValue();
       
-      IArray array = (IArray) msg.getBodyContent();
+      IArray array = null;
+      IDataItem item = null;
+      if(msg.getBodyContent() instanceof IArray) {
+        array = (IArray) msg.getBodyContent();
+      } else if (msg.getBodyContent() instanceof IDataItem) {
+        item = (IDataItem) msg.getBodyContent();
+        array = item.getData();
+      }
       IArrayIterator itr = array.getIterator();
       int rowLength=0;
       int nrValues=0;
+      if(item!=null) {
+        System.out.println("Dumping item "+item.getName()+Arrays.toString(item.getShape()));
+      }
       while(itr.hasNext()) {
         System.out.print(itr.next() + " ");
         if(++rowLength >= wrapLength) {
@@ -90,6 +102,7 @@ public class CDMAArrayValueDumper extends Actor {
           break;
         }
       }
+      System.out.println();
       response.addOutputMessage(output, msg);
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "", this, e);

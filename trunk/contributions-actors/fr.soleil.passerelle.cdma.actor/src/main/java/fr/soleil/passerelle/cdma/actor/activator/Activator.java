@@ -13,6 +13,7 @@ import fr.soleil.passerelle.cdma.actor.CDMADataSetReader;
 import fr.soleil.passerelle.cdma.actor.CDMADataSetSlicer;
 import fr.soleil.passerelle.cdma.actor.CDMAFactoryLister;
 import fr.soleil.passerelle.cdma.actor.CDMAShapeFilter;
+import fr.soleil.passerelle.cdma.actor.CDMASqlQueryActor;
 
 public class Activator implements BundleActivator {
 
@@ -30,6 +31,7 @@ public class Activator implements BundleActivator {
 		svcReg = (ServiceRegistration<ModelElementClassProvider>) bundleContext.registerService(ModelElementClassProvider.class, 
 		    new DefaultModelElementClassProvider(
 		         CDMADataSetReader.class,
+		         CDMASqlQueryActor.class,
 		         CDMADataItemSelector.class,
 		         CDMADataSetSlicer.class,
 		         CDMAArrayValueModifier.class,

@@ -89,8 +89,13 @@ public class CDMADataItemSelector extends Actor {
         LogicalGroup logicalRoot = dataSet.getLogicalRoot();
         dataItem = logicalRoot.getDataItem(itemName);
       } else {
-        IGroup physRoot = dataSet.getRootGroup(); 
-        dataItem = (IDataItem) physRoot.findContainerByPath(itemName);
+        IGroup physRoot = dataSet.getRootGroup();
+        String[] pathParts = itemName.split("/");
+        IGroup grp = physRoot;
+        for (int i=0; i< pathParts.length - 1 ; ++i) {
+          grp = grp.getGroup(pathParts[i]);
+        }
+        dataItem = (IDataItem) grp.getDataItem(pathParts[pathParts.length-1]);
       }
 
       if (dataItem != null) {
