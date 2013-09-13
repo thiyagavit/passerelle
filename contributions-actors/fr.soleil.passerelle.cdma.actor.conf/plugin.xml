@@ -19,6 +19,12 @@
             name="CDMADataSetReader">
       </actor>
       <actor
+            class="fr.soleil.passerelle.cdma.actor.CDMASqlQueryActor"
+            group="fr.soleil.passerelle.cdma.actor.actorgroup"
+            id="fr.soleil.passerelle.cdma.actor.CDMASqlQueryActor"
+            name="CDMASqlQueryDataSetReader">
+      </actor>
+      <actor
             class="fr.soleil.passerelle.cdma.actor.CDMADataItemSelector"
             group="fr.soleil.passerelle.cdma.actor.actorgroup"
             id="fr.soleil.passerelle.cdma.actor.CDMADataItemSelector"
