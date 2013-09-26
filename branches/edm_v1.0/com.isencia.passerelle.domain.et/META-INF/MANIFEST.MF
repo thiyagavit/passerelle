@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle domain based on EventQueue
 Bundle-SymbolicName: com.isencia.passerelle.domain.et
-Bundle-Version: 8.3.1
+Bundle-Version: 8.3.2
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: ptolemy.core
