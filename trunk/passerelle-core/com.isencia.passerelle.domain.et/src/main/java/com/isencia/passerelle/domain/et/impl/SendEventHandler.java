@@ -50,8 +50,25 @@ public class SendEventHandler extends AbstractActorEventHandler {
     }
   }
 
+  @Override
+  public HandleResult handle(Event event, boolean isRetry) throws Exception {
+    if (event instanceof SendEvent) {
+      SendEvent _evt = (SendEvent) event;
+      if (!_evt.isProcessed()) {
+        return super.handle(event, isRetry);
+      } else {
+        // evt has already been processed
+        // this can happen e.g. with stream-handling actors that
+        // pop a whole bunch of received pushed messages in one iteration (triggered from a previous Event)
+        return HandleResult.DONE;
+      }
+    } else {
+      return HandleResult.SKIPPED;
+    }
+  }
+
   protected Actor getDestinationActorFromEvent(Event event) {
-    Actor actor = (Actor) ((SendEvent)event).getReceivingPort().getContainer();
+    Actor actor = (Actor) ((SendEvent) event).getReceivingPort().getContainer();
     return actor;
   }
 
