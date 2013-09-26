@@ -37,6 +37,8 @@ public class SendEvent extends AbstractEvent {
   private Port sendingPort;
   private Port receivingPort;
   private Token token;
+  // flag to indicate if this event has already been processed or not
+  private boolean processed;
   
   public SendEvent(Token token, Port sendingPort, Port receivingPort) {
    this(token, sendingPort, receivingPort, new Date());
@@ -77,6 +79,14 @@ public class SendEvent extends AbstractEvent {
     return token;
   }
 
+  public boolean isProcessed() {
+    return processed;
+  }
+  
+  public void setProcessed(boolean processed) {
+    this.processed = processed;
+  }
+  
   @Override
   public int hashCode() {
     final int prime = 31;
