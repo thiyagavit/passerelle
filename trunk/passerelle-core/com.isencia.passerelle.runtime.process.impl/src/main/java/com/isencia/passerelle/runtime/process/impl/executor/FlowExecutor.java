@@ -36,5 +36,5 @@ public class FlowExecutor extends ThreadPoolExecutor {
     } else {
       return super.newTaskFor(callable);
     }
-  };
+  }
 }
