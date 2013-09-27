@@ -187,7 +187,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
     if (getDialogHookComponent() != null) {
       if (modelURL != null) {
-        getDialogHookComponent().setTitle("Passerelle - " + modelURL);
+        getDialogHookComponent().setTitle(HMIBase.HMI_APPLICATIONNAME+" - " + modelURL);
         modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
 
         parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
@@ -744,7 +744,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     listQuery.clear();
 
     if (getDialogHookComponent() != null) {
-      getDialogHookComponent().setTitle("Passerelle");
+      getDialogHookComponent().setTitle(HMIBase.HMI_APPLICATIONNAME);
     }
     if (parameterScrollPane != null) {
       if (modelNameLabel != null) {

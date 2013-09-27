@@ -120,7 +120,13 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 public abstract class HMIBase implements ChangeListener {
 
+  private final static Logger logger = LoggerFactory.getLogger(HMIBase.class);
+
   private static final int RECENTMODELS_LIMIT_MINVALUE = 3;
+  
+  public static final String HMI_APPLICATIONNAME_PROPNAME = "hmi.applicationName";
+  public static final String HMI_APPLICATIONNAME_DEFAULT = "Passerelle";
+  
   public static final String HMI_INI_FILE_PROPNAME = "hmi.iniFile";
   public static final String HMI_MODEL_URL_PROPNAME = "hmi.modelURL";
   public static final String HMI_RECENTMODELS_FILE_PROPNAME = "hmi.recentModels.file";
@@ -129,7 +135,7 @@ public abstract class HMIBase implements ChangeListener {
   public static final String HMI_RECENTMODELS_FILE_DEFAULT = "hmi_userdef.xml";
   public static final String HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME = "hmi.diagnosis.data.base.dir";
 
-  private final static Logger logger = LoggerFactory.getLogger(HMIBase.class);
+  public static String HMI_APPLICATIONNAME = System.getProperty(HMI_APPLICATIONNAME_PROPNAME, HMI_APPLICATIONNAME_DEFAULT);
 
   public static final String INIFILE_PATH_STRING = System.getProperty(HMI_INI_FILE_PROPNAME, "hmi.ini");
   public static String MODELS_URL_STRING = System.getProperty(HMI_MODEL_URL_PROPNAME);
@@ -138,6 +144,7 @@ public abstract class HMIBase implements ChangeListener {
   public static String DIAGNOSIS_DATA_BASE_DIR_STRING;
   public static String DIAGNOSIS_ENTITIES_DUMP_PATHNAME;
   public static String DIAGNOSIS_ASSET_REPOS_PATHNAME;
+//  public static String DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME;
 
   public static final String EXECUTION_CONTROL_ATTR_NAME = "_executionControl";
   public static final String USER_TRACER_ATTR_NAME = "_userTracer";
@@ -256,6 +263,7 @@ public abstract class HMIBase implements ChangeListener {
       // do nothing, we assume all cfg settings have been set as system props then
       logger.info("HMI did not find config file");
     }
+    HMI_APPLICATIONNAME = System.getProperty(HMI_APPLICATIONNAME_PROPNAME, HMI_APPLICATIONNAME_DEFAULT);
     MODELS_URL_STRING = System.getProperty(HMI_MODEL_URL_PROPNAME);
     String recentModelsProp = System.getProperty(HMI_RECENTMODELS_FILE_PROPNAME, HMI_RECENTMODELS_FILE_DEFAULT);
     String recentModelsPath = System.getProperty(HMI_RECENTMODELS_PATH_PROPNAME);
@@ -334,13 +342,16 @@ public abstract class HMIBase implements ChangeListener {
     DIAGNOSIS_DATA_BASE_DIR_STRING = System.getProperty(HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME, "C:/temp");
     DIAGNOSIS_ENTITIES_DUMP_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-diagnosis-results";
     DIAGNOSIS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository";
+//    DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository-submodels";
 
     File diagAssetReposPath = new File(DIAGNOSIS_ASSET_REPOS_PATHNAME);
+//    File diagSubmodelReposPath = new File(DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME);
     File diagEntitiesDumpPath = new File(DIAGNOSIS_ENTITIES_DUMP_PATHNAME);
     if (!diagAssetReposPath.exists() || !diagEntitiesDumpPath.exists()) {
       logger.warn("Paths for diagnostic asset repository and/or result dumps do not exist. :" + "\n\tasset repos :" + DIAGNOSIS_ASSET_REPOS_PATHNAME
           + "\n\tresults dump :" + DIAGNOSIS_ENTITIES_DUMP_PATHNAME + "\n\tDiagnostic processes will not work!");
     }
+//    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath, diagSubmodelReposPath));
     ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
     ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
     ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));

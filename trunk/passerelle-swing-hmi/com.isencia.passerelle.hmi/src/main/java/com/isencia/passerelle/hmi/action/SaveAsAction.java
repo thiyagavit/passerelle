@@ -97,7 +97,7 @@ public class SaveAsAction extends AbstractAction {
 		// Shortcut
 		fileChooser.registerKeyboardAction(deleteAction, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-    fileChooser.addChoosableFileFilter(new ExtensionFileFilter(new String[] { "moml" }, "Passerelle model files"));
+    fileChooser.addChoosableFileFilter(new ExtensionFileFilter(new String[] { "moml" }, HMIBase.HMI_APPLICATIONNAME+" model files"));
     final int returnVal = fileChooser.showSaveDialog(getHMI().getDialogHookComponent());
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       // if the filename is ending by ".moml" we don't need to add

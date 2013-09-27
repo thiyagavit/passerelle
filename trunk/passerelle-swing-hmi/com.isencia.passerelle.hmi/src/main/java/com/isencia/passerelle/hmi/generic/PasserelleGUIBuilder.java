@@ -36,6 +36,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.hmi.HMIBase;
 import com.isencia.passerelle.hmi.PopupUtil;
 import com.isencia.passerelle.hmi.state.StateMachine;
 import com.isencia.passerelle.hmi.util.GenericHMIUserPref;
@@ -294,7 +295,7 @@ public class PasserelleGUIBuilder {
 
 	public JFrame getMainFrame() {
 		if (mainFrame == null) {
-			mainFrame = new JFrame("Passerelle");
+			mainFrame = new JFrame(HMIBase.HMI_APPLICATIONNAME);
 			mainFrame.setContentPane(getBeanPanel());
 			mainFrame.setIconImage(Toolkit.getDefaultToolkit()
 					.getImage(PasserelleIDEMain.class.getResource("/com/isencia/passerelle/hmi/resources/runidew.gif")));
