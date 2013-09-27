@@ -73,7 +73,7 @@ public class OpenAction extends AbstractAction {
 			fileChooser.registerKeyboardAction(deleteAction, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
       fileChooser.setAccessory(new FinderAccessory(fileChooser));
-      fileChooser.addChoosableFileFilter(new ExtensionFileFilter(new String[] { "xml", "moml" }, "Passerelle model files"));
+      fileChooser.addChoosableFileFilter(new ExtensionFileFilter(new String[] { "xml", "moml" }, HMIBase.HMI_APPLICATIONNAME+" model files"));
       final int returnVal = fileChooser.showOpenDialog(getHMI().getDialogHookComponent());
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         modelURL = fileChooser.getSelectedFile().toURL();
