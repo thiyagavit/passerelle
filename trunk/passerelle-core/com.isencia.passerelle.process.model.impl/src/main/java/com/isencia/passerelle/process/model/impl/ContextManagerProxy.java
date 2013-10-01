@@ -80,8 +80,8 @@ public class ContextManagerProxy extends ServiceTracker {
     return delegate.notifyError(context, cause);
   }
 
-  public static Context notifyError(Context context, ErrorItem error) {
-    return delegate.notifyError(context, error);
+  public static Context notifyError(Context context, ErrorItem error, Throwable cause) {
+    return delegate.notifyError(context, error, cause);
   }
 
   public static Context notifyRestarted(Context requestContext, Context taskContext) {
