@@ -80,7 +80,7 @@ public interface ContextManager {
    * @param context Context that finished with an error
    * @param event The error event that happened during processing
    */
-  Context notifyError(Context context, ErrorItem event);
+  Context notifyError(Context context, ErrorItem event, Throwable cause);
 
 	/**
 	 * Notify listeners that the processing of the context was cancelled.
