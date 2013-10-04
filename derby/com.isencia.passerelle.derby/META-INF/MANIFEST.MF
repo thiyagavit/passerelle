@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Derby
 Bundle-SymbolicName: com.isencia.passerelle.derby
-Bundle-Version: 7.0.0.qualifier
+Bundle-Version: 8.5.0.qualifier
 Bundle-Activator: com.isencia.passerelle.derby.Activator
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
