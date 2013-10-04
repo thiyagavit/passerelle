@@ -2,7 +2,7 @@
 <feature
       id="com.isencia.passerelle.workbench.feature"
       label="Passerelle workbench Feature"
-      version="8.4.0.qualifier"
+      version="8.5.0.qualifier"
       provider-name="ISENCIA">
 
    <description url="http://code.google.com/a/eclipselabs.org/p/passerelle/">
@@ -476,7 +476,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.pde.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.swt" version="3.0.0" match="compatible"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="compatible"/>
-      <import plugin="com.isencia.passerelle.workbench.model.editor.ui" version="8.4.0" match="equivalent"/>
+      <import plugin="com.isencia.passerelle.workbench.model.editor.ui" version="8.4.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
