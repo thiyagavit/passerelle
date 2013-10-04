@@ -1,0 +1,1 @@
+#this file ensures the log directory gets copied
