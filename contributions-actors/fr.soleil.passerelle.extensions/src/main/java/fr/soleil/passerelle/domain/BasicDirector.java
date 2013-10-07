@@ -28,7 +28,6 @@ import fr.esrf.TangoApi.ApiUtil;
 import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoDs.TangoConst;
 import fr.soleil.passerelle.actor.IActorFinalizer;
-import fr.soleil.passerelle.scan.SimpleScan;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.Properties;
@@ -62,15 +61,6 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
 
     private boolean interactiveExecution;
 
-    // public final static String DEFAULT_SIMPLE_SCAN_NAME = "tango/scan/simplescan.1";
-    public final static String DEFAULT_SIMPLE_SCAN_NAME = "simplescan/titan/1";
-    private String simpleScanName;// = DEFAULT_SIMPLE_SCAN_NAME;
-    public String getSimpleScanName() {
-        return simpleScanName;
-    }
-
-    private StringParameter simpleScanNameParameter;
-
     private void init() throws IllegalActionException, NameDuplicationException {
         DirectorAdapter adapter = getAdapter(null);
 
@@ -93,9 +83,6 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
         pausingTimeParameter = new StringParameter(this, "Pausing time before retrying (s)");
         pausingTimeParameter.setExpression("1");
         tracer = new DefaultExecutionTracer();
-
-        simpleScanNameParameter = new StringParameter(this, "SimpleScan Device Name");
-        simpleScanNameParameter.setExpression(simpleScanName);
 
         final URL url = this.getClass().getResource("/fr/soleil/soleil.jpg");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"0\" y=\"0\" width=\"160\" "
@@ -154,8 +141,6 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
             } else {
                 errorStrategy = ErrorStrategy.DEFAULT;
             }
-        } else if (attribute == simpleScanNameParameter) {
-            simpleScanName = PasserelleUtil.getParameterValue(simpleScanNameParameter);
         } else {
             super.attributeChanged(attribute);
         }
@@ -211,9 +196,6 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
                 // System.out.println("Connection to TANGO failed");
                 throw new IllegalActionException(TangoToPasserelleUtil.getDevFailedString(e, this));
             }
-
-            simpleScanName = PasserelleUtil.getParameterValue(simpleScanNameParameter);
-            logger.info("using datarecorder " + simpleScanName);
         }
 
         super.initialize();

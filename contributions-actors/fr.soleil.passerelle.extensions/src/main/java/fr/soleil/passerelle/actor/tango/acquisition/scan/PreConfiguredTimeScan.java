@@ -45,6 +45,10 @@ public class PreConfiguredTimeScan extends TransformerV5 {
     public Parameter scanConfigParam;
     private String confName = "root/";
 
+    public StringParameter simpleScanNameParam;
+    public final static String DEFAULT_SIMPLE_SCAN_NAME = "tango/CA/SimpleScan.1";
+    private String simpleScanName = DEFAULT_SIMPLE_SCAN_NAME;
+
     private SimpleScan simpleScanObj = null;
     private final static Logger logger = LoggerFactory.getLogger(PreConfiguredTimeScan.class);
 
@@ -54,6 +58,10 @@ public class PreConfiguredTimeScan extends TransformerV5 {
 
         scanConfigParam = new StringParameter(this, SCAN_CONFIG);
         scanConfigParam.setExpression(confName);
+
+        simpleScanNameParam = new StringParameter(this, "SimpleScan Device Name");
+        simpleScanNameParam.setExpression(simpleScanName);
+        registerExpertParameter(simpleScanNameParam);
 
         input.setName("NbSteps");
         input.setExpectedMessageContentType(Double.class);
@@ -72,6 +80,8 @@ public class PreConfiguredTimeScan extends TransformerV5 {
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == scanConfigParam) {
             confName = PasserelleUtil.getParameterValue(scanConfigParam);
+        } else if (arg0 == simpleScanNameParam) {
+            simpleScanName = PasserelleUtil.getParameterValue(simpleScanNameParam);
         } else {
             super.attributeChanged(arg0);
         }
@@ -84,11 +94,10 @@ public class PreConfiguredTimeScan extends TransformerV5 {
     public void validateInitialization() throws ValidationException {
         if (!isMockMode()) {
             final BasicDirector dir = (BasicDirector) getDirector();
-            final String ssName = dir.getSimpleScanName();
             try {
-                simpleScanObj = new SimpleScan(ssName, confName);
+                simpleScanObj = new SimpleScan(simpleScanName, confName);
             } catch (DevFailed e) {
-                String errorMessage = "Error: " + confName + " cannot be loadded on SimpleScan " + ssName;
+                String errorMessage = "Error: " + confName + " cannot be loadded on SimpleScan " + simpleScanName;
                 ExecutionTracerService.trace(this, errorMessage);
                 throw new ValidationException(errorMessage, this, null);
             }
