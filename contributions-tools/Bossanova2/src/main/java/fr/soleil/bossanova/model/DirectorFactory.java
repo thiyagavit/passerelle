@@ -3,13 +3,11 @@
  */
 package fr.soleil.bossanova.model;
 
-import ptolemy.data.expr.Parameter;
+import ptolemy.actor.Director;
 import ptolemy.kernel.util.Attribute;
-import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.director.DirectorUtils;
-import com.isencia.passerelle.domain.cap.Director;
-import fr.soleil.bossanova.configuration.Configuration;
+import com.isencia.passerelle.director.PasserelleDirector;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.domain.RecordingDirector;
 
@@ -38,8 +36,10 @@ public class DirectorFactory {
 		// Erwin DL : this is not right. Class name has a specific purpose.
 		// result.setClassName("Bossanova Director");
 		result.setName("Bossanova Director");
-		if(result.getAdapter(null)!=null) {
-		  ((Attribute)result.getAdapter(null)).setContainer(null);
+		
+		PasserelleDirector passDir = (PasserelleDirector) result;
+		if(passDir.getAdapter(null)!=null) {
+		  ((Attribute)passDir.getAdapter(null)).setContainer(null);
 		}
 		DirectorUtils.getAdapter(result, null);
 		// no longer done. System properties must be set elsewhere, e.g. in a hmi.ini file.

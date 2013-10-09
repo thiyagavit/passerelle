@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Random;
 import javax.swing.JOptionPane;
+import ptolemy.actor.Director;
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.IOPort;
 import ptolemy.actor.TypedAtomicActor;
@@ -19,7 +20,7 @@ import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.director.DirectorUtils;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.hmi.action.ModelExecutor;
 import com.isencia.passerelle.hmi.state.StateMachine;
 import com.isencia.passerelle.model.Flow;
@@ -278,7 +279,8 @@ public class BossaNovaSequencerImpl extends Observable implements Runnable, Sequ
     // GenericHMI.showModelForm(...) checks for the presence of this attribute.
     // when present : cfg panel is not created
     try {
-      ((Attribute) d.getAdapter(null)).setContainer(null);
+      PasserelleDirector passD = (PasserelleDirector)d;
+      ((Attribute) passD.getAdapter(null)).setContainer(null);
       DirectorUtils.getAdapter(d, null);
       new Attribute(d, "__not_configurable");
     } catch (final Exception e) {
