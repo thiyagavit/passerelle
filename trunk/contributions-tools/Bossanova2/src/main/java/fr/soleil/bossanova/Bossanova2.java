@@ -11,13 +11,13 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.Director;
 import ptolemy.actor.ExecutionListener;
 import ptolemy.actor.Manager;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.hmi.PopupUtil;
 import com.isencia.passerelle.hmi.action.ModelExecutor;
 import com.isencia.passerelle.hmi.generic.GenericHMI;

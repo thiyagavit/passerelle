@@ -10,9 +10,9 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import ptolemy.actor.Director;
 
 import net.infonode.docking.View;
-import com.isencia.passerelle.domain.cap.Director;
 import fr.soleil.bossanova.bossaNovaData.BossaNovaData;
 import fr.soleil.bossanova.controller.BossaNovaSequencerImpl;
 import fr.soleil.bossanova.gui.action.ApplyDirectorChangeToAllStepsAction;
