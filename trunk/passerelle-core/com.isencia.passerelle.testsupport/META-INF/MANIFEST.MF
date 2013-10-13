@@ -15,6 +15,8 @@ Import-Package: com.isencia.passerelle.actor;version="8.3.0",
  com.isencia.passerelle.statistics;version="8.3.0",
  com.isencia.sherpa.commons,
  junit.framework;version="3.8.2",
+ org.apache.log4j,
+ org.apache.log4j.spi;version="1.2.0",
  org.slf4j;version="1.5.8",
  ptolemy.actor;version="7.0.1",
  ptolemy.actor.gui.style;version="7.0.1",
@@ -25,4 +27,5 @@ Import-Package: com.isencia.passerelle.actor;version="8.3.0",
  ptolemy.kernel.util;version="7.0.1"
 Require-Bundle:  org.eclipse.core.runtime;bundle-version="3.4.0"
 Export-Package: com.isencia.passerelle.testsupport,
- com.isencia.passerelle.testsupport.actor
+ com.isencia.passerelle.testsupport.actor,
+ com.isencia.passerelle.testsupport.utils
