@@ -310,14 +310,24 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     return false;
   }
 
-public Image getImage(String code) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  public Image getImage(String code) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-public MetaData[] getAllSubmodelMetaData() {
-	// TODO Auto-generated method stub
-	return null;
-}
-
+  public MetaData[] getAllSubmodelMetaData() {
+    String[] codes = getAllSubmodels();
+    if (codes == null) {
+      return new MetaData[] {};
+    }
+    List<String> codeList = Arrays.asList(codes);
+    List<MetaData> metaDatas = new ArrayList<MetaData>();
+    for (String code : codeList) {
+      MetaData submodelMetaData = getSubmodelMetaData(code);
+      if (submodelMetaData != null) {
+        metaDatas.add(submodelMetaData);
+      }
+    }
+    return metaDatas.toArray(new MetaData[metaDatas.size()]);
+  }
 }
