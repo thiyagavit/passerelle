@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.CompositeActor;
@@ -54,8 +53,6 @@ public class Director extends ProcessDirector {
 	private File propsFile=null;
 	public FileParameter propsFileParameter;
 	public final static String PROPSFILE_PARAM = "Properties File";
-	
-	private Collection<BlockingQueueReceiver> managedReceivers = new HashSet<BlockingQueueReceiver>();
 	
 	//~ Constructors ___________________________________________________________________________________________________________________________________________
 
@@ -227,7 +224,6 @@ public class Director extends ProcessDirector {
 	 */
 	public Receiver newReceiver() {
 		BlockingQueueReceiver receiver = new BlockingQueueReceiver();
-		managedReceivers .add(receiver);
 		try {
 			receiver.setCapacity(FIFOQueue.INFINITE_CAPACITY);
 		} catch (IllegalActionException e) {
@@ -242,7 +238,7 @@ public class Director extends ProcessDirector {
 	 * i.e. of the input ports of the actors in this Director's model.
 	 */
 	public Collection<BlockingQueueReceiver> getManagedReceivers() {
-		return Collections.unmodifiableCollection(managedReceivers);
+		return Collections.emptyList();
 	}
 	
 	/**
