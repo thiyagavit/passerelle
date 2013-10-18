@@ -72,4 +72,4 @@ Export-Package: com.isencia.passerelle.actor.advanced;version="8.5.0",
  com.isencia.passerelle.actor.mail;version="8.5.0",
  com.isencia.passerelle.actor.net;version="8.5.0",
  com.isencia.passerelle.actor.sequence;version="8.5.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: J2SE-1.6
