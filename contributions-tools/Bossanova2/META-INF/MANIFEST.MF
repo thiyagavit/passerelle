@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Bossanova
 Bundle-SymbolicName: fr.soleil.gui.Bossanova
-Bundle-Version: 7.0.0
+Bundle-Version: 8.5.0
 Bundle-Activator: com.isencia.passerelle.hmi.activator.Activator
 Bundle-Vendor: soleil
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -21,10 +21,10 @@ Bundle-ClassPath: .,
  lib/swing-layout-1.0.3.jar,
  lib/swing-worker-1.1.jar,
  lib/swingx-1.6.jar
-Require-Bundle: com.isencia.passerelle.commons;bundle-version="8.3.0",
- com.isencia.passerelle.actor;bundle-version="8.3.0",
- com.isencia.passerelle.engine;bundle-version="8.3.0",
- com.isencia.passerelle.hmi.definition;bundle-version="8.1.0",
+Require-Bundle: com.isencia.passerelle.commons;bundle-version="8.5.0",
+ com.isencia.passerelle.actor;bundle-version="8.5.0",
+ com.isencia.passerelle.engine;bundle-version="8.5.0",
+ com.isencia.passerelle.hmi.definition;bundle-version="8.5.0",
  diva;bundle-version="7.0.1",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
