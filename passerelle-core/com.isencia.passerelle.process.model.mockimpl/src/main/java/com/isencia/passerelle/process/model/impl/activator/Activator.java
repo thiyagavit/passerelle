@@ -11,8 +11,8 @@ import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.impl.factory.EntityFactoryImpl;
 import com.isencia.passerelle.process.model.impl.factory.EntityManagerImpl;
 import com.isencia.passerelle.process.model.impl.service.ContextRepositoryImpl;
-import com.isencia.passerelle.process.model.service.ContextRepository;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ContextRepository;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.impl.ContextImpl;
-import com.isencia.passerelle.process.model.service.ContextRepository;
+import com.isencia.passerelle.process.service.ContextRepository;
 
 /**
  * @author erwin

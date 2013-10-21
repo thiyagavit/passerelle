@@ -24,7 +24,7 @@ package com.isencia.passerelle.process.model;
  * 
  * @author delerw
  */
-public interface ContextEvent extends Event, Identifiable, Comparable<ContextEvent> {
+public interface ContextEvent extends com.isencia.passerelle.runtime.Event, Identifiable, Comparable<ContextEvent> {
 
   /**
    * 
