@@ -29,7 +29,6 @@ import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.impl.ContextImpl;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -453,7 +452,7 @@ public abstract class TaskBasedActor extends Actor {
       // Retrieve the task from db, bypassing the cache
       task = ServiceRegistry.getInstance().getEntityManager().getTask(task.getId(), true);
       // Re-attach on the process context
-      ((ContextImpl) processContext).reattachTask(task);
+      processContext.reattachTask(task);
     }
   }
 }
