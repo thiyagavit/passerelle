@@ -4,7 +4,7 @@ Bundle-Name: Passerelle actors and tools for Diagnosis solutions
 Bundle-SymbolicName: com.isencia.passerelle.process.actor
 Bundle-Version: 8.5.0.qualifier
 Bundle-Vendor: ISENCIA
-Bundle-RequiredExecutionEnvironment: J2SE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
 Import-Package: 
  com.isencia.passerelle.process.common.exception;version="8.4.0",
