@@ -6,6 +6,7 @@ Bundle-Version: 8.5.0.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.isencia.passerelle.process.model;version="8.5.0",
+ com.isencia.passerelle.process.model.event,
  com.isencia.passerelle.process.model.factory;version="8.5.0",
  com.isencia.passerelle.process.model.service;version="8.5.0",
  com.isencia.passerelle.process.model.util;version="8.5.0"

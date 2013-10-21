@@ -15,6 +15,7 @@
 package com.isencia.passerelle.process.service;
 
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.factory.EntityManager;
 
 /**
  * A <code>ContextRepository</code> provides an API to store & retrieve <code>Context</code>s
@@ -47,5 +48,7 @@ public interface ContextRepository {
    * @return the Context, null if not found
    */
   Context getContext(String processContextId);
+
+  void setEntityManager(EntityManager entityManager);
 
 }

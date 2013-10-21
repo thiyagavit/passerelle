@@ -55,6 +55,15 @@ public interface Context extends Identifiable, Serializable {
    * @return the unique ID identifying each <code>Context</code> in a runtime's <code>ContextRepository</code>.
    */
   String getContextRepositoryID();
+  
+  /**
+   * Set the <code>Context</code>'s <code>repositoryID</code>
+   * 
+   * REMARK this is only to be used by ContextRepository implementations!
+   * 
+   * @param contextReposID
+   */
+  void setContextRepositoryID(String contextReposID);
 	
   /**
    * @return current status of this context
