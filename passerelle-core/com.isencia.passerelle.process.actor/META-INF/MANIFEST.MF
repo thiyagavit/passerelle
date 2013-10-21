@@ -12,7 +12,6 @@ Import-Package:
  com.isencia.passerelle.process.common.util;version="8.5.0",
  com.isencia.passerelle.process.model;version="8.5.0",
  com.isencia.passerelle.process.model.factory;version="8.5.0",
- com.isencia.passerelle.process.model.impl;version="8.5.0",
  com.isencia.passerelle.process.model.service;version="8.5.0",
  com.isencia.passerelle.process.service;version="8.5.0",
  com.isencia.sherpa.commons,
