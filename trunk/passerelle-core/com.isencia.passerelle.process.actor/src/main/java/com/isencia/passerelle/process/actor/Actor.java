@@ -53,8 +53,8 @@ import com.isencia.passerelle.message.MessageProvider;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.service.ContextRepository;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ContextRepository;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * Continuing on the track started with the "v3" and "v5" Actor APIs, the process-context-aware API offers further enhancements in Actor development features,
@@ -639,11 +639,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   protected Context getRequiredContextForMessage(ManagedMessage message) throws ProcessingException {
     if (message == null) {
-      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No message received ", this, null);
+      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No message received", this, null);
     }
     String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
     if (ctxtHdrs == null || ctxtHdrs.length == 0) {
-      return null;
+      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, null);
     }
     Context context = contextRepository.getContext(ctxtHdrs[0]);
     if (context != null) {

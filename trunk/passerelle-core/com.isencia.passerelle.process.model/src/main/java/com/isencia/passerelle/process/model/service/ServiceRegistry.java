@@ -10,11 +10,10 @@ import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
 
 /**
  * @author "puidir"
- * 
+ * @deprecated Use com.isencia.passerelle.process.service.ServiceRegistry instead.
  */
 public class ServiceRegistry {
 
-  private ContextRepository contextRepository;
 	private EntityFactory entityFactory;
 	private EntityManager entityManager;
 	private HistoricalDataProvider historicalDataProvider;
@@ -24,20 +23,6 @@ public class ServiceRegistry {
 
   public static ServiceRegistry getInstance() {
     return _instance;
-  }
-
-	/**
-   * @return the contextRepository
-   */
-  public ContextRepository getContextRepository() {
-    return contextRepository;
-  }
-
-  /**
-   * @param contextRepository the contextRepository to set
-   */
-  public void setContextRepository(ContextRepository contextRepository) {
-    this.contextRepository = contextRepository;
   }
 
   public HistoricalDataProvider getHistoricalDataProvider() {

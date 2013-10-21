@@ -4,6 +4,7 @@ package com.isencia.passerelle.process.common.exception;
 /**
  * @author puidir
  */
+@SuppressWarnings("serial")
 public class ErrorCode extends com.isencia.passerelle.core.ErrorCode {
 
   public static final ErrorCode SERVICE_REQUEST_PROCEED_ERROR = new ErrorCode("SERVICE_REQUEST_PROCEED_ERROR", "1008", ErrorCategory.FUNCTIONAL, Severity.ERROR,
@@ -12,7 +13,6 @@ public class ErrorCode extends com.isencia.passerelle.core.ErrorCode {
   // 3000 RANGE : errors related to request handling and engine internals
   public static final ErrorCode REQUEST_CONTENTS_ERROR = new ErrorCode("REQUEST_CONTENTS_ERROR", "3000", ErrorCategory.FUNCTIONAL, Severity.WARNING,"Request contents error");
   public static final ErrorCode REQUEST_INIT_ERROR = new ErrorCode("REQUEST_INIT_ERROR", "3001", ErrorCategory.FUNCTIONAL, Severity.WARNING,"Request initialisation error");
-  public static final ErrorCode REQUEST_NOT_FOUND = new ErrorCode("REQUEST_NOT_FOUND", "3002", ErrorCategory.FUNCTIONAL, Severity.WARNING,"Unknown reference id");
 
   public static final ErrorCode REQUEST_ERROR = new ErrorCode("REQUEST_ERROR", "3100", "request/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR,"Request processing error");
   public static final ErrorCode REQUEST_SLOW = new ErrorCode("REQUEST_SLOW", "3101", "request/SLOW", ErrorCategory.FUNCTIONAL, Severity.WARNING,"Request processing slow");
@@ -40,12 +40,13 @@ public class ErrorCode extends com.isencia.passerelle.core.ErrorCode {
 
   // 5000 RANGE : errors related to asynchronous service communications
   public static final ErrorCode BACKEND_ERROR = new ErrorCode("BACKEND_ERROR", "5000", "task/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR, "Backend request processing error");
-  public static final ErrorCode BACKEND_SLOW = new ErrorCode("BACKEND_SLOW", "5001", "task/SLOW", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Backend request processing slow");
-  public static final ErrorCode BACKEND_TIMEOUT = new ErrorCode("BACKEND_TIMEOUT", "5002", "task/TIME_OUT", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Backend request processing timed out");
+  public static final ErrorCode TASK_ERROR = new ErrorCode("TASK_ERROR", "5000", "task/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR, "Task processing error");
+  public static final ErrorCode TASK_SLOW = new ErrorCode("TASK_SLOW", "5001", "task/SLOW", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Task processing slow");
+  public static final ErrorCode TASK_TIMEOUT = new ErrorCode("TASK_TIMEOUT", "5002", "task/TIME_OUT", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Task processing timed out");
+  public static final ErrorCode TASK_UNHANDLED = new ErrorCode("TASK_UNHANDLED", "5020", "task/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR, "No service found to handle the task");
 
   public static final ErrorCode ASYNC_SERVICE_ERROR = new ErrorCode("ASYNC_SERVICE_ERROR", "5000", "task/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR, "Asynchronous service request processing error");
   public static final ErrorCode INVALID_PARAMETERS = new ErrorCode("INVALID_PARAMETERS", "5003", "task/ERROR", ErrorCategory.FUNCTIONAL, Severity.INFO, "Request contains invalid parameters");
-  public static final ErrorCode AXIS_FAULT = new ErrorCode("AXIS_FAULT", "5004", "task/ERROR", ErrorCategory.TECHNICAL, Severity.INFO, "Axis error while calling web service");
   public static final ErrorCode INVALID_CONFIGURATION = new ErrorCode("INVALID_CONFIGURATION", "5005", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Invalid configuration");
   public static final ErrorCode BACKEND_WARNING = new ErrorCode("BACKEND_WARNING", "5010", ErrorCategory.FUNCTIONAL, Severity.WARNING, "Backend request returned a warning");
 

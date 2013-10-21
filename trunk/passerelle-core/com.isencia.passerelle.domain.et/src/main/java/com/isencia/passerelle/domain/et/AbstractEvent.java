@@ -17,61 +17,19 @@ package com.isencia.passerelle.domain.et;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.runtime.Event;
+import com.isencia.passerelle.runtime.SimpleEvent;
 
-public abstract class AbstractEvent extends EventObject implements Event {
+public abstract class AbstractEvent extends SimpleEvent {
   
   private static final long serialVersionUID = 6094980381771564552L;
 
-  private static volatile AtomicLong idCounter = new AtomicLong(0);
-
-  private Date timeStamp;
-  private long id;
-  private String topic;
-  
-  private Map<String, String> eventProperties =  new HashMap<String, String>();
-  
   protected AbstractEvent(NamedObj subject, String topic, Date creationTS) {
-    super(subject);
-    this.topic = topic;
-    this.timeStamp = creationTS;
-    this.id = idCounter.incrementAndGet();
-    eventProperties.put(SUBJECT, subject.getFullName());
+    super(subject, topic, creationTS, 0L);
+    setProperty(SUBJECT, subject.getFullName());
   }
 
-  protected long getId() {
-    return id;
-  }
-
-  public String getTopic() {
-    return topic;
-  }
-  
-  public Date getCreationTS() {
-    return timeStamp;
-  }
-
-  /**
-   * @return 0L as default duration
-   */
-  public Long getDuration() {
-    return 0L;
-  }
-  
-  public String getProperty(String propName) {
-    return eventProperties.get(propName);
-  }
-  
-  public Iterator<String> getPropertyNames() {
-    return eventProperties.keySet().iterator();
-  }
-  
   /**
    * 
    * @return a new Event with copied info, but new timestamp

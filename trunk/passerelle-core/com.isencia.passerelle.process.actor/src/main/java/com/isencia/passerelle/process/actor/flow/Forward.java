@@ -43,9 +43,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.process.actor.activator.Activator;
+import com.isencia.passerelle.process.common.util.ContextUtils;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
@@ -85,9 +86,6 @@ public class Forward extends Actor {
 
   public Port input; // NOSONAR
   public Port output; // NOSONAR
-  /**
-   * 
-   */
   public StringParameter projectCodeParameter; // NOSONAR
   public StringParameter flowCodeParameter; // NOSONAR
   public StringParameter parameterParameter; // NOSONAR
@@ -161,13 +159,7 @@ public class Forward extends Actor {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
           String paramName = paramKeyValue[0].trim();
-          String paramValue = paramKeyValue[1].trim();
-          if (paramValue.startsWith("#[") && paramValue.endsWith("]")) {
-            // it's a property place holder like thing
-            // TODO use the real property place holder service for this, once all required providers are available
-            String placeHolderName = paramValue.substring(2, paramValue.length()-1);
-            paramValue = processContext.lookupValue(placeHolderName);
-          }
+          String paramValue = ContextUtils.lookupValueForPlaceHolder(processContext, paramKeyValue[1].trim());
           try {
             // TODO When moving to trunk, and using new FlowProcessingService, this extra check is not needed anymore.
             // but on the edm v1.0 branch invalid parameter overrides generate exceptions!
