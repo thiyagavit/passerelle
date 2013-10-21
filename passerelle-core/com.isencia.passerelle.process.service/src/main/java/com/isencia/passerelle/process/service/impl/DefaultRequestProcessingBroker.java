@@ -33,9 +33,9 @@ import com.isencia.passerelle.process.service.ServiceRegistry;
  * 
  * @author erwin
  */
-public class DefaultTaskExecutionBroker implements RequestProcessingBroker {
+public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
 
-  private final static RequestProcessingBroker INSTANCE = new DefaultTaskExecutionBroker();
+  private final static RequestProcessingBroker INSTANCE = new DefaultRequestProcessingBroker();
 
   public static RequestProcessingBroker getInstance() {
     return INSTANCE;
@@ -45,7 +45,7 @@ public class DefaultTaskExecutionBroker implements RequestProcessingBroker {
 
   private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
 
-  private DefaultTaskExecutionBroker() {
+  private DefaultRequestProcessingBroker() {
   }
 
   @Override

@@ -6,6 +6,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
+import com.isencia.passerelle.process.actor.ServiceBasedActor;
+import com.isencia.passerelle.process.actor.event.EventsToTaskCollector;
+import com.isencia.passerelle.process.actor.event.TaskToEventsGenerator;
 import com.isencia.passerelle.process.actor.flow.BufferedTrigger;
 import com.isencia.passerelle.process.actor.flow.ContextEntryModifier;
 import com.isencia.passerelle.process.actor.flow.Fork;
@@ -22,8 +25,15 @@ public class Activator implements BundleActivator {
   private ServiceTracker repoSvcTracker;
 
   public void start(BundleContext context) throws Exception {
-    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), new DefaultModelElementClassProvider(BufferedTrigger.class, Fork.class, Join.class,
-        StartActor.class, ContextEntryModifier.class), null);
+    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), 
+        new DefaultModelElementClassProvider(
+            BufferedTrigger.class, Fork.class, Join.class,
+            StartActor.class, ContextEntryModifier.class,
+            ServiceBasedActor.class,
+            EventsToTaskCollector.class,
+            TaskToEventsGenerator.class
+            ),
+        null);
 
     repoSvcTracker = new ServiceTracker(context, RepositoryService.class.getName(), null);
     repoSvcTracker.open();
