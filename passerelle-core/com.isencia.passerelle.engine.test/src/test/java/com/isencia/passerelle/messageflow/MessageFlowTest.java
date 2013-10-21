@@ -16,8 +16,12 @@ package com.isencia.passerelle.messageflow;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import junit.framework.TestCase;
 import ptolemy.actor.NoRoomException;
+
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -74,6 +78,9 @@ public class MessageFlowTest extends TestCase{
    * @throws Exception
    */
   public void testReceiverQueueCapacityWarning() throws Exception {
+	CollectingLog4JAppender.initWithPattern(".*delay.input - reached/passed warning threshold size 1");
+	Logger.getRootLogger().addAppender(new CollectingLog4JAppender());
+	
     flow = new Flow("", null);
     flow.setDirector(new Director(flow, "director"));
     
@@ -83,7 +90,6 @@ public class MessageFlowTest extends TestCase{
     flow.connect(source,delay);
     flow.connect(delay,sink);
     
-    CollectingLog4JAppender.initWithPattern(".*delay.input - reached/passed warning threshold size 1");
     
     Map<String, String> props = new HashMap<String, String>();
     props.put("source.values", "Hello,world,again,and,again");
