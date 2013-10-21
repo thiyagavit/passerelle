@@ -10,8 +10,6 @@ import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.impl.factory.EntityFactoryImpl;
 import com.isencia.passerelle.process.model.impl.factory.EntityManagerImpl;
-import com.isencia.passerelle.process.model.impl.service.ContextRepositoryImpl;
-import com.isencia.passerelle.process.service.ContextRepository;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
@@ -26,15 +24,12 @@ public class Activator implements BundleActivator {
   public void start(BundleContext bundleContext) throws Exception {
     EntityFactoryImpl entityFactory = new EntityFactoryImpl();
     EntityManagerImpl entityManager = new EntityManagerImpl();
-    ContextRepositoryImpl contextRepositoryImpl = new ContextRepositoryImpl(entityManager);
     
     ServiceRegistry.getInstance().setEntityFactory(entityFactory);
     ServiceRegistry.getInstance().setEntityManager(entityManager);
-    ServiceRegistry.getInstance().setContextRepository(contextRepositoryImpl);
     
     factorySvcReg = bundleContext.registerService(EntityFactory.class.getName(), entityFactory, null);
     mgrSvcReg = bundleContext.registerService(EntityManager.class.getName(), entityManager, null);
-    ctxtReposSvcReg = bundleContext.registerService(ContextRepository.class.getName(), contextRepositoryImpl, null);
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
