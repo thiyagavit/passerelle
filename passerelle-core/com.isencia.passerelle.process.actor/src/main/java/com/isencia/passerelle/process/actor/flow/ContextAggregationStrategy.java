@@ -20,7 +20,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * A <code>AggregationStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages,

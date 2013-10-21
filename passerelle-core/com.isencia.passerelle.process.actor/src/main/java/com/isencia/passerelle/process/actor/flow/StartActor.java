@@ -25,7 +25,7 @@ import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 /**
@@ -184,6 +184,7 @@ public class StartActor extends Actor {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   private Map<String, String> getParameterMap(NamedObj flow, String type) throws IllegalActionException {
     Attribute attribute = flow.getAttribute(type);
     Parameter parameter = (Parameter) attribute;
@@ -193,7 +194,7 @@ public class StartActor extends Actor {
     ObjectToken oToken = (ObjectToken) parameter.getToken();
     Object o = oToken.getValue();
     if (o instanceof Map) {
-      return (Map) o;
+      return (Map<String,String>) o;
     }
     return null;
   }
