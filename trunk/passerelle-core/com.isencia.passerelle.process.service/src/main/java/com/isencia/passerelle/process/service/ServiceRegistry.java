@@ -19,7 +19,7 @@ import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.factory.EntityManager;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
 import com.isencia.passerelle.process.service.impl.ContextRepositoryImpl;
-import com.isencia.passerelle.process.service.impl.DefaultTaskExecutionBroker;
+import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroker;
 
 /**
  * A central singleton for easy access to all kinds of services used in the Passerelle process domain.
@@ -34,7 +34,7 @@ public class ServiceRegistry {
 	private EntityManager entityManager;
 	private HistoricalDataProvider historicalDataProvider;
   private ContextManager contextManager;
-  private RequestProcessingBroker requestProcessingBroker = DefaultTaskExecutionBroker.getInstance();
+  private RequestProcessingBroker requestProcessingBroker = DefaultRequestProcessingBroker.getInstance();
 
   private static ServiceRegistry _instance = new ServiceRegistry();
 

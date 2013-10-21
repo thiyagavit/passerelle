@@ -18,13 +18,19 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import com.isencia.passerelle.ext.ModelElementClassProvider;
+import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
 import com.isencia.passerelle.process.actor.test.suite.TestRunner;
+import com.isencia.passerelle.process.actor.trial.ContextTracerConsole;
+import com.isencia.passerelle.process.actor.trial.MockEventGenerator;
+import com.isencia.passerelle.process.actor.trial.MockTaskActor;
 
 public class TestFragmentActivator implements BundleActivator  {
 
   private ServiceRegistration<?> testCmdProvider;
   private static TestFragmentActivator instance = null;
   private BundleContext context;
+  private ServiceRegistration<?> apSvcReg;
   
   public static TestFragmentActivator getInstance() {
     return instance;
@@ -37,11 +43,17 @@ public class TestFragmentActivator implements BundleActivator  {
   public void start(BundleContext context) throws Exception {
     this.context = context;
     instance = this;
+    apSvcReg = context.registerService(ModelElementClassProvider.class.getName(), 
+        new DefaultModelElementClassProvider(
+            ContextTracerConsole.class,MockEventGenerator.class,MockTaskActor.class
+            ),
+        null);
     testCmdProvider = context.registerService(CommandProvider.class.getName(), new TestRunner(), null);
   }
 
   public void stop(BundleContext context) throws Exception {
     testCmdProvider.unregister();
+    apSvcReg.unregister();
     instance = null;
   }
 
