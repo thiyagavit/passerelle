@@ -10,7 +10,7 @@ import org.osgi.framework.ServiceRegistration;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.impl.ContextManagerProxy;
 import com.isencia.passerelle.process.model.impl.factory.EntityFactoryImpl;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"
@@ -33,6 +33,7 @@ public class Activator implements BundleActivator {
       EntityFactoryImpl entityFactory = new EntityFactoryImpl();
       factoryServiceRegistration = bundleContext.registerService(EntityFactory.class.getName(), entityFactory, null);
       ServiceRegistry.getInstance().setEntityFactory(entityFactory);
+      com.isencia.passerelle.process.model.service.ServiceRegistry.getInstance().setEntityFactory(entityFactory);
     }
   }
 
@@ -45,6 +46,7 @@ public class Activator implements BundleActivator {
     lifeCycleEntityManagerTracker.close();
     if (factoryServiceRegistration != null) {
       ServiceRegistry.getInstance().setEntityFactory(null);
+      com.isencia.passerelle.process.model.service.ServiceRegistry.getInstance().setEntityFactory(null);
       factoryServiceRegistration.unregister();
     }
   }
