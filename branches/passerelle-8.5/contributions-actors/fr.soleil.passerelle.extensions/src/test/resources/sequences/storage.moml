@@ -1,0 +1,79 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="storage" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="4.0.1">
+    </property>
+    <property name="Recording" class="fr.soleil.passerelle.domain.RecordingDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="/usr/Local/passerelle/passerelle/conf/systemproperties.txt">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{175, 85}">
+        </property>
+    </property>
+    <entity name="StartRecording" class="fr.soleil.passerelle.actor.tango.recording.StartRecording">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[175.0, 210.0]">
+        </property>
+    </entity>
+    <entity name="EndRecording" class="fr.soleil.passerelle.actor.tango.recording.EndRecording">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[415.0, 230.0]">
+        </property>
+    </entity>
+    <entity name="ChangeNXEntry" class="fr.soleil.passerelle.actor.tango.recording.ChangeNXEntry">
+        <property name="Acquisition Name" class="ptolemy.data.expr.StringParameter" value="TestPasselle">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[245.0, 370.0]">
+        </property>
+    </entity>
+    <entity name="SaveDevice" class="fr.soleil.passerelle.actor.tango.recording.SaveDevice">
+        <property name="Device Name" class="ptolemy.data.expr.StringParameter" value="test/diffractometer/cb-a">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[355.0, 375.0]">
+        </property>
+    </entity>
+    <entity name="SimpleLoop" class="fr.soleil.passerelle.actor.flow.SimpleLoop">
+        <property name="Number of Loops" class="ptolemy.data.expr.StringParameter" value="3">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{280, 220}">
+        </property>
+    </entity>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation3" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation4" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation5" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="StartRecording.output" relation="relation3"/>
+    <link port="EndRecording.input" relation="relation"/>
+    <link port="ChangeNXEntry.input" relation="relation5"/>
+    <link port="ChangeNXEntry.input copy" relation="relation2"/>
+    <link port="SaveDevice.trigger" relation="relation2"/>
+    <link port="SaveDevice.output" relation="relation4"/>
+    <link port="SimpleLoop.trigger (start loop)" relation="relation3"/>
+    <link port="SimpleLoop.handled" relation="relation4"/>
+    <link port="SimpleLoop.end loop trigger" relation="relation"/>
+    <link port="SimpleLoop.output value" relation="relation5"/>
+</entity>
