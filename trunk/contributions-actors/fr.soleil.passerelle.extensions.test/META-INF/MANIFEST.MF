@@ -14,6 +14,7 @@ Import-Package: com.isencia.passerelle.actor;version="7.0.0",
  com.isencia.passerelle.domain.et,
  com.isencia.passerelle.model;version="7.0.0",
  junit.framework;version="3.8.2",
+ org.slf4j;version="1.6.0",
  ptolemy.actor;version="7.0.1",
  ptolemy.data.expr;version="7.0.1",
  ptolemy.kernel;version="7.0.1"
