@@ -20,6 +20,5 @@ Import-Package: com.isencia.passerelle.actor;version="8.5.0",
  org.slf4j;version="1.6.0",
  ptolemy.kernel.util;version="7.0.1"
 Export-Package: com.isencia.passerelle.process.service;version="8.5.0"
-Require-Bundle: com.isencia.passerelle.process.scheduler;bundle-version="8.5.0",
- com.isencia.passerelle.process.common;bundle-version="8.5.0",
+Require-Bundle: com.isencia.passerelle.process.common;bundle-version="8.5.0",
  org.eclipse.equinox.preferences;bundle-version="3.4.0"
