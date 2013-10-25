@@ -62,7 +62,7 @@ public class ContextUtils {
         // not implemented yet
       } else {
         // it's a simple syntax thing
-        String itemName = itemValueOrPlaceHolder.substring(SIMPLE_PLACEHOLDER_START_LENGTH, phEnd);
+        String itemName = itemValueOrPlaceHolder.substring(phStart + SIMPLE_PLACEHOLDER_START_LENGTH, phEnd);
         String lookupValue = context.lookupValue(itemName);
         return lookupValue != null ? itemValueOrPlaceHolder.replace(SIMPLE_PLACEHOLDER_START + itemName + "]", lookupValue) : itemValueOrPlaceHolder;
       }
