@@ -40,7 +40,13 @@ public interface RepositoryService {
 	String JOB_ID = "jobID";
 	String SYSTEM_PARAMETERS = "systemParameters";
 	String APPLICATION_PARAMETERS = "applicationParameters";
-
+  String REQUEST_ATTRIBUTES = "requestAttributes";
+  String MOCK_EXECUTION_DATA_ATTRIBUTE = "com.isencia.passerelle.mock.data";
+  String MOCK_HISTORICAL_DATA_ATTRIBUTE = "com.isencia.passerelle.mock.request";
+  String PERSIST_HISTORICAL_DATA = "com.isencia.passerelle.persist.mock";
+  String MOCK_REQUEST = "Mock Request";
+	
+	
 	/**
 	 * 
 	 * @param submodelCode
