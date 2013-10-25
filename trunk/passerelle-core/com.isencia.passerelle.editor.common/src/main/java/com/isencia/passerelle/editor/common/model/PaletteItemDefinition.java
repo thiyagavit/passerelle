@@ -61,6 +61,16 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     this.icon = icon;
   }
 
+  private String helpUrl;
+
+  public String getHelpUrl() {
+    return helpUrl;
+  }
+
+  public void setHelpUrl(String helpUrl) {
+    this.helpUrl = helpUrl;
+  }
+
   private PaletteGroup group;
 
   public PaletteGroup getGroup() {
