@@ -1,5 +1,7 @@
 package com.isencia.passerelle.process.common.exception;
 
+import com.isencia.passerelle.core.ErrorCategory;
+
 
 /**
  * @author puidir
