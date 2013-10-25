@@ -251,6 +251,7 @@ public class PaletteBuilder implements Serializable {
 
                   }
                 }
+                item.setHelpUrl(generateHelpUrl(item));
                 group.addPaletteItem(item);
                 actorBundleMap.put(clazz.getName(), bundleId);
                 paletteItemMap.put(item.getClazz().getName(), item);
@@ -276,6 +277,19 @@ public class PaletteBuilder implements Serializable {
       // logError(e);
     }
     return actorGroups;
+  }
+
+  protected String generateHelpUrl(PaletteItemDefinition item) {
+    return null;
+  }
+
+  public String getHelpUrl(String clazzName) {
+
+    PaletteItemDefinition itemDefinition = getPaletteItem(clazzName);
+    if (itemDefinition != null) {
+      return itemDefinition.getHelpUrl();
+    }
+    return null;
   }
 
   public PaletteGroup getPaletteGroup(List<PaletteGroup> groups, Map<String, PaletteGroup> groupMap, String path, PaletteGroup parent) {
