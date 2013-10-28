@@ -33,6 +33,10 @@ public interface RepositoryService {
   String SUBMODEL_ROOT = "com.isencia.passerelle.submodel.root";
   String SYSTEM_PARAMETERS = "systemParameters";
   String APPLICATION_PARAMETERS = "applicationParameters";
+  String REFERENCE = "REFERENCE";
+  String FLOW_NAME = "flowname";
+  String USER_ID = "userID";
+  String JOB_ID = "jobID";
 
   /**
    * 
