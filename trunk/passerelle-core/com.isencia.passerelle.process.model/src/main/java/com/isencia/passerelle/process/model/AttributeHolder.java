@@ -36,6 +36,12 @@ public interface AttributeHolder {
 	 * @return the attribute with the given name, or null if not found
 	 */
   Attribute getAttribute(String name);
+  /**
+   * 
+   * @param name should be non-null
+   * @return the value of the attribute with the given name, or null if not found
+   */
+  String getAttributeValue(String name);
   
   /**
    * Associate the attribute with this holder.
