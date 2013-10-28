@@ -28,8 +28,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.apache.commons.collections.map.CaseInsensitiveMap;
-
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
@@ -43,10 +41,10 @@ import com.isencia.passerelle.process.model.Request;
 public class RequestImpl implements Request {
 
   public void setId(Long id) {
-		this.id = id;
-	}
+    this.id = id;
+  }
 
-private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   @Id
   @Column(name = "ID", nullable = false, unique = true, updatable = false)
@@ -80,8 +78,7 @@ private static final long serialVersionUID = 1L;
   @Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
   private String type;
 
-  @OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = { CascadeType.PERSIST,
-      CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
+  @OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = { CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
   private Context processingContext;
 
   @Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 250)
@@ -151,8 +148,9 @@ private static final long serialVersionUID = 1L;
     this.correlationId = correlationId;
     this.category = category;
   }
-  public RequestImpl(Case requestCase, String initiator,String executor, String type, String correlationId, String category) {
-    this(requestCase, initiator, type,correlationId,category);
+
+  public RequestImpl(Case requestCase, String initiator, String executor, String type, String correlationId, String category) {
+    this(requestCase, initiator, type, correlationId, category);
     this.correlationId = correlationId;
     this.category = category;
     this.executor = executor;
@@ -199,6 +197,14 @@ private static final long serialVersionUID = 1L;
       }
     }
     return null;
+  }
+
+  public String getAttributeValue(String name) {
+    Attribute attribute = getAttribute(name);
+    if (attribute == null) {
+      return null;
+    }
+    return attribute.getValueAsString();
   }
 
   public Attribute putAttribute(Attribute attribute) {

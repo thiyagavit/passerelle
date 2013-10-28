@@ -120,6 +120,14 @@ public class ResultBlockImpl implements ResultBlock {
     return attributes.get(name);
   }
 
+  public String getAttributeValue(String name) {
+    Attribute attribute = getAttribute(name);
+    if (attribute == null) {
+      return null;
+    }
+    return attribute.getValueAsString();
+  }
+
   public Attribute putAttribute(Attribute attribute) {
     return attributes.put(attribute.getName(), attribute);
   }

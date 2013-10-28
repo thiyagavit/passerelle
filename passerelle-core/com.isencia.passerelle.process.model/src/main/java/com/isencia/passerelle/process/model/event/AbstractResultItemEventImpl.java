@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.model.event;
 
 import java.io.Serializable;
@@ -33,20 +33,29 @@ public abstract class AbstractResultItemEventImpl<V extends Serializable> extend
   private V value;
 
   protected AbstractResultItemEventImpl(String topic, V value, Date creationTS, Long duration) {
-    super(topic,creationTS,duration);
+    super(topic, creationTS, duration);
     this.value = value;
   }
-  
+
   @Override
   public Attribute getAttribute(String name) {
     return attributes.get(name);
   }
-  
+
+  @Override
+  public String getAttributeValue(String name) {
+    Attribute attribute = getAttribute(name);
+    if (attribute == null) {
+      return null;
+    }
+    return attribute.getValueAsString();
+  }
+
   @Override
   public Iterator<String> getAttributeNames() {
     return attributes.keySet().iterator();
   }
-  
+
   @Override
   public Set<Attribute> getAttributes() {
     return new HashSet<Attribute>(attributes.values());
@@ -102,14 +111,14 @@ public abstract class AbstractResultItemEventImpl<V extends Serializable> extend
 
   @Override
   public String getValueAsString() {
-    return value!=null?value.toString():null;
+    return value != null ? value.toString() : null;
   }
 
   @Override
   public Attribute putAttribute(Attribute attribute) {
     return attributes.put(attribute.getName(), attribute);
   }
-  
+
   @Override
   public void setColour(String colour) {
     this.colour = colour;
