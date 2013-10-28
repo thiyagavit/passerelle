@@ -23,7 +23,6 @@ import ptolemy.actor.CompositeActor;
 import com.isencia.passerelle.core.IEventLog;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.project.repository.api.Image;
 import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
@@ -33,24 +32,6 @@ import com.isencia.passerelle.project.repository.api.RepositoryService;
  * 
  */
 public class FileSystemBasedRepositoryService implements RepositoryService {
-
-  public String getDefaultDsl(String name) {
-    return null;
-  }
-
-  public String getDefaultDslr(String name) {
-    return null;
-  }
-
-  public boolean existNewPackage(String packageCode) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  public boolean existNewProject(String projectCode) {
-    // TODO Auto-generated method stub
-    return false;
-  }
 
   private File rootFolder;
   private File submodelFolder;
@@ -135,48 +116,8 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
     return result;
   }
 
-  /**
-   * We assume that the 1st level of folders are all Projects, and they all contain just 1 level of packages.
-   */
-  public String[] getAllPackageCodes() {
-    List<String> results = new ArrayList<String>();
-    File[] projectFolders = rootFolder.listFiles((FileFilter) null);
-    for (File projectFolder : projectFolders) {
-      if (projectFolder.isDirectory()) {
-        Project p = getProject(projectFolder.getName());
-        String[] projectKBCodes = p.getAllKnowledgeBaseCodes();
-        for (String kbCode : projectKBCodes) {
-          results.add(kbCode);
-        }
-      }
-    }
-    return results.toArray(new String[results.size()]);
-  }
-
-  /**
-   * Performs a very inefficient traversal of the Projects to find the right KB...
-   * 
-   */
-  public Object getKnowledgeBase(String packageCode) throws Exception {
-    return null;
-  }
-
-  public String getFlowCode(Long id) {
-
-    return null;
-  }
-
-  public Project getProject(Long projectId) {
-
-    return null;
-  }
-
   public MetaData getFlowMetaData(String flowCode) {
     return new MetaData("Flow", null, null, flowCode, null, null);
-  }
-
-  public Object getKnowledgeBaseConfiguration() {
-    return null;
   }
 
   public void commitFlow(Flow flow, String comment) throws Exception {
@@ -305,15 +246,6 @@ public class FileSystemBasedRepositoryService implements RepositoryService {
 
   public MetaData getSubmodelMetaData(String flowCode) {
     return new MetaData(flowCode, null);
-  }
-
-  public boolean knowledgeBaseHasFlow(String kbCode) {
-    return false;
-  }
-
-  public Image getImage(String code) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   public MetaData[] getAllSubmodelMetaData() {
