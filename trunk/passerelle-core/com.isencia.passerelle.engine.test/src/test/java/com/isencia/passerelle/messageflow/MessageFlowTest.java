@@ -40,6 +40,9 @@ public class MessageFlowTest extends TestCase{
   @Override
   protected void setUp() throws Exception {
     flowMgr = new FlowManager();
+    CollectingLog4JAppender.initWithPattern(".*delay.input - reached/passed warning threshold size 1");
+    Logger.getRootLogger().removeAllAppenders();
+    Logger.getRootLogger().addAppender(new CollectingLog4JAppender());
   }
   
   /**
@@ -78,8 +81,6 @@ public class MessageFlowTest extends TestCase{
    * @throws Exception
    */
   public void testReceiverQueueCapacityWarning() throws Exception {
-	CollectingLog4JAppender.initWithPattern(".*delay.input - reached/passed warning threshold size 1");
-	Logger.getRootLogger().addAppender(new CollectingLog4JAppender());
 	
     flow = new Flow("", null);
     flow.setDirector(new Director(flow, "director"));
