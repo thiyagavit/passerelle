@@ -23,9 +23,9 @@ package com.isencia.passerelle.process.model;
  */
 public enum Status {
 	// these are transient states
-	CREATED,STARTED,PROCESSING,PAUSED,DELAYED,RESUMED,RESTARTED,
+	CREATED,STARTED,PROCESSING,PAUSED,DELAYED,RESUMED,PENDING,RESTARTED,
 	// these are final states
-	FINISHED,CANCELLED,TIMEOUT,ERROR,PENDING,INTERRUPTED;
+	FINISHED,CANCELLED,TIMEOUT,ERROR,INTERRUPTED;
 	
 	public boolean isFinalStatus() {
 		return this.compareTo(FINISHED)>=0;
