@@ -240,4 +240,16 @@ public class RequestImpl implements Request {
     return processingContext;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[id=");
+    builder.append(id);
+    if (type != null) {
+      builder.append(", type=");
+      builder.append(type);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 }
