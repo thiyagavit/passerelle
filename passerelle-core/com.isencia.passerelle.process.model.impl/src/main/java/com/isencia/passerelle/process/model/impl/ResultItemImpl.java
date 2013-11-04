@@ -216,4 +216,18 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return new EqualsBuilder().append(this.id, rhs.id).append(this.name, rhs.name).append(this.unit, rhs.unit).append(this.value, rhs.value).isEquals();
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[name=");
+    builder.append(name);
+    builder.append(", value=");
+    builder.append(getValueAsString());
+    if (colour != null) {
+      builder.append(", colour=");
+      builder.append(getColour());
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 }
