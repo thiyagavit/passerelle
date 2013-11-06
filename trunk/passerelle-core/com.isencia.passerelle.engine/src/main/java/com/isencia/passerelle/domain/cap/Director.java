@@ -222,15 +222,15 @@ public class Director extends ProcessDirector {
 	 *
 	 * @return DOCUMENT ME!
 	 */
-	public Receiver newReceiver() {
-		BlockingQueueReceiver receiver = new BlockingQueueReceiver();
-		try {
-			receiver.setCapacity(FIFOQueue.INFINITE_CAPACITY);
-		} catch (IllegalActionException e) {
-		}
-
-		return receiver;
-	}
+//	public Receiver newReceiver() {
+//		BlockingQueueReceiver receiver = new BlockingQueueReceiver();
+//		try {
+//			receiver.setCapacity(FIFOQueue.INFINITE_CAPACITY);
+//		} catch (IllegalActionException e) {
+//		}
+//
+//		return receiver;
+//	}
 
 	/**
 	 * 
