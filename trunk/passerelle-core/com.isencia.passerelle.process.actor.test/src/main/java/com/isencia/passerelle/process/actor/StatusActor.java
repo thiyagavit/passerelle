@@ -19,7 +19,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * An actor that marks an incoming request with the configured status.
