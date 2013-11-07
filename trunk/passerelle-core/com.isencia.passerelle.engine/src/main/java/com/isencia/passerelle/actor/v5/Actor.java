@@ -243,7 +243,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   @Override
   protected boolean doPreFire() throws ProcessingException {
-    getLogger().trace("{} - doPreFire() - entry", getFullName());
+    getLogger().trace("{} - doPreFire() - entry  ", getFullName());
 
     boolean readyToFire = super.doPreFire();
 
@@ -285,7 +285,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
               getLogger().debug("{} - doPreFire() - found exhausted port {} ", getFullName(), handler.getName());
             } else if (msg != null) {
               if (getLogger().isDebugEnabled())
-                getLogger().debug("{} - doPreFire() - msg {} received on port {}", new Object[] { getFullName(), msg.getID(), handler.getName() });
+                getLogger().debug("{} - doPreFire() - message {} received on port {}", new Object[] { getFullName(), msg.getID(), handler.getName() });
             }
           }
         }

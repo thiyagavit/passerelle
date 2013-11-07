@@ -19,17 +19,26 @@ import ptolemy.actor.Manager;
 import com.isencia.passerelle.actor.ProcessingException;
 
 /**
- * An ExecutionListener that can be used to count errors of a specific class.
+ * An ExecutionListener that can be used to listen for an error of a specific class,
+ * and to optionally stop the execution then.
  * 
  * @author erwin
  *
  */
-public class ExecutionErrorCounter implements ExecutionListener {
+public class ExecutionErrorCatcher implements ExecutionListener {
+  public final static boolean STOP_ON_ERROR = true;
+  
   private int errorCounter;
   private Class<?> errorClass;
+  private boolean stopOnError;
 
-  public ExecutionErrorCounter(Class<?> errorClass) {
+  public ExecutionErrorCatcher(Class<?> errorClass) {
     this.errorClass = errorClass;
+  }
+
+  public ExecutionErrorCatcher(Class<?> errorClass, boolean stopOnError) {
+    this.errorClass = errorClass;
+    this.stopOnError = stopOnError;
   }
 
   public void managerStateChanged(Manager manager) {
@@ -42,6 +51,9 @@ public class ExecutionErrorCounter implements ExecutionListener {
     if (errorClass == null || errorClass.isInstance(throwable) || 
         ((throwable instanceof ProcessingException) && errorClass.isInstance(((ProcessingException) throwable).getCause()))) {
       errorCounter++;
+      if(stopOnError) {
+        manager.stop();
+      }
     }
   }
 
