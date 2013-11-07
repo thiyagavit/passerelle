@@ -46,7 +46,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
-import com.isencia.passerelle.process.model.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"
