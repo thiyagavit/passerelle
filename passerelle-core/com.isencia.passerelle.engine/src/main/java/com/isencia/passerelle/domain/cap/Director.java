@@ -14,21 +14,7 @@
 */
 package com.isencia.passerelle.domain.cap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ptolemy.actor.CompositeActor;
-import ptolemy.actor.Receiver;
-import ptolemy.actor.util.FIFOQueue;
-import ptolemy.data.expr.FileParameter;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
@@ -47,41 +33,31 @@ import com.isencia.passerelle.domain.ProcessDirector;
 public class Director extends ProcessDirector {
 	//~ Static variables/initializers __________________________________________________________________________________________________________________________
 
-	private static Logger logger = LoggerFactory.getLogger(Director.class);
+  /** Construct a director in the default workspace with an empty string
+   *  as its name. The director is added to the list of objects in
+   *  the workspace. Increment the version number of the workspace.
+   *  Create a director parameter "Initial_queue_capacity" with the default
+   *  value 1. This sets the initial capacities of the queues in all
+   *  the receivers created in the PN domain.
+   */
+  public Director() throws IllegalActionException, NameDuplicationException {
+    this(null);
+  }
 
-	//~ Instance variables _____________________________________________________________________________________________________________________________________
-	private File propsFile=null;
-	public FileParameter propsFileParameter;
-	public final static String PROPSFILE_PARAM = "Properties File";
-	
-	//~ Constructors ___________________________________________________________________________________________________________________________________________
-
-	/** Construct a director in the default workspace with an empty string
-	 *  as its name. The director is added to the list of objects in
-	 *  the workspace. Increment the version number of the workspace.
-	 *  Create a director parameter "Initial_queue_capacity" with the default
-	 *  value 1. This sets the initial capacities of the queues in all
-	 *  the receivers created in the PN domain.
-	 */
-	public Director() throws IllegalActionException, NameDuplicationException {
-		this(null);
-	}
-
-	/** Construct a director in the  workspace with an empty name.
-	 *  The director is added to the list of objects in the workspace.
-	 *  Increment the version number of the workspace.
-	 *  Create a director parameter "Initial_queue_capacity" with the default
-	 *  value 1. This sets the initial capacities of the queues in all
-	 *  the receivers created in the PN domain.
-	 *  @param workspace The workspace of this object.
-	 */
-	public Director(Workspace workspace)
-		throws IllegalActionException, NameDuplicationException {
-		super(workspace);
-		propsFileParameter = new FileParameter(this, PROPSFILE_PARAM);
-		// to trigger the creation of our default adapter
-		getAdapter(null);
-	}
+  /** Construct a director in the  workspace with an empty name.
+   *  The director is added to the list of objects in the workspace.
+   *  Increment the version number of the workspace.
+   *  Create a director parameter "Initial_queue_capacity" with the default
+   *  value 1. This sets the initial capacities of the queues in all
+   *  the receivers created in the PN domain.
+   *  @param workspace The workspace of this object.
+   */
+  public Director(Workspace workspace)
+    throws IllegalActionException, NameDuplicationException {
+    super(workspace);
+    // to trigger the creation of our default adapter
+    getAdapter(null);
+  }
 
 	/** Construct a director in the given container with the given name.
 	 *  If the container argument must not be null, or a
@@ -103,8 +79,6 @@ public class Director extends ProcessDirector {
 		throws IllegalActionException, NameDuplicationException {
 		super(container, name);
 		
-		propsFileParameter = new FileParameter(this, PROPSFILE_PARAM);
-
     // to trigger the creation of our default adapter
     getAdapter(null);
     
@@ -158,146 +132,4 @@ public class Director extends ProcessDirector {
 			+ "</svg>\n");
 	}
 
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param workspace DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 *
-	 * @throws CloneNotSupportedException DOCUMENT ME!
-	 */
-	public Object clone(Workspace workspace)
-		throws CloneNotSupportedException {
-		Director newObject = (Director) super.clone(workspace);
-
-		return newObject;
-	}
-
-	public void attributeChanged(Attribute attribute) throws IllegalActionException {
-
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" :"+attribute);
-			
-		if (attribute == propsFileParameter) {
-			try {
-				File asFile = propsFileParameter.asFile();
-				if (asFile != null) {
-					String propsPath = asFile.getPath();
-					propsFile = new File(propsPath);
-					logger.debug("System Properties file changed to : " + propsPath);
-				}
-			} catch (NullPointerException e) {
-				// Ignore. Means that path is not a valid URL.
-			}
-		} else 
-			super.attributeChanged(attribute);
-
-		if(logger.isTraceEnabled())
-			logger.trace(getName());
-	}
-	
-	public void initialize() throws IllegalActionException {
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" initialize() - entry");
-		
-		if(propsFile!=null) {
-			try {
-				InputStream propsInput = new FileInputStream(propsFile);
-				System.getProperties().load(propsInput);
-			} catch (FileNotFoundException e) {
-				logger.error("", e);
-			} catch (IOException e) {
-				logger.error("", e);
-			}
-		}
-		super.initialize();
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" initialize() - exit");
-	}
-
-
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 */
-//	public Receiver newReceiver() {
-//		BlockingQueueReceiver receiver = new BlockingQueueReceiver();
-//		try {
-//			receiver.setCapacity(FIFOQueue.INFINITE_CAPACITY);
-//		} catch (IllegalActionException e) {
-//		}
-//
-//		return receiver;
-//	}
-
-	/**
-	 * 
-	 * @return unmodifiable copy of all receivers managed by this Director,
-	 * i.e. of the input ports of the actors in this Director's model.
-	 */
-	public Collection<BlockingQueueReceiver> getManagedReceivers() {
-		return Collections.emptyList();
-	}
-	
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 *
-	 * @throws IllegalActionException DOCUMENT ME!
-	 */
-	public boolean postfire() throws IllegalActionException {
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" postfire() - entry");
-		
-		boolean res = true;
-        _notDone = super.postfire();
-        
-		//If the container has input ports and there are active processes
-		//in the container, then the execution might restart on receiving
-		// additional data.
-		if (!((((CompositeActor) getContainer()).inputPortList()).isEmpty())
-			&& (_getActiveThreadsCount() != 0)) {
-			// System.out.println("DIRECTOR.POSTFIRE() returning " + _notDone);
-            res = !_stopRequested;
-		} else {
-			//System.out.println("DIRECTOR.POSTFIRE() returning " + _notDone
-			//	    + " again.");
-			res = _notDone;
-		}
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" postfire() - exit - returning :"+res);
-		
-		return res;
-	}
-
-	/* (non-Javadoc)
-	 * @see ptolemy.actor.Executable#wrapup()
-	 */
-	public void wrapup() throws IllegalActionException {
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" wrapup() - entry");
-		
-		super.wrapup();
-		if(logger.isTraceEnabled())
-			logger.trace(getName()+" wrapup() - exit");
-	}
-	
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 *
-	 * @throws IllegalActionException DOCUMENT ME!
-	 */
-	protected boolean _resolveInternalDeadlock()
-		throws IllegalActionException {
-		if (_getActiveThreadsCount() == 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
 }
