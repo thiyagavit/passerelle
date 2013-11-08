@@ -25,7 +25,7 @@ import ptolemy.data.Token;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
-import com.isencia.passerelle.domain.ProcessThread;
+import com.isencia.passerelle.domain.cap.ProcessThread;
 import com.isencia.passerelle.util.LoggerManager;
 
 /**
@@ -177,7 +177,7 @@ public class PortHandler {
       // messages will be in the queue
       try {
         token = (Token) queue.take();
-        if (Token.NIL.equals(token)) {
+        if (Token.NIL.equals(token) || PasserelleToken.POISON_PILL.equals(token)) {
           // indicates a terminating system
           queue.offer(token);
           token = null;
@@ -200,9 +200,10 @@ public class PortHandler {
       try {
         if (ioPort.hasToken(i)) {
           token = ioPort.get(i);
-          if (token != null) {
+          if (token != null && !PasserelleToken.POISON_PILL.equals(token)) {
             break;
-          } else {
+          } 
+          if(token==null) {
             channelIsDead = true;
           }
         }

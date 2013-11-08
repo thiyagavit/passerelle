@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.Initializable;
-import ptolemy.domains.pn.kernel.PNDirector;
+import ptolemy.actor.process.CompositeProcessDirector;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -43,7 +43,7 @@ import com.isencia.passerelle.ext.PausableResumable;
  * 
  * @author erwin
  */
-public abstract class ProcessDirector extends PNDirector implements PausableResumable, PasserelleDirector {
+public abstract class ProcessDirector extends CompositeProcessDirector implements PausableResumable, PasserelleDirector {
   private static Logger logger = LoggerFactory.getLogger(ProcessDirector.class);
 
   // annoyingly need to maintaina copy here of the activeThreads in the Ptolemy ProcessDirector baseclass,
