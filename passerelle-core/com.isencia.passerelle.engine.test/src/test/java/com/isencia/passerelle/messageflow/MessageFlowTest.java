@@ -17,8 +17,10 @@ package com.isencia.passerelle.messageflow;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import ptolemy.actor.NoRoomException;
 import ptolemy.data.IntToken;
-import com.isencia.passerelle.core.PortMode;
+import com.isencia.passerelle.domain.cap.CapDirector;
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -26,7 +28,10 @@ import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;
 import com.isencia.passerelle.testsupport.actor.RandomMatrixSource;
+import com.isencia.passerelle.testsupport.actor.TextSource;
+import com.isencia.passerelle.testsupport.utils.CollectingLog4JAppender;
 import com.isencia.passerelle.testsupport.utils.ExecutionErrorCatcher;
+import com.isencia.passerelle.testsupport.utils.ExecutionErrorCounter;
 
 public class MessageFlowTest extends TestCase {
 
@@ -35,6 +40,9 @@ public class MessageFlowTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     flowMgr = new FlowManager();
+    CollectingLog4JAppender.initWithPattern(".*delay.input - reached/passed warning threshold size 1");
+    Logger.getRootLogger().removeAllAppenders();
+    Logger.getRootLogger().addAppender(new CollectingLog4JAppender());
   }
 
   /**
@@ -47,7 +55,7 @@ public class MessageFlowTest extends TestCase {
    */
   public void testReceiverQueueCapacityLimit() throws Exception {
     Flow flow = new Flow("ReceiverQueueCapacityLimit", null);
-    Director director = new Director(flow, "director");
+    CapDirector director = new CapDirector(flow, "director");
     flow.setDirector(director);
     director.maximumQueueCapacity.setToken(new IntToken(1));
 
@@ -76,7 +84,7 @@ public class MessageFlowTest extends TestCase {
   public void testReceiverQueueNoCapacityLimitWithOutOfMemory() throws Exception {
     try {
       Flow flow = new Flow("testReceiverQueueNoCapacityLimitWithOutOfMemory", null);
-      Director director = new Director(flow, "director");
+      CapDirector director = new CapDirector(flow, "director");
       flow.setDirector(director);
       director.initialQueueCapacity.setToken(new IntToken(65536));
 
@@ -98,5 +106,64 @@ public class MessageFlowTest extends TestCase {
     } catch (OutOfMemoryError e) {
       // all's well ;-)
     }
+  }
+  /**
+   * A simple test on limited input queue sizes,
+   * i.e. where extra messages get refused.
+   * 
+   * @throws Exception
+   */
+  public void testActorReceiverQueueCapacityLimit() throws Exception {
+    Flow flow = new Flow("", null);
+    flow.setDirector(new Director(flow, "director"));
+    
+    TextSource source = new TextSource(flow, "source");
+    Delay delay = new Delay(flow, "delay");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    flow.connect(source,delay);
+    flow.connect(delay,sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("source.values", "Hello,world,again,and,again");
+    props.put("delay.time(ms)", "100");
+    props.put("delay.Receiver Q Capacity (-1)", "1");
+    
+    ExecutionErrorCounter listener = new ExecutionErrorCounter(NoRoomException.class);
+    flowMgr.executeBlockingLocally(flow, props, listener);
+    // at least 3 since the Delay actor does not block before retrieving its first message;
+    // i.e. the second message is in fact the 1st one to stay in the receiver queue for a while,
+    // and the third message will get refused then if it arrives within the same delay-timeslot.
+    assertTrue("Should get at least 3 NoRoomExceptions", listener.getErrorCount()>=3);
+  }
+  
+  /**
+   * A simple test on size warnings for input queues,
+   * i.e. where extra messages get through but warning messages are logged.
+   * 
+   * @throws Exception
+   */
+  public void testActorReceiverQueueCapacityWarning() throws Exception {
+	
+    Flow flow = new Flow("", null);
+    flow.setDirector(new Director(flow, "director"));
+    
+    TextSource source = new TextSource(flow, "source");
+    Delay delay = new Delay(flow, "delay");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    flow.connect(source,delay);
+    flow.connect(delay,sink);
+    
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("source.values", "Hello,world,again,and,again");
+    props.put("delay.time(ms)", "100");
+    props.put("delay.Receiver Q warning size (-1)", "1");
+    
+    flowMgr.executeBlockingLocally(flow, props);
+    new FlowStatisticsAssertion()
+      .expectMsgReceiptCount(sink, 5L)
+      .assertFlow(flow);
+    
+    assertEquals("Should get 5 warnings",5,CollectingLog4JAppender.getLoggedMessages());
   }
 }

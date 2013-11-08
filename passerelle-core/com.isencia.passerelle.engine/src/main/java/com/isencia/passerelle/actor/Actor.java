@@ -31,6 +31,7 @@ import ptolemy.actor.Receiver;
 import ptolemy.actor.TypedAtomicActor;
 import ptolemy.actor.process.ProcessDirector;
 import ptolemy.actor.process.TerminateProcessException;
+import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
@@ -53,6 +54,7 @@ import com.isencia.passerelle.core.PortHandler;
 import com.isencia.passerelle.core.PortListener;
 import com.isencia.passerelle.core.PortListenerAdapter;
 import com.isencia.passerelle.director.DirectorUtils;
+import com.isencia.passerelle.domain.cap.BlockingQueueReceiver;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorControlStrategy;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -242,6 +244,27 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   protected Map<String, String> actorMsgHeaders = new HashMap<String, String>();
 
   /**
+   * Parameter to set a size for input port queues, starting at which a warning message will be logged. This can be useful to determine processing hot-spots in
+   * Passerelle sequences, where actors may become flooded by input messages that they are unable to process in time.
+   * <p>
+   * Default value = -1 indicates that no such warning logs are generated.
+   * </p>
+   */
+  public Parameter receiverQueueWarningSizeParam;
+  /**
+   * Parameter to set a max capacity for input port queues. When a queue reaches its max capacity, any new tokens trying to reach the input port will be
+   * refused, and a NoRoomException will be thrown.
+   * <p>
+   * Should only be used in very specific cases, as it does not correspond to the theoretical semantics of Kahn process networks, the basis for Passerelle's
+   * execution model (cfr Ptolemy project docs).
+   * </p>
+   * <p>
+   * Default value = -1 indicates that received queues have unlimited capacity.
+   * </p>
+   */
+  public Parameter receiverQueueCapacityParam;
+
+  /**
    * Constructor for Actor.
    * 
    * @param container
@@ -259,6 +282,11 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     hasFiredPort = PortFactory.getInstance().createOutputControlPort(this, "hasFired");
 
     hasFinishedPort = PortFactory.getInstance().createOutputControlPort(this, "hasFinished");
+
+    receiverQueueCapacityParam = new Parameter(this, "Receiver Q Capacity (-1)", new IntToken(-1));
+    receiverQueueWarningSizeParam = new Parameter(this, "Receiver Q warning size (-1)", new IntToken(-1));
+    registerExpertParameter(receiverQueueCapacityParam);
+    registerExpertParameter(receiverQueueWarningSizeParam);
 
     try {
       new EditorIcon(this, "_icon");
@@ -423,6 +451,20 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     getDirectorAdapter().notifyActorActive(this);
 
     getLogger().trace("{} - preinitialize() - exit ", getInfo());
+  }
+
+  @Override
+  public Receiver newReceiver() throws IllegalActionException {
+    Receiver rcver = super.newReceiver();
+    if (rcver instanceof BlockingQueueReceiver) {
+      BlockingQueueReceiver qRcvr = (BlockingQueueReceiver) rcver;
+      int qCapacity = ((IntToken) receiverQueueCapacityParam.getToken()).intValue();
+      qRcvr.setCapacity(qCapacity);
+
+      int qWarningSize = ((IntToken) receiverQueueWarningSizeParam.getToken()).intValue();
+      qRcvr.setSizeWarningThreshold(qWarningSize);
+    }
+    return rcver;
   }
 
   /**
@@ -823,6 +865,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
     while (outputPorts.hasNext()) {
       Port port = (Port) outputPorts.next();
+//      port.broadcast(PasserelleToken.POISON_PILL);
       Receiver[][] farReceivers = port.getRemoteReceivers();
 
       for (int i = 0; i < farReceivers.length; i++) {

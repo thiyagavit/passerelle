@@ -254,12 +254,11 @@ public class Port extends TypedIOPort {
    * @exception NoRoomException If a send to one of the channels throws it.
    */
   public void broadcast(Token token) throws IllegalActionException, NoRoomException {
+    logger.trace("{} - broadcast() - entry : {} ", this.getFullName(), token);
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("broadcast() - entry : " + token);
+    if(!(PasserelleToken.POISON_PILL==token)) {
+      statistics.acceptSentMessage(null);
     }
-
-    statistics.acceptSentMessage(null);
 
     Receiver[][] farReceivers;
     // ptolemy debug listener stuff etc
@@ -289,9 +288,7 @@ public class Port extends TypedIOPort {
       putAtFarReceivers(token, farReceivers[i]);
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("broadcast() - exit");
-    }
+    logger.trace("{} - broadcast() - exit", this.getFullName());
   }
 
   /**
@@ -314,7 +311,7 @@ public class Port extends TypedIOPort {
   public void broadcast(Token[] tokenArray, int vectorLength) throws IllegalActionException, NoRoomException {
 
     if (logger.isTraceEnabled()) {
-      logger.trace("broadcast(array) - entry : " + tokenArray + " length :" + vectorLength);
+      logger.trace("{} - broadcast(array) - entry : {} length : {}", new Object[] {this.getFullName(), tokenArray, vectorLength});
     }
     Receiver[][] farReceivers;
     if (_debugging) {
@@ -349,9 +346,7 @@ public class Port extends TypedIOPort {
       putAtFarReceivers(tokenArray, vectorLength, farReceivers[i]);
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("broadcast(array) - exit");
-    }
+    logger.trace("{} - broadcast(array) - exit", this.getFullName());
   }
 
   /**
@@ -372,13 +367,15 @@ public class Port extends TypedIOPort {
    */
   public void send(int channelIndex, Token token) throws IllegalActionException, NoRoomException {
     if (logger.isTraceEnabled()) {
-      logger.trace("send() - entry : channel : " + channelIndex + " token : " + token);
+      logger.trace("{} - send() - entry : channel : {} token : {}", new Object[] {this.getFullName(), channelIndex, token});
     }
     if (token == null) {
       throw new IllegalActionException(this, "Cannot send a null token.");
     }
 
-    statistics.acceptSentMessage(null);
+    if(!(PasserelleToken.POISON_PILL==token)) {
+      statistics.acceptSentMessage(null);
+    }
 
     Receiver[][] farReceivers;
     if (_debugging) {
@@ -411,9 +408,7 @@ public class Port extends TypedIOPort {
       // This is allowed, just do nothing.
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("send() - exit");
-    }
+    logger.trace("{} - send() - exit", this.getFullName());
   }
 
   /**
@@ -445,7 +440,7 @@ public class Port extends TypedIOPort {
    */
   public void send(int channelIndex, Token[] tokenArray, int vectorLength) throws IllegalActionException, NoRoomException {
     if (logger.isTraceEnabled()) {
-      logger.trace("send(array) - entry : channel : " + channelIndex + " token : " + tokenArray + " length : " + vectorLength);
+      logger.trace("{} - send(array) - entry : channel : {} token : {} length : {}", new Object[]{this.getFullName(), channelIndex, tokenArray, vectorLength});
     }
     if (vectorLength > tokenArray.length) {
       throw new IllegalActionException(this, "Not enough data supplied to send specified number of samples.");
@@ -484,9 +479,7 @@ public class Port extends TypedIOPort {
       // This is allowed, just do nothing.
     }
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("send(array) - exit");
-    }
+    logger.trace("{} - send(array) - exit", this.getFullName());
   }
 
   /**
@@ -518,9 +511,7 @@ public class Port extends TypedIOPort {
    *              index is out of range.
    */
   public Token get(int channelIndex) throws NoTokenException, IllegalActionException {
-    if (logger.isTraceEnabled()) {
-      logger.trace("get() - entry : channel : " + channelIndex);
-    }
+    logger.trace("{} - get() - entry : channel : {}", this.getFullName(), channelIndex);
 
     Receiver[][] localReceivers;
     try {
@@ -563,9 +554,7 @@ public class Port extends TypedIOPort {
 
     statistics.acceptReceivedMessage(null);
 
-    if (logger.isTraceEnabled()) {
-      logger.trace("get() - exit - result : " + token);
-    }
+    logger.trace("{} - get() - exit - result : {}", this.getFullName(), token);
     return token;
   }
 
@@ -848,12 +837,12 @@ public class Port extends TypedIOPort {
   }
 
   public synchronized void notifySourcePortFinished(Port port) {
-    logger.trace("notifySourcePortFinished() - entry - srcPort : {}", port.getFullName());
+    logger.trace("{} - notifySourcePortFinished() - entry - srcPort : {}", this.getFullName(), port.getFullName());
     operationalSourcePorts.remove(port);
     if (operationalSourcePorts.size() == 0) {
       requestFinish();
     }
-    logger.trace("notifySourcePortFinished() - exit");
+    logger.trace("{} - notifySourcePortFinished() - exit", this.getFullName());
   }
   
   /**
@@ -864,11 +853,8 @@ public class Port extends TypedIOPort {
    * by a user or by a central control/dispatch like in an event-based domain.
    */
   public void requestFinish() {
-    logger.trace("requestFinish() - entry");
-    
-    logger.debug("Finishing port {}", this.getFullName());
+    logger.trace("{} - requestFinish() - entry", this.getFullName());
     operationalSourcePorts.clear();
-    
     Receiver[][] myLocalReceivers = getReceivers();
     for (Receiver[] receivers : myLocalReceivers) {
       for (Receiver receiver : receivers) {
@@ -879,7 +865,7 @@ public class Port extends TypedIOPort {
         }
       }
     }
-    logger.trace("requestFinish() - exit");
+    logger.trace("{} - requestFinish() - exit", this.getFullName());
   }
   
   public boolean isExhausted() {
