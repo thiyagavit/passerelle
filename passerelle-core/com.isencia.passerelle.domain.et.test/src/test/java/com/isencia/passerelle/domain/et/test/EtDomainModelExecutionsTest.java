@@ -27,7 +27,6 @@ import com.isencia.passerelle.actor.error.ErrorObserver;
 import com.isencia.passerelle.actor.filter.HeaderFilter;
 import com.isencia.passerelle.actor.general.DevNullActor;
 import com.isencia.passerelle.actor.v5.Actor;
-import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
@@ -171,20 +170,6 @@ public class EtDomainModelExecutionsTest extends TestCase {
     props.put("director.Dispatch timeout(ms)", "250");
     ETDirector d = new ETDirector(flow, "director");
     __testChainedDelays(true, d, props);
-  }
-
-  /**
-   * This test illustrates the "factory chain" advantage of the PN domain, where each actor has its own thread. This leads to all 3 "worker" actors (the delays)
-   * to be able to work (spend time) concurrently.
-   */
-  public void testChainedDelaysPN() throws Exception {
-    flow = new Flow("testChainedDelaysPN", null);
-    __testChainedDelays(false, new Director(flow, "director"), new HashMap<String, String>());
-  }
-
-  public void testChainedAsynchDelaysPN() throws Exception {
-    flow = new Flow("testChainedAsynchDelaysPN", null);
-    __testChainedDelays(true, new Director(flow, "director"), new HashMap<String, String>());
   }
 
   public void __testChainedDelays(boolean asynchDelay, ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
@@ -373,18 +358,6 @@ public class EtDomainModelExecutionsTest extends TestCase {
     __testConcurrentInputsOnDelay(false, d, props);
   }
 
-  public void testConcurrentInputsOnDelayPN() throws Exception {
-    Map<String, String> props = new HashMap<String, String>();
-    flow = new Flow("testConcurrentInputsOnDelayPN", null);
-    __testConcurrentInputsOnDelay(false, new Director(flow, "director"), props);
-  }
-
-  public void testConcurrentInputsOnAsynchDelayPN() throws Exception {
-    Map<String, String> props = new HashMap<String, String>();
-    flow = new Flow("testConcurrentInputsOnAsynchDelayPN", null);
-    __testConcurrentInputsOnDelay(true, new Director(flow, "director"), props);
-  }
-
   public void __testConcurrentInputsOnDelay(boolean asynchDelay, ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
     flow.setDirector(d);
 
@@ -425,16 +398,6 @@ public class EtDomainModelExecutionsTest extends TestCase {
   /**
    * A more chaotic delay model, with two parallel branches with delay actors, ending up in their own sinks.
    */
-  public void testChainedAndParallelDelaysPN() throws Exception {
-    flow = new Flow("testChainedAndParallelDelaysPN", null);
-    __testChainedAndParallelDelays(false, new Director(flow, "director"), new HashMap<String, String>());
-  }
-
-  public void testChainedAndParallelAsynchDelaysPN() throws Exception {
-    flow = new Flow("testChainedAndParallelAsynchDelaysPN", null);
-    __testChainedAndParallelDelays(true, new Director(flow, "director"), new HashMap<String, String>());
-  }
-
   public void testChainedAndParallelDelaysET3Threads() throws Exception {
     flow = new Flow("testChainedAndParallelDelaysET3Threads", null);
     Map<String, String> props = new HashMap<String, String>();
