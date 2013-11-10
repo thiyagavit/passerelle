@@ -20,7 +20,8 @@ import junit.framework.TestCase;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.v5.Actor;
-import com.isencia.passerelle.domain.cap.Director;
+import com.isencia.passerelle.domain.cap.CapDirector;
+import ptolemy.actor.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
@@ -44,19 +45,22 @@ public class FlowExecutionsTest extends TestCase {
     flowMgr = new FlowManager();
   }
 
+  private static Director createProcessDirector(boolean createCapDirector, Flow flow, String name) throws IllegalActionException, NameDuplicationException {
+    return createCapDirector ? new CapDirector(flow, name) : new com.isencia.passerelle.domain.cap.Director(flow, name);
+  }
   private static Delay createDelayActor(boolean asynchDelay, Flow flow, String name) throws IllegalActionException, NameDuplicationException {
     return asynchDelay ? new AsynchDelay(flow, name) : new Delay(flow, name);
   }
 
   public void testSynchDelayedForwarder() throws Exception {
     flow = new Flow("testSynchDelayedForwarder", null);
-    Director d = new Director(flow, "director");
+    Director d = createProcessDirector(false, flow, "director");
     __testDelayedForwarder(false, d, new HashMap<String, String>());
   }
 
   public void testAsynchDelayedForwarder() throws Exception {
     flow = new Flow("testAsynchDelayedForwarder", null);
-    Director d = new Director(flow, "director");
+    Director d = createProcessDirector(false, flow, "director");
     __testDelayedForwarder(true, d, new HashMap<String, String>());
   }
 
@@ -88,14 +92,14 @@ public class FlowExecutionsTest extends TestCase {
    * This test illustrates the "factory chain" advantage of the PN domain, where each actor has its own thread. This leads to all 3 "worker" actors (the delays)
    * to be able to work (spend time) concurrently.
    */
-  public void testChainedDelaysPN() throws Exception {
-    flow = new Flow("testChainedDelaysPN", null);
-    __testChainedDelays(false, new Director(flow, "director"), new HashMap<String, String>());
+  public void testChainedDelays() throws Exception {
+    flow = new Flow("testChainedDelays", null);
+    __testChainedDelays(false, createProcessDirector(false, flow, "director"), new HashMap<String, String>());
   }
 
-  public void testChainedAsynchDelaysPN() throws Exception {
-    flow = new Flow("testChainedAsynchDelaysPN", null);
-    __testChainedDelays(true, new Director(flow, "director"), new HashMap<String, String>());
+  public void testChainedAsynchDelays() throws Exception {
+    flow = new Flow("testChainedAsynchDelays", null);
+    __testChainedDelays(true, createProcessDirector(false, flow, "director"), new HashMap<String, String>());
   }
 
   public void __testChainedDelays(boolean asynchDelay, ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
@@ -129,16 +133,22 @@ public class FlowExecutionsTest extends TestCase {
       .assertFlow(flow);
   }
 
-  public void testConcurrentInputsOnDelayPN() throws Exception {
+  public void testConcurrentInputsOnDelay() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
-    flow = new Flow("testConcurrentInputsOnDelayPN", null);
-    __testConcurrentInputsOnDelay(false, new Director(flow, "director"), props);
+    flow = new Flow("testConcurrentInputsOnDelay", null);
+    __testConcurrentInputsOnDelay(false, createProcessDirector(false, flow, "director"), props);
   }
 
-  public void testConcurrentInputsOnAsynchDelayPN() throws Exception {
+  public void testConcurrentInputsOnAsynchDelay() throws Exception {
     Map<String, String> props = new HashMap<String, String>();
-    flow = new Flow("testConcurrentInputsOnAsynchDelayPN", null);
-    __testConcurrentInputsOnDelay(true, new Director(flow, "director"), props);
+    flow = new Flow("testConcurrentInputsOnAsynchDelay", null);
+    __testConcurrentInputsOnDelay(true, createProcessDirector(false, flow, "director"), props);
+  }
+
+  public void testConcurrentInputsOnAsynchDelayWithCapDirector() throws Exception {
+    Map<String, String> props = new HashMap<String, String>();
+    flow = new Flow("testConcurrentInputsOnAsynchDelayWithCapDirector", null);
+    __testConcurrentInputsOnDelay(true, createProcessDirector(true, flow, "director"), props);
   }
 
   public void __testConcurrentInputsOnDelay(boolean asynchDelay, ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
@@ -181,14 +191,19 @@ public class FlowExecutionsTest extends TestCase {
   /**
    * A more chaotic delay model, with two parallel branches with delay actors, ending up in their own sinks.
    */
-  public void testChainedAndParallelDelaysPN() throws Exception {
-    flow = new Flow("testChainedAndParallelDelaysPN", null);
-    __testChainedAndParallelDelays(false, new Director(flow, "director"), new HashMap<String, String>());
+  public void testChainedAndParallelDelays() throws Exception {
+    flow = new Flow("testChainedAndParallelDelays", null);
+    __testChainedAndParallelDelays(false, createProcessDirector(false, flow, "director"), new HashMap<String, String>());
   }
 
-  public void testChainedAndParallelAsynchDelaysPN() throws Exception {
-    flow = new Flow("testChainedAndParallelAsynchDelaysPN", null);
-    __testChainedAndParallelDelays(true, new Director(flow, "director"), new HashMap<String, String>());
+  public void testChainedAndParallelAsynchDelays() throws Exception {
+    flow = new Flow("testChainedAndParallelAsynchDelays", null);
+    __testChainedAndParallelDelays(true, createProcessDirector(false, flow, "director"), new HashMap<String, String>());
+  }
+
+  public void testChainedAndParallelAsynchDelaysWithCapDirector() throws Exception {
+    flow = new Flow("testChainedAndParallelAsynchDelaysWithCapDirector", null);
+    __testChainedAndParallelDelays(true, createProcessDirector(true, flow, "director"), new HashMap<String, String>());
   }
 
   public void __testChainedAndParallelDelays(boolean asynchDelay, ptolemy.actor.Director d, Map<String, String> paramOverrides) throws Exception {
@@ -235,7 +250,7 @@ public class FlowExecutionsTest extends TestCase {
 
   public void testProcessException() throws Exception {
     flow = new Flow("testProcessException", null);
-    Director director = new Director(flow, "director");
+    Director director = createProcessDirector(false, flow, "director");
     flow.setDirector(director);
 
     Const constant = new Const(flow, "const");
