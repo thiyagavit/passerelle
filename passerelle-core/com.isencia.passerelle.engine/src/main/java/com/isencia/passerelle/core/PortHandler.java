@@ -98,7 +98,6 @@ public class PortHandler {
   }
 
   /**
-   * 
    * @param ioPort
    * @param inProcessDomain
    */
@@ -108,7 +107,6 @@ public class PortHandler {
   }
 
   /**
-   * 
    * @param ioPort
    * @param listener
    * @param inProcessDomain
@@ -122,7 +120,8 @@ public class PortHandler {
    * Creates a new PortHandler object.
    * 
    * @param ioPort
-   * @param listener an object interested in receiving messages from the handler in push mode
+   * @param listener
+   *          an object interested in receiving messages from the handler in push mode
    */
   public PortHandler(Port ioPort, PortListener listener) {
     this(ioPort);
@@ -130,7 +129,8 @@ public class PortHandler {
   }
 
   /**
-   * @param listener an object interested in receiving messages from the handler in push mode
+   * @param listener
+   *          an object interested in receiving messages from the handler in push mode
    */
   public void setListener(PortListener listener) {
     this.listener = listener;
@@ -166,9 +166,10 @@ public class PortHandler {
    * @return a message token received by the handler
    */
   public Token getToken() {
-    LOGGER.trace("{} - getToken() - entry", getName());
+    LOGGER.trace("{} - getToken() - entry", getPort().getFullName());
 
     if (hasNoMoreTokens()) {
+      LOGGER.debug("{} - getToken() - has no more tokens", getPort().getFullName());
       return null;
     }
 
@@ -180,6 +181,7 @@ public class PortHandler {
         if (Token.NIL.equals(token) || PasserelleToken.POISON_PILL.equals(token)) {
           // indicates a terminating system
           queue.offer(token);
+          LOGGER.debug("{} - getToken() - got a termination token {}", getPort().getFullName(), token);
           token = null;
         }
       } catch (InterruptedException e) {
@@ -189,7 +191,7 @@ public class PortHandler {
       // just read the port directly
       token = readTokenFromPort();
     }
-    LOGGER.trace("{} - getToken() - exit - token : {} ", getName(), token);
+    LOGGER.trace("{} - getToken() - exit - token : {} ", getPort().getFullName(), token);
     return token;
   }
 
@@ -202,12 +204,15 @@ public class PortHandler {
           token = ioPort.get(i);
           if (token != null && !PasserelleToken.POISON_PILL.equals(token)) {
             break;
-          } 
-          if(token==null) {
+          }
+          if (token == null) {
             channelIsDead = true;
           }
         }
       } catch (Exception e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(getPort().getFullName()+" - readTokenFromPort() exception", e);
+        }
         channelIsDead = true;
       }
       if (channelIsDead) {
