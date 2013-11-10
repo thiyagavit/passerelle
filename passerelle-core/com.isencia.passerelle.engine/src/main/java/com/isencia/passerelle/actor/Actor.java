@@ -420,7 +420,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    **/
   @SuppressWarnings("unchecked")
   final public void preinitialize() throws IllegalActionException {
-    getLogger().trace("{} - preinitialize() - entry", getInfo());
+    getLogger().trace("{} - preinitialize() - entry", getFullName());
 
     super.preinitialize();
     try {
@@ -440,7 +440,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
         try {
           validateInitialization();
           if (getAuditLogger().isDebugEnabled())
-            getAuditLogger().debug(getInfo() + " - (PRE)INITIALIZATION VALIDATED");
+            getAuditLogger().debug(getFullName() + " - (PRE)INITIALIZATION VALIDATED");
         } catch (ValidationException e) {
           getErrorControlStrategy().handleInitializationValidationException(this, e);
         }
@@ -450,7 +450,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     }
     getDirectorAdapter().notifyActorActive(this);
 
-    getLogger().trace("{} - preinitialize() - exit ", getInfo());
+    getLogger().trace("{} - preinitialize() - exit ", getFullName());
   }
 
   @Override
@@ -477,7 +477,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   final public void initialize() throws IllegalActionException {
-    getLogger().trace("{} - initialize() - entry", getInfo());
+    getLogger().trace("{} - initialize() - entry", getFullName());
 
     super.initialize();
     paused = false;
@@ -491,9 +491,9 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
         public void tokenReceived() {
           Token token = requestFinishHandler.getToken();
           if (token != null && !token.isNil()) {
-            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
+            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getFullName());
             requestFinish();
-            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getInfo());
+            getLogger().trace("{} - requestFinishHandler.tokenReceived()", getFullName());
           }
         }
       });
@@ -514,11 +514,11 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
     // audit logging for state per actor is on debug
     // NDC is not yet active during initialize, so we
-    // show complete getInfo().
+    // show complete getFullName().
     if (getAuditLogger().isDebugEnabled())
-      getAuditLogger().debug(getInfo() + " - INITIALIZED");
+      getAuditLogger().debug(getFullName() + " - INITIALIZED");
 
-    getLogger().trace("{} - initialize() - exit ", getInfo());
+    getLogger().trace("{} - initialize() - exit ", getFullName());
   }
 
   /**
@@ -622,7 +622,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return true if the actor was not yet paused, and is paused now.
    */
   final public synchronized boolean pauseFire() {
-    getLogger().trace("{} - pauseFire() - entry", getInfo());
+    getLogger().trace("{} - pauseFire() - entry", getFullName());
     boolean wasNotPaused = !paused;
     try {
       paused = true;
@@ -632,7 +632,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     } catch (ClassCastException e) {
       return wasNotPaused;
     } finally {
-      getLogger().trace("{} - pauseFire() - exit", getInfo());
+      getLogger().trace("{} - pauseFire() - exit", getFullName());
     }
   }
 
@@ -657,7 +657,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return true if the actor was paused before, and is no longer paused after this method has finished.
    */
   final public synchronized boolean resumeFire() {
-    getLogger().trace("{} - resumeFire() - entry", getInfo());
+    getLogger().trace("{} - resumeFire() - entry", getFullName());
     boolean wasPaused = paused;
     try {
       if (wasPaused)
@@ -667,7 +667,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     } catch (ClassCastException e) {
       return wasPaused;
     } finally {
-      getLogger().trace("{} - resumeFire() - exit - {}", getInfo(), wasPaused);
+      getLogger().trace("{} - resumeFire() - exit - {}", getFullName(), wasPaused);
     }
   }
 
@@ -688,7 +688,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   final public boolean prefire() throws IllegalActionException {
-    getLogger().trace("{} - prefire() - entry", getInfo());
+    getLogger().trace("{} - prefire() - entry", getFullName());
     boolean res = true;
     try {
       if (!isFinishRequested()) {
@@ -709,7 +709,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       getDirectorAdapter().notifyActorInactive(this);
       throw e;
     } finally {
-      getLogger().trace("{} - prefire() - exit - {}", getInfo(), res);
+      getLogger().trace("{} - prefire() - exit - {}", getFullName(), res);
     }
   }
 
@@ -738,7 +738,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   final public void fire() throws IllegalActionException {
     isFiring = true;
     try {
-      getLogger().trace("{} - fire() - entry", getInfo());
+      getLogger().trace("{} - fire() - entry", getFullName());
       if (!isFinishRequested()) {
         try {
           if (!isMockMode()) {
@@ -762,13 +762,13 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       getDirectorAdapter().notifyActorInactive(this);
       throw e;
     } finally {
-      getLogger().trace("{} - fire() - exit", getInfo());
+      getLogger().trace("{} - fire() - exit", getFullName());
       isFiring = false;
       if (hasFiredPort.getWidth() > 0) {
         try {
           hasFiredPort.broadcast(new PasserelleToken(MessageFactory.getInstance().createTriggerMessage()));
         } catch (Exception e) {
-          getLogger().error(getInfo() + " - Error sending hasFired msg", e);
+          getLogger().error(getFullName() + " - Error sending hasFired msg", e);
         }
       }
     }
@@ -794,7 +794,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   final public boolean postfire() throws IllegalActionException {
-    getLogger().trace("{} - postfire() - entry", getInfo());
+    getLogger().trace("{} - postfire() - entry", getFullName());
     boolean res = true;
     try {
       try {
@@ -813,7 +813,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       if (!res) {
         getDirectorAdapter().notifyActorInactive(this);
       }
-      getLogger().trace("{} - postfire() - exit - {}", getInfo(), res);
+      getLogger().trace("{} - postfire() - exit - {}", getFullName(), res);
     }
   }
 
@@ -830,7 +830,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   final public void wrapup() throws IllegalActionException {
-    getLogger().trace("{} - wrapup() - entry", getInfo());
+    getLogger().trace("{} - wrapup() - entry", getFullName());
 
     try {
       getLogger().trace("{} doWrapUp() - entry", getFullName());
@@ -857,7 +857,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     try {
       hasFinishedPort.broadcast(new PasserelleToken(MessageFactory.getInstance().createTriggerMessage()));
     } catch (Exception e) {
-      getLogger().error(getInfo() + " - Error sending hasFinished msg", e);
+      getLogger().error(getFullName() + " - Error sending hasFinished msg", e);
     }
 
     // Inform connected receivers that this actor has stopped
@@ -893,21 +893,16 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
             // }
           }
         } else {
-          getLogger().warn("{} - wrapup() - port {} has a remote receiver null on channel {}", new Object[] { getInfo(), port.getName(), i });
+          getLogger().warn("{} - wrapup() - port {} has a remote receiver null on channel {}", new Object[] { getFullName(), port.getName(), i });
         }
       }
     }
 
     super.wrapup();
 
-    // audit logging for state per actor is on debug
-    // NDC is active during wrapup(), so we just need to
-    // show extended info as extra
-    // edl : use getInfo() after all, as sometimes actors
-    // don't have extended info
-    getAuditLogger().debug("{} - WRAPPED UP", getInfo());
+    getAuditLogger().debug("{} - WRAPPED UP", getFullName());
 
-    getLogger().trace("{} - wrapup() - exit", getInfo());
+    getLogger().trace("{} - wrapup() - exit", getFullName());
   }
 
   /**
@@ -920,25 +915,25 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
   }
 
   final public void terminate() {
-    getLogger().trace("{} - terminate() - entry", getInfo());
+    getLogger().trace("{} - terminate() - entry", getFullName());
     super.terminate();
-    getLogger().trace("{} - terminate() - exit", getInfo());
+    getLogger().trace("{} - terminate() - exit", getFullName());
   }
 
   final public void stopFire() {
-    getLogger().trace("{} - stopfire() - entry()", getInfo());
+    getLogger().trace("{} - stopfire() - entry()", getFullName());
     pauseFire();
-    getLogger().trace("{} - stopfire() - exit", getInfo());
+    getLogger().trace("{} - stopfire() - exit", getFullName());
   }
 
   final public void stop() {
-    getLogger().trace("{} - stop() - entry()", getInfo());
+    getLogger().trace("{} - stop() - entry()", getFullName());
     super.stop();
     if (!isFinishRequested()) {
       requestFinish();
     }
     doStop();
-    getLogger().trace("{} - stop() - exit", getInfo());
+    getLogger().trace("{} - stop() - exit", getFullName());
   }
 
   /**
@@ -962,7 +957,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    */
   final public void requestFinish() {
     finishRequested = true;
-    getLogger().debug("{} FINISH REQUESTED !!", getInfo());
+    getLogger().debug("{} FINISH REQUESTED !!", getFullName());
   }
 
   /**
@@ -1152,7 +1147,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @throws IllegalActionException
    */
   final public void sendErrorMessage(PasserelleException exception) throws IllegalActionException {
-    getLogger().debug("{} sendErrorMessage() - generating error msg for exception {}", getInfo(), exception);
+    getLogger().debug("{} sendErrorMessage() - generating error msg for exception {}", getFullName(), exception);
     if (errorPort.getWidth() > 0) {
       ManagedMessage errorMessage = createErrorMessage(exception);
       Token errorToken = new PasserelleToken(errorMessage);
@@ -1183,7 +1178,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       Token token = new PasserelleToken(message);
       port.broadcast(token);
       if (getLogger().isDebugEnabled()) {
-        getLogger().debug("{} - sendOutputMsg() - message {} sent on port {}", new Object[] { getInfo(), message.getID(), port.getDisplayName() });
+        getLogger().debug("{} - sendOutputMsg() - message {} sent on port {}", new Object[] { getFullName(), message.getID(), port.getName() });
       }
 
       if (getAuditLogger().isDebugEnabled()) {
@@ -1192,7 +1187,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
           auditDetail = getAuditTrailMessage(message, port);
         } catch (Exception e) {
           // simple hack to log a default msg anyway
-          auditDetail = getInfo() + " message " + message.getID() + " sent on port " + port.getDisplayName();
+          auditDetail = "message " + message.getID() + " on port " + this.getDisplayName()+"."+port.getDisplayName();
         }
         if (auditDetail != null) {
           getAuditLogger().debug(auditDetail);
@@ -1212,7 +1207,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * @return
    */
   protected String getAuditTrailMessage(ManagedMessage message, Port port) {
-    return message.getID() + (port != null ? " on port " + port.getDisplayName() : "");
+    return "message " + message.getID() + (port != null ? " on port " + this.getDisplayName()+"."+port.getDisplayName() : "");
   }
 
   /**
@@ -1220,10 +1215,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * processing logic is being executed, after having received the relevant input messages (or leaving the blocked state for any other reason).
    */
   protected void notifyStartingFireProcessing() {
-    getLogger().trace("{} - notifyStartingFireProcessing() - entry", getInfo());
+    getLogger().trace("{} - notifyStartingFireProcessing() - entry", getFullName());
     statistics.beginCycle();
     isFiring = true;
-    getLogger().trace("{} - notifyStartingFireProcessing() - exit", getInfo());
+    getLogger().trace("{} - notifyStartingFireProcessing() - exit", getFullName());
   }
 
   /**
@@ -1231,10 +1226,10 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
    * blocked, waiting for new input messages.
    */
   protected void notifyFinishedFireProcessing() {
-    getLogger().trace("{} - notifyFinishedFireProcessing() - entry", getInfo());
+    getLogger().trace("{} - notifyFinishedFireProcessing() - entry", getFullName());
     statistics.endCycle();
     isFiring = false;
-    getLogger().trace("{} - notifyFinishedFireProcessing() - exit", getInfo());
+    getLogger().trace("{} - notifyFinishedFireProcessing() - exit", getFullName());
   }
 
   @Override

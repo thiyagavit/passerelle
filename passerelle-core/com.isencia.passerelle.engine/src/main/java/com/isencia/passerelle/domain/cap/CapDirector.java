@@ -23,12 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.Initializable;
-import ptolemy.actor.Receiver;
-import ptolemy.data.IntToken;
 import ptolemy.domains.pn.kernel.PNDirector;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.InternalErrorException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.director.DirectorUtils;
@@ -36,12 +33,9 @@ import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.ext.DirectorAdapter;
 
 /**
- * The standard Passerelle director. Besides the std Ptolemy director stuff, such as providing custom receivers and process threads, this director adds:
- * <ul>
- * <li>Support for centralized maintenance of a scheduler instance
- * </ul>
+ * A new version of the Passerelle process-domain director, directly extending from Ptolemy's PNDirector, mainly to try to reuse Ptolemy's receiver queue
+ * handling as much as possible and at the same time to start reducing the volume of Ptolemy customizations in Passerelle.
  * 
- * @author dirk
  * @author erwin
  */
 public class CapDirector extends PNDirector implements PasserelleDirector {
@@ -164,9 +158,7 @@ public class CapDirector extends PNDirector implements PasserelleDirector {
   @Override
   public synchronized void removeThread(Thread thread) {
     super.removeThread(thread);
-    if (thread instanceof ProcessThread) {
-      myThreads.remove((ProcessThread) thread);
-    }
+    myThreads.remove(thread);
 
     Set<com.isencia.passerelle.actor.Actor> activeActorsWithoutInputs = DirectorUtils.getActiveActorsWithoutInputs(this);
     boolean areAllDaemon = true;
@@ -192,17 +184,17 @@ public class CapDirector extends PNDirector implements PasserelleDirector {
     return new ProcessThread(actor, (CapDirector) director);
   }
 
-//  @Override
-//  public Receiver newReceiver() {
-//    CapReceiver receiver = new CapReceiver();
-//    try {
-//      int capacity = ((IntToken) initialQueueCapacity.getToken()).intValue();
-//      receiver.setCapacity(capacity);
-//    } catch (IllegalActionException e) {
-//      throw new InternalErrorException(e);
-//    }
-//    return receiver;
-//  }
+  // @Override
+  // public Receiver newReceiver() {
+  // CapReceiver receiver = new CapReceiver();
+  // try {
+  // int capacity = ((IntToken) initialQueueCapacity.getToken()).intValue();
+  // receiver.setCapacity(capacity);
+  // } catch (IllegalActionException e) {
+  // throw new InternalErrorException(e);
+  // }
+  // return receiver;
+  // }
 
   /**
    * just an alias for stopFire()...
@@ -226,26 +218,35 @@ public class CapDirector extends PNDirector implements PasserelleDirector {
   }
 
   public void initialize() throws IllegalActionException {
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " initialize() - entry");
+    LOGGER.trace("{} - initialize() - entry", getFullName());
     getAdapter(null).getExecutionPrePostProcessor().preProcess();
     super.initialize();
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " initialize() - exit");
+    LOGGER.trace("{} - initialize() - exit", getFullName());
+  }
+
+  @Override
+  public boolean postfire() throws IllegalActionException {
+    LOGGER.trace("{} - postfire() - entry", getFullName());
+    boolean result = super.postfire();
+    if(!result && !_notDone) {
+      // need to add our Passerelle busy-actor-management to include support for actors doing their processing in a background thread
+      boolean hasBusyActors = getAdapter(null).hasBusyTaskActors();
+      LOGGER.debug("{} - postfire() - _notDone false ; busy actors {}", getFullName(), hasBusyActors);
+      result = _notDone = hasBusyActors;
+    }
+    LOGGER.trace("{} - postfire() - exit : {}", getFullName(), result);
+    return result;
   }
 
   public void wrapup() throws IllegalActionException {
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " wrapup() - entry");
+    LOGGER.trace("{} - wrapup() - entry", getFullName());
     getAdapter(null).getExecutionPrePostProcessor().postProcess();
     super.wrapup();
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " wrapup() - exit");
+    LOGGER.trace("{} - wrapup() - exit", getFullName());
   }
 
   public void terminate() {
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " terminate() - entry");
+    LOGGER.trace("{} - terminate() - entry", getFullName());
     try {
       getAdapter(null).getExecutionPrePostProcessor().postProcess();
     } catch (IllegalActionException e) {
@@ -253,7 +254,6 @@ public class CapDirector extends PNDirector implements PasserelleDirector {
       LOGGER.error("Internal error - inconsistent attributes for director " + this.getFullName(), e);
     }
     super.terminate();
-    if (LOGGER.isTraceEnabled())
-      LOGGER.trace(getName() + " terminate() - exit");
+    LOGGER.trace("{} - terminate() - exit", getFullName());
   }
 }
