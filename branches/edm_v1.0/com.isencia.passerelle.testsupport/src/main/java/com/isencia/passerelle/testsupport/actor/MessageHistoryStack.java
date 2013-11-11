@@ -15,6 +15,8 @@
 package com.isencia.passerelle.testsupport.actor;
 
 import java.util.concurrent.LinkedBlockingDeque;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
@@ -43,6 +45,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  */
 @SuppressWarnings("serial")
 public class MessageHistoryStack extends Actor {
+  private final static Logger LOGGER = LoggerFactory.getLogger(MessageHistoryStack.class);
 
   public Port input;
   public Parameter historySizeParameter;
@@ -110,5 +113,10 @@ public class MessageHistoryStack extends Actor {
    */
   public ManagedMessage poll() {
     return messageHistory.poll();
+  }
+
+  @Override
+  public Logger getLogger() {
+    return LOGGER;
   }
 }
