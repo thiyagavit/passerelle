@@ -310,7 +310,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       readyToFire = currentProcessRequest.hasSomethingToProcess();
 
       // when all ports are exhausted, we can stop this actor
-      if (!readyToFire && areAllInputsFinished() && !hasPushedMessages()) {
+      if (!readyToFire && !getDirectorAdapter().isActorBusy(this) && areAllInputsFinished() && !hasPushedMessages()) {
         requestFinish();
       }
     }
