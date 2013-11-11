@@ -17,12 +17,9 @@ package com.isencia.passerelle.testsupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import junit.framework.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ptolemy.actor.Actor;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.TypedIOPort;
-import ptolemy.kernel.Port;
 import ptolemy.kernel.util.Attribute;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.util.ModelUtils;
@@ -39,7 +36,6 @@ import com.isencia.passerelle.model.util.ModelUtils;
  *
  */
 public class FlowDefinitionAssertion {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FlowDefinitionAssertion.class);
   
   private static class Relation {
     String from;
