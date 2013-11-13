@@ -34,8 +34,8 @@ import com.isencia.passerelle.validation.version.VersionSpecification;
 /**
  * This service provides a facade on a combination of different possible validation strategies on Passerelle models.
  * <p>
- * Currently, only a validation of actor versions is implemented. In the future more advanced validation logic can be added e.g. on correct actor
- * interconnectivity etc.
+ * Currently, only a validation of actor versions is implemented. In the future more advanced validation logic can be
+ * added e.g. on correct actor interconnectivity etc.
  * </p>
  * 
  * @author erwin
@@ -55,21 +55,33 @@ public class ModelValidationService {
     return instance;
   }
 
+  public void addStrategy(ModelElementVersionValidationStrategy strategy) {
+    versionValidationStrategies.add(strategy);
+  }
+
   public void validate(Flow model, ValidationContext context) {
+    try {
+      for (ModelElementVersionValidationStrategy validationStrategy : versionValidationStrategies) {
+        validationStrategy.validate(model, null);
+      }
+    } catch (ValidationException e1) {
+      context.addError(e1);
+    }
     List deepEntityList = model.deepEntityList();
     for (Object e : deepEntityList) {
       if (e instanceof Actor) {
         Actor a = (Actor) e;
         try {
-          VersionAttribute versionAttr = (VersionAttribute) a.getAttribute("_version", VersionAttribute.class);
-          if(versionAttr!=null) {
-            VersionSpecification versionToBeValidated = VersionSpecification.parse(versionAttr.getValueAsString());
-            for (ModelElementVersionValidationStrategy validationStrategy : versionValidationStrategies) {
-              try {
-                validationStrategy.validate(a, versionToBeValidated);
-              } catch (ValidationException e1) {
-                context.addError(e1);
+          for (ModelElementVersionValidationStrategy validationStrategy : versionValidationStrategies) {
+            try {
+              VersionAttribute versionAttr = (VersionAttribute) a.getAttribute("_version", VersionAttribute.class);
+              VersionSpecification versionToBeValidated = null;
+              if (versionAttr != null) {
+                versionToBeValidated = VersionSpecification.parse(versionAttr.getValueAsString());
               }
+              validationStrategy.validate(a, versionToBeValidated);
+            } catch (ValidationException e1) {
+              context.addError(e1);
             }
           }
         } catch (IllegalActionException iae) {
