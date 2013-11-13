@@ -26,6 +26,7 @@ import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 public class PaletteBuilder implements Serializable {
+  private static final long serialVersionUID = 5998773152255762310L;
   public static final String SUBMODELS = "com.isencia.passerelle.actor.actorgroup.submodels";
   List<PaletteGroup> paletteGroups;
   List<PaletteGroup> editablePaletteGroups;
