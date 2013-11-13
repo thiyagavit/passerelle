@@ -158,10 +158,12 @@ public class ActorAttributesView extends ViewPart implements
 					final Director director = actor instanceof Actor
 					                        ? (Director)((Actor)actor).getDirector()
 					                        : null;
-					if (actor instanceof Actor)
+					
+					boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
+					if (actor instanceof Actor && expert)
 						ret.add(new GeneralAttribute( GeneralAttribute.ATTRIBUTE_TYPE.TYPE,PaletteBuilder.getInstance().getType(actor.getClass())));
 
-					if (actor instanceof Actor && director!=null )
+					if (actor instanceof Actor && director!=null && expert)
 						ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.CLASS, actor.getClass().getName()));
 
 					ret.add(new GeneralAttribute(GeneralAttribute.ATTRIBUTE_TYPE.NAME,PaletteBuilder.getInstance().getType(actor.getName())));
@@ -339,9 +341,14 @@ public class ActorAttributesView extends ViewPart implements
 		if (ModelUtils.isNameLegal(name)) {
 			element.setValue(name);
 			final PasserelleModelMultiPageEditor ed = (PasserelleModelMultiPageEditor) this.part;
-			final RenameCommand cmd = new RenameCommand(viewer,actor,element);
-			ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
-			ed.refreshActions();
+			try {
+				final RenameCommand cmd = new RenameCommand(viewer,actor,element);
+				ed.getEditor().getEditDomain().getCommandStack().execute(cmd);
+				ed.refreshActions();
+			} catch (Exception ne) {
+				MessageDialog.openError(Display.getCurrent().getActiveShell(),
+						"Invalid Name", ne.getMessage());
+			}
 		} else {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(),
 					"Invalid Name", "The name '" + name
