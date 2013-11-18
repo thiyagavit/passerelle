@@ -20,8 +20,9 @@ import com.isencia.passerelle.message.MessageQueue;
 
 /**
  * Instances of this class can be used to manage the actor's internal buffer to handle messages from PUSH input ports. 
- * It mixes queuing with the locking behaviour of Ptolemy's PNQueueReceiver. 
+ * It mixes queuing with the put-blocking behaviour of Ptolemy's PNQueueReceiver. 
  * It can not be a Ptolemy receiver itself, as it's not contained in a Port, but in an Actor...
+ * Also it only needs blocking puts, not blocking gets
  * 
  * @author erwin
  */
@@ -38,10 +39,7 @@ public class CapActorMessageQueue implements MessageQueue {
   private int capacity;
   private boolean terminate;
 
-  /** Reference to a thread that is read blocked on this receiver. */
-  private Thread _readPending = null;
-
-  /** Reference to a thread that is write blocked on this receiver. */
+  /** Reference to a thread that is write blocked on this queue. */
   private Thread _writePending = null;
 
   CapActorMessageQueue(Actor actor, int capacity) throws InitializationException {
@@ -84,14 +82,6 @@ public class CapActorMessageQueue implements MessageQueue {
       while (!terminate) {
         if (messages.remainingCapacity() > 0) {
           messages.put(ctxt);
-          // If any thread is blocked on a get(), then it will become
-          // unblocked. Notify the director now so that there isn't a
-          // spurious deadlock detection.
-          if (_readPending != null) {
-            director.threadUnblocked(_readPending, myDummyReceiver, PNDirector.READ_BLOCKED);
-            _readPending = null;
-          }
-
           // Normally, the _writePending reference will have
           // been cleared by the read that unblocked this write.
           // However, it might be that the director increased the
@@ -120,52 +110,14 @@ public class CapActorMessageQueue implements MessageQueue {
     }
   }
 
-  public MessageInputContext take() throws InterruptedException, TerminateProcessException {
+  public MessageInputContext poll() throws InterruptedException, TerminateProcessException {
     MessageInputContext result = null;
-
-    // NOTE: This method used to be synchronized on this
-    // receiver, but since it calls synchronized methods in
-    // the director, that can cause deadlock.
     synchronized (director) {
-      if (!messages.isEmpty()) {
-        result = messages.take();
-
-        // Need to mark any thread that is write blocked on
-        // this receiver unblocked now, before any notification,
-        // or we will detect deadlock and increase the buffer sizes.
-        // Note that there is no need to clear the _readPending
-        // reference because that will have been cleared by the write.
-        if (_writePending != null) {
-          director.threadUnblocked(_writePending, myDummyReceiver, PNDirector.WRITE_BLOCKED);
-          _writePending = null;
-        }
-      } else {
-        while (!terminate) {
-          // Wait to try again.
-          try {
-            _readPending = Thread.currentThread();
-            director.threadBlocked(Thread.currentThread(), myDummyReceiver, PNDirector.READ_BLOCKED);
-
-            Workspace workspace = director.workspace();
-            workspace.wait(director);
-          } catch (InterruptedException e) {
-            terminate = true;
-          }
-          if (!messages.isEmpty()) {
-            result = messages.take();
-
-            // Need to mark any thread that is write blocked on
-            // this receiver unblocked now, before any notification,
-            // or we will detect deadlock and increase the buffer sizes.
-            // Note that there is no need to clear the _readPending
-            // reference because that will have been cleared by the write.
-            if (_writePending != null) {
-              director.threadUnblocked(_writePending, myDummyReceiver, PNDirector.WRITE_BLOCKED);
-              _writePending = null;
-            }
-            break;
-          }
-        }
+      result = messages.poll();
+      // Need to mark any thread that is write blocked on this queue unblocked now.
+      if (result!=null && _writePending != null) {
+        director.threadUnblocked(_writePending, myDummyReceiver, PNDirector.WRITE_BLOCKED);
+        _writePending = null;
       }
       if (terminate && result == null) {
         throw new TerminateProcessException("");
@@ -178,13 +130,9 @@ public class CapActorMessageQueue implements MessageQueue {
    * Clear the state variables for this queue.
    */
   public void clear() {
-    if (_readPending != null) {
-      director.threadUnblocked(_readPending, myDummyReceiver, PNDirector.READ_BLOCKED);
-    }
     if (_writePending != null) {
       director.threadUnblocked(_writePending, myDummyReceiver, PNDirector.WRITE_BLOCKED);
     }
-    _readPending = null;
     _writePending = null;
     messages.clear();
   }
