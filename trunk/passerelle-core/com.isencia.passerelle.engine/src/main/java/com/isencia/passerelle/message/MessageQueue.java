@@ -22,7 +22,7 @@ public interface MessageQueue {
   
   void put(MessageInputContext ctxt) throws InterruptedException, TerminationException;
   
-  MessageInputContext take() throws InterruptedException, TerminateProcessException;
+  MessageInputContext poll() throws InterruptedException, TerminateProcessException;
   
   void clear();
 

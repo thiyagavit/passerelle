@@ -21,9 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.actor.Director;
@@ -124,9 +121,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // incl info on the input port on which
   // they have been received.
   private MessageQueue pushedMessages;
-  // lock to manage blocking on empty pushedMessages queue
-  private ReentrantLock msgQLock = new ReentrantLock();
-  private Condition msgQNonEmpty = msgQLock.newCondition();
 
   // These track current processing containers between prefire/fire/postfire.
   // Storing processing state in this way can only work for actors that are iterating
@@ -185,19 +179,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   public void offer(MessageInputContext ctxt) throws PasserelleException {
     getLogger().debug("{} - offer {}", getFullName(), ctxt);
     try {
-      if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
-        // if we did not get the lock, something is getting overcharged, so refuse the task
-        throw new Exception("Msg Queue lock overcharged for " + getFullName());
-      }
       pushedMessages.put(ctxt);
-      msgQNonEmpty.signal();
     } catch (Exception e) {
       throw new PasserelleException(ErrorCode.MSG_DELIVERY_FAILURE, "Error storing received msg", this, ctxt.getMsg(), e);
-    } finally {
-      try {
-        msgQLock.unlock();
-      } catch (Exception e) {
-      }
     }
   }
 
@@ -330,7 +314,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       readyToFire = currentProcessRequest.hasSomethingToProcess();
 
       // when all ports are exhausted, we can stop this actor
-      if (!readyToFire && !getDirectorAdapter().isActorBusy(this) && areAllInputsFinished() && !hasPushedMessages()) {
+      if (!readyToFire && !getDirectorAdapter().isActorBusy(this) && areAllInputsFinished() && pushedMessages.isEmpty()) {
         requestFinish();
         readyToFire = true;
       }
@@ -443,50 +427,15 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     getLogger().trace("{} - addPushedMessages() - entry", getFullName());
     int msgCtr = 0;
     try {
-      if (!msgQLock.tryLock(10, TimeUnit.SECONDS)) {
-        // if we did not get the lock, something is getting overcharged,
-        // so refuse the task
-        throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock overcharged...", this, null);
-      }
-      // while (!isFinishRequested() && !areAllInputsFinished() && pushedMessages.isEmpty()) {
-      // msgQNonEmpty.await(100, TimeUnit.MILLISECONDS);
-      // }
-
       while (!pushedMessages.isEmpty()) {
-        req.addInputContext(pushedMessages.take());
+        req.addInputContext(pushedMessages.poll());
         msgCtr++;
       }
     } catch (InterruptedException e) {
       throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock interrupted...", this, null);
     } finally {
-      try {
-        msgQLock.unlock();
-      } catch (Exception e) {
-      }
       getLogger().trace("{} - addPushedMessages() - exit - added {}", getFullName(), msgCtr);
     }
-  }
-
-  protected boolean hasPushedMessages() throws ProcessingException {
-    getLogger().trace("{} - hasPushedMessages() - entry", getFullName());
-    boolean result = false;
-    try {
-      if (!msgQLock.tryLock(1, TimeUnit.SECONDS)) {
-        // if we did not get the lock, something is getting overcharged,
-        // so refuse the task
-        throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock overcharged...", this, null);
-      }
-      result = !pushedMessages.isEmpty();
-    } catch (InterruptedException e) {
-      throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock interrupted...", this, null);
-    } finally {
-      try {
-        msgQLock.unlock();
-      } catch (Exception e) {
-      }
-      getLogger().trace("{} - hasPushedMessages() - exit - {}", getFullName(), result);
-    }
-    return result;
   }
 
   /**

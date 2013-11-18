@@ -48,7 +48,7 @@ public class SimpleActorMessageQueue implements MessageQueue {
     }
   }
 
-  public MessageInputContext take() throws InterruptedException, TerminateProcessException {
+  public MessageInputContext poll() throws InterruptedException, TerminateProcessException {
     MessageInputContext result = messages.poll();
     if (terminate && result == null) {
       throw new TerminateProcessException("");
