@@ -14,7 +14,7 @@
 */
 package com.isencia.passerelle.runtime.repository;
 
-import ptolemy.kernel.util.NamedObj;
+import ptolemy.kernel.util.Nameable;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 
@@ -41,7 +41,7 @@ public class RepositoryException extends PasserelleException {
    * @param modelElement
    * @param rootException
    */
-  public RepositoryException(ErrorCode errorCode, String message, NamedObj modelElement, Throwable rootException) {
+  public RepositoryException(ErrorCode errorCode, String message, Nameable modelElement, Throwable rootException) {
     super(errorCode, message, modelElement, rootException);
   }
 }
