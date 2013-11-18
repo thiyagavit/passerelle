@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.util.FIFOQueue;
@@ -32,7 +33,10 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.domain.ProcessDirector;
+import com.isencia.passerelle.message.MessageQueue;
+import com.isencia.passerelle.message.SimpleActorMessageQueue;
 
 /**
  * The standard Passerelle director. Besides the std Ptolemy director stuff,
@@ -231,6 +235,12 @@ public class Director extends ProcessDirector {
 
 		return receiver;
 	}
+
+  @Override
+  public MessageQueue newMessageQueue(Actor actor) throws InitializationException {
+    return new SimpleActorMessageQueue(actor);
+  }
+
 
 	/**
 	 * 
