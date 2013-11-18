@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.Director;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
@@ -43,6 +43,7 @@ import com.isencia.passerelle.core.ControlPort;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.director.PasserelleDirector;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageBuffer;
 import com.isencia.passerelle.message.MessageException;
@@ -50,6 +51,8 @@ import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.message.MessageOutputContext;
 import com.isencia.passerelle.message.MessageProvider;
+import com.isencia.passerelle.message.MessageQueue;
+import com.isencia.passerelle.message.SimpleActorMessageQueue;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
@@ -94,7 +97,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   // Queue of messages that have been pushed to us, incl info on the input port on which
   // they have been received.
-  private Queue<MessageInputContext> pushedMessages = new ConcurrentLinkedQueue<MessageInputContext>();
+  private MessageQueue pushedMessages;
   // lock to manage blocking on empty pushedMessages queue and to synchronize concurrent access
   private ReentrantLock msgQLock = new ReentrantLock();
   private Condition msgQNonEmpty = msgQLock.newCondition();
@@ -140,8 +143,19 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     return "";
   }
 
-  public Queue<MessageInputContext> getMessageQueue() {
+  public MessageQueue getMessageQueue() {
     return pushedMessages;
+  }
+  
+  protected MessageQueue newMessageQueue() throws InitializationException {
+    MessageQueue result = null;
+    Director d = getDirector();
+    if(d instanceof PasserelleDirector) {
+      result = ((PasserelleDirector)d).newMessageQueue(this);
+    } else {
+      result = new SimpleActorMessageQueue(this);
+    }
+    return result;
   }
 
   /**
@@ -195,7 +209,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         // if we did not get the lock, something is getting overcharged, so refuse the task
         throw new Exception("Msg Queue lock overcharged for " + getFullName());
       }
-      pushedMessages.offer(ctxt);
+      pushedMessages.put(ctxt);
       msgQNonEmpty.signal();
     } catch (Exception e) {
       throw new PasserelleException(ErrorCode.MSG_DELIVERY_FAILURE, "Error storing received msg", this, ctxt.getMsg(), e);
@@ -214,7 +228,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     super.doInitialize();
 
     iterationCount = 1;
-    pushedMessages.clear();
+    if(pushedMessages!=null) {
+      pushedMessages.clear();
+    } else {
+      pushedMessages = newMessageQueue();
+    }
     incompleteProcessRequests.clear();
     pendingProcessRequests.clear();
     finishedProcessResponses.clear();
@@ -392,7 +410,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       // Contrary to plain v5 Actors, we only want to handle one MessageInputContext per iteration.
       // So no while loop here!
       if (!pushedMessages.isEmpty()) {
-        MessageInputContext msgInputCtxt = pushedMessages.poll();
+        MessageInputContext msgInputCtxt = pushedMessages.take();
         Iterator<ManagedMessage> msgIterator = msgInputCtxt.getMsgIterator();
         while (msgIterator.hasNext()) {
           ManagedMessage managedMessage = (ManagedMessage) msgIterator.next();
@@ -593,7 +611,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   @Override
   public Object clone(Workspace workspace) throws CloneNotSupportedException {
     final Actor actor = (Actor) super.clone(workspace);
-    actor.pushedMessages = new ConcurrentLinkedQueue<MessageInputContext>();
+    try {
+      actor.pushedMessages = actor.newMessageQueue();
+    } catch (InitializationException e) {
+      throw new RuntimeException("Failed to create new message queue for cloned actor "+actor.getFullName(), e);
+    }
     actor.msgProviders = new HashSet<Object>();
     actor.incompleteProcessRequests = new ConcurrentHashMap<String, ProcessRequest>();
     actor.pendingProcessRequests = new LinkedBlockingQueue<ProcessResponse>();
