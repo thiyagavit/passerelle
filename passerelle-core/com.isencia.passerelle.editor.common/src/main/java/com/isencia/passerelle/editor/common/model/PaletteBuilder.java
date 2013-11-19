@@ -11,6 +11,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
@@ -20,6 +22,7 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
 
 import com.isencia.passerelle.editor.common.activator.Activator;
+import com.isencia.passerelle.editor.common.business.CopyComponentCommand;
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.project.repository.api.MetaData;
@@ -27,6 +30,9 @@ import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 public class PaletteBuilder implements Serializable {
   private static final long serialVersionUID = 5998773152255762310L;
+
+  private static Logger logger = LoggerFactory.getLogger(PaletteBuilder.class);
+
   public static final String SUBMODELS = "com.isencia.passerelle.actor.actorgroup.submodels";
   List<PaletteGroup> paletteGroups;
   List<PaletteGroup> editablePaletteGroups;
@@ -178,6 +184,7 @@ public class PaletteBuilder implements Serializable {
             try {
               e.setPriority(Integer.parseInt(priorityAttribute));
             } catch (Exception e2) {
+              logger.error("Item with id " + idAttribute + " has a priority which is not a valid Integer " + priorityAttribute);
 
             }
           }
@@ -239,21 +246,22 @@ public class PaletteBuilder implements Serializable {
 
             Object icon = createIcon(null, iconLocationAttribute, iconAttribute, bundleId);
             if (group != null && submodels != null && submodels.getId().equals(group.getId())) {
-              submodelDefinition = new PaletteItemDefinition(icon, null, idAttribute, nameAttribute, colorAttribute, Flow.class, null);
+              submodelDefinition = new PaletteItemDefinition(icon, null, idAttribute, nameAttribute, colorAttribute, Flow.class, null, 0);
             } else {
               final Class<?> clazz = loadClass(configurationElement, bundleId);
 
               if (clazz != null && group != null) {
-                PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId);
+                int priority = 0;
                 if (priorityAttribute != null) {
                   try {
-                    item.setPriority(Integer.parseInt(priorityAttribute));
-                  } catch (Exception e2) {
+                    priority = Integer.parseInt(priorityAttribute);
+                  } catch (Exception e) {
 
                   }
                 }
+                PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
+
                 item.setHelpUrl(generateHelpUrl(item));
-                group.addPaletteItem(item);
                 actorBundleMap.put(clazz.getName(), bundleId);
                 paletteItemMap.put(item.getClazz().getName(), item);
               }
