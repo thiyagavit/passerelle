@@ -92,12 +92,12 @@ public class ServiceBasedActor extends TaskBasedActor {
     attributeMappingParameter = new StringParameter(this, AttributeNames.ATTR_MAPPING);
     new TextStyle(attributeMappingParameter, "textarea");
     
-    timeOutParameter = new Parameter(this, AttributeNames.TIMEOUT_TIME, new LongToken(DEFAULT_TIMEOUT));
+    timeOutParameter = new Parameter(this, AttributeNames.TIMEOUT_TIME, new LongToken(getDefaultTimeOutValue()));
     timeOutParameter.setTypeEquals(BaseType.LONG);
     
     timeUnitParameter = new StringParameter(this, AttributeNames.TIME_UNIT);
     TimeUnit[] timeUnits = TimeUnit.values();
-    timeUnitParameter.setExpression(DEFAULT_TIMEOUT_UNIT.name());
+    timeUnitParameter.setExpression(getDefaultTimeOutUnit().name());
     for (TimeUnit timeUnit : timeUnits) {
       timeUnitParameter.addChoice(timeUnit.name());
     }
@@ -118,7 +118,7 @@ public class ServiceBasedActor extends TaskBasedActor {
     try {
       Map<String, String> attrMappings = getAttributeMappings();
       for(Entry<String, String> attrEntry : attrMappings.entrySet()) {
-        storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), null);
+        storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), (String)null);
       }
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.TASK_ERROR, "Unable to obtain task attributes", this, e);
@@ -138,6 +138,10 @@ public class ServiceBasedActor extends TaskBasedActor {
     }
   }
   
+  protected TimeUnit getDefaultTimeOutUnit() {
+    return DEFAULT_TIMEOUT_UNIT;
+  }
+  
   /**
    * 
    * @return the configured {@link TimeUnit}
@@ -148,6 +152,10 @@ public class ServiceBasedActor extends TaskBasedActor {
     return TimeUnit.valueOf(timeUnitParameter.stringValue());
   }
 
+  protected Long getDefaultTimeOutValue() {
+    return DEFAULT_TIMEOUT;
+  }
+  
   private Long getTimeOutValue() throws IllegalActionException {
     Long timeoutValue = null;
     if(timeOutParameter.getToken()!=null) {
