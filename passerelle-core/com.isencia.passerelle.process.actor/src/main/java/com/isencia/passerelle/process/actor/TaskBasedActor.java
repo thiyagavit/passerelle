@@ -319,6 +319,58 @@ public abstract class TaskBasedActor extends Actor {
     }
   }
 
+  /**
+   * Look up the value of a context item with one of the given itemNames (first one that is found).
+   * 
+   * This can be used to look for parameters where the name of the key varies.
+   * 
+   * @param context
+   *          The context of the request or task to look in
+   * @param itemNames
+   *          The item names to search for
+   * @return First value found or null
+   */
+  private String lookupValueForFirstKeyFound(final Context context, String... itemNames) {
+    String value = null;
+    for (String itemName : itemNames) {
+      value = context.lookupValue(itemName);
+      if (value != null) {
+        break;
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Retrieves the value of a context item with one of the given itemNames (first one that is found).
+   * 
+   * This can be used to look for parameters where the name of the key varies. E.g. a LineNumber is sometimes known as
+   * an NA, a CLE or a DN. You can look up this parameter by searching with a number of keys with:
+   * storeContextItemValueInMap(flowCtx, taskAttrs, "my_attr_key", null, new String[]{"LINENUMBER", "NA",
+   * "CLE", "DN"});
+   * 
+   * @param context Context of the request to search in
+   * @param map Map to store the value in
+   * @param attrName
+   *          the name that will be given to the resulting attribute, stored in the map
+   * @param defaultValue
+   *          Default value to use when none of the keys yield a value
+   * @param itemNames
+   *          Item names to search for
+   */
+  protected final void storeContextItemValueInMap(Map<String, String> map, Context context, String attrName, String defaultValue, String... itemNames) {
+
+    if (itemNames != null) {
+      String value = lookupValueForFirstKeyFound(context, itemNames);
+
+      if (value != null) {
+        map.put(attrName, value);
+      } else if (defaultValue != null) {
+        map.put(attrName, defaultValue);
+      }
+    }
+  }
+
   @Override
   protected final String getAuditTrailMessage(ManagedMessage message, Port port) {
     try {
