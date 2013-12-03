@@ -19,26 +19,29 @@ import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v3.ActorContext;
-import com.isencia.passerelle.actor.v3.ProcessRequest;
-import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.Port;
+import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.soleil.passerelle.actor.IActorFinalizer;
-import fr.soleil.passerelle.actor.tango.ATangoDeviceActor;
+import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 @SuppressWarnings("serial")
-public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActorFinalizer {
+public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IActorFinalizer {
 
-    private final static Logger logger = LoggerFactory.getLogger(CCDAcquisitionPerformer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CCDAcquisitionPerformer.class);
     public Parameter acquisitionModeParam;
     public Parameter recordAllSequenceParam;
     protected CCDManager ccd;
@@ -48,14 +51,30 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
     HashMap<String, Integer> acqModeMap;
 
     // /** The output ports */
-    // public Port output;
+    public Port outputAcqStarted = null;
 
     public CCDAcquisitionPerformer(final CompositeEntity arg0, final String arg1,
             final HashMap<String, Integer> acqModeMap) throws NameDuplicationException,
             IllegalActionException {
         super(arg0, arg1);
+        initActor(acqModeMap,false);
+    }
+    
+    public CCDAcquisitionPerformer(final CompositeEntity arg0, final String arg1,
+            final HashMap<String, Integer> acqModeMap, final boolean withAcqStartedInfo)
+                    throws NameDuplicationException, IllegalActionException {
+        super(arg0, arg1);
+        initActor(acqModeMap,withAcqStartedInfo);
+        
+    }
+    
+    private void initActor (final HashMap<String, Integer> acqModeMap, final boolean withAcqStartedInfo)
+            throws NameDuplicationException, IllegalActionException{
         input.setMode(PortMode.PUSH);
-        // output = PortFactory.getInstance().createOutputPort(this,"output");
+        
+        if(withAcqStartedInfo) {
+            outputAcqStarted = PortFactory.getInstance().createOutputPort(this,"AcqStarted");
+        }
 
         this.acqModeMap = acqModeMap;
         // ccd = new CCDManager(this);
@@ -91,9 +110,8 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
                 + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
                 + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
                 + " <image x=\"-11\" y=\"-11\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
-    }
-
+                + "\"/>\n" + "</svg>\n"); 
+            }
     @Override
     protected void doInitialize() throws InitializationException {
         final Director dir = getDirector();
@@ -104,14 +122,17 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
         ccd = CCDManagerFactory.getInstance().createCCDManager(this, getDeviceName());
 
     }
-
+    
+    @Override
+    protected Logger getLogger() {
+      return LOGGER;
+    }
+    
     @Override
     protected void process(final ActorContext ctxt, final ProcessRequest request,
             final ProcessResponse response) throws ProcessingException {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + "process - entry");
-        }
+        getLogger().trace("process - entry");
         final CCDConfiguration config = ccd.getConfig();
         config.setAcqModeMap(acqModeMap);
         config.setAcqMode(acqMode);
@@ -125,6 +146,10 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
             }
             else {
                 ccd.startStandardAcquisition();
+                if(outputAcqStarted != null){
+                    getLogger().trace("process - Acquisition is started");
+                    response.addOutputMessage(outputAcqStarted, PasserelleUtil.createTriggerMessage());
+                }
                 ccd.updateConfigFromDevice();
                 ExecutionTracerService.trace(this, "starting CCD acquisition with parameters: \n"
                         + ccd.getConfig());
@@ -136,24 +161,21 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActor implements IActor
                 }
                 ExecutionTracerService.trace(this, "CCD acquisition finished");
             }
-            // sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-            response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
+            response.addOutputMessage(output, PasserelleUtil.createTriggerMessage());
 
-            if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + "process - exit");
-            }
+            getLogger().trace("process - exit");
         }
         catch (final DevFailed e) {
             throw new DevFailedProcessingException(e, this);
         }
         catch (final IllegalActionException e) {
-            throw new ProcessingException("Cannot record data", null, e);
+            throw new ProcessingExceptionWithLog(this,"Cannot record data", null, e);
         }
     }
 
     @Override
     protected void doStop() {
-        logger.debug(" doStop - cancelWaitEndAcquisition");
+        getLogger().debug(" doStop - cancelWaitEndAcquisition");
         ccd.cancelWaitEndAcquisition();
         super.doStop();
     }
