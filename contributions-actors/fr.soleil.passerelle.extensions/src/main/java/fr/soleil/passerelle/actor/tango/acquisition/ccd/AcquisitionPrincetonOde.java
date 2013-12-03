@@ -5,14 +5,17 @@ import java.util.LinkedHashMap;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v3.ActorContext;
-import com.isencia.passerelle.actor.v3.ProcessRequest;
-import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 @SuppressWarnings("serial")
@@ -56,28 +59,25 @@ public class AcquisitionPrincetonOde extends CCDAcquisitionPerformer {
 					break;
 				case 3:
 					this.doIntensity0Acquisition();
-					// sendOutputMsg(output,PasserelleUtil.createTriggerMessage());
-					response.addOutputMessage(0, output, PasserelleUtil
+					response.addOutputMessage(output, PasserelleUtil
 							.createTriggerMessage());
 					break;
 				case 4:
 					this.doIntensityBlackAcquisition();
-					// sendOutputMsg(output,PasserelleUtil.createTriggerMessage());
-					response.addOutputMessage(0, output, PasserelleUtil
+					response.addOutputMessage(output, PasserelleUtil
 							.createTriggerMessage());
 					break;
 				case 5:
 					ccd.getConfig().setAcqMode("MultiFrame");
 					this.doAverageIntensity0Acquisition();
-					// sendOutputMsg(output,PasserelleUtil.createTriggerMessage());
-					response.addOutputMessage(0, output, PasserelleUtil
+					response.addOutputMessage(output, PasserelleUtil
 							.createTriggerMessage());
 					break;
 				}
 			} catch (final DevFailed e) {
 				throw new DevFailedProcessingException(e, this);
 			} catch (final IllegalActionException e) {
-				throw new ProcessingException("error saving data", null, e);
+				throw new ProcessingExceptionWithLog(this,"error saving data", null, e);
 			}
 
 		}
