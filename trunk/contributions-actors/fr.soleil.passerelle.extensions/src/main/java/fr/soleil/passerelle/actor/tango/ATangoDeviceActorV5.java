@@ -32,7 +32,7 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
     public static final String DEVICE_NAME = "Device Name";
     public static final String ERROR_DEVICE_NAME_EMPTY = DEVICE_NAME
             + "  parameter can not be empty";
-    private static final Logger logger = LoggerFactory.getLogger(ATangoDeviceActorV5.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ATangoDeviceActorV5.class);
     /**
      * The Tango device name (e.g domain/family/member).
      */
@@ -70,7 +70,11 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
             super.attributeChanged(attribute);
         }
     }
-
+    
+    @Override
+    protected Logger getLogger() {
+      return LOGGER;
+    }
     /**
      * extract from parameter and check if the deviceName is correct (ie not empty)
      * 
@@ -92,9 +96,7 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
     @Override
     protected void validateInitialization() throws ValidationException {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getName() + " validateInitialization() - entry");
-        }
+        getLogger().trace("ValidateInitialization() - entry");
 
         if (!isMockMode() && createDeviceProxy) {
             try {
@@ -103,6 +105,7 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
                 // see bug 22954 : The deviceProxy is still created here because the daughter
                 // classes need of it
                 deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
+             // deviceProxy.ping();
                 new TangoCommand(deviceName, "State").execute();
 
             }
@@ -117,9 +120,7 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
         }
         super.validateInitialization();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(getName() + " validateInitialization() - exit");
-        }
+        getLogger().trace("ValidateInitialization() - exit");
     }
 
     /**
