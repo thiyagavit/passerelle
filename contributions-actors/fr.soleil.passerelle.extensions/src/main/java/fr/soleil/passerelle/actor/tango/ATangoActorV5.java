@@ -2,9 +2,6 @@ package fr.soleil.passerelle.actor.tango;
 
 import java.net.URL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
@@ -23,7 +20,6 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public abstract class ATangoActorV5 extends Actor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ATangoActorV5.class);
     private static final String RECORD_DATA = "Record data";
     public static final String OUTPUT_PORT_NAME = "output";
     public Port input;
@@ -40,8 +36,7 @@ public abstract class ATangoActorV5 extends Actor {
         super(container, name);
 
         input = PortFactory.getInstance().createInputPort(this, null);
-        output = PortFactory.getInstance().createOutputPort(this);
-        output.setName(OUTPUT_PORT_NAME);
+        output = PortFactory.getInstance().createOutputPort(this, OUTPUT_PORT_NAME);
 
         recordDataParam = new Parameter(this, RECORD_DATA, new BooleanToken(false));
         recordDataParam.setTypeEquals(BaseType.BOOLEAN);
