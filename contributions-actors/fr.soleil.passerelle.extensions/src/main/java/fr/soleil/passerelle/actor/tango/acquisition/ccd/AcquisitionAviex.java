@@ -26,7 +26,7 @@ public class AcquisitionAviex extends CCDAcquisitionPerformer{
 	
 	
 	public AcquisitionAviex(CompositeEntity arg0, String arg1) throws NameDuplicationException, IllegalActionException {
-		super(arg0, arg1,acqModeMap);
+		super(arg0, arg1,acqModeMap,true);
 	
 	}
 	
