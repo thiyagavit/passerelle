@@ -83,6 +83,7 @@ public class RequestSource extends Actor {
     try {
       String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
       Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);
+      caze = ServiceRegistry.getInstance().getEntityManager().persistCase(caze);
       String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
       String category = ((StringToken) categoryParameter.getToken()).stringValue();
       String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
@@ -100,7 +101,7 @@ public class RequestSource extends Actor {
           getLogger().warn("Invalid mapping definition: " + paramDef);
         }
       }
-      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
+//      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
       Context context = req.getProcessingContext();
       context.setStatus(Status.STARTED);
       context = getContextRepository().storeContext(context);
