@@ -61,7 +61,8 @@ public class StatusActor extends Actor {
       Status status = Status.valueOf(statusParam.getExpression());
       context.setStatus(status);
       getLogger().debug("Request {} set to status {}", context.getRequest().getId(), status);
-      ServiceRegistry.getInstance().getEntityManager().persistContext(context);
+      context = ServiceRegistry.getInstance().getEntityManager().mergeContext(context);
+      message.setBodyContent(context, ManagedMessage.objectContentType);
     } catch (MessageException e) {
       throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "", this, message, e);
     }

@@ -108,7 +108,7 @@ public class EntityManagerImpl implements EntityManager {
   }
 
   public Context mergeContext(Context context) {
-    return context;
+    return persistContext(context);
   }
 
   public Context mergeWithBranchedContexts(Context context, Collection<Context> branches) {

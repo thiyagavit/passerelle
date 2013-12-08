@@ -19,7 +19,6 @@ public class Activator implements BundleActivator {
 
   private ServiceRegistration<?> factorySvcReg;
   private ServiceRegistration<?> mgrSvcReg;
-  private ServiceRegistration<?> ctxtReposSvcReg;
   
   public void start(BundleContext bundleContext) throws Exception {
     EntityFactoryImpl entityFactory = new EntityFactoryImpl();
@@ -33,11 +32,9 @@ public class Activator implements BundleActivator {
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
-    ctxtReposSvcReg.unregister();
     factorySvcReg.unregister();
     mgrSvcReg.unregister();
     ServiceRegistry.getInstance().setEntityFactory(null);
     ServiceRegistry.getInstance().setEntityManager(null);
-    ServiceRegistry.getInstance().setContextRepository(null);
   }
 }
