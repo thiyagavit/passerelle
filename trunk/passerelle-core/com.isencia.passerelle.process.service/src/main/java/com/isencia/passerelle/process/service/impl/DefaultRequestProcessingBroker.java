@@ -74,8 +74,9 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
     }
     delayTimer.schedule(new Callable<Void>() {
       public Void call() {
-        if (!taskContext.isFinished()) {
-          ServiceRegistry.getInstance().getContextManager().notifyTimeOut(taskContext);
+        Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext.getId());
+        if (!finalTaskContext.isFinished()) {
+          ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
         }
         return null;
       }
