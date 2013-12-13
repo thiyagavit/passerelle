@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.CascadeType;
@@ -63,7 +64,6 @@ public class ContextImpl implements Context {
   @GeneratedValue(generator = "pas_context")
   private Long id;
 
-  @SuppressWarnings("unused")
   @Version
   private int version;
 
@@ -119,6 +119,10 @@ public class ContextImpl implements Context {
   
   @Transient
   private String repositoryId;
+  
+  //avoid concurrent modif ex when getForkedContexts is called while forking or joining
+  @Transient
+  private List<Context> forkedContexts = new CopyOnWriteArrayList<Context>();
 
   public static final String _ID = "id";
   public static final String _STATUS = "status";
@@ -405,6 +409,7 @@ public class ContextImpl implements Context {
 
     } finally {
       lock.unlock();
+      forkedContexts.clear();
     }
   }
 
@@ -423,6 +428,7 @@ public class ContextImpl implements Context {
       // what's been added on the copy afterwards.
       copy.pushCurrentTaskCursorIndex();
       copy.pushCurrentEventCursorIndex();
+      forkedContexts.add(copy);
     } finally {
       lock.unlock();
     }
@@ -431,6 +437,10 @@ public class ContextImpl implements Context {
 
   public boolean isForkedContext() {
     return transientBranch;
+  }
+  
+  public List<Context> getForkedChildContexts() {
+    return Collections.unmodifiableList(forkedContexts);
   }
 
   public List<ErrorItem> getErrors() {
