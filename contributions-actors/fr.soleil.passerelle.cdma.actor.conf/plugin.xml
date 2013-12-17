@@ -6,7 +6,7 @@
       <actorgroup
             id="fr.soleil.passerelle.cdma.actor.actorgroup"
             name="CDMA Actors"
-            parent="com.isencia.passerelle.actor.actorgroup.soleil"
+            parent="fr.soleil.passerelle.actor.actorgroup.soleil"
             open="false">
       </actorgroup>
    </extension>
