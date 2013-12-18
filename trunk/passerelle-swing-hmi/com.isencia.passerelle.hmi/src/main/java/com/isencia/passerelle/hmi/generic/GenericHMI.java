@@ -178,6 +178,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     if (!showModelForms) {
       return;
     }
+    
+    int originalScrollPosition = parameterScrollPane.getVerticalScrollBar().getValue();
 
     final URL modelURL = getModelURL();
     try {
@@ -308,7 +310,12 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         }
       }
       paremeterFormPanel.add("Center", configPanel);
+      // try to set to previous scroll position if still possible
+      int minScroll = parameterScrollPane.getVerticalScrollBar().getMinimum();
+      int maxScroll = parameterScrollPane.getVerticalScrollBar().getMaximum();
+      int newScrollPosition = Math.max(Math.min(originalScrollPosition, maxScroll), minScroll);
       parameterScrollPane.validate();
+      parameterScrollPane.getVerticalScrollBar().setValue(newScrollPosition);
     }
   }
 
