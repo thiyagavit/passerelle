@@ -790,6 +790,20 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     }
   }
 
+  private class LayoutPrefsClearer implements ActionListener {
+    public void actionPerformed(final ActionEvent e) {
+      if (getCurrentModel() != null) {
+        String modelIdentifierForFilterDef = getModelIdentifierForFilterDef(getCurrentModel());
+        getHmiDef().getModelLayoutPrefs().remove(modelIdentifierForFilterDef);
+        getHmiDef().removeModel(modelIdentifierForFilterDef);
+        saveAndApplySettings();
+        showModelForm(null);
+      } else {
+        JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
+      }
+    }
+  }
+
   private class ParameterFilterOpener implements ActionListener {
     public void actionPerformed(final ActionEvent e) {
       if (getCurrentModel() != null) {
@@ -968,6 +982,10 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
             HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
         paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
         prefsMenu.add(paramFilterMenuItem);
+        final JMenuItem clearLayoutPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_CLEAR_LAYOUTPREFS), 
+            HMIMessages.getString(HMIMessages.MENU_CLEAR_LAYOUTPREFS + HMIMessages.KEY).charAt(0));
+        clearLayoutPrefsMenuItem.addActionListener(new LayoutPrefsClearer());
+        prefsMenu.add(clearLayoutPrefsMenuItem);
 
         prefsMenu.add(new JSeparator());
         StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_PREFS, layoutMenuItem);
