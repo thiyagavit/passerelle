@@ -19,26 +19,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
-
 import com.thoughtworks.xstream.XStream;
 
 /**
  * This class represents a set of configuration info for a HMI tool.
  * <p>
- * For specific customized HMIs, only the models predefined in their bundle will
- * be supported. If a user tries to open another type of model, the tool will
- * give an error pop-up.
+ * For specific customized HMIs, only the models predefined in their bundle will be supported. If a user tries to open another type of model, the tool will give
+ * an error pop-up.
  * </p>
  * <p>
  * For the generic HMI, this bundle just contains the recently used models.
  * </p>
  * <p>
- * Both types of entries are typically used in the HMI to populate the
- * Files>Models menu.
+ * Both types of entries are typically used in the HMI to populate the Files>Models menu.
  * </p>
  * 
  * @author erwin
@@ -47,8 +46,7 @@ public class ModelBundle implements Serializable {
   protected final static XStream xmlStreamer = new XStream();
 
   /**
-   * collection of predefined models, i.e. part of the static configuration of a
-   * HMI instance
+   * collection of predefined models, i.e. part of the static configuration of a HMI instance
    */
   private Map<String, Model> predefinedModels = new TreeMap<String, Model>();
   /**
@@ -71,12 +69,31 @@ public class ModelBundle implements Serializable {
 
   }
 
-  /**
-   * Apparently XStream is able to create an object where the list is still
-   * null! So we need this extra check.
-   * 
-   * @return
-   */
+  public boolean isEmpty() {
+    return getRecentModels().isEmpty() && getPredefinedModels().isEmpty();
+  }
+
+  public boolean containsPredefinedModel(URI modelURI) {
+    boolean result = false;
+    for (Model m : getPredefinedModels().values()) {
+      try {
+        if (modelURI.equals(m.getMomlPath().toURI())) {
+          result = true;
+          break;
+        }
+      } catch (Exception e) {
+        // ignore, should never happen
+      }
+    }
+    return result;
+  }
+
+  public void setPredefinedModel(String modelKey, Model newModel) {
+    getPredefinedModels().put(modelKey, newModel);
+  }
+
+  // Apparently XStream is able to create an object where the list is still null! 
+  // So we need this extra null check in the following methods.
   public Map<String, Model> getPredefinedModels() {
     if (predefinedModels == null) {
       predefinedModels = new TreeMap<String, Model>();
@@ -90,11 +107,11 @@ public class ModelBundle implements Serializable {
     }
     return recentModelKeysList;
   }
-  
+
   public void setReorderedRecentModelsList(List<String> recentModelList) {
     recentModelKeysList.clear();
     for (String newModelKey : recentModelList) {
-      if(recentModels.keySet().contains(newModelKey)) {
+      if (recentModels.keySet().contains(newModelKey)) {
         recentModelKeysList.add(newModelKey);
       }
     }
@@ -107,19 +124,15 @@ public class ModelBundle implements Serializable {
     return recentModels;
   }
 
-  public boolean isEmpty() {
-    return getRecentModels().isEmpty() && getPredefinedModels().isEmpty();
-  }
-
   public void addModel(String modelKey, Model newModel) {
     Model prevOne = getRecentModels().get(modelKey);
-    if(prevOne!=null && prevOne != newModel) {
+    if (prevOne != null && prevOne != newModel) {
       // need to generate an indexed name
       int i = 2;
-      while(true) {
-        String newModelKey = modelKey + "("+ (i++) +")";
-        Model _m = getRecentModels().get(newModelKey); 
-        if(_m==null || _m.getMomlPath().equals(newModel.getMomlPath())) {
+      while (true) {
+        String newModelKey = modelKey + "(" + (i++) + ")";
+        Model _m = getRecentModels().get(newModelKey);
+        if (_m == null || _m.getMomlPath().equals(newModel.getMomlPath())) {
           modelKey = newModelKey;
           break;
         }
@@ -133,14 +146,31 @@ public class ModelBundle implements Serializable {
     }
   }
 
-    public boolean removeModel(String modelKey) {
-		boolean result = getRecentModels().remove(modelKey) != null;
-		getRecentModelsList().remove(modelKey);
-		return result;
+  public boolean removeModel(String modelKey) {
+    boolean result = getRecentModels().remove(modelKey) != null;
+    getRecentModelsList().remove(modelKey);
+    return result;
+  }
+
+  public boolean removeRecentModel(URI modelURI) {
+    String modelKey = getModelKey(modelURI);
+    return (modelKey!=null) && removeModel(modelKey);
+  }
+
+  public String getModelKey(URI modelURI) {
+    String modelKey = null;
+    for(Entry<String,Model> entry : getRecentModels().entrySet()) {
+      Model m = entry.getValue();
+      try {
+        if (modelURI.equals(m.getMomlPath().toURI())) {
+          modelKey = entry.getKey();
+          break;
+        }
+      } catch (Exception e) {
+        // ignore, should never happen
+      }
     }
-    
-  public void setPredefinedModel(String modelKey, Model newModel) {
-    getPredefinedModels().put(modelKey, newModel);
+    return modelKey;
   }
 
   public Model getModel(String modelKey) {
@@ -161,10 +191,11 @@ public class ModelBundle implements Serializable {
       t.printStackTrace();
       result = new ModelBundle();
     } finally {
-      if (r != null) try {
-        r.close();
-      } catch (IOException e) {
-      }
+      if (r != null)
+        try {
+          r.close();
+        } catch (IOException e) {
+        }
     }
     return result;
   }
