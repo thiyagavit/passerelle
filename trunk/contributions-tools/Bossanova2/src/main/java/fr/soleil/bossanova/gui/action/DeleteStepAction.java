@@ -7,15 +7,13 @@ package fr.soleil.bossanova.gui.action;
 import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-
 import fr.soleil.bossanova.bossaNovaData.BossaNovaData;
 import fr.soleil.bossanova.controller.BossaNovaSequencerImpl;
 import fr.soleil.bossanova.resources.Icons;
 
 public class DeleteStepAction extends AbstractMultipleSelectionAction {
-
-
-	public DeleteStepAction(BossaNovaSequencerImpl sequencer, JTable table) {
+  private static final long serialVersionUID = 1L;
+  public DeleteStepAction(BossaNovaSequencerImpl sequencer, JTable table) {
 		super(sequencer, table);
 		// This is an instance initializer; it is executed just after the
 		// constructor of the superclass is invoked
@@ -47,14 +45,13 @@ public class DeleteStepAction extends AbstractMultipleSelectionAction {
 
 	}
 	protected void doSpecificUnitaryActionOnRow(int row) {
-
 		if (row >= 0) {
 			sequencer.removeStepAt(row);
-			if (row - 1 > 0)
+			if (row - 1 >= 0) {
 				getTable().getSelectionModel().setSelectionInterval(row - 1, row - 1);
-			else
+			} else {
 				getTable().getSelectionModel().setSelectionInterval(row, row);
-
+			}
 			// DBA
 			if (getTable().getRowCount() == 0) {
 			    BossaNovaData.getSingleton().getApplication().getMainScreen().disableStepButton();
