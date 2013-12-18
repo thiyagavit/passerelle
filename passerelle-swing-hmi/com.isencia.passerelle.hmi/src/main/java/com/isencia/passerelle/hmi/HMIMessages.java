@@ -41,6 +41,7 @@ public class HMIMessages {
   public final static String MENU_NEW = "hmi.menu.new"; //$NON-NLS-1$
   public final static String MENU_OPEN = "hmi.menu.open"; //$NON-NLS-1$
   public final static String MENU_PARAM_VISIBILITY = "hmi.menu.paramVisibility"; //$NON-NLS-1$
+  public final static String MENU_CLEAR_LAYOUTPREFS = "hmi.menu.clearLayoutPrefs"; //$NON-NLS-1$
   public final static String MENU_PREFS = "hmi.menu.prefs"; //$NON-NLS-1$
   public final static String MENU_PRINT = "hmi.menu.print"; //$NON-NLS-1$
   public final static String MENU_RESUME = "hmi.menu.resume"; //$NON-NLS-1$
