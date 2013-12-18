@@ -66,7 +66,7 @@ public class OpenAction extends AbstractAction {
 
 			// add delete action to the menu, we give map of all open sequence
 			// in parameter to forbid to delete an open sequence
-			final DeleteFileAction deleteAction = new DeleteFileAction(HMIMessages.getString(HMIMessages.FILECHOOSER_DELETE_TITLE), fileChooser, getHMI().getLoadedModels());
+			final DeleteFileAction deleteAction = new DeleteFileAction(HMIMessages.getString(HMIMessages.FILECHOOSER_DELETE_TITLE), fileChooser, getHMI());
 			popup.add(new JMenuItem(deleteAction));
 
 			// Shortcut
@@ -83,7 +83,7 @@ public class OpenAction extends AbstractAction {
       }
     } catch (final Exception e1) {
       logger.error("Error opening file", e1);
-      PopupUtil.showError(getHMI().getDialogHookComponent(), "error.file.open");
+      PopupUtil.showError(getHMI().getDialogHookComponent(), HMIMessages.HMI_ERROR_FILE_OPEN, e1.getMessage());
     }
     if (logger.isTraceEnabled()) {
       logger.trace("File Open action - exit - current file : " + modelURL); //$NON-NLS-1$

@@ -74,9 +74,6 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.diagnosis.actor.util.ServicesRegistry;
-import com.isencia.passerelle.diagnosis.impl.entities.EntityFactory;
-import com.isencia.passerelle.diagnosis.impl.entities.EntityManager;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
@@ -114,7 +111,6 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowHandle;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
-import com.isencia.passerelle.project.repository.impl.filesystem.FileSystemBasedRepositoryService;
 import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -123,10 +119,10 @@ public abstract class HMIBase implements ChangeListener {
   private final static Logger logger = LoggerFactory.getLogger(HMIBase.class);
 
   private static final int RECENTMODELS_LIMIT_MINVALUE = 3;
-  
+
   public static final String HMI_APPLICATIONNAME_PROPNAME = "hmi.applicationName";
   public static final String HMI_APPLICATIONNAME_DEFAULT = "Passerelle";
-  
+
   public static final String HMI_INI_FILE_PROPNAME = "hmi.iniFile";
   public static final String HMI_MODEL_URL_PROPNAME = "hmi.modelURL";
   public static final String HMI_RECENTMODELS_FILE_PROPNAME = "hmi.recentModels.file";
@@ -144,7 +140,7 @@ public abstract class HMIBase implements ChangeListener {
   public static String DIAGNOSIS_DATA_BASE_DIR_STRING;
   public static String DIAGNOSIS_ENTITIES_DUMP_PATHNAME;
   public static String DIAGNOSIS_ASSET_REPOS_PATHNAME;
-//  public static String DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME;
+  public static String DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME;
 
   public static final String EXECUTION_CONTROL_ATTR_NAME = "_executionControl";
   public static final String USER_TRACER_ATTR_NAME = "_userTracer";
@@ -339,27 +335,26 @@ public abstract class HMIBase implements ChangeListener {
     ExecutionTracerService.registerTracer(new DefaultExecutionTracer());
 
     // set file-based asset repo for HMI executions of diagnostic seqs
-    DIAGNOSIS_DATA_BASE_DIR_STRING = System.getProperty(HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME, "C:/temp");
-    DIAGNOSIS_ENTITIES_DUMP_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-diagnosis-results";
-    DIAGNOSIS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository";
-//    DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository-submodels";
+    // DIAGNOSIS_DATA_BASE_DIR_STRING = System.getProperty(HMI_DIAGNOSIS_DATA_BASE_DIR_PROPNAME, "C:/temp");
+    // DIAGNOSIS_ENTITIES_DUMP_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-diagnosis-results";
+    // DIAGNOSIS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository";
+    // DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME = DIAGNOSIS_DATA_BASE_DIR_STRING + "/passerelle-repository-submodels";
 
-    File diagAssetReposPath = new File(DIAGNOSIS_ASSET_REPOS_PATHNAME);
-//    File diagSubmodelReposPath = new File(DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME);
-    File diagEntitiesDumpPath = new File(DIAGNOSIS_ENTITIES_DUMP_PATHNAME);
-    if (!diagAssetReposPath.exists() || !diagEntitiesDumpPath.exists()) {
-      logger.warn("Paths for diagnostic asset repository and/or result dumps do not exist. :" + "\n\tasset repos :" + DIAGNOSIS_ASSET_REPOS_PATHNAME
-          + "\n\tresults dump :" + DIAGNOSIS_ENTITIES_DUMP_PATHNAME + "\n\tDiagnostic processes will not work!");
-    }
-//    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath, diagSubmodelReposPath));
-    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
-    ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
-    ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
-    
-//    ServiceRegistry.getInstance().setEntityFactory(new EntityFactoryImpl());
-//    EntityManagerImpl entityManager = new EntityManagerImpl();
-//    ServiceRegistry.getInstance().setEntityManager(entityManager);
-//    ServiceRegistry.getInstance().setContextRepository(new ContextRepositoryImpl(entityManager));
+    // File diagAssetReposPath = new File(DIAGNOSIS_ASSET_REPOS_PATHNAME);
+    // File diagSubmodelReposPath = new File(DIAGNOSIS_SUBMODELS_ASSET_REPOS_PATHNAME);
+    // File diagEntitiesDumpPath = new File(DIAGNOSIS_ENTITIES_DUMP_PATHNAME);
+    // if (!diagAssetReposPath.exists() || !diagEntitiesDumpPath.exists()) {
+    // logger.warn("Paths for diagnostic asset repository and/or result dumps do not exist. :" + "\n\tasset repos :" + DIAGNOSIS_ASSET_REPOS_PATHNAME
+    // + "\n\tresults dump :" + DIAGNOSIS_ENTITIES_DUMP_PATHNAME + "\n\tDiagnostic processes will not work!");
+    // }
+    // ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath, diagSubmodelReposPath));
+    // ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
+    // ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
+    // ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
+
+    // ServiceRegistry.getInstance().setEntityFactory(new EntityFactoryImpl());
+    // EntityManagerImpl entityManager = new EntityManagerImpl();
+    // ServiceRegistry.getInstance().setEntityManager(entityManager);
   }
 
   /**
@@ -368,8 +363,10 @@ public abstract class HMIBase implements ChangeListener {
    * classloader, which uses the classpath to find the resource. If that fails, then it throws an exception. The specification can give a file name relative to
    * current working directory, or the directory in which this application is started up.
    * 
-   * @param spec The specification.
-   * @exception IOException If it cannot convert the specification to a URL.
+   * @param spec
+   *          The specification.
+   * @exception IOException
+   *              If it cannot convert the specification to a URL.
    */
   public static URL specToURL(final String spec) throws IOException {
     try {
@@ -486,6 +483,19 @@ public abstract class HMIBase implements ChangeListener {
     }
   }
 
+  public boolean delete(URI modelURI) throws IllegalStateException {
+    if (isDeleteAllowed(modelURI)) {
+      File f = new File(modelURI);
+      boolean deleted = f.delete();
+      // if the delete succeeded, we must also remove the file from the list of recently opened models
+      getHmiModelsDef().removeRecentModel(modelURI);
+      recreateModelsMenu(modelsSubMenu);
+      return deleted;
+    } else {
+      throw new IllegalStateException("Delete not allowed for " + modelURI);
+    }
+  }
+
   /**
    * CHecks if the flow loaded OK, to exclude errors when trying to save a "crippled" model i.e. one that only loaded partially when some actors are not on the
    * HMI classpath etc.
@@ -496,7 +506,7 @@ public abstract class HMIBase implements ChangeListener {
   public boolean checkFlowLoadingError(Flow model) {
     boolean result = true;
     if (modelURL != null) {
-     // Boolean chgStatus = modelsChangedStatus.get(modelURL);
+      // Boolean chgStatus = modelsChangedStatus.get(modelURL);
       if (!model.isLoadedFaultless()) {
         Icon icon = new ImageIcon(getClass().getResource("/com/isencia/passerelle/hmi/resources/ide32.gif"));
         int choice = PopupUtil.showOptionDialog(getDialogHookComponent(), HMIMessages.getString("warning.flow.loadingError"), HMIMessages.getString("warning"),
@@ -526,8 +536,7 @@ public abstract class HMIBase implements ChangeListener {
       case 0:
         result = true;
         if (getCurrentModel() != null && getCurrentModel().getManager() != null) {
-          ExecutionTracerService.trace(getCurrentModel().getDirector(), "HMI shutting down. Stopping model execution for "
-              + getCurrentModel().getName());
+          ExecutionTracerService.trace(getCurrentModel().getDirector(), "HMI shutting down. Stopping model execution for " + getCurrentModel().getName());
           try {
             getCurrentModel().getManager().stop();
           } catch (final Throwable t) {
@@ -858,15 +867,15 @@ public abstract class HMIBase implements ChangeListener {
 
     return modelsSubMenu;
   }
-  
+
   public JToolBar createDefaultToolbar() {
-      return createToolbar(true);
+    return createToolbar(true);
   }
-  
+
   public JToolBar createToolbarWithoutSave() {
-      return createToolbar(false);
+    return createToolbar(false);
   }
-  
+
   private JToolBar createToolbar(final boolean withSaveButton) {
     final JToolBar toolBar = new JToolBar();
 
@@ -888,9 +897,9 @@ public abstract class HMIBase implements ChangeListener {
     if (modelResumer == null) {
       modelResumer = new ModelResumer(this);
     }
-//    if (saveAction == null) {
-//      saveAction = new SaveAction(this);
-//    }
+    // if (saveAction == null) {
+    // saveAction = new SaveAction(this);
+    // }
     // DBA : add tooltip for each button
     createToolbarButton(modelExecutor, toolBar, HMIMessages.getString(HMIMessages.MENU_EXECUTE));
     createToolbarButton(modelSuspender, toolBar, HMIMessages.getString(HMIMessages.MENU_SUSPEND));
@@ -901,12 +910,12 @@ public abstract class HMIBase implements ChangeListener {
     createToolbarButton(modelDebugStepper, toolBar, HMIMessages.getString(HMIMessages.MENU_DEBUG_STEP));
     toolBar.addSeparator();
     toolBar.addSeparator();
-    
-    if(withSaveButton){
-        if (saveAction == null) {
-            saveAction = new SaveAction(this);
-          }
-        createToolbarButton(saveAction, toolBar, HMIMessages.getString(HMIMessages.MENU_SAVE));
+
+    if (withSaveButton) {
+      if (saveAction == null) {
+        saveAction = new SaveAction(this);
+      }
+      createToolbarButton(saveAction, toolBar, HMIMessages.getString(HMIMessages.MENU_SAVE));
     }
 
     StateMachine.getInstance().registerActionForState(StateMachine.MODEL_OPEN, HMIMessages.MENU_EXECUTE, modelExecutor);
@@ -1029,6 +1038,25 @@ public abstract class HMIBase implements ChangeListener {
     return modelsChangedStatus;
   }
 
+  /**
+   * Checks if the user can be allowed to delete the given model file. For the moment this is only used for local model files (i.e. not managed via REST/web
+   * services).
+   * <p>
+   * Current logic in the basic HMI is to make sure the model is not currently loaded, and not part of the predefined models in case the HMI is a custom
+   * configured one.
+   * </p>
+   * 
+   * @param modelURI
+   * @return
+   */
+  public boolean isDeleteAllowed(URI modelURI) {
+    boolean result = !getLoadedModels().containsKey(modelURI);
+    if (result) {
+      result = !getHmiModelsDef().containsPredefinedModel(modelURI);
+    }
+    return result;
+  }
+
   public boolean isChangedModel(URI modelURI) {
     Boolean changeStatus = getModelsChangedStatus().get(modelURI);
     return (changeStatus != null) && changeStatus;
@@ -1052,14 +1080,14 @@ public abstract class HMIBase implements ChangeListener {
         }
       }
     }
-    
+
     boolean returnValue = false;
-    if (modelURL != null){
-        try {
-            returnValue = getModelsChangedStatus().get(modelURL.toURI()).booleanValue();
-          } catch (URISyntaxException e) {
-            // We can safely ignore this since all used URLs are in compliance with RFC2396
-          }
+    if (modelURL != null) {
+      try {
+        returnValue = getModelsChangedStatus().get(modelURL.toURI()).booleanValue();
+      } catch (URISyntaxException e) {
+        // We can safely ignore this since all used URLs are in compliance with RFC2396
+      }
     }
     return returnValue;
   }
@@ -1112,7 +1140,7 @@ public abstract class HMIBase implements ChangeListener {
   public void launchModel(final Flow model, final ModelExecutor executor, final boolean blocking, final boolean updateState) {
     try {
       final ptolemy.actor.Director director = model.getDirector();
-      DirectorAdapter directorAdapter = DirectorUtils.getAdapter(director,null);
+      DirectorAdapter directorAdapter = DirectorUtils.getAdapter(director, null);
       if (interactiveErrorControl) {
         directorAdapter.setErrorControlStrategy(new AskTheUserErrorControlStrategy(this, executor), true);
       } else {
@@ -1189,8 +1217,15 @@ public abstract class HMIBase implements ChangeListener {
     Flow currentModelTmp = loadedModels.get(mdlURI);
     if (currentModelTmp == null) {
       currentModelTmp = ModelUtils.loadModel(_modelURL);
-      loadedModels.put(mdlURI, currentModelTmp);
-      setCurrentModel(currentModelTmp, _modelURL, modelKey, showModelGraph);
+      // Soleil Mantis 27166 : double check that someone has not copied/moved/modified model files outsids of HMI
+      // which could lead to inconsistent model&file names.
+      String expectedModelName = getExpectedModelName(mdlURI);
+      if (expectedModelName.equals(currentModelTmp.getName())) {
+        loadedModels.put(mdlURI, currentModelTmp);
+        setCurrentModel(currentModelTmp, _modelURL, modelKey, showModelGraph);
+      } else {
+        throw new Exception(HMIMessages.getString(HMIMessages.HMI_ERROR_FILE_OPEN_INFO)+" : "+currentModelTmp.getName()+" - "+expectedModelName);
+      }
     } else {
       refreshParamsForm(mdlURI, modelKey);
     }
@@ -1307,7 +1342,7 @@ public abstract class HMIBase implements ChangeListener {
       // if (modelURL==null || !modelURL.equals(_modelURL)) {
       modelURL = _modelURL;
       currentModelDef = hmiModelsDef.getModel(modelKey);
-      if (currentModelDef == null || (_modelURL!= null && currentModelDef.getMomlPath().toString().compareTo(_modelURL.toString()) != 0)) {
+      if (currentModelDef == null || (_modelURL != null && currentModelDef.getMomlPath().toString().compareTo(_modelURL.toString()) != 0)) {
         currentModelDef = new Model(_modelURL, new FieldMapping());
       }
       hmiModelsDef.addModel(modelKey, currentModelDef);
@@ -1544,8 +1579,8 @@ public abstract class HMIBase implements ChangeListener {
     }
 
     public synchronized void executionError(final Manager manager, final Throwable throwable) {
-//      logger.error(HMIMessages.getString("error.execution.error"), throwable);
-      if(Manager.IDLE.equals(manager.getState())) {
+      // logger.error(HMIMessages.getString("error.execution.error"), throwable);
+      if (Manager.IDLE.equals(manager.getState())) {
         // There's a big chance that the executionFinished() will not be invoked anymore
         // as Ptolemy only calls it when execution is successfully finished.
         // And since we're still getting error notifs after the Manager went to IDLE
@@ -1576,7 +1611,7 @@ public abstract class HMIBase implements ChangeListener {
       }
       execDone = true;
     }
-    
+
     public synchronized boolean isExecuting() {
       return !execDone;
     }
@@ -1706,5 +1741,11 @@ public abstract class HMIBase implements ChangeListener {
 
   public void enableChangeImpacts() {
     this.changeImpactEnabled = true;
+  }
+
+  public String getExpectedModelName(URI modelURI) {
+    File modelFile = new File(modelURI);
+    String modelFileName = modelFile.getName();
+    return modelFileName.substring(0, modelFileName.lastIndexOf('.'));
   }
 }
