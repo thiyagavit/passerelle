@@ -55,10 +55,15 @@ public class HMIMessages {
   public final static String MENU_TRACING = "hmi.menu.tracing"; //$NON-NLS-1$
   public final static String MENU_HELP = "hmi.menu.help"; //$NON-NLS-1$
   public final static String TITLE = "hmi.title"; //$NON-NLS-1$
-  public final static String FILECHOOSER_DELETE_TITLE = "hmi.fileChooser.delete.title";
-  public final static String FILECHOOSER_DELETE_MESSAGE = "hmi.fileChooser.delete.message";
-  public static final String FILECHOOSER_DELETE_IMPOSSIBLE = "hmi.fileChooser.delete.impossible";
-
+  public final static String FILECHOOSER_DELETE_TITLE = "hmi.fileChooser.delete.title"; //$NON-NLS-1$
+  public final static String FILECHOOSER_DELETE_MESSAGE = "hmi.fileChooser.delete.message"; //$NON-NLS-1$
+  public static final String FILECHOOSER_DELETE_IMPOSSIBLE = "hmi.fileChooser.delete.impossible"; //$NON-NLS-1$
+  public static final String FILECHOOSER_DELETE_FAILED = "hmi.fileChooser.delete.failed"; //$NON-NLS-1$
+  public final static String HMI_ERROR_FILE_NEW = "error.file.new"; //$NON-NLS-1$
+  public final static String HMI_ERROR_FILE_OPEN = "error.file.open"; //$NON-NLS-1$
+  public final static String HMI_ERROR_FILE_SAVE = "error.file.save"; //$NON-NLS-1$
+  public final static String HMI_ERROR_FILE_OPEN_INFO = "error.file.open.info"; //$NON-NLS-1$
+  
   protected HMIMessages() {
   }
 

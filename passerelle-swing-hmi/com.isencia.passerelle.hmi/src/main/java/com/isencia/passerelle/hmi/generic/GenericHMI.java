@@ -74,6 +74,7 @@ import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Settable;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
@@ -187,7 +188,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
     if (getDialogHookComponent() != null) {
       if (modelURL != null) {
-        getDialogHookComponent().setTitle(HMIBase.HMI_APPLICATIONNAME+" - " + modelURL);
+        getDialogHookComponent().setTitle(HMIBase.HMI_APPLICATIONNAME + " - " + modelURL);
         modelNameLabel = new JLabel(modelURL.toString(), JLabel.CENTER);
 
         parameterScrollPane.getParent().add(modelNameLabel, BorderLayout.NORTH);
@@ -331,12 +332,12 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         ModelValidationService.getInstance().validate(loadedModel, validationContext);
         if (!validationContext.isValid()) {
           boolean isError = false;
-          for (NamedObj validatedElement : validationContext.getElementsWithErrors()) {
+          for (Nameable validatedElement : validationContext.getElementsWithErrors()) {
             for (ValidationException e : validationContext.getErrors(validatedElement)) {
               Object obj = e.getModelElement();
               String validationErrorMsg = e.getSimpleMessage();
               Severity severity = e.getErrorCode().getSeverity();
-              if(Severity.ERROR.compareTo(severity)<=0) {
+              if (Severity.ERROR.compareTo(severity) <= 0) {
                 isError = true;
               }
               String severityStr = severity.name();
@@ -349,7 +350,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
               break;
             }
           }
-          if(!isError) {
+          if (!isError) {
             PopupUtil.showWarning(getDialogHookComponent(), "warning.flow.validationError");
           } else {
             PopupUtil.showError(getDialogHookComponent(), "warning.flow.validationError");
@@ -815,6 +816,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         if (filterSettingsFromDialog != null) {
           hmiDef = filterSettingsFromDialog;
           saveAndApplySettings();
+          showModelForm(null);
         }
       } else {
         JOptionPane.showMessageDialog(getDialogHookComponent(), "Please select/open a model first", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -837,6 +839,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         layoutPrefs.setNrColumns(nrColumns);
       }
       saveAndApplySettings();
+      showModelForm(null);
     }
   }
 
@@ -861,11 +864,11 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
       }
     }
   }
-  
+
   private class RecentModelsManagementOpener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      final RecentModelsManagementDialog dialog = new RecentModelsManagementDialog(getDialogHookComponent(), getHmiModelsDef() );
+      final RecentModelsManagementDialog dialog = new RecentModelsManagementDialog(getDialogHookComponent(), getHmiModelsDef());
       dialog.setVisible(true);
       final ModelBundle filterSettingsFromDialog = dialog.getRecentModelsConfig();
       if (filterSettingsFromDialog != null) {
@@ -1173,6 +1176,35 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     if (getModelGraphPanel().getTabCount() == 0) {
       StateMachine.getInstance().transitionTo(StateMachine.READY);
     }
+  }
+
+  @Override
+  public boolean delete(URI modelURI) throws IllegalStateException {
+    boolean deleted = super.delete(modelURI);
+    if (deleted) {
+      // Soleil Mantis 26538 : also need to clean up related layout prefs
+      // these are stored based on the name of the parsed model...
+      // But the FILE IS GONE!!!!
+      // So we try to get things working by just checking if we can find the model key
+      // from the URI in the known layout preferences...
+      try {
+        String modelKey = getHmiDef().getModelKey(modelURI);
+        if (modelKey == null) {
+          modelKey = getHmiModelsDef().getModelKey(modelURI);
+        }
+        if (modelKey == null) {
+          modelKey = getExpectedModelName(modelURI);
+        }
+        if (modelKey != null) {
+          getHmiDef().getModelLayoutPrefs().remove(modelKey);
+          getHmiDef().removeModel(modelKey);
+          saveAndApplySettings();
+        }
+      } catch (Exception e) {
+        logger.warn("Unable to read model to clean up layout prefs after deleting " + modelURI, e);
+      }
+    }
+    return deleted;
   }
 
   public JPanel getTracePanel() {

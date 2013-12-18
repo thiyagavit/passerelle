@@ -91,7 +91,7 @@ public class SaveAsAction extends AbstractAction {
 
 		// add delete action to the menu, we give map of all open sequence in
 		// parameter to forbid to delete an open sequence
-		final DeleteFileAction deleteAction = new DeleteFileAction(HMIMessages.getString(HMIMessages.FILECHOOSER_DELETE_TITLE), fileChooser, getHMI().getLoadedModels());
+		final DeleteFileAction deleteAction = new DeleteFileAction(HMIMessages.getString(HMIMessages.FILECHOOSER_DELETE_TITLE), fileChooser, getHMI());
 		popup.add(new JMenuItem(deleteAction));
 
 		// Shortcut
