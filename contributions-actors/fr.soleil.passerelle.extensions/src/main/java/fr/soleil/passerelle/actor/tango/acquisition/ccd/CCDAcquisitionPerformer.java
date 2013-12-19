@@ -147,8 +147,8 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
             else {
                 ccd.startStandardAcquisition();
                 if(outputAcqStarted != null){
-                    getLogger().trace("process - Acquisition is started");
-                    response.addOutputMessage(outputAcqStarted, PasserelleUtil.createTriggerMessage());
+                    getLogger().trace("process - Acquisition is started");                    
+                    sendOutputMsg(outputAcqStarted, PasserelleUtil.createTriggerMessage());
                 }
                 ccd.updateConfigFromDevice();
                 ExecutionTracerService.trace(this, "starting CCD acquisition with parameters: \n"
