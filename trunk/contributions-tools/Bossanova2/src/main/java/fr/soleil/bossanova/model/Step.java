@@ -222,7 +222,17 @@ final public class Step implements Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		//Step inst = null;
-
+	
+	// See bug 26369 :
+	    // During copy a clone is called and during the past too
+	    // At past step the parameters was lose. 
+	    // Before realize the step copy its is important to be sure that the this.parameters is up to date with the 
+	    // memory information.
+	    // The distinguish between the step copy and past copy is that the flow is null (see more far in the code)
+            if(this.flow != null) {
+                applyFlowParametersToStep();
+            }
+            // end bug 26369
 		//inst = (Step) super.clone();
 	    
 	    Step inst = new Step();
