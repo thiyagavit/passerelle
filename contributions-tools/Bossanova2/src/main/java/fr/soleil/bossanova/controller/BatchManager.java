@@ -60,7 +60,7 @@ public class BatchManager {
 				try {
 					writer.close();
 				} catch (Exception e) {
-                    // Bug 18567
+                    // Bug 17628
 					LoggerFactory.getLogger("BatchManager").error(
 							"Cannot save Batch !", e);
 
