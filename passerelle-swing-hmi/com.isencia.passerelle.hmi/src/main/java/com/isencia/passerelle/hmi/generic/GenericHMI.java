@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -49,6 +50,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
 import net.infonode.docking.TabWindow;
 import net.infonode.tabbedpanel.Tab;
 import net.infonode.tabbedpanel.TabDragEvent;
@@ -60,9 +62,11 @@ import net.infonode.tabbedpanel.TabRemovedEvent;
 import net.infonode.tabbedpanel.TabStateChangedEvent;
 import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.tabbedpanel.titledtab.TitledTab;
+
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
 import ptolemy.actor.gui.PtolemyEffigy;
@@ -74,10 +78,10 @@ import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Settable;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
+
 import com.isencia.constants.IPropertyNames;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ValidationException;
@@ -111,6 +115,7 @@ import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.validation.ModelValidationService;
 import com.isencia.passerelle.validation.ValidationContext;
+
 import diva.graph.GraphEvent;
 import diva.graph.GraphModel;
 
