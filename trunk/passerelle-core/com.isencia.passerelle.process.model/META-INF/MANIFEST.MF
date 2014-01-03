@@ -8,7 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.isencia.passerelle.process.model;version="8.5.0",
  com.isencia.passerelle.process.model.event,
  com.isencia.passerelle.process.model.factory;version="8.5.0",
- com.isencia.passerelle.process.model.service;version="8.5.0",
  com.isencia.passerelle.process.model.util;version="8.5.0"
 Import-Package: com.isencia.passerelle.core;version="8.5.0",
  com.isencia.passerelle.runtime;version="8.5.0",

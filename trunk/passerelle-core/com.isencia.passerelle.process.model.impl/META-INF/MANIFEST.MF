@@ -9,7 +9,6 @@ Require-Bundle: javax.persistence;bundle-version="2.0.1"
 Import-Package: com.isencia.passerelle.core;version="8.5.0",
  com.isencia.passerelle.process.model;version="8.5.0",
  com.isencia.passerelle.process.model.factory;version="8.5.0",
- com.isencia.passerelle.process.model.service;version="8.5.0",
  com.isencia.passerelle.process.service;version="8.5.0",
  com.isencia.passerelle.runtime;version="8.5.0",
  com.isencia.sherpa.commons,
