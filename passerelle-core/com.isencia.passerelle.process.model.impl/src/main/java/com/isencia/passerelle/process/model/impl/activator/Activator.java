@@ -33,7 +33,6 @@ public class Activator implements BundleActivator {
       EntityFactoryImpl entityFactory = new EntityFactoryImpl();
       factoryServiceRegistration = bundleContext.registerService(EntityFactory.class.getName(), entityFactory, null);
       ServiceRegistry.getInstance().setEntityFactory(entityFactory);
-      com.isencia.passerelle.process.model.service.ServiceRegistry.getInstance().setEntityFactory(entityFactory);
     }
   }
 
@@ -46,7 +45,6 @@ public class Activator implements BundleActivator {
     lifeCycleEntityManagerTracker.close();
     if (factoryServiceRegistration != null) {
       ServiceRegistry.getInstance().setEntityFactory(null);
-      com.isencia.passerelle.process.model.service.ServiceRegistry.getInstance().setEntityFactory(null);
       factoryServiceRegistration.unregister();
     }
   }
