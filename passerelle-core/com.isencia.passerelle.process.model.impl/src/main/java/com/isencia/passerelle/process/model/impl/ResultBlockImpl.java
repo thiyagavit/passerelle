@@ -116,6 +116,10 @@ public class ResultBlockImpl implements ResultBlock {
     return id;
   }
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public Attribute getAttribute(String name) {
     return attributes.get(name);
   }
@@ -219,5 +223,9 @@ public class ResultBlockImpl implements ResultBlock {
     }
     ResultBlockImpl rhs = (ResultBlockImpl) arg0;
     return new EqualsBuilder().append(this.id, rhs.id).append(this.type, rhs.type).isEquals();
+  }
+
+  public void resetItems() {
+    resultItems = new HashMap<String, ResultItem<?>>();
   }
 }
