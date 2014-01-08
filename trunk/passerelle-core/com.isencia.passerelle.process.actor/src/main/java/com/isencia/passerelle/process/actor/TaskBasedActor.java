@@ -1,6 +1,8 @@
 package com.isencia.passerelle.process.actor;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -182,8 +184,22 @@ public abstract class TaskBasedActor extends Actor {
    */
   protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String taskType = taskTypeParam.stringValue();
-    return ServiceRegistry.getInstance().getContextManager()
-        .createTask(getTaskClass(parentContext), parentContext, taskAttributes, taskContextEntries, FlowUtils.getFullNameWithoutFlow(this), taskType);
+    String initiator = getTaskInitiator();
+    return ServiceRegistry.getInstance().getContextManager().createTask(getTaskClass(parentContext), parentContext, taskAttributes, taskContextEntries, initiator, taskType);
+  }
+
+  /**
+   * Defines the initiator for a new Task started by this actor.
+   * <p>
+   * Default implementation uses an URI-syntax as follows :
+   * <br/><code>actor:/<flow name>.[<subflow name>...].<actor name></code>
+   * <br/>i.e. the actor's full name (without leading .) is used as URI path
+   * </p>
+   * @return
+   * @throws Exception
+   */
+  protected String getTaskInitiator() throws Exception {
+    return new URI("actor",null,"/"+getFullName().substring(1),null,null).toString();
   }
 
   /**
