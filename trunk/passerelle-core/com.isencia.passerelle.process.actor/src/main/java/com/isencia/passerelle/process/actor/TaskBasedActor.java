@@ -2,26 +2,28 @@ package com.isencia.passerelle.process.actor;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.expr.StringParameter;
 import ptolemy.data.expr.Variable;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.actor.FlowUtils;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.ext.impl.DefaultActorErrorControlStrategy;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
@@ -38,11 +40,17 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 public abstract class TaskBasedActor extends Actor {
   private final static Logger LOGGER = LoggerFactory.getLogger(TaskBasedActor.class);
 
+  private static final String ERROR_STRATEGY = "Error Strategy";
+  private static final String ERROR_VIA_ERROR_PORT = "Error via error port";
+  private static final String CONTINUE_VIA_ERROR_PORT = "Continue via error port";
+  private static final String CONTINUE_VIA_OUTPUT_PORT = "Continue via output port";
+
   public Port output; // NOSONAR
   public Port input; // NOSONAR
   // by default the actor name is set as task/result type
   public StringParameter taskTypeParam; // NOSONAR
   public StringParameter resultTypeParam;
+  public StringParameter errorStrategyParameter;// NOSONAR
 
   private Set<ContextProcessingCallback> pendingListeners = Collections.synchronizedSet(new HashSet<ContextProcessingCallback>());
 
@@ -55,6 +63,14 @@ public abstract class TaskBasedActor extends Actor {
     taskTypeParam.setExpression(name);
     resultTypeParam = new StringParameter(this, AttributeNames.RESULT_TYPE);
     resultTypeParam.setExpression(name);
+    
+    // TODO: the default should come from the DirectorAdapter
+    errorStrategyParameter = new StringParameter(this, ERROR_STRATEGY);
+    errorStrategyParameter.addChoice(CONTINUE_VIA_OUTPUT_PORT);
+    errorStrategyParameter.addChoice(CONTINUE_VIA_ERROR_PORT);
+    errorStrategyParameter.addChoice(ERROR_VIA_ERROR_PORT);
+    errorStrategyParameter.setExpression(ERROR_VIA_ERROR_PORT);
+    
   }
 
   @Override
@@ -73,6 +89,29 @@ public abstract class TaskBasedActor extends Actor {
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
     pendingListeners.clear();
+
+    if (errorStrategyParameter != null) {
+      if (CONTINUE_VIA_OUTPUT_PORT.equals(errorStrategyParameter.getExpression())) {
+        // Continue with the message on the output port
+        setErrorControlStrategy(new ContinueOnOutputControlStrategy());
+      } else if (CONTINUE_VIA_ERROR_PORT.equals(errorStrategyParameter.getExpression())) {
+        // Continue with the message on the error port
+        setErrorControlStrategy(new ContinueOnErrorControlStrategy());
+      } else if (ERROR_VIA_ERROR_PORT.equals(errorStrategyParameter.getExpression())) {
+        setErrorControlStrategy(new DefaultActorErrorControlStrategy());
+      }
+    } else {
+      // Send error on error port
+      setErrorControlStrategy(new DefaultActorErrorControlStrategy());
+    }
+  }
+
+  /**
+   * Allow ErrorControlStrategy to write to the output port
+   */
+  @Override
+  protected void sendOutputMsg(Port port, ManagedMessage message) throws ProcessingException {
+    super.sendOutputMsg(port, message);
   }
 
   @Override
