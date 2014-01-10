@@ -158,12 +158,14 @@ public abstract class TaskBasedActor extends Actor {
         ExecutionTracerService.trace(this, ex.getMessage());
         // copy the ex info but ensure that the message is added
         // as an exception coming from the depths of task processing may not know about the received message
+        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
         ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, ex);
         response.setException(new ProcessingException(ex.getErrorCode(), ex.getSimpleMessage(), this, message, ex.getCause()));
         processFinished(ctxt, request, response);
       } catch (Throwable t) {
         ExecutionTracerService.trace(this, t.getMessage());
         response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, message, t));
+        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
         ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, t);
         processFinished(ctxt, request, response);
       }
