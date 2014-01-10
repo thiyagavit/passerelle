@@ -18,6 +18,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
+import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
@@ -238,7 +239,7 @@ public abstract class TaskBasedActor extends Actor {
    * @throws Exception
    */
   protected String getTaskInitiator() throws Exception {
-    return new URI("actor",null,"/"+getFullName().substring(1),null,null).toString();
+    return new URI("actor",null,"/"+FlowUtils.getOriginalFullName(this).substring(1),null,null).toString();
   }
 
   /**
