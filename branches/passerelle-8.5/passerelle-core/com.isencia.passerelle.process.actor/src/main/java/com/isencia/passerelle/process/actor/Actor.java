@@ -206,18 +206,24 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       }
     }
   }
-
+  
   @Override
-  @SuppressWarnings("unchecked")
-  protected void doInitialize() throws InitializationException {
-    getLogger().trace("{} - doInitialize() - entry", getFullName());
-    super.doInitialize();
-
+  protected void doPreInitialize() throws InitializationException {
+    super.doPreInitialize();
+    // need to do this here, as in thread-based models
+    // the doInitialize could cause race conditions with preceeding actors
+    // that already started sending msgs!
     iterationCount = 1;
     pushedMessages.clear();
     incompleteProcessRequests.clear();
     pendingProcessRequests.clear();
     finishedProcessResponses.clear();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void doInitialize() throws InitializationException {
+    super.doInitialize();
 
     List<Port> inputPortList = this.inputPortList();
     for (Port _p : inputPortList) {
@@ -240,7 +246,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     } catch (IllegalActionException e) {
       throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error triggering a fire iteration for source actor " + getFullName(), this, e);
     }
-    getLogger().trace("{} - doInitialize() - exit", getFullName());
   }
 
   protected ContextRepository getContextRepository() {
