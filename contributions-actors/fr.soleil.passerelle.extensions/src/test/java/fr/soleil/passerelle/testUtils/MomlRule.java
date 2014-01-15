@@ -11,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.junit.rules.ExternalResource;
 
 import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.util.Workspace;
 
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.model.Flow;
@@ -29,7 +30,7 @@ import fr.soleil.passerelle.domain.BasicDirector;
 // TODO remove inheritance
 public class MomlRule extends ExternalResource {
 
-    private Reader reader;
+    private Reader reader = null;
     private FlowManager flowMgr;
     private final String sequenceName;
 
@@ -43,13 +44,17 @@ public class MomlRule extends ExternalResource {
 
     @Override
     public void before() throws Exception {
-        reader = new InputStreamReader(getClass().getResourceAsStream(sequenceName));
-        flowMgr = new FlowManager();
-        original = FlowManager.readMoml(reader);
+        if (reader == null) {
+            reader = new InputStreamReader(getClass().getResourceAsStream(sequenceName));
+            flowMgr = new FlowManager();
+            original = FlowManager.readMoml(reader);
 
-        final BasicDirector dir = new BasicDirector(original, "Dir");
-        original.setDirector(dir);
-        // copy = (Flow) original.clone();
+            final BasicDirector dir = new BasicDirector(original, "Dir");
+            original.setDirector(dir);
+        }
+//        // copy = (Flow) original.clone();
+        copy = (Flow) original.clone(new Workspace());
+
     }
 
     @Override
@@ -57,18 +62,18 @@ public class MomlRule extends ExternalResource {
         if (reader != null) {
             try {
                 reader.close();
-            }
-            catch (final IOException e) {
+            } catch (final IOException e) {
                 fail("cant close file: " + e.getMessage());
             }
         }
     }
 
-    public void executeBlockingErrorLocally(final Map<String, String> props)
-            throws FlowAlreadyExecutingException, PasserelleException {
+    public void executeBlockingErrorLocally(final Map<String, String> props) throws FlowAlreadyExecutingException,
+            PasserelleException {
 
-        // TODO change this to flowMgr.executeBlockingErrorLocally(copy, props);
-        flowMgr.executeBlockingErrorLocally(original, props);
+        // TODO change this to
+        flowMgr.executeBlockingErrorLocally(copy, props);
+
         // TODO uncomment this line
         // reset the copy
         // copy = (Flow) original.clone();
@@ -76,7 +81,8 @@ public class MomlRule extends ExternalResource {
 
     public ComponentEntity getEntity(final String actorName) {
         // change this to copy.getEntity(actorName);
-        return original.getEntity(actorName);
+        //return original.getEntity(actorName);
+        return copy.getEntity(actorName);
     }
 
     /**
@@ -93,7 +99,7 @@ public class MomlRule extends ExternalResource {
             final ArrayBlockingQueue<String> receiver) {
 
         // change this to copy.getEntity(actorName);
-        original.getEntity(actorName).getPort(portName)
-                .addDebugListener(new MessageListener(receiver));
+        //original.getEntity(actorName).getPort(portName).addDebugListener(new MessageListener(receiver));
+        copy.getEntity(actorName).getPort(portName).addDebugListener(new MessageListener(receiver));
     }
 }
