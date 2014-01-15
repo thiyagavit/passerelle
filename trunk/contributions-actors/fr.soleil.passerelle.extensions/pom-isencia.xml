@@ -11,7 +11,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>fr.soleil.passerelle.actor</artifactId>
-	<version>4.7.3-SNAPSHOT</version>
+	<version>4.7.7-SNAPSHOT</version>
 
 	<packaging>eclipse-plugin</packaging>
 	

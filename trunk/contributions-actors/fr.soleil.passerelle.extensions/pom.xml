@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.7.6</version>
+	<version>4.7.7-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -33,7 +33,7 @@
 			</roles>
 			<timezone>1</timezone>
 		</developer>
-		
+
 		<developer>
 			<id>vincentgramer</id>
 			<name>Vincent Gramer</name>
@@ -240,11 +240,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.commons</groupId> -->
-<!-- 			<artifactId>commons-math3</artifactId> -->
-<!-- 			<version>3.2</version>			 -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>commons-math3</artifactId> -->
+		<!-- <version>3.2</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>com.microstar</groupId>
 			<artifactId>xml</artifactId>
