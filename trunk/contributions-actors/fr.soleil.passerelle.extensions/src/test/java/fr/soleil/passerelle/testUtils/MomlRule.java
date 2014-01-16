@@ -52,7 +52,6 @@ public class MomlRule extends ExternalResource {
             final BasicDirector dir = new BasicDirector(original, "Dir");
             original.setDirector(dir);
         }
-//        // copy = (Flow) original.clone();
         copy = (Flow) original.clone(new Workspace());
 
     }
@@ -71,17 +70,11 @@ public class MomlRule extends ExternalResource {
     public void executeBlockingErrorLocally(final Map<String, String> props) throws FlowAlreadyExecutingException,
             PasserelleException {
 
-        // TODO change this to
         flowMgr.executeBlockingErrorLocally(copy, props);
 
-        // TODO uncomment this line
-        // reset the copy
-        // copy = (Flow) original.clone();
     }
 
     public ComponentEntity getEntity(final String actorName) {
-        // change this to copy.getEntity(actorName);
-        //return original.getEntity(actorName);
         return copy.getEntity(actorName);
     }
 
@@ -97,9 +90,6 @@ public class MomlRule extends ExternalResource {
      */
     public void addMessageReceiver(final String actorName, final String portName,
             final ArrayBlockingQueue<String> receiver) {
-
-        // change this to copy.getEntity(actorName);
-        //original.getEntity(actorName).getPort(portName).addDebugListener(new MessageListener(receiver));
         copy.getEntity(actorName).getPort(portName).addDebugListener(new MessageListener(receiver));
     }
 }
