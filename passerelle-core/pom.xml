@@ -31,6 +31,7 @@
 		<module>com.isencia.passerelle.process.actor</module>
 		<module>com.isencia.passerelle.process.common</module>
 		<module>com.isencia.passerelle.process.model.impl</module>
+		<module>com.isencia.passerelle.process.model.impl.test</module>
 		<module>com.isencia.passerelle.process.model</module>
 		<module>com.isencia.passerelle.process.scheduler</module>
 		<module>com.isencia.passerelle.process.service</module>
