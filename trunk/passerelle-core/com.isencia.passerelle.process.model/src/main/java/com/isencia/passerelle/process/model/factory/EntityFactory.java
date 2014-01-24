@@ -5,6 +5,7 @@ package com.isencia.passerelle.process.model.factory;
 
 import java.util.Date;
 import java.util.Set;
+
 import com.isencia.passerelle.core.ErrorCategory;
 import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.process.model.Attribute;
@@ -14,6 +15,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
+import com.isencia.passerelle.process.model.RawResultBlock;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -48,6 +50,8 @@ public interface EntityFactory {
   ResultBlock createResultBlock(Task task, String type, Date date);
 
   ResultBlock createResultBlock(Task task, String type);
+  
+  RawResultBlock createRawResultBlock(Task task, String type);
 
   Attribute createAttribute(AttributeHolder holder, String name, String value);
 

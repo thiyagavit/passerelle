@@ -166,12 +166,12 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Collection<ResultItem<?>> getAllItems() {
-    return Collections.unmodifiableCollection(resultItems.values());
+    return Collections.unmodifiableCollection(getResultItemMap().values());
   }
 
   public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
     Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
-    for (ResultItem<?> item : resultItems.values()) {
+    for (ResultItem<?> item : getResultItemMap().values()) {
       if (matcher.matches(item))
         results.add(item);
     }
@@ -180,11 +180,11 @@ public class ResultBlockImpl implements ResultBlock {
 
   @OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
   public Set<ResultItem> getResultItems() {
-    return new HashSet<ResultItem>(resultItems.values());
+    return new HashSet<ResultItem>(getResultItemMap().values());
   }
 
   public ResultItem<?> getItemForName(String name) {
-    return resultItems.get(name);
+    return getResultItemMap().get(name);
   }
 
   public Task getTask() {
@@ -227,5 +227,14 @@ public class ResultBlockImpl implements ResultBlock {
 
   public void resetItems() {
     resultItems = new HashMap<String, ResultItem<?>>();
+  }
+
+  /**
+   * Allows subclasses to give another view on the actual result items, e.g. to add generated result items.
+   * 
+   * @return
+   */
+  protected Map<String, ResultItem<?>> getResultItemMap() {
+    return resultItems;
   }
 }

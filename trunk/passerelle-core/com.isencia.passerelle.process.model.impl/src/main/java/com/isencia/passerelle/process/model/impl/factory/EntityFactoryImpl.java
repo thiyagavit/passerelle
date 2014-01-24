@@ -5,6 +5,7 @@ package com.isencia.passerelle.process.model.impl.factory;
 
 import java.util.Date;
 import java.util.Set;
+
 import com.isencia.passerelle.core.ErrorCategory;
 import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.process.model.Attribute;
@@ -14,6 +15,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
+import com.isencia.passerelle.process.model.RawResultBlock;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -23,6 +25,7 @@ import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextEventImpl;
 import com.isencia.passerelle.process.model.impl.ErrorItemImpl;
 import com.isencia.passerelle.process.model.impl.MainRequestImpl;
+import com.isencia.passerelle.process.model.impl.RawResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.RequestAttributeImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockAttributeImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
@@ -53,6 +56,10 @@ public class EntityFactoryImpl implements EntityFactory {
   }
   public ResultBlock createResultBlock(Task task, String type,Date date) {
     return new ResultBlockImpl(task, type,date);
+  }
+  
+  public RawResultBlock createRawResultBlock(Task task, String type) {
+    return new RawResultBlockImpl(task, type);
   }
 
   public Attribute createAttribute(AttributeHolder holder, String name, String value) {
