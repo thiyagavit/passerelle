@@ -9,8 +9,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.engine"/>
-	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.core_7.0.1.1.jar"/>
-	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.domains.and.actors_7.0.1.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.core_7.0.1.4.jar"/>
+	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.domains.and.actors_7.0.1.1.jar"/>
 	<classpathentry kind="lib" path="/com.isencia.passerelle.gettingstarted/ptolemy/plugins/ptolemy.gui_7.0.1.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
