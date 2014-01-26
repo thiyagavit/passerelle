@@ -1,7 +1,5 @@
 package com.isencia.passerelle.process.service;
 
-import org.slf4j.Logger;
-
 /**
  * Encapsulates knowledge of the protocol needed to communicate
  * with and external system, e.g. through SOAP, MQUEUEs, etc.
@@ -17,9 +15,4 @@ public interface Adapter extends RequestProcessingService {
    */
   String getServiceName();
   
-  /**
-   * Implementor must provide a Logger
-   */
-  Logger getLogger();
-
 }
