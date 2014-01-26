@@ -103,17 +103,26 @@ public class ResultBlockImpl implements ResultBlock {
 		return resultItems.put(item.getName(), item);
 	}
 
-	public Collection<ResultItem<?>> getAllItems() {
-		return Collections.unmodifiableCollection(resultItems.values());
-	}
+  public Collection<ResultItem<?>> getAllItems() {
+    return Collections.unmodifiableCollection(getResultItemMap().values());
+  }
 
-	public Set<ResultItem> getResultItems() {
-		return new HashSet<ResultItem>(resultItems.values());
-	}
+  public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
+    Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
+    for (ResultItem<?> item : getResultItemMap().values()) {
+      if (matcher.matches(item))
+        results.add(item);
+    }
+    return results;
+  }
 
-	public ResultItem<?> getItemForName(String name) {
-		return resultItems.get(name);
-	}
+  public Set<ResultItem> getResultItems() {
+    return new HashSet<ResultItem>(getResultItemMap().values());
+  }
+
+  public ResultItem<?> getItemForName(String name) {
+    return getResultItemMap().get(name);
+  }
 
 	public Task getTask() {
 		return task;
@@ -150,10 +159,12 @@ public class ResultBlockImpl implements ResultBlock {
 		return new EqualsBuilder().append(this.id, rhs.id).append(this.type, rhs.type).isEquals();
 	}
 
-  public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
-    // TODO Auto-generated method stub
-    return null;
+  /**
+   * Allows subclasses to give another view on the actual result items, e.g. to add generated result items.
+   * 
+   * @return
+   */
+  protected Map<String, ResultItem<?>> getResultItemMap() {
+    return resultItems;
   }
-  
-  
 }
