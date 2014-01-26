@@ -58,6 +58,8 @@ public class ContextImpl implements Context {
 
   private ReentrantLock lock = new ReentrantLock();
 
+  private List<Context> forkedContexts;
+
   public ContextImpl() {
   }
 
@@ -308,6 +310,7 @@ public class ContextImpl implements Context {
 
     } finally {
       lock.unlock();
+      forkedContexts.remove(other);
     }
   }
 
@@ -330,6 +333,7 @@ public class ContextImpl implements Context {
       // what's been added on the copy afterwards.
       copy.pushCurrentTaskCursorIndex();
       copy.pushCurrentEventCursorIndex();
+      forkedContexts.add(copy);
     } finally {
       lock.unlock();
     }
@@ -342,6 +346,10 @@ public class ContextImpl implements Context {
    */
   public boolean isForkedContext() {
     return transientBranch;
+  }
+  
+  public List<Context> getForkedChildContexts() {
+    return Collections.unmodifiableList(forkedContexts);
   }
 
   public List<ErrorItem> getErrors() {
