@@ -1,7 +1,7 @@
 package com.isencia.passerelle.process.service;
 
 import org.apache.commons.lang.StringUtils;
-
+import org.slf4j.Logger;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
@@ -126,4 +126,8 @@ public abstract class AbstractAdapter implements Adapter {
     }
   }
 
+  /**
+   * Implementor must provide a Logger
+   */
+  protected abstract Logger getLogger();
 }
