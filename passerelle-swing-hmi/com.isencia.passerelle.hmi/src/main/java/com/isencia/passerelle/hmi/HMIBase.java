@@ -1224,7 +1224,7 @@ public abstract class HMIBase implements ChangeListener {
         loadedModels.put(mdlURI, currentModelTmp);
         setCurrentModel(currentModelTmp, _modelURL, modelKey, showModelGraph);
       } else {
-        throw new Exception(HMIMessages.getString(HMIMessages.HMI_ERROR_FILE_OPEN_INFO)+" : "+currentModelTmp.getName()+" - "+expectedModelName);
+        throw new Exception(HMIMessages.getString(HMIMessages.HMI_ERROR_FILE_OPEN_INFO) + " : " + currentModelTmp.getName() + " - " + expectedModelName);
       }
     } else {
       refreshParamsForm(mdlURI, modelKey);
@@ -1744,8 +1744,13 @@ public abstract class HMIBase implements ChangeListener {
   }
 
   public String getExpectedModelName(URI modelURI) {
-    File modelFile = new File(modelURI);
-    String modelFileName = modelFile.getName();
-    return modelFileName.substring(0, modelFileName.lastIndexOf('.'));
+    String modelName = modelURI.getPath();
+    modelName = modelName.substring(modelName.lastIndexOf('/') + 1);
+    int extSeparatorIndex = modelName.lastIndexOf('.');
+    if (extSeparatorIndex > 0) {
+      return modelName.substring(0, extSeparatorIndex);
+    } else {
+      return modelName;
+    }
   }
 }
