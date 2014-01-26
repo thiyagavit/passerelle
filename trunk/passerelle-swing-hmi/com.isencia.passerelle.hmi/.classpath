@@ -10,27 +10,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/skinlf-1.2.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-worker-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar" sourcepath="C:/Users/delerw/.m2/repository/org/swinglabs/swingx/1.6/swingx-1.6-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor.examples"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.commons"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.commons.ume"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.domain.et"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.engine"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.hmi.definition"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.actor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.actor.test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.model.mockimpl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.project.repository.api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.project.repository.impl.filesystem"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.testsupport"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.defaulttypeconverterprovider"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
