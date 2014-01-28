@@ -15,4 +15,4 @@ Import-Package: com.isencia.passerelle.actor.dynaport;version="8.5.0",
  com.isencia.passerelle.domain.et;version="8.5.0",
  com.isencia.passerelle.testsupport;version="8.5.0",
  com.isencia.passerelle.testsupport.actor;version="8.5.0",
- org.slf4j;version="1.6.0"
+ org.slf4j;version="1.5.0"
