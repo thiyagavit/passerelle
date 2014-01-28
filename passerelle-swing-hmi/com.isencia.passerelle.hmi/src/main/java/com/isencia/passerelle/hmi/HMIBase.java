@@ -74,9 +74,6 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.gui.binding.ParameterToWidgetBinder;
 import com.isencia.passerelle.actor.gui.graph.ModelGraphPanel;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.diagnosis.actor.util.ServicesRegistry;
-import com.isencia.passerelle.diagnosis.impl.entities.EntityFactory;
-import com.isencia.passerelle.diagnosis.impl.entities.EntityManager;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.ext.ErrorCollector;
@@ -114,7 +111,6 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowHandle;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.util.MoMLParser;
-import com.isencia.passerelle.project.repository.impl.filesystem.FileSystemBasedRepositoryService;
 import com.isencia.passerelle.util.EnvironmentUtils;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -352,9 +348,9 @@ public abstract class HMIBase implements ChangeListener {
           + "\n\tresults dump :" + DIAGNOSIS_ENTITIES_DUMP_PATHNAME + "\n\tDiagnostic processes will not work!");
     }
 //    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath, diagSubmodelReposPath));
-    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
-    ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
-    ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
+//    ServicesRegistry.getInstance().setRepositoryService(new FileSystemBasedRepositoryService(diagAssetReposPath));
+//    ServicesRegistry.getInstance().setDiagnosisEntityFactory(new EntityFactory());
+//    ServicesRegistry.getInstance().setDiagnosisEntityManager(new EntityManager(diagEntitiesDumpPath));
     
 //    ServiceRegistry.getInstance().setEntityFactory(new EntityFactoryImpl());
 //    EntityManagerImpl entityManager = new EntityManagerImpl();

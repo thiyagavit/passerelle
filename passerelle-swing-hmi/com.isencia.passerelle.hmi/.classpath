@@ -16,21 +16,5 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.actor.examples"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.commons"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.commons.ume"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.domain.et"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.engine"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.hmi.definition"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.actor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.actor.test"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.process.model.mockimpl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.project.repository.api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.project.repository.impl.filesystem"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.testsupport"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.isencia.passerelle.defaulttypeconverterprovider"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
