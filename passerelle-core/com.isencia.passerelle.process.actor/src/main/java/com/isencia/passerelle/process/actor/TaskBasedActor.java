@@ -527,7 +527,7 @@ public abstract class TaskBasedActor extends Actor {
         Task task = (Task) event.getContext().getRequest();
         Request parentrequest = task.getParentContext().getRequest();
         final String errorMsg = "Timeout invoking task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
-        ProcessingException exception = new ProcessingException(ErrorCode.TASK_TIMEOUT, errorMsg, TaskBasedActor.this, null);
+        ProcessingException exception = new ProcessingException(ErrorCode.TASK_TIMEOUT, errorMsg, TaskBasedActor.this, message, null);
         try {
           refreshTaskInContext(task, message);
 
