@@ -12,6 +12,12 @@
    <extension
          point="com.isencia.passerelle.engine.actors">
       <actor
+            class="com.isencia.passerelle.actor.examples.TextSource"
+            group="com.isencia.passerelle.actor.examples.actorgroup"
+            id="com.isencia.passerelle.actor.examples.TextSource"
+            name="TextSource">
+      </actor>
+      <actor
             class="com.isencia.passerelle.actor.examples.MultiInputsTracerConsole"
             group="com.isencia.passerelle.actor.examples.actorgroup"
             id="com.isencia.passerelle.actor.examples.MultiInputsTracerConsole"
