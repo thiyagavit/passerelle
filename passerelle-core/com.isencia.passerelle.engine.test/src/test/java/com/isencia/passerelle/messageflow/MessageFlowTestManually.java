@@ -33,7 +33,7 @@ import com.isencia.passerelle.testsupport.utils.CollectingLog4JAppender;
 import com.isencia.passerelle.testsupport.utils.ExecutionErrorCatcher;
 import com.isencia.passerelle.testsupport.utils.ExecutionErrorCounter;
 
-public class MessageFlowTest extends TestCase {
+public class MessageFlowTestManually extends TestCase {
 
   private FlowManager flowMgr;
 
