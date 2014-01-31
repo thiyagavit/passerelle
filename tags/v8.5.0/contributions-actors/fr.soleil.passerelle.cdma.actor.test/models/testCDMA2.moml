@@ -1,0 +1,127 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="testCDMA2" class="com.isencia.passerelle.model.Flow">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Passerelle Std" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{55, 55}">
+        </property>
+    </property>
+    <entity name="CDMADataSetReader" class="fr.soleil.passerelle.cdma.actor.CDMADataSetReader">
+        <property name="DataSet URI" class="ptolemy.data.expr.StringParameter" value="C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/FlyscanSwing_2011-04-11_15-44-11.nxs">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[95.0, 170.0]">
+        </property>
+    </entity>
+    <entity name="CDMADataSetSlicer" class="fr.soleil.passerelle.cdma.actor.CDMADataSetSlicer">
+        <property name="Slice rank" class="ptolemy.data.expr.Parameter" value="2">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[480.0, 180.0]">
+        </property>
+    </entity>
+    <entity name="Constant" class="com.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="done slicing">
+        </property>
+        <property name="_version" class="ptolemy.kernel.attributes.VersionAttribute" value="8.1.0">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[650.0, 180.0]">
+        </property>
+    </entity>
+    <entity name="Tracer Console_2" class="com.isencia.passerelle.actor.general.TracerConsole">
+        <property name="_version" class="ptolemy.kernel.attributes.VersionAttribute" value="8.1.0">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[800.0, 190.0]">
+        </property>
+    </entity>
+    <entity name="CDMADataItemSelector" class="fr.soleil.passerelle.cdma.actor.CDMADataItemSelector">
+        <property name="Item name" class="ptolemy.data.expr.StringParameter" value="scan:data:images">
+        </property>
+        <property name="Logical selection mode" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[275.0, 180.0]">
+        </property>
+    </entity>
+    <entity name="Dumper after change" class="fr.soleil.passerelle.cdma.actor.CDMAArrayValueDumper">
+        <property name="Chop output at #values" class="ptolemy.data.expr.Parameter" value="100">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[530.0, 305.0]">
+        </property>
+    </entity>
+    <relation name="relation_5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_6" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_10" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="CDMADataSetReader.output" relation="relation_10"/>
+    <link port="CDMADataSetSlicer.input" relation="relation_3"/>
+    <link port="CDMADataSetSlicer.next" relation="relation_2"/>
+    <link port="CDMADataSetSlicer.end" relation="relation_5"/>
+    <link port="CDMADataSetSlicer.output" relation="relation"/>
+    <link port="Constant.output" relation="relation_6"/>
+    <link port="Constant.trigger" relation="relation_5"/>
+    <link port="Tracer Console_2.input" relation="relation_6"/>
+    <link port="CDMADataItemSelector.input" relation="relation_10"/>
+    <link port="CDMADataItemSelector.output" relation="relation_3"/>
+    <link port="Dumper after change.input" relation="relation"/>
+    <link port="Dumper after change.output" relation="relation_2"/>
+</entity>
