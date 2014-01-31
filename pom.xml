@@ -9,7 +9,7 @@
 
 	<groupId>com.isencia.passerelle</groupId>
 	<artifactId>parent</artifactId>
-	<version>8.5.0</version>
+	<version>8.5.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Passerelle :: Parent</name>
