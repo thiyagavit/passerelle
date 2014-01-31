@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Engine Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.engine;singleton:=true
-Bundle-Version: 8.5.0.qualifier
+Bundle-Version: 8.5.0
 Bundle-Activator: com.isencia.passerelle.engine.activator.Activator
 Bundle-Vendor: ISENCIA
 Eclipse-BuddyPolicy: registered
