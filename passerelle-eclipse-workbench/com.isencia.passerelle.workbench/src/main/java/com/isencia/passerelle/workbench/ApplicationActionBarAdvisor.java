@@ -1,6 +1,5 @@
 package com.isencia.passerelle.workbench;
 
-import java.util.HashSet;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -20,15 +19,14 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
-import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
-import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.WorkbenchPlugin;
+//import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
+//import org.eclipse.ui.internal.WorkbenchMessages;
+//import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.actions.CommandAction;
-import org.eclipse.ui.internal.registry.ActionSetRegistry;
-import org.eclipse.ui.internal.registry.IActionSetDescriptor;
-import org.eclipse.ui.internal.registry.ViewDescriptor;
-import org.eclipse.ui.internal.registry.ViewRegistry;
-import org.eclipse.ui.views.IViewDescriptor;
+//import org.eclipse.ui.internal.registry.ActionSetRegistry;
+//import org.eclipse.ui.internal.registry.IActionSetDescriptor;
+//import org.eclipse.ui.internal.registry.ViewDescriptor;
+//import org.eclipse.ui.internal.registry.ViewRegistry;
 
 /**
  * An action bar advisor is responsible for creating, adding, and disposing of
@@ -189,46 +187,46 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		aboutAction = ActionFactory.ABOUT.create(window);
 		register(aboutAction);
 
-		// Remove unwanted actions
-		ActionSetRegistry reg = WorkbenchPlugin.getDefault()
-				.getActionSetRegistry();
-		IActionSetDescriptor actionSets[] = reg.getActionSets();
-		HashSet<String> actionsToBeRemoved = new HashSet<String>();
-		actionsToBeRemoved
-				.add("org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo");
-		actionsToBeRemoved
-				.add("org.eclipse.ui.edit.text.actionSet.openExternalFile");
-
-		actionsToBeRemoved.add("org.eclipse.ui.actionSet.openFiles");
-		for (int i = 0; i < actionSets.length; i++) {
-			if (actionsToBeRemoved.contains(actionSets[i].getId())) {
-				org.eclipse.core.runtime.IExtension ext = actionSets[i]
-						.getConfigurationElement().getDeclaringExtension();
-				reg.removeExtension(ext, new Object[] { actionSets[i] });
-			}
-		}
-
-		// Remove unwanted views
-		HashSet<String> viewsToBeRemoved = new HashSet<String>();
-		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
-		viewsToBeRemoved.add("org.eclipse.ui.views.ProblemView");
-		viewsToBeRemoved.add("org.eclipse.ui.views.BookmarkView");
-		viewsToBeRemoved.add("org.eclipse.ui.views.ProgressView");
-		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
-
-		ViewRegistry viewReg = (ViewRegistry) WorkbenchPlugin.getDefault()
-				.getViewRegistry();
-		IViewDescriptor viewDescriptors[] = viewReg.getViews();
-		for (int i = 0; i < viewDescriptors.length; i++) {
-			if (viewsToBeRemoved.contains(viewDescriptors[i].getId())
-					&& (viewDescriptors[i] instanceof ViewDescriptor)) {
-				ViewDescriptor descriptor = (ViewDescriptor) viewDescriptors[i];
-				org.eclipse.core.runtime.IExtension ext = descriptor
-						.getConfigurationElement().getDeclaringExtension();
-				viewReg.removeExtension(ext,
-						new Object[] { viewDescriptors[i] });
-			}
-		}
+//		// Remove unwanted actions
+//		ActionSetRegistry reg = WorkbenchPlugin.getDefault()
+//				.getActionSetRegistry();
+//		IActionSetDescriptor actionSets[] = reg.getActionSets();
+//		HashSet<String> actionsToBeRemoved = new HashSet<String>();
+//		actionsToBeRemoved
+//				.add("org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo");
+//		actionsToBeRemoved
+//				.add("org.eclipse.ui.edit.text.actionSet.openExternalFile");
+//
+//		actionsToBeRemoved.add("org.eclipse.ui.actionSet.openFiles");
+//		for (int i = 0; i < actionSets.length; i++) {
+//			if (actionsToBeRemoved.contains(actionSets[i].getId())) {
+//				org.eclipse.core.runtime.IExtension ext = actionSets[i]
+//						.getConfigurationElement().getDeclaringExtension();
+//				reg.removeExtension(ext, new Object[] { actionSets[i] });
+//			}
+//		}
+//
+//		// Remove unwanted views
+//		HashSet<String> viewsToBeRemoved = new HashSet<String>();
+//		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
+//		viewsToBeRemoved.add("org.eclipse.ui.views.ProblemView");
+//		viewsToBeRemoved.add("org.eclipse.ui.views.BookmarkView");
+//		viewsToBeRemoved.add("org.eclipse.ui.views.ProgressView");
+//		viewsToBeRemoved.add("org.eclipse.ui.views.TaskList");
+//
+//		ViewRegistry viewReg = (ViewRegistry) WorkbenchPlugin.getDefault()
+//				.getViewRegistry();
+//		IViewDescriptor viewDescriptors[] = viewReg.getViews();
+//		for (int i = 0; i < viewDescriptors.length; i++) {
+//			if (viewsToBeRemoved.contains(viewDescriptors[i].getId())
+//					&& (viewDescriptors[i] instanceof ViewDescriptor)) {
+//				ViewDescriptor descriptor = (ViewDescriptor) viewDescriptors[i];
+//				org.eclipse.core.runtime.IExtension ext = descriptor
+//						.getConfigurationElement().getDeclaringExtension();
+//				viewReg.removeExtension(ext,
+//						new Object[] { viewDescriptors[i] });
+//			}
+//		}
 
 	}
 
