@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Default TypeConverterProvider Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.defaulttypeconverterprovider
-Bundle-Version: 8.5.0
+Bundle-Version: 8.5.1.qualifier
 Bundle-Activator: com.isencia.passerelle.defaulttypeconverterprovider.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
