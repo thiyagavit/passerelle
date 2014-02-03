@@ -110,6 +110,7 @@
 			<artifactId>com.isencia.sherpa.commons.reduced</artifactId>
 			<version>6.2.5</version>
 			<classifier>isencia-bundle</classifier>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Thirdparty dependencies -->
