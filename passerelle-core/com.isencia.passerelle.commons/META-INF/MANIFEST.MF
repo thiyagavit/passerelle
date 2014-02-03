@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Commons Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.commons
-Bundle-Version: 8.6.0.qualifier
+Bundle-Version: 8.6.0
 Bundle-Vendor: iSencia
 Import-Package: org.jdom;version="1.0.0",
  org.jdom.input;version="1.0.0",
