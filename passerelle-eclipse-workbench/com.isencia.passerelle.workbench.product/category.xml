@@ -3,10 +3,10 @@
    <feature url="features/ptolemy.feature_7.0.1.jar" id="ptolemy.feature" version="7.0.1">
       <category name="passerelle_category"/>
    </feature>
-   <feature url="features/com.isencia.passerelle.core.feature_8.5.0.jar" id="com.isencia.passerelle.core.feature" version="8.5.0">
+   <feature url="features/com.isencia.passerelle.core.feature_8.5.1.jar" id="com.isencia.passerelle.core.feature" version="8.5.1">
       <category name="passerelle_category"/>
    </feature>
-   <feature url="features/com.isencia.passerelle.workbench.feature_8.5.0.jar" id="com.isencia.passerelle.workbench.feature" version="8.5.0">
+   <feature url="features/com.isencia.passerelle.workbench.feature_8.5.1.jar" id="com.isencia.passerelle.workbench.feature" version="8.5.1">
       <category name="passerelle_category"/>
    </feature>
    <category-def name="passerelle_category" label="Passerelle"/>
