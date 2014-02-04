@@ -16,6 +16,7 @@ import com.isencia.passerelle.testsupport.actor.MapModifier;
 import com.isencia.passerelle.testsupport.actor.MapSource;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
 import com.isencia.passerelle.testsupport.actor.MockWorker;
+import com.isencia.passerelle.testsupport.actor.MultiBlockingInputActor;
 import com.isencia.passerelle.testsupport.actor.RandomMatrixSource;
 import com.isencia.passerelle.testsupport.actor.TextSource;
 
@@ -47,6 +48,7 @@ public class Activator implements BundleActivator {
             MapModifier.class,
             MapSource.class,
             MessageHistoryStack.class,
+            MultiBlockingInputActor.class,
             RandomMatrixSource.class,
             TextSource.class
             ),
