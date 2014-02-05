@@ -1,4 +1,4 @@
-/* Copyright 2011 - iSencia Belgium NV
+/* Copyright 2014 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -244,10 +244,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   @Override
   protected boolean doPreFire() throws ProcessingException {
     getLogger().trace("{} - doPreFire() - entry", getFullName());
-
     boolean readyToFire = super.doPreFire();
-
-    if (!isSource) {
+    if (readyToFire && !isSource) {
       // first read from all blocking inputs
       for (int i = 0; i < blockingInputHandlers.size(); i++) {
         PortHandler handler = blockingInputHandlers.get(i);
@@ -290,7 +288,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           }
         }
       }
-      if (!pushedMessages.isEmpty() || (readyToFire && !msgProviders.isEmpty())) {
+      if (readyToFire && (!pushedMessages.isEmpty() || !msgProviders.isEmpty())) {
         try {
           // TODO check if it's not nicer to maintain buffer time from 1st preFire() call
           // to when readyToFire, i.o. adding it after the time we've already been waiting
@@ -307,8 +305,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         // so we need to include all pushed msgs in the request as well
         addPushedMessages(currentProcessRequest);
       }
-      readyToFire = currentProcessRequest.hasSomethingToProcess();
-
+      readyToFire = readyToFire && currentProcessRequest.hasSomethingToProcess();
       // when all ports are exhausted, we can stop this actor
       if (!readyToFire && !getDirectorAdapter().isActorBusy(this) && areAllInputsFinished() && !hasPushedMessages()) {
         requestFinish();
