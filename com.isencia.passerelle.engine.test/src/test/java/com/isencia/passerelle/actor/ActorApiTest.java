@@ -16,7 +16,9 @@ package com.isencia.passerelle.actor;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import junit.framework.TestCase;
+
 import com.isencia.passerelle.domain.cap.Director;
 import com.isencia.passerelle.ext.DirectorAdapter;
 import com.isencia.passerelle.model.Flow;
@@ -25,33 +27,9 @@ import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.Const;
 import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;
+import com.isencia.passerelle.testsupport.actor.MultiBlockingInputActor;
 
 public class ActorApiTest extends TestCase {
-  /**
-   * A unit test for a plain HelloPasserelle model.
-   * 
-   * @throws Exception
-   */
-  public void testHelloPasserelle() throws Exception {
-    Flow flow = new Flow("testHelloPasserelle",null);
-    FlowManager flowMgr = new FlowManager();
-    flow.setDirector(new Director(flow,"director"));
-    
-    Const source = new Const(flow,"Constant");
-    DevNullActor sink = new DevNullActor(flow, "sink");
-    
-    flow.connect(source, sink);
-    
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("Constant.value", "Hello world");
-    flowMgr.executeBlockingLocally(flow,props);
-    
-    new FlowStatisticsAssertion()
-    .expectMsgSentCount(source, 1L)
-    .expectMsgReceiptCount(sink, 1L)
-    .assertFlow(flow);
-  }
-  
   public void testFlowWithValidationErrorAndValidation() throws Exception {
     Flow flow = new Flow("testFlowWithValidationErrorAndValidation",null);
     FlowManager flowMgr = new FlowManager();
@@ -185,4 +163,62 @@ public class ActorApiTest extends TestCase {
     .assertFlow(flow);
   }
   
+  /**
+   * A unit test for an actor with multiple blocking inputs
+   * 
+   * @throws Exception
+   */
+  public void testMultiBlockingInputs() throws Exception {
+    Flow flow = new Flow("testMultiBlockingInputs",null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new Director(flow,"director"));
+    
+    Const source1 = new Const(flow,"Constant1");
+    Const source2 = new Const(flow,"Constant2");
+    Delay delay = new Delay(flow, "delay");
+    MultiBlockingInputActor trf = new MultiBlockingInputActor(flow, "trf");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    
+    flow.connect(source1.output, trf.input1);
+    flow.connect(source2.output, delay.input);
+    flow.connect(delay.output, trf.input2);
+    flow.connect(trf, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant1.value", "Hello world");
+    props.put("Constant2.value", "Goodbye world");
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source1, 1L)
+    .expectMsgSentCount(source2, 1L)
+    .expectActorIterationCount(trf, 1L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
+  
+  /**
+   * A unit test for a plain HelloPasserelle model.
+   * 
+   * @throws Exception
+   */
+  public void testHelloPasserelle() throws Exception {
+    Flow flow = new Flow("testHelloPasserelle",null);
+    FlowManager flowMgr = new FlowManager();
+    flow.setDirector(new Director(flow,"director"));
+    
+    Const source = new Const(flow,"Constant");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    
+    flow.connect(source, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant.value", "Hello world");
+    flowMgr.executeBlockingLocally(flow,props);
+    
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source, 1L)
+    .expectMsgReceiptCount(sink, 1L)
+    .assertFlow(flow);
+  }
 }
