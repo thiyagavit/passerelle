@@ -18,7 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -151,7 +153,7 @@ public class FlowProcessingTest1 extends TestCase {
     // this is a bit risky, as we can not strictly be certain that the process was indeed terminated/canceled before its start...
     // assertTrue("Process should have terminated", procHandle2.getExecutionStatus().isFinalStatus());
     // then we just let it die
-    Thread.sleep(200);
+    Thread.sleep(500);
     ProcessHandle procHandle3 = processingService.refresh(procHandle2);
     assertTrue("Process should have terminated", procHandle3.getExecutionStatus().isFinalStatus());
   }
@@ -178,6 +180,20 @@ public class FlowProcessingTest1 extends TestCase {
     long endTime = new Date().getTime();
     assertTrue("Process should have terminated", procHandle.getExecutionStatus().isFinalStatus());
     assertTrue("Process should last for at least 100ms", (endTime - startTime) > 100);
+  }
+
+  public final void testWaitUntilFinishedMultiRunsSameFlow() throws Exception {
+    FlowHandle flowHandle = repositoryService.commit("testWaitUntilFinishedMultiRunsSameFlow", buildDelay100msFlow("testWaitUntilFinishedMultiRunsSameFlow"));
+    Set<ProcessHandle> handles = new HashSet<ProcessHandle>();
+    for(int i=0;i<5;++i) {
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("const.value", "msg"+i);
+      handles.add(processingService.start(StartMode.RUN, flowHandle, null, params, null));
+    }
+    for (ProcessHandle procHandle : handles) {
+      procHandle = processingService.waitUntilFinished(procHandle, 5, TimeUnit.SECONDS);
+      assertTrue("Process should have terminated", procHandle.getExecutionStatus().isFinalStatus());
+    }
   }
 
   public final void testWaitForTerminatedProcess() throws Exception {
