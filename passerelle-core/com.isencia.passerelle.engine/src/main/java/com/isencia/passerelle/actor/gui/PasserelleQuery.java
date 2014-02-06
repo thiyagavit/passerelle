@@ -291,9 +291,14 @@ public class PasserelleQuery extends ptolemy.actor.gui.PtolemyQuery implements I
 							}
 						}
 					}
-					if (directory != null) {
-						base = directory.toURI();
-					}
+					// erwin : ptolemy transforms a file path to a relative path
+					// when base is set. But this conflicts with keeping track of the 
+					// previously set path as initial lookup location.
+					// In Passerelle there's no real use case for relative paths,
+					// so we can ignore base.
+//					if (directory != null) {
+//						base = directory.toURI();
+//					}
 					if (attribute instanceof com.isencia.passerelle.util.ptolemy.FileParameter) {
 						// this is a Passerelle extension that is able to maintain a FileFilter
 						com.isencia.passerelle.util.ptolemy.FileParameter passerelleFileParameter = (com.isencia.passerelle.util.ptolemy.FileParameter) attribute;
