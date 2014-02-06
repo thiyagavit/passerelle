@@ -33,6 +33,7 @@ import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.Entity;
 import ptolemy.kernel.Port;
 import ptolemy.kernel.util.IllegalActionException;
+import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Manager;
 import com.isencia.passerelle.core.PasserelleException;
@@ -104,13 +105,13 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
   public ProcessStatus call() throws Exception {
     LOGGER.trace("call() - Context {} - Flow {}", processContextId, flowHandle.getCode());
     try {
-      applyParameterSettings(flowHandle, parameterOverrides);
       boolean debug = false;
-      if (StartMode.DEBUG.equals(mode)) {
-        debug = setBreakpoints(flowHandle, breakpointNames);
-      }
       synchronized (this) {
-        Flow flow = flowHandle.getFlow();
+        Flow flow = (Flow) flowHandle.getFlow().clone(new Workspace());
+        applyParameterSettings(flowHandle, flow, parameterOverrides);
+        if (StartMode.DEBUG.equals(mode)) {
+          debug = setBreakpoints(flowHandle, flow, breakpointNames);
+        }
         manager = new Manager(flow.workspace(), processContextId);
         manager.addExecutionListener(this);
         flow.setManager(manager);
@@ -275,8 +276,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     }
   }
 
-  protected void applyParameterSettings(FlowHandle flowHandle, Map<String, String> props) throws PasserelleException {
-    Flow flow = flowHandle.getFlow();
+  protected void applyParameterSettings(FlowHandle flowHandle, Flow flow, Map<String, String> props) throws PasserelleException {
     if (props != null) {
       Iterator<Entry<String, String>> propsItr = props.entrySet().iterator();
       while (propsItr.hasNext()) {
@@ -340,8 +340,7 @@ public class FlowExecutionTask implements CancellableTask<ProcessStatus>, Execut
     }
   }
 
-  protected boolean setBreakpoints(FlowHandle flowHandle, Set<String> breakpointNames) {
-    Flow flow = flowHandle.getFlow();
+  protected boolean setBreakpoints(FlowHandle flowHandle, Flow flow, Set<String> breakpointNames) {
     boolean breakpointsDefined = false;
     if (breakpointNames != null) {
       for (String breakpointName : breakpointNames) {
