@@ -36,6 +36,7 @@ import com.isencia.message.io.FileSenderChannel;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
+import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
@@ -116,6 +117,29 @@ public class FileWriter2 extends Actor {
   }
 
   // actor life-cycle methods
+  @Override
+  protected void validateInitialization() throws ValidationException {
+    super.validateInitialization();
+    try {
+      File file = new File(getDestinationPath(), getDestinationFileName());
+      if(!file.exists()) {
+        // need to check somehow if the file can be correctly created and written
+        boolean writeable = false;
+        try {
+          writeable = file.setWritable(true);
+        } catch(Exception e) {
+          // ignore
+        }
+        if(!writeable) {
+          throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, file + " can not be written to", this, null);
+        }
+      } else if (!file.isFile() || !file.canWrite()) {
+        throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Invalid file specification "+file, this, null);
+      }
+    } catch (IllegalActionException e) {
+      throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error obtaining file specification", this, e);
+    }
+  }
 
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
