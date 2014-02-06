@@ -2,7 +2,7 @@
  * (c) Copyright 2004, iSencia Belgium NV
  * All Rights Reserved.
  * 
- * This software is the proprietary information of iSencia Belgium NV.  
+ * This software is the proprietary information of iSencia Belgium NV.
  * Use is subject to license terms.
  */
 package com.isencia.passerelle.hmi.state;
@@ -22,8 +22,8 @@ import java.util.Set;
 public class State {
 
   private String name;
-  private Set allowedActions;
-  private static Map states = new HashMap();
+  private Set<String> allowedActions;
+  private static Map<String, State> states = new HashMap<String, State>();
 
   /**
    * @param name
@@ -40,12 +40,13 @@ public class State {
    * @param name
    * @param allowedActions
    */
-  State(String name, Set allowedActions) {
+  State(String name, Set<String> allowedActions) {
     this.name = name;
-    if (allowedActions != null)
-      this.allowedActions = new HashSet(allowedActions);
-    else
-      this.allowedActions = new HashSet();
+    if (allowedActions != null) {
+      this.allowedActions = new HashSet<String>(allowedActions);
+    } else {
+      this.allowedActions = new HashSet<String>();
+    }
     states.put(name, this);
   }
 
@@ -66,7 +67,7 @@ public class State {
   }
 
   public static State getState(String name) {
-    return (State) states.get(name);
+    return states.get(name);
   }
 
   public String toString() {
