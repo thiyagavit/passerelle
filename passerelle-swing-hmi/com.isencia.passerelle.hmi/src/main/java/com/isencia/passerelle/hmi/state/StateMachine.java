@@ -12,8 +12,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import javax.swing.Action;
 
 /**
@@ -35,6 +36,9 @@ public class StateMachine {
   public final static State EXITING = new State("EXITING");
 
   private State currentState;
+
+  private StateMachine() { // Only singleton Allowed
+  }
 
   public static StateMachine getInstance() {
     return instance;
@@ -74,13 +78,13 @@ public class StateMachine {
    * Step 2: compile the state machine
    */
   public void compile() {
-    final Iterator stateItr = allActionsPerState.entrySet().iterator();
+    final Iterator<Entry<State, Set<ActionEnabler>>> stateItr = allActionsPerState.entrySet().iterator();
     while (stateItr.hasNext()) {
-      final Entry entry = (Entry) stateItr.next();
-      final State state = (State) entry.getKey();
-      final Set actions = (Set) entry.getValue();
-      for (final Iterator actionItr = actions.iterator(); actionItr.hasNext();) {
-        final ActionEnabler acb = (ActionEnabler) actionItr.next();
+      final Entry<State, Set<ActionEnabler>> entry = stateItr.next();
+      final State state = entry.getKey();
+      final Set<ActionEnabler> actions = entry.getValue();
+      for (ActionEnabler element : actions) {
+        final ActionEnabler acb = element;
         state.addAllowedAction(acb.getActionName());
       }
     }
@@ -94,9 +98,9 @@ public class StateMachine {
    */
   public synchronized void transitionTo(final State newState) {
     currentState = newState;
-    final Iterator actionItr = allActions.iterator();
+    final Iterator<ActionEnabler> actionItr = allActions.iterator();
     while (actionItr.hasNext()) {
-      final ActionEnabler acb = (ActionEnabler) actionItr.next();
+      final ActionEnabler acb = actionItr.next();
       acb.setEnabled(newState.isAllowed(acb.getActionName()));
     }
   }
