@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle ProcessContext API
 Bundle-SymbolicName: com.isencia.passerelle.process.model
-Bundle-Version: 8.6.1
+Bundle-Version: 8.6.2.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.isencia.passerelle.process.model;version="8.6.0",

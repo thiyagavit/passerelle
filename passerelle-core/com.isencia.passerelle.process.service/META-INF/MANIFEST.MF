@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle processing services bundle
 Bundle-SymbolicName: com.isencia.passerelle.process.service
-Bundle-Version: 8.6.1
+Bundle-Version: 8.6.2.qualifier
 Bundle-Activator: com.isencia.passerelle.process.service.activator.Activator
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
