@@ -2,6 +2,7 @@ package com.isencia.passerelle.process.actor;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -127,32 +129,37 @@ public abstract class TaskBasedActor extends Actor {
         } else {
           throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
         }
-        if (mustProcess(message)) {
-          String requestId = Long.toString(processContext.getRequest().getId());
-          String referenceId = Long.toString(processContext.getRequest().getCase().getId());
+        if (!doRestart(message, response)) {
+          if (mustProcess(message)) {
+            String requestId = Long.toString(processContext.getRequest().getId());
+            String referenceId = Long.toString(processContext.getRequest().getCase().getId());
 
-          Map<String, String> taskAttributes = new HashMap<String, String>();
-          taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
-          taskAttributes.put(AttributeNames.REF_ID, referenceId);
-          taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
-          // allow subclasses to add their own attributes, mostly based on data in the received processContext
-          addActorSpecificTaskAttributes(processContext, taskAttributes);
+            Map<String, String> taskAttributes = new HashMap<String, String>();
+            taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
+            taskAttributes.put(AttributeNames.REF_ID, referenceId);
+            taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
+            // allow subclasses to add their own attributes, mostly based on data in the received processContext
+            addActorSpecificTaskAttributes(processContext, taskAttributes);
 
-          // allow subclasses to add task context entries
-          Map<String, Serializable> taskContextEntries = new HashMap<String, Serializable>();
-          addActorSpecificTaskContextEntries(processContext, taskContextEntries);
+            // allow subclasses to add task context entries
+            Map<String, Serializable> taskContextEntries = new HashMap<String, Serializable>();
+            addActorSpecificTaskContextEntries(processContext, taskContextEntries);
 
-          taskContext = createTask(processContext, taskAttributes, taskContextEntries);
-          // Remark that we don't return a changed taskContext or so
-          // any changes (e.g. new events,results,status,... should be done in the passed taskContext instance, if
-          // needed
-          // for this actor it's not relevant as it doesn't work with the context in the remainder of this method.
-          // any following processing is done in the TaskContextListener.
-          // But we need to check if this works OK with the strange JPA/eclipselink behaviour in some configurations
-          process(taskContext);
-          postProcess(message, taskContext, response);
+            taskContext = createTask(processContext, taskAttributes, taskContextEntries);
+            // Remark that we don't return a changed taskContext or so
+            // any changes (e.g. new events,results,status,... should be done in the passed taskContext instance, if
+            // needed
+            // for this actor it's not relevant as it doesn't work with the context in the remainder of this method.
+            // any following processing is done in the TaskContextListener.
+            // But we need to check if this works OK with the strange JPA/eclipselink behaviour in some configurations
+            process(taskContext);
+            postProcess(message, taskContext, response);
+          } else {
+            response.addOutputMessage(output, message);
+            processFinished(ctxt, request, response);
+          }
         } else {
-          response.addOutputMessage(output, message);
+         
           processFinished(ctxt, request, response);
         }
       } catch (PasserelleException ex) {
@@ -214,6 +221,37 @@ public abstract class TaskBasedActor extends Actor {
    */
   protected boolean mustProcess(ManagedMessage message) {
     return true;
+  }
+
+  protected boolean doRestart(ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
+    Context flowContext = (Context) message.getBodyContent();
+
+    if (Status.RESTARTED.equals(flowContext.getStatus())) {
+      for (int taskIdx = flowContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
+        Task task = flowContext.getTasks().get(taskIdx);
+        try {
+          URI uri = new URI(task.getInitiator());
+          if (FlowUtils.getOriginalFullName(this).substring(1).equals(uri.getPath().substring(1))) {
+            if (task.getProcessingContext().isFinished()) {
+              beforeRestart(task, flowContext);
+              onTaskFinished(task, message, response);
+              return true;
+            }
+            if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
+              ServiceRegistry.getInstance().getContextManager().notifyStarted(flowContext);
+              break;
+            }
+          }
+        } catch (URISyntaxException e) {
+          continue;
+        }
+
+      }
+    }
+    return false;
+  }
+
+  protected void beforeRestart(Task task, Context flowContext) {
   }
 
   /**
