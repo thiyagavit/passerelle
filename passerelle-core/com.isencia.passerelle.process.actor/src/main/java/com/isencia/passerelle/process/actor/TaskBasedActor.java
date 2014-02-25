@@ -77,14 +77,9 @@ public abstract class TaskBasedActor extends Actor {
   public final void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage message = request.getMessage(input);
     if (message != null) {
-      Context processContext = null;
+      Context processContext = getRequiredContextForMessage(message);
       Context taskContext = null;
       try {
-        if (message.getBodyContent() instanceof Context) {
-          processContext = (Context) message.getBodyContent();
-        } else {
-          throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
-        }
         if (mustProcess(message)) {
           String requestId = Long.toString(processContext.getRequest().getId());
           String referenceId = Long.toString(processContext.getRequest().getCase().getId());
@@ -133,8 +128,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Override this in specific cases where default postProcessing is not OK. Default is to register a TaskContextListener that will send the processing Context
-   * onwards when the Task is done.
+   * Override this in specific cases where default postProcessing is not OK. Default is to register a
+   * TaskContextListener that will send the processing Context onwards when the Task is done.
    * 
    * @param message
    * @param taskContext
@@ -148,8 +143,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Should perform the actual processing of the task. For most simple/fast cases, this can be done in a synchronous fashion. For complex/long-running
-   * processing, the usage of a ServiceBasedActor is advisable.
+   * Should perform the actual processing of the task. For most simple/fast cases, this can be done in a synchronous
+   * fashion. For complex/long-running processing, the usage of a ServiceBasedActor is advisable.
    * 
    * @param taskContext
    *          the context of the new task that must be processed
@@ -188,7 +183,8 @@ public abstract class TaskBasedActor extends Actor {
 
   /**
    * @param parentContext
-   * @return the java class of the Task implementation entity. Default is com.isencia.passerelle.process.model.impl.TaskImpl.
+   * @return the java class of the Task implementation entity. Default is
+   *         com.isencia.passerelle.process.model.impl.TaskImpl.
    */
   protected Class<? extends Task> getTaskClass(Context parentContext) {
     return ServiceRegistry.getInstance().getContextManager().getDefaultTaskClass();
@@ -212,8 +208,9 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Method to configure the attributes for the task that the actor wants to get executed. The actor implementation should add entries in the taskAttributes map
-   * as needed for its type of task. Attribute data is typically obtained either from the received processContext and/or from the actor's parameters.
+   * Method to configure the attributes for the task that the actor wants to get executed. The actor implementation
+   * should add entries in the taskAttributes map as needed for its type of task. Attribute data is typically obtained
+   * either from the received processContext and/or from the actor's parameters.
    * 
    * @param processContext
    * @param taskAttributes
@@ -228,8 +225,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Method to allow actor implementations to pass specific context entries into the task that will be created and executed. Similar to
-   * <code>addActorSpecificTaskAttributes</code> but :
+   * Method to allow actor implementations to pass specific context entries into the task that will be created and
+   * executed. Similar to <code>addActorSpecificTaskAttributes</code> but :
    * <ul>
    * <li>context entries can contain any serializable object i.o. just strings</li>
    * <li>context entries are typically not persisted, but only valid in memory during the process execution!</li>
@@ -258,7 +255,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Stores the value of the context item with the given itemName, or the defaultValue, in the given map, iff a non-null value is found.
+   * Stores the value of the context item with the given itemName, or the defaultValue, in the given map, iff a non-null
+   * value is found.
    * 
    * @param map
    * @param context
@@ -273,8 +271,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Stores the value of the context item with the given lookupItemName, or the defaultValue, in the given map, with as name attrName, iff a non-null value is
-   * found.
+   * Stores the value of the context item with the given lookupItemName, or the defaultValue, in the given map, with as
+   * name attrName, iff a non-null value is found.
    * 
    * @param map
    * @param context
@@ -292,10 +290,11 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Retrieves the value of a context item with the given itemName. If this is not found, it uses the value of the actorParameter as default value.
+   * Retrieves the value of a context item with the given itemName. If this is not found, it uses the value of the
+   * actorParameter as default value.
    * <p>
-   * The actorParameter's value may contain a placeHolder (syntax #[some_name]), in which case another context item is looked up, this time with the
-   * <i>some_name</i> from the placeHolder.
+   * The actorParameter's value may contain a placeHolder (syntax #[some_name]), in which case another context item is
+   * looked up, this time with the <i>some_name</i> from the placeHolder.
    * </p>
    * 
    * @param map
