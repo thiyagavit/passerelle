@@ -52,6 +52,9 @@ public class ContextUtils {
    * @return
    */
   public static String lookupValueForPlaceHolder(Context context, String itemValueOrPlaceHolder) {
+    if(itemValueOrPlaceHolder==null || context==null) {
+      return null;
+    }
     int phStart = itemValueOrPlaceHolder.indexOf(SIMPLE_PLACEHOLDER_START);
     int phEnd = itemValueOrPlaceHolder.indexOf(']', phStart);
     if (phStart >= 0 && phEnd >= 0 && phStart < phEnd) {
