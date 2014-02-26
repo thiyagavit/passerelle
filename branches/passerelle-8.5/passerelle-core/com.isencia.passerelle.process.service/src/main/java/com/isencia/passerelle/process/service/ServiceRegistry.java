@@ -29,7 +29,7 @@ import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroke
  */
 public class ServiceRegistry {
 
-  private ContextRepository contextRepository = ContextRepositoryImpl.getInstance();
+  private ContextRepository contextRepository;
 	private EntityFactory entityFactory;
 	private EntityManager entityManager;
 	private HistoricalDataProvider historicalDataProvider;
