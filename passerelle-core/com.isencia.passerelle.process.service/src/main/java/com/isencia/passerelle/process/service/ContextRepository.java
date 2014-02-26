@@ -1,4 +1,4 @@
-/* Copyright 2013 - iSencia Belgium NV
+/* Copyright 2014 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,6 +24,13 @@ import com.isencia.passerelle.process.model.factory.EntityManager;
  * The main use case is for context-aware actors that need to be able to work with the right <code>Context</code>s
  * for the messages they are processing during a model execution.
  * </p>
+ * <p>
+ * The ContextRepository also provides a facade for simplified {@link Context} persistence :
+ * <ul>
+ * <li>via the {@link EntityManager} for the main entity-based persistence (e.g. based on JPA)</li>
+ * <li>via additional {@link ContextStore}s for extra/custom trace files, memory stores etc</li>
+ * </ul>
+ * </p>
  * 
  * TODO : simplify and formalize responsibilities between this <code>ContextRepository</code>, 
  * <code>com.isencia.passerelle.process.model.factory.ContextManager</code> and <code>com.isencia.passerelle.process.model.factory.EntityManager</code>.
@@ -34,8 +41,13 @@ import com.isencia.passerelle.process.model.factory.EntityManager;
 public interface ContextRepository {
 
   /**
-   * Store a <code>Context</code> in the repository
-   * 
+   * Store a <code>Context</code> in the repository and in the primary entity persistent store, if an {@link EntityManager} has been set.
+   * If extra {@link ContextStore}s have been added, these will also be invoked.
+   * <p>
+   * Remark that a {@link ContextRepository} implementation is allowed to invoke the {@link ContextStore}s asynchronously,
+   * and that such storage may fail silently. 
+   * On the other hand, the invocation of {@link EntityManager} must be done synchronously in this method and may generate {@link RuntimeException}s.
+   * </p> 
    * @param context
    * @return the <code>Context</code> after its storage
    */
@@ -49,6 +61,33 @@ public interface ContextRepository {
    */
   Context getContext(String processContextId);
 
+  /**
+   * Sets the primary EntityManager, responsible for the standard Context persistence. (e.g. based on JPA)
+   * 
+   * @param entityManager can be null, in which case no standard persistence will be done
+   */
   void setEntityManager(EntityManager entityManager);
 
+  /**
+   * Adds the given store for use by this repository.
+   * <p>
+   * All registered auxiliary stores will receive storage requests each time <code>storeContext</code> is invoked.
+   * ContextStores should be considered as secondary storage providers, next to the main Context persistence
+   * implemented via an {@link EntityManager}.
+   * </p>
+   * @param store
+   * @return
+   */
+  boolean addAuxiliaryStore(ContextStore store);
+  
+  /**
+   * Removes the given store. 
+   * <p>
+   * After this operation no further storage operations will be passed to the store,
+   * from this repository.
+   * </p>
+   * @param store
+   * @return true if this repository contained the given store and it was removed successfully
+   */
+  boolean removeAuxiliaryStore(ContextStore store);
 }
