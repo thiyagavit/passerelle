@@ -62,8 +62,8 @@ public class Delay extends TransformerV5 {
      * @exception NameDuplicationException
      *                If the container already has an actor with this name.
      */
-    public Delay(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public Delay(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
         timeParameter = new StringParameter(this, "time(s)");
         timeParameter.setExpression("1");
@@ -74,13 +74,19 @@ public class Delay extends TransformerV5 {
     @Override
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
-        
+
         double currentTime = time;
         final ManagedMessage timeMessage = request.getMessage(input);
         if (takePortValue) {
-            currentTime = (Double) PasserelleUtil.getInputValue(timeMessage);                    
+
+            try {
+                currentTime = (Double) PasserelleUtil.getInputValue(timeMessage);
+            } catch (final ClassCastException e) {
+                // Useful for test case because input data arrived as string type 
+                currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(timeMessage));
+            }
         }
-        logger.debug("currentTime : {}",currentTime);   
+        logger.debug("currentTime : {}", currentTime);
         if (currentTime > 0) {
             final long millis = (long) (currentTime * 1000);
             ExecutionTracerService.trace(this, "pausing for " + millis + " ms");
@@ -101,15 +107,14 @@ public class Delay extends TransformerV5 {
                 // do nothing, means someone wants us to stop
             }
         }
-        sendOutputMsg(output, timeMessage);       
+        sendOutputMsg(output, timeMessage);
     }
 
-    
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
         if (attribute == timeParameter) {
             time = PasserelleUtil.getParameterDoubleValue(timeParameter);
-            if(time < 0){
+            if (time < 0) {
                 throw new IllegalActionException(this, "Time value must be upper or equal to 0.");
             }
         } else if (attribute == takePortValueParam) {
@@ -129,5 +134,4 @@ public class Delay extends TransformerV5 {
         return time + " (s)";
     }
 
- 
 }
