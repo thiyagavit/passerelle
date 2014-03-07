@@ -10,6 +10,7 @@ import org.osgi.framework.ServiceRegistration;
 import com.isencia.passerelle.process.model.ResultItemFromRawBuilderRegistry;
 import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.model.impl.ContextManagerProxy;
+import com.isencia.passerelle.process.model.impl.ResultItemFromRawBuilderNOP;
 import com.isencia.passerelle.process.model.impl.ResultItemFromRawBuilderRegistryImpl;
 import com.isencia.passerelle.process.model.impl.factory.EntityFactoryImpl;
 import com.isencia.passerelle.process.service.ServiceRegistry;
@@ -32,7 +33,9 @@ public class Activator implements BundleActivator {
   public void start(BundleContext bundleContext) throws Exception {
     lifeCycleEntityManagerTracker = new ContextManagerProxy(bundleContext);
     lifeCycleEntityManagerTracker.open();
-    registryServiceRegistration = bundleContext.registerService(ResultItemFromRawBuilderRegistry.class, new ResultItemFromRawBuilderRegistryImpl(), null);
+    ResultItemFromRawBuilderRegistryImpl rawBuilderRegistryImpl = new ResultItemFromRawBuilderRegistryImpl();
+    rawBuilderRegistryImpl.registerBuilder(new ResultItemFromRawBuilderNOP());
+    registryServiceRegistration = bundleContext.registerService(ResultItemFromRawBuilderRegistry.class, rawBuilderRegistryImpl, null);
     if (ServiceRegistry.getInstance().getEntityFactory() == null) {
       EntityFactoryImpl entityFactory = new EntityFactoryImpl();
       factoryServiceRegistration = bundleContext.registerService(EntityFactory.class, entityFactory, null);
@@ -51,7 +54,7 @@ public class Activator implements BundleActivator {
       ServiceRegistry.getInstance().setEntityFactory(null);
       factoryServiceRegistration.unregister();
     }
-    if(registryServiceRegistration != null){
+    if (registryServiceRegistration != null) {
       registryServiceRegistration.unregister();
     }
   }
