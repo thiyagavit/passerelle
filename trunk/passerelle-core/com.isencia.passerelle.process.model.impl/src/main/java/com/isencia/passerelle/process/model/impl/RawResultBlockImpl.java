@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import com.isencia.passerelle.process.model.RawResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -17,10 +18,11 @@ import com.isencia.passerelle.process.model.Task;
 @DiscriminatorValue("RAW_RESULTBLOCK")
 public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBlock {
   private static final long serialVersionUID = 1L;
-
   public static final String RESULT_ITEM_FROM_RAW_BUILDER_ATT_NAME = "ResultItemFromRawBuilderName";
 
+  @Transient
   private Map<String, ResultItem<?>> generatedResultItems = new HashMap<String, ResultItem<?>>();
+  @Transient
   private Set<String> generationFlags = new HashSet<String>();
 
   public RawResultBlockImpl() {
