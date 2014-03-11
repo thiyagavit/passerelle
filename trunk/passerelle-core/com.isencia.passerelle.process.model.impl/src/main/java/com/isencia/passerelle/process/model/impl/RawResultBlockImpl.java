@@ -2,8 +2,10 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -57,7 +59,7 @@ public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBloc
         }
       }
     }
-    Map<String, ResultItem<?>> merged = new HashMap<String, ResultItem<?>>();
+    Map<String, ResultItem<?>> merged = new LinkedHashMap<String, ResultItem<?>>();
     merged.putAll(resultItemMap);
     merged.putAll(generatedResultItems);
     return merged;
