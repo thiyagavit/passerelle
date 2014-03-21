@@ -62,7 +62,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
   public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
   public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
   public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
-  public static final String DEFAULT_ACTORNAME = "InitReferencePosition.";
+  public static final String DEFAULT_ACTORNAME = "MotorInitReferencePosition.";
 
   private MotorConfigurationV2 conf;
   private WaitStateTask waitTask;
