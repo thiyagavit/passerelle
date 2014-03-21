@@ -108,7 +108,8 @@ Imports should work with python+numpy only agreed with MB 11 Nov 2011
 try:
     import nexus
 except Exception, e:
-    print >> sys.stderr, "Could not import nexus"
+    pass
+#     print >> sys.stderr, "Could not import nexus"
 
 try:
     import io
