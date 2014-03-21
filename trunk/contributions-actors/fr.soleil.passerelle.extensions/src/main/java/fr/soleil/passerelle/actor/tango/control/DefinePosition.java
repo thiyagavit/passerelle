@@ -59,7 +59,6 @@ public class DefinePosition extends ATangoDeviceActorV5 {
   public static final String DEFINE_POSITION_CMD_NAME = "DefinePosition";
   public static final String OFFSET_PORT_NAME = "offset";
   public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
-  public static final String DEVICE_NAME = "Device Name";
   public static final String DEFAULT_ACTORNAME = "DefinePosition.";
   public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
   public static final String OUTPUT_PORT_NAME = "InitOK";
