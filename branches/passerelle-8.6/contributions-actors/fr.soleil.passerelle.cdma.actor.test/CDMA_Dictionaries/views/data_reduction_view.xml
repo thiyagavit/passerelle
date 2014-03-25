@@ -1,0 +1,64 @@
+<!DOCTYPE data-def SYSTEM "../dtd/view_file.dtd">
+<data-def name="DATA_REDUCTION" synonym="">
+  <group key="scan">
+    <group key="detector">
+      <item key="camera" />
+      <item key="dark" />
+      <item key="distance" />
+      <item key="exposureTime" />
+      <item key="shutterCloseDelay" />
+      <item key="xBin" />
+      <item key="yBin" />
+      <item key="channelScale" />
+      <item key="liveTime" />
+      <item key="sweeps" />
+      <item key="acquisitionMode" />
+      <item key="lensMode" />
+      <item key="passEnergy" />
+      <item key="lowEnergy" />
+      <item key="highEnergy" />
+      <item key="energyStep" />
+      <item key="stepTime" />
+      <item key="firstXChannel" />
+      <item key="lastXChannel" />
+      <item key="firstYChannel" />
+      <item key="lastYChannel" />
+      <item key="slices" />
+      <item key="sliceScale" />
+      <item key="energyScale" />
+      <item key="dataChannelScale" />
+    </group>
+    <group key="monitor">
+      <item key="mi" />
+      <item key="gain" />
+      <item key="intensity" />
+    </group>
+    <group key="monochromator">
+      <item key="lambda" />
+      <item key="energy" />
+      <item key="exitSlits" />
+    </group>
+    <group key="motors">
+      <item key="motor_name" />
+      <item key="motor_position" />
+    </group>
+    <group key="data">
+      <item key="images" />
+      <item key="beamEnergy" />
+      <item key="spectrums_xia" />
+      <item key="spectrums_scienta" />
+      <item key="scalars_xia" />
+      <item key="total_spectrum" />
+      <item key="total_image" />
+      <item key="x_position" />
+      <item key="y_position" />
+      <item key="sampleTheta" />
+      <item key="samplePhi" />
+      <item key="apertureAngle" />
+    </group>
+    <group key="info">
+      <item key="comments" />
+    </group>
+    <item key="acquisition_sequence" />
+  </group>
+</data-def>
