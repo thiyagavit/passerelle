@@ -9,7 +9,6 @@ import java.util.Map;
  * 
  */
 public interface ResultItemFromRawBuilder {
-  String NOP_BUILDER_NAME = ResultItemFromRawBuilder.class.getName() + "NOP";
 
   /**
    * Make sure the name is something unique, so that they can be distinguished in the registry.

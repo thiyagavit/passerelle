@@ -86,8 +86,8 @@ public class PaletteBuilder implements Serializable {
     paletteGroups = createCategories();
   }
 
-  protected Map<String, PaletteGroup> groups;
-  protected Map<String, PaletteItemDefinition> paletteItemMap;
+  private Map<String, PaletteGroup> groups;
+  private Map<String, PaletteItemDefinition> paletteItemMap;
 
   public PaletteItemDefinition getPaletteItem(String clazz) {
 
@@ -147,8 +147,8 @@ public class PaletteBuilder implements Serializable {
     return clazzName;
   }
 
-  protected PaletteItemDefinition submodelDefinition = null;
-  protected PaletteGroup submodels = null;
+  PaletteItemDefinition submodelDefinition = null;
+  PaletteGroup submodels = null;
 
   public List<PaletteGroup> createCategories() {
     List<PaletteGroup> actorGroups = new ArrayList<PaletteGroup>();
