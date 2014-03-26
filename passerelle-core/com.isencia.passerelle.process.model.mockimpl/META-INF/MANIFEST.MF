@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle ProcessContext mock implementation
 Bundle-SymbolicName: com.isencia.passerelle.process.model.mockimpl
-Bundle-Version: 8.6.2.qualifier
+Bundle-Version: 8.6.2
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.constants;version="8.6.0",
