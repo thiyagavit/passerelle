@@ -16,8 +16,6 @@ import com.isencia.passerelle.process.model.Task;
  * @author puidir
  *
  */
-// TODO: can't we simplify this now that we have an enum for the status?
-// TODO: should be moved to the model?
 public interface ContextManager {
   
   String REPORT_EVENT_TYPE = "REPORTED";
@@ -32,6 +30,13 @@ public interface ContextManager {
 	 * Destroy any listeners
 	 */
 	void clear();
+	
+	/**
+	 * This method should be invoked to clean-up ThreadLocal resources linked to the persistence fwk.
+	 * 
+	 * @deprecated temporary fix for issue with trailing persistence-context-related resources
+	 */
+	void cleanupShbResources();
 	
   /**
   * Creates a new event

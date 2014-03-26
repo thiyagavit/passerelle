@@ -72,15 +72,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
     if (timeout == null || unit == null || (timeout <= 0)) {
       return;
     }
-    delayTimer.schedule(new Callable<Void>() {
-      public Void call() {
-        Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext.getId());
-        if (!finalTaskContext.isFinished()) {
-          ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
-        }
-        return null;
-      }
-    }, timeout, unit);
+    delayTimer.schedule(new TimeoutHandler(taskContext.getId()), timeout, unit);
   }
 
   @Override
@@ -96,5 +88,25 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
   @Override
   public void clearServices() {
     services.clear();
+  }
+
+
+
+  public static final class TimeoutHandler implements Callable<Void> {
+    private final Long taskContext;
+    public TimeoutHandler(Long ctxtID) {
+      this.taskContext = ctxtID;
+    }
+    public Void call() {
+      try {
+        Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext);
+        if (!finalTaskContext.isFinished()) {
+          ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
+        }
+      } finally {
+        ServiceRegistry.getInstance().getContextManager().cleanupShbResources();
+      }
+      return null;
+    }
   }
 }

@@ -44,13 +44,12 @@ public class ContextRepositoryImpl implements ContextRepository {
   }
 
   public Context storeContext(Context context) {
+    if (entityManager != null) {
+      context = entityManager.persistContext(context);
+    }
     context.setContextRepositoryID(UUID.randomUUID().toString());
     contexts.put(context.getContextRepositoryID(), context);
-    if (entityManager != null) {
-      return entityManager.persistContext(context);
-    } else {
-      return context;
-    }
+    return context;
   }
 
   public Context getContext(String reposId) {
