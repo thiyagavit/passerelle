@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="yedgeigd" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="4.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="/usr/Local/passerelle/passerelle_core/conf/systemproperties.txt">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{145, 60}">
+        </property>
+    </property>
+    <entity name="Constant" class="be.isencia.passerelle.actor.general.Const">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[115.0, 430.0]">
+        </property>
+    </entity>
+    <entity name="MultipleSpectrumViewer" class="fr.soleil.passerelle.actor.tango.debug.MultipleSpectrumViewer">
+        <property name="number of Y plots" class="ptolemy.data.expr.StringParameter" value="1">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[460.0, 555.0]">
+        </property>
+        <port name="Y1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <entity name="MultipleSpectrumViewer2" class="fr.soleil.passerelle.actor.tango.debug.MultipleSpectrumViewer">
+        <property name="number of Y plots" class="ptolemy.data.expr.StringParameter" value="1">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{445, 460}">
+        </property>
+        <port name="Y1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <entity name="GetScanData" class="fr.soleil.passerelle.actor.tango.util.GetScanData">
+        <property name="Actuators" class="ptolemy.data.expr.StringParameter" value="image/analyzer/test/mx">
+        </property>
+        <property name="Sensors" class="ptolemy.data.expr.StringParameter" value="image/analyzer/1/centroidx">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[260.0, 455.0]">
+        </property>
+        <port name="actuator0" class="be.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+        <port name="sensor0" class="be.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation3" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation4" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation5" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="Constant.output" relation="relation"/>
+    <link port="MultipleSpectrumViewer.X" relation="relation4"/>
+    <link port="MultipleSpectrumViewer.Y1" relation="relation5"/>
+    <link port="MultipleSpectrumViewer2.X" relation="relation2"/>
+    <link port="MultipleSpectrumViewer2.Y1" relation="relation3"/>
+    <link port="GetScanData.input" relation="relation"/>
+    <link port="GetScanData.timestamps" relation="relation2"/>
+    <link port="GetScanData.actuator0" relation="relation4"/>
+    <link port="GetScanData.sensor0" relation="relation3"/>
+    <link port="GetScanData.sensor0" relation="relation5"/>
+</entity>
