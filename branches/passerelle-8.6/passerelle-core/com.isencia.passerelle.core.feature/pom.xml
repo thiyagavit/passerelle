@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.isencia.passerelle</groupId>
     <artifactId>passerelle-core</artifactId>
-    <version>8.6.2</version>
+    <version>8.6.3-SNAPSHOT</version>
   </parent>
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.core.feature</artifactId>
-  <version>8.6.2</version>
+  <version>8.6.3-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 </project>
