@@ -2,7 +2,7 @@
 <feature
       id="com.isencia.passerelle.core.feature"
       label="Passerelle core Feature"
-      version="8.6.2"
+      version="8.6.3.qualifier"
       provider-name="ISENCIA">
 
    <description url="http://code.google.com/a/eclipselabs.org/p/passerelle/">
