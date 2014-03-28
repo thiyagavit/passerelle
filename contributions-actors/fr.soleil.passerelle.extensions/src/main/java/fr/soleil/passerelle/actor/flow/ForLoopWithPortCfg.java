@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ptolemy.actor.NoTokenException;
 import ptolemy.data.IntToken;
 import ptolemy.data.ScalarToken;
 import ptolemy.data.Token;
@@ -143,6 +144,8 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
       if (stepWidth <= 0) {
         throw new IllegalActionException(stepWidthParam, "Step Width must be positive");
       }
+    } catch (NoTokenException e) {
+      // ignore; may happen at the end of an execution, during model shutdown
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error reading loop start/end values", this, e);
     }
@@ -176,10 +179,10 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
    */
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    if(firstIteration) {
+//    if(firstIteration) {
       setLoopConfiguration();
-      firstIteration = false;
-    }
+//      firstIteration = false;
+//    }
     super.process(ctxt, request, response);
   }
 
