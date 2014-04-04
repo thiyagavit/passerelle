@@ -28,6 +28,7 @@ import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.ChangeListener;
 import ptolemy.kernel.util.ChangeRequest;
@@ -70,23 +71,32 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
         return EMPTY_ATTRS;
       } else {
         entity.addChangeListener(this);
-        final List<Attribute> attrList = new ArrayList<Attribute>();
-        Class<?> filter = null;
-        if (entity instanceof TextAttribute) {
-          filter = StringAttribute.class;
-        } else {
-          filter = Parameter.class;
-        }
-        @SuppressWarnings("unchecked")
-        Iterator<Attribute> parameterIterator = entity.attributeList(filter).iterator();
         boolean expert = Activator.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.EXPERT);
-        while (parameterIterator.hasNext()) {
-          Attribute parameter = parameterIterator.next();
-          if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(entity, (Parameter) parameter, expert))) {
-            attrList.add(parameter);
+        final List<Attribute> attrList = new ArrayList<Attribute>();
+        if (entity instanceof Variable) {
+          // In this case we need to show the name and value of the variable itself in the attrs view,
+          // i.o. those of child attributes/parameters.
+          // If we would ever need to handle "sub-attributes" of parameters, this split in logic must be removed.
+          // But then we need to think about a way to clearly differentiate the entity/parameter itself from its sub-attributes,
+          // in the table view.
+          attrList.add((Attribute) entity);
+        } else {
+          Class<?> filter = null;
+          if (entity instanceof TextAttribute) {
+            filter = StringAttribute.class;
+          } else {
+            filter = Parameter.class;
           }
+          @SuppressWarnings("unchecked")
+          Iterator<Attribute> parameterIterator = entity.attributeList(filter).iterator();
+          while (parameterIterator.hasNext()) {
+            Attribute parameter = parameterIterator.next();
+            if (!(parameter instanceof Parameter) || (ParameterUtils.isVisible(entity, (Parameter) parameter, expert))) {
+              attrList.add(parameter);
+            }
+          }
+          Collections.sort(attrList, new NamedObjComparator());
         }
-        Collections.sort(attrList, new NamedObjComparator());
         boolean addExpertElements = (entity instanceof Actor && expert);
         final List<Object> ret = addExpertElements ? new ArrayList<Object>(attrList.size() + 3) : new ArrayList<Object>(attrList.size() + 1);
         if (addExpertElements) {

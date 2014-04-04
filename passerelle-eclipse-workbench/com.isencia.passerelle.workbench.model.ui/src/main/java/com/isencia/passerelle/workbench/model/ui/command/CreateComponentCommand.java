@@ -16,10 +16,11 @@ import ptolemy.actor.TypedIORelation;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.ComponentEntity;
+import ptolemy.kernel.ComponentPort;
 import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.Entity;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.moml.Vertex;
-import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
@@ -121,23 +122,17 @@ public class CreateComponentCommand extends org.eclipse.gef.commands.Command {
               relation = new TypedIORelation(parentModel, componentName);
             }
             child = new Vertex(relation, "Vertex");
-
           } else if (Flow.class.isAssignableFrom(clazz)) {
             if (flow != null) {
-
               child = (NamedObj) flow.instantiate(parentModel, componentName);
               ((CompositeActor) child).setClassName(flow.getName());
-
             }
-
           } else {
             Class constructorClazz = CompositeEntity.class;
-            if (TypedIOPort.class.isAssignableFrom(clazz)) {
+            if (ComponentPort.class.isAssignableFrom(clazz)) {
               constructorClazz = ComponentEntity.class;
-
-            } else if (TextAttribute.class.isAssignableFrom(clazz)) {
+            } else if (!Entity.class.isAssignableFrom(clazz) && !Director.class.isAssignableFrom(clazz)) {
               constructorClazz = NamedObj.class;
-
             }
             Constructor constructor = clazz.getConstructor(constructorClazz, String.class);
 
