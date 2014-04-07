@@ -20,7 +20,7 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class RecordingDirector extends BasicDirector {
 
-  private final static Logger logger = LoggerFactory.getLogger(BasicDirector.class);
+  private final static Logger logger = LoggerFactory.getLogger(RecordingDirector.class);
 
   private boolean asyncRecording = true;
   public Parameter asyncRecordingParam;
