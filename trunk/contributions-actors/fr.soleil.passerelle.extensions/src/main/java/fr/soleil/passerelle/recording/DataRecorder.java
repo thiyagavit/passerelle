@@ -38,11 +38,13 @@ public class DataRecorder {
 	    final boolean asyncMode) throws DevFailed {
 	final TangoAttribute att = new TangoAttribute(dataRecorderName
 		+ "/asynchronousWrite");
-	double val = 0;
+	// PASSERELLE-79 : conversion is not useful
+	/*double val = 0;
 	if (asyncMode) {
 	    val = 1;
 	}
-	att.write(val);
+	att.write(val);*/
+	att.write(asyncMode);
 	DataRecorder.asyncMode = asyncMode;
     }
 
