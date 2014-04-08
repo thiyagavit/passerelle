@@ -94,7 +94,7 @@ public class RecordingDirector extends BasicDirector {
         // .getDevicesFromClass("DataRecorder")[0];
         // }
         dataRecorderName = PasserelleUtil.getParameterValue(dataRecorderNameParam);
-        logger.info("using datarecorder " + dataRecorderName);
+        logger.debug("using datarecorder {} ", dataRecorderName);
         DataRecorder.getInstance().startSession();
         DataRecorder.getInstance().setAsyncMode(dataRecorderName, asyncRecording);
         if (asyncRecording) {

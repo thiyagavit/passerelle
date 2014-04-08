@@ -153,11 +153,13 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
 
         // set parameters for retry error strategy
         if (errorStrategy.equals(ErrorStrategy.DEFAULT)) {
+            logger.info("Error Stategy is DEFAULT");
             Properties.setDelay(0);
             Properties.setRetries(1);
         } else if (errorStrategy.equals(ErrorStrategy.RETRY)) {
             Properties.setDelay((int) (pausingTime * 1000));
             Properties.setRetries(nbRetry);
+            logger.info("Error Stategy is RETRY : nb {} and pausing {}", nbRetry, pausingTime);
         } else {
             Properties.setDelay(0);
             Properties.setRetries(0);
