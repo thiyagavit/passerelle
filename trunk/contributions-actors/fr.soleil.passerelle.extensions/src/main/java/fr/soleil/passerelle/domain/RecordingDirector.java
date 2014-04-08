@@ -33,7 +33,7 @@ public class RecordingDirector extends BasicDirector {
 
   private String dataRecorderName;
   private final Parameter dataRecorderNameParam;
-
+  
   public RecordingDirector() throws IllegalActionException, NameDuplicationException {
     super();
 
@@ -95,7 +95,10 @@ public class RecordingDirector extends BasicDirector {
         // }
         dataRecorderName = PasserelleUtil.getParameterValue(dataRecorderNameParam);
         logger.debug("using datarecorder {} ", dataRecorderName);
-        DataRecorder.getInstance().startSession();
+        if(DataRecorder.getInstance().isRecordingStarted(dataRecorderName)){
+            throw new IllegalActionException("DataRecorder session is already Running. Stop it before starting a new one.");
+        }
+        DataRecorder.getInstance().startSession();       
         DataRecorder.getInstance().setAsyncMode(dataRecorderName, asyncRecording);
         if (asyncRecording) {
           ExecutionTracerService.trace(this, "using asynchronous recording");
@@ -141,10 +144,12 @@ public class RecordingDirector extends BasicDirector {
     if (!getAdapter(null).isMockMode()) {
       try {
         DataRecorder.getInstance().cancel();
-        DataRecorder.getInstance().endRecording(dataRecorderName);
+        if(DataRecorder.getInstance().isStartRecording()){
+            DataRecorder.getInstance().endRecording(dataRecorderName);
+        }
       } catch (final DevFailed e) {
         // ignore error
-        // e.printStackTrace();
+         e.printStackTrace();
       }
     }
     super.wrapup();
