@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.actor.Director;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceProxy;
@@ -15,7 +17,6 @@ import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class DataRecorder {
 
@@ -26,6 +27,8 @@ public class DataRecorder {
     private static WaitStateTask waitTask;
     private static boolean cancel = false;
 
+    private boolean startRecording = false;
+    
     private DataRecorder() {
 
     }
@@ -165,16 +168,23 @@ public class DataRecorder {
             final String deviceName = ((RecordingDirector) actor.getDirector()).getDataRecorderName();
             final TangoCommand comHelp = new TangoCommand(deviceName, "StartRecording");
             comHelp.execute();
+            startRecording = true;
         } else {
             ExecutionTracerService.trace(actor, "WARNING - there is no Recording director");
         }
     }
 
+    public synchronized boolean isStartRecording() {
+        return startRecording;
+    }
+
     public synchronized void endRecording(final String dataRecorderName) throws DevFailed {
         if (isRecordingStarted(dataRecorderName)) {
+            logger.debug("EndRecording is called");
             final TangoCommand comHelp = new TangoCommand(dataRecorderName, "EndRecording");
-            comHelp.execute();
+            comHelp.execute();            
         }
+        startRecording = false;
     }
 
     public synchronized void endRecording(final Actor actor) throws DevFailed {
@@ -346,18 +356,21 @@ public class DataRecorder {
     }
 
     public synchronized boolean isRecordingStarted(final String dataRecorderName) throws DevFailed {
-        boolean result = false;
         // PASSERELLE-78
-        /*final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
+        /*boolean result = false;        
+        final DeviceProxy dev = ProxyFactory.getInstance().createDeviceProxy(
         	dataRecorderName);
-        if (dev != null) {*/
+        if (dev != null) {
         if (TangoAccess.isCurrentStateEqualStateRequired(dataRecorderName, DevState.ON)) {
             result = false;
         } else {
             result = true;
         }
-        // }
+        }
         return result;
+        */
+        return !TangoAccess.isCurrentStateEqualStateRequired(dataRecorderName, DevState.ON);
+        
     }
 
     public synchronized boolean isRecordingStarted(final Actor actor) throws DevFailed {
