@@ -102,6 +102,18 @@ public abstract class AbstractSequenceStepper extends Actor {
     super.offer(ctxt);
   }
 
+  @Override
+  protected boolean doPreFire() throws ProcessingException {
+    boolean result = super.doPreFire();
+    if (!result && stepQueue.isEmpty()) {
+      if (!isFinishRequested() && startPort.getActiveSources().isEmpty()) {
+        requestFinish();
+        result = true;
+      }
+    }
+    return result;
+  }
+  
   /**
    * React on each received start message, by generating a complete step sequence again, and store the steps in a queue.
    */
