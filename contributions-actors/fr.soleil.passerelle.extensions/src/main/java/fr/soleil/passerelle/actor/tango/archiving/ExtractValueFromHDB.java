@@ -132,7 +132,7 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
         new BooleanToken(throwExceptionOnError));
     throwExceptionOnErrorParam.setTypeEquals(BaseType.BOOLEAN);
 
-    dateParam = new DateTimeParameter(this, DATE_PARAM_NAME, DATE_FORMAT);
+    dateParam = new DateTimeParameter(this, DATE_PARAM_NAME/*, DATE_FORMAT*/);
     dateParam.setExpression(DATE_PARAMETER_FORMAT.format(new Date()));
 
   }
