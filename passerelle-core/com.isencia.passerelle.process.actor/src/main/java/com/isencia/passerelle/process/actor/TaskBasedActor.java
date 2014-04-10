@@ -131,21 +131,22 @@ public abstract class TaskBasedActor extends Actor {
         }
         if (!doRestart(message, response)) {
           if (mustProcess(message)) {
-            String requestId = Long.toString(processContext.getRequest().getId());
-            String referenceId = Long.toString(processContext.getRequest().getCase().getId());
-
+            // create attributes and entries, in case of error catch and rethrow after task creation
             Map<String, String> taskAttributes = new HashMap<String, String>();
-            taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
-            taskAttributes.put(AttributeNames.REF_ID, referenceId);
-            taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
-            // allow subclasses to add their own attributes, mostly based on data in the received processContext
-            addActorSpecificTaskAttributes(processContext, taskAttributes);
-
-            // allow subclasses to add task context entries
             Map<String, Serializable> taskContextEntries = new HashMap<String, Serializable>();
-            addActorSpecificTaskContextEntries(processContext, taskContextEntries);
+            Exception exceptionDuringCreation = null;
+            try {
+              taskAttributes = createImmutableTaskAtts(processContext, taskAttributes);
+              taskContextEntries = createContextEntries(processContext, taskContextEntries);
+            } catch (Exception e) {
+              exceptionDuringCreation = e;
+            }
 
             taskContext = createTask(processContext, taskAttributes, taskContextEntries);
+            if (exceptionDuringCreation != null) {
+              // re-throw here, exception will be attached to taskContext
+              throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
+            }
             // Remark that we don't return a changed taskContext or so
             // any changes (e.g. new events,results,status,... should be done in the passed taskContext instance, if
             // needed
@@ -159,7 +160,7 @@ public abstract class TaskBasedActor extends Actor {
             processFinished(ctxt, request, response);
           }
         } else {
-         
+
           processFinished(ctxt, request, response);
         }
       } catch (PasserelleException ex) {
@@ -424,28 +425,6 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Look up the value of a context item with one of the given itemNames (first one that is found).
-   * 
-   * This can be used to look for parameters where the name of the key varies.
-   * 
-   * @param context
-   *          The context of the request or task to look in
-   * @param itemNames
-   *          The item names to search for
-   * @return First value found or null
-   */
-  private String lookupValueForFirstKeyFound(final Context context, String... itemNames) {
-    String value = null;
-    for (String itemName : itemNames) {
-      value = context.lookupValue(itemName);
-      if (value != null) {
-        break;
-      }
-    }
-    return value;
-  }
-
-  /**
    * Retrieves the value of a context item with one of the given itemNames (first one that is found).
    * 
    * This can be used to look for parameters where the name of the key varies. E.g. a LineNumber is sometimes known as
@@ -503,6 +482,46 @@ public abstract class TaskBasedActor extends Actor {
   protected void onTaskFinished(Task task, ManagedMessage message, ProcessResponse processResponse) {
     // by default send out on output port
     processResponse.addOutputMessage(output, message);
+  }
+
+  /**
+   * Look up the value of a context item with one of the given itemNames (first one that is found).
+   * 
+   * This can be used to look for parameters where the name of the key varies.
+   * 
+   * @param context
+   *          The context of the request or task to look in
+   * @param itemNames
+   *          The item names to search for
+   * @return First value found or null
+   */
+  private String lookupValueForFirstKeyFound(final Context context, String... itemNames) {
+    String value = null;
+    for (String itemName : itemNames) {
+      value = context.lookupValue(itemName);
+      if (value != null) {
+        break;
+      }
+    }
+    return value;
+  }
+
+  private Map<String, Serializable> createContextEntries(Context processContext, Map<String, Serializable> taskContextEntries) {
+    // allow subclasses to add task context entries
+    addActorSpecificTaskContextEntries(processContext, taskContextEntries);
+    return taskContextEntries;
+  }
+
+  private Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
+    String requestId = Long.toString(processContext.getRequest().getId());
+    String referenceId = Long.toString(processContext.getRequest().getCase().getId());
+  
+    taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
+    taskAttributes.put(AttributeNames.REF_ID, referenceId);
+    taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
+    // allow subclasses to add their own attributes, mostly based on data in the received processContext
+    addActorSpecificTaskAttributes(processContext, taskAttributes);
+    return taskAttributes;
   }
 
   private final class TaskContextListener implements ContextProcessingCallback {
