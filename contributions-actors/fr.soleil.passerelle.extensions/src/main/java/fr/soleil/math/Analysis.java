@@ -1,7 +1,5 @@
 package fr.soleil.math;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MathException;
@@ -13,8 +11,8 @@ import org.apache.commons.math.analysis.interpolation.NevilleInterpolator;
 import org.apache.commons.math.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.UnivariateRealInterpolator;
 import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
-
-import fr.soleil.passerelle.actor.calculation.SpectrumPeakFinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.actor.ProcessingException;
 
