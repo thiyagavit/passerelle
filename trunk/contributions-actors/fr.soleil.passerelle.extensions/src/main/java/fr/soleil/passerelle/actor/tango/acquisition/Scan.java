@@ -38,7 +38,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
-import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -48,9 +47,7 @@ import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
-import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxyFactory;
-import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
@@ -116,21 +113,15 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
     @Override
     public void validateInitialization() throws ValidationException {
         super.validateInitialization();
-        if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - entry");
-        }
 
         if (!isMockMode()) {
             final Director dir = getDirector();
             if (dir instanceof BasicDirector) {
                 ((BasicDirector) dir).registerFinalizer(this);
             }
-
-            if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + "load salsa config");
-            }
-
+            
             try {
+                logger.debug("load salsa config {}", confName);
                 conf = (ConfigImpl<?>) ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
 
             } catch (final ScanNotFoundException e) {
@@ -153,11 +144,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
      */
     @Override
     protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
-            throws ProcessingException {
-
-        if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " process() - entry");
-        }
+            throws ProcessingException {       
         if (isMockMode()) {
             ExecutionTracerService.trace(this, "MOCK - Scan started with config: " + confName);
             ExecutionTracerService.trace(this, "MOCK - Scan finished");
@@ -176,10 +163,6 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
         }
 
         sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-
-        if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doFire() - exit");
-        }
     }
 
     private void configureRecordingSession() throws SalsaDeviceException {
@@ -190,7 +173,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             ScanUtil.getCurrentSalsaApi().setDataRecorderPartialMode(true);
             // System.out.println("setDataRecorderPartialMode(true)");
         } else {
-            
+
             ScanUtil.getCurrentSalsaApi().setDataRecorderPartialMode(false);
             // System.out.println("setDataRecorderPartialMode(false)");
         }
@@ -249,7 +232,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             try {
                 if (scanTask != null) {
                     if (scanTask.isRunning()) {
-                        ScanUtil.getCurrentSalsaApi().stopScan(conf);
+                        ScanUtil.getCurrentSalsaApi().stopScan();
                         ExecutionTracerService.trace(this, "Scan aborted");
                     }
                 }
