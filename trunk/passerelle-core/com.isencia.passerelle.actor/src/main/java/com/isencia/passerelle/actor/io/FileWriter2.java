@@ -15,8 +15,6 @@
 package com.isencia.passerelle.actor.io;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ptolemy.data.BooleanToken;
@@ -45,8 +43,6 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
-import com.isencia.passerelle.util.EnvironmentUtils;
-import com.isencia.util.StringConvertor;
 
 /**
  * A new implementation of a FileWriter actor which forwards received messages on its output port (i.e. is not a Sink) and is based on the v5 Actor API. It also
@@ -81,12 +77,6 @@ public class FileWriter2 extends Actor {
     destinationPathParam = new FileParameter(this, PATH_PARAM);
     new Parameter(destinationPathParam, "allowDirectories", BooleanToken.TRUE);
     new Parameter(destinationPathParam, "allowFiles", BooleanToken.FALSE);
-    try {
-      URI baseURI = new URI("file://" + StringConvertor.convertPathDelimiters(EnvironmentUtils.getApplicationRootFolder()));
-      destinationPathParam.setBaseDirectory(baseURI);
-    } catch (URISyntaxException e) {
-      // just give up
-    }
     registerConfigurableParameter(destinationPathParam);
 
     destinationFileNameParam = new StringParameter(this, FILE_PARAM);
