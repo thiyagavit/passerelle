@@ -810,9 +810,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
       }
       return res;
     } finally {
-      if (!res) {
-        getDirectorAdapter().notifyActorInactive(this);
-      }
       getLogger().trace("{} - postfire() - exit - {}", getFullName(), res);
     }
   }
@@ -901,6 +898,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     super.wrapup();
 
     getAuditLogger().debug("{} - WRAPPED UP", getFullName());
+    
+    getDirectorAdapter().notifyActorInactive(this);
 
     getLogger().trace("{} - wrapup() - exit", getFullName());
   }
