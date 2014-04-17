@@ -21,13 +21,12 @@ import com.isencia.passerelle.runtime.process.FlowProcessingService;
 import com.isencia.passerelle.runtime.process.impl.FlowProcessingServiceImpl;
 
 public class Activator implements BundleActivator {
-
 	private FlowProcessingService processSvc;
 	private ServiceRegistration<FlowProcessingService> processSvcreg;
 
 	// TODO make max concurrent runs configurable
 	public void start(BundleContext context) throws Exception {
-	  processSvc = new FlowProcessingServiceImpl(3);
+	  processSvc = new FlowProcessingServiceImpl(Runtime.getRuntime().availableProcessors());
 	  processSvcreg = (ServiceRegistration<FlowProcessingService>) context.registerService(FlowProcessingService.class.getName(), processSvc, null);
 	}
 
@@ -35,5 +34,4 @@ public class Activator implements BundleActivator {
 	  processSvcreg.unregister();
 	  processSvc = null;
 	}
-
 }
