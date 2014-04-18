@@ -69,8 +69,12 @@ public class ActorAttributesView extends ViewPart implements ISelectionListener 
   public void createPartControl(Composite parent) {
     this.viewer = new ActorAttributesTableViewer(null, part, parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
-    if (getSite() != null)
+    if (getSite() != null) {
+      // Required for documentation to work
+      getSite().setSelectionProvider(viewer);
+    
       getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(this);
+    }
   }
 
   @Override
