@@ -7,17 +7,14 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.IllegalActionException;
-
 import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.resources.util.ResourceUtils;
+import com.isencia.passerelle.eclipse.resources.util.ResourceUtils;
 import com.isencia.passerelle.util.ptolemy.ResourceParameter;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
 
@@ -26,7 +23,6 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 	private static final Logger logger = LoggerFactory.getLogger(ResourceBrowserEditor.class);
 	protected String            stringValue = "";
 	protected ResourceParameter param;
-	private Text text;
 
 	public ResourceBrowserEditor(Composite aComposite, ResourceParameter param) {
 		super(aComposite);
