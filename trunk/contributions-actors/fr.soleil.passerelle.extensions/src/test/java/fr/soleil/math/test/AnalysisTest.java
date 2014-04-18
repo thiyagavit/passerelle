@@ -17,6 +17,7 @@ public class AnalysisTest {
 
         final double expectedFWHM = 10;
         final double[] l = functions.createLorentzian(100, expectedFWHM, 50);
+        //System.out.println("l = " + ArrayUtils.toString(l));
         /*
          * TangoAttribute attr; try { attr = new
          * TangoAttribute("tango/tangotest/1/double_spectrum");
@@ -24,7 +25,16 @@ public class AnalysisTest {
          * (DevFailed e) { // TODO Auto-generated catch block
          * e.printStackTrace(); }
          */
-        final double result = BeamCalculations.fwhm(functions.createLine(100), l);
+        //
+        //System.out.println("line = " + ArrayUtils.toString(functions.createLine(100)));
+        //org.apache.commons.lang.ArrayUtils.indexOf(array, valueToFind)
+        double result = 0;
+        try {
+            result = BeamCalculations.fwhm(functions.createLine(100), l);
+        } catch (ProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         System.out.println("fwhm posistion is " + result);
         AssertJUnit.assertEquals(expectedFWHM, result, 0.1);
 
