@@ -1,7 +1,6 @@
 package com.isencia.passerelle.workbench.model.editor.ui.editor.actions;
 
 import java.io.File;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.gef.ui.actions.SelectionAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -10,12 +9,10 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.Actor;
-
+import com.isencia.passerelle.eclipse.resources.actor.IResourceActor;
+import com.isencia.passerelle.eclipse.resources.actor.ResourceObject;
 import com.isencia.passerelle.workbench.model.actor.IPartListenerActor;
-import com.isencia.passerelle.workbench.model.actor.IResourceActor;
-import com.isencia.passerelle.workbench.model.actor.ResourceObject;
 import com.isencia.passerelle.workbench.model.editor.ui.Activator;
 import com.isencia.passerelle.workbench.model.editor.ui.editpart.ActorEditPart;
 import com.isencia.passerelle.workbench.model.ui.utils.EclipseUtils;

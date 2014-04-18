@@ -480,6 +480,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    </requires>
 
    <plugin
+         id="com.isencia.passerelle.eclipse.resources"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+         
+   <plugin
          id="com.isencia.passerelle.workbench"
          download-size="0"
          install-size="0"
