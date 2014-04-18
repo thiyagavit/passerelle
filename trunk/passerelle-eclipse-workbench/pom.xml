@@ -15,6 +15,7 @@
 	<name>Passerelle :: Eclipse-workbench :: parent</name>
 
 	<modules>
+		<module>com.isencia.passerelle.eclipse.resources</module>
 		<module>com.isencia.passerelle.workbench.util</module>
 		<module>com.isencia.passerelle.workbench.model</module>
 		<module>com.isencia.passerelle.workbench.model.ui</module>
