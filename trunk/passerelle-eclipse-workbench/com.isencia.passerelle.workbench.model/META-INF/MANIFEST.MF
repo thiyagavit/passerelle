@@ -26,6 +26,7 @@ Bundle-ClassPath: config/,
  .
 Import-Package: com.isencia.constants;version="8.5.0",
  com.isencia.passerelle.eclipse.resources.actor,
+ com.isencia.passerelle.eclipse.resources.util,
  org.apache.commons.digester.substitution,
  org.eclipse.draw2d.geometry,
  org.eclipse.gef,
