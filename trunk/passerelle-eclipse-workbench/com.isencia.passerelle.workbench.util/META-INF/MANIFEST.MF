@@ -11,4 +11,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.core.resources,
  ptolemy.data.expr;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
-Export-Package: com.isencia.passerelle.workbench.util;version="8.5.0"
+Export-Package: com.isencia.passerelle.workbench.util;version="8.7.0"
