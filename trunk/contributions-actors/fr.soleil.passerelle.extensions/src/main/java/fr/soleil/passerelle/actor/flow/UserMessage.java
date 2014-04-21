@@ -50,8 +50,8 @@ public class UserMessage extends TransformerV5 {
     public Parameter titleParam;
     private String titleValue = "";
 
-    Port cancelOutput;
-    Port noOutput;
+    public Port cancelOutput;
+    public Port noOutput;
 
     public UserMessage(final CompositeEntity container, final String name) throws NameDuplicationException,
             IllegalActionException {
