@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.7.8-SNAPSHOT</version>
+	<version>4.7.8</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -30,18 +30,6 @@
 			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
 			<roles>
 				<role>Manager</role>
-			</roles>
-			<timezone>1</timezone>
-		</developer>
-
-		<developer>
-			<id>vincentgramer</id>
-			<name>Vincent Gramer</name>
-			<email>vincent.gramer@synchrotron-soleil.fr</email>
-			<organization>Synchrotron Soleil</organization>
-			<organizationUrl>http://www.synchrotron-soleil.fr</organizationUrl>
-			<roles>
-				<role>Developer</role>
 			</roles>
 			<timezone>1</timezone>
 		</developer>
@@ -158,7 +146,8 @@
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
 		</dependency>
-
+		
+		<!-- Pour Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.gui</groupId>
 			<artifactId>salsa</artifactId>
@@ -174,6 +163,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
+			<artifactId>Display</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
+			<artifactId>Pattern</artifactId>
+		</dependency>
+		<!-- End Pour Salsa V2 -->
+		
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
@@ -193,20 +192,8 @@
 
 		<dependency>
 			<groupId>fr.soleil.comete.bean</groupId>
-			<artifactId>CurrentScanDataModel</artifactId>
+			<artifactId>CurrentScanDataModel</artifactId>		
 		</dependency>
-
-
-		<!-- Pour Salsa V2 -->
-		<dependency>
-			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
-			<artifactId>Display</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
-			<artifactId>Pattern</artifactId>
-		</dependency>
-		<!-- End Pour Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
 			<artifactId>TangoCore</artifactId>
