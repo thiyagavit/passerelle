@@ -339,7 +339,8 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         ModelValidationService.getInstance().validate(loadedModel, validationContext);
         if (!validationContext.isValid()) {
           boolean isError = false;
-          for (Nameable  validatedElement : validationContext.getElementsWithErrors()) {
+          //for (Nameable  validatedElement : validationContext.getElementsWithErrors()) {
+          for (NamedObj  validatedElement : validationContext.getElementsWithErrors()) {
             for (ValidationException e : validationContext.getErrors(validatedElement)) {
               Object obj = e.getModelElement();
               String validationErrorMsg = e.getSimpleMessage();
