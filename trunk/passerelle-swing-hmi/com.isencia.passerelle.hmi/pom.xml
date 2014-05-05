@@ -11,7 +11,7 @@
 	<groupId>com.isencia.passerelle.gui</groupId>
 	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
-	<version>8.5.1-SNAPSHOT</version>
+	<version>8.5.1</version>
 
 	<developers>
 		<developer>
