@@ -96,7 +96,11 @@ public final class GenericHMIBean extends JPanel {
         if (sequencePath.startsWith("file") || sequencePath.startsWith("http")) {
           mainGenericHMI.getGenericHMI().loadModel(new URL(sequencePath), null);
         } else {
-          mainGenericHMI.getGenericHMI().loadModel(new URL("file:/" + sequencePath), null);
+            URL fileName = new URL("file:" + sequencePath);
+            if(fileName.toURI().getPath() == null) {
+                fileName = new URL("file:/" + sequencePath);
+            }
+            mainGenericHMI.getGenericHMI().loadModel(fileName, null);
         }
         this.removeAll();
         mainPanel = mainGenericHMI.getBeanPanel();
