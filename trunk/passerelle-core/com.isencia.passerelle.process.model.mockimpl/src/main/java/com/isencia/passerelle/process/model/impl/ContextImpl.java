@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
@@ -58,7 +59,7 @@ public class ContextImpl implements Context {
 
   private ReentrantLock lock = new ReentrantLock();
 
-  private List<Context> forkedContexts;
+  private List<Context> forkedContexts = new CopyOnWriteArrayList<Context>();
 
   public ContextImpl() {
   }
