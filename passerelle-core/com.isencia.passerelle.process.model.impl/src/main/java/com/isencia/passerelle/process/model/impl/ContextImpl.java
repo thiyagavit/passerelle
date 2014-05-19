@@ -286,16 +286,6 @@ public class ContextImpl implements Context {
       if (result == null) {
         HistoricalDataProvider historicalDataProvider = ServiceRegistry.getInstance().getHistoricalDataProvider();
         if (historicalDataProvider != null) {
-          List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
-          if (historicalRequestAttributes != null) {
-            for (Attribute attribute : historicalRequestAttributes) {
-              if (attribute.getName().equalsIgnoreCase(name)) {
-                result = attribute.getValueAsString();
-                break;
-              }
-            }
-          }
-
           if (result == null) {
             List<ResultBlock> historicalBlocks = historicalDataProvider.getResultBlocks(this);
             if (historicalBlocks != null) {
@@ -307,6 +297,15 @@ public class ContextImpl implements Context {
                     break;
                   }
                 }
+              }
+            }
+          }
+          List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
+          if (historicalRequestAttributes != null) {
+            for (Attribute attribute : historicalRequestAttributes) {
+              if (attribute.getName().equalsIgnoreCase(name)) {
+                result = attribute.getValueAsString();
+                break;
               }
             }
           }
