@@ -240,6 +240,8 @@ public abstract class TaskBasedActor extends Actor {
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
               ServiceRegistry.getInstance().getContextManager().notifyStarted(flowContext);
+              task.getProcessingContext().setStatus(Status.CANCELLED);
+              ServiceRegistry.getInstance().getContextManager().notifyCancelled(ServiceRegistry.getInstance().getContextManager().getContext(task.getProcessingContext().getId()));
               break;
             }
           }
@@ -515,7 +517,7 @@ public abstract class TaskBasedActor extends Actor {
   private Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
     String requestId = Long.toString(processContext.getRequest().getId());
     String referenceId = Long.toString(processContext.getRequest().getCase().getId());
-  
+
     taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
     taskAttributes.put(AttributeNames.REF_ID, referenceId);
     taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
