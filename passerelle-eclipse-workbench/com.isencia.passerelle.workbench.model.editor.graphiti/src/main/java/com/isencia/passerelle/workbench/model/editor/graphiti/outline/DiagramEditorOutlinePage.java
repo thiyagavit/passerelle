@@ -47,6 +47,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.PageBook;
 import com.isencia.passerelle.workbench.model.editor.graphiti.ImageConstants;
+import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramTypeProvider;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.DiagramFlowRepository;
 import com.isencia.passerelle.workbench.model.editor.graphiti.outline.tree.OutlinePartFactory;
 
@@ -241,7 +242,7 @@ public class DiagramEditorOutlinePage extends ContentOutlinePage implements IPro
         showPage(ID_OUTLINE);
       }
     };
-    _showOutlineAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(ImageConstants.IMG_OUTLINE_TREE));
+    _showOutlineAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_OUTLINE_TREE));
     tbm.add(_showOutlineAction);
     _showOverviewAction = new Action() {
 
@@ -250,7 +251,7 @@ public class DiagramEditorOutlinePage extends ContentOutlinePage implements IPro
         showPage(ID_THUMBNAIL);
       }
     };
-    _showOverviewAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(ImageConstants.IMG_OUTLINE_THUMBNAIL));
+    _showOverviewAction.setImageDescriptor(GraphitiUi.getImageService().getImageDescriptorForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_OUTLINE_THUMBNAIL));
     tbm.add(_showOverviewAction);
 
     // by default show the outline-page

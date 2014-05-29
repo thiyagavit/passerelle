@@ -24,6 +24,7 @@ import ptolemy.actor.IOPort;
 import ptolemy.data.expr.Parameter;
 import ptolemy.vergil.kernel.attributes.TextAttribute;
 import com.isencia.passerelle.workbench.model.editor.graphiti.ImageConstants;
+import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramTypeProvider;
 
 /**
  * Tree EditPart for the Container.
@@ -48,7 +49,8 @@ public class OutlineContainerEditPart extends OutlineEditPart {
 
   @Override
   protected Image getImage() {
-    return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_COMPOSITE);
+    return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, 
+        ImageConstants.IMG_COMPOSITE);
   }
 
   /**

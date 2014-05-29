@@ -7,7 +7,7 @@ import java.util.List;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CommandStackEvent;
 import org.eclipse.gef.commands.CommandStackEventListener;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -305,11 +305,11 @@ public class ActorAttributesTableViewer extends TableViewer implements CommandSt
       ed.getEditDomain().getCommandStack().execute(cmd);
       ed.getEditorSite().getActionBars().getToolBarManager().update(true);
       ed.refresh();
-    } else if (this.actorSourcePart instanceof IDiagramEditor) {
+    } else if (this.actorSourcePart instanceof DiagramEditor) {
       // TODO eventually this must be migrated to the graphiti/EMF command stack
       // at this stage a direct execution is the only option, but this prevents undo/redo...
       cmd.execute();
-      ((IDiagramEditor) this.actorSourcePart).refresh();
+      ((DiagramEditor) this.actorSourcePart).getDiagramBehavior().refresh();
     }
   }
 
