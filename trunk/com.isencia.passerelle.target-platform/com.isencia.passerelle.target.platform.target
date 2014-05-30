@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="com.isencia.passerelle.target.platform.platform" sequenceNumber="20">
+<?pde version="3.8"?><target name="com.isencia.passerelle.target.platform.platform" sequenceNumber="21">
 <locations>
-<location path="${project_loc}/target/platform" type="Directory"/>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.jetty.sdk.feature.group" version="8.1.3.201206060641"/>
 <unit id="org.eclipse.gmf.examples.runtime.feature.group" version="1.6.2.201302122140"/>
@@ -12,9 +11,6 @@
 <unit id="org.eclipse.equinox.sdk.feature.group" version="3.8.0.v20121212-203907-7M7fA78g4_y-gDvtH0ZcFvhMPDZJ"/>
 <repository location="http://download.eclipse.org/releases/juno/"/>
 </location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.graphiti.sdk.feature.feature.group" version="0.10.2.v20140217-1225"/>
-<repository location="http://download.eclipse.org/releases/kepler/"/>
-</location>
+<location path="${project_loc}/target/platform" type="Directory"/>
 </locations>
 </target>

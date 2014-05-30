@@ -279,14 +279,42 @@
 			<classifier>isencia-bundle</classifier>
 		</dependency>
 
-		<!-- UI -->
-		<dependency>
-			<groupId>com.teaminabox</groupId>
-			<artifactId>com.teaminabox.eclipse.wiki</artifactId>
-			<version>2.8.0.201111071732</version>
-			<classifier>isencia-bundle</classifier>
-		</dependency>
-
+        <!-- Graphiti 0.10.2
+            Ultimately this should be obtained as part of eclipse Kepler
+            but for the moment we're still on Juno.
+            Building on mixed Juno&Kepler doesn't work well,
+                  so we treat Graphiti as just another dep now... -->
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti-mm</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti-pattern</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti-ui</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti-ui-capabilities</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+            
 		<!-- Testing bundles -->
 		<dependency>
 			<groupId>junit</groupId>
