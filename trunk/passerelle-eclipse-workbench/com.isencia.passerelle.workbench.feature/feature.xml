@@ -447,7 +447,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.help.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help.webapp" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="com.teaminabox.eclipse.wiki"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.gmf.runtime.common.core"/>
       <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
@@ -485,7 +484,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="com.isencia.passerelle.workbench"
          download-size="0"
