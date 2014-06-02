@@ -93,7 +93,6 @@
       <plugin id="com.isencia.sherpa.commons.reduced"/>
       <plugin id="com.microstar"/>
       <plugin id="com.sun.packages" fragment="true"/>
-      <plugin id="com.teaminabox.eclipse.wiki"/>
       <plugin id="com.thoughtworks.xstream"/>
       <plugin id="diva"/>
       <plugin id="javax.el"/>
