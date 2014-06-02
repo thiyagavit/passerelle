@@ -230,6 +230,7 @@
       <plugin id="org.eclipse.graphiti"/>
       <plugin id="org.eclipse.graphiti.mm"/>
       <plugin id="org.eclipse.graphiti.pattern"/>
+      <plugin id="org.eclipse.graphiti.doc"/>
       <plugin id="org.eclipse.graphiti.ui"/>
       <plugin id="org.eclipse.graphiti.ui.capabilities"/>
       <plugin id="org.eclipse.help"/>
