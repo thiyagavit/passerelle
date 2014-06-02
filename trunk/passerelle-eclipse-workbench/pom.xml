@@ -20,6 +20,7 @@
 		<module>com.isencia.passerelle.workbench.model</module>
 		<module>com.isencia.passerelle.workbench.model.ui</module>
 		<module>com.isencia.passerelle.workbench.model.editor.ui</module>
+		<module>com.isencia.passerelle.workbench.model.editor.graphiti</module>
 		<module>com.isencia.passerelle.workbench.model.editor.ui.cocoa.macosx.x86_64</module>
 		<module>com.isencia.passerelle.workbench.model.editor.ui.linux.x86</module>
 		<module>com.isencia.passerelle.workbench.model.editor.ui.linux.x86_64</module>
@@ -29,6 +30,7 @@
 		<module>com.isencia.passerelle.workbench.logging.development</module>
 		<module>com.isencia.passerelle.workbench.logging.production</module>
 		<module>com.isencia.passerelle.workbench.feature</module>
+		<module>com.isencia.passerelle.workbench.graphiti.feature</module>
 		<module>com.isencia.passerelle.workbench</module>
 		<module>com.isencia.passerelle.workbench.product</module>
 	</modules>
