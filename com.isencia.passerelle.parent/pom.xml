@@ -292,6 +292,12 @@
         </dependency>
         <dependency>
           <groupId>org.eclipse.graphiti</groupId>
+          <artifactId>graphiti-doc</artifactId>
+          <version>0.10.2</version>
+          <classifier>isencia-bundle</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.graphiti</groupId>
           <artifactId>graphiti-mm</artifactId>
           <version>0.10.2</version>
           <classifier>isencia-bundle</classifier>
