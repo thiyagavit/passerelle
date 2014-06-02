@@ -116,11 +116,11 @@ public class ContextImpl implements Context {
 
   @Transient
   private List<Long> minimizedTasks = new ArrayList<Long>();
-  
+
   @Transient
   private String repositoryId;
-  
-  //avoid concurrent modif ex when getForkedContexts is called while forking or joining
+
+  // avoid concurrent modif ex when getForkedContexts is called while forking or joining
   @Transient
   private List<Context> forkedContexts = new CopyOnWriteArrayList<Context>();
 
@@ -153,11 +153,11 @@ public class ContextImpl implements Context {
   public void setId(Long id) {
     this.id = id;
   }
-  
+
   public String getContextRepositoryID() {
     return repositoryId;
   }
-  
+
   public void setContextRepositoryID(String repositoryId) {
     this.repositoryId = repositoryId;
   }
@@ -167,7 +167,7 @@ public class ContextImpl implements Context {
   }
 
   public boolean setStatus(Status status) {
-    if (this.status != null && this.status.isFinalStatus() && !Status.RESTARTED.equals(status)) {
+    if (this.status != null && this.status.isFinalStatus() && (!Status.RESTARTED.equals(status) && !Status.CANCELLED.equals(status))) {
       return false;
     } else {
       this.status = status;
@@ -300,12 +300,14 @@ public class ContextImpl implements Context {
               }
             }
           }
-          List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
-          if (historicalRequestAttributes != null) {
-            for (Attribute attribute : historicalRequestAttributes) {
-              if (attribute.getName().equalsIgnoreCase(name)) {
-                result = attribute.getValueAsString();
-                break;
+          if (result == null) {
+            List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
+            if (historicalRequestAttributes != null) {
+              for (Attribute attribute : historicalRequestAttributes) {
+                if (attribute.getName().equalsIgnoreCase(name)) {
+                  result = attribute.getValueAsString();
+                  break;
+                }
               }
             }
           }
@@ -402,7 +404,7 @@ public class ContextImpl implements Context {
       entries.putAll(contextToMerge.entries);
       
       // Status.RESTARTED should be overwritten in case other status is found
-      if(Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(other.getStatus())){
+      if (Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(other.getStatus())) {
         this.setStatus(other.getStatus());
       }
 
@@ -437,7 +439,7 @@ public class ContextImpl implements Context {
   public boolean isForkedContext() {
     return transientBranch;
   }
-  
+
   public List<Context> getForkedChildContexts() {
     return Collections.unmodifiableList(forkedContexts);
   }
