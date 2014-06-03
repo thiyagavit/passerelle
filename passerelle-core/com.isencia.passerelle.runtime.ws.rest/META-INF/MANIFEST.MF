@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: REST Resources API to Passerelle runtime services
 Bundle-SymbolicName: com.isencia.passerelle.runtime.ws.rest
-Bundle-Version: 8.7.0.qualifier
+Bundle-Version: 8.7.0
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.core;version="8.4.0",
