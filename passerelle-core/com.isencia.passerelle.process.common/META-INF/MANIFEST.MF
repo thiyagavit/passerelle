@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle process commons
 Bundle-SymbolicName: com.isencia.passerelle.process.common
-Bundle-Version: 8.7.0
+Bundle-Version: 8.7.1.qualifier
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.isencia.passerelle.process.common.exception;version="8.7.0",

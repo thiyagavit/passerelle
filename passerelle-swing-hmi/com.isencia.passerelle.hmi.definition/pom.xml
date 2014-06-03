@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.isencia.passerelle</groupId>
     <artifactId>hmi</artifactId>
-    <version>8.7.0</version>
+    <version>8.7.1-SNAPSHOT</version>
   </parent>
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.hmi.definition</artifactId>
-  <version>8.7.0</version>
+  <version>8.7.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 </project>
