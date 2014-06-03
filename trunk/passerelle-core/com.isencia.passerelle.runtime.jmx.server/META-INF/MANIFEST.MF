@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Runtime JMX Server
 Bundle-SymbolicName: com.isencia.passerelle.runtime.jmx.server
-Bundle-Version: 8.7.0.qualifier
+Bundle-Version: 8.7.0
 Bundle-Activator: com.isencia.passerelle.runtime.jmx.server.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
