@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Soleil actor tests
+Bundle-SymbolicName: fr.soleil.passerelle.actor.test
+Bundle-Version: 8.5.0.qualifier
+Bundle-Vendor: Synchrotron Soleil
+Fragment-Host: fr.soleil.passerelle.actor;bundle-version="8.5.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="3.8.2",
+ com.isencia.passerelle.testsupport;bundle-version="8.5.0"
+Import-Package: com.isencia.passerelle.domain.cap;version="8.5.0",
+ com.isencia.passerelle.domain.et;version="8.5.0",
+ com.isencia.passerelle.model;version="8.5.0",
+ org.eclipse.osgi.framework.console;version="1.1.0",
+ ptolemy.actor;version="7.0.1"
