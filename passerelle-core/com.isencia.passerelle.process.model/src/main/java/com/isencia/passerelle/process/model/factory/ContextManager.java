@@ -3,14 +3,10 @@
  */
 package com.isencia.passerelle.process.model.factory;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
-import com.isencia.passerelle.process.model.Task;
 
 /**
  * @author puidir
@@ -19,12 +15,6 @@ import com.isencia.passerelle.process.model.Task;
 public interface ContextManager {
   
   String REPORT_EVENT_TYPE = "REPORTED";
-
-	/**
-	 * 
-	 * @return The type of task to create if nobody gives us a specific type
-	 */
-	Class<? extends Task> getDefaultTaskClass();
 
 	/**
 	 * Destroy any listeners
@@ -157,18 +147,6 @@ public interface ContextManager {
 	 * @return Whether the context has one of the finished status values
 	 */
 	boolean isFinished(Context context);
-	
-	/**
-	 * Create a task entity of the given type for the given flow context.
-	 * 
-	 * @param clazz Type of task to create
-	 * @param flowContext Flow in which the task is created
-	 * @param taskAttributes Task attributes
-	 * @param owner Who created the task
-	 * @return type What type of task to create
-	 * @throws Exception If the task could not be created
-	 */
-	Context createTask(Class<? extends Task> taskClass, Context flowContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries, String initiator, String type) throws Exception;
 
 	/**
 	 * Retrieve the context with the given identifier
