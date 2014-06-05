@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -37,11 +39,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
  * @author "puidir"
  * 
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_RESULTITEM")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
@@ -68,7 +72,6 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   @GeneratedValue(generator = "pas_resultitem")
   private Long id;
 
-  @SuppressWarnings("unused")
   @Version
   private int version;
 
@@ -85,14 +88,14 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   @Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 20)
   private String unit;
 
-  @OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, AttributeImpl> attributes = new HashMap<String, AttributeImpl>();
+  private Map<String, AttributeImpl> attributes = Collections.emptyMap();
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter
   // methods
-  @ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "RESULTBLOCK_ID")
   private ResultBlockImpl resultBlock;
 
@@ -166,6 +169,8 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   }
 
   public Attribute putAttribute(Attribute attribute) {
+	  if (!ProcessUtils.isInitialized(attributes))
+		  attributes = new HashMap<String,AttributeImpl>();
     return attributes.put(attribute.getName(), (AttributeImpl) attribute);
   }
 
@@ -173,7 +178,6 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return attributes.keySet().iterator();
   }
 
-  @OneToMany(mappedBy = "resultItem", targetEntity = ResultItemAttributeImpl.class)
   public Set<Attribute> getAttributes() {
     return new HashSet<Attribute>(attributes.values());
   }
@@ -198,7 +202,6 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return level;
   }
 
-  @SuppressWarnings("unused")
   @Column(name = "DTYPE", updatable = false)
   private String discriminator;
 
@@ -212,7 +215,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     if (!(arg0 instanceof ResultItemImpl)) {
       return false;
     }
-    ResultItemImpl rhs = (ResultItemImpl) arg0;
+    ResultItemImpl<?> rhs = (ResultItemImpl<?>) arg0;
     return new EqualsBuilder().append(this.id, rhs.id).append(this.name, rhs.name).append(this.unit, rhs.unit).append(this.value, rhs.value).isEquals();
   }
 

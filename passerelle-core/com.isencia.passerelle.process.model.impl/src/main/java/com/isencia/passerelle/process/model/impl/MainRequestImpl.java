@@ -1,10 +1,12 @@
 package com.isencia.passerelle.process.model.impl;
 
+import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import com.isencia.passerelle.process.model.Case;
 
+@Cacheable(false)
 @Entity
 @DiscriminatorValue("MAINREQUEST")
 public class MainRequestImpl extends RequestImpl {

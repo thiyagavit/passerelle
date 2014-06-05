@@ -1,10 +1,11 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,7 +20,9 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
+@Cacheable(false)
 @Entity
 @DiscriminatorValue("TASK")
 public class TaskImpl extends RequestImpl implements Task {
@@ -33,8 +36,8 @@ public class TaskImpl extends RequestImpl implements Task {
 	@JoinColumn(name = "PARENT_CONTEXT_ID", nullable = false, updatable = true)
 	private ContextImpl parentContext;
 
-	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<ResultBlock> resultBlocks = new HashSet<ResultBlock>();
+	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY)
+	private Set<ResultBlock> resultBlocks = Collections.emptySet();
 
 	public static final String _PARENT_CONTEXT = "parentContext";
 	public static final String _RESULT_BLOCKS = "resultBlocks";
@@ -53,8 +56,14 @@ public class TaskImpl extends RequestImpl implements Task {
 	public Context getParentContext() {
 		return parentContext;
 	}
+	
+	public void setParentContext(ContextImpl parentContext) {
+		this.parentContext = parentContext;
+	}
 
 	public boolean addResultBlock(ResultBlock block) {
+		if (!ProcessUtils.isInitialized(resultBlocks))
+			resultBlocks = new HashSet<ResultBlock>();
 		return resultBlocks.add(block);
 	}
 

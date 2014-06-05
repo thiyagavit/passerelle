@@ -4,6 +4,8 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
+
+import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.PrePersist;
@@ -15,11 +17,12 @@ import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.impl.ContextEventImpl;
-import com.isencia.passerelle.process.model.impl.util.ErrorItemMarshaller;
+import com.isencia.passerelle.process.model.impl.util.internal.ErrorItemMarshaller;
 
 /**
  * @author delerw
  */
+@Cacheable(false)
 @Entity
 @DiscriminatorValue("EDMERROREVENT")
 public class ContextErrorEventImpl extends ContextEventImpl implements ContextErrorEvent,Serializable {
