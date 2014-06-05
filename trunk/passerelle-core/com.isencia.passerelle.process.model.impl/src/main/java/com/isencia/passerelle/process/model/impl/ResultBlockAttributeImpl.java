@@ -3,9 +3,9 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -22,6 +22,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
  * @author "puidir"
  * 
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_RESULTBLOCKATTRIBUTE")
 public class ResultBlockAttributeImpl extends AttributeImpl implements Comparable<ResultBlockAttributeImpl> {
@@ -37,7 +38,7 @@ public class ResultBlockAttributeImpl extends AttributeImpl implements Comparabl
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter methods
-  @ManyToOne(targetEntity = ResultBlockImpl.class, fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "RESULTBLOCK_ID")
   private ResultBlockImpl resultBlock;
 

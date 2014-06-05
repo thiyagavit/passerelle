@@ -1,5 +1,6 @@
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -32,7 +34,9 @@ import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_REQUEST")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -51,7 +55,6 @@ public class RequestImpl implements Request {
   @GeneratedValue(generator = "pas_request")
   private Long id;
 
-  @SuppressWarnings("unused")
   @Version
   private int version;
 
@@ -59,16 +62,16 @@ public class RequestImpl implements Request {
   @Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
   private Date creationTS;
 
-  @OneToMany(targetEntity = RequestAttributeImpl.class, mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = RequestAttributeImpl.class, mappedBy = "request", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, Attribute> requestAttributes = new HashMap<String, Attribute>();
+  private Map<String, Attribute> attributes = Collections.emptyMap();
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter
   // methods
   // Remark: Cannot use optional = false here since we made TaskImpl extend
   // from RequestImpl
-  @ManyToOne(targetEntity = CaseImpl.class, optional = true, fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "CASE_ID")
   private CaseImpl requestCase;
 
@@ -78,7 +81,7 @@ public class RequestImpl implements Request {
   @Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
   private String type;
 
-  @OneToOne(targetEntity = ContextImpl.class, optional = false, mappedBy = "request", cascade = { CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH })
+  @OneToOne(targetEntity = ContextImpl.class, mappedBy = "request", cascade = CascadeType.ALL)
   private Context processingContext;
 
   @Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 250)
@@ -90,7 +93,6 @@ public class RequestImpl implements Request {
   @Column(name = "CATEGORY", nullable = true, unique = false, updatable = true, length = 250)
   private String category;
 
-  @SuppressWarnings("unused")
   @Column(name = "DTYPE", updatable = false)
   private String discriminator;
 
@@ -191,9 +193,9 @@ public class RequestImpl implements Request {
 
   public Attribute getAttribute(String name) {
     // Remark: can't use a CaseInsensitiveMap here because of lazy loading
-    for (String attrName : requestAttributes.keySet()) {
+    for (String attrName : attributes.keySet()) {
       if (attrName.equalsIgnoreCase(name)) {
-        return requestAttributes.get(attrName);
+        return attributes.get(attrName);
       }
     }
     return null;
@@ -208,20 +210,25 @@ public class RequestImpl implements Request {
   }
 
   public Attribute putAttribute(Attribute attribute) {
-    return requestAttributes.put(attribute.getName(), attribute);
+	  if (!ProcessUtils.isInitialized(attributes))
+		  attributes = new HashMap<String,Attribute>();
+    return attributes.put(attribute.getName(), attribute);
   }
 
   public Iterator<String> getAttributeNames() {
-    return requestAttributes.keySet().iterator();
+    return attributes.keySet().iterator();
   }
 
-  @OneToMany(mappedBy = "request", targetEntity = RequestAttributeImpl.class)
   public Set<Attribute> getAttributes() {
-    return new HashSet<Attribute>(requestAttributes.values());
+    return new HashSet<Attribute>(attributes.values());
   }
 
   public Case getCase() {
     return requestCase;
+  }
+  
+  public void setCase(CaseImpl caze) {
+    this.requestCase = caze;
   }
 
   public String getCorrelationId() {

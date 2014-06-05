@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -40,11 +41,13 @@ import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
  * @author "puidir"
  * 
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_RESULTBLOCK")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
@@ -59,7 +62,6 @@ public class ResultBlockImpl implements ResultBlock {
   @GeneratedValue(generator = "pas_resultblock")
   private Long id;
 
-  @SuppressWarnings("unused")
   @Version
   private int version;
 
@@ -70,9 +72,9 @@ public class ResultBlockImpl implements ResultBlock {
   @JoinColumn(name = "TASK_ID")
   private TaskImpl task;
 
-  @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+  private Map<String, Attribute> attributes = Collections.emptyMap();
 
   @Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
   private String colour;
@@ -84,13 +86,14 @@ public class ResultBlockImpl implements ResultBlock {
   @Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
   private String type;
 
-  @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn(name = "RESULTBLOCK_ID")
   @MapKey(name = "name")
-  private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
+  private Map<String, ResultItem<?>> resultItems = Collections.emptyMap();
 
   public static final String _ID = "id";
   public static final String _CREATION_TS = "creationTS";
+  public static final String _TASK = "task";
   public static final String _TYPE = "type";
   public static final String _RESULT_ITEMS = "allItems";
   public static final String _COLOUR = "colour";
@@ -133,6 +136,8 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Attribute putAttribute(Attribute attribute) {
+	  if (!ProcessUtils.isInitialized(attributes))
+		  attributes = new HashMap<String,Attribute>();
     return attributes.put(attribute.getName(), attribute);
   }
 
@@ -140,7 +145,6 @@ public class ResultBlockImpl implements ResultBlock {
     return attributes.keySet().iterator();
   }
 
-  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
   public Set<Attribute> getAttributes() {
     return new HashSet<Attribute>(attributes.values());
   }
@@ -162,6 +166,8 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public ResultItem<?> putItem(ResultItem<?> item) {
+	  if (!ProcessUtils.isInitialized(resultItems))
+		  resultItems = new HashMap<String,ResultItem<?>>();
     return resultItems.put(item.getName(), item);
   }
 
@@ -178,7 +184,6 @@ public class ResultBlockImpl implements ResultBlock {
     return results;
   }
 
-  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
   public Set<ResultItem> getResultItems() {
     return new HashSet<ResultItem>(getResultItemMap().values());
   }
@@ -207,7 +212,6 @@ public class ResultBlockImpl implements ResultBlock {
     return builder.toString();
   }
 
-  @SuppressWarnings("unused")
   @Column(name = "DTYPE", updatable = false)
   private String discriminator;
 

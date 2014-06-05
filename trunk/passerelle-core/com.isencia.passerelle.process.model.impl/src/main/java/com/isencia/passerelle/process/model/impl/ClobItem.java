@@ -6,6 +6,7 @@ package com.isencia.passerelle.process.model.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,6 +23,7 @@ import com.isencia.passerelle.process.model.Identifiable;
  * @author "puidir"
  *
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_CLOBITEM")
 public class ClobItem implements Identifiable, Serializable {

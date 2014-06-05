@@ -41,7 +41,7 @@ public abstract class AttributeImpl implements Attribute {
 	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = MAX_CHAR_SIZE)
 	private String value;
 	
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(optional = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
 	private ClobItem clobItem;
 

@@ -6,12 +6,13 @@ package com.isencia.passerelle.process.model.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
+
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -22,7 +23,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+
 import org.apache.commons.lang.builder.CompareToBuilder;
+
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 
@@ -30,6 +33,7 @@ import com.isencia.passerelle.process.model.ContextEvent;
  * @author "puidir"
  *
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_EVENT")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
@@ -44,7 +48,6 @@ public class ContextEventImpl implements ContextEvent {
 	@GeneratedValue(generator = "pas_contextevent")
 	private Long id;
 
-	@SuppressWarnings("unused")
 	@Version
 	private int version;
 	
@@ -60,8 +63,8 @@ public class ContextEventImpl implements ContextEvent {
 
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter methods	
-	@ManyToOne(targetEntity = ContextImpl.class, optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "CONTEXT_ID", nullable = true, updatable = true)
+	@ManyToOne
+	@JoinColumn(name = "CONTEXT_ID")
 	private ContextImpl context;
 
   public static final String _ID = "id";

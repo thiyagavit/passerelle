@@ -15,6 +15,7 @@ import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,12 +48,14 @@ import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"
  * 
  */
+@Cacheable(false)
 @Entity
 @Table(name = "PAS_CONTEXT")
 public class ContextImpl implements Context {
@@ -71,17 +74,17 @@ public class ContextImpl implements Context {
   @Enumerated(value = EnumType.STRING)
   private Status status;
 
-  @OneToOne(targetEntity = RequestImpl.class, optional = false, cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = RequestImpl.class)
   @JoinColumn(name = "REQUEST_ID", unique = true, nullable = false)
   private Request request;
 
-  @OneToMany(targetEntity = TaskImpl.class, mappedBy = "parentContext", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = TaskImpl.class, mappedBy = "parentContext", fetch = FetchType.LAZY)
   @OrderBy("id")
-  private List<Task> tasks = new ArrayList<Task>();
+  private List<Task> tasks = Collections.emptyList();
 
-  @OneToMany(targetEntity = ContextEventImpl.class, mappedBy = "context", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ContextEventImpl.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @OrderBy("creationTS")
-  private List<ContextEvent> events = new ArrayList<ContextEvent>();
+  private List<ContextEvent> events = Collections.emptyList();
 
   @SuppressWarnings("unchecked")
   @Transient
@@ -116,11 +119,11 @@ public class ContextImpl implements Context {
 
   @Transient
   private List<Long> minimizedTasks = new ArrayList<Long>();
-
+  
   @Transient
   private String repositoryId;
-
-  // avoid concurrent modif ex when getForkedContexts is called while forking or joining
+  
+  //avoid concurrent modif ex when getForkedContexts is called while forking or joining
   @Transient
   private List<Context> forkedContexts = new CopyOnWriteArrayList<Context>();
 
@@ -153,11 +156,11 @@ public class ContextImpl implements Context {
   public void setId(Long id) {
     this.id = id;
   }
-
+  
   public String getContextRepositoryID() {
     return repositoryId;
   }
-
+  
   public void setContextRepositoryID(String repositoryId) {
     this.repositoryId = repositoryId;
   }
@@ -167,7 +170,7 @@ public class ContextImpl implements Context {
   }
 
   public boolean setStatus(Status status) {
-    if (this.status != null && this.status.isFinalStatus() && (!Status.RESTARTED.equals(status) && !Status.CANCELLED.equals(status))) {
+    if (this.status != null && this.status.isFinalStatus() && !Status.RESTARTED.equals(status)) {
       return false;
     } else {
       this.status = status;
@@ -187,29 +190,9 @@ public class ContextImpl implements Context {
     return request;
   }
 
-  /**
-   * Replace an existing task with one that is more up-to-date.
-   * 
-   * @param task
-   *          The more up-to-date version of the task
-   */
-  public void reattachTask(Task task) {
-    // Check if we simply need to reattach the task
-    if (task.getId() != null) {
-      synchronized (tasks) {
-        // Remark: not using indexOf to allow Task implementations to
-        // have their own equals()
-        for (int taskIndex = 0; taskIndex < tasks.size(); taskIndex++) {
-          if (task.getId().equals(tasks.get(taskIndex).getId())) {
-            tasks.set(taskIndex, task);
-            return;
-          }
-        }
-      }
-    }
-  }
-
   public void addTask(Task task) {
+	  if (!ProcessUtils.isInitialized(tasks))
+		  tasks = new ArrayList<Task>();
     this.tasks.add(task);
   }
 
@@ -218,6 +201,8 @@ public class ContextImpl implements Context {
   }
 
   void addEvent(ContextEvent event) {
+	  if (!ProcessUtils.isInitialized(events))
+		  events = new ArrayList<ContextEvent>();
     events.add(event);
     if (event instanceof ContextErrorEvent) {
       _getErrors().add(((ContextErrorEvent) event).getErrorItem());
@@ -286,6 +271,16 @@ public class ContextImpl implements Context {
       if (result == null) {
         HistoricalDataProvider historicalDataProvider = ServiceRegistry.getInstance().getHistoricalDataProvider();
         if (historicalDataProvider != null) {
+          List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
+          if (historicalRequestAttributes != null) {
+            for (Attribute attribute : historicalRequestAttributes) {
+              if (attribute.getName().equalsIgnoreCase(name)) {
+                result = attribute.getValueAsString();
+                break;
+              }
+            }
+          }
+
           if (result == null) {
             List<ResultBlock> historicalBlocks = historicalDataProvider.getResultBlocks(this);
             if (historicalBlocks != null) {
@@ -296,17 +291,6 @@ public class ContextImpl implements Context {
                     result = item.getValueAsString();
                     break;
                   }
-                }
-              }
-            }
-          }
-          if (result == null) {
-            List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
-            if (historicalRequestAttributes != null) {
-              for (Attribute attribute : historicalRequestAttributes) {
-                if (attribute.getName().equalsIgnoreCase(name)) {
-                  result = attribute.getValueAsString();
-                  break;
                 }
               }
             }
@@ -378,40 +362,42 @@ public class ContextImpl implements Context {
     eventCursorStack.push(events.size());
   }
 
-  public void join(Context other) {
-    ContextImpl contextToMerge = (ContextImpl) other;
-    try {
-      lock.lock();
+  public void join(Context... contexts) {
+	for (Context context : contexts) {
+	    ContextImpl contextToMerge = (ContextImpl)context;
+	    try {
+	      lock.lock();
 
-      // add new tasks obtained from the related branch
-      int taskCursorIndex = contextToMerge.popTaskCursorIndex();
-      List<Task> tasks = contextToMerge.getTasks();
-      if (tasks.size() > taskCursorIndex) {
-        for (int r = taskCursorIndex; r < tasks.size(); ++r) {
-          addTask(tasks.get(r));
-        }
-      }
-      // add new events obtained from the related branch
-      int eventCursorIndex = contextToMerge.popEventCursorIndex();
-      List<ContextEvent> events = contextToMerge.getEvents();
-      if (events.size() > eventCursorIndex) {
-        for (int r = eventCursorIndex; r < events.size(); ++r) {
-          getEvents().add(events.get(r));
-        }
-      }
+	      // add new tasks obtained from the related branch
+	      int taskCursorIndex = contextToMerge.popTaskCursorIndex();
+	      List<Task> tasks = contextToMerge.getTasks();
+	      if (tasks.size() > taskCursorIndex) {
+	        for (int r = taskCursorIndex; r < tasks.size(); ++r) {
+	          addTask(tasks.get(r));
+	        }
+	      }
+	      // add new events obtained from the related branch
+	      int eventCursorIndex = contextToMerge.popEventCursorIndex();
+	      List<ContextEvent> events = contextToMerge.getEvents();
+	      if (events.size() > eventCursorIndex) {
+	        for (int r = eventCursorIndex; r < events.size(); ++r) {
+	          getEvents().add(events.get(r));
+	        }
+	      }
 
-      // merge context entries
-      entries.putAll(contextToMerge.entries);
-      
-      // Status.RESTARTED should be overwritten in case other status is found
-      if (Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(other.getStatus())) {
-        this.setStatus(other.getStatus());
-      }
+	      // merge context entries
+	      entries.putAll(contextToMerge.entries);
+	      
+	      // Status.RESTARTED should be overwritten in case other status is found
+	      if(Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(context.getStatus())){
+	        this.setStatus(context.getStatus());
+	      }
 
-    } finally {
-      lock.unlock();
-      forkedContexts.clear();
-    }
+	    } finally {
+	      lock.unlock();
+	      forkedContexts.clear();
+	    }
+	}  	  
   }
 
   public Context fork() {
@@ -421,8 +407,12 @@ public class ContextImpl implements Context {
       copy.id = id;
       copy.status = status;
       copy.request = request;
-      copy.tasks.addAll(tasks);
-      copy.events.addAll(events);
+      // use addTask() to add tasks to copy, because it has to initialize the collection
+      for (Task task : tasks)
+    	  copy.addTask(task);
+      // use addEvent() to add events to copy, because it has to initialize the collection
+      for (ContextEvent event :events)
+    	  copy.addEvent(event);
       copy.entries.putAll(entries);
       copy.transientBranch = true;
       // Mark the current results size, so we're able to identify
@@ -439,7 +429,7 @@ public class ContextImpl implements Context {
   public boolean isForkedContext() {
     return transientBranch;
   }
-
+  
   public List<Context> getForkedChildContexts() {
     return Collections.unmodifiableList(forkedContexts);
   }
