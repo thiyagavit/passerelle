@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.7.0.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.8.0.qualifier" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
@@ -317,8 +317,8 @@
    </plugins>
 
    <features>
-      <feature id="com.isencia.passerelle.core.feature" version="8.7.1"/>
-      <feature id="com.isencia.passerelle.workbench.feature" version="8.7.1"/>
+      <feature id="com.isencia.passerelle.core.feature" version="8.8.0"/>
+      <feature id="com.isencia.passerelle.workbench.feature" version="8.8.0"/>
       <feature id="ptolemy.feature" version="7.0.1"/>
    </features>
 
