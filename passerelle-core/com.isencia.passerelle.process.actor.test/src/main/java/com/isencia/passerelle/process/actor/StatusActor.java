@@ -2,11 +2,13 @@ package com.isencia.passerelle.process.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -61,7 +63,7 @@ public class StatusActor extends Actor {
       Status status = Status.valueOf(statusParam.getExpression());
       context.setStatus(status);
       getLogger().debug("Request {} set to status {}", context.getRequest().getId(), status);
-      context = ServiceRegistry.getInstance().getEntityManager().mergeContext(context);
+      ServiceRegistry.getInstance().getProcessPersistenceService().updateStatus(context.getRequest());
       message.setBodyContent(context, ManagedMessage.objectContentType);
     } catch (MessageException e) {
       throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "", this, message, e);

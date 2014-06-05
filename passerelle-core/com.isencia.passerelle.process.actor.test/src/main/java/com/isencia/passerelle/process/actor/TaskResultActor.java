@@ -16,14 +16,17 @@ package com.isencia.passerelle.process.actor;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
@@ -32,8 +35,8 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
-import com.isencia.passerelle.process.model.factory.EntityManager;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.service.ProcessPersistenceService;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -69,8 +72,8 @@ public class TaskResultActor extends AsynchDelay {
     Context processContext = getRequiredContextForMessage(message);
     String resultType = resultTypeParam.getExpression();
     try {
-      EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
-      EntityManager entityManager = ServiceRegistry.getInstance().getEntityManager();
+      ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
+      ProcessPersistenceService persistenceService = ServiceRegistry.getInstance().getProcessPersistenceService();
       Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
       task.getProcessingContext().setStatus(Status.STARTED);
       ResultBlock rb = entityFactory.createResultBlock(task, resultType);
@@ -86,7 +89,7 @@ public class TaskResultActor extends AsynchDelay {
         }
       }
       task.getProcessingContext().setStatus(Status.FINISHED);
-      entityManager.persistRequest(task);
+      persistenceService.persistTask(task);
       response.addOutputMessage(output, message);
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);

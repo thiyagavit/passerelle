@@ -104,7 +104,6 @@ public class Splitter extends AbstractMessageSequenceGenerator {
             }
             for (int i = 0; i < valueParts.length; ++i) {
               Context newOne = processContext.fork();
-              newOne = getContextRepository().storeContext(newOne);
               newOne.putEntry(splitOutItemName, valueParts[i]);
               MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message,
                   processContext.getRequest().getId(), // sequence ID
