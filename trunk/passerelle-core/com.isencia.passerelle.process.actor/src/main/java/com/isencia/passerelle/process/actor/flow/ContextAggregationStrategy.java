@@ -14,13 +14,10 @@
 */
 package com.isencia.passerelle.process.actor.flow;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * A <code>AggregationStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages,
@@ -35,13 +32,13 @@ public class ContextAggregationStrategy implements AggregationStrategy {
     MessageContainer scopeMsg = (MessageContainer) initialMsg;
     ManagedMessage msg = scopeMsg.copy();
     Context mergedCtxt = (Context) scopeMsg.getBodyContent();
-    List<Context> branches = new ArrayList<Context>();
-    for (ManagedMessage branchMsg : otherMessages) {
-      Context branchedCtx = (Context)branchMsg.getBodyContent();
-      msg.addCauseID(branchMsg.getID());
-      branches.add(branchedCtx);
+    Context[] branches = new Context[otherMessages.length];
+    for (int i = 0; i < otherMessages.length; i++) {
+      Context branchedCtx = (Context)otherMessages[i].getBodyContent();
+      msg.addCauseID(otherMessages[i].getID());
+      branches[i] = branchedCtx;
     }
-    mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
+    mergedCtxt.join(branches);
     msg.setBodyContent(mergedCtxt, ManagedMessage.objectContentType);
     return msg;
   }
