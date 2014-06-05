@@ -15,10 +15,8 @@
 package com.isencia.passerelle.process.service;
 
 import com.isencia.passerelle.process.model.factory.ContextManager;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
-import com.isencia.passerelle.process.model.factory.EntityManager;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
-import com.isencia.passerelle.process.service.impl.ContextRepositoryImpl;
 import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroker;
 
 /**
@@ -28,104 +26,64 @@ import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroke
  * 
  */
 public class ServiceRegistry {
-
-  private ContextRepository contextRepository = ContextRepositoryImpl.getInstance();
-	private EntityFactory entityFactory;
-	private EntityManager entityManager;
-	private HistoricalDataProvider historicalDataProvider;
-  private ContextManager contextManager;
-  private RequestProcessingBroker requestProcessingBroker = DefaultRequestProcessingBroker.getInstance();
-
   private static ServiceRegistry _instance = new ServiceRegistry();
 
   public static ServiceRegistry getInstance() {
     return _instance;
   }
 
-	/**
-   * @return the contextRepository
-   */
-  public ContextRepository getContextRepository() {
-    return contextRepository;
-  }
+  private ProcessFactory processFactory;
+  private ProcessManagerService processManagerService;
+  private ProcessPersistenceService processPersistenceService;
+  private HistoricalDataProvider historicalDataProvider;
+  private ContextManager contextManager;
+  private RequestProcessingBroker requestProcessingBroker = DefaultRequestProcessingBroker.getInstance();
 
-  /**
-   * @param contextRepository the contextRepository to set
-   */
-  public void setContextRepository(ContextRepository contextRepository) {
-    this.contextRepository = contextRepository;
-  }
-
-  /**
-   * 
-   * @return the requestProcessingBroker
-   */
-  public RequestProcessingBroker getRequestProcessingBroker() {
-    return requestProcessingBroker;
-  }
-
-  /**
-   * 
-   * @param requestProcessingBroker
-   */
-  public void setRequestProcessingBroker(RequestProcessingBroker requestProcessingBroker) {
-    this.requestProcessingBroker = requestProcessingBroker;
-  }
-
-  public HistoricalDataProvider getHistoricalDataProvider() {
-		return historicalDataProvider;
-	}
-
-	public void setHistoricalDataProvider(HistoricalDataProvider historicalDataProvider) {
-		this.historicalDataProvider = historicalDataProvider;
-	}
-
-	/**
-	 * @return the entityFactory
-	 */
-	public EntityFactory getEntityFactory() {
-		return entityFactory;
-	}
-
-	/**
-	 * @param entityFactory
-	 *            the entityFactory to set
-	 */
-	public void setEntityFactory(EntityFactory entityFactory) {
-		this.entityFactory = entityFactory;
-	}
-
-	/**
-	 * @return the entityManager
-	 */
-	public EntityManager getEntityManager() {
-		return entityManager;
-	}
-
-	/**
-	 * @param entityManager
-	 *            the entityManager to set
-	 */
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-		if(contextRepository!=null) {
-		  contextRepository.setEntityManager(entityManager);
-		}
-	}
-
-  /**
-   * @return the contextManager service
-   */
   public ContextManager getContextManager() {
     return contextManager;
   }
 
-  /**
-   * 
-   * @param contextManager
-   *          the contextManager service to set
-   */
+  public HistoricalDataProvider getHistoricalDataProvider() {
+    return historicalDataProvider;
+  }
+
+  public ProcessFactory getProcessFactory() {
+    return processFactory;
+  }
+
+  public ProcessManagerService getProcessManagerService() {
+    return processManagerService;
+  }
+
+  public ProcessPersistenceService getProcessPersistenceService() {
+    return processPersistenceService;
+  }
+
+  public RequestProcessingBroker getRequestProcessingBroker() {
+    return requestProcessingBroker;
+  }
+	
   public void setContextManager(ContextManager contextManager) {
     this.contextManager = contextManager;
+  }
+
+  public void setHistoricalDataProvider(HistoricalDataProvider historicalDataProvider) {
+	this.historicalDataProvider = historicalDataProvider;
+  }
+	
+  public void setProcessFactory(ProcessFactory processFactory) {
+    this.processFactory = processFactory;
+  }
+  
+  public void setProcessManagerService(ProcessManagerService processManagerService) {
+	this.processManagerService = processManagerService;
+  }
+
+  public void setProcessPersistenceService(ProcessPersistenceService processPersistenceService) {
+	this.processPersistenceService = processPersistenceService;
+  }
+  
+  public void setRequestProcessingBroker(RequestProcessingBroker requestProcessingBroker) {
+    this.requestProcessingBroker = requestProcessingBroker;
   }
 }
