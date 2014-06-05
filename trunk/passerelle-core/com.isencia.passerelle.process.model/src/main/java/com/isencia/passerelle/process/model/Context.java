@@ -196,9 +196,9 @@ public interface Context extends Identifiable, Serializable {
 
   /**
    * 
-   * @param other
+   * @param contexts
    */
-  void join(Context other);
+  void join(Context... contexts);
 
   /**
    * 
@@ -233,8 +233,6 @@ public interface Context extends Identifiable, Serializable {
    * @return whether the context is minimized
    */
   boolean isMinimized();
-
-  void reattachTask(Task task);
 
   void addTask(Task task);
 }
