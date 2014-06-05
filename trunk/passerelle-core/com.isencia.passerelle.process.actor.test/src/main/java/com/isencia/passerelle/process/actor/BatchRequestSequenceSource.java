@@ -24,8 +24,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.IntToken;
 import ptolemy.data.StringToken;
@@ -34,6 +36,7 @@ import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
@@ -49,6 +52,7 @@ import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
+import com.isencia.passerelle.process.service.ProcessManagerImpl;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
@@ -240,21 +244,22 @@ public class BatchRequestSequenceSource extends Actor {
         String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
         String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
 
-        req = ServiceRegistry.getInstance().getEntityFactory()
+        req = ServiceRegistry.getInstance().getProcessFactory()
             .createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
         for (Entry<String, String> reqAttr : requestAttributes.entrySet()) {
-          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
+          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
         }
-        req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
+//        req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
 //      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
 //        ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generated request", Long.toString(req.getId()));
+        ServiceRegistry.getInstance().getProcessManagerService().addProcessManager(new ProcessManagerImpl(req));
+
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to persist request " + requestAttributes, this, e);
       }
       try {
         Context context = req.getProcessingContext();
         context.setStatus(Status.STARTED);
-        context = getContextRepository().storeContext(context);
         boolean isSeqEnd = requestAttrsQueue.size() == 0;
         ManagedMessage outputMessage = MessageFactory.getInstance().createMessageInSequence(seqID, seqPos++, isSeqEnd, getStandardMessageHeaders());
         outputMessage.setBodyContent(context, ManagedMessage.objectContentType);

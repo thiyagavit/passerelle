@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.RequestProcessingService;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.util.FutureValue;
@@ -28,7 +28,7 @@ public class MockRequestProcessingService implements RequestProcessingService {
       return null;
     } else {
       try {
-        EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
+        ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
         ResultBlock rb = entityFactory.createResultBlock((Task) taskContext.getRequest(), serviceType);
         for (Entry<String, String> item : resultItems.entrySet()) {
           entityFactory.createResultItem(rb, item.getKey(), item.getValue(), null);

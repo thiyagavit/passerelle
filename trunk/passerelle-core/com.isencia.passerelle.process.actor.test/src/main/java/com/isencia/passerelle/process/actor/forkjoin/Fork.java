@@ -89,7 +89,6 @@ public class Fork extends AbstractMessageSequenceGenerator {
         List<Port> outputPorts = outputPortCfgExt.getOutputPorts();
         for (int i = 0; i < outputPorts.size(); ++i) {
           Context newOne = processContext.fork();
-          newOne = getContextRepository().storeContext(newOne);
           MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(
               message,
               processContext.getRequest().getId(),  // sequence ID

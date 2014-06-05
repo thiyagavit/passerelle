@@ -16,14 +16,17 @@ package com.isencia.passerelle.process.actor.v5;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -34,8 +37,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
-import com.isencia.passerelle.process.model.factory.EntityManager;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.service.ProcessPersistenceService;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -72,13 +75,13 @@ public class TaskResultActor extends AsynchDelay {
     String resultType = resultTypeParam.getExpression();
     if (message != null) {
       try {
-        EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
-        EntityManager entityManager = ServiceRegistry.getInstance().getEntityManager();
+        ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
+        ProcessPersistenceService persistenceService = ServiceRegistry.getInstance().getProcessPersistenceService();
         
         Context processContext = (Context) message.getBodyContent();
         Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
         
-        task = (Task) entityManager.persistRequest(task);
+        persistenceService.persistTask(task);
         
         ResultBlock rb = entityFactory.createResultBlock(task, resultType);
 
