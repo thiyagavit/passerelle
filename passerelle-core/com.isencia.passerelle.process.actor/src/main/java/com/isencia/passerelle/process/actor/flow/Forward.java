@@ -45,7 +45,7 @@ import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.process.actor.activator.Activator;
 import com.isencia.passerelle.process.common.util.ContextUtils;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
@@ -203,7 +203,7 @@ public class Forward extends Actor {
     return Activator.getDefault().getRepositoryService();
   }
 
-  protected EntityFactory getEntityFactory() {
-    return ServiceRegistry.getInstance().getEntityFactory();
+  protected ProcessFactory getEntityFactory() {
+    return ServiceRegistry.getInstance().getProcessFactory();
   }
 }

@@ -19,9 +19,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.ObjectToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -30,6 +33,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -50,7 +54,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
-import com.isencia.passerelle.process.model.factory.EntityFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -161,7 +165,7 @@ public class EventsToTaskCollector extends Actor {
       taskContext = createTask(processContext, taskAttributes, new HashMap<String, Serializable>());
       task = (Task) taskContext.getRequest();
       if (!events.isEmpty()) {
-        EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
+        ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
         ResultBlock rb = entityFactory.createResultBlock(task, resultTypeParam.stringValue());
         for (Event event : events) {
           String value = null;
@@ -182,7 +186,6 @@ public class EventsToTaskCollector extends Actor {
       ServiceRegistry.getInstance().getContextManager().notifyFinished(taskContext);
     }
 
-    refreshTaskInContext(task, processContext);
     try {
       // send the process context with the additional task
       ManagedMessage msg = createMessage(processContext, ManagedMessage.objectContentType);
@@ -209,8 +212,20 @@ public class EventsToTaskCollector extends Actor {
    */
   protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String taskType = taskTypeParam.stringValue();
-    return ServiceRegistry.getInstance().getContextManager()
-        .createTask(getTaskClass(parentContext), parentContext, taskAttributes, taskContextEntries, FlowUtils.getFullNameWithoutFlow(this), taskType);
+    
+    Task task = ServiceRegistry.getInstance().getProcessFactory().createTask(getTaskClass(parentContext), parentContext, FlowUtils.getFullNameWithoutFlow(this), taskType);
+	for (Entry<String, String> attr : taskAttributes.entrySet()) {
+		ServiceRegistry.getInstance().getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
+	}
+	
+	for (String key : taskContextEntries.keySet()) {
+		Serializable value = taskContextEntries.get(key);
+		task.getProcessingContext().putEntry(key, value);
+	}
+
+	ServiceRegistry.getInstance().getProcessPersistenceService().persistTask(task);
+
+	return(task.getProcessingContext());
   }
 
   /**
@@ -218,14 +233,6 @@ public class EventsToTaskCollector extends Actor {
    * @return the java class of the Task implementation entity. Default is com.isencia.passerelle.process.model.impl.TaskImpl.
    */
   protected Class<? extends Task> getTaskClass(Context parentContext) {
-    return ServiceRegistry.getInstance().getContextManager().getDefaultTaskClass();
+    return null;
   }
-
-  private void refreshTaskInContext(Task task, Context processContext) {
-    // Retrieve the task from db, bypassing the cache
-    task = ServiceRegistry.getInstance().getEntityManager().getTask(task.getId(), true);
-    // Re-attach on the process context
-    processContext.reattachTask(task);
-  }
-
 }

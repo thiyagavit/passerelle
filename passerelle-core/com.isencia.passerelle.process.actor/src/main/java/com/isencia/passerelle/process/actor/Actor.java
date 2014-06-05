@@ -27,8 +27,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.Director;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
@@ -36,6 +38,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
@@ -56,7 +59,7 @@ import com.isencia.passerelle.message.SimpleActorMessageQueue;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ContextRepository;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
@@ -122,8 +125,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // This can be useful for streaming-mode executions, where actors may be able to optimize their work
   // when they can process many msgs/events in one shot, i.o. one-by-one.
   public Parameter bufferTimeParameter;
-
-  private ContextRepository contextRepository;
 
   /**
    * @param container
@@ -252,24 +253,12 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       }
     }
 
-    contextRepository = ServiceRegistry.getInstance().getContextRepository();
-    if (contextRepository == null) {
-      // TODO check if we can not find a way to run models ico missing ContextRepository
-      // e.g. do as for plain v5 Actor : add all pushed msgs to a same ProcessRequest,
-      // or still try to generate context IDs in some way and just group per ID or ...
-      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "ContextRepository service not found", this, null);
-    }
-
     try {
       triggerFirstIteration();
     } catch (IllegalActionException e) {
       throw new InitializationException(ErrorCode.FLOW_EXECUTION_FATAL, "Error triggering a fire iteration for source actor " + getFullName(), this, e);
     }
     getLogger().trace("{} - doInitialize() - exit", getFullName());
-  }
-
-  protected ContextRepository getContextRepository() {
-    return contextRepository;
   }
 
   /**
@@ -426,8 +415,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
             for (String ctxtHdr : ctxtHdrs) {
               ProcessRequest processRequest = incompleteProcessRequests.get(ctxtHdr);
               if (processRequest == null) {
-                Context context = contextRepository.getContext(ctxtHdr);
-                if (context != null) {
+            	ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(ctxtHdr);
+            	if (processManager != null) {
                   processRequest = new ProcessRequest();
                   processRequest.setIterationCount(iterationCount);
                   incompleteProcessRequests.put(ctxtHdr, processRequest);
@@ -674,12 +663,16 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     if (ctxtHdrs == null || ctxtHdrs.length == 0) {
       throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, null);
     }
-    Context context = contextRepository.getContext(ctxtHdrs[0]);
-    if (context != null) {
-      return context;
-    } else {
-      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
-    }
+    
+	ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(ctxtHdrs[0]);
+	if (processManager != null) {
+	    Context context = processManager.getRequest().getProcessingContext();
+	    if (context != null) {
+	      return context;
+	    }
+	   }
+	
+    throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
   }
 
   @Override

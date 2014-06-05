@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -167,14 +168,14 @@ public abstract class TaskBasedActor extends Actor {
         ExecutionTracerService.trace(this, ex.getMessage());
         // copy the ex info but ensure that the message is added
         // as an exception coming from the depths of task processing may not know about the received message
-        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
+//        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
         ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, ex);
         response.setException(new ProcessingException(ex.getErrorCode(), ex.getSimpleMessage(), this, message, ex.getCause()));
         processFinished(ctxt, request, response);
       } catch (Throwable t) {
         ExecutionTracerService.trace(this, t.getMessage());
         response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, message, t));
-        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
+//        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
         ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, t);
         processFinished(ctxt, request, response);
       }
@@ -240,8 +241,6 @@ public abstract class TaskBasedActor extends Actor {
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
               ServiceRegistry.getInstance().getContextManager().notifyStarted(flowContext);
-              task.getProcessingContext().setStatus(Status.CANCELLED);
-              ServiceRegistry.getInstance().getContextManager().notifyCancelled(ServiceRegistry.getInstance().getContextManager().getContext(task.getProcessingContext().getId()));
               break;
             }
           }
@@ -268,7 +267,20 @@ public abstract class TaskBasedActor extends Actor {
    */
   protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
-    return ServiceRegistry.getInstance().getContextManager().createTask(getTaskClass(parentContext), parentContext, taskAttributes, taskContextEntries, initiator, getTaskType());
+    
+    Task task = ServiceRegistry.getInstance().getProcessFactory().createTask(getTaskClass(parentContext), parentContext, initiator, getTaskType());
+	for (Entry<String, String> attr : taskAttributes.entrySet()) {
+		ServiceRegistry.getInstance().getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
+	}
+	
+	for (String key : taskContextEntries.keySet()) {
+		Serializable value = taskContextEntries.get(key);
+		task.getProcessingContext().putEntry(key, value);
+	}
+
+	ServiceRegistry.getInstance().getProcessPersistenceService().persistTask(task);
+	
+    return(task.getProcessingContext());
   }
 
   /**
@@ -296,7 +308,7 @@ public abstract class TaskBasedActor extends Actor {
    *         com.isencia.passerelle.process.model.impl.TaskImpl.
    */
   protected Class<? extends Task> getTaskClass(Context parentContext) {
-    return ServiceRegistry.getInstance().getContextManager().getDefaultTaskClass();
+    return null;
   }
 
   @Override
@@ -517,7 +529,7 @@ public abstract class TaskBasedActor extends Actor {
   private Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
     String requestId = Long.toString(processContext.getRequest().getId());
     String referenceId = Long.toString(processContext.getRequest().getCase().getId());
-
+  
     taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
     taskAttributes.put(AttributeNames.REF_ID, referenceId);
     taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
@@ -567,7 +579,6 @@ public abstract class TaskBasedActor extends Actor {
         final String errorMsg = "Error executing task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
         ProcessingException exception = new ProcessingException(ErrorCode.TASK_ERROR, errorMsg, TaskBasedActor.this, message, error);
         try {
-          refreshTaskInContext(task, message);
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
           setConsumed(true);
         } catch (Exception e) {
@@ -586,7 +597,6 @@ public abstract class TaskBasedActor extends Actor {
         Task task = (Task) event.getContext().getRequest();
         Request parentrequest = task.getParentContext().getRequest();
         try {
-          refreshTaskInContext(task, message);
           onTaskFinished(task, message, processResponse);
           setConsumed(true);
         } catch (Exception e) {
@@ -610,8 +620,6 @@ public abstract class TaskBasedActor extends Actor {
         final String errorMsg = "Timeout invoking task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
         ProcessingException exception = new ProcessingException(ErrorCode.TASK_TIMEOUT, errorMsg, TaskBasedActor.this, message, null);
         try {
-          refreshTaskInContext(task, message);
-
           ExecutionTracerService.trace(TaskBasedActor.this, exception);
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
           setConsumed(true);
@@ -636,14 +644,6 @@ public abstract class TaskBasedActor extends Actor {
       if (consumed) {
         processFinished(processResponse.getContext(), processResponse.getRequest(), processResponse);
       }
-    }
-
-    private void refreshTaskInContext(Task task, ManagedMessage message) throws MessageException {
-      Context processContext = (Context) message.getBodyContent();
-      // Retrieve the task from db, bypassing the cache
-      task = ServiceRegistry.getInstance().getEntityManager().getTask(task.getId(), true);
-      // Re-attach on the process context
-      processContext.reattachTask(task);
     }
   }
 }
