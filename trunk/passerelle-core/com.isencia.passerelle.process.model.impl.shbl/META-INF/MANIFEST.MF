@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SherpaBeans LightWeight
+Bundle-SymbolicName: com.isencia.passerelle.process.model.impl.shbl
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.isencia.passerelle.process.model.impl.shbl.activator.Activator
+Bundle-Vendor: ISENCIA
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-BuddyPolicy: registered
+Eclipse-RegisterBuddy: 
+ com.isencia.sherpa.persistence
+Import-Package: com.isencia.passerelle.process.model;version="8.7.0",
+ com.isencia.passerelle.process.model.factory;version="8.7.0",
+ com.isencia.passerelle.process.service;version="8.7.0",
+ org.apache.commons.lang;version="2.4.0",
+ org.eclipse.persistence.jpa.osgi;version="2.4.1",
+ org.osgi.framework;version="1.3.0",
+ org.slf4j;version="1.6.0"
+Bundle-ActivationPolicy: lazy
+Require-Bundle: com.isencia.sherpa.commons;bundle-version="6.4.0",
+ com.isencia.sherpa.persistence;bundle-version="6.4.0",
+ com.isencia.passerelle.process.model.impl;bundle-version="8.7.0",
+ com.isencia.sherpa.jndi;bundle-version="2.2.5",
+ org.eclipse.persistence.jpa;bundle-version="2.4.1"
+Export-Package: com.isencia.passerelle.process.model.impl.shbl
