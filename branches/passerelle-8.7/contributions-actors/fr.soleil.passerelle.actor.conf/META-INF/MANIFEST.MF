@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Soleil actors palette configuration
+Bundle-SymbolicName: fr.soleil.passerelle.actor.conf;singleton:=true
+Bundle-Version: 8.5.0.qualifier
+Bundle-Vendor: isencia
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

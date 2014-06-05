@@ -1,0 +1,1372 @@
+<Version> 0.6 </Version>
+<ScanConfig>
+  <dimensions serialization="custom">
+    <unserializable-parents/>
+    <list>
+      <default>
+        <size>1</size>
+      </default>
+      <int>10</int>
+      <Dimension>
+        <trajectoryClass>fr.soleil.salsa.model.scanconfig.LinearTrajectory</trajectoryClass>
+        <rangeClass>fr.soleil.salsa.model.scanconfig.LinearRange</rangeClass>
+        <actuators serialization="custom">
+          <unserializable-parents/>
+          <list>
+            <default>
+              <size>1</size>
+            </default>
+            <int>10</int>
+            <Actuator>
+              <secondDimension>false</secondDimension>
+              <changed>false</changed>
+              <name>image/analyzer/test/mx</name>
+              <enabled>true</enabled>
+              <obs>
+                <ActuatorList reference="../../../.."/>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+                <ActuatorList serialization="custom">
+                  <unserializable-parents/>
+                  <list>
+                    <default>
+                      <size>1</size>
+                    </default>
+                    <int>10</int>
+                    <Actuator reference="../../../.."/>
+                  </list>
+                  <fr.soleil.salsa.util.AbstractSalsaModelList>
+                    <default>
+                      <listenerList/>
+                      <support serialization="custom">
+                        <java.beans.PropertyChangeSupport>
+                          <default>
+                            <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                            <source class="ActuatorList" reference="../../../../../.."/>
+                          </default>
+                          <null/>
+                        </java.beans.PropertyChangeSupport>
+                      </support>
+                    </default>
+                  </fr.soleil.salsa.util.AbstractSalsaModelList>
+                </ActuatorList>
+              </obs>
+            </Actuator>
+          </list>
+          <fr.soleil.salsa.util.AbstractSalsaModelList>
+            <default>
+              <listenerList>
+                <Dimension reference="../../../../.."/>
+              </listenerList>
+              <support serialization="custom">
+                <java.beans.PropertyChangeSupport>
+                  <default>
+                    <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                    <source class="ActuatorList" reference="../../../../../.."/>
+                  </default>
+                  <null/>
+                </java.beans.PropertyChangeSupport>
+              </support>
+            </default>
+          </fr.soleil.salsa.util.AbstractSalsaModelList>
+        </actuators>
+        <ranges serialization="custom">
+          <unserializable-parents/>
+          <list>
+            <default>
+              <size>1</size>
+            </default>
+            <int>10</int>
+            <Range>
+              <integrationTime>1.0</integrationTime>
+              <stepNumber>3</stepNumber>
+              <changed>false</changed>
+              <name>1</name>
+              <enabled>true</enabled>
+              <obs>
+                <fr.soleil.salsa.util.RangeList reference="../../../.."/>
+                <Trajectory>
+                  <originPosition>0.0</originPosition>
+                  <endPosition>15.0</endPosition>
+                  <delta>5.0</delta>
+                  <deltaConstant>false</deltaConstant>
+                  <scanSpeed>0.0</scanSpeed>
+                  <relative>false</relative>
+                  <range class="Range" reference="../../.."/>
+                  <changed>false</changed>
+                  <name></name>
+                  <enabled>true</enabled>
+                  <obs>
+                    <Dimension reference="../../../../../../.."/>
+                  </obs>
+                </Trajectory>
+              </obs>
+            </Range>
+          </list>
+          <fr.soleil.salsa.util.AbstractSalsaModelList>
+            <default>
+              <listenerList>
+                <Dimension reference="../../../../.."/>
+              </listenerList>
+              <support serialization="custom">
+                <java.beans.PropertyChangeSupport>
+                  <default>
+                    <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                    <source class="fr.soleil.salsa.util.RangeList" reference="../../../../../.."/>
+                  </default>
+                  <null/>
+                </java.beans.PropertyChangeSupport>
+              </support>
+            </default>
+          </fr.soleil.salsa.util.AbstractSalsaModelList>
+        </ranges>
+        <trajectories>
+          <fr.soleil.salsa.model.scanconfig.Trajectory-array>
+            <Trajectory reference="../../../ranges/list/Range/obs/Trajectory"/>
+          </fr.soleil.salsa.model.scanconfig.Trajectory-array>
+        </trajectories>
+        <listenerList/>
+        <changed>false</changed>
+        <name></name>
+        <enabled>true</enabled>
+        <obs>
+          <DimensionList reference="../../../.."/>
+        </obs>
+      </Dimension>
+    </list>
+    <fr.soleil.salsa.util.AbstractSalsaModelList>
+      <default>
+        <listenerList/>
+        <support serialization="custom">
+          <java.beans.PropertyChangeSupport>
+            <default>
+              <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+              <source class="DimensionList" reference="../../../../../.."/>
+            </default>
+            <null/>
+          </java.beans.PropertyChangeSupport>
+        </support>
+      </default>
+    </fr.soleil.salsa.util.AbstractSalsaModelList>
+  </dimensions>
+  <clientProperties>
+    <entry>
+      <string>displayConfiguration</string>
+      <fr.soleil.util.display.DisplayConfiguration>
+        <sources>
+          <fr.soleil.util.display.DisplayConfiguration_-CSource serialization="custom">
+            <unserializable-parents/>
+            <list>
+              <default>
+                <size>1</size>
+              </default>
+              <int>10</int>
+              <fr.soleil.util.display.tango.AttributeDataSource>
+                <attributeInfo>
+                  <name>data_1</name>
+                  <writable>
+                    <value>0</value>
+                  </writable>
+                  <data__format>
+                    <value>1</value>
+                  </data__format>
+                  <data__type>2</data__type>
+                  <max__dim__x>2147483647</max__dim__x>
+                  <max__dim__y>0</max__dim__y>
+                  <description>No description</description>
+                  <label>tango/tangotest/1/short_scalar</label>
+                  <unit>No unit</unit>
+                  <standard__unit>1.0</standard__unit>
+                  <display__unit>1.0</display__unit>
+                  <format>%6.2f</format>
+                  <min__value>Not specified</min__value>
+                  <max__value>Not specified</max__value>
+                  <min__alarm>Not specified</min__alarm>
+                  <max__alarm>Not specified</max__alarm>
+                  <writable__attr__name>None</writable__attr__name>
+                  <level>
+                    <value>0</value>
+                  </level>
+                  <extensions/>
+                </attributeInfo>
+                <description></description>
+                <name></name>
+                <origin>test/scan/assane/data_1</origin>
+                <type>SENSOR</type>
+                <value/>
+              </fr.soleil.util.display.tango.AttributeDataSource>
+            </list>
+            <fr.soleil.api.GenericListModel>
+              <default>
+                <e>
+                  <enabled>true</enabled>
+                  <id class="fr.soleil.api.Id">
+                    <type>test/scan/assane</type>
+                    <enabled>true</enabled>
+                    <name>test/scan/assane</name>
+                  </id>
+                  <name>test/scan/assane</name>
+                </e>
+              </default>
+            </fr.soleil.api.GenericListModel>
+            <fr.soleil.util.display.DisplayConfiguration_-CSource>
+              <default>
+                <outer-class reference="../../../../.."/>
+              </default>
+            </fr.soleil.util.display.DisplayConfiguration_-CSource>
+          </fr.soleil.util.display.DisplayConfiguration_-CSource>
+        </sources>
+        <displayers>
+          <fr.soleil.util.display.DisplayConfiguration_-CDisplayer serialization="custom">
+            <unserializable-parents/>
+            <list>
+              <default>
+                <size>2</size>
+              </default>
+              <int>10</int>
+              <fr.soleil.util.display.Projection>
+                <dataSource class="fr.soleil.util.display.tango.AttributeDataSource">
+                  <attributeInfo>
+                    <name>actuator_1_1</name>
+                    <writable reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/writable"/>
+                    <data__format reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/data_format"/>
+                    <data__type>5</data__type>
+                    <max__dim__x>2147483647</max__dim__x>
+                    <max__dim__y>0</max__dim__y>
+                    <description>No description</description>
+                    <label>image/analyzer/test/mx</label>
+                    <unit>No unit</unit>
+                    <standard__unit>No standard unit</standard__unit>
+                    <display__unit>No display unit</display__unit>
+                    <format>%6.2f</format>
+                    <min__value>Not specified</min__value>
+                    <max__value>Not specified</max__value>
+                    <min__alarm>Not specified</min__alarm>
+                    <max__alarm>Not specified</max__alarm>
+                    <writable__attr__name>None</writable__attr__name>
+                    <level reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/level"/>
+                    <extensions/>
+                  </attributeInfo>
+                  <description></description>
+                  <name></name>
+                  <origin>test/scan/assane/actuator_1_1</origin>
+                  <type>ACTUATOR</type>
+                  <value/>
+                </dataSource>
+                <service class="fr.soleil.util.display.Service">
+                  <axeType>X</axeType>
+                  <cardinality>One</cardinality>
+                </service>
+              </fr.soleil.util.display.Projection>
+              <fr.soleil.util.display.Projection>
+                <dataSource class="fr.soleil.util.display.tango.AttributeDataSource">
+                  <attributeInfo>
+                    <name>data_1</name>
+                    <writable reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/writable"/>
+                    <data__format reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/data_format"/>
+                    <data__type>5</data__type>
+                    <max__dim__x>2147483647</max__dim__x>
+                    <max__dim__y>0</max__dim__y>
+                    <description>No description</description>
+                    <label>image/analyzer/1/centroidx</label>
+                    <unit>µm</unit>
+                    <standard__unit>No standard unit</standard__unit>
+                    <display__unit>No display unit</display__unit>
+                    <format>%10.2f</format>
+                    <min__value>Not specified</min__value>
+                    <max__value>Not specified</max__value>
+                    <min__alarm>Not specified</min__alarm>
+                    <max__alarm>Not specified</max__alarm>
+                    <writable__attr__name>None</writable__attr__name>
+                    <level reference="../../../../../../../sources/fr.soleil.util.display.DisplayConfiguration$CSource/list/fr.soleil.util.display.tango.AttributeDataSource/attributeInfo/level"/>
+                    <extensions/>
+                  </attributeInfo>
+                  <description></description>
+                  <name></name>
+                  <origin>test/scan/assane/data_1</origin>
+                  <type>SENSOR</type>
+                  <value/>
+                </dataSource>
+                <service class="fr.soleil.util.display.Service">
+                  <axeType>Y1</axeType>
+                  <cardinality>OneToAll</cardinality>
+                </service>
+              </fr.soleil.util.display.Projection>
+            </list>
+            <fr.soleil.api.GenericListModel>
+              <default>
+                <e>
+                  <enabled>true</enabled>
+                  <id class="fr.soleil.api.Id">
+                    <type>spectrum</type>
+                    <enabled>true</enabled>
+                    <name>spectrum (0)</name>
+                  </id>
+                  <name>1D</name>
+                </e>
+              </default>
+            </fr.soleil.api.GenericListModel>
+            <fr.soleil.util.display.ADisplayer>
+              <default>
+                <prefs class="string">graph_title:&apos;null&apos;
+label_visible:true
+graph_background:255,255,255
+title_font:Dialog,0,12
+xgrid:false
+xsubgrid:false
+xgrid_style:1
+xmin:0.0
+xmax:100.0
+xautoscale:true
+xcale:0
+xformat:0
+xtitle:&apos;null&apos;
+xcolor:0,0,0
+xlabel_font:Dialog,0,11
+y1grid:false
+y1subgrid:false
+y1grid_style:1
+y1min:0.0
+y1max:100.0
+y1autoscale:true
+y1cale:0
+y1format:0
+y1title:&apos;null&apos;
+y1color:0,0,0
+y1label_font:Dialog,0,11
+y2grid:false
+y2subgrid:false
+y2grid_style:1
+y2min:0.0
+y2max:100.0
+y2autoscale:true
+y2cale:0
+y2format:0
+y2title:&apos;null&apos;
+y2color:0,0,0
+y2label_font:Dialog,0,11
+dv_number:1
+dv0_name:&apos;image/analyzer/1/centroidx&apos;
+dv0_linecolor:255,0,0
+dv0_linewidth:1
+dv0_linestyle:0
+dv0_fillcolor:192,192,192
+dv0_fillmethod:2
+dv0_fillstyle:0
+dv0_viewtype:0
+dv0_barwidth:10
+dv0_markercolor:255,0,0
+dv0_markersize:6
+dv0_markerstyle:0
+dv0_A0:0.0
+dv0_A1:1.0
+dv0_A2:0.0
+dv0_labelvisible:true
+dv0_clickable:true
+dv0_labelColor:0,0,0
+</prefs>
+              </default>
+            </fr.soleil.util.display.ADisplayer>
+            <fr.soleil.util.display.DisplayConfiguration_-CDisplayer>
+              <default>
+                <outer-class reference="../../../../.."/>
+              </default>
+            </fr.soleil.util.display.DisplayConfiguration_-CDisplayer>
+          </fr.soleil.util.display.DisplayConfiguration_-CDisplayer>
+        </displayers>
+        <enabled>true</enabled>
+        <name></name>
+      </fr.soleil.util.display.DisplayConfiguration>
+    </entry>
+    <entry>
+      <string>displayPerspective</string>
+      <fr.soleil.util.docking.Perspective>
+        <name>1DScan</name>
+        <byteArray>rO0ABXoAAAH4AAAABAAAAAAEAAAAV6ztAAVzcgARamF2YS5sYW5nLkludGVnZXIS4qCk94GHOAIA
+AUkABXZhbHVleHIAEGphdmEubGFuZy5OdW1iZXKGrJUdC5TgiwIAAHhw/////3cE/////wAAAFes
+7QAFc3IAEWphdmEubGFuZy5JbnRlZ2VyEuKgpPeBhzgCAAFJAAV2YWx1ZXhyABBqYXZhLmxhbmcu
+TnVtYmVyhqyVHQuU4IsCAAB4cP////93BP////8AAABXrO0ABXNyABFqYXZhLmxhbmcuSW50ZWdl
+chLioKT3gYc4AgABSQAFdmFsdWV4cgAQamF2YS5sYW5nLk51bWJlcoaslR0LlOCLAgAAeHD/////
+dwT/////AAAAV6ztAAVzcgARamF2YS5sYW5nLkludGVnZXIS4qCk94GHOAIAAUkABXZhbHVleHIA
+EGphdmEubGFuZy5OdW1iZXKGrJUdC5TgiwIAAHhw/////3cE/////wAAAAEAAAABAAAAAQAAAAIA
+AAADAP//////////AP////8BAAAAyAD//////////wAAAAAAAADIAP//////////AAAAAAAAAMgB
+//////////8AAAAAAAAAyAD//////////wAAAAAAAAAA////////////////////////////////
+</byteArray>
+      </fr.soleil.util.docking.Perspective>
+    </entry>
+  </clientProperties>
+  <name>1DScan</name>
+  <scanAddOn>
+    <support serialization="custom">
+      <java.beans.PropertyChangeSupport>
+        <default>
+          <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+          <source class="ScanAddOns" reference="../../../.."/>
+        </default>
+        <null/>
+      </java.beans.PropertyChangeSupport>
+    </support>
+    <postScanBehaviour>
+      <stage>POST_RUN</stage>
+      <actions serialization="custom">
+        <unserializable-parents/>
+        <list>
+          <default>
+            <size>1</size>
+          </default>
+          <int>10</int>
+          <fr.soleil.salsa.model.scanconfig.hook.BehaviourAction>
+            <behaviour>NOOP</behaviour>
+            <value serialization="custom">
+              <unserializable-parents/>
+              <list>
+                <default>
+                  <size>2</size>
+                </default>
+                <int>10</int>
+                <fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-StringElement>
+                  <outer-class reference="../../../.."/>
+                  <changed>false</changed>
+                  <name>1</name>
+                  <enabled>true</enabled>
+                  <obs/>
+                </fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-StringElement>
+                <fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-StringElement>
+                  <outer-class reference="../../../.."/>
+                  <changed>false</changed>
+                  <name>1</name>
+                  <enabled>true</enabled>
+                  <obs/>
+                </fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-StringElement>
+              </list>
+              <fr.soleil.salsa.util.AbstractSalsaModelList>
+                <default>
+                  <listenerList/>
+                  <support serialization="custom">
+                    <java.beans.PropertyChangeSupport>
+                      <default>
+                        <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                        <source class="fr.soleil.salsa.model.scanconfig.hook.BehaviourAction$BehaviourParameters" reference="../../../../../.."/>
+                      </default>
+                      <null/>
+                    </java.beans.PropertyChangeSupport>
+                  </support>
+                </default>
+              </fr.soleil.salsa.util.AbstractSalsaModelList>
+              <fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-BehaviourParameters>
+                <default>
+                  <outer-class reference="../../../.."/>
+                </default>
+              </fr.soleil.salsa.model.scanconfig.hook.BehaviourAction_-BehaviourParameters>
+            </value>
+            <enabled>true</enabled>
+            <changed>false</changed>
+            <name></name>
+            <enabled defined-in="fr.soleil.salsa.util.Element">true</enabled>
+            <obs>
+              <ActionList reference="../../../.."/>
+            </obs>
+          </fr.soleil.salsa.model.scanconfig.hook.BehaviourAction>
+        </list>
+        <fr.soleil.salsa.util.AbstractSalsaModelList>
+          <default>
+            <listenerList/>
+            <support serialization="custom">
+              <java.beans.PropertyChangeSupport>
+                <default>
+                  <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                  <source class="ActionList" reference="../../../../../.."/>
+                </default>
+                <null/>
+              </java.beans.PropertyChangeSupport>
+            </support>
+          </default>
+        </fr.soleil.salsa.util.AbstractSalsaModelList>
+      </actions>
+      <changed>false</changed>
+      <name>Post Scan Behaviour</name>
+      <enabled>true</enabled>
+      <obs>
+        <ScanAddOns reference="../../.."/>
+      </obs>
+    </postScanBehaviour>
+    <hooks serialization="custom">
+      <unserializable-parents/>
+      <list>
+        <default>
+          <size>0</size>
+        </default>
+        <int>10</int>
+      </list>
+      <fr.soleil.salsa.util.AbstractSalsaModelList>
+        <default>
+          <listenerList/>
+          <support serialization="custom">
+            <java.beans.PropertyChangeSupport>
+              <default>
+                <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+                <source class="HookList" reference="../../../../../.."/>
+              </default>
+              <null/>
+            </java.beans.PropertyChangeSupport>
+          </support>
+        </default>
+      </fr.soleil.salsa.util.AbstractSalsaModelList>
+    </hooks>
+    <errorStrategy>
+      <actuatorsTimeOut>5.0</actuatorsTimeOut>
+      <actuatorsRetryCount>5</actuatorsRetryCount>
+      <actuatorsRetryTimeOut>0.2</actuatorsRetryTimeOut>
+      <actuatorsErrorStrategy>IGNORE</actuatorsErrorStrategy>
+      <timebasesTimeOut>5.0</timebasesTimeOut>
+      <timebasesRetryCount>5</timebasesRetryCount>
+      <timebasesRetryTimeOut>0.2</timebasesRetryTimeOut>
+      <timebasesErrorStrategy reference="../actuatorsErrorStrategy"/>
+      <sensorsTimeOut>5.0</sensorsTimeOut>
+      <sensorsRetryCount>5</sensorsRetryCount>
+      <sensorsRetryTimeOut>0.2</sensorsRetryTimeOut>
+      <sensorsErrorStrategy reference="../actuatorsErrorStrategy"/>
+      <hooksTimeOut>5.0</hooksTimeOut>
+      <hooksRetryCount>5</hooksRetryCount>
+      <hooksRetryTimeOut>0.2</hooksRetryTimeOut>
+      <hooksErrorStrategy reference="../actuatorsErrorStrategy"/>
+      <contextValidationErrorStrategy reference="../actuatorsErrorStrategy"/>
+      <changed>false</changed>
+      <name></name>
+      <enabled>true</enabled>
+      <obs>
+        <ScanAddOns reference="../../.."/>
+      </obs>
+    </errorStrategy>
+  </scanAddOn>
+  <scanNumber>1</scanNumber>
+  <sensors serialization="custom">
+    <unserializable-parents/>
+    <list>
+      <default>
+        <size>1</size>
+      </default>
+      <int>10</int>
+      <Sensor>
+        <timebase>false</timebase>
+        <changed>false</changed>
+        <name>image/analyzer/1/centroidx</name>
+        <enabled>true</enabled>
+        <obs>
+          <SensorList reference="../../../.."/>
+        </obs>
+      </Sensor>
+    </list>
+    <fr.soleil.salsa.util.AbstractSalsaModelList>
+      <default>
+        <listenerList/>
+        <support serialization="custom">
+          <java.beans.PropertyChangeSupport>
+            <default>
+              <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+              <source class="SensorList" reference="../../../../../.."/>
+            </default>
+            <null/>
+          </java.beans.PropertyChangeSupport>
+        </support>
+      </default>
+    </fr.soleil.salsa.util.AbstractSalsaModelList>
+  </sensors>
+  <timebases serialization="custom">
+    <unserializable-parents/>
+    <list>
+      <default>
+        <size>0</size>
+      </default>
+      <int>10</int>
+    </list>
+    <fr.soleil.salsa.util.AbstractSalsaModelList>
+      <default>
+        <listenerList/>
+        <support serialization="custom">
+          <java.beans.PropertyChangeSupport>
+            <default>
+              <propertyChangeSupportSerializedDataVersion>2</propertyChangeSupportSerializedDataVersion>
+              <source class="TimebaseList" reference="../../../../../.."/>
+            </default>
+            <null/>
+          </java.beans.PropertyChangeSupport>
+        </support>
+      </default>
+    </fr.soleil.salsa.util.AbstractSalsaModelList>
+  </timebases>
+  <modified>false</modified>
+  <actuatorsDelay>0.0</actuatorsDelay>
+  <onTheFly>false</onTheFly>
+  <enabledScanSpeed>false</enabledScanSpeed>
+  <zigzag>false</zigzag>
+  <propertyListenerList/>
+  <changed>false</changed>
+  <obs/>
+</ScanConfig>
