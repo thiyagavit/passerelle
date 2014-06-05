@@ -567,7 +567,7 @@ public abstract class TaskBasedActor extends Actor {
         final String errorMsg = "Error executing task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
         ProcessingException exception = new ProcessingException(ErrorCode.TASK_ERROR, errorMsg, TaskBasedActor.this, message, error);
         try {
-          refreshTaskInContext(task, message);
+          task = refreshTaskInContext(task, message);
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
           setConsumed(true);
         } catch (Exception e) {
@@ -586,7 +586,7 @@ public abstract class TaskBasedActor extends Actor {
         Task task = (Task) event.getContext().getRequest();
         Request parentrequest = task.getParentContext().getRequest();
         try {
-          refreshTaskInContext(task, message);
+          task = refreshTaskInContext(task, message);
           onTaskFinished(task, message, processResponse);
           setConsumed(true);
         } catch (Exception e) {
@@ -610,7 +610,7 @@ public abstract class TaskBasedActor extends Actor {
         final String errorMsg = "Timeout invoking task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
         ProcessingException exception = new ProcessingException(ErrorCode.TASK_TIMEOUT, errorMsg, TaskBasedActor.this, message, null);
         try {
-          refreshTaskInContext(task, message);
+          task = refreshTaskInContext(task, message);
 
           ExecutionTracerService.trace(TaskBasedActor.this, exception);
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
@@ -638,12 +638,13 @@ public abstract class TaskBasedActor extends Actor {
       }
     }
 
-    private void refreshTaskInContext(Task task, ManagedMessage message) throws MessageException {
+    private Task refreshTaskInContext(Task task, ManagedMessage message) throws MessageException {
       Context processContext = (Context) message.getBodyContent();
       // Retrieve the task from db, bypassing the cache
       task = ServiceRegistry.getInstance().getEntityManager().getTask(task.getId(), true);
       // Re-attach on the process context
       processContext.reattachTask(task);
+      return task;
     }
   }
 }
