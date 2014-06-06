@@ -12,8 +12,12 @@ import org.eclipse.persistence.sessions.server.ServerSession;
 
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ContextErrorEvent;
+import com.isencia.passerelle.process.model.ContextEvent;
+import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextImpl;
@@ -22,6 +26,7 @@ import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.TaskImpl;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 import com.isencia.passerelle.process.service.ProcessPersistenceService;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.sherpa.persistence.commons.EntityManagerPool;
 import com.isencia.sherpa.persistence.context.PersistenceRequestContext;
 import com.isencia.sherpa.persistence.jpa.LightWeightEntityManager;
@@ -31,8 +36,16 @@ import com.isencia.sherpa.persistence.jpa.query.SherpaCriteriaQuery;
 import com.isencia.sherpa.persistence.jpa.query.SherpaQuery;
 
 public class LightWeightProcessPersistenceService implements ProcessPersistenceService {	
+	/**
+	 * closes a unit of work, committing or rolling back the transaction if one is active.
+	 * This method will remove the unit of work from the thread, and close the transaction
+	 * doing a commit or a rollback if any call during the transaction has failed.
+	 */
 	public void close() {
 		LightWeightEntityManager em = getEntityManager();
+		if (em == null)
+			return;
+		
 		EntityTransaction transaction = em.getTransaction();
 		if (transaction.isActive())
 			if (transaction.getRollbackOnly())
@@ -50,8 +63,13 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 	}
 	
 	protected LightWeightEntityManager getEntityManager() {
-		return((LightWeightEntityManager) EntityManagerPool.getEntityManager("passerelle"));
+		return(getEntityManager(false));
 	}
+
+	protected LightWeightEntityManager getEntityManager(boolean create) {
+		return((LightWeightEntityManager) EntityManagerPool.getEntityManager("passerelle",create));
+	}
+	
 	
 	@Override
 	public Request getRequest(Case caze, Long id) {
@@ -149,33 +167,57 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 		return(task);
 	}
 
-	public void open(boolean transactional) {
-		// make sure to login to the database the first time an entityManager is
-		// created
-		// (login is done lazily to allow initialization after the entities have
-		// been woven and before the persistenceUnit is deployed)
-		ServerSession session = EntityManagerPool.getFactory("passerelle").getServerSession();
-		if (!session.isLoggedIn()) {
-			// PERF: Avoid synchronization.
-			synchronized (session) {
-				// DCL ok as isLoggedIn is volatile boolean, set after login is
-				// complete.
-				if (!session.isLoggedIn()) {
-					PersistenceRequestContext.setPersistenceUnitName(session.getName());
-					session.login();
-					PersistenceRequestContext.setPersistenceUnitName(null);
-					PersistenceRequestContext.unset();
+	/**
+	 * opens a unit of work, and starts a transaction if required.
+	 * If there is no open unit of work, this method will open one and associate it with the current thread,
+	 * allowing calls to any other methods to use that unit of work. In that case, the method returns <code>true</code>,
+	 * meaning that the caller should call <code>close()</code> to mark the end of the unit of work.
+	 * If the unit of work is transactional, a commit or rollback will be done when it is closed.
+	 * If there is already an open unit of work, this method will check if it is transactional.
+	 * If a transaction is active, this method returns <code>false</code> indicating that the caller is
+	 * participating in an ongoing unit of work, and the caller should not call <code>close()</code>.
+	 * If no transaction is active, this method will start a transaction and return <code>true</code>,
+	 * meaning that the caller should call <code>close()</code> to close the transaction.
+	 */
+	public boolean open(boolean transactional) {
+		// look for an entityManager associated with the current thread
+		LightWeightEntityManager em = getEntityManager();
+
+		if (em == null) {
+			// make sure to login to the database the first time an entityManager is
+			// created
+			// (login is done lazily to allow initialization after the entities have
+			// been woven and before the persistenceUnit is deployed)
+			ServerSession session = EntityManagerPool.getFactory("passerelle").getServerSession();
+			if (!session.isLoggedIn()) {
+				// PERF: Avoid synchronization.
+				synchronized (session) {
+					// DCL ok as isLoggedIn is volatile boolean, set after login is
+					// complete.
+					if (!session.isLoggedIn()) {
+						PersistenceRequestContext.setPersistenceUnitName(session.getName());
+						session.login();
+						PersistenceRequestContext.setPersistenceUnitName(null);
+						PersistenceRequestContext.unset();
+					}
 				}
 			}
-		}
 
-		LightWeightEntityManager em = getEntityManager();
+			// create an entityManager and associate it with the current thread
+			em = getEntityManager(true);
+		} else {
+			if (!transactional || em.getTransaction().isActive())
+				// there is an entityManager with the correct transaction propagation 
+				return(false);
+		}
 
 		if (transactional) {
 			EntityTransaction transaction = em.getTransaction();
 			if (!transaction.isActive())
 				transaction.begin();
 		}
+		
+		return(true);
 	}
 
 	@Override
@@ -260,5 +302,61 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 			if (transaction.isActive())
 				transaction.setRollbackOnly();
 		}
+	}
+
+	@Override
+	public void updateStatus(Context context, Status status) {
+		updateStatus(context,status,null,null);
+	}
+
+	@Override
+	public void updateStatus(Context context, Status status, ErrorItem errorItem) {
+		updateStatus(context,status,errorItem,null);
+	}
+
+	protected void updateStatus(Context context, Status status, ErrorItem errorItem, String message) {
+		LightWeightEntityManager entityManager = getEntityManager();
+	    context.setStatus(status);
+	    entityManager.update(context, ContextImpl._STATUS);
+	    if (errorItem == null) {
+	      ContextEvent event = ServiceRegistry.getInstance().getProcessFactory().createContextEvent(context,status.name(),message);
+	      entityManager.persist(event);
+	    } else {
+	      ContextErrorEvent event = ServiceRegistry.getInstance().getProcessFactory().createContextErrorEvent(context,errorItem);
+	      entityManager.persist(event);
+	    }
+	}
+
+	@Override
+	public void updateStatus(Context context, Status status, String message) {
+		updateStatus(context,status,null,message);
+	}
+
+	@Override
+	public ContextEvent getContextEvent(Request request, Long id) {
+		List<ContextEvent> events = request.getProcessingContext().getEvents();
+		if (ProcessUtils.isInitialized(events))
+			for (ContextEvent event : request.getProcessingContext().getEvents()) {
+				if (event.getId().equals(id))
+					return(event);
+			}
+
+		for (Task task : request.getProcessingContext().getTasks()) {
+			events = request.getProcessingContext().getEvents();
+			if (ProcessUtils.isInitialized(events))
+				for (ContextEvent event : task.getProcessingContext().getEvents()) {
+					if (event.getId().equals(id))
+						return(event);
+				}
+		}
+		
+		// TODO should we lookup an event in the database and update the list of events of the context !?
+		// (looks like that should never occur if events are loaded eagerly and new events are automatically added to the context)
+		return null;
+	}
+
+	@Override
+	public void persistContextEvent(ContextEvent event) {
+	    getEntityManager().persist(event);
 	}
 }

@@ -7,6 +7,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
+import com.isencia.passerelle.process.model.Task;
 
 /**
  * @author puidir
@@ -16,18 +17,6 @@ public interface ContextManager {
   
   String REPORT_EVENT_TYPE = "REPORTED";
 
-	/**
-	 * Destroy any listeners
-	 */
-	void clear();
-	
-	/**
-	 * This method should be invoked to clean-up ThreadLocal resources linked to the persistence fwk.
-	 * 
-	 * @deprecated temporary fix for issue with trailing persistence-context-related resources
-	 */
-	void cleanupShbResources();
-	
   /**
   * Creates a new event
   *
@@ -48,18 +37,23 @@ public interface ContextManager {
 
 	
 	/**
-	 * Notify listeners that the processing of the context has started.
+	 * Notify listeners that the processing of the request has started.
 	 *
-	 * @param context Context that started
+	 * @param request Request that started
 	 */
-	Context notifyStarted(Context context);
+	void notifyStarted();
+	void notifyStarted(Task task);
 
 	/**
-	 * Notify listeners that the processing of the context has finished.
-	 *
-	 * @param context Context that finished
+	 * Notify listeners that the processing of the request has finished.
 	 */
-	Context notifyFinished(Context context);
+	void notifyFinished();
+	/**
+	 * Notify listeners that the processing of a task has finished.
+	 *
+	 * @param task Task that finished
+	 */
+	void notifyFinished(Task task);
 
 	/**
 	 * Notify listeners that the processing of the context has finished with an error.

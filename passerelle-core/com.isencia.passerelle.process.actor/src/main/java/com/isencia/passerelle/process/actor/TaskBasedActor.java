@@ -37,6 +37,7 @@ import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -226,8 +227,11 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   protected boolean doRestart(ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
-    Context flowContext = (Context) message.getBodyContent();
-
+	  //FIXME we suppose the message contains the UUID of the processManager  
+	  String id = (String)message.getBodyContent();
+	  ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(id);
+	  Context flowContext = processManager.getRequest().getProcessingContext();
+	  
     if (Status.RESTARTED.equals(flowContext.getStatus())) {
       for (int taskIdx = flowContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
         Task task = flowContext.getTasks().get(taskIdx);
@@ -240,7 +244,7 @@ public abstract class TaskBasedActor extends Actor {
               return true;
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
-              ServiceRegistry.getInstance().getContextManager().notifyStarted(flowContext);
+              processManager.notifyStarted();
               break;
             }
           }
