@@ -98,13 +98,9 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
       this.taskContext = ctxtID;
     }
     public Void call() {
-      try {
-        Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext);
-        if (!finalTaskContext.isFinished()) {
-          ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
-        }
-      } finally {
-        ServiceRegistry.getInstance().getContextManager().cleanupShbResources();
+      Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext);
+      if (!finalTaskContext.isFinished()) {
+        ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
       }
       return null;
     }

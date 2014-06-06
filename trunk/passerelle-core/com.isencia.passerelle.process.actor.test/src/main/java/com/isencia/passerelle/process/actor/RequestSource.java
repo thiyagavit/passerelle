@@ -35,8 +35,8 @@ import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.service.ProcessManagerImpl;
 import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
 
 /**
  * @author erwin
