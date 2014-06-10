@@ -1,12 +1,9 @@
 package com.isencia.passerelle.process.service;
 
 import com.isencia.passerelle.process.model.Case;
-import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
-import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
-import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 
 public interface ProcessPersistenceService {
@@ -31,7 +28,4 @@ public interface ProcessPersistenceService {
 	void persistTask(Task task);
 	void updateResultBlock(ResultBlock resultBlock);
 	void updateStatus(Request request);
-	void updateStatus(Context context, Status status);
-	void updateStatus(Context context, Status status, ErrorItem item);
-	void updateStatus(Context context, Status status, String message);
 }
