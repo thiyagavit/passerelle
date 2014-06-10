@@ -16,8 +16,8 @@ package com.isencia.passerelle.process.service;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.factory.ContextManager;
 import com.isencia.util.FutureValue;
 
 /**

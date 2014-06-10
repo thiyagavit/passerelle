@@ -12,12 +12,9 @@ import org.eclipse.persistence.sessions.server.ServerSession;
 
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
-import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
-import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextImpl;
@@ -26,7 +23,6 @@ import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.TaskImpl;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.sherpa.persistence.commons.EntityManagerPool;
 import com.isencia.sherpa.persistence.context.PersistenceRequestContext;
 import com.isencia.sherpa.persistence.jpa.LightWeightEntityManager;
@@ -302,34 +298,6 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 			if (transaction.isActive())
 				transaction.setRollbackOnly();
 		}
-	}
-
-	@Override
-	public void updateStatus(Context context, Status status) {
-		updateStatus(context,status,null,null);
-	}
-
-	@Override
-	public void updateStatus(Context context, Status status, ErrorItem errorItem) {
-		updateStatus(context,status,errorItem,null);
-	}
-
-	protected void updateStatus(Context context, Status status, ErrorItem errorItem, String message) {
-		LightWeightEntityManager entityManager = getEntityManager();
-	    context.setStatus(status);
-	    entityManager.update(context, ContextImpl._STATUS);
-	    if (errorItem == null) {
-	      ContextEvent event = ServiceRegistry.getInstance().getProcessFactory().createContextEvent(context,status.name(),message);
-	      entityManager.persist(event);
-	    } else {
-	      ContextErrorEvent event = ServiceRegistry.getInstance().getProcessFactory().createContextErrorEvent(context,errorItem);
-	      entityManager.persist(event);
-	    }
-	}
-
-	@Override
-	public void updateStatus(Context context, Status status, String message) {
-		updateStatus(context,status,null,message);
 	}
 
 	@Override
