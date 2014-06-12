@@ -31,6 +31,7 @@ import com.isencia.sherpa.persistence.jpa.query.SherpaCriteriaBuilder;
 import com.isencia.sherpa.persistence.jpa.query.SherpaCriteriaQuery;
 import com.isencia.sherpa.persistence.jpa.query.SherpaQuery;
 
+//FIXME persist methods should throw exception
 public class LightWeightProcessPersistenceService implements ProcessPersistenceService {	
 	/**
 	 * closes a unit of work, committing or rolling back the transaction if one is active.

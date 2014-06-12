@@ -97,7 +97,7 @@ public class Fork extends AbstractMessageSequenceGenerator {
           // enforce single Fork name
           outputMsg.setHeader(HEADER_SEQ_SRC, getName());
           outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-          ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getContextRepositoryID());
+          ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getProcessId());
           procResponse.addOutputMessage(outputPorts.get(i), outputMsg);
         }
       } catch (Exception e) {

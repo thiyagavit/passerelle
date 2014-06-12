@@ -263,7 +263,7 @@ public class BatchRequestSequenceSource extends Actor {
         boolean isSeqEnd = requestAttrsQueue.size() == 0;
         ManagedMessage outputMessage = MessageFactory.getInstance().createMessageInSequence(seqID, seqPos++, isSeqEnd, getStandardMessageHeaders());
         outputMessage.setBodyContent(context, ManagedMessage.objectContentType);
-        ((SettableMessage)outputMessage).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getContextRepositoryID());
+        ((SettableMessage)outputMessage).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getProcessId());
         response.addOutputMessage(output, outputMessage);
         // trigger ourselves again
         offer(new MessageInputContext(0, input.getName(), outputMessage));

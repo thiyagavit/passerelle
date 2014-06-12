@@ -632,8 +632,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    */
   protected ManagedMessage createMessageForContext(Context context) throws MessageException {
     SettableMessage message = (SettableMessage) createMessage(context, ManagedMessage.objectContentType);
-    if (context.getId() != null) {
-      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getContextRepositoryID());
+    if (context.getProcessId() != null) {
+      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getProcessId());
     }
     return message;
   }

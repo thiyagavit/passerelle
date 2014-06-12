@@ -22,3 +22,5 @@ Export-Package: com.isencia.passerelle.process.service;version="8.7.0",
  com.isencia.passerelle.process.service.impl
 Require-Bundle: com.isencia.passerelle.process.common;bundle-version="8.7.0",
  org.eclipse.equinox.preferences;bundle-version="3.4.0"
+Service-Component: OSGI-INF/ProcessPersistenceService.xml,
+ OSGI-INF/ProcessManagerService.xml

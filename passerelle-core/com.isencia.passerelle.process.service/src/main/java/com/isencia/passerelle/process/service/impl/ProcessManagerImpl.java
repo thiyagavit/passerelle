@@ -22,6 +22,7 @@ public class ProcessManagerImpl implements ProcessManager {
 	public ProcessManagerImpl(String id, Request request) {
 		this.id = id;
 		this.request = request;
+		this.request.getProcessingContext().setProcessId(id);
 	}
 	
 	@Override
