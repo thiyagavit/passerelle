@@ -23,6 +23,7 @@ import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.TaskImpl;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 import com.isencia.passerelle.process.service.ProcessPersistenceService;
+import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
 import com.isencia.sherpa.persistence.commons.EntityManagerPool;
 import com.isencia.sherpa.persistence.context.PersistenceRequestContext;
 import com.isencia.sherpa.persistence.jpa.LightWeightEntityManager;
@@ -51,6 +52,10 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 				transaction.commit();
 
 		EntityManagerPool.closeEntityManager("passerelle");
+	}
+	
+	public void destroy() {
+		ProcessPersistenceServiceTracker.setService(null);
 	}
 	
 	@Override
@@ -162,6 +167,10 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 		}
 		
 		return(task);
+	}
+	
+	public void init() {
+		ProcessPersistenceServiceTracker.setService(this);
 	}
 
 	/**
