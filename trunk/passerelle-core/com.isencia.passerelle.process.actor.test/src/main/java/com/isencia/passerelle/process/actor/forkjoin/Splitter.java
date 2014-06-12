@@ -112,7 +112,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
               // enforce single Splitter name (so use setHeader i.o. addHeader)
               outputMsg.setHeader(HEADER_SEQ_SRC, getName());
               outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-              ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getContextRepositoryID());
+              ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getProcessId());
               procResponse.addOutputMessage(output, outputMsg);
             }
             doingSplit = true;

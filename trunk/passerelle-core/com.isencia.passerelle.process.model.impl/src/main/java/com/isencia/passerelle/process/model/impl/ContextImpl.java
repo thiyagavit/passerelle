@@ -121,7 +121,7 @@ public class ContextImpl implements Context {
   private List<Long> minimizedTasks = new ArrayList<Long>();
   
   @Transient
-  private String repositoryId;
+  private String processId;
   
   //avoid concurrent modif ex when getForkedContexts is called while forking or joining
   @Transient
@@ -157,12 +157,15 @@ public class ContextImpl implements Context {
     this.id = id;
   }
   
-  public String getContextRepositoryID() {
-    return repositoryId;
+  public String getProcessId() {
+	 if (processId == null && request instanceof Task) {
+		 return(((Task)request).getParentContext().getProcessId());
+	 }
+    return processId;
   }
   
-  public void setContextRepositoryID(String repositoryId) {
-    this.repositoryId = repositoryId;
+  public void setProcessId(String repositoryId) {
+    this.processId = repositoryId;
   }
 
   public Status getStatus() {
