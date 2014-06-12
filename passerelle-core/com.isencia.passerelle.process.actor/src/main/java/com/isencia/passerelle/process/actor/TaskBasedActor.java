@@ -240,8 +240,8 @@ public abstract class TaskBasedActor extends Actor {
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
               ServiceRegistry.getInstance().getContextManager().notifyStarted(flowContext);
-              task.getProcessingContext().setStatus(Status.CANCELLED);
               ServiceRegistry.getInstance().getContextManager().notifyCancelled(ServiceRegistry.getInstance().getContextManager().getContext(task.getProcessingContext().getId()));
+              task.getProcessingContext().setStatus(Status.CANCELLED);
               break;
             }
           }
