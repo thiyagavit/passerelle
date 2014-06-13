@@ -136,9 +136,17 @@ public interface EntityManager {
 	 * @param status one of the enum values
 	 * @return List of requests
 	 */
-	List<Request> getRequestsByContextStatus(Status status);
+	List<? extends Request> getRequestsByContextStatus(Status status);
 
 	/**
+	 * Get all requests that are in a certain state
+	 * 
+	 * @param status Status to search for
+	 * @return List of key-value StringPair objects containing the ID and Type of the requests found
+	 */
+  List<StringPair> getRequestsInfoByContextStatus(Status status);
+
+  /**
 	 * Generate a Request with the same correlation identifier as the given
 	 * Request
 	 * 
