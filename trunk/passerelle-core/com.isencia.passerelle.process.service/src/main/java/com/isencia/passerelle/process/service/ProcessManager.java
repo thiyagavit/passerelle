@@ -162,7 +162,7 @@ public interface ProcessManager {
 	/**
 	 * Pause the flow for this request.
 	 */
-	void pause(long timeOut, TimeUnit timeOutUnit);
+	void pause();
 
 	/**
 	 * Restart the flow for this request from the given Task.
@@ -172,12 +172,12 @@ public interface ProcessManager {
 	/**
 	 * Resume the flow for this request.
 	 */
-	void resume(long timeOut, TimeUnit timeOutUnit);
+	void resume();
 	
 	/**
 	 * Start the flow for this request.
 	 */
-	void start(long timeOut, TimeUnit timeOutUnit);
+	void start();
 
 	/**
 	 * Stop the flow for this request.
