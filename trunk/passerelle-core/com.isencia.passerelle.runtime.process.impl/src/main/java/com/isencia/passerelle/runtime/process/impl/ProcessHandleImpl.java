@@ -46,7 +46,7 @@ public class ProcessHandleImpl implements ProcessHandle {
   }
 
   @Override
-  public String getProcessContextId() {
+  public String getProcessId() {
     return processContextId;
   }
 

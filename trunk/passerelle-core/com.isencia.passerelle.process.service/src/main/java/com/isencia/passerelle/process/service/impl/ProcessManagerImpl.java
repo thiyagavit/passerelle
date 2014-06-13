@@ -1,33 +1,33 @@
 package com.isencia.passerelle.process.service.impl;
 
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.runtime.ProcessHandle;
 
 public class ProcessManagerImpl implements ProcessManager {
 	
-	private final String id;
+	private final ProcessHandle handle;
 	private Request request;
 
 	public ProcessManagerImpl(Request request) {
-		this(UUID.randomUUID().toString(),request);
+		this(new ProcessHandleImpl(),request);
 	}
 	
-	public ProcessManagerImpl(String id, Request request) {
-		this.id = id;
+	public ProcessManagerImpl(ProcessHandle handle, Request request) {
+		this.handle = handle;
 		this.request = request;
-		this.request.getProcessingContext().setProcessId(id);
+		this.request.getProcessingContext().setProcessId(handle.getProcessId());
 	}
 	
 	@Override
-	public String getId() {
-		return(id);
+	public ProcessHandle getHandle() {
+		return(handle);
 	}
 	
 	public Request getRequest() {
@@ -143,5 +143,25 @@ public class ProcessManagerImpl implements ProcessManager {
 	@Override
 	public void unsubscribe(ContextProcessingCallback callback) {
 		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public void pause(long timeOut, TimeUnit timeOutUnit) {
+	}
+
+	@Override
+	public void restart(Long taskId, long timeOut, TimeUnit timeOutUnit) {
+	}
+
+	@Override
+	public void resume(long timeOut, TimeUnit timeOutUnit) {
+	}
+
+	@Override
+	public void start(long timeOut, TimeUnit timeOutUnit) {
+	}
+
+	@Override
+	public void stop(long timeOut, TimeUnit timeOutUnit) {
 	}
 }

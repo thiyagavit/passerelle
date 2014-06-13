@@ -11,7 +11,7 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 	private Map<String,ProcessManager> processManagers = new ConcurrentHashMap<String,ProcessManager>(16,0.9F,1);
 
 	public ProcessManager addProcessManager(ProcessManager processManager) {
-		return(processManagers.put(processManager.getId(),processManager));
+		return(processManagers.put(processManager.getHandle().getProcessId(),processManager));
 	}
 	
 	public void destroy() {

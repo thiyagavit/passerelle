@@ -109,13 +109,13 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle refresh(ProcessHandle processHandle) {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     return fet!=null ? new ProcessHandleImpl(fet) : processHandle;
   }
 
   @Override
   public ProcessHandle waitUntilFinished(ProcessHandle processHandle, long time, TimeUnit unit) throws TimeoutException, InterruptedException, FlowNotExecutingException, ExecutionException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if (fet != null) {
       try {
         fet.get(time, unit);
@@ -133,7 +133,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
    */
   @Override
   public ProcessHandle terminate(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
       throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
@@ -144,7 +144,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
       throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
@@ -156,7 +156,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
       throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
