@@ -30,13 +30,13 @@ public interface ProcessHandle {
   
   /**
    * 
-   * @return the flow that is running the process
+   * @return the flowHandle of the flow that is running the process
    */
-  FlowHandle getFlow();
+  FlowHandle getFlowHandle();
   
   /**
    * For context-aware executions, this can be used to retrieve 
-   * the <code>Context</code> from the <code>ContextRepository</code> if needed.
+   * the <code>ProcessManager</code> from the <code>ProcessManagerService</code> if needed.
    * <b>Remark that such retrieval can be a heavy operation and should only be attempted when really necessary.</b> 
    * <br/>
    * For the rare process executions without assigned <code>Context</code>s, this returns an id that can be used to
