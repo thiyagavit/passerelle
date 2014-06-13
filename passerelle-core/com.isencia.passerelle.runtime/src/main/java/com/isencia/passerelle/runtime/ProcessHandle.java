@@ -45,7 +45,7 @@ public interface ProcessHandle {
    * @return the UUID of the process execution;
    * 
    */
-  String getProcessContextId();
+  String getProcessId();
   
   /**
    * 

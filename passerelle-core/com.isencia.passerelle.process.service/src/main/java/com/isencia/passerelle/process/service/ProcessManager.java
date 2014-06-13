@@ -1,18 +1,21 @@
 package com.isencia.passerelle.process.service;
 
+import java.util.concurrent.TimeUnit;
+
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
 	public static final String REPORT_EVENT_TYPE = "REPORTED";
-	
-	String getId();
 
-	Request getRequest();
+	ProcessHandle getHandle();
 	
+	Request getRequest();
+
 	Task getTask(Long id);
 
 	/**
@@ -74,7 +77,7 @@ public interface ProcessManager {
 	 * @param event
 	 */
 	void notifyEvent(ContextEvent event);
-	
+
 	/**
 	 * Notify all listeners about a given context event on the request.
 	 * 
@@ -121,7 +124,7 @@ public interface ProcessManager {
 	 *            Task that is pending completion
 	 */
 	void notifyPendingCompletion(Task task);
-	
+
 	/**
 	 * Notify listeners that the processing of a task was restarted.
 	 * 
@@ -157,23 +160,52 @@ public interface ProcessManager {
 	void notifyTimeOut(Task task);
 
 	/**
-	 * Subscribe the given callback to status change notifications of the given task
-	 * 
-	 * @param task Task for which status change notifications are posted
-	 * @param callback Callback that will be notified
+	 * Pause the flow for this request.
 	 */
-	void subscribe(Task task, ContextProcessingCallback callback);
+	void pause(long timeOut, TimeUnit timeOutUnit);
+
+	/**
+	 * Restart the flow for this request from the given Task.
+	 */
+	void restart(Long taskId, long timeOut, TimeUnit timeOutUnit);
+
+	/**
+	 * Resume the flow for this request.
+	 */
+	void resume(long timeOut, TimeUnit timeOutUnit);
 	
 	/**
-	 * Subscribe the given callback to status change notifications for any/all task(s).
+	 * Start the flow for this request.
+	 */
+	void start(long timeOut, TimeUnit timeOutUnit);
+
+	/**
+	 * Stop the flow for this request.
+	 */
+	void stop(long timeOut, TimeUnit timeOutUnit);
+
+	/**
+	 * Subscribe the given callback to status change notifications of the given
+	 * task
+	 * 
+	 * @param task
+	 *            Task for which status change notifications are posted
+	 * @param callback
+	 *            Callback that will be notified
+	 */
+	void subscribe(Task task, ContextProcessingCallback callback);
+
+	/**
+	 * Subscribe the given callback to status change notifications for any/all
+	 * task(s).
 	 * 
 	 * @param callback
 	 */
 	void subscribeAll(ContextProcessingCallback callback);
-	
+
 	/**
-	 * Unsubscribe the given callback.
-	 * It can be an "all" subscriber or one subscribed for a specific task.
+	 * Unsubscribe the given callback. It can be an "all" subscriber or one
+	 * subscribed for a specific task.
 	 * 
 	 * @param callback
 	 */

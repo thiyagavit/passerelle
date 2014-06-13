@@ -8,8 +8,12 @@ Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.actor;version="8.7.0",
  com.isencia.passerelle.core;version="8.7.0",
+ com.isencia.passerelle.model;version="8.7.0",
  com.isencia.passerelle.process.model;version="8.7.0",
  com.isencia.passerelle.process.model.factory;version="8.7.0",
+ com.isencia.passerelle.runtime;version="8.7.0",
+ com.isencia.passerelle.runtime.process;version="8.7.0",
+ com.isencia.passerelle.runtime.repository;version="8.7.0",
  com.isencia.sherpa.commons,
  com.isencia.util;version="8.7.0",
  org.apache.commons.lang;version="2.4.0",
