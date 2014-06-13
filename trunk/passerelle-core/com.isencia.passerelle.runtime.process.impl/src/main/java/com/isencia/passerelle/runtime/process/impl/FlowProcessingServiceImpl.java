@@ -124,7 +124,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
       }
       return new ProcessHandleImpl(fet);
     } else {
-      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
     }
   }
 
@@ -135,7 +135,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   public ProcessHandle terminate(ProcessHandle processHandle) throws FlowNotExecutingException {
     FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
     } else {
       fet.cancel(true);
       return new ProcessHandleImpl(fet);
@@ -146,7 +146,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
     FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
     } else {
       // TODO check if we can/need to do something with the boolean result...
       fet.suspend();
@@ -158,7 +158,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
     FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
     } else {
       // TODO check if we can/need to do something with the boolean result...
       fet.resume();

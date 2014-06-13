@@ -7,7 +7,7 @@ import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
 public class ProcessHandleImpl implements ProcessHandle {
-	private FlowHandle flow;
+	private FlowHandle flowHandle;
 	private String processId;
 	private ProcessStatus executionStatus;
 	private String[] suspendedElements;
@@ -26,8 +26,8 @@ public class ProcessHandleImpl implements ProcessHandle {
 	}
 
 	@Override
-	public FlowHandle getFlow() {
-		return flow;
+	public FlowHandle getFlowHandle() {
+		return flowHandle;
 	}
 
 	@Override
@@ -44,8 +44,8 @@ public class ProcessHandleImpl implements ProcessHandle {
 		this.executionStatus = executionStatus;
 	}
 	
-	public void setFlow(FlowHandle flow) {
-		this.flow = flow;
+	public void setFlowHandle(FlowHandle flowHandle) {
+		this.flowHandle = flowHandle;
 	}
 	
 	public void setSuspendedElements(String[] suspendedElements) {

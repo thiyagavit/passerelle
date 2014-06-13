@@ -41,7 +41,7 @@ public class ProcessHandleImpl implements ProcessHandle {
   }
 
   @Override
-  public FlowHandle getFlow() {
+  public FlowHandle getFlowHandle() {
     return flowHandle;
   }
 
