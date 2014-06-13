@@ -38,7 +38,6 @@ import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.service.ProcessManager;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 @SuppressWarnings("serial")
@@ -124,14 +123,14 @@ public abstract class TaskBasedActor extends Actor {
     ManagedMessage message = request.getMessage(input);
     if (message != null) {
       Context processContext = null;
-      Context taskContext = null;
       try {
-        if (message.getBodyContent() instanceof Context) {
-          processContext = (Context) message.getBodyContent();
-        } else {
-          throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
-        }
-        if (!doRestart(message, response)) {
+        processContext = request.getContext(input);
+      } catch (MessageException e1) {
+        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Unable to get process context from message", this, message, e1);
+      }
+      Task task = null;
+      try {
+        if (!doRestart(ctxt, message, response)) {
           if (mustProcess(message)) {
             // create attributes and entries, in case of error catch and rethrow after task creation
             Map<String, String> taskAttributes = new HashMap<String, String>();
@@ -143,20 +142,13 @@ public abstract class TaskBasedActor extends Actor {
             } catch (Exception e) {
               exceptionDuringCreation = e;
             }
-
-            taskContext = createTask(processContext, taskAttributes, taskContextEntries);
+            task = createTask(ctxt, processContext, taskAttributes, taskContextEntries);
             if (exceptionDuringCreation != null) {
               // re-throw here, exception will be attached to taskContext
               throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
             }
-            // Remark that we don't return a changed taskContext or so
-            // any changes (e.g. new events,results,status,... should be done in the passed taskContext instance, if
-            // needed
-            // for this actor it's not relevant as it doesn't work with the context in the remainder of this method.
-            // any following processing is done in the TaskContextListener.
-            // But we need to check if this works OK with the strange JPA/eclipselink behaviour in some configurations
-            process(taskContext);
-            postProcess(message, taskContext, response);
+            process(task);
+            postProcess(message, task, response);
           } else {
             response.addOutputMessage(output, message);
             processFinished(ctxt, request, response);
@@ -167,17 +159,13 @@ public abstract class TaskBasedActor extends Actor {
         }
       } catch (PasserelleException ex) {
         ExecutionTracerService.trace(this, ex.getMessage());
-        // copy the ex info but ensure that the message is added
-        // as an exception coming from the depths of task processing may not know about the received message
-//        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
-        ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, ex);
+        ctxt.getProcessManagerService().getProcessManager(processContext.getProcessId()).notifyError(task, ex);
         response.setException(new ProcessingException(ex.getErrorCode(), ex.getSimpleMessage(), this, message, ex.getCause()));
         processFinished(ctxt, request, response);
       } catch (Throwable t) {
         ExecutionTracerService.trace(this, t.getMessage());
+        ctxt.getProcessManagerService().getProcessManager(processContext.getProcessId()).notifyError(task, t);
         response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, message, t));
-//        taskContext = ServiceRegistry.getInstance().getEntityManager().getContext(taskContext.getId());
-        ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, t);
         processFinished(ctxt, request, response);
       }
     } else {
@@ -188,35 +176,40 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Override this in specific cases where default postProcessing is not OK. Default is to register a
-   * TaskContextListener that will send the processing Context onwards when the Task is done.
+   * Override this in specific cases where default postProcessing is not OK.
+   * Default is to register a TaskContextListener that will send the processing
+   * Context onwards when the Task is done.
    * 
    * @param message
-   * @param taskContext
+   * @param task
    * @param response
    * @throws Exception
    */
-  protected void postProcess(ManagedMessage message, Context taskContext, ProcessResponse response) throws Exception {
+  protected void postProcess(ManagedMessage message, Task task, ProcessResponse response) throws Exception {
     TaskContextListener listener = new TaskContextListener(message, response);
     pendingListeners.add(listener);
-    ServiceRegistry.getInstance().getContextManager().subscribe(taskContext, listener);
+    ProcessManager procMgr  = response.getContext().getProcessManagerService().getProcessManager(task.getProcessingContext().getProcessId());
+    procMgr.subscribe(task, listener);
   }
 
   /**
-   * Should perform the actual processing of the task. For most simple/fast cases, this can be done in a synchronous
-   * fashion. For complex/long-running processing, the usage of a ServiceBasedActor is advisable.
+   * Should perform the actual processing of the task. For most simple/fast
+   * cases, this can be done in a synchronous fashion. For complex/long-running
+   * processing, the usage of a ServiceBasedActor is advisable.
    * 
-   * @param taskContext
-   *          the context of the new task that must be processed
+   * @param task
+   *          the new task that must be processed
    * @return the updated context of the started/executed task
    * @throws ProcessingException
    */
-  protected abstract void process(Context taskContext) throws ProcessingException;
+  protected abstract void process(Task task) throws ProcessingException;
 
   /**
-   * Override this method to define the logic for potentially skipping the processing of a received message.
+   * Override this method to define the logic for potentially skipping the
+   * processing of a received message.
    * <p>
-   * Sample cases could be : check for mock mode, filter on certain request elements etc
+   * Sample cases could be : check for mock mode, filter on certain request
+   * elements etc
    * </p>
    * 
    * @param message
@@ -226,25 +219,33 @@ public abstract class TaskBasedActor extends Actor {
     return true;
   }
 
-  protected boolean doRestart(ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
-	  //FIXME we suppose the message contains the UUID of the processManager  
-	  String id = (String)message.getBodyContent();
-	  ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(id);
-	  Context flowContext = processManager.getRequest().getProcessingContext();
-	  
-    if (Status.RESTARTED.equals(flowContext.getStatus())) {
-      for (int taskIdx = flowContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
-        Task task = flowContext.getTasks().get(taskIdx);
+  /**
+   * Checks if the process is being restarted and if the task for this actor is the one where the restart should pick in.
+   * 
+   * @param actorContext
+   * @param message
+   * @param response
+   * @return
+   * @throws MessageException
+   * @throws ProcessingException
+   */
+  protected boolean doRestart(ActorContext actorContext, ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
+    Context processContext = ProcessRequest.getContextForMessage(message);
+    if (Status.RESTARTED.equals(processContext.getStatus())) {
+      for (int taskIdx = processContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
+        Task task = processContext.getTasks().get(taskIdx);
         try {
           URI uri = new URI(task.getInitiator());
           if (FlowUtils.getOriginalFullName(this).substring(1).equals(uri.getPath().substring(1))) {
             if (task.getProcessingContext().isFinished()) {
-              beforeRestart(task, flowContext);
+              beforeRestart(task, processContext);
               onTaskFinished(task, message, response);
               return true;
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
+              ProcessManager processManager = actorContext.getProcessManagerService().getProcessManager(processContext.getProcessId());
               processManager.notifyStarted();
+              processManager.notifyCancelled(task);
               break;
             }
           }
@@ -261,30 +262,28 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Returns a new Task (or at least its Context) with the configured resultType as taskType.
+   * Returns a new Task (or at least its Context) with the configured resultType
+   * as taskType.
    * 
    * @param parentContext
    * @param taskAttributes
    * @param taskContextEntries
-   * @return the context for a new task created within the parent process context
+   * @return the context for a new task created within the parent process
+   *         context
    * @throws Exception
    */
-  protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
+  protected Task createTask(ActorContext actorContext, Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
-    
-    Task task = ServiceRegistry.getInstance().getProcessFactory().createTask(getTaskClass(parentContext), parentContext, initiator, getTaskType());
-	for (Entry<String, String> attr : taskAttributes.entrySet()) {
-		ServiceRegistry.getInstance().getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
-	}
-	
-	for (String key : taskContextEntries.keySet()) {
-		Serializable value = taskContextEntries.get(key);
-		task.getProcessingContext().putEntry(key, value);
-	}
-
-	ServiceRegistry.getInstance().getProcessPersistenceService().persistTask(task);
-	
-    return(task.getProcessingContext());
+    Task task = actorContext.getProcessFactory().createTask(getTaskClass(parentContext), parentContext, initiator, getTaskType());
+    for (Entry<String, String> attr : taskAttributes.entrySet()) {
+      actorContext.getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
+    }
+    for (String key : taskContextEntries.keySet()) {
+      Serializable value = taskContextEntries.get(key);
+      task.getProcessingContext().putEntry(key, value);
+    }
+    actorContext.getProcessPersistenceService().persistTask(task);
+    return task;
   }
 
   /**
@@ -333,8 +332,9 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Method to configure the attributes for the task that the actor wants to get executed. The actor implementation
-   * should add entries in the taskAttributes map as needed for its type of task. Attribute data is typically obtained
+   * Method to configure the attributes for the task that the actor wants to get
+   * executed. The actor implementation should add entries in the taskAttributes
+   * map as needed for its type of task. Attribute data is typically obtained
    * either from the received processContext and/or from the actor's parameters.
    * 
    * @param processContext
@@ -350,11 +350,13 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Method to allow actor implementations to pass specific context entries into the task that will be created and
-   * executed. Similar to <code>addActorSpecificTaskAttributes</code> but :
+   * Method to allow actor implementations to pass specific context entries into
+   * the task that will be created and executed. Similar to
+   * <code>addActorSpecificTaskAttributes</code> but :
    * <ul>
    * <li>context entries can contain any serializable object i.o. just strings</li>
-   * <li>context entries are typically not persisted, but only valid in memory during the process execution!</li>
+   * <li>context entries are typically not persisted, but only valid in memory
+   * during the process execution!</li>
    * </ul>
    * 
    * @param processContext
@@ -368,7 +370,8 @@ public abstract class TaskBasedActor extends Actor {
    * @param context
    * @param itemName
    * @param defaultValue
-   * @return the value of the context item with the given itemName, or the defaultValue if no such item was found.
+   * @return the value of the context item with the given itemName, or the
+   *         defaultValue if no such item was found.
    */
   protected final String getContextItemValue(Context context, String itemName, String defaultValue) {
     if (context == null || itemName == null) {
@@ -380,8 +383,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Stores the value of the context item with the given itemName, or the defaultValue, in the given map, iff a non-null
-   * value is found.
+   * Stores the value of the context item with the given itemName, or the
+   * defaultValue, in the given map, iff a non-null value is found.
    * 
    * @param map
    * @param context
@@ -396,13 +399,15 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Stores the value of the context item with the given lookupItemName, or the defaultValue, in the given map, with as
-   * name attrName, iff a non-null value is found.
+   * Stores the value of the context item with the given lookupItemName, or the
+   * defaultValue, in the given map, with as name attrName, iff a non-null value
+   * is found.
    * 
    * @param map
    * @param context
    * @param attrName
-   *          the name that will be given to the resulting attribute, stored in the map
+   *          the name that will be given to the resulting attribute, stored in
+   *          the map
    * @param lookupItemName
    *          the name used to lookup the data item in the given context.
    * @param defaultValue
@@ -415,11 +420,12 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Retrieves the value of a context item with the given itemName. If this is not found, it uses the value of the
-   * actorParameter as default value.
+   * Retrieves the value of a context item with the given itemName. If this is
+   * not found, it uses the value of the actorParameter as default value.
    * <p>
-   * The actorParameter's value may contain a placeHolder (syntax #[some_name]), in which case another context item is
-   * looked up, this time with the <i>some_name</i> from the placeHolder.
+   * The actorParameter's value may contain a placeHolder (syntax #[some_name]),
+   * in which case another context item is looked up, this time with the
+   * <i>some_name</i> from the placeHolder.
    * </p>
    * 
    * @param map
@@ -428,7 +434,8 @@ public abstract class TaskBasedActor extends Actor {
    * @param actorParameter
    * @throws IllegalActionException
    */
-  protected final void storeContextItemValueInMap(Map<String, String> map, Context context, String itemName, Variable actorParameter) throws IllegalActionException {
+  protected final void storeContextItemValueInMap(Map<String, String> map, Context context, String itemName, Variable actorParameter)
+      throws IllegalActionException {
     String defaultValue = null;
     if (actorParameter instanceof StringParameter) {
       defaultValue = ((StringParameter) actorParameter).stringValue();
@@ -443,18 +450,22 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Retrieves the value of a context item with one of the given itemNames (first one that is found).
+   * Retrieves the value of a context item with one of the given itemNames
+   * (first one that is found).
    * 
-   * This can be used to look for parameters where the name of the key varies. E.g. a LineNumber is sometimes known as
-   * an NA, a CLE or a DN. You can look up this parameter by searching with a number of keys with:
-   * storeContextItemValueInMap(flowCtx, taskAttrs, "my_attr_key", null, new String[]{"LINENUMBER", "NA", "CLE", "DN"});
+   * This can be used to look for parameters where the name of the key varies.
+   * E.g. a LineNumber is sometimes known as an NA, a CLE or a DN. You can look
+   * up this parameter by searching with a number of keys with:
+   * storeContextItemValueInMap(flowCtx, taskAttrs, "my_attr_key", null, new
+   * String[]{"LINENUMBER", "NA", "CLE", "DN"});
    * 
    * @param context
    *          Context of the request to search in
    * @param map
    *          Map to store the value in
    * @param attrName
-   *          the name that will be given to the resulting attribute, stored in the map
+   *          the name that will be given to the resulting attribute, stored in
+   *          the map
    * @param defaultValue
    *          Default value to use when none of the keys yield a value
    * @param itemNames
@@ -503,7 +514,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Look up the value of a context item with one of the given itemNames (first one that is found).
+   * Look up the value of a context item with one of the given itemNames (first
+   * one that is found).
    * 
    * This can be used to look for parameters where the name of the key varies.
    * 
@@ -533,11 +545,12 @@ public abstract class TaskBasedActor extends Actor {
   private Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
     String requestId = Long.toString(processContext.getRequest().getId());
     String referenceId = Long.toString(processContext.getRequest().getCase().getId());
-  
+
     taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
     taskAttributes.put(AttributeNames.REF_ID, referenceId);
     taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
-    // allow subclasses to add their own attributes, mostly based on data in the received processContext
+    // allow subclasses to add their own attributes, mostly based on data in the
+    // received processContext
     addActorSpecificTaskAttributes(processContext, taskAttributes);
     return taskAttributes;
   }
@@ -586,7 +599,8 @@ public abstract class TaskBasedActor extends Actor {
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
           setConsumed(true);
         } catch (Exception e) {
-          // this line serves to get the constructed PasserelleException in the log file
+          // this line serves to get the constructed PasserelleException in the
+          // log file
           getLogger().error("Failed to send error msg, so dumping its stacktrace here ", exception);
           // and this one to also get the IllegalActionException in there
           getLogger().error("Failed to send error msg because of ", e);
@@ -629,7 +643,8 @@ public abstract class TaskBasedActor extends Actor {
           setConsumed(true);
         } catch (Exception e) {
           ExecutionTracerService.trace(TaskBasedActor.this, exception);
-          // this line serves to get the constructed PasserelleException in the log file
+          // this line serves to get the constructed PasserelleException in the
+          // log file
           getLogger().error("Failed to send timeout error msg, so dumping its stacktrace here ", exception);
           // and this one to also get the IllegalActionException in there
           getLogger().error("Failed to send timeout error msg because of ", e);

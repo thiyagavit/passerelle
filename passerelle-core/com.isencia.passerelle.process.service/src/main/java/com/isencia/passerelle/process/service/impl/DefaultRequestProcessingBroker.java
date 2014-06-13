@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.service.impl;
 
 import java.util.HashSet;
@@ -21,15 +21,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
-import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
 import com.isencia.passerelle.process.service.RequestProcessingService;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
- * A simple default implementation in case no custom implementations get registered as service impl.
+ * A simple default implementation in case no custom implementations get
+ * registered as service impl.
  * 
  * @author erwin
  */
@@ -49,14 +53,15 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
   }
 
   @Override
-  public Future<Context> process(Context taskContext, Long timeout, TimeUnit unit) throws ProcessingException {
+  public Future<Request> process(Request request, Long timeout, TimeUnit unit) throws ProcessingException {
     // Get timeout handling working before accessing the services
-    // to make sure that bad/blocking service implementations don't interfere with it.
-    registerTimeOutHandler(taskContext, timeout, unit);
+    // to make sure that bad/blocking service implementations don't interfere
+    // with it.
+    registerTimeOutHandler(request, timeout, unit);
 
-    Future<Context> futResult = null;
+    Future<Request> futResult = null;
     for (RequestProcessingService service : services) {
-      futResult = service.process(taskContext, timeout, unit);
+      futResult = service.process(request, timeout, unit);
       if (futResult != null) {
         break;
       }
@@ -64,15 +69,15 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
     if (futResult != null) {
       return futResult;
     } else {
-      throw new ProcessingException(ErrorCode.TASK_UNHANDLED, "No service found for "+taskContext, null, null);
+      throw new ProcessingException(ErrorCode.TASK_UNHANDLED, "No service found for " + request, null, null);
     }
   }
 
-  private void registerTimeOutHandler(final Context taskContext, Long timeout, TimeUnit unit) {
+  private void registerTimeOutHandler(final Request request, Long timeout, TimeUnit unit) {
     if (timeout == null || unit == null || (timeout <= 0)) {
       return;
     }
-    delayTimer.schedule(new TimeoutHandler(taskContext.getId()), timeout, unit);
+    delayTimer.schedule(new TimeoutHandler(request.getProcessingContext().getProcessId(), request.getId()), timeout, unit);
   }
 
   @Override
@@ -90,17 +95,22 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
     services.clear();
   }
 
-
-
   public static final class TimeoutHandler implements Callable<Void> {
-    private final Long taskContext;
-    public TimeoutHandler(Long ctxtID) {
-      this.taskContext = ctxtID;
+    private final String processID;
+    private final Long taskID;
+
+    public TimeoutHandler(String processID, Long taskID) {
+      this.processID = processID;
+      this.taskID = taskID;
     }
+
     public Void call() {
-      Context finalTaskContext = ServiceRegistry.getInstance().getContextManager().getContext(taskContext);
-      if (!finalTaskContext.isFinished()) {
-        ServiceRegistry.getInstance().getContextManager().notifyTimeOut(finalTaskContext);
+      ProcessManager procMgr = ProcessManagerServiceTracker.getService().getProcessManager(processID);
+      if (procMgr != null) {
+        Task task = procMgr.getTask(taskID);
+        if (task!=null && !task.getProcessingContext().isFinished()) {
+          procMgr.notifyTimeOut(task);
+        }
       }
       return null;
     }

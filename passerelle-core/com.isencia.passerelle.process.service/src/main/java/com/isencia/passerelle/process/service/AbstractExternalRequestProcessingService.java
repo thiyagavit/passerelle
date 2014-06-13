@@ -6,7 +6,7 @@ package com.isencia.passerelle.process.service;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 
 /**
  * Abstract base class for RequestProcessingServices that delegate work to an Adapter.
@@ -26,8 +26,8 @@ public abstract class AbstractExternalRequestProcessingService<A extends Adapter
   }
   
   @Override
-  public Future<Context> process(Context context, Long timeout, TimeUnit unit) {
-    return adapter.process(context, timeout, unit);
+  public Future<Request> process(Request request, Long timeout, TimeUnit unit) {
+    return adapter.process(request, timeout, unit);
   }
   
 }

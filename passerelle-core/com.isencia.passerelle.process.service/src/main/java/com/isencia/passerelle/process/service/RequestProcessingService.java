@@ -17,7 +17,7 @@ package com.isencia.passerelle.process.service;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.util.FutureValue;
 
 /**
@@ -28,24 +28,24 @@ import com.isencia.util.FutureValue;
 public interface RequestProcessingService {
   
   /**
-   * Process the given Context within the given timeout, if this service instance is capable of handling it.
+   * Process the given Request within the given timeout, if this service instance is capable of handling it.
    * If the service is unable to handle it, it should simply return <code>null</code> immediately.
    * <p>
    * The service implementation is responsible for notifying the system when the task is finished,
-   * or when a timeout or error occurred, using the related methods in {@link ContextManager}.
+   * or when a timeout or error occurred, using the related methods in {@link ProcessManager}.
    * </p>
    * <p>
    * Service implementations are by preference non-blocking, and should just return a {@link Future}
-   * to the finished task's {@link Context}.
+   * to the finished Request.
    * <br/>
    * Blocking service implementations are of course possible, and could use e.g. {@link FutureValue}
    * to return a pre-filled Future.
    * </p>
    * 
-   * @param context the Context of the Request/Task that must be processed
+   * @param request the Request/Task that must be processed
    * @param timeout the timeout period; null or <=0 values indicate : no timeout should be set.
    * @param unit the {@link TimeUnit} of the timeout period
-   * @return a Future to the task's context after processing is finished or null if this service is unable to process the given task
+   * @return a Future to the request after processing is finished or null if this service is unable to process the given request
    */
-  Future<Context> process(Context context, Long timeout, TimeUnit unit);
+  Future<Request> process(Request request, Long timeout, TimeUnit unit);
 }
