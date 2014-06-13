@@ -146,22 +146,27 @@ public class ProcessManagerImpl implements ProcessManager {
 	}
 
 	@Override
-	public void pause(long timeOut, TimeUnit timeOutUnit) {
+	public void pause() {
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
 	public void restart(Long taskId, long timeOut, TimeUnit timeOutUnit) {
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
-	public void resume(long timeOut, TimeUnit timeOutUnit) {
+	public void resume() {
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
-	public void start(long timeOut, TimeUnit timeOutUnit) {
+	public void start() {
+		// TODO Auto-generated method stub	
 	}
 
 	@Override
 	public void stop(long timeOut, TimeUnit timeOutUnit) {
+		// TODO Auto-generated method stub	
 	}
 }
