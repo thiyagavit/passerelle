@@ -55,6 +55,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -179,11 +180,11 @@ public class EventsToTaskCollector extends Actor {
       ExecutionTracerService.trace(this, t.getMessage());
       response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, t));
       if (taskContext != null) {
-        ServiceRegistry.getInstance().getContextManager().notifyError(taskContext, t);
+        ProcessManagerServiceTracker.getService().getProcessManager(processContext.getProcessId()).notifyError(task, t);
       }
     }
     if (taskContext != null) {
-      ServiceRegistry.getInstance().getContextManager().notifyFinished(taskContext);
+      ProcessManagerServiceTracker.getService().getProcessManager(processContext.getProcessId()).notifyFinished(task);
     }
 
     try {

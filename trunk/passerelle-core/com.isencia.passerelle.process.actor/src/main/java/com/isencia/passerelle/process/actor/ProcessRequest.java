@@ -19,18 +19,25 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import com.isencia.passerelle.message.MessageInputContext;
+
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.message.ManagedMessage;
+import com.isencia.passerelle.message.MessageException;
+import com.isencia.passerelle.message.MessageInputContext;
+import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 
 /**
- * ProcessRequest is a generic container for request data delivered to an actor in the process domain. 
- * It contains (inputport,message) pairs, related to a same processing <code>Context</code>.
+ * ProcessRequest is a generic container for request data delivered to an actor
+ * in the process domain. It contains (inputport,message) pairs, related to a
+ * same processing <code>Context</code>.
  * <p>
- * A process actor needs to be able to collect input messages belonging to a same process context before
- * executing its <code>process(...)</code> method.
+ * A process actor needs to be able to collect input messages belonging to a
+ * same process context before executing its <code>process(...)</code> method.
  * </p>
  * 
  * @author erwin
@@ -74,7 +81,7 @@ public class ProcessRequest {
   public boolean addInputMessage(int inputIndex, String inputName, ManagedMessage inputMsg) {
     if (isMessageInContext(inputMsg)) {
       MessageInputContext presentCtxt = inputContexts.get(inputName);
-    MessageInputContext newCtxt = new MessageInputContext(inputIndex, inputName, inputMsg);
+      MessageInputContext newCtxt = new MessageInputContext(inputIndex, inputName, inputMsg);
       if (presentCtxt == null) {
         inputContexts.put(inputName, newCtxt);
       } else {
@@ -106,43 +113,84 @@ public class ProcessRequest {
     }
   }
 
+  protected static Context getContextForMessage(ManagedMessage message) throws MessageException {
+    if (message.getBodyContent() instanceof Context) {
+      return (Context) message.getBodyContent();
+    } else {
+      String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+      if (ctxtHdrs == null || ctxtHdrs.length == 0) {
+        throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", message, null);
+      } else {
+        ProcessManager processManager = ProcessManagerServiceTracker.getService().getProcessManager(ctxtHdrs[0]);
+        if (processManager != null && processManager.getRequest()!=null) {
+          return processManager.getRequest().getProcessingContext();
+        } else {
+          throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context found for ID " + ctxtHdrs[0] + " in msg", message, null);
+        }
+      }
+    }
+  }
+  
   /**
-   * Returns the most recently received message on the given Port. For PULL ports, only one message can be read from an input port per iteration, and any other
-   * buffered messages will be offered one-by-one in consecutive actor iterations. For PUSH ports, multiple messages can be pushed into each actor iteration.
-   * This method only returns the most recent one.
+   * @see getMessage(Port)
+   * @param inputPort can not be null
+   * @return the context for the most recently received message on the given port.
+   * @throws MessageException if the received message does not contain a context
+   */
+  public Context getContext(Port inputPort) throws MessageException {
+    return getContext(inputPort.getName());
+  }
+  
+  /**
+   * @see getMessage(String)
+   * @param inputName can not be null
+   * @return the context for the most recently received message on the given port or null if no message arrived
+   * @throws MessageException if the received message does not contain a context
+   */
+  public Context getContext(String inputName) throws MessageException {
+    ManagedMessage msg = getMessage(inputName);
+    return msg!=null ? getContextForMessage(msg) : null ;
+  }
+
+  /**
+   * Returns the most recently received message on the given Port. For PULL
+   * ports, only one message can be read from an input port per iteration, and
+   * any other buffered messages will be offered one-by-one in consecutive actor
+   * iterations. For PUSH ports, multiple messages can be pushed into each actor
+   * iteration. This method only returns the most recent one.
    * 
-   * @param inputPort
-   * @return the most recently received message on the given Port, or null if no message arrived on the port.
+   * @param inputPort can not be null
+   * @return the most recently received message on the given Port, or null if no
+   *         message arrived on the port.
    */
   public ManagedMessage getMessage(Port inputPort) {
-    if (inputPort != null)
-      return getMessage(inputPort.getName());
-    else
-      return null;
+    return getMessage(inputPort.getName());
   }
 
   /**
-   * Returns the most recently received message on the given Port. For PULL ports, only one message can be read from an input port per iteration, and any other
-   * buffered messages will be offered one-by-one in consecutive actor iterations. For PUSH ports, multiple messages can be pushed into each actor iteration.
-   * This method only returns the most recent one.
+   * Returns the most recently received message on the given Port. For PULL
+   * ports, only one message can be read from an input port per iteration, and
+   * any other buffered messages will be offered one-by-one in consecutive actor
+   * iterations. For PUSH ports, multiple messages can be pushed into each actor
+   * iteration. This method only returns the most recent one.
    * 
-   * @param inputName
-   * @return the most recently received message on the given Port, or null if no message arrived on the port.
+   * @param inputName can not be null
+   * @return the most recently received message on the given Port, or null if no
+   *         message arrived on the port.
    */
   public ManagedMessage getMessage(String inputName) {
-    if (inputName != null) {
-      MessageInputContext ctxt = inputContexts.get(inputName);
-      return ctxt != null ? ctxt.getMsg() : null;
-    } else
-      return null;
+    MessageInputContext ctxt = inputContexts.get(inputName);
+    return ctxt != null ? ctxt.getMsg() : null;
   }
 
   /**
-   * Returns an iterator on <code>ManagedMessages</code> received on the given input port. If no messages were received on the given port, an "empty" iterator
-   * is returned. If the inputPort is null, null is returned.
+   * Returns an iterator on <code>ManagedMessages</code> received on the given
+   * input port. If no messages were received on the given port, an "empty"
+   * iterator is returned. If the inputPort is null, null is returned.
    * 
    * @param inputPort
-   * @return an iterator on <code>ManagedMessages</code> received on the given input port, or null if the input parameter is null.
+   * @return an iterator on <code>ManagedMessages</code> received on the given
+   *         input port, or null if the input parameter is null.
    * @since Passerelle v8.0
    */
   public Iterator<ManagedMessage> getAllMessages(Port inputPort) {
@@ -153,11 +201,13 @@ public class ProcessRequest {
   }
 
   /**
-   * Returns an iterator on <code>ManagedMessages</code> received on the given input port. If no messages were received on the given port, an "empty" iterator
-   * is returned. If the inputName is null, null is returned.
+   * Returns an iterator on <code>ManagedMessages</code> received on the given
+   * input port. If no messages were received on the given port, an "empty"
+   * iterator is returned. If the inputName is null, null is returned.
    * 
    * @param inputName
-   * @return an iterator on <code>ManagedMessages</code> received on the given input port, or null if the input parameter is null.
+   * @return an iterator on <code>ManagedMessages</code> received on the given
+   *         input port, or null if the input parameter is null.
    * @since Passerelle v8.0
    */
   public Iterator<ManagedMessage> getAllMessages(String inputName) {
@@ -177,14 +227,16 @@ public class ProcessRequest {
   }
 
   /**
-   * @return an indication whether this request contains at least one MessageInputContext
+   * @return an indication whether this request contains at least one
+   *         MessageInputContext
    */
   public boolean isEmpty() {
     return inputContexts.isEmpty();
   }
 
   /**
-   * @return an indication whether this request contains unprocessed MessageInputContexts
+   * @return an indication whether this request contains unprocessed
+   *         MessageInputContexts
    */
   public boolean hasSomethingToProcess() {
     boolean result = false;
@@ -213,8 +265,9 @@ public class ProcessRequest {
 
   /**
    * @param inputMsg
-   * @return true if this <code>ProcessRequest</code> is non-context-specific, or the inputMsg is non-context-specific, or the inputMsg has the required context
-   *         id in its headers.
+   * @return true if this <code>ProcessRequest</code> is non-context-specific,
+   *         or the inputMsg is non-context-specific, or the inputMsg has the
+   *         required context id in its headers.
    */
   public boolean isMessageInContext(ManagedMessage inputMsg) {
     if (inputMsg == null) {

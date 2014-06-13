@@ -126,15 +126,15 @@ public class ServiceBasedActor extends TaskBasedActor {
   }
 
   @Override
-  protected void process(Context taskContext) throws ProcessingException {
+  protected void process(Task task) throws ProcessingException {
     try {
       Long timeOutValue = getTimeOutValue();
       TimeUnit timeUnit = getTimeOutUnit();
-      getProcessingBroker().process(taskContext, timeOutValue, timeUnit);
+      getProcessingBroker().process(task, timeOutValue, timeUnit);
     } catch (ProcessingException e) {
       throw e;
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task "+taskContext.getId(), this, null, e);
+      throw new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task "+task.getId(), this, null, e);
     }
   }
   
