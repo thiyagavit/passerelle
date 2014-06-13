@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.EntityManager;
+import com.isencia.passerelle.process.model.factory.StringPair;
 import com.isencia.passerelle.process.model.impl.CaseImpl;
 import com.isencia.passerelle.process.model.impl.ContextImpl;
 import com.isencia.passerelle.process.model.impl.RequestImpl;
@@ -204,5 +206,10 @@ public class EntityManagerImpl implements EntityManager {
 
   public long getTaskCountForContext(Context context) {
     return context.getTasks().size();
+  }
+
+  @Override
+  public List<StringPair> getRequestsInfoByContextStatus(Status status) {
+    return Collections.emptyList();
   }
 }
