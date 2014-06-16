@@ -11,6 +11,7 @@ import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
 	public static final String REPORT_EVENT_TYPE = "REPORTED";
+	public static final String RESTARTING = "restarting";
 
 	ProcessHandle getHandle();
 	
@@ -162,27 +163,27 @@ public interface ProcessManager {
 	/**
 	 * Pause the flow for this request.
 	 */
-	void pause();
+	boolean pause();
 
 	/**
 	 * Restart the flow for this request from the given Task.
 	 */
-	void restart(Long taskId, long timeOut, TimeUnit timeOutUnit);
+	boolean restart(long taskId, long timeOut, TimeUnit timeOutUnit);
 
 	/**
 	 * Resume the flow for this request.
 	 */
-	void resume();
+	boolean resume();
 	
 	/**
 	 * Start the flow for this request.
 	 */
-	void start();
+	boolean start();
 
 	/**
 	 * Stop the flow for this request.
 	 */
-	void stop(long timeOut, TimeUnit timeOutUnit);
+	boolean stop(long timeOut, TimeUnit timeOutUnit);
 
 	/**
 	 * Subscribe the given callback to status change notifications of the given

@@ -14,6 +14,8 @@
 */
 package com.isencia.passerelle.runtime;
 
+import java.io.Serializable;
+
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
 
@@ -26,7 +28,7 @@ import com.isencia.passerelle.runtime.process.ProcessStatus;
  * @author erwin
  *
  */
-public interface ProcessHandle {
+public interface ProcessHandle extends Serializable {
   
   /**
    * 

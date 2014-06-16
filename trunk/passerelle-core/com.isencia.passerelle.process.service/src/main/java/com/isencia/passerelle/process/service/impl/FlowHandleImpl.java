@@ -7,6 +7,8 @@ import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
 public class FlowHandleImpl implements FlowHandle {
+	private static final long serialVersionUID = 1L;
+
 	private URI resourceLocator;
 	private String code;
 	private VersionSpecification version;
