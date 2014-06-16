@@ -173,7 +173,7 @@ public class ContextImpl implements Context {
   }
 
   public boolean setStatus(Status status) {
-    if (this.status != null && this.status.isFinalStatus() && !Status.RESTARTED.equals(status)) {
+    if (this.status != null && this.status.isFinalStatus() && (!Status.RESTARTED.equals(status) && !Status.CANCELLED.equals(status))) {
       return false;
     } else {
       this.status = status;
