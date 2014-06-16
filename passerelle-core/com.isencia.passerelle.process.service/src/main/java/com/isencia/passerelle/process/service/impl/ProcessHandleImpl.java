@@ -7,6 +7,8 @@ import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
 public class ProcessHandleImpl implements ProcessHandle {
+	private static final long serialVersionUID = 1L;
+
 	private FlowHandle flowHandle;
 	private String processId;
 	private ProcessStatus executionStatus;
