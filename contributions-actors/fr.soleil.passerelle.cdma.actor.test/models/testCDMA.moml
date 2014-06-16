@@ -4,16 +4,16 @@
 <entity name="testCDMA" class="com.isencia.passerelle.model.Flow">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
-    <property name="Passerelle Std" class="com.isencia.passerelle.domain.cap.Director">
+    <property name="Passerelle ET" class="com.isencia.passerelle.domain.et.ETDirector">
         <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
         </property>
         <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{55, 55}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{170, 45}">
         </property>
     </property>
     <entity name="CDMADataSetReader" class="fr.soleil.passerelle.cdma.actor.CDMADataSetReader">
-        <property name="DataSet URI" class="ptolemy.data.expr.StringParameter" value="C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/FlyscanSwing_2011-04-11_15-44-11.nxs">
+        <property name="DataSet URI" class="ptolemy.data.expr.StringParameter" value="C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/GrCu_2012-04-07_12-12-28.nxs">
         </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
@@ -75,9 +75,9 @@
         </property>
     </entity>
     <entity name="CDMADataItemSelector" class="fr.soleil.passerelle.cdma.actor.CDMADataItemSelector">
-        <property name="Item name" class="ptolemy.data.expr.StringParameter" value="scan:data:images">
+        <property name="Item name" class="ptolemy.data.expr.StringParameter" value="GrCu_4_H_1/Scienta_0_84/data1">
         </property>
-        <property name="Logical selection mode" class="ptolemy.data.expr.Parameter" value="true">
+        <property name="Logical selection mode" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
         </property>
