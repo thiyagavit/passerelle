@@ -55,8 +55,9 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -166,7 +167,7 @@ public class EventsToTaskCollector extends Actor {
       taskContext = createTask(processContext, taskAttributes, new HashMap<String, Serializable>());
       task = (Task) taskContext.getRequest();
       if (!events.isEmpty()) {
-        ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
+        ProcessFactory entityFactory = ((com.isencia.passerelle.process.actor.ActorContext)ctxt).getProcessFactory();
         ResultBlock rb = entityFactory.createResultBlock(task, resultTypeParam.stringValue());
         for (Event event : events) {
           String value = null;
@@ -214,9 +215,10 @@ public class EventsToTaskCollector extends Actor {
   protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String taskType = taskTypeParam.stringValue();
     
-    Task task = ServiceRegistry.getInstance().getProcessFactory().createTask(getTaskClass(parentContext), parentContext, FlowUtils.getFullNameWithoutFlow(this), taskType);
+    ProcessFactory factory = ProcessFactoryTracker.getService();
+    Task task = factory.createTask(getTaskClass(parentContext), parentContext, FlowUtils.getFullNameWithoutFlow(this), taskType);
 	for (Entry<String, String> attr : taskAttributes.entrySet()) {
-		ServiceRegistry.getInstance().getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
+		factory.createAttribute(task, attr.getKey(), attr.getValue());
 	}
 	
 	for (String key : taskContextEntries.keySet()) {
@@ -224,7 +226,7 @@ public class EventsToTaskCollector extends Actor {
 		task.getProcessingContext().putEntry(key, value);
 	}
 
-	ServiceRegistry.getInstance().getProcessPersistenceService().persistTask(task);
+	ProcessPersistenceServiceTracker.getService().persistTask(task);
 
 	return(task.getProcessingContext());
   }

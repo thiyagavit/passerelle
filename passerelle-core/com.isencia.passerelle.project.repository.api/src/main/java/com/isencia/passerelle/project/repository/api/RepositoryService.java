@@ -38,12 +38,30 @@ public interface RepositoryService {
   String USER_ID = "userID";
   String JOB_ID = "jobID";
 
+  void commitFlow(Flow flow, String comment) throws Exception;
+
+  void createSubmodel(CompositeActor flow);
+
+  void deleteSubmodel(String flow);
+
   /**
    * 
-   * @param submodelCode
-   * @return the submodel for the given flowCode, or null if not found
+   * @param flowCode
+   * @return exists a new version of the project in the repository
    */
-  Flow getSubmodel(String flowCode);
+  boolean existNewSubModel(String flowCode);
+
+  /**
+   * 
+   * @return an array of the metadata for all submodels in the Repository, this avoids double call
+   */
+  MetaData[] getAllSubmodelMetaData();
+
+  /**
+   * 
+   * @return an array of the codes for all submodels in the Repository
+   */
+  String[] getAllSubmodels();
 
   /**
    * 
@@ -59,12 +77,7 @@ public interface RepositoryService {
    */
   MetaData getFlowMetaData(String flowCode);
 
-  /**
-   * 
-   * @param flowCode
-   * @return the metadata for the given submodel, or null if not found
-   */
-  MetaData getSubmodelMetaData(String flowCode);
+  List<IEventLog> getLogs(String name, Integer maxResult);
 
   /**
    * 
@@ -75,33 +88,20 @@ public interface RepositoryService {
 
   /**
    * 
-   * @return an array of the codes for all submodels in the Repository
+   * @param submodelCode
+   * @return the submodel for the given flowCode, or null if not found
    */
-  String[] getAllSubmodels();
+  Flow getSubmodel(String flowCode);
 
-  /**
-   * 
-   * @return an array of the metadata for all submodels in the Repository, this avoids double call
-   */
-  MetaData[] getAllSubmodelMetaData();
+  File getSubmodelFolder();
 
   /**
    * 
    * @param flowCode
-   * @return exists a new version of the project in the repository
+   * @return the metadata for the given submodel, or null if not found
    */
-  boolean existNewSubModel(String flowCode);
-
-  void commitFlow(Flow flow, String comment) throws Exception;
-
-  void createSubmodel(CompositeActor flow);
-
-  void deleteSubmodel(String flow);
-
-  List<IEventLog> getLogs(String name, Integer maxResult);
+  MetaData getSubmodelMetaData(String flowCode);
 
   void setSubmodelFolder(File folder);
-
-  File getSubmodelFolder();
 
 }

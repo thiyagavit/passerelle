@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.ObjectToken;
 import ptolemy.data.StringToken;
@@ -30,6 +32,7 @@ import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
@@ -46,7 +49,7 @@ import com.isencia.passerelle.process.actor.activator.Activator;
 import com.isencia.passerelle.process.common.util.ContextUtils;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
@@ -204,6 +207,6 @@ public class Forward extends Actor {
   }
 
   protected ProcessFactory getEntityFactory() {
-    return ServiceRegistry.getInstance().getProcessFactory();
+    return ProcessFactoryTracker.getService();
   }
 }
