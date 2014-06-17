@@ -1,7 +1,9 @@
 package com.isencia.passerelle.process.actor.flow;
 
 import java.util.Map;
+
 import org.slf4j.MDC;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.ObjectToken;
 import ptolemy.data.expr.Parameter;
@@ -11,6 +13,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -25,7 +28,10 @@ import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
+import com.isencia.passerelle.process.service.ProcessPersistenceService;
+import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 /**
@@ -130,13 +136,16 @@ public class StartActor extends Actor {
 		} catch (Exception e) {
 			// ignore, just indicates an invalid or empty reference
 		}
+		
+		ProcessFactory factory = ProcessFactoryTracker.getService();
+		ProcessPersistenceService persistenceService = ProcessPersistenceServiceTracker.getService();
 		if (caseId == null) {
-			caze = ServiceRegistry.getInstance().getProcessFactory().createCase(null);
-			ServiceRegistry.getInstance().getProcessPersistenceService().persistCase(caze);
+			caze = factory.createCase(null);
+			persistenceService.persistCase(caze);
 		} else {
-			caze = ServiceRegistry.getInstance().getProcessPersistenceService().getCase(caseId);
+			caze = persistenceService.getCase(caseId);
 		}
-		Request req = ServiceRegistry.getInstance().getProcessFactory().createRequest(caze, initiator, toplevel().getName(), getCategory(), processType, jobID);
+		Request req = factory.createRequest(caze, initiator, toplevel().getName(), getCategory(), processType, jobID);
 		if (systemParameterMap != null) {
 			for (Map.Entry<String, String> entry : systemParameterMap.entrySet()) {
 				addSystemAttribute(req, entry);
@@ -147,7 +156,7 @@ public class StartActor extends Actor {
 				addApplicationAttribute(req, entry);
 			}
 		}
-		ServiceRegistry.getInstance().getProcessPersistenceService().persistRequest(req);
+		persistenceService.persistRequest(req);
 
 		context = req.getProcessingContext();
 		try {
@@ -166,11 +175,11 @@ public class StartActor extends Actor {
 	}
 
 	protected void addApplicationAttribute(Request req, Map.Entry<String, String> entry) {
-		ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, entry.getKey(), entry.getValue());
+		ProcessFactoryTracker.getService().createAttribute(req, entry.getKey(), entry.getValue());
 	}
 
 	protected void addSystemAttribute(Request req, Map.Entry<String, String> entry) {
-		ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, entry.getKey(), entry.getValue());
+		ProcessFactoryTracker.getService().createAttribute(req, entry.getKey(), entry.getValue());
 	}
 
 	protected void processContext(Context context, Map<String, String> systemParameterMap) {

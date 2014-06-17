@@ -15,7 +15,6 @@
 package com.isencia.passerelle.process.service;
 
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroker;
 
 /**
@@ -31,26 +30,11 @@ public class ServiceRegistry {
     return _instance;
   }
 
-  private ProcessFactory processFactory;
-  private ProcessManagerService processManagerService;
-  private ProcessPersistenceService processPersistenceService;
   private HistoricalDataProvider historicalDataProvider;
   private RequestProcessingBroker requestProcessingBroker = DefaultRequestProcessingBroker.getInstance();
 
   public HistoricalDataProvider getHistoricalDataProvider() {
     return historicalDataProvider;
-  }
-
-  public ProcessFactory getProcessFactory() {
-    return processFactory;
-  }
-
-  public ProcessManagerService getProcessManagerService() {
-    return processManagerService;
-  }
-
-  public ProcessPersistenceService getProcessPersistenceService() {
-    return processPersistenceService;
   }
 
   public RequestProcessingBroker getRequestProcessingBroker() {
@@ -59,18 +43,6 @@ public class ServiceRegistry {
 	
   public void setHistoricalDataProvider(HistoricalDataProvider historicalDataProvider) {
 	this.historicalDataProvider = historicalDataProvider;
-  }
-	
-  public void setProcessFactory(ProcessFactory processFactory) {
-    this.processFactory = processFactory;
-  }
-  
-  public void setProcessManagerService(ProcessManagerService processManagerService) {
-	this.processManagerService = processManagerService;
-  }
-
-  public void setProcessPersistenceService(ProcessPersistenceService processPersistenceService) {
-	this.processPersistenceService = processPersistenceService;
   }
   
   public void setRequestProcessingBroker(RequestProcessingBroker requestProcessingBroker) {

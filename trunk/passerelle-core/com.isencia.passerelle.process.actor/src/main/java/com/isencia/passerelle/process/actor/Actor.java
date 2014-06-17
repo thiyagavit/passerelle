@@ -59,11 +59,8 @@ import com.isencia.passerelle.message.SimpleActorMessageQueue;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * Continuing on the track started with the "v3" and "v5" Actor APIs, the
@@ -462,7 +459,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
             for (String ctxtHdr : ctxtHdrs) {
               ProcessRequest processRequest = incompleteProcessRequests.get(ctxtHdr);
               if (processRequest == null) {
-                ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(ctxtHdr);
+                ProcessManager processManager = ProcessManagerServiceTracker.getService().getProcessManager(ctxtHdr);
                 if (processManager != null) {
                   processRequest = new ProcessRequest();
                   processRequest.setIterationCount(iterationCount);
