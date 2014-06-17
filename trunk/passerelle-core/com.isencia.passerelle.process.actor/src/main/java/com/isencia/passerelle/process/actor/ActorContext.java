@@ -14,9 +14,14 @@
 */
 package com.isencia.passerelle.process.actor;
 
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerService;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.process.service.ProcessPersistenceService;
+import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
 
 /**
  * In the new Passerelle Actor API, the ActorContext is a generic container
@@ -24,12 +29,16 @@ import com.isencia.passerelle.process.service.ProcessPersistenceService;
  * 
  * @author erwin
  */
-public class ActorContext {
+public class ActorContext extends com.isencia.passerelle.actor.v5.ActorContext {
   private ProcessFactory processFactory;
   private ProcessManagerService processManagerService;
   private ProcessPersistenceService processPersistenceService;
 
-  public ActorContext(ProcessFactory processFactory, ProcessManagerService processManagerService, ProcessPersistenceService processPersistenceService) {
+  public ActorContext() {
+    this(ProcessFactoryTracker.getService(),ProcessManagerServiceTracker.getService(),ProcessPersistenceServiceTracker.getService());
+  }
+  
+  protected ActorContext(ProcessFactory processFactory, ProcessManagerService processManagerService, ProcessPersistenceService processPersistenceService) {
     if(processFactory==null)
       throw new NullPointerException("ProcessFactory can not be null");
     if(processManagerService==null)
@@ -45,9 +54,15 @@ public class ActorContext {
   public ProcessFactory getProcessFactory() {
     return processFactory;
   }
+
+  public ProcessManager getProcessManager(Context context) {
+	return processManagerService.getProcessManager(context.getProcessId());
+  }
+  
   public ProcessManagerService getProcessManagerService() {
     return processManagerService;
   }
+  
   public ProcessPersistenceService getProcessPersistenceService() {
     return processPersistenceService;
   }

@@ -335,7 +335,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       // source must finish and wrap up.
       ProcessRequest currentProcessRequest = new ProcessRequest();
       currentProcessRequest.setIterationCount(iterationCount);
-      pendingProcessRequests.add(new ProcessResponse(getActorContext(), currentProcessRequest));
+      pendingProcessRequests.add(new ProcessResponse(createActorContext(), currentProcessRequest));
     }
     getLogger().trace("{} - doPreFire() - exit : {}", getFullName(), readyToFire);
     return readyToFire;
@@ -482,7 +482,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       // if the context-less process request has something to process, let's do
       // it as well!
       if (contextLessProcessRequest.hasSomethingToProcess()) {
-        pendingProcessRequests.offer(new ProcessResponse(getActorContext(), contextLessProcessRequest));
+        pendingProcessRequests.offer(new ProcessResponse(createActorContext(), contextLessProcessRequest));
       }
       // now check for any completely-defined context-scoped process requests
       Collection<Entry<String, ProcessRequest>> transfers = new ArrayList<Entry<String, ProcessRequest>>();
@@ -492,7 +492,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         }
       }
       for (Entry<String, ProcessRequest> entry : transfers) {
-        pendingProcessRequests.offer(new ProcessResponse(getActorContext(), entry.getValue()));
+        pendingProcessRequests.offer(new ProcessResponse(createActorContext(), entry.getValue()));
         incompleteProcessRequests.remove(entry.getKey());
       }
     } catch (InterruptedException e) {
@@ -508,8 +508,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
   }
 
-  protected ActorContext getActorContext() {
-    return new ActorContext(ProcessFactoryTracker.getService(), ProcessManagerServiceTracker.getService(), ProcessPersistenceServiceTracker.getService());
+  protected ActorContext createActorContext() {
+	return new ActorContext();
   }
 
   /**
