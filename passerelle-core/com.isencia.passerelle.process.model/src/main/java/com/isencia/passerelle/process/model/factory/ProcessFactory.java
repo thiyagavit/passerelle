@@ -23,51 +23,58 @@ import com.isencia.passerelle.process.model.Task;
 
 /**
  * @author "puidir"
- *
+ * 
  */
 public interface ProcessFactory {
 
-  /**
-   * Create a new Case.
-   * 
-   * @param externalReference Can be used to link the Case to external system, e.g. order identifiers, client numbers, etc
-   */
-  Case createCase(String externalReference);
+	Attribute createAttribute(AttributeHolder holder, String name, String value);
 
-  /**
-   * Create a Request.
-   * 
-   * @param requestCase Requests are always linked to a Case
-   * @param type
-   * @param correlationId
-   */
-  Request createRequest(Case requestCase, String initiator,String category, String type, String correlationId);
+	/**
+	 * Create a new Case.
+	 * 
+	 * @param externalReference
+	 *            Can be used to link the Case to external system, e.g. order
+	 *            identifiers, client numbers, etc
+	 */
+	Case createCase(String externalReference);
 
-  Request createRequest(Case requestCase, String initiator,String executor,String category, String type, String correlationId);
-  
-  Task createTask(Context parentContext, String initiator, String type);
-  Task createTask(Class<? extends Task> taskClass, Context parentContext, String initiator, String type) throws Exception;
-  
-  ResultBlock createResultBlock(Task task, String type, Date date);
+	ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem);
 
-  ResultBlock createResultBlock(Task task, String type);
-  
-  RawResultBlock createRawResultBlock(Task task, String type);
+	ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
 
-  Attribute createAttribute(AttributeHolder holder, String name, String value);
+	ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
 
-  ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date);
+	ContextEvent createContextEvent(Context context, String topic, String message);
 
-  ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit);
+	ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
 
-  ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit,Integer level);
-  
-  ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
-  ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
-  
-  ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem);
-  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
-  ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
+	ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
 
-  ContextEvent createContextEvent(Context context, String topic, String message);
+	RawResultBlock createRawResultBlock(Task task, String type);
+
+	/**
+	 * Create a Request.
+	 * 
+	 * @param requestCase
+	 *            Requests are always linked to a Case
+	 * @param type
+	 * @param correlationId
+	 */
+	Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId);
+
+	Request createRequest(Case requestCase, String initiator, String executor, String category, String type, String correlationId);
+
+	ResultBlock createResultBlock(Task task, String type);
+
+	ResultBlock createResultBlock(Task task, String type, Date date);
+
+	ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit);
+
+	ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date);
+
+	ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level);
+
+	Task createTask(Class<? extends Task> taskClass, Context parentContext, String initiator, String type) throws Exception;
+
+	Task createTask(Context parentContext, String initiator, String type);
 }

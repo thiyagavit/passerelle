@@ -40,37 +40,6 @@ import com.isencia.passerelle.process.model.impl.TaskImpl;
  */
 public class ProcessFactoryImpl implements ProcessFactory {
 
-	public Case createCase(String externalReference) {
-		return new CaseImpl();
-	}
-
-	public Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId) {
-		return new MainRequestImpl(requestCase, initiator, type, correlationId, category);
-	}
-
-	public Task createTask(Context parentContext, String initiator, String type) {
-		return new TaskImpl(parentContext, initiator, type);
-	}
-
-	@Override
-	public Task createTask(Class<? extends Task> taskClass, Context parentContext, String initiator, String type) throws Exception {
-		if (taskClass == null)
-			return (createTask(parentContext, initiator, type));
-		return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(parentContext, initiator, type);
-	}
-
-	public ResultBlock createResultBlock(Task task, String type) {
-		return new ResultBlockImpl(task, type);
-	}
-
-	public ResultBlock createResultBlock(Task task, String type, Date date) {
-		return new ResultBlockImpl(task, type, date);
-	}
-
-	public RawResultBlock createRawResultBlock(Task task, String type) {
-		return new RawResultBlockImpl(task, type);
-	}
-
 	public Attribute createAttribute(AttributeHolder holder, String name, String value) {
 		if (holder == null) {
 			throw new IllegalArgumentException("AttributeHolder can not be null");
@@ -86,24 +55,8 @@ public class ProcessFactoryImpl implements ProcessFactory {
 		}
 	}
 
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date) {
-		return createResultItem(resultBlock, name, value, unit, null, date);
-	}
-
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit) {
-		return createResultItem(resultBlock, name, value, unit, null, null);
-	}
-
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level, Date date) {
-		return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
-	}
-
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level) {
-		return createResultItem(resultBlock, name, value, unit, level, null);
-	}
-
-	public ContextEvent createContextEvent(Context context, String topic, String message) {
-		return new ContextEventImpl(context, topic, message);
+	public Case createCase(String externalReference) {
+		return new CaseImpl();
 	}
 
 	public ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem) {
@@ -118,16 +71,63 @@ public class ProcessFactoryImpl implements ProcessFactory {
 		throw new UnsupportedOperationException();
 	}
 
-	public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
-		return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
+	public ContextEvent createContextEvent(Context context, String topic, String message) {
+		return new ContextEventImpl(context, topic, message);
 	}
 
 	public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
 		return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
 	}
 
+	public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
+		return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
+	}
+
+	public RawResultBlock createRawResultBlock(Task task, String type) {
+		return new RawResultBlockImpl(task, type);
+	}
+
+	public Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId) {
+		return new MainRequestImpl(requestCase, initiator, type, correlationId, category);
+	}
+
 	public Request createRequest(Case requestCase, String initiator, String executor, String category, String type, String correlationId) {
 		return new MainRequestImpl(requestCase, initiator, executor, type, correlationId, category);
+	}
+
+	public ResultBlock createResultBlock(Task task, String type) {
+		return new ResultBlockImpl(task, type);
+	}
+
+	public ResultBlock createResultBlock(Task task, String type, Date date) {
+		return new ResultBlockImpl(task, type, date);
+	}
+
+	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit) {
+		return createResultItem(resultBlock, name, value, unit, null, null);
+	}
+
+	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date) {
+		return createResultItem(resultBlock, name, value, unit, null, date);
+	}
+
+	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level) {
+		return createResultItem(resultBlock, name, value, unit, level, null);
+	}
+
+	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level, Date date) {
+		return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
+	}
+
+	@Override
+	public Task createTask(Class<? extends Task> taskClass, Context parentContext, String initiator, String type) throws Exception {
+		if (taskClass == null)
+			return (createTask(parentContext, initiator, type));
+		return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(parentContext, initiator, type);
+	}
+
+	public Task createTask(Context parentContext, String initiator, String type) {
+		return new TaskImpl(parentContext, initiator, type);
 	}
 
 	public void destroy() {

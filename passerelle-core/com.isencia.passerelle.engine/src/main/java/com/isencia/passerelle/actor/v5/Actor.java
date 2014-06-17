@@ -319,13 +319,18 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     getLogger().trace("{} - doPreFire() - exit : {}", getFullName(), readyToFire);
     return readyToFire;
   }
+  
+  protected ActorContext createActorContext() {
+	  return new ActorContext();
+  }
+  
 
   @Override
   protected void doFire() throws ProcessingException {
     getLogger().trace("{} - doFire() - entry", getFullName());
     if (isSource || currentProcessRequest.hasSomethingToProcess()) {
       getLogger().trace("{} - doFire() - processing request {}", getFullName(), currentProcessRequest);
-      ActorContext ctxt = new ActorContext();
+      ActorContext ctxt = createActorContext();
       if (mustValidateIteration()) {
         try {
           getLogger().trace("{} - doFire() - validating iteration for request {}", getFullName(), currentProcessRequest);
