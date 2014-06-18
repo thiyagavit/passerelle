@@ -5,13 +5,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerService;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
+import com.isencia.passerelle.process.service.ProcessPersister;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public class ProcessManagerServiceImpl implements ProcessManagerService {
 	protected Map<String,ProcessManager> processManagers = new ConcurrentHashMap<String,ProcessManager>(16,0.9F,1);
+	
+	protected ProcessFactory factory;
+	protected ProcessPersister persister;
 
 	public ProcessManager addProcessManager(ProcessManager processManager) {
 		return(processManagers.put(processManager.getHandle().getProcessId(),processManager));
@@ -19,6 +24,16 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 	
 	public void destroy() {
 		ProcessManagerServiceTracker.setService(null);
+	}
+	
+	@Override
+	public ProcessFactory getFactory() {
+		return factory;
+	}
+	
+	@Override
+	public ProcessPersister getPersister() {
+		return persister;
 	}
 	
 	@Override
@@ -48,5 +63,13 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 	
 	public ProcessManager removeProcessManager(String id) {
 		return(processManagers.remove(id));
+	}
+	
+	public void setFactory(ProcessFactory factory) {
+		this.factory = factory;
+	}
+	
+	public void setPersister(ProcessPersister persister) {
+		this.persister = persister;
 	}
 }

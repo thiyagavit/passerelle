@@ -20,8 +20,8 @@ import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerService;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
+import com.isencia.passerelle.process.service.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessPersisterTracker;
 
 /**
  * In the new Passerelle Actor API, the ActorContext is a generic container
@@ -32,19 +32,19 @@ import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
 public class ActorContext extends com.isencia.passerelle.actor.v5.ActorContext {
   private ProcessFactory processFactory;
   private ProcessManagerService processManagerService;
-  private ProcessPersistenceService processPersistenceService;
+  private ProcessPersister processPersistenceService;
 
   public ActorContext() {
-    this(ProcessFactoryTracker.getService(),ProcessManagerServiceTracker.getService(),ProcessPersistenceServiceTracker.getService());
+    this(ProcessFactoryTracker.getService(),ProcessManagerServiceTracker.getService(),ProcessPersisterTracker.getService());
   }
   
-  protected ActorContext(ProcessFactory processFactory, ProcessManagerService processManagerService, ProcessPersistenceService processPersistenceService) {
+  protected ActorContext(ProcessFactory processFactory, ProcessManagerService processManagerService, ProcessPersister processPersistenceService) {
     if(processFactory==null)
       throw new NullPointerException("ProcessFactory can not be null");
     if(processManagerService==null)
       throw new NullPointerException("ProcessManagerService can not be null");
     if(processPersistenceService==null)
-      throw new NullPointerException("ProcessPersistenceService can not be null");
+      throw new NullPointerException("ProcessPersister can not be null");
     
     this.processFactory = processFactory;
     this.processManagerService = processManagerService;
@@ -63,7 +63,7 @@ public class ActorContext extends com.isencia.passerelle.actor.v5.ActorContext {
     return processManagerService;
   }
   
-  public ProcessPersistenceService getProcessPersistenceService() {
+  public ProcessPersister getProcessPersistenceService() {
     return processPersistenceService;
   }
 }

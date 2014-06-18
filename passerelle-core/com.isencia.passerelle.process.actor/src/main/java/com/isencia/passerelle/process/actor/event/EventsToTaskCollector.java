@@ -57,7 +57,7 @@ import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
+import com.isencia.passerelle.process.service.ProcessPersisterTracker;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -226,7 +226,7 @@ public class EventsToTaskCollector extends Actor {
 		task.getProcessingContext().putEntry(key, value);
 	}
 
-	ProcessPersistenceServiceTracker.getService().persistTask(task);
+	ProcessPersisterTracker.getService().persistTask(task);
 
 	return(task.getProcessingContext());
   }

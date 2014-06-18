@@ -30,8 +30,8 @@ import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
-import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
+import com.isencia.passerelle.process.service.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessPersisterTracker;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
 /**
@@ -138,7 +138,7 @@ public class StartActor extends Actor {
 		}
 		
 		ProcessFactory factory = ProcessFactoryTracker.getService();
-		ProcessPersistenceService persistenceService = ProcessPersistenceServiceTracker.getService();
+		ProcessPersister persistenceService = ProcessPersisterTracker.getService();
 		if (caseId == null) {
 			caze = factory.createCase(null);
 			persistenceService.persistCase(caze);

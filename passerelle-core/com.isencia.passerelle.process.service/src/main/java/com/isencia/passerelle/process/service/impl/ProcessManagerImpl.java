@@ -11,28 +11,43 @@ import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerService;
+import com.isencia.passerelle.process.service.ProcessPersister;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public class ProcessManagerImpl implements ProcessManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessManagerImpl.class);
 	
+	private ProcessManagerService service;
 	private final ProcessHandle handle;
 	private Request request;
 
-	public ProcessManagerImpl(Request request) {
-		this(new ProcessHandleImpl(),request);
+	public ProcessManagerImpl(ProcessManagerService service, Request request) {
+		this(service,new ProcessHandleImpl(),request);
 	}
 	
-	public ProcessManagerImpl(ProcessHandle handle, Request request) {
+	public ProcessManagerImpl(ProcessManagerService service, ProcessHandle handle, Request request) {
+		this.service = service;
 		this.handle = handle;
 		this.request = request;
 		this.request.getProcessingContext().setProcessId(handle.getProcessId());
 	}
 	
 	@Override
+	public ProcessFactory getFactory() {
+		return(service.getFactory());
+	}
+	
+	@Override
 	public ProcessHandle getHandle() {
 		return(handle);
+	}
+	
+	@Override
+	public ProcessPersister getPersister() {
+		return(service.getPersister());
 	}
 	
 	public Request getRequest() {

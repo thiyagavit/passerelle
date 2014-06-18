@@ -22,8 +22,8 @@ import com.isencia.passerelle.process.model.impl.RequestImpl;
 import com.isencia.passerelle.process.model.impl.ResultBlockImpl;
 import com.isencia.passerelle.process.model.impl.TaskImpl;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
-import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ProcessPersistenceServiceTracker;
+import com.isencia.passerelle.process.service.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessPersisterTracker;
 import com.isencia.sherpa.persistence.commons.EntityManagerPool;
 import com.isencia.sherpa.persistence.context.PersistenceRequestContext;
 import com.isencia.sherpa.persistence.jpa.LightWeightEntityManager;
@@ -33,7 +33,7 @@ import com.isencia.sherpa.persistence.jpa.query.SherpaCriteriaQuery;
 import com.isencia.sherpa.persistence.jpa.query.SherpaQuery;
 
 //FIXME persist methods should throw exception
-public class LightWeightProcessPersistenceService implements ProcessPersistenceService {	
+public class ProcessPersisterImpl implements ProcessPersister {	
 	/**
 	 * closes a unit of work, committing or rolling back the transaction if one is active.
 	 * This method will remove the unit of work from the thread, and close the transaction
@@ -55,7 +55,7 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 	}
 	
 	public void destroy() {
-		ProcessPersistenceServiceTracker.setService(null);
+		ProcessPersisterTracker.setService(null);
 	}
 	
 	@Override
@@ -170,7 +170,7 @@ public class LightWeightProcessPersistenceService implements ProcessPersistenceS
 	}
 	
 	public void init() {
-		ProcessPersistenceServiceTracker.setService(this);
+		ProcessPersisterTracker.setService(this);
 	}
 
 	/**
