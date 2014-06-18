@@ -11,17 +11,48 @@ import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
-	public static final String REPORT_EVENT_TYPE = "REPORTED";
-	public static final String RESTARTING = "restarting";
+  
+  /**
+   * The standard name of flow attributes or other instance holders for ProcessManagers
+   */
+  String NAME_AS_ATTRIBUTE = "__PSRL_PROC_MGR";
+  
+	String REPORT_EVENT_TYPE = "REPORTED";
+	String RESTARTING = "restarting";
 
+	/**
+	 * Obtain the manager's ID, via a shortcut for invoking <code>getHandle.getProcessId()</code>.
+	 * @return the manager's ID.
+	 */
+	String getId();
+	
+	/**
+	 * @return the factory to be used for creating new process model entities
+	 */
 	ProcessFactory getFactory();
 	
-	ProcessHandle getHandle();
-	
+	/**
+	 * @return the persister to be used to save/update/find/... entities in a persistent storage
+	 */
 	ProcessPersister getPersister();
-	
-	Request getRequest();
 
+	/**
+	 * @return the handle to the flow-based process behind this ProcessManager
+	 */
+  ProcessHandle getHandle();
+  
+  /**
+   * 
+   * @return the Request entity that is being handled in this manager's process
+   */
+	Request getRequest();
+	
+	/**
+	 * Finds the given Task within the Request Context's collection of finished/ongoing tasks.
+	 * 
+	 * @param id
+	 * @return the Task entity that was (or is being) executed as part of this manager's process
+	 */
 	Task getTask(long id);
 
 	/**

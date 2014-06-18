@@ -36,6 +36,11 @@ public class ProcessManagerImpl implements ProcessManager {
 	}
 	
 	@Override
+	public String getId() {
+	  return getHandle().getProcessId();
+	}
+	
+	@Override
 	public ProcessFactory getFactory() {
 		return(service.getFactory());
 	}

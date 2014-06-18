@@ -43,24 +43,22 @@ import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
  * @author erwin
  */
 public class ProcessRequest {
-  public static final String HEADER_PROCESS_CONTEXT = "__PSRL_PROC_CTXT_ID";
+  public static final String HEADER_PROCESS_ID = "__PSRL_PROC_ID";
   private final static Collection<ManagedMessage> EMPTY_MSG_COLLECTION = new ArrayList<ManagedMessage>();
 
-  private Context processContext;
+  private ProcessManager processManager;
   private long iterationCount = 0;
   private Map<String, MessageInputContext> inputContexts = new HashMap<String, MessageInputContext>();
 
   /**
-	 *
-	 */
-  public ProcessRequest() {
-  }
-
-  /**
-   * @param processContext
+   * @param processManager
    */
-  public ProcessRequest(Context processContext) {
-    this.processContext = processContext;
+  public ProcessRequest(ProcessManager processManager) {
+    this.processManager = processManager;
+  }
+  
+  public ProcessManager getProcessManager() {
+    return processManager;
   }
 
   /**
@@ -117,7 +115,7 @@ public class ProcessRequest {
     if (message.getBodyContent() instanceof Context) {
       return (Context) message.getBodyContent();
     } else {
-      String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+      String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_ID);
       if (ctxtHdrs == null || ctxtHdrs.length == 0) {
         throw new MessageException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", message, null);
       } else {
@@ -131,27 +129,6 @@ public class ProcessRequest {
     }
   }
   
-  /**
-   * @see getMessage(Port)
-   * @param inputPort can not be null
-   * @return the context for the most recently received message on the given port.
-   * @throws MessageException if the received message does not contain a context
-   */
-  public Context getContext(Port inputPort) throws MessageException {
-    return getContext(inputPort.getName());
-  }
-  
-  /**
-   * @see getMessage(String)
-   * @param inputName can not be null
-   * @return the context for the most recently received message on the given port or null if no message arrived
-   * @throws MessageException if the received message does not contain a context
-   */
-  public Context getContext(String inputName) throws MessageException {
-    ManagedMessage msg = getMessage(inputName);
-    return msg!=null ? getContextForMessage(msg) : null ;
-  }
-
   /**
    * Returns the most recently received message on the given Port. For PULL
    * ports, only one message can be read from an input port per iteration, and
@@ -273,11 +250,11 @@ public class ProcessRequest {
     if (inputMsg == null) {
       return false;
     } else {
-      String[] ctxtIDHdrs = ((SettableMessage) inputMsg).getHeader(HEADER_PROCESS_CONTEXT);
-      boolean itsOk = (processContext == null) || (processContext.getId() == null) || (ctxtIDHdrs.length == 0);
+      String[] ctxtIDHdrs = ((SettableMessage) inputMsg).getHeader(HEADER_PROCESS_ID);
+      boolean itsOk = (processManager == null) || (ctxtIDHdrs.length == 0);
       if (!itsOk) {
         for (String ctxtIdHdr : ctxtIDHdrs) {
-          if (itsOk = (processContext.getId().equals(ctxtIdHdr))) {
+          if (itsOk = (processManager.getId().equals(ctxtIdHdr))) {
             break;
           }
         }

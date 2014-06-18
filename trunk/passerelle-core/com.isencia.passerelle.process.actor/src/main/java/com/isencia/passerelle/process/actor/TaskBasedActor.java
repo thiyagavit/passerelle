@@ -78,7 +78,7 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   @Override
-  public final ProcessingMode getProcessingMode(ActorContext ctxt, ProcessRequest request) {
+  public final ProcessingMode getProcessingMode(ProcessRequest request) {
     return ProcessingMode.ASYNCHRONOUS;
   }
 
@@ -119,18 +119,14 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   @Override
-  public final void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    ManagedMessage message = request.getMessage(input);
+  public final void process(ProcessManager processManager, ProcessRequest procReq, ProcessResponse procResp) throws ProcessingException {
+    ManagedMessage message = procReq.getMessage(input);
     if (message != null) {
-      Context processContext = null;
-      try {
-        processContext = request.getContext(input);
-      } catch (MessageException e1) {
-        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Unable to get process context from message", this, message, e1);
-      }
+      Request request = processManager.getRequest();
+      Context processContext = request.getProcessingContext();
       Task task = null;
       try {
-        if (!doRestart(ctxt, message, response)) {
+        if (!doRestart(processManager, message, procResp)) {
           if (mustProcess(message)) {
             // create attributes and entries, in case of error catch and rethrow after task creation
             Map<String, String> taskAttributes = new HashMap<String, String>();
@@ -142,36 +138,35 @@ public abstract class TaskBasedActor extends Actor {
             } catch (Exception e) {
               exceptionDuringCreation = e;
             }
-            task = createTask(ctxt, processContext, taskAttributes, taskContextEntries);
+            task = createTask(processManager, request, taskAttributes, taskContextEntries);
             if (exceptionDuringCreation != null) {
               // re-throw here, exception will be attached to taskContext
               throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
             }
             process(task);
-            postProcess(message, task, response);
+            postProcess(message, task, procResp);
           } else {
-            response.addOutputMessage(output, message);
-            processFinished(ctxt, request, response);
+            procResp.addOutputMessage(output, message);
+            processFinished(processManager, procReq, procResp);
           }
         } else {
-
-          processFinished(ctxt, request, response);
+          processFinished(processManager, procReq, procResp);
         }
       } catch (PasserelleException ex) {
         ExecutionTracerService.trace(this, ex.getMessage());
-        ctxt.getProcessManagerService().getProcessManager(processContext.getProcessId()).notifyError(task, ex);
-        response.setException(new ProcessingException(ex.getErrorCode(), ex.getSimpleMessage(), this, message, ex.getCause()));
-        processFinished(ctxt, request, response);
+        processManager.notifyError(task, ex);
+        procResp.setException(new ProcessingException(ex.getErrorCode(), ex.getSimpleMessage(), this, message, ex.getCause()));
+        processFinished(processManager, procReq, procResp);
       } catch (Throwable t) {
         ExecutionTracerService.trace(this, t.getMessage());
-        ctxt.getProcessManagerService().getProcessManager(processContext.getProcessId()).notifyError(task, t);
-        response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, message, t));
-        processFinished(ctxt, request, response);
+        processManager.notifyError(task, t);
+        procResp.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, message, t));
+        processFinished(processManager, procReq, procResp);
       }
     } else {
       // should not happen, but one never knows, e.g. when a requestFinish msg arrived or so...
       getLogger().warn("Actor " + this.getFullName() + " received empty message in process()");
-      processFinished(ctxt, request, response);
+      processFinished(processManager, procReq, procResp);
     }
   }
 
@@ -188,8 +183,7 @@ public abstract class TaskBasedActor extends Actor {
   protected void postProcess(ManagedMessage message, Task task, ProcessResponse response) throws Exception {
     TaskContextListener listener = new TaskContextListener(message, response);
     pendingListeners.add(listener);
-    ProcessManager procMgr  = response.getContext().getProcessManagerService().getProcessManager(task.getProcessingContext().getProcessId());
-    procMgr.subscribe(task, listener);
+    response.getProcessManager().subscribe(task, listener);
   }
 
   /**
@@ -222,14 +216,14 @@ public abstract class TaskBasedActor extends Actor {
   /**
    * Checks if the process is being restarted and if the task for this actor is the one where the restart should pick in.
    * 
-   * @param actorContext
+   * @param processManager
    * @param message
    * @param response
    * @return
    * @throws MessageException
    * @throws ProcessingException
    */
-  protected boolean doRestart(ActorContext actorContext, ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
+  protected boolean doRestart(ProcessManager processManager, ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
     Context processContext = ProcessRequest.getContextForMessage(message);
     if (Status.RESTARTED.equals(processContext.getStatus())) {
       for (int taskIdx = processContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
@@ -243,7 +237,6 @@ public abstract class TaskBasedActor extends Actor {
               return true;
             }
             if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
-              ProcessManager processManager = actorContext.getProcessManagerService().getProcessManager(processContext.getProcessId());
               processManager.notifyStarted();
               processManager.notifyCancelled(task);
               break;
@@ -262,27 +255,25 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Returns a new Task (or at least its Context) with the configured resultType
-   * as taskType.
    * 
-   * @param parentContext
+   * @param processManager
+   * @param parentRequest
    * @param taskAttributes
    * @param taskContextEntries
-   * @return the context for a new task created within the parent process
-   *         context
+   * @return the new task
    * @throws Exception
    */
-  protected Task createTask(ActorContext actorContext, Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
+  protected Task createTask(ProcessManager processManager, Request parentRequest, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
-    Task task = actorContext.getProcessFactory().createTask(getTaskClass(parentContext), parentContext, initiator, getTaskType());
+    Task task = processManager.getFactory().createTask(getTaskClass(parentRequest), parentRequest, initiator, getTaskType());
     for (Entry<String, String> attr : taskAttributes.entrySet()) {
-      actorContext.getProcessFactory().createAttribute(task, attr.getKey(), attr.getValue());
+      processManager.getFactory().createAttribute(task, attr.getKey(), attr.getValue());
     }
     for (String key : taskContextEntries.keySet()) {
       Serializable value = taskContextEntries.get(key);
       task.getProcessingContext().putEntry(key, value);
     }
-    actorContext.getProcessPersistenceService().persistTask(task);
+    processManager.getPersister().persistTask(task);
     return task;
   }
 
@@ -306,11 +297,11 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * @param parentContext
+   * @param parentRequest
    * @return the java class of the Task implementation entity. Default is
    *         com.isencia.passerelle.process.model.impl.TaskImpl.
    */
-  protected Class<? extends Task> getTaskClass(Context parentContext) {
+  protected Class<? extends Task> getTaskClass(Request parentRequest) {
     return null;
   }
 
@@ -661,7 +652,7 @@ public abstract class TaskBasedActor extends Actor {
     public void setConsumed(boolean consumed) {
       this.consumed = consumed;
       if (consumed) {
-        processFinished(processResponse.getContext(), processResponse.getRequest(), processResponse);
+        processFinished(processResponse.getProcessManager(), processResponse.getRequest(), processResponse);
       }
     }
   }
