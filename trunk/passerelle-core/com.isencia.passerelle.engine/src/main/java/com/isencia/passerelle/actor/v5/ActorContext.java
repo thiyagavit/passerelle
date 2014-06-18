@@ -20,6 +20,6 @@ package com.isencia.passerelle.actor.v5;
  * 
  * @author erwin
  */
-public class ActorContext {
+public interface ActorContext {
 
 }

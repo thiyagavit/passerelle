@@ -321,7 +321,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
   
   protected ActorContext createActorContext() {
-	  return new ActorContext();
+	  return new ActorContextImpl();
   }
   
 
