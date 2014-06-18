@@ -74,7 +74,7 @@ public interface ProcessFactory {
 
 	ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level);
 
-	Task createTask(Class<? extends Task> taskClass, Context parentContext, String initiator, String type) throws Exception;
+	Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception;
 
-	Task createTask(Context parentContext, String initiator, String type);
+	Task createTask(Request request, String initiator, String type);
 }
