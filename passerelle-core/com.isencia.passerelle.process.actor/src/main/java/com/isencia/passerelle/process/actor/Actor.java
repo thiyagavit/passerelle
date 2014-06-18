@@ -64,29 +64,22 @@ import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 
 /**
- * Continuing on the track started with the "v3" and "v5" Actor APIs, the
- * process-context-aware API offers further enhancements in Actor development
- * features, combined with runtime enhancements.
+ * Continuing on the track started with the "v3" and "v5" Actor APIs, the process-context-aware API offers further
+ * enhancements in Actor development features, combined with runtime enhancements.
  * <p>
- * Similar to the v5 Actor API, a process-actor hides the complexity of
- * push/pull port management, threading etc. But whereas plain actors only care
- * about the receipt of any arbitrary msg on a given port, a process-actor knows
- * about specific request processing contexts to which incoming message may be
- * related.
+ * Similar to the v5 Actor API, a process-actor hides the complexity of push/pull port management, threading etc. But
+ * whereas plain actors only care about the receipt of any arbitrary msg on a given port, a process-actor knows about
+ * specific request processing contexts to which incoming message may be related.
  * </p>
  * <p>
- * In "streaming"-mode model runs, where actors may be receiving many
- * consecutive messages on their input ports, during one run, such
- * process-context-aware actors must be able to handle mixed ordering of
- * received messages. <br/>
- * Practically, this implies that actors with multiple data-input-ports must
- * contain a kind of internal buffering for received messages. Based on a
- * definition of mandatory and optional inputs (using the default approach of
- * blocking/non-blocking a.k.a. pull/push port modes), message may need to be
- * kept waiting a while until all required messages have been received for a
- * same context. <br/>
- * Only then should the <code>process(...)</code> method be invoked with a
- * <code>ProcessRequest</code> containing all the related messages.
+ * In "streaming"-mode model runs, where actors may be receiving many consecutive messages on their input ports, during
+ * one run, such process-context-aware actors must be able to handle mixed ordering of received messages. <br/>
+ * Practically, this implies that actors with multiple data-input-ports must contain a kind of internal buffering for
+ * received messages. Based on a definition of mandatory and optional inputs (using the default approach of
+ * blocking/non-blocking a.k.a. pull/push port modes), message may need to be kept waiting a while until all required
+ * messages have been received for a same context. <br/>
+ * Only then should the <code>process(...)</code> method be invoked with a <code>ProcessRequest</code> containing all
+ * the related messages.
  * </p>
  * 
  * @author erwin
@@ -183,16 +176,13 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Process-aware actors that must support out-of-order multiple inputs for
-   * their processing contexts, require non-blocking input ports. This is
-   * implemented via the <code>MessageBuffer</code> &
-   * <code>MessageProvider</code> system.
+   * Process-aware actors that must support out-of-order multiple inputs for their processing contexts, require
+   * non-blocking input ports. This is implemented via the <code>MessageBuffer</code> & <code>MessageProvider</code>
+   * system.
    * <p>
-   * Via this method call, <code>Port</code>s sniff around a bit on their
-   * <code>Actor</code> to check if it wants to act as a
-   * <code>MessageBuffer</code> for the <code>Port</code>. So for process-aware
-   * actors, this call will return <code>true</code> for all data input ports
-   * that belong to this actor instance.
+   * Via this method call, <code>Port</code>s sniff around a bit on their <code>Actor</code> to check if it wants to act
+   * as a <code>MessageBuffer</code> for the <code>Port</code>. So for process-aware actors, this call will return
+   * <code>true</code> for all data input ports that belong to this actor instance.
    * </p>
    */
   public boolean acceptInputPort(Port p) {
@@ -206,9 +196,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Registers a <code>MessageProvider</code>, so the actor knows there's
-   * someone out there that may feed messages to it. This is important to allow
-   * the actor to determine when it can wrap-up.
+   * Registers a <code>MessageProvider</code>, so the actor knows there's someone out there that may feed messages to
+   * it. This is important to allow the actor to determine when it can wrap-up.
    */
   public boolean registerMessageProvider(MessageProvider provider) {
     getLogger().debug("{} - Registered msgprovider {}", getFullName(), provider);
@@ -216,9 +205,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Unregisters a <code>MessageProvider</code>, so the actor knows that it
-   * should not expect anything anymore from this one. This is important to
-   * allow the actor to determine when it can wrap-up.
+   * Unregisters a <code>MessageProvider</code>, so the actor knows that it should not expect anything anymore from this
+   * one. This is important to allow the actor to determine when it can wrap-up.
    */
   public boolean unregisterMessageProvider(MessageProvider provider) {
     getLogger().debug("{} - Unregistered msgprovider {}", getFullName(), provider);
@@ -226,13 +214,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * This method is called each time a message is received on receivers of the
-   * actor's input ports, for the ports that have been accepted via
-   * <code>acceptInputPort()</code>.
+   * This method is called each time a message is received on receivers of the actor's input ports, for the ports that
+   * have been accepted via <code>acceptInputPort()</code>.
    * <p>
-   * In this way the ports/receivers are able to push messages directly into the
-   * common msg queue of the actor, i.o. forcing the actor to try to get its
-   * input messages from a number of <code>BlockingQueue</code>s, one for each
+   * In this way the ports/receivers are able to push messages directly into the common msg queue of the actor, i.o.
+   * forcing the actor to try to get its input messages from a number of <code>BlockingQueue</code>s, one for each
    * blocking input port.
    * </p>
    */
@@ -296,10 +282,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Checks if any messages have been received since the previous iteration. If
-   * so, tries to aggregate them per <code>Context</code>. If a
-   * <code>ProcessRequest</code> has a complete set of messages, it is stored in
-   * a "pending-for-processing" queue.
+   * Checks if any messages have been received since the previous iteration. If so, tries to aggregate them per
+   * <code>Context</code>. If a <code>ProcessRequest</code> has a complete set of messages, it is stored in a
+   * "pending-for-processing" queue.
    */
   @Override
   protected boolean doPreFire() throws ProcessingException {
@@ -328,15 +313,28 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         requestFinish();
       }
     } else {
-      // For sources, we feed in an empty <code>ProcessRequest</code> anyway.
-      // It's up to the <code>process()</code> implementation to define when the
-      // source must finish and wrap up.
-      ProcessRequest currentProcessRequest = new ProcessRequest();
+      // For sources, we feed in an empty <code>ProcessRequest</code> anyway, with a process manager obtained from
+      // somewhere...
+      // It's up to the <code>process()</code> implementation to define when the source must finish and wrap up.
+      ProcessRequest currentProcessRequest = new ProcessRequest(getNonMessageBoundProcessManager());
       currentProcessRequest.setIterationCount(iterationCount);
-      pendingProcessRequests.add(new ProcessResponse(createActorContext(), currentProcessRequest));
+      pendingProcessRequests.add(new ProcessResponse(currentProcessRequest));
     }
     getLogger().trace("{} - doPreFire() - exit : {}", getFullName(), readyToFire);
     return readyToFire;
+  }
+
+  /**
+   * This method should be overridden by source actors to obtain/construct a valid ProcessManager.
+   * 
+   * @return a ProcessManager for the actor's running process, but not bound to a specific received message. <br/>
+   *         <b>Can be null!</b>
+   * 
+   * @throws ProcessingException
+   *           if something goes wrong in obtaining a ProcessManager
+   */
+  protected ProcessManager getNonMessageBoundProcessManager() throws ProcessingException {
+    return null;
   }
 
   /**
@@ -347,13 +345,14 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     getLogger().trace("{} - doFire() - entry", getFullName());
     if (!pendingProcessRequests.isEmpty()) {
       ProcessResponse currentProcessResponse = pendingProcessRequests.poll();
-      ActorContext ctxt = currentProcessResponse.getContext();
       ProcessRequest currentProcessRequest = currentProcessResponse.getRequest();
+      ProcessManager processManager = currentProcessRequest.getProcessManager();
+
       getLogger().trace("{} - doFire() - processing request {}", getFullName(), currentProcessRequest);
       if (mustValidateIteration()) {
         try {
           getLogger().trace("{} - doFire() - validating iteration for request {}", getFullName(), currentProcessRequest);
-          validateIteration(ctxt, currentProcessRequest);
+          validateIteration(currentProcessRequest);
           getAuditLogger().debug("ITERATION VALIDATED");
           getLogger().trace("{} - doFire() - validation done for request {}", getFullName(), currentProcessRequest);
         } catch (ValidationException e) {
@@ -368,9 +367,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       try {
         getDirectorAdapter().notifyActorStartedTask(this, currentProcessRequest);
         notifyStartingFireProcessing();
-        process(ctxt, currentProcessRequest, currentProcessResponse);
-        if (ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(ctxt, currentProcessRequest))) {
-          processFinished(ctxt, currentProcessRequest, currentProcessResponse);
+        process(processManager, currentProcessRequest, currentProcessResponse);
+        if (ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(currentProcessRequest))) {
+          processFinished(processManager, currentProcessRequest, currentProcessResponse);
         }
       } finally {
         notifyFinishedFireProcessing();
@@ -402,10 +401,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Overridable method that triggers a first iteration, from inside the actor
-   * initialization. Default implementation calls
-   * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source.
-   * (i.e. has no connected data input ports)
+   * Overridable method that triggers a first iteration, from inside the actor initialization. Default implementation
+   * calls <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input
+   * ports)
    * 
    * @throws IllegalActionException
    */
@@ -416,10 +414,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Overridable method that triggers a next iteration, after each actor's
-   * previous iteration. Default implementation calls
-   * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source.
-   * (i.e. has no connected data input ports)
+   * Overridable method that triggers a next iteration, after each actor's previous iteration. Default implementation
+   * calls <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input
+   * ports)
    * 
    * @throws IllegalActionException
    */
@@ -430,9 +427,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   /**
-   * Check out all msgs pushed to this actor, and group them according to their
-   * context. If a ProcessRequest is found with all required inputs filled in,
-   * add it to the pending queue.
+   * Check out all msgs pushed to this actor, and group them according to their context. If a ProcessRequest is found
+   * with all required inputs filled in, add it to the pending queue.
    * 
    * @throws ProcessingException
    */
@@ -445,8 +441,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         // so refuse the task
         throw new ProcessingException(ErrorCode.RUNTIME_PERFORMANCE_INFO, "Msg Queue lock overcharged...", this, null);
       }
-      ProcessRequest contextLessProcessRequest = new ProcessRequest();
-      contextLessProcessRequest.setIterationCount(iterationCount);
       // Contrary to plain v5 Actors, we only want to handle one
       // MessageInputContext per iteration.
       // So no while loop here!
@@ -455,33 +449,39 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         Iterator<ManagedMessage> msgIterator = msgInputCtxt.getMsgIterator();
         while (msgIterator.hasNext()) {
           ManagedMessage managedMessage = (ManagedMessage) msgIterator.next();
-          String[] ctxtHdrs = ((MessageContainer) managedMessage).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
+          String[] ctxtHdrs = ((MessageContainer) managedMessage).getHeader(ProcessRequest.HEADER_PROCESS_ID);
           if (ctxtHdrs != null && ctxtHdrs.length > 0) {
             for (String ctxtHdr : ctxtHdrs) {
               ProcessRequest processRequest = incompleteProcessRequests.get(ctxtHdr);
               if (processRequest == null) {
                 ProcessManager processManager = ProcessManagerServiceTracker.getService().getProcessManager(ctxtHdr);
                 if (processManager != null) {
-                  processRequest = new ProcessRequest();
+                  processRequest = new ProcessRequest(processManager);
                   processRequest.setIterationCount(iterationCount);
                   incompleteProcessRequests.put(ctxtHdr, processRequest);
                 } else {
-                  processRequest = contextLessProcessRequest;
+                  // TODO check if we need some basic transparent msg handling when no process context header is
+                  // found???
+                  // processRequest = contextLessProcessRequest;
                 }
               }
-              processRequest.addInputMessage(msgInputCtxt.getPortIndex(), msgInputCtxt.getPortName(), managedMessage);
+              if (processRequest != null) {
+                processRequest.addInputMessage(msgInputCtxt.getPortIndex(), msgInputCtxt.getPortName(), managedMessage);
+              }
             }
           } else {
-            contextLessProcessRequest.addInputMessage(msgInputCtxt.getPortIndex(), msgInputCtxt.getPortName(), managedMessage);
+            // TODO check if we need some basic transparent msg handling when no process context header is found???
+            // contextLessProcessRequest.addInputMessage(msgInputCtxt.getPortIndex(), msgInputCtxt.getPortName(),
+            // managedMessage);
           }
           msgCtr++;
         }
       }
-      // if the context-less process request has something to process, let's do
-      // it as well!
-      if (contextLessProcessRequest.hasSomethingToProcess()) {
-        pendingProcessRequests.offer(new ProcessResponse(createActorContext(), contextLessProcessRequest));
-      }
+      // if the context-less process request has something to process, let's do it as well!
+      // if (contextLessProcessRequest.hasSomethingToProcess()) {
+      // pendingProcessRequests.offer(new ProcessResponse(contextLessProcessRequest));
+      // }
+
       // now check for any completely-defined context-scoped process requests
       Collection<Entry<String, ProcessRequest>> transfers = new ArrayList<Entry<String, ProcessRequest>>();
       for (Entry<String, ProcessRequest> prEntry : incompleteProcessRequests.entrySet()) {
@@ -490,7 +490,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         }
       }
       for (Entry<String, ProcessRequest> entry : transfers) {
-        pendingProcessRequests.offer(new ProcessResponse(createActorContext(), entry.getValue()));
+        pendingProcessRequests.offer(new ProcessResponse(entry.getValue()));
         incompleteProcessRequests.remove(entry.getKey());
       }
     } catch (InterruptedException e) {
@@ -507,18 +507,15 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   }
 
   protected ProcessManager getProcessManager(Request request) {
-	return ProcessManagerServiceTracker.getService().getProcessManager(request.getProcessingContext().getProcessId());
+    return ProcessManagerServiceTracker.getService().getProcessManager(request.getProcessingContext().getProcessId());
   }
 
   /**
-   * Does a check on the size of the <code>pushedMessages</code> queue,
-   * protected with a <code>msgLock</code>
+   * Does a check on the size of the <code>pushedMessages</code> queue, protected with a <code>msgLock</code>
    * 
-   * @return true if this actor currently has msgs in its
-   *         <code>pushedMessages</code> queue.
+   * @return true if this actor currently has msgs in its <code>pushedMessages</code> queue.
    * @throws ProcessingException
-   *           if the access to the queue fails, e.g. when the lock is not
-   *           available within a reasonable time
+   *           if the access to the queue fails, e.g. when the lock is not available within a reasonable time
    */
   protected boolean hasPushedMessages() throws ProcessingException {
     getLogger().trace("{} - hasPushedMessages() - entry", getFullName());
@@ -549,37 +546,11 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     return msgProviders.isEmpty();
   }
 
-  /**
-   * Overridable method to indicate whether the given request will be processed
-   * synchronously or asynchronously. Default implementation indicates
-   * synchronous processing for all requests.
-   * <p>
-   * Actors that have asynchronous processing, should combine returning
-   * <code>ProcessingMode.ASYNCHRONOUS</code> here, with invoking
-   * <code>processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response)</code>
-   * when the work is done for a given request.
-   * </p>
-   * 
-   * @param ctxt
-   * @param request
-   * @return whether the given request will be processed synchronously or
-   *         asynchronously.
-   */
-  public ProcessingMode getProcessingMode(ActorContext ctxt, ProcessRequest request) {
+  public ProcessingMode getProcessingMode(ProcessRequest request) {
     return ProcessingMode.SYNCHRONOUS;
   }
 
-  /**
-   * @param ctxt
-   *          the context in which the request was processed
-   * @param request
-   *          the request that was processed
-   * @param response
-   *          contains the output messages that the actor should send, or a
-   *          ProcessingException if some error was encountered during
-   *          processing.
-   */
-  public void processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response) {
+  public void processFinished(ProcessManager processManager, ProcessRequest request, ProcessResponse response) {
     try {
       if (response.getException() == null) {
         // Mark the contexts as processed.
@@ -630,29 +601,26 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   /**
    * <p>
-   * Method that should be overridden for actors that need to be able to
-   * validate their state before processing a next fire-iteration.
+   * Method that should be overridden for actors that need to be able to validate their state before processing a next
+   * fire-iteration.
    * </p>
    * <p>
-   * E.g. it can typically be used to validate dynamic parameter settings,
-   * and/or messages received on their input ports.
+   * E.g. it can typically be used to validate dynamic parameter settings, and/or messages received on their input
+   * ports.
    * </p>
    * 
-   * @param ctxt
    * @param request
-   *          contains all messages received on the actor's input ports for the
-   *          current iteration.
+   *          contains all messages received on the actor's input ports for the current iteration.
    * @throws ValidationException
    */
-  protected void validateIteration(ActorContext ctxt, ProcessRequest request) throws ValidationException {
+  protected void validateIteration(ProcessRequest request) throws ValidationException {
   }
 
   /**
-   * Overridable method to determine if an actor should do a validation of its
-   * state and incoming request for each iteration. <br>
-   * By default, checks on its Passerelle director what must be done. If no
-   * Passerelle director is used (but e.g. a plain Ptolemy one), it returns
-   * false.
+   * Overridable method to determine if an actor should do a validation of its state and incoming request for each
+   * iteration. <br>
+   * By default, checks on its Passerelle director what must be done. If no Passerelle director is used (but e.g. a
+   * plain Ptolemy one), it returns false.
    * 
    * @see validateIteration()
    * @see doFire()
@@ -686,34 +654,22 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   protected Logger getLogger() {
     return LOGGER;
   }
-
+  
   /**
-   * @param context
+   * This is the method that should be ALWAYS used by process actors to construct output messages, 
+   * optionally with causal info about received input messages.
+   * <p>
+   * The request's process ID will be stored in a message header and the message body is available for arbitrary data
+   * as needed by concrete actor implementations.
+   * </p>
+   * 
+   * @param request the request being processed in the actor, typically by executing a child task
+   * @param causes
    * @return
-   * @throws MessageException
    */
-  protected ManagedMessage createMessageForContext(Context context) throws MessageException {
-    SettableMessage message = (SettableMessage) createMessage(context, ManagedMessage.objectContentType);
-    if (context.getProcessId() != null) {
-      message.setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getProcessId());
-    }
-    return message;
-  }
-
-  @Override
-  public ManagedMessage createMessageFromCauses(ManagedMessage... causes) {
+  protected ManagedMessage createOutputMessage(Request request, ManagedMessage... causes) {
     SettableMessage message = (SettableMessage) super.createMessageFromCauses(causes);
-    for (ManagedMessage causeMsg : causes) {
-      // Normally we would only expect a msg to be related to one context,
-      // but one never knows what may happen with complex/concurrent workflows
-      // where work could maybe be optimized via sharing/grouping...
-      String[] ctxtIDHdrs = ((SettableMessage) causeMsg).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
-      if (ctxtIDHdrs != null) {
-        for (String ctxtIDHdr : ctxtIDHdrs) {
-          message.addHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, ctxtIDHdr);
-        }
-      }
-    }
+    message.setHeader(ProcessRequest.HEADER_PROCESS_ID, request.getProcessingContext().getProcessId());
     return message;
   }
 

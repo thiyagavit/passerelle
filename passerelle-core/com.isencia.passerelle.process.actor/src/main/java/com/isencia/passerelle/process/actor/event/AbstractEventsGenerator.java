@@ -88,10 +88,10 @@ public abstract class AbstractEventsGenerator extends TaskBasedActor {
   protected void postProcess(ManagedMessage message, Task task, ProcessResponse response) throws Exception {
     Collections.sort(events, new EventComparator());
     sendEventBatch(events, response);
-    ProcessManager procMgr  = response.getContext().getProcessManagerService().getProcessManager(task.getProcessingContext().getProcessId());
+    ProcessManager procMgr  = response.getProcessManager();
     procMgr.notifyEvent(task, "EVENTS_SENT", events.toString());
     procMgr.notifyFinished(task);
-    processFinished(response.getContext(), response.getRequest(), response);
+    processFinished(response.getProcessManager(), response.getRequest(), response);
   }
 
   private void sendEventBatch(Collection<Event> batch, ProcessResponse response) throws MessageException {

@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.actor.event;
 
 import java.io.Serializable;
@@ -29,7 +29,6 @@ import ptolemy.data.ObjectToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
@@ -50,32 +49,31 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.process.actor.AttributeNames;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
-import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
-import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.ProcessPersisterTracker;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
- * This actor provides a bridge from the event-based monitoring "world" towards the classic Context/Task-based processing.
+ * This actor provides a bridge from the event-based monitoring "world" towards the classic Context/Task-based
+ * processing.
  * <p>
- * It is not desirable to store detailed traces of each activity during the monitoring of potentially huge and long-running event streams. 
- * Only when a potential issue is identified, it makes sense to store this fact as an alarm.
- * The treatment of the alarms is a good match to classic task-based processing and tracing. 
- * <br/>
+ * It is not desirable to store detailed traces of each activity during the monitoring of potentially huge and
+ * long-running event streams. Only when a potential issue is identified, it makes sense to store this fact as an alarm.
+ * The treatment of the alarms is a good match to classic task-based processing and tracing. <br/>
  * This actor can be used to collect alarm (or other) events and to add them as Task results to a processing Context.
  * </p>
  * <p>
- * Currently this is implemented in a basic way, adding events as items on the default Context of the monitoring process execution. 
- * In the future more options must be added, e.g. to start specific diagnosis Contexts per alarm etc.
+ * Currently this is implemented in a basic way, adding events as items on the default Context of the monitoring process
+ * execution. In the future more options must be added, e.g. to start specific diagnosis Contexts per alarm etc.
  * </p>
  * <p>
- * REMARK : some basic elements are duplicated from TaskBasedActor, but this actor is not a TaskBasedActor in the traditional sense!
+ * REMARK : some basic elements are duplicated from TaskBasedActor, but this actor is not a TaskBasedActor in the
+ * traditional sense!
  * </p>
  * 
  * @author erwin
@@ -91,7 +89,7 @@ public class EventsToTaskCollector extends Actor {
   public StringParameter taskTypeParam; // NOSONAR
   public StringParameter resultTypeParam;
 
-  private Context processContext = null;
+  private ProcessManager processManager = null;
 
   public EventsToTaskCollector(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
@@ -112,21 +110,20 @@ public class EventsToTaskCollector extends Actor {
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
     NamedObj flow = toplevel();
-    processContext = null;
-    Attribute contextAttribute = flow.getAttribute("context");
-    if (contextAttribute != null) {
-      Parameter parameter = (Parameter) contextAttribute;
-      try {
-        ObjectToken oToken = (ObjectToken) parameter.getToken();
-        Object o = oToken.getValue();
-        if (o instanceof Context) {
-          processContext = (Context) o;
+    try {
+      processManager = null;
+      Parameter procMgrParameter = (Parameter) flow.getAttribute(ProcessManager.NAME_AS_ATTRIBUTE, Parameter.class);
+      if (procMgrParameter != null) {
+        Object o = ((ObjectToken) procMgrParameter.getToken()).getValue();
+        if (o instanceof ProcessManager) {
+          processManager = (ProcessManager) o;
         }
-      } catch (IllegalActionException e) {
       }
+    } catch (Exception e) {
+      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error obtaining ProcessManager", this, e);
     }
-    if (processContext == null) {
-      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "No processing Context found on " + flow.getName(), this, null);
+    if (processManager == null) {
+      throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error obtaining ProcessManager", this, null);
     }
   }
 
@@ -153,21 +150,19 @@ public class EventsToTaskCollector extends Actor {
       }
     }
 
-    Context taskContext = null;
     Task task = null;
     try {
       // time to create a task etc with the events as results
-      String requestId = Long.toString(processContext.getRequest().getId());
-      String referenceId = Long.toString(processContext.getRequest().getCase().getId());
+      String requestId = Long.toString(processManager.getRequest().getId());
+      String referenceId = Long.toString(processManager.getRequest().getCase().getId());
 
       Map<String, String> taskAttributes = new HashMap<String, String>();
       taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
       taskAttributes.put(AttributeNames.REF_ID, referenceId);
       taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
-      taskContext = createTask(processContext, taskAttributes, new HashMap<String, Serializable>());
-      task = (Task) taskContext.getRequest();
+      task = createTask(processManager, processManager.getRequest(), taskAttributes, new HashMap<String, Serializable>());
       if (!events.isEmpty()) {
-        ProcessFactory entityFactory = ((com.isencia.passerelle.process.actor.ActorContext)ctxt).getProcessFactory();
+        ProcessFactory entityFactory = processManager.getFactory();
         ResultBlock rb = entityFactory.createResultBlock(task, resultTypeParam.stringValue());
         for (Event event : events) {
           String value = null;
@@ -177,20 +172,18 @@ public class EventsToTaskCollector extends Actor {
           entityFactory.createResultItem(rb, event.getTopic(), value, null, event.getCreationTS());
         }
       }
+      processManager.notifyFinished(task);
     } catch (Throwable t) {
       ExecutionTracerService.trace(this, t.getMessage());
       response.setException(new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task", this, t));
-      if (taskContext != null) {
-        ProcessManagerServiceTracker.getService().getProcessManager(processContext.getProcessId()).notifyError(task, t);
+      if (task != null) {
+        processManager.notifyError(task, t);
       }
-    }
-    if (taskContext != null) {
-      ProcessManagerServiceTracker.getService().getProcessManager(processContext.getProcessId()).notifyFinished(task);
     }
 
     try {
       // send the process context with the additional task
-      ManagedMessage msg = createMessage(processContext, ManagedMessage.objectContentType);
+      ManagedMessage msg = createMessage(processManager, ManagedMessage.objectContentType);
       response.addOutputMessage(output, msg);
     } catch (MessageException e) {
       response.setException(new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error sending output msg", this, e));
@@ -199,43 +192,31 @@ public class EventsToTaskCollector extends Actor {
 
   @Override
   protected void doWrapUp() throws TerminationException {
-    processContext = null;
+    processManager = null;
     super.doWrapUp();
   }
 
   /**
-   * Returns a new Task (or at least its Context) with the configured resultType as taskType.
+   * Returns a new Task with the configured taskType.
    * 
-   * @param parentContext
+   * @param processManager
+   * @param parentRequest
    * @param taskAttributes
    * @param taskContextEntries
-   * @return the context for a new task created within the parent process context
+   * @return the new task
    * @throws Exception
    */
-  protected Context createTask(Context parentContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
+  protected Task createTask(ProcessManager processManager, Request parentRequest, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String taskType = taskTypeParam.stringValue();
-    
-    ProcessFactory factory = ProcessFactoryTracker.getService();
-    Task task = factory.createTask(getTaskClass(parentContext), parentContext, FlowUtils.getFullNameWithoutFlow(this), taskType);
-	for (Entry<String, String> attr : taskAttributes.entrySet()) {
-		factory.createAttribute(task, attr.getKey(), attr.getValue());
-	}
-	
-	for (String key : taskContextEntries.keySet()) {
-		Serializable value = taskContextEntries.get(key);
-		task.getProcessingContext().putEntry(key, value);
-	}
-
-	ProcessPersisterTracker.getService().persistTask(task);
-
-	return(task.getProcessingContext());
-  }
-
-  /**
-   * @param parentContext
-   * @return the java class of the Task implementation entity. Default is com.isencia.passerelle.process.model.impl.TaskImpl.
-   */
-  protected Class<? extends Task> getTaskClass(Context parentContext) {
-    return null;
+    Task task = processManager.getFactory().createTask(null, parentRequest, FlowUtils.getFullNameWithoutFlow(this), taskType);
+    for (Entry<String, String> attr : taskAttributes.entrySet()) {
+      processManager.getFactory().createAttribute(task, attr.getKey(), attr.getValue());
+    }
+    for (String key : taskContextEntries.keySet()) {
+      Serializable value = taskContextEntries.get(key);
+      task.getProcessingContext().putEntry(key, value);
+    }
+    processManager.getPersister().persistTask(task);
+    return task;
   }
 }
