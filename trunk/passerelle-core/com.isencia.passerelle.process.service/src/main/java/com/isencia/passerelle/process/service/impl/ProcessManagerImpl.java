@@ -55,9 +55,17 @@ public class ProcessManagerImpl implements ProcessManager {
 	}
 	
 	@Override
-	public Task getTask(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Task getTask(long id) {
+		for (Task task : request.getProcessingContext().getTasks())
+			if (task.getId().longValue() == id)
+				return(task);
+
+		boolean shouldClose = getPersister().open(false);
+		Task task = getPersister().getTask(request,id);
+		if (shouldClose)
+			getPersister().close();
+		
+		return task;
 	}
 	
 	@Override

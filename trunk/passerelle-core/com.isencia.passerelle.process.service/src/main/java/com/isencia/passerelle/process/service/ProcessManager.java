@@ -2,7 +2,6 @@ package com.isencia.passerelle.process.service;
 
 import java.util.concurrent.TimeUnit;
 
-import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
@@ -11,7 +10,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
-public interface ProcessManager extends ActorContext {
+public interface ProcessManager {
 	public static final String REPORT_EVENT_TYPE = "REPORTED";
 	public static final String RESTARTING = "restarting";
 
@@ -23,7 +22,7 @@ public interface ProcessManager extends ActorContext {
 	
 	Request getRequest();
 
-	Task getTask(Long id);
+	Task getTask(long id);
 
 	/**
 	 * Notify listeners that the processing of the request was cancelled.
