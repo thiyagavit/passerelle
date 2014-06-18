@@ -6,7 +6,7 @@ import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 
-public interface ProcessPersistenceService {
+public interface ProcessPersister {
 	/**
 	 * closes a unit of work, committing or rolling back the transaction if one is active. 
 	 */

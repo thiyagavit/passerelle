@@ -24,3 +24,4 @@ Require-Bundle: com.isencia.sherpa.commons;bundle-version="6.4.0",
  com.isencia.sherpa.jndi;bundle-version="2.2.5",
  org.eclipse.persistence.jpa;bundle-version="2.4.1"
 Export-Package: com.isencia.passerelle.process.model.impl.shbl
+Service-Component: OSGI-INF/ProcessPersister.xml

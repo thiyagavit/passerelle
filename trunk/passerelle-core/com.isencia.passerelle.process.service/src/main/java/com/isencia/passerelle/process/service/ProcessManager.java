@@ -7,13 +7,18 @@ import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
 	public static final String REPORT_EVENT_TYPE = "REPORTED";
 	public static final String RESTARTING = "restarting";
 
+	ProcessFactory getFactory();
+	
 	ProcessHandle getHandle();
+	
+	ProcessPersister getPersister();
 	
 	Request getRequest();
 
