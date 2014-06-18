@@ -7,6 +7,7 @@ Bundle-Activator: com.isencia.passerelle.process.service.activator.Activator
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.actor;version="8.7.0",
+ com.isencia.passerelle.actor.v5;version="8.7.0",
  com.isencia.passerelle.core;version="8.7.0",
  com.isencia.passerelle.model;version="8.7.0",
  com.isencia.passerelle.process.model;version="8.7.0",

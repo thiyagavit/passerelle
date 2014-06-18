@@ -59,6 +59,7 @@ import com.isencia.passerelle.message.SimpleActorMessageQueue;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 
@@ -505,8 +506,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
   }
 
-  protected ActorContext createActorContext() {
-	return new ActorContext();
+  protected ProcessManager getProcessManager(Request request) {
+	return ProcessManagerServiceTracker.getService().getProcessManager(request.getProcessingContext().getProcessId());
   }
 
   /**
