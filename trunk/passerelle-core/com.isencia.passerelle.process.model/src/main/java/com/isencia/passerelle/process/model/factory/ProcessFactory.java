@@ -77,4 +77,6 @@ public interface ProcessFactory {
 	Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception;
 
 	Task createTask(Request request, String initiator, String type);
+
+	Class<? extends Task> getDefaultTaskClass();
 }
