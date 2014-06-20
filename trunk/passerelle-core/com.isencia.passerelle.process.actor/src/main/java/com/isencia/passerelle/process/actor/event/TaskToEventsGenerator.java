@@ -18,6 +18,7 @@ import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * This actor provides a bridge from a classic EDM Context/Task-based processing towards the event-based processing "world".
@@ -61,7 +62,7 @@ public class TaskToEventsGenerator extends AbstractEventsGenerator {
   }
 
   @Override
-  protected void process(Task task) throws ProcessingException {
+  protected void process(ProcessManager processManager, Task task) throws ProcessingException {
     try {
       boolean sendContextEvents = ((BooleanToken) sendContextEventsParameter.getToken()).booleanValue();
       boolean sendResultItemEvents = ((BooleanToken) sendResultItemEventsParameter.getToken()).booleanValue();

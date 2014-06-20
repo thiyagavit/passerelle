@@ -23,6 +23,7 @@ import com.isencia.passerelle.process.model.AttributeNames;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.util.ProcessModelUtils;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
 
@@ -130,7 +131,7 @@ public class ServiceBasedActor extends TaskBasedActor {
   }
 
   @Override
-  protected void process(Task task) throws ProcessingException {
+  protected void process(ProcessManager processManager, Task task) throws ProcessingException {
     try {
       Long timeOutValue = getTimeOutValue();
       TimeUnit timeUnit = getTimeOutUnit();

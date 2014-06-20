@@ -161,7 +161,7 @@ public abstract class TaskBasedActor extends Actor {
               // re-throw here, exception will be attached to taskContext
               throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
             }
-            process(task);
+            process(processManager, task);
             postProcess(message, task, procResp);
           } else {
             procResp.addOutputMessage(output, message);
@@ -207,12 +207,13 @@ public abstract class TaskBasedActor extends Actor {
    * Should perform the actual processing of the task. For most simple/fast cases, this can be done in a synchronous
    * fashion. For complex/long-running processing, the usage of a ServiceBasedActor is advisable.
    * 
+   * @param processManager
    * @param task
    *          the new task that must be processed
    * @return the updated context of the started/executed task
    * @throws ProcessingException
    */
-  protected abstract void process(Task task) throws ProcessingException;
+  protected abstract void process(ProcessManager processManager, Task task) throws ProcessingException;
 
   /**
    * Override this method to define the logic for potentially skipping the processing of a received message.
