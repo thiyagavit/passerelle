@@ -37,9 +37,9 @@ import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
 import com.isencia.passerelle.process.model.util.ProcessModelUtils;
 import com.isencia.passerelle.process.service.ProcessManager;
-import com.isencia.passerelle.process.service.ProcessPersister;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 @SuppressWarnings("serial")

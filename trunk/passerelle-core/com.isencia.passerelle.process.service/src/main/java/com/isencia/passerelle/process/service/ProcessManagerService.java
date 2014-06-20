@@ -3,6 +3,7 @@ package com.isencia.passerelle.process.service;
 import java.util.Set;
 
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManagerService {

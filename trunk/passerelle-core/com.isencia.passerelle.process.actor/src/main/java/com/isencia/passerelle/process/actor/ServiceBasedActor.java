@@ -24,8 +24,8 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.util.ProcessModelUtils;
 import com.isencia.passerelle.process.service.ProcessManager;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
+import com.isencia.passerelle.process.service.RequestProcessingBrokerTracker;
 
 /**
  * This is a generic base class for service based actors.
@@ -114,7 +114,7 @@ public class ServiceBasedActor extends TaskBasedActor {
    * will delegate its {@link Task} processing.
    */
   protected RequestProcessingBroker getProcessingBroker() {
-    return ServiceRegistry.getInstance().getRequestProcessingBroker();
+    return RequestProcessingBrokerTracker.getService();
   }
   
   @Override

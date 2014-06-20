@@ -63,6 +63,11 @@ public class ErrorCode extends com.isencia.passerelle.core.ErrorCode {
   // 9000 RANGE : dramatic technical errors
   public static final ErrorCode SYSTEM_ERROR = new ErrorCode("SYSTEM_ERROR", "9999", "system/ERROR", ErrorCategory.TECHNICAL, Severity.ERROR, "Internal error");
   public static final ErrorCode CONFIG_ERROR = new ErrorCode("CONFIG_ERROR", "9000", "system/ERROR", ErrorCategory.FUNCTIONAL, Severity.ERROR, "Configuration error");
+  
+  public static final ErrorCode PERSISTENCE_ERROR = new ErrorCode("PERSISTENCE_ERROR", "9100", "persistence/ERROR", ErrorCategory.TECHNICAL, Severity.ERROR,"Persistence error");
+  public static final ErrorCode PERSISTENCE_WARNING = new ErrorCode("PERSISTENCE_WARNING", "9101", "persistence/WARNING", ErrorCategory.TECHNICAL, Severity.WARNING,"Persistence warning");
+  public static final ErrorCode PERSISTENCE_FATAL = new ErrorCode("PERSISTENCE_FATAL", "9102", "persistence/FATAL", ErrorCategory.TECHNICAL, Severity.FATAL,"Persistence fatal error");
+
 
   public ErrorCode(String name, String code, ErrorCategory category, Severity severity, String description) {
     super(name, code, category, severity, description);

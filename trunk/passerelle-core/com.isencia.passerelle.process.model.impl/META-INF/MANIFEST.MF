@@ -23,4 +23,3 @@ Export-Package: com.isencia.passerelle.process.model.impl;version="8.7.0",
  com.isencia.passerelle.process.model.impl.util
 Bundle-Activator: com.isencia.passerelle.process.model.impl.activator.Activator
 DynamicImport-Package:  org.eclipse.persistence.*
-Service-Component: OSGI-INF/ProcessFactory.xml

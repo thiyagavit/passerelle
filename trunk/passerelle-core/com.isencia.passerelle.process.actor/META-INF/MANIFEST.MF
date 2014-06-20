@@ -13,6 +13,7 @@ Import-Package:
  com.isencia.passerelle.process.model;version="8.7.0",
  com.isencia.passerelle.process.model.event,
  com.isencia.passerelle.process.model.factory;version="8.7.0",
+ com.isencia.passerelle.process.model.persist;version="8.7.0",
  com.isencia.passerelle.process.model.util;version="8.7.0",
  com.isencia.passerelle.process.service;version="8.7.0",
  com.isencia.passerelle.process.service.impl,
