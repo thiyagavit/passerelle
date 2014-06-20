@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.LongToken;
 import ptolemy.data.StringToken;
@@ -15,10 +16,13 @@ import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
+import com.isencia.passerelle.process.model.AttributeNames;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.util.ProcessModelUtils;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
 
@@ -118,7 +122,7 @@ public class ServiceBasedActor extends TaskBasedActor {
     try {
       Map<String, String> attrMappings = getAttributeMappings();
       for(Entry<String, String> attrEntry : attrMappings.entrySet()) {
-        storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), (String)null);
+        ProcessModelUtils.storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), (String)null);
       }
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.TASK_ERROR, "Unable to obtain task attributes", this, e);

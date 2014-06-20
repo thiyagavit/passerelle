@@ -1,4 +1,4 @@
-package com.isencia.passerelle.process.actor;
+package com.isencia.passerelle.process.model;
 
 /**
  * Some constants for actor parameters, context attributes etc.
@@ -17,5 +17,6 @@ public interface AttributeNames {
   public static final String TASK_TYPE = "Task type";
   public final static String TIMEOUT_TIME = "Timeout";
   public final static String TIME_UNIT = "Time unit";
+  public static final String RESULT_TAG = "Result tag";
 
 }

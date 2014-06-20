@@ -10,6 +10,7 @@ import com.isencia.passerelle.core.ErrorCategory;
 import com.isencia.passerelle.core.ErrorCode.Severity;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.AttributeHolder;
+import com.isencia.passerelle.process.model.AttributeNames;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
@@ -107,12 +108,17 @@ public class ProcessFactoryImpl implements ProcessFactory {
 
 	@Override
 	public ResultBlock createResultBlock(Task task, String type) {
-		return new ResultBlockImpl(task, type);
+	  return createResultBlock(task, type, new Date());
 	}
 
 	@Override
 	public ResultBlock createResultBlock(Task task, String type, Date date) {
-		return new ResultBlockImpl(task, type, date);
+    String resultTag = (String) task.getProcessingContext().getEntryValue(AttributeNames.RESULT_TAG);
+    ResultBlock rb = new ResultBlockImpl(task, type, date);
+    if(resultTag!=null) {
+      createAttribute(rb, "tag", resultTag);
+    }
+    return rb;
 	}
 
 	@Override
