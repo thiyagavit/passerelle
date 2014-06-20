@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.persist.ProcessPersister;
 import com.isencia.passerelle.process.service.ProcessManager;
@@ -34,6 +35,12 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 	@Override
 	public ProcessPersister getPersister() {
 		return persister;
+	}
+	
+	
+	@Override
+	public ProcessManager getProcessManager(Request request) {
+	  return getProcessManager(request.getProcessingContext().getProcessId());
 	}
 	
 	@Override

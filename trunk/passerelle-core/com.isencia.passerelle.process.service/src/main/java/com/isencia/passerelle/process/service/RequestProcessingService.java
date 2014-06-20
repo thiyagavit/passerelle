@@ -25,7 +25,7 @@ import com.isencia.util.FutureValue;
  * @author erwin
  *
  */
-public interface RequestProcessingService {
+public interface RequestProcessingService<R extends Request> {
   
   /**
    * Process the given Request within the given timeout, if this service instance is capable of handling it.
@@ -47,5 +47,5 @@ public interface RequestProcessingService {
    * @param unit the {@link TimeUnit} of the timeout period
    * @return a Future to the request after processing is finished or null if this service is unable to process the given request
    */
-  Future<Request> process(Request request, Long timeout, TimeUnit unit);
+  Future<R> process(R request, Long timeout, TimeUnit unit);
 }
