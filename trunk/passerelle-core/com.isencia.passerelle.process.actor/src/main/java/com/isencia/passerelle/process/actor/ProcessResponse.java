@@ -17,12 +17,10 @@ package com.isencia.passerelle.process.actor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.isencia.passerelle.message.MessageOutputContext;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.internal.SettableMessage;
-import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.message.MessageOutputContext;
 import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
@@ -49,6 +47,9 @@ public class ProcessResponse {
   }
 
   public boolean addOutputMessage(Port outputPort, ManagedMessage outputMsg) {
+    if(outputPort==null || outputMsg==null) {
+      return false;
+    } 
     if (request.isMessageInContext(outputMsg)) {
       outputs.add(new MessageOutputContext(outputPort, outputMsg));
       return true;
@@ -58,6 +59,9 @@ public class ProcessResponse {
   }
 
   public boolean addOutputMessageInSequence(Port outputPort, ManagedMessage outputMsg) {
+    if(outputPort==null || outputMsg==null) {
+      return false;
+    } 
     if (request.isMessageInContext(outputMsg)) {
       outputsInSequence.add(new MessageOutputContext(outputPort, outputMsg));
       return true;

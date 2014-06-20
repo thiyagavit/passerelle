@@ -46,10 +46,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.process.actor.activator.Activator;
-import com.isencia.passerelle.process.common.util.ContextUtils;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
+import com.isencia.passerelle.process.model.util.ProcessModelUtils;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
@@ -162,7 +162,7 @@ public class Forward extends Actor {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
           String paramName = paramKeyValue[0].trim();
-          String paramValue = ContextUtils.lookupValueForPlaceHolder(processContext, paramKeyValue[1].trim());
+          String paramValue = ProcessModelUtils.lookupValueForPlaceHolder(processContext, paramKeyValue[1].trim());
           try {
             // TODO When moving to trunk, and using new FlowProcessingService, this extra check is not needed anymore.
             // but on the edm v1.0 branch invalid parameter overrides generate exceptions!
