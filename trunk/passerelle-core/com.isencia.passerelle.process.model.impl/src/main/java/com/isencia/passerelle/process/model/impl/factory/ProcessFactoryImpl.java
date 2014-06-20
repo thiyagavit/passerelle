@@ -156,11 +156,6 @@ public class ProcessFactoryImpl implements ProcessFactory {
 		ProcessFactoryTracker.setService(null);
 	}
 	
-	@Override
-	public Class<? extends Task> getDefaultTaskClass() {
-		return TaskImpl.class;
-	}
-
 	public void init() {
 		ProcessFactoryTracker.setService(this);
 	}
