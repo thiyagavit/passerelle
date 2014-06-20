@@ -1,27 +1,80 @@
 package com.isencia.passerelle.process.model.util;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import ptolemy.data.expr.StringParameter;
 import ptolemy.data.expr.Variable;
 import ptolemy.kernel.util.IllegalActionException;
 
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.ResultBlock;
+import com.isencia.passerelle.process.model.ResultItem;
+import com.isencia.passerelle.process.model.Task;
 
 public class ProcessModelUtils {
 
   /**
    * @param context
-   * @param itemName
+   * @param itemName can not be blank
    * @param defaultValue
    * @return the value of the context item with the given itemName, or the defaultValue if no such item was found.
    */
   public static String getContextItemValue(Context context, String itemName, String defaultValue) {
-    if (context == null || itemName == null) {
+    if (context == null || StringUtils.isBlank(itemName)) {
       return null;
     } else {
       String itemValue = context.lookupValue(itemName);
       return itemValue != null ? itemValue : defaultValue;
+    }
+  }
+
+  /**
+   * Look for the item with given itemName in the results of given dataType in the previous tasks. The search is done
+   * backwards from the last (i.e. most recent) one to the beginning, for the maximum depth given.
+   * 
+   * @param context
+   *          can not be null
+   * @param dataType
+   *          if null or blank, look in all results otherwise only in results of the given type
+   * @param itemName
+   *          can not be blank
+   * @param maxDepth
+   *          if <= 0 all tasks are checked in backwards order; otherwise maximally check this nr of tasks in backwards
+   *          order
+   * @return
+   */
+  public static String lookupValueForMaxDepth(Context context, String dataType, String itemName, int maxDepth) {
+    if (context == null || StringUtils.isBlank(itemName)) {
+      return null;
+    } else {
+      String itemValue = null;
+      if (maxDepth > 0) {
+        maxDepth = maxDepth + 1;
+        List<Task> tasks = context.getTasks();
+        int startI = tasks.size() - 1;
+        int endI = Math.max(tasks.size() - maxDepth, 0);
+        for (int taskIdx = startI; taskIdx >= endI && itemValue == null; taskIdx--) {
+          Task task = tasks.get(taskIdx);
+          Collection<ResultBlock> blocks = task.getResultBlocks();
+          for (ResultBlock block : blocks) {
+            if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+              ResultItem<?> item = block.getItemForName(itemName);
+              if (item != null) {
+                itemValue = item.getValueAsString();
+                break;
+              }
+            }
+          }
+        }
+      } else {
+        itemValue = context.lookupValue(itemName);
+      }
+
+      return itemValue;
     }
   }
 
@@ -37,14 +90,18 @@ public class ProcessModelUtils {
    * @return First value found or null
    */
   public static String lookupValueForFirstKeyFound(final Context context, String... itemNames) {
-    String value = null;
-    for (String itemName : itemNames) {
-      value = context.lookupValue(itemName);
-      if (value != null) {
-        break;
+    if (context == null || itemNames == null) {
+      return null;
+    } else {
+      String value = null;
+      for (String itemName : itemNames) {
+        value = context.lookupValue(itemName);
+        if (value != null) {
+          break;
+        }
       }
+      return value;
     }
-    return value;
   }
 
   private static final String ADVANCED_PLACEHOLDER_START = "#[context://";
