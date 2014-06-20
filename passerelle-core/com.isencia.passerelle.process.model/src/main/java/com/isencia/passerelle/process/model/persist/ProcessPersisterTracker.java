@@ -1,4 +1,4 @@
-package com.isencia.passerelle.process.service;
+package com.isencia.passerelle.process.model.persist;
 
 public class ProcessPersisterTracker {
 	private static ProcessPersister SERVICE = null;

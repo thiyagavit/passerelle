@@ -8,6 +8,7 @@ import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {

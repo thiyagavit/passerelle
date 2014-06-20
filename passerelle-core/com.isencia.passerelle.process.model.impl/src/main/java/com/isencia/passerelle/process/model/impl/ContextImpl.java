@@ -48,8 +48,8 @@ import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
+import com.isencia.passerelle.process.model.factory.HistoricalDataProviderTracker;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"
@@ -272,7 +272,7 @@ public class ContextImpl implements Context {
 
       // if still nothin found, check in the historical data
       if (result == null) {
-        HistoricalDataProvider historicalDataProvider = ServiceRegistry.getInstance().getHistoricalDataProvider();
+        HistoricalDataProvider historicalDataProvider = HistoricalDataProviderTracker.getService();
         if (historicalDataProvider != null) {
           List<Attribute> historicalRequestAttributes = historicalDataProvider.getRequestAttributes(this);
           if (historicalRequestAttributes != null) {
