@@ -25,7 +25,7 @@ import com.isencia.passerelle.process.model.Request;
  * @author erwin
  *
  */
-public interface RequestProcessingBroker {
+public interface RequestProcessingBroker<R extends Request> {
   
   /**
    * @param request the {@link Request} that must be processed
@@ -36,21 +36,21 @@ public interface RequestProcessingBroker {
    * @throws ProcessingException when the delivery has failed of the {@link Request} to a service able to process it.
    * E.g. when no service is found for it.
    */
-  Future<Request> process(Request request, Long timeout, TimeUnit unit) throws ProcessingException;
+  Future<R> process(R request, Long timeout, TimeUnit unit) throws ProcessingException;
   
   /**
    * 
    * @param service
    * @return <tt>true</tt> if the new service was successfully registered
    */
-  boolean registerService(RequestProcessingService service);
+  boolean registerService(RequestProcessingService<R> service);
   
   /**
    * 
    * @param service
    * @return <tt>true</tt> if the service was registered and was successfully removed
    */
-  boolean removeService(RequestProcessingService service);
+  boolean removeService(RequestProcessingService<R> service);
   
   /**
    * remove all registered services

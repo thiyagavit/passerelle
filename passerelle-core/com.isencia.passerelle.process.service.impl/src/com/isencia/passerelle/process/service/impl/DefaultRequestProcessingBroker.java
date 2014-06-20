@@ -37,15 +37,15 @@ import com.isencia.passerelle.process.service.RequestProcessingService;
  * 
  * @author erwin
  */
-public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
+public class DefaultRequestProcessingBroker implements RequestProcessingBroker<Task> {
 
-  private final static RequestProcessingBroker INSTANCE = new DefaultRequestProcessingBroker();
+  private final static RequestProcessingBroker<Task> INSTANCE = new DefaultRequestProcessingBroker();
 
-  public static RequestProcessingBroker getInstance() {
+  public static RequestProcessingBroker<Task> getInstance() {
     return INSTANCE;
   }
 
-  private Set<RequestProcessingService> services = new HashSet<RequestProcessingService>();
+  private Set<RequestProcessingService<Task>> services = new HashSet<RequestProcessingService<Task>>();
 
   private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
 
@@ -53,14 +53,14 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
   }
 
   @Override
-  public Future<Request> process(Request request, Long timeout, TimeUnit unit) throws ProcessingException {
+  public Future<Task> process(Task request, Long timeout, TimeUnit unit) throws ProcessingException {
     // Get timeout handling working before accessing the services
     // to make sure that bad/blocking service implementations don't interfere
     // with it.
     registerTimeOutHandler(request, timeout, unit);
 
-    Future<Request> futResult = null;
-    for (RequestProcessingService service : services) {
+    Future<Task> futResult = null;
+    for (RequestProcessingService<Task> service : services) {
       futResult = service.process(request, timeout, unit);
       if (futResult != null) {
         break;
@@ -81,12 +81,12 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker {
   }
 
   @Override
-  public boolean registerService(RequestProcessingService service) {
+  public boolean registerService(RequestProcessingService<Task> service) {
     return services.add(service);
   }
 
   @Override
-  public boolean removeService(RequestProcessingService service) {
+  public boolean removeService(RequestProcessingService<Task> service) {
     return services.remove(service);
   }
 
