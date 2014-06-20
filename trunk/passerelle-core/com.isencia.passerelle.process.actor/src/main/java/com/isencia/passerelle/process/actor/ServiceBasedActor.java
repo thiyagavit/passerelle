@@ -131,7 +131,7 @@ public class ServiceBasedActor extends TaskBasedActor {
   }
 
   @Override
-  protected void process(ProcessManager processManager, Task task) throws ProcessingException {
+  protected void process(Task task, ProcessManager processManager, ProcessResponse processResponse) throws ProcessingException {
     try {
       Long timeOutValue = getTimeOutValue();
       TimeUnit timeUnit = getTimeOutUnit();

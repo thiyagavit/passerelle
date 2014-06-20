@@ -14,6 +14,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -62,7 +63,7 @@ public class TaskToEventsGenerator extends AbstractEventsGenerator {
   }
 
   @Override
-  protected void process(ProcessManager processManager, Task task) throws ProcessingException {
+  protected void process(Task task, ProcessManager processManager, ProcessResponse processResponse) throws ProcessingException {
     try {
       boolean sendContextEvents = ((BooleanToken) sendContextEventsParameter.getToken()).booleanValue();
       boolean sendResultItemEvents = ((BooleanToken) sendResultItemEventsParameter.getToken()).booleanValue();
