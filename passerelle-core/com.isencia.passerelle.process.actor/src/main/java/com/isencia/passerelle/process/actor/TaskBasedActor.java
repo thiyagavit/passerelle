@@ -46,7 +46,9 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 public abstract class TaskBasedActor extends Actor {
   private final static Logger LOGGER = LoggerFactory.getLogger(TaskBasedActor.class);
 
-  private static final String ERROR_STRATEGY = "Error Strategy";
+  public static final String RESULT_TAG = "Result tag";
+  public static final String CONDITION_TAG = "Condition tag";
+  public static final String ERROR_STRATEGY = "Error Strategy";
   private static final String ERROR_VIA_ERROR_PORT = "Error via error port";
   private static final String CONTINUE_VIA_ERROR_PORT = "Continue via error port";
   private static final String CONTINUE_VIA_OUTPUT_PORT = "Continue via output port";
@@ -90,8 +92,8 @@ public abstract class TaskBasedActor extends Actor {
     errorStrategyParameter.addChoice(ERROR_VIA_ERROR_PORT);
     errorStrategyParameter.setExpression(ERROR_VIA_ERROR_PORT);
 
-    resultTagParameter = new StringParameter(this, "Result tag");
-    conditionTagParameter = new StringParameter(this, "Condition tag");
+    resultTagParameter = new StringParameter(this, RESULT_TAG);
+    conditionTagParameter = new StringParameter(this, CONDITION_TAG);
     registerExpertParameter(resultTagParameter);
     registerExpertParameter(conditionTagParameter);
 }
