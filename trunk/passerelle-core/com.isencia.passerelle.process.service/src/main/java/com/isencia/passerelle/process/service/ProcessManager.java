@@ -12,240 +12,234 @@ import com.isencia.passerelle.process.model.persist.ProcessPersister;
 import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
-  
+
   /**
    * The standard name of flow attributes or other instance holders for ProcessManagers
    */
   String NAME_AS_ATTRIBUTE = "__PSRL_PROC_MGR";
-  
-	String REPORT_EVENT_TYPE = "REPORTED";
-	String RESTARTING = "restarting";
 
-	/**
-	 * Obtain the manager's ID, via a shortcut for invoking <code>getHandle.getProcessId()</code>.
-	 * @return the manager's ID.
-	 */
-	String getId();
-	
-	/**
-	 * @return the factory to be used for creating new process model entities
-	 */
-	ProcessFactory getFactory();
-	
-	/**
-	 * @return the persister to be used to save/update/find/... entities in a persistent storage
-	 */
-	ProcessPersister getPersister();
+  String REPORT_EVENT_TYPE = "REPORTED";
+  String RESTARTING = "restarting";
 
-	/**
-	 * @return the handle to the flow-based process behind this ProcessManager
-	 */
+  /**
+   * Obtain the manager's ID, via a shortcut for invoking <code>getHandle.getProcessId()</code>.
+   * 
+   * @return the manager's ID.
+   */
+  String getId();
+
+  /**
+   * @return the factory to be used for creating new process model entities
+   */
+  ProcessFactory getFactory();
+
+  /**
+   * @return the persister to be used to save/update/find/... entities in a persistent storage
+   */
+  ProcessPersister getPersister();
+
+  /**
+   * @return the handle to the flow-based process behind this ProcessManager
+   */
   ProcessHandle getHandle();
-  
+
   /**
    * 
    * @return the Request entity that is being handled in this manager's process
    */
-	Request getRequest();
-	
-	/**
-	 * Finds the given Task within the Request Context's collection of finished/ongoing tasks.
-	 * 
-	 * @param id
-	 * @return the Task entity that was (or is being) executed as part of this manager's process
-	 */
-	Task getTask(long id);
+  Request getRequest();
 
-	/**
-	 * Notify listeners that the processing of the request was cancelled.
-	 */
-	void notifyCancelled();
+  /**
+   * Finds the given Task within the Request Context's collection of finished/ongoing tasks.
+   * 
+   * @param id
+   * @return the Task entity that was (or is being) executed as part of this manager's process
+   */
+  Task getTask(long id);
 
-	/**
-	 * Notify listeners that the processing of a task was cancelled.
-	 * 
-	 * @param task
-	 *            Task that got cancelled
-	 */
-	void notifyCancelled(Task task);
+  /**
+   * Notify listeners that the processing of the request was cancelled.
+   */
+  void notifyCancelled();
 
-	/**
-	 * Notify listeners that the processing of the request has finished with an
-	 * error.
-	 * 
-	 * @param error
-	 *            The error that happened during processing
-	 */
-	void notifyError(ErrorItem error, Throwable cause);
+  /**
+   * Notify listeners that the processing of a task was cancelled.
+   * 
+   * @param task
+   *          Task that got cancelled
+   */
+  void notifyCancelled(Task task);
 
-	/**
-	 * Notify listeners that the processing of a task has finished with an
-	 * error.
-	 * 
-	 * @param task
-	 *            Task that finished with an error
-	 * @param error
-	 *            The error that happened during processing
-	 */
-	void notifyError(Task task, ErrorItem error, Throwable cause);
+  /**
+   * Notify listeners that the processing of the request has finished with an error.
+   * 
+   * @param error
+   *          The error that happened during processing
+   */
+  void notifyError(ErrorItem error, Throwable cause);
 
-	/**
-	 * Notify listeners that the processing of a task has finished with an
-	 * error.
-	 * 
-	 * @param task
-	 *            Task that finished with an error
-	 * @param error
-	 *            The error that happened during processing
-	 */
-	void notifyError(Task task, Throwable error);
+  /**
+   * Notify listeners that the processing of a task has finished with an error.
+   * 
+   * @param task
+   *          Task that finished with an error
+   * @param error
+   *          The error that happened during processing
+   */
+  void notifyError(Task task, ErrorItem error, Throwable cause);
 
-	/**
-	 * Notify listeners that the processing of the request has finished with an
-	 * error.
-	 * 
-	 * @param error
-	 *            The error that happened during processing
-	 */
-	void notifyError(Throwable error);
+  /**
+   * Notify listeners that the processing of a task has finished with an error.
+   * 
+   * @param task
+   *          Task that finished with an error
+   * @param error
+   *          The error that happened during processing
+   */
+  void notifyError(Task task, Throwable error);
 
-	/**
-	 * Notify all listeners about a given context event.
-	 * 
-	 * @param event
-	 */
-	void notifyEvent(ContextEvent event);
+  /**
+   * Notify listeners that the processing of the request has finished with an error.
+   * 
+   * @param error
+   *          The error that happened during processing
+   */
+  void notifyError(Throwable error);
 
-	/**
-	 * Notify all listeners about a given context event on the request.
-	 * 
-	 * @param eventType
-	 * @param message
-	 */
-	void notifyEvent(String eventType, String message);
+  /**
+   * Notify all listeners about a given context event.
+   * 
+   * @param event
+   */
+  void notifyEvent(ContextEvent event);
 
-	/**
-	 * Notify all listeners about a given context event on a task.
-	 * 
-	 * @param task
-	 * @param eventType
-	 * @param message
-	 */
-	void notifyEvent(Task task, String eventType, String message);
+  /**
+   * Notify all listeners about a given context event on the request.
+   * 
+   * @param eventType
+   * @param message
+   */
+  void notifyEvent(String eventType, String message);
 
-	/**
-	 * Notify listeners that the processing of the request has finished.
-	 */
-	void notifyFinished();
+  /**
+   * Notify all listeners about a given context event on a task.
+   * 
+   * @param task
+   * @param eventType
+   * @param message
+   */
+  void notifyEvent(Task task, String eventType, String message);
 
-	/**
-	 * Notify listeners that the processing of a task has finished.
-	 * 
-	 * @param task
-	 *            Task that finished
-	 */
-	void notifyFinished(Task task);
+  /**
+   * Notify listeners that the processing of the request has finished.
+   */
+  void notifyFinished();
 
-	/**
-	 * Notify listeners that the processing of the request is pending
-	 * completion. It has done its work but remains in 'ongoing' state until
-	 * something else finishes it.
-	 */
-	void notifyPendingCompletion();
+  /**
+   * Notify listeners that the processing of a task has finished.
+   * 
+   * @param task
+   *          Task that finished
+   */
+  void notifyFinished(Task task);
 
-	/**
-	 * Notify listeners that the processing of a task is pending completion. It
-	 * has done its work but remains in 'ongoing' state until something else
-	 * finishes it.
-	 * 
-	 * @param task
-	 *            Task that is pending completion
-	 */
-	void notifyPendingCompletion(Task task);
+  /**
+   * Notify listeners that the processing of the request is pending completion. It has done its work but remains in
+   * 'ongoing' state until something else finishes it.
+   */
+  void notifyPendingCompletion();
 
-	/**
-	 * Notify listeners that the processing of a task was restarted.
-	 * 
-	 * @param task
-	 *            Task that restarted
-	 */
-	void notifyRestarted(Task task);
+  /**
+   * Notify listeners that the processing of a task is pending completion. It has done its work but remains in 'ongoing'
+   * state until something else finishes it.
+   * 
+   * @param task
+   *          Task that is pending completion
+   */
+  void notifyPendingCompletion(Task task);
 
-	/**
-	 * Notify listeners that the processing of the request has started.
-	 */
-	void notifyStarted();
+  /**
+   * Notify listeners that the processing of a task was restarted.
+   * 
+   * @param task
+   *          Task that restarted
+   */
+  void notifyRestarted(Task task);
 
-	/**
-	 * Notify listeners that the processing of a task has started.
-	 * 
-	 * @param task
-	 *            Task that started
-	 */
-	void notifyStarted(Task task);
+  /**
+   * Notify listeners that the processing of the request has started.
+   */
+  void notifyStarted();
 
-	/**
-	 * Notify listeners that the processing of the request has timed out.
-	 */
-	void notifyTimeOut();
+  /**
+   * Notify listeners that the processing of a task has started.
+   * 
+   * @param task
+   *          Task that started
+   */
+  void notifyStarted(Task task);
 
-	/**
-	 * Notify listeners that the processing of the task has timed out.
-	 * 
-	 * @param task
-	 *            Task that timed out
-	 */
-	void notifyTimeOut(Task task);
+  /**
+   * Notify listeners that the processing of the request has timed out.
+   */
+  void notifyTimeOut();
 
-	/**
-	 * Pause the flow for this request.
-	 */
-	boolean pause();
+  /**
+   * Notify listeners that the processing of the task has timed out.
+   * 
+   * @param task
+   *          Task that timed out
+   */
+  void notifyTimeOut(Task task);
 
-	/**
-	 * Restart the flow for this request from the given Task.
-	 */
-	boolean restart(long taskId, long timeOut, TimeUnit timeOutUnit);
+  /**
+   * Pause the flow for this request.
+   */
+  boolean pause();
 
-	/**
-	 * Resume the flow for this request.
-	 */
-	boolean resume();
-	
-	/**
-	 * Start the flow for this request.
-	 */
-	boolean start();
+  /**
+   * Restart the flow for this request from the given Task.
+   */
+  boolean restart(long taskId, long timeOut, TimeUnit timeOutUnit);
 
-	/**
-	 * Stop the flow for this request.
-	 */
-	boolean stop(long timeOut, TimeUnit timeOutUnit);
+  /**
+   * Resume the flow for this request.
+   */
+  boolean resume();
 
-	/**
-	 * Subscribe the given callback to status change notifications of the given
-	 * task
-	 * 
-	 * @param task
-	 *            Task for which status change notifications are posted
-	 * @param callback
-	 *            Callback that will be notified
-	 */
-	void subscribe(Task task, ContextProcessingCallback callback);
+  /**
+   * Start the flow for this request.
+   */
+  boolean start();
 
-	/**
-	 * Subscribe the given callback to status change notifications for any/all
-	 * task(s).
-	 * 
-	 * @param callback
-	 */
-	void subscribeAll(ContextProcessingCallback callback);
+  /**
+   * Stop the flow for this request.
+   */
+  boolean stop(long timeOut, TimeUnit timeOutUnit);
 
-	/**
-	 * Unsubscribe the given callback. It can be an "all" subscriber or one
-	 * subscribed for a specific task.
-	 * 
-	 * @param callback
-	 */
-	void unsubscribe(ContextProcessingCallback callback);
+  /**
+   * Subscribe the given callback to status change notifications of the given task,
+   * that should be within the request scope of this process manager.
+   * 
+   * @param task
+   *          Task for which status change notifications are posted
+   * @param callback
+   *          Callback that will be notified
+   */
+  void subscribe(Task task, ContextProcessingCallback callback);
+
+  /**
+   * Subscribe the given callback to status change notifications for any/all task(s) 
+   * within the request scope of this process manager.
+   * 
+   * @param callback
+   */
+  void subscribe(ContextProcessingCallback callback);
+
+  /**
+   * Unsubscribe the given callback. It can be an "all" subscriber or one subscribed for a specific task.
+   * 
+   * @param callback
+   */
+  void unsubscribe(ContextProcessingCallback callback);
 }
