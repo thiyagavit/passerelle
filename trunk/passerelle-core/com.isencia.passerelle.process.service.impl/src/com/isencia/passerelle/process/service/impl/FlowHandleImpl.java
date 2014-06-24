@@ -2,6 +2,7 @@ package com.isencia.passerelle.process.service.impl;
 
 import java.net.URI;
 
+import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
@@ -14,6 +15,18 @@ public class FlowHandleImpl implements FlowHandle {
 	private VersionSpecification version;
 	private String rawFlowDefinition;
 	private transient Flow flow;
+	
+	public FlowHandleImpl() {
+	}
+	
+	public FlowHandleImpl(Flow flow) {
+		code = flow.getName();
+	    if (code.contains(FlowUtils.FLOW_SEPARATOR)) {
+	        code = code.split(FlowUtils.FLOW_SEPARATOR)[0];
+	    }
+		
+		this.flow = flow;
+	}
 	
 	@Override
 	public String getCode() {

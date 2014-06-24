@@ -2,6 +2,7 @@ package com.isencia.passerelle.process.service.impl;
 
 import java.util.UUID;
 
+import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
@@ -15,11 +16,20 @@ public class ProcessHandleImpl implements ProcessHandle {
 	private String[] suspendedElements;
 
 	public ProcessHandleImpl() {
-		this(UUID.randomUUID().toString());
+		this(UUID.randomUUID().toString(),null);
+	}
+
+	public ProcessHandleImpl(String processId) {
+		this(processId,null);
 	}
 	
-	public ProcessHandleImpl(String processId) {
-		this.processId = processId; 
+	public ProcessHandleImpl(Flow flow) {
+		this(UUID.randomUUID().toString(),flow);
+	}
+	
+	public ProcessHandleImpl(String processId, Flow flow) {
+		this.processId = processId;
+		this.flowHandle = new FlowHandleImpl(flow);
 	}
 	
 	@Override
