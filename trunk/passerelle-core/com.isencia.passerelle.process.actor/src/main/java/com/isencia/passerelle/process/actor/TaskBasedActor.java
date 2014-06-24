@@ -344,10 +344,14 @@ public abstract class TaskBasedActor extends Actor {
    * Override this if other type determination logic is needed.
    * 
    * @return the task type to be used for new task instances
-   * @throws Exception
    */
-  protected String getTaskType() throws Exception {
-    return taskTypeParam.stringValue();
+  protected String getTaskType() {
+    try {
+      return taskTypeParam.stringValue();
+    } catch (IllegalActionException e) {
+      getLogger().error(ErrorCode.TASK_INIT_ERROR + " - Error reading taskTypeParam - using alternate read", e);
+      return taskTypeParam.getExpression();
+    }
   }
 
   /**
