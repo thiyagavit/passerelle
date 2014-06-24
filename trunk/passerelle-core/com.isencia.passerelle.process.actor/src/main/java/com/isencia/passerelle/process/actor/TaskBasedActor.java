@@ -157,7 +157,7 @@ public abstract class TaskBasedActor extends Actor {
             } catch (Exception e) {
               exceptionDuringCreation = e;
             }
-            task = createTask(processManager, request, taskAttributes, taskContextEntries);
+            task = createTask(processManager, taskAttributes, taskContextEntries);
             if (exceptionDuringCreation != null) {
               // re-throw here, exception will be attached to taskContext
               throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
@@ -304,10 +304,10 @@ public abstract class TaskBasedActor extends Actor {
    * @return the new task
    * @throws Exception
    */
-  protected Task createTask(ProcessManager processManager, Request parentRequest, Map<String, String> taskAttributes,
-      Map<String, Serializable> taskContextEntries) throws Exception {
+  protected Task createTask(ProcessManager processManager, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
-    Task task = processManager.getFactory().createTask(getTaskClass(parentRequest), parentRequest, initiator, getTaskType());
+    Request request = processManager.getRequest();
+    Task task = processManager.getFactory().createTask(getTaskClass(request), request, initiator, getTaskType());
     for (Entry<String, String> attr : taskAttributes.entrySet()) {
       processManager.getFactory().createAttribute(task, attr.getKey(), attr.getValue());
     }
@@ -444,7 +444,7 @@ public abstract class TaskBasedActor extends Actor {
     processResponse.addOutputMessage(output, message);
   }
 
-  private Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
+  protected Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
     String requestId = Long.toString(processContext.getRequest().getId());
     String referenceId = Long.toString(processContext.getRequest().getCase().getId());
 
