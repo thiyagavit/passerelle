@@ -6,7 +6,7 @@ package com.isencia.passerelle.process.service;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.Task;
 
 /**
  * Abstract base class for RequestProcessingServices that delegate work to an Adapter.
@@ -17,7 +17,7 @@ import com.isencia.passerelle.process.model.Request;
  * @author puidir
  *
  */
-public abstract class AbstractExternalRequestProcessingService<A extends Adapter> implements RequestProcessingService {
+public abstract class AbstractExternalRequestProcessingService<A extends Adapter> implements RequestProcessingService<Task> {
 
   A adapter;
 
@@ -26,8 +26,8 @@ public abstract class AbstractExternalRequestProcessingService<A extends Adapter
   }
   
   @Override
-  public Future<Request> process(Request request, Long timeout, TimeUnit unit) {
-    return adapter.process(request, timeout, unit);
+  public Future<Task> process(Task task, Long timeout, TimeUnit unit) {
+    return adapter.process(task, timeout, unit);
   }
   
 }

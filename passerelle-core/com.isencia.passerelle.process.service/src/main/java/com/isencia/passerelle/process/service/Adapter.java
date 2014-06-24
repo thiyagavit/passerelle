@@ -1,5 +1,7 @@
 package com.isencia.passerelle.process.service;
 
+import com.isencia.passerelle.process.model.Task;
+
 /**
  * Encapsulates knowledge of the protocol needed to communicate
  * with and external system, e.g. through SOAP, MQUEUEs, etc.
@@ -7,7 +9,7 @@ package com.isencia.passerelle.process.service;
  * @author puidir
  *
  */
-public interface Adapter extends RequestProcessingService {
+public interface Adapter extends RequestProcessingService<Task> {
 
   /**
    * 

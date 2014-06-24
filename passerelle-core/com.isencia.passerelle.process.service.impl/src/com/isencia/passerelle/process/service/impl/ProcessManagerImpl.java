@@ -166,13 +166,13 @@ public class ProcessManagerImpl implements ProcessManager {
 		// TODO Auto-generated method stub	
 	}
 	
+  @Override
+  public void subscribe(ContextProcessingCallback callback) {
+    // TODO Auto-generated method stub  
+  }
+  
 	@Override
 	public void subscribe(Task task, ContextProcessingCallback callback) {
-		// TODO Auto-generated method stub	
-	}
-	
-	@Override
-	public void subscribeAll(ContextProcessingCallback callback) {
 		// TODO Auto-generated method stub	
 	}
 	
