@@ -6,8 +6,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+import com.isencia.passerelle.process.service.RequestProcessingBrokerTracker;
 import com.isencia.passerelle.process.service.RequestProcessingService;
-import com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroker;
 
 public class Activator implements BundleActivator {
 
@@ -46,7 +46,7 @@ public class Activator implements BundleActivator {
     @Override
     public RequestProcessingService addingService(ServiceReference<RequestProcessingService> reference) {
       RequestProcessingService rps = bundleContext.getService(reference);
-      DefaultRequestProcessingBroker.getInstance().registerService(rps);
+      RequestProcessingBrokerTracker.getService().registerService(rps);
       return rps;
     }
 
@@ -56,7 +56,7 @@ public class Activator implements BundleActivator {
 
     @Override
     public void removedService(ServiceReference<RequestProcessingService> reference, RequestProcessingService service) {
-      DefaultRequestProcessingBroker.getInstance().removeService(service);
+      RequestProcessingBrokerTracker.getService().removeService(service);
       bundleContext.ungetService(reference);
     }
   }
