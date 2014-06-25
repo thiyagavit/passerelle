@@ -29,6 +29,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
+import com.isencia.passerelle.process.service.RequestProcessingBrokerTracker;
 import com.isencia.passerelle.process.service.RequestProcessingService;
 
 /**
@@ -39,6 +40,27 @@ import com.isencia.passerelle.process.service.RequestProcessingService;
  */
 public class DefaultRequestProcessingBroker implements RequestProcessingBroker<Task> {
 
+  public static final class TimeoutHandler implements Callable<Void> {
+    private final String processID;
+    private final Long taskID;
+
+    public TimeoutHandler(String processID, Long taskID) {
+      this.processID = processID;
+      this.taskID = taskID;
+    }
+
+    public Void call() {
+      ProcessManager procMgr = ProcessManagerServiceTracker.getService().getProcessManager(processID);
+      if (procMgr != null) {
+        Task task = procMgr.getTask(taskID);
+        if (task!=null && !task.getProcessingContext().isFinished()) {
+          procMgr.notifyTimeOut(task);
+        }
+      }
+      return null;
+    }
+  }
+
   private final static RequestProcessingBroker<Task> INSTANCE = new DefaultRequestProcessingBroker();
 
   public static RequestProcessingBroker<Task> getInstance() {
@@ -46,12 +68,25 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
   }
 
   private Set<RequestProcessingService<Task>> services = new HashSet<RequestProcessingService<Task>>();
-
   private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
 
   private DefaultRequestProcessingBroker() {
   }
 
+  @Override
+  public void clearServices() {
+    services.clear();
+  }
+  
+  public void destroy() {
+    RequestProcessingBrokerTracker.setService(null);
+  }
+
+  
+  public void init() {
+    RequestProcessingBrokerTracker.setService(this);
+  }
+  
   @Override
   public Future<Task> process(Task request, Long timeout, TimeUnit unit) throws ProcessingException {
     // Get timeout handling working before accessing the services
@@ -73,6 +108,11 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
     }
   }
 
+  @Override
+  public boolean registerService(RequestProcessingService<Task> service) {
+    return services.add(service);
+  }
+
   private void registerTimeOutHandler(final Request request, Long timeout, TimeUnit unit) {
     if (timeout == null || unit == null || (timeout <= 0)) {
       return;
@@ -81,38 +121,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
   }
 
   @Override
-  public boolean registerService(RequestProcessingService<Task> service) {
-    return services.add(service);
-  }
-
-  @Override
   public boolean removeService(RequestProcessingService<Task> service) {
     return services.remove(service);
-  }
-
-  @Override
-  public void clearServices() {
-    services.clear();
-  }
-
-  public static final class TimeoutHandler implements Callable<Void> {
-    private final String processID;
-    private final Long taskID;
-
-    public TimeoutHandler(String processID, Long taskID) {
-      this.processID = processID;
-      this.taskID = taskID;
-    }
-
-    public Void call() {
-      ProcessManager procMgr = ProcessManagerServiceTracker.getService().getProcessManager(processID);
-      if (procMgr != null) {
-        Task task = procMgr.getTask(taskID);
-        if (task!=null && !task.getProcessingContext().isFinished()) {
-          procMgr.notifyTimeOut(task);
-        }
-      }
-      return null;
-    }
   }
 }
