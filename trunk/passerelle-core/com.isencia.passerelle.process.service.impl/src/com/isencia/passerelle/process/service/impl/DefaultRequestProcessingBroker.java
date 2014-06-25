@@ -40,88 +40,79 @@ import com.isencia.passerelle.process.service.RequestProcessingService;
  */
 public class DefaultRequestProcessingBroker implements RequestProcessingBroker<Task> {
 
-  public static final class TimeoutHandler implements Callable<Void> {
-    private final String processID;
-    private final Long taskID;
+	public static final class TimeoutHandler implements Callable<Void> {
+		private final String processID;
+		private final Long taskID;
 
-    public TimeoutHandler(String processID, Long taskID) {
-      this.processID = processID;
-      this.taskID = taskID;
-    }
+		public TimeoutHandler(String processID, Long taskID) {
+			this.processID = processID;
+			this.taskID = taskID;
+		}
 
-    public Void call() {
-      ProcessManager procMgr = ProcessManagerServiceTracker.getService().getProcessManager(processID);
-      if (procMgr != null) {
-        Task task = procMgr.getTask(taskID);
-        if (task!=null && !task.getProcessingContext().isFinished()) {
-          procMgr.notifyTimeOut(task);
-        }
-      }
-      return null;
-    }
-  }
+		public Void call() {
+			ProcessManager procMgr = ProcessManagerServiceTracker.getService().getProcessManager(processID);
+			if (procMgr != null) {
+				Task task = procMgr.getTask(taskID);
+				if (task != null && !task.getProcessingContext().isFinished()) {
+					procMgr.notifyTimeOut(task);
+				}
+			}
+			return null;
+		}
+	}
 
-  private final static RequestProcessingBroker<Task> INSTANCE = new DefaultRequestProcessingBroker();
+	private Set<RequestProcessingService<Task>> services = new HashSet<RequestProcessingService<Task>>();
+	private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
 
-  public static RequestProcessingBroker<Task> getInstance() {
-    return INSTANCE;
-  }
+	@Override
+	public void clearServices() {
+		services.clear();
+	}
 
-  private Set<RequestProcessingService<Task>> services = new HashSet<RequestProcessingService<Task>>();
-  private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
+	public void destroy() {
+		RequestProcessingBrokerTracker.setService(null);
+	}
 
-  private DefaultRequestProcessingBroker() {
-  }
+	public void init() {
+		RequestProcessingBrokerTracker.setService(this);
+	}
 
-  @Override
-  public void clearServices() {
-    services.clear();
-  }
-  
-  public void destroy() {
-    RequestProcessingBrokerTracker.setService(null);
-  }
+	@Override
+	public Future<Task> process(Task request, Long timeout, TimeUnit unit) throws ProcessingException {
+		// Get timeout handling working before accessing the services
+		// to make sure that bad/blocking service implementations don't
+		// interfere
+		// with it.
+		registerTimeOutHandler(request, timeout, unit);
 
-  
-  public void init() {
-    RequestProcessingBrokerTracker.setService(this);
-  }
-  
-  @Override
-  public Future<Task> process(Task request, Long timeout, TimeUnit unit) throws ProcessingException {
-    // Get timeout handling working before accessing the services
-    // to make sure that bad/blocking service implementations don't interfere
-    // with it.
-    registerTimeOutHandler(request, timeout, unit);
+		Future<Task> futResult = null;
+		for (RequestProcessingService<Task> service : services) {
+			futResult = service.process(request, timeout, unit);
+			if (futResult != null) {
+				break;
+			}
+		}
+		if (futResult != null) {
+			return futResult;
+		} else {
+			throw new ProcessingException(ErrorCode.TASK_UNHANDLED, "No service found for " + request, null, null);
+		}
+	}
 
-    Future<Task> futResult = null;
-    for (RequestProcessingService<Task> service : services) {
-      futResult = service.process(request, timeout, unit);
-      if (futResult != null) {
-        break;
-      }
-    }
-    if (futResult != null) {
-      return futResult;
-    } else {
-      throw new ProcessingException(ErrorCode.TASK_UNHANDLED, "No service found for " + request, null, null);
-    }
-  }
+	@Override
+	public boolean registerService(RequestProcessingService<Task> service) {
+		return services.add(service);
+	}
 
-  @Override
-  public boolean registerService(RequestProcessingService<Task> service) {
-    return services.add(service);
-  }
+	private void registerTimeOutHandler(final Request request, Long timeout, TimeUnit unit) {
+		if (timeout == null || unit == null || (timeout <= 0)) {
+			return;
+		}
+		delayTimer.schedule(new TimeoutHandler(request.getProcessingContext().getProcessId(), request.getId()), timeout, unit);
+	}
 
-  private void registerTimeOutHandler(final Request request, Long timeout, TimeUnit unit) {
-    if (timeout == null || unit == null || (timeout <= 0)) {
-      return;
-    }
-    delayTimer.schedule(new TimeoutHandler(request.getProcessingContext().getProcessId(), request.getId()), timeout, unit);
-  }
-
-  @Override
-  public boolean removeService(RequestProcessingService<Task> service) {
-    return services.remove(service);
-  }
+	@Override
+	public boolean removeService(RequestProcessingService<Task> service) {
+		return services.remove(service);
+	}
 }
