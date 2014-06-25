@@ -25,8 +25,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ptolemy.data.ObjectToken;
-import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -55,6 +53,7 @@ import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.AbstractResultItemEventImpl;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -112,12 +111,9 @@ public class EventsToTaskCollector extends Actor {
     NamedObj flow = toplevel();
     try {
       processManager = null;
-      Parameter procMgrParameter = (Parameter) flow.getAttribute(ProcessManager.NAME_AS_ATTRIBUTE, Parameter.class);
+      StringParameter procMgrParameter = (StringParameter) flow.getAttribute(com.isencia.passerelle.process.actor.ProcessRequest.HEADER_PROCESS_ID, StringParameter.class);
       if (procMgrParameter != null) {
-        Object o = ((ObjectToken) procMgrParameter.getToken()).getValue();
-        if (o instanceof ProcessManager) {
-          processManager = (ProcessManager) o;
-        }
+        processManager = ProcessManagerServiceTracker.getService().getProcessManager(procMgrParameter.stringValue());
       }
     } catch (Exception e) {
       throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error obtaining ProcessManager", this, e);
@@ -206,7 +202,8 @@ public class EventsToTaskCollector extends Actor {
    * @return the new task
    * @throws Exception
    */
-  protected Task createTask(ProcessManager processManager, Request parentRequest, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
+  protected Task createTask(ProcessManager processManager, Request parentRequest, Map<String, String> taskAttributes,
+      Map<String, Serializable> taskContextEntries) throws Exception {
     String taskType = taskTypeParam.stringValue();
     Task task = processManager.getFactory().createTask(null, parentRequest, FlowUtils.getFullNameWithoutFlow(this), taskType);
     for (Entry<String, String> attr : taskAttributes.entrySet()) {

@@ -51,32 +51,11 @@ public class StartActor extends Actor {
   }
 
   @Override
-  protected ProcessManager getNonMessageBoundProcessManager() throws ProcessingException {
-    try {
-      NamedObj flow = toplevel();
-      Parameter procMgrParameter = (Parameter) flow.getAttribute(ProcessManager.NAME_AS_ATTRIBUTE, Parameter.class);
-      if (procMgrParameter != null) {
-        Object o = ((ObjectToken) procMgrParameter.getToken()).getValue();
-        if (o instanceof ProcessManager) {
-          ProcessManager processManager = (ProcessManager) o;
-          // for grouping request processing log messages
-          MDC.put("requestId", processManager.getRequest().getId().toString());
-
-          Map<String, String> systemParameterMap = getParameterMap(flow, RepositoryService.SYSTEM_PARAMETERS);
-          preProcess(processManager, systemParameterMap);
-          
-          return processManager;
-        }
-      }
-    } catch (Exception t) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager", this, t);
-    }
-    return super.getNonMessageBoundProcessManager();
-  }
-
-  @Override
   public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
+      Map<String, String> systemParameterMap = getParameterMap(toplevel(), RepositoryService.SYSTEM_PARAMETERS);
+      preProcess(processManager, systemParameterMap);
+
       processManager.notifyStarted();
       ManagedMessage message = createOutputMessage(processManager.getRequest());
       response.addOutputMessage(output, message);
@@ -95,6 +74,7 @@ public class StartActor extends Actor {
    * @param systemParameterMap
    */
   protected void preProcess(ProcessManager processManager, Map<String, String> systemParameterMap) {
+    MDC.put("requestId", processManager.getRequest().getId().toString());
   }
 
   @SuppressWarnings("unchecked")

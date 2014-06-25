@@ -34,9 +34,11 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Director;
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 
 import com.isencia.passerelle.actor.InitializationException;
@@ -334,7 +336,20 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    *           if something goes wrong in obtaining a ProcessManager
    */
   protected ProcessManager getNonMessageBoundProcessManager() throws ProcessingException {
-    return null;
+    NamedObj flow = toplevel();
+    ProcessManager processManager = null;
+    try {
+      StringParameter procMgrParameter = (StringParameter) flow.getAttribute(ProcessRequest.HEADER_PROCESS_ID, StringParameter.class);
+      if (procMgrParameter != null) {
+        processManager = ProcessManagerServiceTracker.getService().getProcessManager(procMgrParameter.stringValue());
+        if (processManager != null) {
+          return processManager;
+        }
+      }
+    } catch (Exception e) {
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager", this, e);
+    }
+    throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager", this, null);
   }
 
   /**
@@ -460,9 +475,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
                   processRequest.setIterationCount(iterationCount);
                   incompleteProcessRequests.put(ctxtHdr, processRequest);
                 } else {
-                  // TODO check if we need some basic transparent msg handling when no process context header is
-                  // found???
-                  // processRequest = contextLessProcessRequest;
+                  throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager for processID "+ctxtHdr, this, managedMessage, null);
                 }
               }
               if (processRequest != null) {
@@ -470,17 +483,18 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
               }
             }
           } else {
-            // TODO check if we need some basic transparent msg handling when no process context header is found???
-            // contextLessProcessRequest.addInputMessage(msgInputCtxt.getPortIndex(), msgInputCtxt.getPortName(),
-            // managedMessage);
+            ProcessManager processManager = getNonMessageBoundProcessManager();
+            if (processManager != null) {
+              ProcessRequest processRequest = new ProcessRequest(processManager);
+              processRequest.setIterationCount(iterationCount);
+              incompleteProcessRequests.put(processManager.getId(), processRequest);
+            } else {
+              throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager", this, managedMessage, null);
+            }
           }
           msgCtr++;
         }
       }
-      // if the context-less process request has something to process, let's do it as well!
-      // if (contextLessProcessRequest.hasSomethingToProcess()) {
-      // pendingProcessRequests.offer(new ProcessResponse(contextLessProcessRequest));
-      // }
 
       // now check for any completely-defined context-scoped process requests
       Collection<Entry<String, ProcessRequest>> transfers = new ArrayList<Entry<String, ProcessRequest>>();
@@ -654,16 +668,17 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   protected Logger getLogger() {
     return LOGGER;
   }
-  
+
   /**
-   * This is the method that should be ALWAYS used by process actors to construct output messages, 
-   * optionally with causal info about received input messages.
+   * This is the method that should be ALWAYS used by process actors to construct output messages, optionally with
+   * causal info about received input messages.
    * <p>
-   * The request's process ID will be stored in a message header and the message body is available for arbitrary data
-   * as needed by concrete actor implementations.
+   * The request's process ID will be stored in a message header and the message body is available for arbitrary data as
+   * needed by concrete actor implementations.
    * </p>
    * 
-   * @param request the request being processed in the actor, typically by executing a child task
+   * @param request
+   *          the request being processed in the actor, typically by executing a child task
    * @param causes
    * @return
    */
@@ -682,5 +697,4 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
       return super.getAuditTrailMessage(message, port);
     }
   }
-
 }
