@@ -13,10 +13,6 @@ import com.isencia.passerelle.runtime.ProcessHandle;
 
 public interface ProcessManager {
 
-  /**
-   * The standard name of flow attributes or other instance holders for ProcessManagers
-   */
-  String NAME_AS_ATTRIBUTE = "__PSRL_PROC_MGR";
 
   String REPORT_EVENT_TYPE = "REPORTED";
   String RESTARTING = "restarting";
