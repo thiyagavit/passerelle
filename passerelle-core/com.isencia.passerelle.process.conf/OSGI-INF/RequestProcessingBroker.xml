@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="init" deactivate="destroy" immediate="true" name="RequestProcessingBroker">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="init" immediate="true" name="RequestProcessingBroker">
    <implementation class="com.isencia.passerelle.process.service.impl.DefaultRequestProcessingBroker"/>
    <service>
       <provide interface="com.isencia.passerelle.process.service.RequestProcessingBroker"/>
    </service>
+   <reference bind="registerService" cardinality="0..n" interface="com.isencia.passerelle.process.service.RequestProcessingService" name="RequestProcessingService" policy="static" unbind="removeService"/>
 </scr:component>
