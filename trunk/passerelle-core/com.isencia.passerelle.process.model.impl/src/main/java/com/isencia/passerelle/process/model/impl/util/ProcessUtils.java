@@ -5,15 +5,71 @@ import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.RandomAccess;
 import java.util.Set;
 
 public class ProcessUtils {
+
+	@SuppressWarnings("unchecked")
+	public static <T> Iterator<T> emptyIterator() {
+		return (Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
+	}
+
+	private static class EmptyIterator<E> implements Iterator<E> {
+		@SuppressWarnings({"unchecked","rawtypes"})
+		static final EmptyIterator<Object> EMPTY_ITERATOR = new EmptyIterator();
+
+		public boolean hasNext() {
+			return false;
+		}
+
+		public E next() {
+			throw new NoSuchElementException();
+		}
+
+		public void remove() {
+			throw new IllegalStateException();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> ListIterator<T> emptyListIterator() {
+		return (ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
+	}
+
+	private static class EmptyListIterator<E> extends EmptyIterator<E> implements ListIterator<E> {
+		@SuppressWarnings({"unchecked","rawtypes"})
+		static final EmptyListIterator<Object> EMPTY_ITERATOR = new EmptyListIterator();
+
+		public boolean hasPrevious() {
+			return false;
+		}
+
+		public E previous() {
+			throw new NoSuchElementException();
+		}
+
+		public int nextIndex() {
+			return 0;
+		}
+
+		public int previousIndex() {
+			return -1;
+		}
+
+		public void set(E e) {
+			throw new IllegalStateException();
+		}
+
+		public void add(E e) {
+			throw new UnsupportedOperationException();
+		}
+	}
 
 	/**
 	 * @serial include
@@ -52,11 +108,11 @@ public class ProcessUtils {
 		}
 
 		public Iterator<E> iterator() {
-			return Collections.emptyIterator();
+			return emptyIterator();
 		}
 
 		public ListIterator<E> listIterator() {
-			return Collections.emptyListIterator();
+			return emptyListIterator();
 		}
 
 		// Preserves singleton property
@@ -86,7 +142,7 @@ public class ProcessUtils {
 		protected Object clone() throws CloneNotSupportedException {
 			return EMPTY_MAP;
 		}
-		
+
 		public boolean containsKey(Object key) {
 			return false;
 		}
@@ -155,7 +211,7 @@ public class ProcessUtils {
 		}
 
 		public Iterator<E> iterator() {
-			return Collections.emptyIterator();
+			return emptyIterator();
 		}
 
 		// Preserves singleton property
@@ -178,18 +234,23 @@ public class ProcessUtils {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static final Set EMPTY_SET = new EmptySet();
+	@SuppressWarnings("rawtypes")
 	public static final List EMPTY_LIST = new EmptyList();
+	@SuppressWarnings("rawtypes")
 	public static final Map EMPTY_MAP = new EmptyMap();
 
 	@SuppressWarnings("unchecked")
 	public static final <T> List<T> emptyList() {
 		return (List<T>) EMPTY_LIST;
 	}
+
 	@SuppressWarnings("unchecked")
 	public static final <K, V> Map<K, V> emptyMap() {
 		return (Map<K, V>) EMPTY_MAP;
 	}
+
 	@SuppressWarnings("unchecked")
 	public static final <T> Set<T> emptySet() {
 		return (Set<T>) EMPTY_SET;
