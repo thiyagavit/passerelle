@@ -441,11 +441,38 @@ public abstract class TaskBasedActor extends Actor {
     return LOGGER;
   }
 
+  /**
+   * Callback method that is invoked after a task has been started by the actor.
+   * By default it does nothing.
+   * <p>
+   * This method may be overridden for special cases where extra logic is needed when starting a task.
+   * </p>
+   * <p>
+   * REMARK : any implementation must be fast and non-blocking as this is invoked on the task execution thread!
+   * Implementations should not throw any exceptions!
+   * </p>
+   * @param task
+   */
   protected void onTaskStarted(Task task) {
     // do nothing by default
   }
 
-  protected void onTaskFinished(Task task, ManagedMessage message, ProcessResponse processResponse) {
+  /**
+   * Callback method that is invoked after a task has been finished by the actor.
+   * By default it sends the received message on the actor's output port.
+   * <p>
+   * This method may be overridden for special cases where e.g. extra/custom output ports must be used 
+   * or extra logic must be triggered after finishing a task.
+   * </p>
+   * <p>
+   * REMARK : any implementation must be fast and non-blocking as this is invoked on the task execution thread!
+   * </p>
+   * @param task
+   * @param message
+   * @param processResponse
+   * @throws ProcessingException 
+   */
+  protected void onTaskFinished(Task task, ManagedMessage message, ProcessResponse processResponse) throws ProcessingException {
     // by default send out on output port
     processResponse.addOutputMessage(output, message);
   }
@@ -536,6 +563,9 @@ public abstract class TaskBasedActor extends Actor {
 
     @Override
     public void contextPendingCompletion(ContextEvent event) {
+      // this used to be an almost-copy of the logic of contextFinished() up to 1.5.
+      // we now expect that a completely uniform handling works as well.
+      // the only/main actor using the pending-completion state will/should indeed work correctly with the new version.
       contextFinished(event);
     }
 
