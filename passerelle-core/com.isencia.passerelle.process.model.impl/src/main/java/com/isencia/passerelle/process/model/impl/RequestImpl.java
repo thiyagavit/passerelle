@@ -1,6 +1,5 @@
 package com.isencia.passerelle.process.model.impl;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class RequestImpl implements Request {
 
   @OneToMany(targetEntity = RequestAttributeImpl.class, mappedBy = "request", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, Attribute> attributes = Collections.emptyMap();
+  private Map<String, Attribute> attributes = ProcessUtils.emptyMap();
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter
@@ -220,6 +219,10 @@ public class RequestImpl implements Request {
   }
 
   public Set<Attribute> getAttributes() {
+	if (!ProcessUtils.isInitialized(attributes)) {
+		return ProcessUtils.emptySet();
+	}
+		
     return new HashSet<Attribute>(attributes.values());
   }
 

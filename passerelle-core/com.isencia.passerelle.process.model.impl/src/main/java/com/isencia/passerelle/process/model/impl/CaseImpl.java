@@ -64,7 +64,7 @@ public class CaseImpl implements Case {
 	private String externalReference;
 
 	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY)
-	private List<Request> requests = Collections.emptyList();
+	private List<Request> requests = ProcessUtils.emptyList();
 
 	public static final String _ID = "id";
 	public static final String _REFERENCE = "id";
@@ -92,10 +92,11 @@ public class CaseImpl implements Case {
 	}
 
 	public Collection<Request> getRequests() {
-		// This avoids concurrent modifications
-		List<Request> requestCopies = new ArrayList<Request>();
-		requestCopies.addAll(requests);
-		return requestCopies;
+		if (!ProcessUtils.isInitialized(requests)) {
+			return requests;
+		}
+
+		return Collections.unmodifiableList(requests);
 	}
 
 	public void addRequest(Request request) {

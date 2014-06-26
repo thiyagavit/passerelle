@@ -4,7 +4,6 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,7 +89,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 
   @OneToMany(targetEntity = ResultItemAttributeImpl.class, mappedBy = "resultItem", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, AttributeImpl> attributes = Collections.emptyMap();
+  private Map<String, AttributeImpl> attributes = ProcessUtils.emptyMap();
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter
@@ -179,6 +178,10 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   }
 
   public Set<Attribute> getAttributes() {
+	if (!ProcessUtils.isInitialized(attributes)) {
+		return ProcessUtils.emptySet();
+	}
+	  
     return new HashSet<Attribute>(attributes.values());
   }
 

@@ -74,7 +74,7 @@ public class ResultBlockImpl implements ResultBlock {
 
   @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, Attribute> attributes = Collections.emptyMap();
+  private Map<String, Attribute> attributes = ProcessUtils.emptyMap();
 
   @Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
   private String colour;
@@ -89,7 +89,7 @@ public class ResultBlockImpl implements ResultBlock {
   @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn(name = "RESULTBLOCK_ID")
   @MapKey(name = "name")
-  private Map<String, ResultItem<?>> resultItems = Collections.emptyMap();
+  private Map<String, ResultItem<?>> resultItems = ProcessUtils.emptyMap();
 
   public static final String _ID = "id";
   public static final String _CREATION_TS = "creationTS";
@@ -146,6 +146,10 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Set<Attribute> getAttributes() {
+	if (!ProcessUtils.isInitialized(attributes)) {
+		return ProcessUtils.emptySet();
+	}
+	
     return new HashSet<Attribute>(attributes.values());
   }
 
@@ -172,7 +176,12 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Collection<ResultItem<?>> getAllItems() {
-    return Collections.unmodifiableCollection(getResultItemMap().values());
+	Map<String, ResultItem<?>> map = getResultItemMap();
+	if (!ProcessUtils.isInitialized(map)) {
+		return ProcessUtils.EMPTY_SET;
+	}
+		
+    return Collections.unmodifiableCollection(map.values());
   }
 
   public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
@@ -185,7 +194,12 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Set<ResultItem> getResultItems() {
-    return new HashSet<ResultItem>(getResultItemMap().values());
+    Map<String, ResultItem<?>> map = getResultItemMap();
+    if (!ProcessUtils.isInitialized(map)) {
+      return ProcessUtils.EMPTY_SET;
+    }
+    
+    return new HashSet<ResultItem>(map.values());
   }
 
   public ResultItem<?> getItemForName(String name) {
