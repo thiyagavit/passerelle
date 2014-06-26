@@ -190,14 +190,9 @@ public class Forward extends Actor {
 
   @SuppressWarnings("unchecked")
   protected Flow setRedirected(Flow flow) throws Exception {
-    Parameter p = (Parameter) flow.getAttribute(RepositoryService.SYSTEM_PARAMETERS, Parameter.class);
-    Map<String, String> systemParameterMap = null;
-    if ((p != null) && (p.getToken() instanceof ObjectToken)) {
-      Object o = ((ObjectToken) p.getToken()).getValue();
-      if (o instanceof Map<?, ?>) {
-        systemParameterMap = (Map<String, String>) o;
-        systemParameterMap.put("com.isencia.passerelle.edm.redirected", "true");
-      }
+    Map<String, String> systemParameterMap = FlowUtils.getParameterMap(flow, FlowUtils.SYSTEM_PARAMETERS);
+    if(systemParameterMap!=null) {
+        systemParameterMap.put(FlowUtils.REDIRECTED, "true");
     }
     return flow;
   }
