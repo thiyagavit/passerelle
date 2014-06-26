@@ -80,11 +80,11 @@ public class ContextImpl implements Context {
 
   @OneToMany(targetEntity = TaskImpl.class, mappedBy = "parentContext", fetch = FetchType.LAZY)
   @OrderBy("id")
-  private List<Task> tasks = Collections.emptyList();
+  private List<Task> tasks = ProcessUtils.emptyList();
 
   @OneToMany(targetEntity = ContextEventImpl.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @OrderBy("creationTS")
-  private List<ContextEvent> events = Collections.emptyList();
+  private List<ContextEvent> events = ProcessUtils.emptyList();
 
   @SuppressWarnings("unchecked")
   @Transient
@@ -200,6 +200,9 @@ public class ContextImpl implements Context {
   }
 
   public List<Task> getTasks() {
+	if (!ProcessUtils.isInitialized(tasks)) {
+		return tasks;
+	}
     return Collections.unmodifiableList(tasks);
   }
 
@@ -213,6 +216,9 @@ public class ContextImpl implements Context {
   }
 
   public List<ContextEvent> getEvents() {
+	if (!ProcessUtils.isInitialized(events)) {
+		return events;
+	}
     return Collections.unmodifiableList(events);
   }
 
@@ -470,7 +476,7 @@ public class ContextImpl implements Context {
     for (Task t : tasks) {
       minimizedTasks.add(t.getId());
     }
-    tasks = new ArrayList<Task>();
+    tasks = ProcessUtils.emptyList();
     // }
     return this;
   }

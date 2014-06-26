@@ -37,7 +37,7 @@ public class TaskImpl extends RequestImpl implements Task {
 	private ContextImpl parentContext;
 
 	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY)
-	private Set<ResultBlock> resultBlocks = Collections.emptySet();
+	private Set<ResultBlock> resultBlocks = ProcessUtils.emptySet();
 
 	public static final String _PARENT_CONTEXT = "parentContext";
 	public static final String _RESULT_BLOCKS = "resultBlocks";
@@ -68,15 +68,17 @@ public class TaskImpl extends RequestImpl implements Task {
 	}
 
 	public Collection<ResultBlock> getResultBlocks() {
-		// TODO this was unmodifiable set but this gave difficulties for sherpa
-		// when used to show resultBlocks
-		return resultBlocks;
+		if (!ProcessUtils.isInitialized(resultBlocks)) {
+			return resultBlocks;
+		}
+			
+		// TODO check if returning an unmodifiable collection still gives difficulties for sherpa when used to show resultBlocks
+		return Collections.unmodifiableSet(resultBlocks);
 	}
 
-	// this is a utitlity getter for sherpa
+	// this is a utility getter for sherpa
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock.task")
 	public Set<ResultItem> getResultItems() {
-
 		return null;
 	}
 
