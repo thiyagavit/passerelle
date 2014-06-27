@@ -197,7 +197,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return unit;
   }
 
-  public ResultBlock getResultBlock() {
+  public ResultBlockImpl getResultBlock() {
     return resultBlock;
   }
 

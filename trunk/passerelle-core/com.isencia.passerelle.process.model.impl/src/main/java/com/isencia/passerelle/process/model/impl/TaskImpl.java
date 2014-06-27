@@ -53,7 +53,7 @@ public class TaskImpl extends RequestImpl implements Task {
 		this.parentContext.addTask(this);
 	}
 
-	public Context getParentContext() {
+	public ContextImpl getParentContext() {
 		return parentContext;
 	}
 	

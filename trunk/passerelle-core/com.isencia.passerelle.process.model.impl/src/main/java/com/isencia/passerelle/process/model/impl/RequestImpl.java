@@ -31,7 +31,6 @@ import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
-import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
@@ -81,7 +80,7 @@ public class RequestImpl implements Request {
   private String type;
 
   @OneToOne(targetEntity = ContextImpl.class, mappedBy = "request", cascade = CascadeType.ALL)
-  private Context processingContext;
+  private ContextImpl processingContext;
 
   @Column(name = "INITIATOR", nullable = false, unique = false, updatable = false, length = 250)
   private String initiator;
@@ -226,7 +225,7 @@ public class RequestImpl implements Request {
     return new HashSet<Attribute>(attributes.values());
   }
 
-  public Case getCase() {
+  public CaseImpl getCase() {
     return requestCase;
   }
   
@@ -246,7 +245,7 @@ public class RequestImpl implements Request {
     return type;
   }
 
-  public Context getProcessingContext() {
+  public ContextImpl getProcessingContext() {
     return processingContext;
   }
 
