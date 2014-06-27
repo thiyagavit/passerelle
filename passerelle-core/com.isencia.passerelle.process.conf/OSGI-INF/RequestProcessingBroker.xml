@@ -4,5 +4,5 @@
    <service>
       <provide interface="com.isencia.passerelle.process.service.RequestProcessingBroker"/>
    </service>
-   <reference bind="registerService" cardinality="0..n" interface="com.isencia.passerelle.process.service.RequestProcessingService" name="RequestProcessingService" policy="static" unbind="removeService"/>
+   <reference bind="registerService" cardinality="0..n" interface="com.isencia.passerelle.process.service.RequestProcessingService" name="RequestProcessingService" policy="dynamic" unbind="removeService"/>
 </scr:component>
