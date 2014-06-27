@@ -62,7 +62,7 @@ public class ResultBlockAttributeImpl extends AttributeImpl implements Comparabl
     return id;
   }
 
-  public ResultBlock getResultBlock() {
+  public ResultBlockImpl getResultBlock() {
     return resultBlock;
   }
 

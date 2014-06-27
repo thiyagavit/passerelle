@@ -206,7 +206,7 @@ public class ResultBlockImpl implements ResultBlock {
     return getResultItemMap().get(name);
   }
 
-  public Task getTask() {
+  public TaskImpl getTask() {
     return task;
   }
 

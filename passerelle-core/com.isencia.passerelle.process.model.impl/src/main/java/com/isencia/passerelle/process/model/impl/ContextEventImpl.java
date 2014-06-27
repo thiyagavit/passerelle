@@ -119,7 +119,7 @@ public class ContextEventImpl implements ContextEvent {
 		return 0L;
 	}
 
-	public Context getContext() {
+	public ContextImpl getContext() {
 		return context;
 	}
 

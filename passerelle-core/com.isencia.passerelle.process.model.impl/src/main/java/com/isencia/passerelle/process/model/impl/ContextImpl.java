@@ -42,7 +42,6 @@ import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.NamedValue;
-import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
@@ -76,7 +75,7 @@ public class ContextImpl implements Context {
 
   @OneToOne(targetEntity = RequestImpl.class)
   @JoinColumn(name = "REQUEST_ID", unique = true, nullable = false)
-  private Request request;
+  private RequestImpl request;
 
   @OneToMany(targetEntity = TaskImpl.class, mappedBy = "parentContext", fetch = FetchType.LAZY)
   @OrderBy("id")
@@ -140,7 +139,7 @@ public class ContextImpl implements Context {
   public ContextImpl() {
   }
 
-  public ContextImpl(Request request) {
+  public ContextImpl(RequestImpl request) {
     this.status = Status.CREATED;
     this.creationTS = new Date();
     this.request = request;
@@ -189,7 +188,7 @@ public class ContextImpl implements Context {
     }
   }
 
-  public Request getRequest() {
+  public RequestImpl getRequest() {
     return request;
   }
 

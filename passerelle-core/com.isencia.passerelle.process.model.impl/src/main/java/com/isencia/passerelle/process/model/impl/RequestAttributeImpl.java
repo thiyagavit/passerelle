@@ -75,7 +75,7 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	/**
 	 * @return the request
 	 */
-	public Request getRequest() {
+	public RequestImpl getRequest() {
 		return request;
 	}
 
