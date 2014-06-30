@@ -14,4 +14,9 @@
 	<packaging>eclipse-feature</packaging>
 	
 	<name>Passerelle :: Ptolemy :: ptolemy.feature</name>
+
+	<properties>
+		<!-- ptolemy versions are final, no re-deploy in nexus -->
+		<deploy.plugin.skip>true</deploy.plugin.skip>
+	</properties>
 </project>

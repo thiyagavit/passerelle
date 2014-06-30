@@ -13,11 +13,6 @@
 	<packaging>pom</packaging>
 	<name>Passerelle :: Ptolemy :: parent</name>
 
-	<properties>
-		<!-- ptolemy versions are final, no re-deploy in nexus -->
-		<deploy.plugin.skip>true</deploy.plugin.skip>
-	</properties>
-	
 	<modules>
 		<module>com.microstar</module>
 		<module>diva</module>
