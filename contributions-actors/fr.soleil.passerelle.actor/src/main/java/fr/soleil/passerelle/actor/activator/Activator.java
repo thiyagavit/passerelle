@@ -21,6 +21,7 @@ import com.isencia.passerelle.ext.ModelElementClassProvider;
 import com.isencia.passerelle.ext.impl.DefaultModelElementClassProvider;
 import fr.soleil.passerelle.actor.flow5.ForLoop;
 import fr.soleil.passerelle.actor.flow5.ForLoopWithPortCfg;
+import fr.soleil.passerelle.actor.flow5.SetParameter;
 import fr.soleil.passerelle.actor.flow5.ValueListSplitter;
 
 /**
@@ -39,7 +40,8 @@ public class Activator implements BundleActivator {
         new DefaultModelElementClassProvider(
             ForLoop.class,
             ForLoopWithPortCfg.class,
-            ValueListSplitter.class
+            ValueListSplitter.class,
+            SetParameter.class
             ), 
         null);
     
