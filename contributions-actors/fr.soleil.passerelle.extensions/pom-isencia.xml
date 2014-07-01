@@ -18,7 +18,7 @@
 	<properties>
 		<nexus.base.url>https://ci-nexus.isencia.be</nexus.base.url>
 		
-		<passerelle.version>8.5.0-SNAPSHOT</passerelle.version>
+		<passerelle.version>8.5.0</passerelle.version>
 		<sherpabeans-be.version>6.3.3</sherpabeans-be.version>
 	</properties>
 
