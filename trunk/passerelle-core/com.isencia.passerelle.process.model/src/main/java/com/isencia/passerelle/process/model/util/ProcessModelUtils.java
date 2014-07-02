@@ -19,7 +19,8 @@ public class ProcessModelUtils {
 
   /**
    * @param context
-   * @param itemName can not be blank
+   * @param itemName
+   *          can not be blank
    * @param defaultValue
    * @return the value of the context item with the given itemName, or the defaultValue if no such item was found.
    */
@@ -235,8 +236,7 @@ public class ProcessModelUtils {
    * @param actorParameter
    * @throws IllegalActionException
    */
-  public static void storeContextItemValueInMap(Map<String, String> map, Context context, String itemName, Variable actorParameter)
-      throws IllegalActionException {
+  public static void storeContextItemValueInMap(Map<String, String> map, Context context, String itemName, Variable actorParameter) throws IllegalActionException {
     String defaultValue = null;
     if (actorParameter instanceof StringParameter) {
       defaultValue = ((StringParameter) actorParameter).stringValue();
@@ -281,4 +281,25 @@ public class ProcessModelUtils {
     }
   }
 
+  /**
+   * Retrieves the latest resultblock of a certain type in the context
+   * 
+   * @param context
+   *          Context of the request to search in
+   * @param type
+   *          Type of resultblock
+   */
+  public static ResultBlock getLatestResultBlock(Context context, String type) {
+    if (context.getTasks() == null || context.getTasks().isEmpty()) {
+      return null;
+    }
+    ResultBlock result = null;
+    for (Task task : context.getTasks()) {
+      ResultBlock block = task.getResultBlock(type);
+      if (result == null || block.getCreationTS().after(result.getCreationTS())) {
+        result = block;
+      }
+    }
+    return result;
+  }
 }
