@@ -474,7 +474,9 @@ public abstract class TaskBasedActor extends Actor {
    */
   protected void onTaskFinished(Task task, ManagedMessage message, ProcessResponse processResponse) throws ProcessingException {
     // by default send out on output port
-    processResponse.addOutputMessage(output, message);
+    if (output != null && output.getContainer() != null) {
+      processResponse.addOutputMessage(output, message);
+    }
   }
 
   protected Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
