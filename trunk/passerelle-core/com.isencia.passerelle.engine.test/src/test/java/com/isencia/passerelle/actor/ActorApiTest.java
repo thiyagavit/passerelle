@@ -87,49 +87,49 @@ public class ActorApiTest extends TestCase {
     .assertFlow(flow);
   }
   
-//  public void testFlowWithValidationErrorAndValidation() throws Exception {
-//    Flow flow = new Flow("testFlowWithValidationErrorAndValidation",null);
-//    FlowManager flowMgr = new FlowManager();
-//    Director director = new Director(flow,"director");
-//    flow.setDirector(director);
-//    
-//    Const source = new Const(flow,"Constant");
-//    DevNullActor sink = new DevNullActor(flow, "sink");
-//    Delay firstWorker = new Delay(flow, "firstWorker");
-//    Delay secondWorker = new Delay(flow, "secondWorker");
-//    Delay thirdWorker = new Delay(flow, "thirdWorker");
-//    InitializationValidator validationError = new InitializationValidator(flow, "validationError");
-//    InitializationValidator validationOk = new InitializationValidator(flow, "validationOk");
-//    
-//    flow.connect(source, firstWorker);
-//    flow.connect(firstWorker, secondWorker);
-//    flow.connect(secondWorker, validationOk);
-//    flow.connect(firstWorker, validationError);
-//    flow.connect(validationError, thirdWorker);
-//    flow.connect(thirdWorker, sink);
-//    flow.connect(validationOk, sink);
-//    
-//    Map<String, String> props = new HashMap<String, String>();
-//    props.put("Constant.value", "Hello world");
-//    props.put("director."+DirectorAdapter.VALIDATE_INITIALIZATION_PARAM, "true");
-//    props.put("validationError.Must generate validation error", "true");
-//    props.put("validationError.Validation error message", "something's wrong here");
-//    try {
-//      flowMgr.executeBlockingLocally(flow,props);
-//    } catch (ValidationException e) {
-//      // this is expected
-//    }
-//    new FlowStatisticsAssertion()
-//    .expectMsgSentCount(source, 0L)
-//    .expectActorIterationCount(source, 0L)
-//    .expectActorIterationCount(sink, 0L)
-//    .expectActorIterationCount(firstWorker, 0L)
-//    .expectActorIterationCount(secondWorker, 0L)
-//    .expectActorIterationCount(thirdWorker, 0L)
-//    .expectActorIterationCount(validationError, 0L)
-//    .expectActorIterationCount(validationOk, 0L)
-//    .assertFlow(flow);
-//  }
+  public void testFlowWithValidationErrorAndValidation() throws Exception {
+    Flow flow = new Flow("testFlowWithValidationErrorAndValidation",null);
+    FlowManager flowMgr = new FlowManager();
+    Director director = new Director(flow,"director");
+    flow.setDirector(director);
+    
+    Const source = new Const(flow,"Constant");
+    DevNullActor sink = new DevNullActor(flow, "sink");
+    Delay firstWorker = new Delay(flow, "firstWorker");
+    Delay secondWorker = new Delay(flow, "secondWorker");
+    Delay thirdWorker = new Delay(flow, "thirdWorker");
+    InitializationValidator validationError = new InitializationValidator(flow, "validationError");
+    InitializationValidator validationOk = new InitializationValidator(flow, "validationOk");
+    
+    flow.connect(source, firstWorker);
+    flow.connect(firstWorker, secondWorker);
+    flow.connect(secondWorker, validationOk);
+    flow.connect(firstWorker, validationError);
+    flow.connect(validationError, thirdWorker);
+    flow.connect(thirdWorker, sink);
+    flow.connect(validationOk, sink);
+    
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("Constant.value", "Hello world");
+    props.put("director."+DirectorAdapter.VALIDATE_INITIALIZATION_PARAM, "true");
+    props.put("validationError.Must generate validation error", "true");
+    props.put("validationError.Validation error message", "something's wrong here");
+    try {
+      flowMgr.executeBlockingLocally(flow,props);
+    } catch (ValidationException e) {
+      // this is expected
+    }
+    new FlowStatisticsAssertion()
+    .expectMsgSentCount(source, 0L)
+    .expectActorIterationCount(source, 0L)
+    .expectActorIterationCount(sink, 0L)
+    .expectActorIterationCount(firstWorker, 0L)
+    .expectActorIterationCount(secondWorker, 0L)
+    .expectActorIterationCount(thirdWorker, 0L)
+    .expectActorIterationCount(validationError, 0L)
+    .expectActorIterationCount(validationOk, 0L)
+    .assertFlow(flow);
+  }
 
   public void testFlowWithValidationErrorButNoValidation() throws Exception {
     Flow flow = new Flow("testFlowWithValidationErrorButNoValidation",null);
