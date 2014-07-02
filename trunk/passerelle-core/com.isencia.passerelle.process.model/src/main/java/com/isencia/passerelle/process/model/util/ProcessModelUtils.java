@@ -25,7 +25,7 @@ public class ProcessModelUtils {
    */
   public static String getContextItemValue(Context context, String itemName, String defaultValue) {
     if (context == null || StringUtils.isBlank(itemName)) {
-      return null;
+      return defaultValue;
     } else {
       String itemValue = context.lookupValue(itemName);
       return itemValue != null ? itemValue : defaultValue;
