@@ -29,13 +29,13 @@ public class AllTests {
   public static Test suite() {
     TestSuite suite = new TestSuite(AllTests.class.getName());
     //$JUnit-BEGIN$
-    suite.addTestSuite(ActorApiTest.class);
-    suite.addTestSuite(CloneTest.class);
-    suite.addTestSuite(ActorProviderTest.class);
-    suite.addTestSuite(ActorOrientedClasstest.class);
-    suite.addTestSuite(LibraryBuilderTrial.class);
-    suite.addTestSuite(ModelValidationServiceTest.class);
-    suite.addTestSuite(VersionSpecificationTest.class);
+//    suite.addTestSuite(ActorApiTest.class);
+//    suite.addTestSuite(CloneTest.class);
+//    suite.addTestSuite(ActorProviderTest.class);
+//    suite.addTestSuite(ActorOrientedClasstest.class);
+//    suite.addTestSuite(LibraryBuilderTrial.class);
+//    suite.addTestSuite(ModelValidationServiceTest.class);
+//    suite.addTestSuite(VersionSpecificationTest.class);
     //$JUnit-END$
     return suite;
   }
