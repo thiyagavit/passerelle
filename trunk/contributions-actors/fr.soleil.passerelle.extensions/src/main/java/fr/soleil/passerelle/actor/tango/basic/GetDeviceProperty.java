@@ -1,6 +1,5 @@
 package fr.soleil.passerelle.actor.tango.basic;
 
-import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
