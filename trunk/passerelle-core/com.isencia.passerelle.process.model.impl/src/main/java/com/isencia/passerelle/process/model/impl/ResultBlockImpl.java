@@ -41,6 +41,8 @@ import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
@@ -107,8 +109,9 @@ public class ResultBlockImpl implements ResultBlock {
     this.creationTS = creationTS;
     this.task = (TaskImpl) task;
     this.type = type;
-
-    this.task.addResultBlock(this);
+    if (task != null) {
+      this.task.addResultBlock(this);
+    }
   }
 
   public ResultBlockImpl(Task task, String type) {
@@ -136,8 +139,8 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Attribute putAttribute(Attribute attribute) {
-	  if (!ProcessUtils.isInitialized(attributes))
-		  attributes = new HashMap<String,Attribute>();
+    if (!ProcessUtils.isInitialized(attributes))
+      attributes = new HashMap<String, Attribute>();
     return attributes.put(attribute.getName(), attribute);
   }
 
@@ -146,10 +149,10 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Set<Attribute> getAttributes() {
-	if (!ProcessUtils.isInitialized(attributes)) {
-		return ProcessUtils.emptySet();
-	}
-	
+    if (!ProcessUtils.isInitialized(attributes)) {
+      return ProcessUtils.emptySet();
+    }
+
     return new HashSet<Attribute>(attributes.values());
   }
 
@@ -170,17 +173,17 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public ResultItem<?> putItem(ResultItem<?> item) {
-	  if (!ProcessUtils.isInitialized(resultItems))
-		  resultItems = new HashMap<String,ResultItem<?>>();
+    if (!ProcessUtils.isInitialized(resultItems))
+      resultItems = new HashMap<String, ResultItem<?>>();
     return resultItems.put(item.getName(), item);
   }
 
   public Collection<ResultItem<?>> getAllItems() {
-	Map<String, ResultItem<?>> map = getResultItemMap();
-	if (!ProcessUtils.isInitialized(map)) {
-		return ProcessUtils.EMPTY_SET;
-	}
-		
+    Map<String, ResultItem<?>> map = getResultItemMap();
+    if (!ProcessUtils.isInitialized(map)) {
+      return ProcessUtils.EMPTY_SET;
+    }
+
     return Collections.unmodifiableCollection(map.values());
   }
 
@@ -198,7 +201,7 @@ public class ResultBlockImpl implements ResultBlock {
     if (!ProcessUtils.isInitialized(map)) {
       return ProcessUtils.EMPTY_SET;
     }
-    
+
     return new HashSet<ResultItem>(map.values());
   }
 
@@ -254,5 +257,31 @@ public class ResultBlockImpl implements ResultBlock {
    */
   protected Map<String, ResultItem<?>> getResultItemMap() {
     return resultItems;
+  }
+
+  public ResultBlock clone(Task task) {
+    ResultBlockImpl block = null;
+    if (task == null) {
+      block = new ResultBlockImpl();
+    } else {
+      block = new ResultBlockImpl(task, type);
+    }
+    block.creationTS = this.creationTS;
+    block.type = this.type;
+    block.colour = this.colour;
+    block.creationTS = this.creationTS;
+
+    ProcessFactory factory = ProcessFactoryTracker.getService();
+    for (ResultItem<?> item : getAllItems()) {
+      ResultItem<?> newItem = factory.createResultItem(block, item.getName(), item.getValueAsString(), item.getUnit(), item.getLevel());
+      newItem.setColour(colour);
+      for (Attribute attribute : item.getAttributes()) {
+        factory.createAttribute(newItem, attribute.getName(), attribute.getValue());
+      }
+      for (Attribute attribute : getAttributes()) {
+        factory.createAttribute(block, attribute.getName(), attribute.getValue());
+      }
+    }
+    return block;
   }
 }
