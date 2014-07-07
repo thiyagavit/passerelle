@@ -11,9 +11,6 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v5.ActorContext;
-import com.isencia.passerelle.actor.v5.ProcessRequest;
-import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -88,7 +85,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
     MessageContainer message = (MessageContainer) request.getMessage(input);
     if (message != null) {
       try {
-        Context processContext = (Context) message.getBodyContent();
+        Context processContext = processManager.getRequest().getProcessingContext();
         Long scopeId = processContext.getRequest().getId();
         registerSequenceScopeMessage(scopeId, message);
 
