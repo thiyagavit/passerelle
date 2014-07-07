@@ -3,11 +3,13 @@ package com.isencia.passerelle.process.actor.flow;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
@@ -19,18 +21,22 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
- * A <code>Splitter</code> actor generates a sequence of outgoing messages for each received message. The split count & output message contents are determined
- * by the data in a named item in the received <code>Context</code>.
+ * A <code>Splitter</code> actor generates a sequence of outgoing messages for each received message. The split count &
+ * output message contents are determined by the data in a named item in the received <code>Context</code>.
  * <p>
- * The split-item's name can be configured via the <code>splitItemParameter</code>. The value of the item is assumed to be potentially a concatenation of
- * multiple individual values, with a delimiter as configured in <code>splitDelimiterParameter</code>. <br/>
- * For each individual value, a separate message will be sent out in sequence, with this particalur value for the named item.
+ * The split-item's name can be configured via the <code>splitItemParameter</code>. The value of the item is assumed to
+ * be potentially a concatenation of multiple individual values, with a delimiter as configured in
+ * <code>splitDelimiterParameter</code>. <br/>
+ * For each individual value, a separate message will be sent out in sequence, with this particalur value for the named
+ * item.
  * </p>
- * TODO split value is now set as a <code>Context</code> entry. I.e. it is not effectively replacing the original item which could be in any
- * <code>ResultBlock</code>, <code>Request</code> attribute etc. Check if this is OK in all required use cases. (i.e. in rules modules, facts are typically
- * constructed based on result blocks etc, and the context entries are not necessarily taken into account I think!?
+ * TODO split value is now set as a <code>Context</code> entry. I.e. it is not effectively replacing the original item
+ * which could be in any <code>ResultBlock</code>, <code>Request</code> attribute etc. Check if this is OK in all
+ * required use cases. (i.e. in rules modules, facts are typically constructed based on result blocks etc, and the
+ * context entries are not necessarily taken into account I think!?
  * 
  * @author erwin
  */
@@ -41,12 +47,13 @@ public class Splitter extends AbstractMessageSequenceGenerator {
   public Port input;
   public Port output;
   /**
-   *  extra output where the received msg will be sent out, when nothing was found to split on
+   * extra output where the received msg will be sent out, when nothing was found to split on
    */
   public Port outputNoSplit;
 
   /**
-   * Parameter to specify the name of the name/value item in the <code>Context</code>, that must be used as split criterium.
+   * Parameter to specify the name of the name/value item in the <code>Context</code>, that must be used as split
+   * criterium.
    */
   public StringParameter splitSrcItemParameter;
   public StringParameter splitOutItemParameter;
@@ -75,8 +82,10 @@ public class Splitter extends AbstractMessageSequenceGenerator {
     return LOGGER;
   }
 
-  public void process(ActorContext ctx, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
-    MessageContainer message = (MessageContainer) procRequest.getMessage(input);
+  @Override
+  public void process(ProcessManager processManager, com.isencia.passerelle.process.actor.ProcessRequest request, com.isencia.passerelle.process.actor.ProcessResponse response)
+      throws ProcessingException {
+    MessageContainer message = (MessageContainer) request.getMessage(input);
     if (message != null) {
       try {
         Context processContext = (Context) message.getBodyContent();
@@ -89,11 +98,11 @@ public class Splitter extends AbstractMessageSequenceGenerator {
           splitOutItemName = splitSrcItemName;
         }
         String splitValue = processContext.lookupValue(splitSrcItemName);
-        boolean doingSplit=false;
+        boolean doingSplit = false;
         if (StringUtils.isNotEmpty(splitValue)) {
           String splitDelimiter = ((StringToken) splitDelimiterParameter.getToken()).stringValue();
           String[] valueParts = splitValue.split(splitDelimiter);
-          if(valueParts.length>0) {
+          if (valueParts.length > 0) {
             try {
               if (getAuditLogger().isInfoEnabled()) {
                 getAuditLogger().info("Splitting msg {} on {}:{}", new String[] { getAuditTrailMessage(message, input), splitSrcItemName, splitDelimiter });
@@ -104,19 +113,19 @@ public class Splitter extends AbstractMessageSequenceGenerator {
             for (int i = 0; i < valueParts.length; ++i) {
               Context newOne = processContext.fork();
               newOne.putEntry(splitOutItemName, valueParts[i]);
-              MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message,
-                  processContext.getRequest().getId(), // sequence ID
+              MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message, processContext.getRequest().getId(), // sequence
+                                                                                                                                                                      // ID
                   new Long(i), // sequence position
                   (i == (valueParts.length - 1))); // end of sequence?
               // enforce single Splitter name (so use setHeader i.o. addHeader)
               outputMsg.setHeader(HEADER_SEQ_SRC, getName());
               outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-              procResponse.addOutputMessage(output, outputMsg);
+              response.addOutputMessage(output, outputMsg);
             }
-            doingSplit=true;
+            doingSplit = true;
           }
         }
-        if(!doingSplit) {
+        if (!doingSplit) {
           try {
             if (getAuditLogger().isInfoEnabled()) {
               getAuditLogger().info("Forwarding {} via outputNoSplit ; nothing found to split on {}", getAuditTrailMessage(message, input), splitSrcItemName);
@@ -124,11 +133,12 @@ public class Splitter extends AbstractMessageSequenceGenerator {
           } catch (Exception e) {
             getLogger().error("Error logging audit trail", e);
           }
-          procResponse.addOutputMessage(outputNoSplit, message);
+          response.addOutputMessage(outputNoSplit, message);
         }
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating forked messages", this, message, e);
       }
     }
+
   }
 }
