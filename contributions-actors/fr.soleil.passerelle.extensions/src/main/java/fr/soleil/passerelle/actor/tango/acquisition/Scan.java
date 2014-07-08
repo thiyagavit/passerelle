@@ -36,6 +36,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 
 import com.isencia.passerelle.actor.ProcessingException;
@@ -43,6 +44,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -122,18 +124,18 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             
             try {
                 logger.debug("load salsa config {}", confName);
-                conf = (ConfigImpl<?>) ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
+                conf = ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
 
             } catch (final ScanNotFoundException e) {
                 ExecutionTracerService.trace(this, "Error: Unknown scan configuration " + confName);
-                throw new ValidationException("Unknown scan configuration ", confName, e);
+                throw new ValidationException(ErrorCode.ERROR, "Unknown scan configuration " + confName, this, e) ;
             }
 
             try {
                 configureRecordingSession();
             } catch (SalsaDeviceException e) {
                 ExecutionTracerService.trace(this, "Error: Recording session configuration error");
-                throw new ValidationException("Error: Recording session configuration error", confName, e);
+                throw new ValidationException(ErrorCode.ERROR, "Error: Recording session configuration error" + confName, this, e) ;
             }
 
         }

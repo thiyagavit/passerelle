@@ -1,5 +1,8 @@
 package fr.soleil.passerelle.actor.tango.acquisition.scan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,14 +13,16 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+import ptolemy.kernel.util.Settable;
+import ptolemy.kernel.util.ValueListener;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -25,127 +30,222 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
-import fr.soleil.salsa.entity.impl.scan1d.Config1DImpl;
-import fr.soleil.salsa.entity.scan1d.IConfig1D;
+import fr.soleil.salsa.entity.ITrajectory;
+import fr.soleil.salsa.entity.impl.scan1d.Range1DImpl;
+import fr.soleil.salsa.entity.impl.scan1d.Trajectory1DImpl;
+import fr.soleil.salsa.entity.scan1d.IRange1D;
+import fr.soleil.salsa.entity.scan2D.IConfig2D;
+import fr.soleil.salsa.entity.scank.IConfigK;
 
 /**
  * Do scans using Salsa config, but the From/To NbSteps and InteegrationTime can
  * be configured
- *
+ * 
  * @author GRAMER
  */
 @SuppressWarnings("serial")
-public class PreConfiguredScan extends Scan {
+public class PreConfiguredScan extends Scan implements ValueListener {
 
-	public Port xToPort;
-	public Port xNbStepsPort;
-	public Port xIntegrationTimePort;
+    public List<Port> fromPortList;
+    public List<Port> toPortList;
+    public Port stepsPort;
+    public Port integrationPort;
+    private static final String FROM = "from";
+    private static final String TO = "to";
+    private static final String STEP = "NbSteps";
+    private static final String INTEGRATION = "IntegrationTime";
+    private String outputName = null;
+    private Class<?> outputClass = null;
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(PreConfiguredScan.class);
+    private final static Logger logger = LoggerFactory.getLogger(PreConfiguredScan.class);
 
-	public Parameter xRelativeParam;
-	protected boolean xRelative;
+    public Parameter xRelativeParam;
+    protected boolean xRelative;
+   
+    public Parameter nbActuatorParam;
+    private int nbActuator = 1;
 
-	public PreConfiguredScan(final CompositeEntity container,
-			final String name) throws IllegalActionException,
-			NameDuplicationException {
-		super(container, name);
+    public PreConfiguredScan(final CompositeEntity container, final String name) throws IllegalActionException,
+            NameDuplicationException {
+        super(container, name);
 
-		xRelativeParam = new Parameter(this, "X Relative", new BooleanToken(
-				false));
-		xRelativeParam.setTypeEquals(BaseType.BOOLEAN);
+        fromPortList = new ArrayList<Port>();
+        toPortList = new ArrayList<Port>();
+    
+        xRelativeParam = new Parameter(this, "X Relative", new BooleanToken(false));
+        xRelativeParam.setTypeEquals(BaseType.BOOLEAN);
 
-		input.setName("from");
-		input.setExpectedMessageContentType(Double.class);
+        nbActuatorParam = PortFactory.getInstance().createPortParameter(this, "Nb actuators", Integer.class);
+        nbActuatorParam.addValueListener(this);
 
-		xToPort = PortFactory.getInstance().createInputPort(this, "to",
-				Double.class);
+        input.setName(FROM);
+        input.setExpectedMessageContentType(Double.class);
+        fromPortList.add(input);
 
-		xNbStepsPort = PortFactory.getInstance().createInputPort(this,
-				"NbSteps", Double.class);
+        Port toPort = PortFactory.getInstance().createInputPort(this, TO, Double.class);
+        toPortList.add(toPort);
 
-		xIntegrationTimePort = PortFactory.getInstance().createInputPort(this,
-				"IntegrationTime", Double.class);
+        stepsPort = PortFactory.getInstance().createInputPort(this, STEP, Double.class);
+        integrationPort = PortFactory.getInstance().createInputPort(this, INTEGRATION, Double.class);
+        
+        if(output != null){
+            outputName = output.getName();
+            outputClass = output.getExpectedMessageContentType();
+        }
+      
 
-	}
+    }
 
-	/**
-	 * Initialize actor
-	 */
-	@Override
-	public void validateInitialization() throws ValidationException {
-		super.validateInitialization();
-		// if (!(conf instanceof Config1DImpl)) {
-		if (!(conf instanceof IConfig1D)) {
-			String errorMessage = "Error: " + conf.getFullPath()
-					+ " is not 1D configuration.";
-			ExecutionTracerService.trace(this, errorMessage);
-			throw new ValidationException(errorMessage, this, null);
-		}
-	}
+    @Override
+    public void valueChanged(Settable settable) {
+        if (settable == nbActuatorParam) {
+            String nbActuatorStr = nbActuatorParam.getValueAsString();
+            int newNbActuator = 1;
+            if (nbActuatorStr != null && !nbActuatorStr.isEmpty()) {
+                try {
+                    newNbActuator = Integer.parseInt(nbActuatorStr);
+                    if (newNbActuator < 1) {
+                        newNbActuator = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    newNbActuator = 1;
+                }
+            }
+            if (newNbActuator != nbActuator) {
+                nbActuator = newNbActuator;
+                //System.out.println("nbActuator=" + nbActuator);
+                removeAllPorts();
+                try {
+                    if(outputName != null){
+                        output = PortFactory.getInstance().createOutputPort(this);
+                        output.setName(outputName);
+                        output.setExpectedMessageContentType(outputClass);
+                    }
+                } catch (Exception e1) {
+                    logger.error(e1.getMessage());
+                }
+                
+                fromPortList.clear();
+                toPortList.clear();
+                Port inputPort = null;
+                String idxName = "";
+                try {
+                    for (int i = 0; i < nbActuator; i++) {
+                        if(i > 0){
+                            idxName = String.valueOf(i);
+                        }
+                        inputPort = PortFactory.getInstance().createInputPort(this, FROM + idxName, Double.class);
+                        if(i == 0){
+                            input = inputPort;
+                        }
+                        fromPortList.add(inputPort);
+                        
+                        inputPort = PortFactory.getInstance().createInputPort(this, TO + idxName, Double.class);
+                        toPortList.add(inputPort);
+                        
+                        if(i == 0){
+                            stepsPort = PortFactory.getInstance().createInputPort(this, STEP, Double.class);
+                            integrationPort = PortFactory.getInstance().createInputPort(this, INTEGRATION, Double.class);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+    }
 
-	@Override
-	protected void process(final ActorContext ctxt,
-			final ProcessRequest request, final ProcessResponse response)
-			throws ProcessingException {
+    /**
+     * Initialize actor
+     */
+    @Override
+    public void validateInitialization() throws ValidationException {
+        super.validateInitialization();
+        if ((conf instanceof IConfig2D) || (conf instanceof IConfigK)) {
+            String errorMessage = "Error: " + conf.getFullPath() + " is not 1D configuration.";
+            ExecutionTracerService.trace(this, errorMessage);
+            throw new ValidationException(ErrorCode.ERROR, errorMessage, this, null);
+        }
+    }
 
-		final ManagedMessage fromMessage = request.getMessage(input);
-		final double fromX = (Double) PasserelleUtil.getInputValue(fromMessage);
-		logger.debug("fromX:" + fromX);
+    @Override
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
-		final ManagedMessage toMessage = request.getMessage(xToPort);
-		final double toX = (Double) PasserelleUtil.getInputValue(toMessage);
-		logger.debug("toX:" + toX);
+        
+        StringBuilder logMessage =new StringBuilder();
+        String log = xRelative ? "Relative scan" : "Absolute scan";
+        logger.debug(log);
+        logMessage.append("\n" + log);
+        
+        final ManagedMessage nbStepsmessage = request.getMessage(stepsPort);
+        final int nbSteps = (int) ((Double) PasserelleUtil.getInputValue(nbStepsmessage)).doubleValue();
+        log = STEP +"="+ nbSteps;
+        logger.debug(log);
+        logMessage.append(log);
 
-		final ManagedMessage nbStepsmessage = request.getMessage(xNbStepsPort);
-		final int nbStepsX = (int) ((Double) PasserelleUtil
-				.getInputValue(nbStepsmessage)).doubleValue();
-		logger.debug("nbStepsX:" + nbStepsX);
+        final ManagedMessage intTimemessage = request.getMessage(integrationPort);
+        final double intTime = (Double) PasserelleUtil.getInputValue(intTimemessage);
+        log = INTEGRATION +"="+ intTime + " s";
+        logger.debug(log);
+        logMessage.append("\n" + log);
 
-		final ManagedMessage intTimemessage = request
-				.getMessage(xIntegrationTimePort);
-		final double intTime = (Double) PasserelleUtil
-				.getInputValue(intTimemessage);
-		logger.debug("intTime:" + intTime);
+        final IRange1D range = new Range1DImpl();
+        range.setStepsNumber(nbSteps);
+        range.setIntegrationTime(intTime);
+        
+        List<ITrajectory> trajectoryList = new ArrayList<ITrajectory>(); 
+        ITrajectory trajectory = null;
+        
+        ManagedMessage fromMessage = null;
+        ManagedMessage toMessage = null;
+        Port fromPort = null;
+        Port toPort = null;
+        double fromValue = Double.NaN;
+        double toValue = Double.NaN;
+        
+        for(int i=0; i< fromPortList.size() ; i++){
+            fromPort = fromPortList.get(i);
+            toPort = toPortList.get(i);
+            fromMessage = request.getMessage(fromPort);
+            toMessage = request.getMessage(toPort);
+            fromValue = (Double) PasserelleUtil.getInputValue(fromMessage);
+            toValue = (Double) PasserelleUtil.getInputValue(toMessage);
+            log = FROM + i +"="+ fromValue;
+            logger.debug(log);
+            logMessage.append("\n" + log);
+            log = TO + i +"="+ toValue;
+            logger.debug(log);
+            logMessage.append("\n" + log);
+            trajectory = new Trajectory1DImpl();
+            trajectory.setIRange(range);
+            trajectory.setBeginPosition(fromValue);
+            trajectory.setEndPosition(toValue);
+            trajectoryList.add(trajectory);
+        }
+        
+        range.setTrajectoriesList(trajectoryList);
+        
+        if (!isMockMode()) {
+            try {
+                ScanUtil.setTrajectory1D(conf, range,xRelative );
+            } catch (PasserelleException e) {
+                throw new ProcessingException(ErrorCode.ERROR, e.getMessage(), this, e);
+            }
+            ExecutionTracerService.trace(this, logMessage.toString());
+        } else {
+            ExecutionTracerService.trace(this, "MOCK - " + logMessage);
+        }
+        super.process(ctxt, request, response);
+    }
 
-		String logMessage = xRelative ? "Relative scan" : "Absolute scan";
-		logMessage += " from " + fromX + " to " + toX + " in " + nbStepsX
-		+ " steps with an integration time equals to " + intTime
-		+ " s";
-		if (!isMockMode()) {
+    @Override
+    public void attributeChanged(final Attribute arg0) throws IllegalActionException {
+        if (arg0 == xRelativeParam) {
+            xRelative = PasserelleUtil.getParameterBooleanValue(xRelativeParam);
+        } else {
+            super.attributeChanged(arg0);
+        }
+    }
 
-			final Config1DImpl confTemp = (Config1DImpl) conf;
-			final ScanRangeX scanRangeX = new ScanRangeX(fromX, toX, nbStepsX,
-					intTime, xRelative);
-
-			try {
-				ScanUtil.setTrajectory1D(confTemp, scanRangeX);
-			} catch (PasserelleException e) {
-				throw new ProcessingExceptionWithLog(this,Severity.FATAL, e.getMessage(), this, null);
-			}
-
-			conf = confTemp;
-			String log = xRelative ? "Relative scan" : "Absolute scan";
-			log += " from " + fromX + " to " + toX + " in " + nbStepsX
-					+ " steps with an integration time equals to " + intTime
-					+ " s";
-
-			ExecutionTracerService.trace(this, logMessage);
-		} else {
-			ExecutionTracerService.trace(this, "MOCK - " + logMessage);
-		}
-		super.process(ctxt, request, response);
-	}
-
-	@Override
-	public void attributeChanged(final Attribute arg0)
-			throws IllegalActionException {
-		if (arg0 == xRelativeParam) {
-			xRelative = PasserelleUtil.getParameterBooleanValue(xRelativeParam);
-		} else {
-			super.attributeChanged(arg0);
-		}
-	}
 }
