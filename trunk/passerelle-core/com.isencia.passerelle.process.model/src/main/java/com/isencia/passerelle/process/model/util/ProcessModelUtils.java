@@ -62,7 +62,7 @@ public class ProcessModelUtils {
           Task task = tasks.get(taskIdx);
           Collection<ResultBlock> blocks = task.getResultBlocks();
           for (ResultBlock block : blocks) {
-            if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+            if (dataType == null || dataType.isEmpty() || block.getType().equalsIgnoreCase(dataType)) {
               ResultItem<?> item = block.getItemForName(itemName);
               if (item != null) {
                 itemValue = item.getValueAsString();
@@ -71,6 +71,8 @@ public class ProcessModelUtils {
             }
           }
         }
+      } else if (dataType != null && !dataType.isEmpty()) {
+        itemValue = context.lookupValue(dataType,itemName);
       } else {
         itemValue = context.lookupValue(itemName);
       }
