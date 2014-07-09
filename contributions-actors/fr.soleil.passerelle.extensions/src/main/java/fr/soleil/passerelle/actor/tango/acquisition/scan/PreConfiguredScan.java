@@ -44,8 +44,6 @@ import fr.soleil.salsa.entity.scank.IConfigK;
 @SuppressWarnings("serial")
 public class PreConfiguredScan extends Scan {
 
-    public List<Port> fromPortList;
-    public List<Port> toPortList;
     public Port stepsPort;
     public Port integrationPort;
     private static final String FROM = "from";
@@ -60,32 +58,25 @@ public class PreConfiguredScan extends Scan {
 
     public Parameter nbActuatorParam;
     private int nbActuator = 1;
-    private IntToken nbActuatorDefaultValue = new IntToken(nbActuator);
 
     public PreConfiguredScan(final CompositeEntity container, final String name) throws IllegalActionException,
             NameDuplicationException {
         super(container, name);
-
-        // List of dynamic port for from and to input
-        fromPortList = new ArrayList<Port>();
-        toPortList = new ArrayList<Port>();
 
         // Parameter X relative sent in all trajectories
         xRelativeParam = new Parameter(this, "X Relative", new BooleanToken(xRelative));
         xRelativeParam.setTypeEquals(BaseType.BOOLEAN);
 
         // Parameter number of actuators by default 1
-        nbActuatorParam = new Parameter(this, "Nb actuators", nbActuatorDefaultValue);
+        nbActuatorParam = new Parameter(this, "Nb actuators", new IntToken(1));
         nbActuatorParam.setTypeEquals(BaseType.INT);
 
         // First From input port always existing
         input.setName(FROM);
         input.setExpectedMessageContentType(Double.class);
-        fromPortList.add(input);
 
         // First To input port always existing
-        Port toPort = PortFactory.getInstance().createInputPort(this, TO, Double.class);
-        toPortList.add(toPort);
+        PortFactory.getInstance().createInputPort(this, TO, Double.class);
 
         // Number of step input port always existing
         stepsPort = PortFactory.getInstance().createInputPort(this, STEP, Double.class);
@@ -138,31 +129,36 @@ public class PreConfiguredScan extends Scan {
         List<ITrajectory> trajectoryList = new ArrayList<ITrajectory>();
         ITrajectory trajectory = null;
 
-        ManagedMessage fromMessage = null;
-        ManagedMessage toMessage = null;
-        Port fromPort = null;
-        Port toPort = null;
         double fromValue = Double.NaN;
         double toValue = Double.NaN;
 
-        for (int i = 0; i < fromPortList.size(); i++) {
-            fromPort = fromPortList.get(i);
-            toPort = toPortList.get(i);
-            fromMessage = request.getMessage(fromPort);
-            toMessage = request.getMessage(toPort);
-            fromValue = (Double) PasserelleUtil.getInputValue(fromMessage);
-            toValue = (Double) PasserelleUtil.getInputValue(toMessage);
-            log = FROM + i + "=" + fromValue;
-            logger.debug(log);
-            logMessage.append("\n" + log);
-            log = TO + i + "=" + toValue;
-            logger.debug(log);
-            logMessage.append("\n" + log);
+        String fromPortName = null;
+        String toPortName = null;
+
+        for (int actuatorIndex = 0; actuatorIndex < nbActuator; actuatorIndex++) {
             trajectory = new Trajectory1DImpl();
             trajectory.setIRange(range);
-            trajectory.setBeginPosition(fromValue);
-            trajectory.setEndPosition(toValue);
             trajectoryList.add(trajectory);
+
+            fromPortName = FROM;
+            if (actuatorIndex > 0) {
+                fromPortName = fromPortName + actuatorIndex;
+            }
+
+            fromValue = getValueFromPort(fromPortName, request, logMessage);
+            if (!Double.isNaN(fromValue)) {
+                trajectory.setBeginPosition(fromValue);
+            }
+
+            toPortName = TO;
+            if (actuatorIndex > 0) {
+                toPortName = toPortName + actuatorIndex;
+            }
+
+            toValue = getValueFromPort(toPortName, request, logMessage);
+            if (!Double.isNaN(toValue)) {
+                trajectory.setEndPosition(toValue);
+            }
         }
 
         range.setTrajectoriesList(trajectoryList);
@@ -180,42 +176,64 @@ public class PreConfiguredScan extends Scan {
         super.process(ctxt, request, response);
     }
 
+    private double getValueFromPort(String portName, final ProcessRequest request, final StringBuilder logMessage)
+            throws ProcessingException {
+        double value = Double.NaN;
+        if (portName != null) {
+            Object portObject = getPort(portName);
+            if (portObject instanceof Port) {
+                Port port = (Port) portObject;
+                ManagedMessage message = request.getMessage(port);
+                value = (Double) PasserelleUtil.getInputValue(message);
+                String log = portName + "=" + value;
+                logger.trace(log);
+                logMessage.append("\n" + log);
+            }
+        }
+        return value;
+    }
+
     @Override
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == xRelativeParam) {
             xRelative = PasserelleUtil.getParameterBooleanValue(xRelativeParam);
         } else if (arg0 == nbActuatorParam) {
-            // Read the nb actuator parameter
-            IntToken token = (IntToken)nbActuatorParam.getToken();
-            int newNbActuator =  token.intValue();
+            try {
+                // Read the nb actuator parameter
+                IntToken token = (IntToken) nbActuatorParam.getToken();
+                int newNbActuator = token.intValue();
 
-            // The minimum value must be one
-            if (newNbActuator < 1) {
-                newNbActuator = 1;
-                nbActuatorParam.setToken(nbActuatorDefaultValue);
-            }
+                // The minimum value must be one
+                if (newNbActuator < 1) {
+                    newNbActuator = 1;
+                    nbActuatorParam.setToken(new IntToken(1));
+                }
 
-            // If the value change
-            if (newNbActuator != nbActuator) {
-                nbActuator = newNbActuator;
-                //Clear dynamic port
-                clearDynamicPort();
-                
-                //Create dynamic port over index 0
-                Port inputPort = null;
-                if(nbActuator > 1){
-                try {
-                        for (int i = 1; i < nbActuator; i++) {
-                            inputPort = PortFactory.getInstance().createInputPort(this, FROM + i, Double.class);
-                            fromPortList.add(inputPort);
-    
-                            inputPort = PortFactory.getInstance().createInputPort(this, TO + i, Double.class);
-                            toPortList.add(inputPort);
+                // If the value change
+                if (newNbActuator != nbActuator) {
+                    // System.out.println("newNbActuator=" + newNbActuator);
+                    nbActuator = newNbActuator;
+                    // Clear dynamic port
+                    clearDynamicPort();
+
+                    // Create dynamic port over index 0
+                    if (nbActuator > 1) {
+                        try {
+                            for (int i = 1; i < nbActuator; i++) {
+                                PortFactory.getInstance().createInputPort(this, FROM + i, Double.class);
+                                PortFactory.getInstance().createInputPort(this, TO + i, Double.class);
+                            }
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
+                            logger.debug("Stack trace ", e);
                         }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
                     }
                 }
+            } catch (IllegalActionException e) {
+                throw e;
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                logger.debug("Stack trace ", e);
             }
         } else {
             super.attributeChanged(arg0);
@@ -223,39 +241,40 @@ public class PreConfiguredScan extends Scan {
     }
 
     private void clearDynamicPort() throws IllegalActionException {
-        Port fromPort = null;
-        // Do not remove the first fix port index 0
-        if (fromPortList.size() > 1) {
-            List<Port> fromPortToRemove = new ArrayList<Port>();
-            for (int portIndex = 1; portIndex < fromPortList.size(); portIndex++) {
-                fromPort = fromPortList.get(portIndex);
-                fromPortToRemove.add(fromPort);
-                try {
-                    fromPort.setContainer(null);
-                } catch (NameDuplicationException e) {
-                    logger.error(e.getMessage());
+        List<?> portList = portList();
+        if (portList != null) {
+            List<Object> portListCopy = new ArrayList<Object>();
+            portListCopy.addAll(portList);
+            Port port = null;
+            String portName = null;
+            List<Port> portToRemove = new ArrayList<Port>();
+            for (Object objectPort : portListCopy) {
+                if (objectPort instanceof Port) {
+                    port = (Port) objectPort;
+                    portName = port.getName();
+                    if (isDynamicPort(portName)) {
+                        portToRemove.add(port);
+                        try {
+                            port.setContainer(null);
+                        } catch (NameDuplicationException e) {
+                            logger.error(e.getMessage());
+                            logger.debug("Stack trace ", e);
+                        }
+                    }
                 }
             }
-            //Remove the dynamic port from the list
-            fromPortList.removeAll(fromPortToRemove);
         }
+    }
 
-        Port toPort = null;
-        // Do not remove the first fix port index 0
-        if (toPortList.size() > 1) {
-            List<Port> toPortToRemove = new ArrayList<Port>();
-            for (int portIndex = 1; portIndex < toPortList.size(); portIndex++) {
-                toPort = toPortList.get(portIndex);
-                toPortToRemove.add(toPort);
-                try {
-                    toPort.setContainer(null);
-                } catch (NameDuplicationException e) {
-                    logger.error(e.getMessage());
-                }
+    private boolean isDynamicPort(String portName) {
+        boolean dynamic = false;
+        if (portName != null) {
+            dynamic = portName.startsWith(FROM) && portName.length() > FROM.length();
+            if (!dynamic) {
+                dynamic = portName.startsWith(TO) && portName.length() > TO.length();
             }
-            //Remove the dynamic port from the list
-            toPortList.removeAll(toPortToRemove);
         }
+        return dynamic;
     }
 
 }
