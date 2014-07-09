@@ -247,13 +247,11 @@ public class PreConfiguredScan extends Scan {
             portListCopy.addAll(portList);
             Port port = null;
             String portName = null;
-            List<Port> portToRemove = new ArrayList<Port>();
             for (Object objectPort : portListCopy) {
                 if (objectPort instanceof Port) {
                     port = (Port) objectPort;
                     portName = port.getName();
                     if (isDynamicPort(portName)) {
-                        portToRemove.add(port);
                         try {
                             port.setContainer(null);
                         } catch (NameDuplicationException e) {
