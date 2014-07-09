@@ -7,14 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.data.BooleanToken;
+import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import ptolemy.kernel.util.Settable;
-import ptolemy.kernel.util.ValueListener;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
@@ -34,7 +33,6 @@ import fr.soleil.salsa.entity.ITrajectory;
 import fr.soleil.salsa.entity.impl.scan1d.Range1DImpl;
 import fr.soleil.salsa.entity.impl.scan1d.Trajectory1DImpl;
 import fr.soleil.salsa.entity.scan1d.IRange1D;
-import fr.soleil.salsa.entity.scan2D.IConfig2D;
 import fr.soleil.salsa.entity.scank.IConfigK;
 
 /**
@@ -44,7 +42,7 @@ import fr.soleil.salsa.entity.scank.IConfigK;
  * @author GRAMER
  */
 @SuppressWarnings("serial")
-public class PreConfiguredScan extends Scan implements ValueListener {
+public class PreConfiguredScan extends Scan {
 
     public List<Port> fromPortList;
     public List<Port> toPortList;
@@ -54,105 +52,47 @@ public class PreConfiguredScan extends Scan implements ValueListener {
     private static final String TO = "to";
     private static final String STEP = "NbSteps";
     private static final String INTEGRATION = "IntegrationTime";
-    private String outputName = null;
-    private Class<?> outputClass = null;
 
     private final static Logger logger = LoggerFactory.getLogger(PreConfiguredScan.class);
 
     public Parameter xRelativeParam;
-    protected boolean xRelative;
-   
+    protected boolean xRelative = false;
+
     public Parameter nbActuatorParam;
     private int nbActuator = 1;
+    private IntToken nbActuatorDefaultValue = new IntToken(nbActuator);
 
     public PreConfiguredScan(final CompositeEntity container, final String name) throws IllegalActionException,
             NameDuplicationException {
         super(container, name);
 
+        // List of dynamic port for from and to input
         fromPortList = new ArrayList<Port>();
         toPortList = new ArrayList<Port>();
-    
-        xRelativeParam = new Parameter(this, "X Relative", new BooleanToken(false));
+
+        // Parameter X relative sent in all trajectories
+        xRelativeParam = new Parameter(this, "X Relative", new BooleanToken(xRelative));
         xRelativeParam.setTypeEquals(BaseType.BOOLEAN);
 
-        nbActuatorParam = PortFactory.getInstance().createPortParameter(this, "Nb actuators", Integer.class);
-        nbActuatorParam.addValueListener(this);
+        // Parameter number of actuators by default 1
+        nbActuatorParam = new Parameter(this, "Nb actuators", nbActuatorDefaultValue);
+        nbActuatorParam.setTypeEquals(BaseType.INT);
 
+        // First From input port always existing
         input.setName(FROM);
         input.setExpectedMessageContentType(Double.class);
         fromPortList.add(input);
 
+        // First To input port always existing
         Port toPort = PortFactory.getInstance().createInputPort(this, TO, Double.class);
         toPortList.add(toPort);
 
+        // Number of step input port always existing
         stepsPort = PortFactory.getInstance().createInputPort(this, STEP, Double.class);
+
+        // integration time input port always existing
         integrationPort = PortFactory.getInstance().createInputPort(this, INTEGRATION, Double.class);
-        
-        if(output != null){
-            outputName = output.getName();
-            outputClass = output.getExpectedMessageContentType();
-        }
-      
 
-    }
-
-    @Override
-    public void valueChanged(Settable settable) {
-        if (settable == nbActuatorParam) {
-            String nbActuatorStr = nbActuatorParam.getValueAsString();
-            int newNbActuator = 1;
-            if (nbActuatorStr != null && !nbActuatorStr.isEmpty()) {
-                try {
-                    newNbActuator = Integer.parseInt(nbActuatorStr);
-                    if (newNbActuator < 1) {
-                        newNbActuator = 1;
-                    }
-                } catch (NumberFormatException e) {
-                    newNbActuator = 1;
-                }
-            }
-            if (newNbActuator != nbActuator) {
-                nbActuator = newNbActuator;
-                //System.out.println("nbActuator=" + nbActuator);
-                removeAllPorts();
-                try {
-                    if(outputName != null){
-                        output = PortFactory.getInstance().createOutputPort(this);
-                        output.setName(outputName);
-                        output.setExpectedMessageContentType(outputClass);
-                    }
-                } catch (Exception e1) {
-                    logger.error(e1.getMessage());
-                }
-                
-                fromPortList.clear();
-                toPortList.clear();
-                Port inputPort = null;
-                String idxName = "";
-                try {
-                    for (int i = 0; i < nbActuator; i++) {
-                        if(i > 0){
-                            idxName = String.valueOf(i);
-                        }
-                        inputPort = PortFactory.getInstance().createInputPort(this, FROM + idxName, Double.class);
-                        if(i == 0){
-                            input = inputPort;
-                        }
-                        fromPortList.add(inputPort);
-                        
-                        inputPort = PortFactory.getInstance().createInputPort(this, TO + idxName, Double.class);
-                        toPortList.add(inputPort);
-                        
-                        if(i == 0){
-                            stepsPort = PortFactory.getInstance().createInputPort(this, STEP, Double.class);
-                            integrationPort = PortFactory.getInstance().createInputPort(this, INTEGRATION, Double.class);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                }
-            }
-        }
     }
 
     /**
@@ -161,8 +101,10 @@ public class PreConfiguredScan extends Scan implements ValueListener {
     @Override
     public void validateInitialization() throws ValidationException {
         super.validateInitialization();
-        if ((conf instanceof IConfig2D) || (conf instanceof IConfigK)) {
-            String errorMessage = "Error: " + conf.getFullPath() + " is not 1D configuration.";
+        // This actor is not valid for a K configuration because of the non linear trajectory
+        // All the other kind of configuration have an X linear dimension
+        if (conf == null || conf instanceof IConfigK) {
+            String errorMessage = "Error: " + conf.getFullPath() + " is not a linear trajectory";
             ExecutionTracerService.trace(this, errorMessage);
             throw new ValidationException(ErrorCode.ERROR, errorMessage, this, null);
         }
@@ -172,49 +114,48 @@ public class PreConfiguredScan extends Scan implements ValueListener {
     protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
             throws ProcessingException {
 
-        
-        StringBuilder logMessage =new StringBuilder();
+        StringBuilder logMessage = new StringBuilder();
         String log = xRelative ? "Relative scan" : "Absolute scan";
         logger.debug(log);
         logMessage.append("\n" + log);
-        
+
         final ManagedMessage nbStepsmessage = request.getMessage(stepsPort);
         final int nbSteps = (int) ((Double) PasserelleUtil.getInputValue(nbStepsmessage)).doubleValue();
-        log = STEP +"="+ nbSteps;
+        log = STEP + "=" + nbSteps;
         logger.debug(log);
         logMessage.append(log);
 
         final ManagedMessage intTimemessage = request.getMessage(integrationPort);
         final double intTime = (Double) PasserelleUtil.getInputValue(intTimemessage);
-        log = INTEGRATION +"="+ intTime + " s";
+        log = INTEGRATION + "=" + intTime + " s";
         logger.debug(log);
         logMessage.append("\n" + log);
 
         final IRange1D range = new Range1DImpl();
         range.setStepsNumber(nbSteps);
         range.setIntegrationTime(intTime);
-        
-        List<ITrajectory> trajectoryList = new ArrayList<ITrajectory>(); 
+
+        List<ITrajectory> trajectoryList = new ArrayList<ITrajectory>();
         ITrajectory trajectory = null;
-        
+
         ManagedMessage fromMessage = null;
         ManagedMessage toMessage = null;
         Port fromPort = null;
         Port toPort = null;
         double fromValue = Double.NaN;
         double toValue = Double.NaN;
-        
-        for(int i=0; i< fromPortList.size() ; i++){
+
+        for (int i = 0; i < fromPortList.size(); i++) {
             fromPort = fromPortList.get(i);
             toPort = toPortList.get(i);
             fromMessage = request.getMessage(fromPort);
             toMessage = request.getMessage(toPort);
             fromValue = (Double) PasserelleUtil.getInputValue(fromMessage);
             toValue = (Double) PasserelleUtil.getInputValue(toMessage);
-            log = FROM + i +"="+ fromValue;
+            log = FROM + i + "=" + fromValue;
             logger.debug(log);
             logMessage.append("\n" + log);
-            log = TO + i +"="+ toValue;
+            log = TO + i + "=" + toValue;
             logger.debug(log);
             logMessage.append("\n" + log);
             trajectory = new Trajectory1DImpl();
@@ -223,12 +164,12 @@ public class PreConfiguredScan extends Scan implements ValueListener {
             trajectory.setEndPosition(toValue);
             trajectoryList.add(trajectory);
         }
-        
+
         range.setTrajectoriesList(trajectoryList);
-        
+
         if (!isMockMode()) {
             try {
-                ScanUtil.setTrajectory1D(conf, range,xRelative );
+                ScanUtil.setTrajectory1D(conf, range, xRelative);
             } catch (PasserelleException e) {
                 throw new ProcessingException(ErrorCode.ERROR, e.getMessage(), this, e);
             }
@@ -243,8 +184,77 @@ public class PreConfiguredScan extends Scan implements ValueListener {
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == xRelativeParam) {
             xRelative = PasserelleUtil.getParameterBooleanValue(xRelativeParam);
+        } else if (arg0 == nbActuatorParam) {
+            // Read the nb actuator parameter
+            IntToken token = (IntToken)nbActuatorParam.getToken();
+            int newNbActuator =  token.intValue();
+
+            // The minimum value must be one
+            if (newNbActuator < 1) {
+                newNbActuator = 1;
+                nbActuatorParam.setToken(nbActuatorDefaultValue);
+            }
+
+            // If the value change
+            if (newNbActuator != nbActuator) {
+                nbActuator = newNbActuator;
+                //Clear dynamic port
+                clearDynamicPort();
+                
+                //Create dynamic port over index 0
+                Port inputPort = null;
+                if(nbActuator > 1){
+                try {
+                        for (int i = 1; i < nbActuator; i++) {
+                            inputPort = PortFactory.getInstance().createInputPort(this, FROM + i, Double.class);
+                            fromPortList.add(inputPort);
+    
+                            inputPort = PortFactory.getInstance().createInputPort(this, TO + i, Double.class);
+                            toPortList.add(inputPort);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                    }
+                }
+            }
         } else {
             super.attributeChanged(arg0);
+        }
+    }
+
+    private void clearDynamicPort() throws IllegalActionException {
+        Port fromPort = null;
+        // Do not remove the first fix port index 0
+        if (fromPortList.size() > 1) {
+            List<Port> fromPortToRemove = new ArrayList<Port>();
+            for (int portIndex = 1; portIndex < fromPortList.size(); portIndex++) {
+                fromPort = fromPortList.get(portIndex);
+                fromPortToRemove.add(fromPort);
+                try {
+                    fromPort.setContainer(null);
+                } catch (NameDuplicationException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+            //Remove the dynamic port from the list
+            fromPortList.removeAll(fromPortToRemove);
+        }
+
+        Port toPort = null;
+        // Do not remove the first fix port index 0
+        if (toPortList.size() > 1) {
+            List<Port> toPortToRemove = new ArrayList<Port>();
+            for (int portIndex = 1; portIndex < toPortList.size(); portIndex++) {
+                toPort = toPortList.get(portIndex);
+                toPortToRemove.add(toPort);
+                try {
+                    toPort.setContainer(null);
+                } catch (NameDuplicationException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+            //Remove the dynamic port from the list
+            toPortList.removeAll(toPortToRemove);
         }
     }
 
