@@ -168,7 +168,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
     }
 
     private void configureRecordingSession() throws SalsaDeviceException {
-        // FIXME : http://controle.synchrotron-soleil.fr/mantis/view.php?id=25591
+        // FIXME : http://jira.synchrotron-soleil.fr/jira/browse/TANGOCORE-5
         DeviceProxyFactory.remove(ScanUtil.getCurrentSalsaApi().getDevicePreferences().getScanServer().toLowerCase());
 
         if (DataRecorder.getInstance().isSaveActive(this)) {
@@ -205,7 +205,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }
@@ -223,7 +223,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }
@@ -239,7 +239,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }
