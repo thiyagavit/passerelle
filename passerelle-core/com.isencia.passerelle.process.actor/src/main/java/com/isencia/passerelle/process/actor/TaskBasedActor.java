@@ -265,7 +265,7 @@ public abstract class TaskBasedActor extends Actor {
    * @throws ProcessingException
    */
   protected boolean doRestart(ProcessManager processManager, ManagedMessage message, ProcessResponse response) throws MessageException, ProcessingException {
-    Context processContext = ProcessRequest.getContextForMessage(message);
+    Context processContext = processManager.getRequest().getProcessingContext();
     if (Status.RESTARTED.equals(processContext.getStatus())) {
       for (int taskIdx = processContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
         Task task = processContext.getTasks().get(taskIdx);
