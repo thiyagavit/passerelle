@@ -19,6 +19,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.actor.Actor;
 import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.actor.ProcessResponse;
+import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
@@ -51,8 +53,10 @@ public class StartActor extends Actor {
     try {
       Map<String, String> systemParameterMap = FlowUtils.getParameterMap(toplevel(), FlowUtils.SYSTEM_PARAMETERS);
       preProcess(processManager, systemParameterMap);
-
-      processManager.notifyStarted();
+      Context processingContext = processManager.getRequest().getProcessingContext();
+      if (!Status.STARTED.equals(processingContext.getStatus()) && !Status.RESTARTED.equals(processingContext.getStatus())) {
+        processManager.notifyStarted();
+      }
       ManagedMessage message = createOutputMessage(processManager.getRequest());
       response.addOutputMessage(output, message);
     } catch (Exception t) {
