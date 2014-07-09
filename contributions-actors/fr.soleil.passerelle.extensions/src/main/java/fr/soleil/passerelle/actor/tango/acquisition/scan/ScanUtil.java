@@ -40,7 +40,18 @@ public final class ScanUtil {
         return delta / integrationTime;
     }
 
-    private static void setTrajectory(final IConfig<?> conf, final IRangeIntegrated sourceRange, boolean relative, int dimensionIndex)  throws PasserelleException{
+    /**
+     * Set the trajectory on a SALSA configuration
+     * 
+     * @param conf, the configuration
+     * @param sourceRange, the range (that containing the trajectory list)
+     * @param relative (set all the trajectory to relative or absolute)
+     * @param dimensionIndex (the index of the dimension, 0 for X dimension, 1 for Y dimension)
+     * @param timeScan, check the actuators consistency if it is not a time scan
+     * @throws PasserelleException
+     */
+    private static void setTrajectory(final IConfig<?> conf, final IRangeIntegrated sourceRange, boolean relative,
+            int dimensionIndex, boolean timeScan) throws PasserelleException {
         if (conf == null) {
             throw new PasserelleException(ErrorCode.ERROR, "Configuration is not defined.", null);
         }
@@ -54,8 +65,13 @@ public final class ScanUtil {
         List<IActuator> actuatorsList = dim.getActuatorsList();
         int nbEnable = getNbEnableDevice(actuatorsList);
 
-        if (nbEnable == 0) {
+        if (nbEnable == 0 && !timeScan) {
             throw new PasserelleException(ErrorCode.ERROR, "No activated actuator is defined.", null);
+        }
+
+        if (nbEnable > 0 && timeScan) {
+            throw new PasserelleException(ErrorCode.ERROR, "This is not a time scan there is some activated actuator.",
+                    null);
         }
 
         if (dim == null || dim.getRangeList() == null || dim.getRangeList().isEmpty()) {
@@ -71,17 +87,18 @@ public final class ScanUtil {
         List<ITrajectory> sourceTrajectoriesList = sourceRange.getTrajectoriesList();
         List<ITrajectory> destTrajectoriesList = destRange.getTrajectoriesList();
 
-        if (sourceTrajectoriesList == null || sourceTrajectoriesList.isEmpty() || destTrajectoriesList == null
-                || destTrajectoriesList.isEmpty()) {
+        if (!timeScan
+                && (sourceTrajectoriesList == null || sourceTrajectoriesList.isEmpty() || destTrajectoriesList == null || destTrajectoriesList
+                        .isEmpty())) {
             throw new PasserelleException(ErrorCode.ERROR, "Actuators (trajectory) must not be empty.", null);
         }
 
-        if (nbEnable > sourceTrajectoriesList.size()) {
+        if (!timeScan && (nbEnable > sourceTrajectoriesList.size())) {
             throw new PasserelleException(ErrorCode.ERROR,
                     "Trajectory list size must be equals to activated actuator list size", null);
         }
 
-        if (destTrajectoriesList.size() < sourceTrajectoriesList.size()) {
+        if (!timeScan && (destTrajectoriesList.size() < sourceTrajectoriesList.size())) {
             throw new PasserelleException(ErrorCode.ERROR,
                     "Trajectory list size must be at least smaller than the trajectory list of the configuration", null);
         }
@@ -92,27 +109,34 @@ public final class ScanUtil {
         }
         destRange.setStepsNumber(sourceRange.getStepsNumber());
 
-        IActuator actuator = null;
-        int nbOfActuator = sourceTrajectoriesList.size();
-        int nbOfActivatedActuator = 0;
-        ITrajectory sourceTrajectory = null;
-        ITrajectory destTrajectory = null;
-        for (int actuatorIndex = 0; actuatorIndex < actuatorsList.size(); actuatorIndex++) {
-            actuator = actuatorsList.get(actuatorIndex);
-            if (actuator.isEnabled() && nbOfActivatedActuator < nbOfActuator) {
-                sourceTrajectory = sourceTrajectoriesList.get(nbOfActivatedActuator);
-                destTrajectory = destTrajectoriesList.get(actuatorIndex);
-                destTrajectory.setBeginPosition(sourceTrajectory.getBeginPosition());
-                destTrajectory.setEndPosition(sourceTrajectory.getEndPosition());
-                destTrajectory.setRelative(relative);
-                nbOfActivatedActuator++;
+        if (!timeScan) {
+            IActuator actuator = null;
+            int nbOfActuator = sourceTrajectoriesList.size();
+            int nbOfActivatedActuator = 0;
+            ITrajectory sourceTrajectory = null;
+            ITrajectory destTrajectory = null;
+            for (int actuatorIndex = 0; actuatorIndex < actuatorsList.size(); actuatorIndex++) {
+                actuator = actuatorsList.get(actuatorIndex);
+                if (actuator.isEnabled() && nbOfActivatedActuator < nbOfActuator) {
+                    sourceTrajectory = sourceTrajectoriesList.get(nbOfActivatedActuator);
+                    destTrajectory = destTrajectoriesList.get(actuatorIndex);
+                    destTrajectory.setBeginPosition(sourceTrajectory.getBeginPosition());
+                    destTrajectory.setEndPosition(sourceTrajectory.getEndPosition());
+                    destTrajectory.setRelative(relative);
+                    nbOfActivatedActuator++;
+                }
             }
         }
     }
-    
+
     public static void setTrajectory1D(final IConfig<?> conf, final IRangeIntegrated sourceRange, boolean relative)
             throws PasserelleException {
-        setTrajectory(conf, sourceRange,relative,0);
+        setTrajectory(conf, sourceRange, relative, 0, false);
+    }
+
+    public static void setTimeScanTrajectory(final IConfig<?> conf, final IRangeIntegrated sourceRange)
+            throws PasserelleException {
+        setTrajectory(conf, sourceRange, false, 0, true);
     }
 
     private static int getNbEnableDevice(List<? extends IDevice> deviceList) {
@@ -127,12 +151,12 @@ public final class ScanUtil {
         return nb;
     }
 
-    /*
-     * public static void setTrajectory2D(final Config2DImpl conf, final
-     * List<ScanRangeX> scanRangeXList, final List<ScanRangeY> scanRangeYList) {
-     *
-     * }
-     */
+    public static void setTrajectory2D(final IConfig<?> conf, final IRangeIntegrated xRange,IRangeIntegrated yRange, boolean relative)throws PasserelleException {
+        setTrajectory(conf, xRange, relative, 0, false);
+        setTrajectory(conf, yRange, relative, 1, false);
+    }
+
+    @Deprecated
     public static void setTrajectory2D(final Config2DImpl conf, final ScanRangeX scanRangeX, final ScanRangeY scanRangeY)
             throws PasserelleException {
         setTrajectory2D(conf, scanRangeX);
