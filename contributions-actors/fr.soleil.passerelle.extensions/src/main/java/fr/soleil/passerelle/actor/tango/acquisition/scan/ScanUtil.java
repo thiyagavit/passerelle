@@ -41,6 +41,60 @@ public final class ScanUtil {
     }
 
     /**
+     * 
+     * @param conf, the configuration
+     * @param dimensionIndex, the index of the dimension, 0 for X dimension, 1 for Y dimension
+     * @param nbActuators, the number of actuator
+     * @param timeScan, check the actuators consistency if it is not a time scan
+     * @return
+     */
+    public static String isValidConfiguration(IConfig<?> conf, int dimensionIndex, int nbActuators, boolean timeScan) {
+        if (conf == null) {
+            return "Configuration is null.";
+        }
+
+        List<IDimension> dimensionList = conf.getDimensionList();
+        if (dimensionList == null || dimensionList.isEmpty() || dimensionIndex >= dimensionList.size()) {
+            return "No dimension " + dimensionIndex + " found.";
+        }
+
+        IDimension dim = dimensionList.get(dimensionIndex);
+        List<IActuator> actuatorsList = dim.getActuatorsList();
+        int nbEnable = getNbEnableDevice(actuatorsList);
+
+        if (nbEnable == 0 && !timeScan) {
+            return "No activated actuator is defined.";
+        }
+
+        if (nbEnable > 0 && timeScan) {
+            return "This is not a time scan there is some activated actuator.";
+        }
+
+        if (dim == null || dim.getRangeList() == null || dim.getRangeList().isEmpty()) {
+            return "Range List must not be empty.";
+        }
+
+        List<? extends IRange> rangeList = dim.getRangeList();
+        if (rangeList.size() > 1) {
+            return "There must be only one range.";
+        }
+
+        final IRange destRange = rangeList.get(0);
+        List<ITrajectory> trajectoriesList = destRange.getTrajectoriesList();
+
+        if (!timeScan && (nbActuators < 1 || trajectoriesList == null || trajectoriesList.isEmpty())) {
+            return "Actuators (trajectory) must not be empty.";
+        }
+
+        if (!timeScan && (nbEnable < nbActuators)) {
+            return "Nb of actuators must be <= to the activated actuator list size";
+        }
+
+        // If arrive here the configuration is valid return null
+        return null;
+    }
+
+    /**
      * Set the trajectory on a SALSA configuration
      * 
      * @param conf, the configuration
@@ -52,57 +106,36 @@ public final class ScanUtil {
      */
     private static void setTrajectory(final IConfig<?> conf, final IRangeIntegrated sourceRange, boolean relative,
             int dimensionIndex, boolean timeScan) throws PasserelleException {
+        
+        //Should not happen
+        if(sourceRange == null){
+            throw new PasserelleException(ErrorCode.ERROR, "the range is null", null);
+        }
+                
+        List<ITrajectory> sourceTrajectoriesList = sourceRange.getTrajectoriesList();   
+        //Should not happen
+        if(sourceTrajectoriesList == null){
+            throw new PasserelleException(ErrorCode.ERROR, "the trajectory list is null", null);
+        }
+        
+        //Test the validity of the configuration
+        String errorMessage = isValidConfiguration(conf, dimensionIndex, sourceTrajectoriesList.size(), timeScan);
         if (conf == null) {
             throw new PasserelleException(ErrorCode.ERROR, "Configuration is not defined.", null);
         }
-
-        List<IDimension> dimensionList = conf.getDimensionList();
-        if (dimensionList == null || dimensionList.isEmpty() || dimensionIndex >= dimensionList.size()) {
-            throw new PasserelleException(ErrorCode.ERROR, "No dimension found.", null);
+        //Should not happen
+        if(errorMessage != null){
+            throw new PasserelleException(ErrorCode.ERROR, errorMessage, null);
         }
 
+        //After that all the following instruction must be OK
+        List<IDimension> dimensionList = conf.getDimensionList();
         IDimension dim = dimensionList.get(dimensionIndex);
         List<IActuator> actuatorsList = dim.getActuatorsList();
-        int nbEnable = getNbEnableDevice(actuatorsList);
-
-        if (nbEnable == 0 && !timeScan) {
-            throw new PasserelleException(ErrorCode.ERROR, "No activated actuator is defined.", null);
-        }
-
-        if (nbEnable > 0 && timeScan) {
-            throw new PasserelleException(ErrorCode.ERROR, "This is not a time scan there is some activated actuator.",
-                    null);
-        }
-
-        if (dim == null || dim.getRangeList() == null || dim.getRangeList().isEmpty()) {
-            throw new PasserelleException(ErrorCode.ERROR, "Range List must not be empty.", null);
-        }
-
         List<? extends IRange> rangeList = dim.getRangeList();
-        if (rangeList.size() > 1) {
-            throw new PasserelleException(ErrorCode.ERROR, "There must be only one range", null);
-        }
 
         final IRange destRange = rangeList.get(0);
-        List<ITrajectory> sourceTrajectoriesList = sourceRange.getTrajectoriesList();
         List<ITrajectory> destTrajectoriesList = destRange.getTrajectoriesList();
-
-        if (!timeScan
-                && (sourceTrajectoriesList == null || sourceTrajectoriesList.isEmpty() || destTrajectoriesList == null || destTrajectoriesList
-                        .isEmpty())) {
-            throw new PasserelleException(ErrorCode.ERROR, "Actuators (trajectory) must not be empty.", null);
-        }
-
-        if (!timeScan && (nbEnable > sourceTrajectoriesList.size())) {
-            throw new PasserelleException(ErrorCode.ERROR,
-                    "Trajectory list size must be equals to activated actuator list size", null);
-        }
-
-        if (!timeScan && (destTrajectoriesList.size() < sourceTrajectoriesList.size())) {
-            throw new PasserelleException(ErrorCode.ERROR,
-                    "Trajectory list size must be at least smaller than the trajectory list of the configuration", null);
-        }
-
         // Range Update
         if (destRange instanceof IRangeIntegrated) {
             ((IRangeIntegrated) destRange).setIntegrationTime(sourceRange.getIntegrationTime());
@@ -151,7 +184,8 @@ public final class ScanUtil {
         return nb;
     }
 
-    public static void setTrajectory2D(final IConfig<?> conf, final IRangeIntegrated xRange,IRangeIntegrated yRange, boolean relative)throws PasserelleException {
+    public static void setTrajectory2D(final IConfig<?> conf, final IRangeIntegrated xRange, IRangeIntegrated yRange,
+            boolean relative) throws PasserelleException {
         setTrajectory(conf, xRange, relative, 0, false);
         setTrajectory(conf, yRange, relative, 1, false);
     }

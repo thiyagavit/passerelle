@@ -22,6 +22,7 @@ import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -29,10 +30,12 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
 import fr.soleil.passerelle.util.PasserelleUtil;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.ITrajectory;
 import fr.soleil.salsa.entity.impl.scan1d.Range1DImpl;
 import fr.soleil.salsa.entity.impl.scan1d.Trajectory1DImpl;
 import fr.soleil.salsa.entity.scan1d.IRange1D;
+import fr.soleil.salsa.entity.scan2D.IConfig2D;
 import fr.soleil.salsa.entity.scank.IConfigK;
 
 /**
@@ -70,7 +73,7 @@ public class PreConfiguredScan extends Scan {
         // Parameter number of actuators by default 1
         nbActuatorParam = new Parameter(this, "Nb actuators", new IntToken(1));
         nbActuatorParam.setTypeEquals(BaseType.INT);
-
+  
         // First From input port always existing
         input.setName(FROM);
         input.setExpectedMessageContentType(Double.class);
@@ -93,10 +96,21 @@ public class PreConfiguredScan extends Scan {
     public void validateInitialization() throws ValidationException {
         super.validateInitialization();
         // This actor is not valid for a K configuration because of the non linear trajectory
-        // All the other kind of configuration have an X linear dimension
         if (conf == null || conf instanceof IConfigK) {
             String errorMessage = "Error: " + conf.getFullPath() + " is not a linear trajectory";
             ExecutionTracerService.trace(this, errorMessage);
+            throw new ValidationException(ErrorCode.ERROR, errorMessage, this, null);
+        }
+        //This actor is only used for 1D configuration 
+        if(conf instanceof IConfig2D){
+            String errorMessage = "Error: " + conf.getFullPath() + " is a 2D configuration";
+            ExecutionTracerService.trace(this, errorMessage);
+            throw new ValidationException(ErrorCode.ERROR, errorMessage, this, null);
+        }
+        
+        //Test the validity of the configuration with all the parameter
+        String errorMessage = ScanUtil.isValidConfiguration(conf, 0,nbActuator, false);
+        if(errorMessage != null){
             throw new ValidationException(ErrorCode.ERROR, errorMessage, this, null);
         }
     }
@@ -167,7 +181,7 @@ public class PreConfiguredScan extends Scan {
             try {
                 ScanUtil.setTrajectory1D(conf, range, xRelative);
             } catch (PasserelleException e) {
-                throw new ProcessingException(ErrorCode.ERROR, e.getMessage(), this, e);
+                throw new ProcessingExceptionWithLog(this,Severity.FATAL, e.getMessage(), this, e);
             }
             ExecutionTracerService.trace(this, logMessage.toString());
         } else {
@@ -205,8 +219,8 @@ public class PreConfiguredScan extends Scan {
 
                 // The minimum value must be one
                 if (newNbActuator < 1) {
-                    newNbActuator = 1;
-                    nbActuatorParam.setToken(new IntToken(1));
+                    nbActuator = newNbActuator;
+                    throw new IllegalActionException("nb actuators must be > 0");
                 }
 
                 // If the value change
