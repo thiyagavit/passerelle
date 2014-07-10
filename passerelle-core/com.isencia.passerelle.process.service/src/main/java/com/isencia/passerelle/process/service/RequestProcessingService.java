@@ -37,6 +37,7 @@ public interface RequestProcessingService<R extends Request> {
    * <p>
    * Service implementations are by preference non-blocking, and should just return a {@link Future}
    * to the finished Request.
+   * In case of errors they should also set the relevant exception on the returned Future.
    * <br/>
    * Blocking service implementations are of course possible, and could use e.g. {@link FutureValue}
    * to return a pre-filled Future.
@@ -48,4 +49,11 @@ public interface RequestProcessingService<R extends Request> {
    * @return a Future to the request after processing is finished or null if this service is unable to process the given request
    */
   Future<R> process(R request, Long timeout, TimeUnit unit);
+
+  /**
+   * 
+   * @param request
+   * @return true if the given request can be processed by this service
+   */
+  boolean canProcess(R request);
 }

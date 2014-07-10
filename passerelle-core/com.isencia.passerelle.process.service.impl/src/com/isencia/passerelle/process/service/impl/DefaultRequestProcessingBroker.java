@@ -52,9 +52,11 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
 
     Future<Task> futResult = null;
     for (RequestProcessingService<Task> service : services) {
-      futResult = service.process(request, timeout, unit);
-      if (futResult != null) {
-        break;
+      if (service.canProcess(request)) {
+        futResult = service.process(request, timeout, unit);
+        if (futResult != null) {
+          break;
+        }
       }
     }
     if (futResult != null) {
