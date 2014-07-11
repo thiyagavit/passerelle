@@ -17,12 +17,9 @@ package com.isencia.passerelle.testsupport;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import junit.framework.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.model.Flow;
@@ -50,8 +47,8 @@ import com.isencia.passerelle.model.Flow;
  * @author erwin
  */
 public class FlowStatisticsAssertion {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FlowStatisticsAssertion.class);
-	
+  private static final Logger LOGGER = LoggerFactory.getLogger(FlowStatisticsAssertion.class);
+
   /**
    * Maintains the expected counts of received messages for input ports. Ports are specified by their name. Please check the class doc for info about naming
    * options.
@@ -91,7 +88,7 @@ public class FlowStatisticsAssertion {
     this.portMsgSentCounts = portMsgSentCounts;
     this.actorIterationCounts = actorIterationCounts;
   }
-  
+
   /**
    * Clear all test result expectations.
    * <p>
@@ -114,7 +111,8 @@ public class FlowStatisticsAssertion {
    * If all expectations are ok, further tests can be chained through the returned reference to this <code>FlowStatisticsAssertion</code> instance.
    * </p>
    * 
-   * @param flow the flow that has been executed and for which test result expectations must be asserted.
+   * @param flow
+   *          the flow that has been executed and for which test result expectations must be asserted.
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
   public FlowStatisticsAssertion assertFlow(Flow flow) {
@@ -210,8 +208,9 @@ public class FlowStatisticsAssertion {
    * </p>
    * 
    * @param actor
-   * @param portName should be a simple name of the port of the given actor. I.e. not a full hierarchic name in the sense as described in the class doc, but
-   *          e.g. plainly <code>"input"</code>.
+   * @param portName
+   *          should be a simple name of the port of the given actor. I.e. not a full hierarchic name in the sense as described in the class doc, but e.g.
+   *          plainly <code>"input"</code>.
    * @param expectedCount
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
@@ -238,8 +237,9 @@ public class FlowStatisticsAssertion {
    * </p>
    * 
    * @param actor
-   * @param portName should be a simple name of the port of the given actor. I.e. not a full hierarchic name in the sense as described in the class doc, but
-   *          e.g. plainly <code>"output"</code>.
+   * @param portName
+   *          should be a simple name of the port of the given actor. I.e. not a full hierarchic name in the sense as described in the class doc, but e.g.
+   *          plainly <code>"output"</code>.
    * @param expectedCount
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
@@ -264,7 +264,8 @@ public class FlowStatisticsAssertion {
    * When one of the arguments is null, a <code>NullPointerException</code> will be thrown.
    * </p>
    * 
-   * @param portName check the class doc for port naming options
+   * @param portName
+   *          check the class doc for port naming options
    * @param expectedCount
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
@@ -283,7 +284,8 @@ public class FlowStatisticsAssertion {
    * When one of the arguments is null, a <code>NullPointerException</code> will be thrown.
    * </p>
    * 
-   * @param portName check the class doc for port naming options
+   * @param portName
+   *          check the class doc for port naming options
    * @param expectedCount
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
@@ -314,14 +316,15 @@ public class FlowStatisticsAssertion {
       return expectActorIterationCount(actorName, expectedCount);
     }
   }
-  
+
   /**
    * Add an expected count for fire/process iterations for the actor with given name.
    * <p>
    * When one of the arguments is null, a <code>NullPointerException</code> will be thrown.
    * </p>
    * 
-   * @param actorName check the class doc for actor naming options
+   * @param actorName
+   *          check the class doc for actor naming options
    * @param expectedCount
    * @return this FlowStatisticsAssertion instance to allow fluent method chaining
    */
@@ -333,8 +336,7 @@ public class FlowStatisticsAssertion {
       return this;
     }
   }
-  
-  
+
   /**
    * Assert all specified expectations for message receipts on input ports, applied on the given flow instance.
    * 
@@ -400,7 +402,14 @@ public class FlowStatisticsAssertion {
         }
         Actor a = (Actor) flow.getEntity(actorName);
         Assert.assertNotNull("No actor " + actorName + " found in flow " + flow.getName(), a);
-        Assert.assertEquals("Wrong iteration count for actor " + actorName, expCount, a.getStatistics().getNrCycles());
+        if (expCount != 0) {
+          Assert.assertEquals("Wrong iteration count for actor " + actorName, expCount, a.getStatistics().getNrCycles());
+        } else {
+          // in some test cases, actors may not even have been initialized if we look for 0 iterations
+          if(a.getStatistics()!=null) {
+            Assert.assertEquals("Wrong iteration count for actor " + actorName, expCount, a.getStatistics().getNrCycles());
+          }
+        }
       }
     }
   }
