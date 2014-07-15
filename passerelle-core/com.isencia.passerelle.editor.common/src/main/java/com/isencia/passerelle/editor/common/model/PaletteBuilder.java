@@ -27,6 +27,7 @@ import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
+import com.isencia.passerelle.project.repository.api.RepositoryServiceTracker;
 
 public class PaletteBuilder implements Serializable {
   private static final long serialVersionUID = 5998773152255762310L;
@@ -277,8 +278,7 @@ public class PaletteBuilder implements Serializable {
     }
 
     try {
-      RepositoryService repositoryService = Activator.getDefault().getRepositoryService();
-      for (MetaData metaData : repositoryService.getAllSubmodelMetaData()) {
+      for (MetaData metaData : RepositoryServiceTracker.getService().getAllSubmodelMetaData()) {
 
         PaletteGroup group = getPaletteGroup(actorGroups, groups, metaData.getPath(), submodels);
         SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData.getCode());

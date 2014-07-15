@@ -15,7 +15,6 @@ import com.isencia.passerelle.validation.version.VersionSpecification;
 
 public class Activator implements BundleActivator {
   private ActorOrientedClassProviderTracker actorClassProviderTracker;
-  private ServiceTracker repoSvcTracker;
 
   private static Activator plugin;
 
@@ -31,10 +30,6 @@ public class Activator implements BundleActivator {
     plugin = this;
     actorClassProviderTracker = new ActorOrientedClassProviderTracker(context);
     actorClassProviderTracker.open();
-
-    repoSvcTracker = new ServiceTracker(context, RepositoryService.class.getName(), null);
-    repoSvcTracker.open();
-
   }
 
   public void stop(BundleContext context) throws Exception {
@@ -66,11 +61,4 @@ public class Activator implements BundleActivator {
     }
   }
 
-  public RepositoryService getRepositoryService() {
-    try {
-      return (RepositoryService) (repoSvcTracker != null ? repoSvcTracker.waitForService(3000) : null);
-    } catch (InterruptedException e) {
-      return null;
-    }
-  }
 }
