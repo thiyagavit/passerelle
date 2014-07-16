@@ -73,7 +73,7 @@ public class ContextImpl implements Context {
   @Enumerated(value = EnumType.STRING)
   private Status status;
 
-  @OneToOne(targetEntity = RequestImpl.class)
+  @OneToOne(targetEntity = RequestImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "REQUEST_ID", unique = true, nullable = false)
   private RequestImpl request;
 
@@ -118,11 +118,11 @@ public class ContextImpl implements Context {
 
   @Transient
   private List<Long> minimizedTasks = new ArrayList<Long>();
-  
+
   @Transient
   private String processId;
-  
-  //avoid concurrent modif ex when getForkedContexts is called while forking or joining
+
+  // avoid concurrent modif ex when getForkedContexts is called while forking or joining
   @Transient
   private List<Context> forkedContexts = new CopyOnWriteArrayList<Context>();
 
@@ -150,19 +150,20 @@ public class ContextImpl implements Context {
   public Long getId() {
     return id;
   }
-  
-  // TODO triple-check if this is really needed and then remove it from this "real" entity impl and use another impl if Id must be mutable
+
+  // TODO triple-check if this is really needed and then remove it from this "real" entity impl and use another impl if
+  // Id must be mutable
   public void setId(Long id) {
     this.id = id;
   }
-  
+
   public String getProcessId() {
-	 if (processId == null && request instanceof Task) {
-		 return(((Task)request).getParentContext().getProcessId());
-	 }
+    if (processId == null && request instanceof Task) {
+      return (((Task) request).getParentContext().getProcessId());
+    }
     return processId;
   }
-  
+
   public void setProcessId(String repositoryId) {
     this.processId = repositoryId;
   }
@@ -193,21 +194,21 @@ public class ContextImpl implements Context {
   }
 
   public void addTask(Task task) {
-	  if (!ProcessUtils.isInitialized(tasks))
-		  tasks = new ArrayList<Task>();
+    if (!ProcessUtils.isInitialized(tasks))
+      tasks = new ArrayList<Task>();
     this.tasks.add(task);
   }
 
   public List<Task> getTasks() {
-	if (!ProcessUtils.isInitialized(tasks)) {
-		return tasks;
-	}
+    if (!ProcessUtils.isInitialized(tasks)) {
+      return tasks;
+    }
     return Collections.unmodifiableList(tasks);
   }
 
   void addEvent(ContextEvent event) {
-	  if (!ProcessUtils.isInitialized(events))
-		  events = new ArrayList<ContextEvent>();
+    if (!ProcessUtils.isInitialized(events))
+      events = new ArrayList<ContextEvent>();
     events.add(event);
     if (event instanceof ContextErrorEvent) {
       _getErrors().add(((ContextErrorEvent) event).getErrorItem());
@@ -215,9 +216,9 @@ public class ContextImpl implements Context {
   }
 
   public List<ContextEvent> getEvents() {
-	if (!ProcessUtils.isInitialized(events)) {
-		return events;
-	}
+    if (!ProcessUtils.isInitialized(events)) {
+      return events;
+    }
     return Collections.unmodifiableList(events);
   }
 
@@ -256,14 +257,15 @@ public class ContextImpl implements Context {
       List<Task> tasks = getTasks();
       for (int taskIdx = tasks.size() - 1; taskIdx >= 0 && result == null; taskIdx--) {
         Task task = tasks.get(taskIdx);
-
-        Collection<ResultBlock> blocks = task.getResultBlocks();
-        for (ResultBlock block : blocks) {
-          if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
-            ResultItem<?> item = block.getItemForName(name);
-            if (item != null) {
-              result = item.getValueAsString();
-              break;
+        if (task.getProcessingContext().getStatus().isFinalStatus() && !Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+          Collection<ResultBlock> blocks = task.getResultBlocks();
+          for (ResultBlock block : blocks) {
+            if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+              ResultItem<?> item = block.getItemForName(name);
+              if (item != null) {
+                result = item.getValueAsString();
+                break;
+              }
             }
           }
         }
@@ -343,7 +345,8 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result entry that will be added.
+   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result
+   * entry that will be added.
    */
   protected void pushCurrentTaskCursorIndex() {
     taskCursorStack.push(tasks.size());
@@ -364,48 +367,49 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event entry that will be added.
+   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event
+   * entry that will be added.
    */
   protected void pushCurrentEventCursorIndex() {
     eventCursorStack.push(events.size());
   }
 
   public void join(Context... contexts) {
-	for (Context context : contexts) {
-	    ContextImpl contextToMerge = (ContextImpl)context;
-	    try {
-	      lock.lock();
+    for (Context context : contexts) {
+      ContextImpl contextToMerge = (ContextImpl) context;
+      try {
+        lock.lock();
 
-	      // add new tasks obtained from the related branch
-	      int taskCursorIndex = contextToMerge.popTaskCursorIndex();
-	      List<Task> tasks = contextToMerge.getTasks();
-	      if (tasks.size() > taskCursorIndex) {
-	        for (int r = taskCursorIndex; r < tasks.size(); ++r) {
-	          addTask(tasks.get(r));
-	        }
-	      }
-	      // add new events obtained from the related branch
-	      int eventCursorIndex = contextToMerge.popEventCursorIndex();
-	      List<ContextEvent> events = contextToMerge.getEvents();
-	      if (events.size() > eventCursorIndex) {
-	        for (int r = eventCursorIndex; r < events.size(); ++r) {
-	          getEvents().add(events.get(r));
-	        }
-	      }
+        // add new tasks obtained from the related branch
+        int taskCursorIndex = contextToMerge.popTaskCursorIndex();
+        List<Task> tasks = contextToMerge.getTasks();
+        if (tasks.size() > taskCursorIndex) {
+          for (int r = taskCursorIndex; r < tasks.size(); ++r) {
+            addTask(tasks.get(r));
+          }
+        }
+        // add new events obtained from the related branch
+        int eventCursorIndex = contextToMerge.popEventCursorIndex();
+        List<ContextEvent> events = contextToMerge.getEvents();
+        if (events.size() > eventCursorIndex) {
+          for (int r = eventCursorIndex; r < events.size(); ++r) {
+            getEvents().add(events.get(r));
+          }
+        }
 
-	      // merge context entries
-	      entries.putAll(contextToMerge.entries);
-	      
-	      // Status.RESTARTED should be overwritten in case other status is found
-	      if(Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(context.getStatus())){
-	        this.setStatus(context.getStatus());
-	      }
+        // merge context entries
+        entries.putAll(contextToMerge.entries);
 
-	    } finally {
-	      lock.unlock();
-	      forkedContexts.clear();
-	    }
-	}  	  
+        // Status.RESTARTED should be overwritten in case other status is found
+        if (Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(context.getStatus())) {
+          this.setStatus(context.getStatus());
+        }
+
+      } finally {
+        lock.unlock();
+        forkedContexts.clear();
+      }
+    }
   }
 
   public Context fork() {
@@ -417,10 +421,10 @@ public class ContextImpl implements Context {
       copy.request = request;
       // use addTask() to add tasks to copy, because it has to initialize the collection
       for (Task task : tasks)
-    	  copy.addTask(task);
+        copy.addTask(task);
       // use addEvent() to add events to copy, because it has to initialize the collection
-      for (ContextEvent event :events)
-    	  copy.addEvent(event);
+      for (ContextEvent event : events)
+        copy.addEvent(event);
       copy.entries.putAll(entries);
       copy.transientBranch = true;
       // Mark the current results size, so we're able to identify
@@ -437,7 +441,7 @@ public class ContextImpl implements Context {
   public boolean isForkedContext() {
     return transientBranch;
   }
-  
+
   public List<Context> getForkedChildContexts() {
     return Collections.unmodifiableList(forkedContexts);
   }
