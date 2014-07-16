@@ -13,6 +13,7 @@ import ptolemy.kernel.util.IllegalActionException;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 
 public class ProcessModelUtils {
@@ -60,19 +61,21 @@ public class ProcessModelUtils {
         int endI = Math.max(tasks.size() - maxDepth, 0);
         for (int taskIdx = startI; taskIdx >= endI && itemValue == null; taskIdx--) {
           Task task = tasks.get(taskIdx);
-          Collection<ResultBlock> blocks = task.getResultBlocks();
-          for (ResultBlock block : blocks) {
-            if (dataType == null || dataType.isEmpty() || block.getType().equalsIgnoreCase(dataType)) {
-              ResultItem<?> item = block.getItemForName(itemName);
-              if (item != null) {
-                itemValue = item.getValueAsString();
-                break;
+          if (task.getProcessingContext().getStatus().isFinalStatus() && !Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+            Collection<ResultBlock> blocks = task.getResultBlocks();
+            for (ResultBlock block : blocks) {
+              if (dataType == null || dataType.isEmpty() || block.getType().equalsIgnoreCase(dataType)) {
+                ResultItem<?> item = block.getItemForName(itemName);
+                if (item != null) {
+                  itemValue = item.getValueAsString();
+                  break;
+                }
               }
             }
           }
         }
       } else if (dataType != null && !dataType.isEmpty()) {
-        itemValue = context.lookupValue(dataType,itemName);
+        itemValue = context.lookupValue(dataType, itemName);
       } else {
         itemValue = context.lookupValue(itemName);
       }
