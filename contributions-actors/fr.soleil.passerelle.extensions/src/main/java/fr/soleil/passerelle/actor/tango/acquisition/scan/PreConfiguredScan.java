@@ -120,19 +120,19 @@ public class PreConfiguredScan extends Scan {
             throws ProcessingException {
 
         StringBuilder logMessage = new StringBuilder();
-        String log = xRelative ? "Relative scan" : "Absolute scan";
+        String log = xRelative ? "Relative scan " : "Absolute scan ";
         logger.debug(log);
         logMessage.append("\n" + log);
 
         final ManagedMessage nbStepsmessage = request.getMessage(stepsPort);
         final int nbSteps = (int) ((Double) PasserelleUtil.getInputValue(nbStepsmessage)).doubleValue();
-        log = STEP + "=" + nbSteps;
+        log = STEP + "=" + nbSteps + " ";
         logger.debug(log);
         logMessage.append(log);
 
         final ManagedMessage intTimemessage = request.getMessage(integrationPort);
         final double intTime = (Double) PasserelleUtil.getInputValue(intTimemessage);
-        log = INTEGRATION + "=" + intTime + " s";
+        log = INTEGRATION + "=" + intTime + " s ";
         logger.debug(log);
         logMessage.append("\n" + log);
 
@@ -199,7 +199,7 @@ public class PreConfiguredScan extends Scan {
                 Port port = (Port) portObject;
                 ManagedMessage message = request.getMessage(port);
                 value = (Double) PasserelleUtil.getInputValue(message);
-                String log = portName + "=" + value;
+                String log = portName + "=" + value + " ";
                 logger.trace(log);
                 logMessage.append("\n" + log);
             }
