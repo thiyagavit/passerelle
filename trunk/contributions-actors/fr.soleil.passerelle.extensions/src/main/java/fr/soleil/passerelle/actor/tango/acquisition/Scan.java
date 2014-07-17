@@ -36,7 +36,6 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
 
 import com.isencia.passerelle.actor.ProcessingException;
@@ -59,7 +58,6 @@ import fr.soleil.passerelle.tango.util.ScanTask;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IConfig;
-import fr.soleil.salsa.entity.impl.ConfigImpl;
 import fr.soleil.salsa.exception.SalsaDeviceException;
 import fr.soleil.salsa.exception.ScanNotFoundException;
 
