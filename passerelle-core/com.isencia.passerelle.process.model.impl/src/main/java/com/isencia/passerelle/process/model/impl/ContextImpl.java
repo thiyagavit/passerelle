@@ -148,8 +148,9 @@ public class ContextImpl implements Context {
   public Long getId() {
     return id;
   }
-  
-  // TODO triple-check if this is really needed and then remove it from this "real" entity impl and use another impl if Id must be mutable
+
+  // TODO triple-check if this is really needed and then remove it from this "real" entity impl and use another impl if
+  // Id must be mutable
   public void setId(Long id) {
     this.id = id;
   }
@@ -263,19 +264,19 @@ public class ContextImpl implements Context {
       List<Task> tasks = getTasks();
       for (int taskIdx = tasks.size() - 1; taskIdx >= 0 && result == null; taskIdx--) {
         Task task = tasks.get(taskIdx);
-
-        Collection<ResultBlock> blocks = task.getResultBlocks();
-        for (ResultBlock block : blocks) {
-          if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
-            ResultItem<?> item = block.getItemForName(name);
-            if (item != null) {
-              result = item.getValueAsString();
-              break;
+        if (!Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+          Collection<ResultBlock> blocks = task.getResultBlocks();
+          for (ResultBlock block : blocks) {
+            if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+              ResultItem<?> item = block.getItemForName(name);
+              if (item != null) {
+                result = item.getValueAsString();
+                break;
+              }
             }
           }
         }
       }
-
       // if still nothing found, check in the original request
       if (result == null && getRequest() != null) {
         NamedValue<?> reqAttribute = getRequest().getAttribute(name);
@@ -351,7 +352,8 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result entry that will be added.
+   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result
+   * entry that will be added.
    */
   protected void pushCurrentTaskCursorIndex() {
     taskCursorStack.push(tasks.size());
@@ -372,7 +374,8 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event entry that will be added.
+   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event
+   * entry that will be added.
    */
   protected void pushCurrentEventCursorIndex() {
     eventCursorStack.push(events.size());
@@ -402,7 +405,7 @@ public class ContextImpl implements Context {
 
       // merge context entries
       entries.putAll(contextToMerge.entries);
-      
+
       // Status.RESTARTED should be overwritten in case other status is found
       if (Status.RESTARTED.equals(this.getStatus()) && !Status.RESTARTED.equals(other.getStatus())) {
         this.setStatus(other.getStatus());
