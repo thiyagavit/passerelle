@@ -55,158 +55,158 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 @SuppressWarnings("serial")
 public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
 
-    public static final String MOTOR_NAME_LABEL = "Motor name";
-    public static final String SIMULATED_MOTOR_LABEL = "Simulated Motor";
-    public static final String OFFSET_PORT_NAME = "offset";
-    public static final String SIMULATED_MOTOR_CLASS = "SimulatedMotor";
-    public static final String REAL_MOTOR_CLASS = "GalilAxis";
-    protected static List<String> attributeList = new ArrayList<String>();
+  public static final String MOTOR_NAME_LABEL = "Motor name";
+  public static final String SIMULATED_MOTOR_LABEL = "Simulated Motor";
+  public static final String OFFSET_PORT_NAME = "offset";
+  public static final String SIMULATED_MOTOR_CLASS = "SimulatedMotor";
+  public static final String REAL_MOTOR_CLASS = "GalilAxis";
+  public static final String DEFAULT_ACTORNAME = "MoveMotorV5.";
+  protected static List<String> attributeList = new ArrayList<String>();
 
-    @ParameterName(name = SIMULATED_MOTOR_LABEL)
-    public Parameter simulatedMotorParam;
-    private boolean simulatedMotor;
+  @ParameterName(name = SIMULATED_MOTOR_LABEL)
+  public Parameter simulatedMotorParam;
+  private boolean simulatedMotor;
 
-    public Port offsetPort;
+  public Port offsetPort;
 
-    static {
-        attributeList.add("position");
+  static {
+    attributeList.add("position");
+  }
+
+  public GalilAxisV5(final CompositeEntity container, final String name)
+      throws NameDuplicationException, IllegalActionException {
+    super(container, name, attributeList);
+
+    final URL url = this.getClass().getResource("/image/MOT.png");
+    _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
+        + "height=\"40\" style=\"fill:cyan;stroke:black\"/>\n"
+        + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
+        + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+        + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
+        + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+        + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
+        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+        + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
+        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+        + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
+        + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+        + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
+        + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+        + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
+        + "\"/>\n" + "</svg>\n");
+
+    offsetPort = PortFactory.getInstance().createInputPort(this, OFFSET_PORT_NAME, null);
+
+    mouvementTypeParam.setVisibility(Settable.EXPERT);
+    mouvementTypeParam.addChoice("position");
+    mouvementTypeParam.setExpression("position");
+
+    simulatedMotorParam = new ExpertParameter(this, SIMULATED_MOTOR_LABEL);
+    simulatedMotorParam.setToken(new BooleanToken(false));
+    simulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
+
+    deviceNameParam.setDisplayName(MOTOR_NAME_LABEL);
+  }
+
+  @Override
+  public void attributeChanged(Attribute attribute) throws IllegalActionException {
+    if (attribute == simulatedMotorParam) {
+      simulatedMotor = PasserelleUtil.getParameterBooleanValue(simulatedMotorParam);
+    } else {
+      super.attributeChanged(attribute);
     }
+  }
 
-    public GalilAxisV5(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
-        super(container, name, attributeList);
+  @Override
+  protected void validateInitialization() throws ValidationException {
+    super.validateInitialization();
 
-        final URL url = this.getClass().getResource("/image/MOT.png");
-        _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
-                + "height=\"40\" style=\"fill:cyan;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
-
-        offsetPort = PortFactory.getInstance().createInputPort(this, OFFSET_PORT_NAME, null);
-
-        mouvementTypeParam.setVisibility(Settable.EXPERT);
-        mouvementTypeParam.addChoice("position");
-        mouvementTypeParam.setExpression("position");
-
-        simulatedMotorParam = new ExpertParameter(this, SIMULATED_MOTOR_LABEL);
-        simulatedMotorParam.setToken(new BooleanToken(false));
-        simulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
-
-        deviceNameParam.setDisplayName(MOTOR_NAME_LABEL);
+    try {
+      String motorClass = simulatedMotor ? SIMULATED_MOTOR_CLASS : REAL_MOTOR_CLASS;
+      if (!getDeviceProxy().get_class().equals(motorClass))
+        throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, "The device: \""
+            + getDeviceName() + "\" is not a " + motorClass, this, null);
     }
-
-    @Override
-    public void attributeChanged(Attribute attribute) throws IllegalActionException {
-        if (attribute == simulatedMotorParam) {
-            simulatedMotor = PasserelleUtil.getParameterBooleanValue(simulatedMotorParam);
-        } else {
-            super.attributeChanged(attribute);
-        }
+    catch (DevFailed devFailed) {
+      throw new DevFailedValidationException(devFailed, this);
     }
+    catch (PasserelleException e) {
+      ExecutionTracerService.trace(this, e);
+      throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+    }
+  }
 
-    @Override
-    protected void validateInitialization() throws ValidationException {
-        super.validateInitialization();
+  @Override
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
+      throws ProcessingException {
 
+    // apply offset if
+
+    String offset = "";
+
+    ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
+
+    // if port is Connected
+    if (offsetManagedMsg != null) {
+      offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
+      // message is not empty
+      if (!offset.isEmpty()) {
+
+        // set the offset
         try {
-            String motorClass = simulatedMotor ? SIMULATED_MOTOR_CLASS : REAL_MOTOR_CLASS;
-            if (!getDeviceProxy().get_class().equals(motorClass)) {
-                throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, "The device: \""
-                        + getDeviceName() + "\" is not a " + motorClass, this, null);
-            }
+          getDeviceProxy().write_attribute(
+              new DeviceAttribute("offset", Double.parseDouble(offset)));
+
+          ExecutionTracerService.trace(this, "apply offset " + offset);
         }
-        catch (DevFailed devFailed) {
-            throw new DevFailedValidationException(devFailed, this);
+        catch (NumberFormatException e) {
+          throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+              "Error: offset is not a number", ctxt, null);
+        }
+        catch (DevFailed e) {
+          throw new DevFailedProcessingException(e, this);
         }
         catch (PasserelleException e) {
-            ExecutionTracerService.trace(this, e);
-            throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+          throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+              e.getMessage(), ctxt, e);
         }
+      }
     }
+    // call super class to execute movement
+    super.process(ctxt, request, response);
 
-    @Override
-    protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
-            throws ProcessingException {
+  }
 
-        // apply offset if
+  @Override
+  protected void doInitialize() throws InitializationException {
+    final Director dir = getDirector();
+    if (dir instanceof BasicDirector) {
+      ((BasicDirector) dir).registerFinalizer(this);
+    }
+    super.doInitialize();
+  }
 
-        String offset = "";
+  @Override
+  public IMoveAction createMoveAction() {
+    return new MoveNumericAttribute();
+  }
 
-        ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
-
-        // if port is Connected
-        if (offsetManagedMsg != null) {
-            offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
-            // message is not empty
-            if (!offset.isEmpty()) {
-
-                // set the offset
-                try {
-                    getDeviceProxy().write_attribute(
-                            new DeviceAttribute("offset", Double.parseDouble(offset)));
-
-                    ExecutionTracerService.trace(this, "apply offset " + offset);
-                }
-                catch (NumberFormatException e) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            "Error: offset is not a number", ctxt, null);
-                }
-                catch (DevFailed e) {
-                    throw new DevFailedProcessingException(e, this);
-                }
-                catch (PasserelleException e) {
-                    throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                            e.getMessage(), ctxt, e);
-                }
-            }
+  @Override
+  public void doFinalAction() {
+    if (!isMockMode()) {
+      try {
+        // bug 22954
+        if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
+          ExecutionTracerService.trace(this, "motor has been stop");
         }
-        // call super class to execute movement
-        super.process(ctxt, request, response);
-
+      }
+      catch (final DevFailed e) {
+        TangoToPasserelleUtil.getDevFailedString(e, this);
+      }
+      catch (final Exception e) {
+        // TODO change to log
+        e.printStackTrace();
+      }
     }
-
-    @Override
-    protected void doInitialize() throws InitializationException {
-        final Director dir = getDirector();
-        if (dir instanceof BasicDirector) {
-            ((BasicDirector) dir).registerFinalizer(this);
-        }
-        super.doInitialize();
-    }
-
-    @Override
-    public IMoveAction createMoveAction() {
-        return new MoveNumericAttribute();
-    }
-
-    @Override
-    public void doFinalAction() {
-        if (!isMockMode()) {
-            try {
-                // bug 22954
-                if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
-                    ExecutionTracerService.trace(this, "motor has been stop");
-                }
-            }
-            catch (final DevFailed e) {
-                TangoToPasserelleUtil.getDevFailedString(e, this);
-            }
-            catch (final Exception e) {
-                // TODO change to log
-                e.printStackTrace();
-            }
-        }
-    }
+  }
 }
