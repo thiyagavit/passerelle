@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A <code>Context</code> maintains all status information and executed work for a certain <code>Request</code>.
@@ -122,7 +123,23 @@ public interface Context extends Identifiable, Serializable {
    * @return the entry that was present for the given name (or null if none was there)
    */
   Serializable removeEntry(String name);
+  
+  /**
+   * 
+   * @param name
+   * @return the entry stored under the given name in this context and context of all linked tasks, or null if not present.
+   */
+  Serializable getDeepEntryValue(String name);
 
+  /**
+   * 
+   * @param name
+   * @return merged map of all entries stored in this context and context of all linked tasks.
+   * entries on the main context have priority on entries on tasks
+   * 
+   */
+  Map<String, Serializable> getDeepEntryValues();
+  
   /**
    * 
    * @param name
