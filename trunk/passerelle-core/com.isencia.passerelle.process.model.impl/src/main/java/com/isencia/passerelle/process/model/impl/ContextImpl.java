@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -228,6 +229,58 @@ public class ContextImpl implements Context {
 
   public Serializable removeEntry(String name) {
     return entries.remove(name);
+  }
+
+  public Map<String, Serializable> getDeepEntryValues() {
+    Map<String, Serializable> map = new HashMap<String, Serializable>();
+    // check in task results, most recent first
+    // we get a copy of the tasks list, so need to synchronize etc
+    List<Task> tasks = getTasks();
+    for (int taskIdx = 0; taskIdx < tasks.size(); taskIdx++) {
+      Task task = tasks.get(taskIdx);
+      if (task.getProcessingContext().getStatus().isFinalStatus() && !Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+        // this could override previous entries !
+        Iterator<String> entryNames = task.getProcessingContext().getEntryNames();
+        while (entryNames.hasNext()) {
+          String entryName = entryNames.next();
+          Serializable entryValue = task.getProcessingContext().getEntryValue(entryName);
+          if (entryValue != null) {
+            map.put(entryName, entryValue);
+          }
+        }
+      }
+    }
+    // this could override previous entries !
+    Iterator<String> entryNames = getEntryNames();
+    while (entryNames.hasNext()) {
+      String entryName = entryNames.next();
+      Serializable entryValue = getEntryValue(entryName);
+      if (entryValue != null) {
+        map.put(entryName, entryValue);
+      }
+    }
+    return map;
+
+  }
+
+  public Serializable getDeepEntryValue(String name) {
+    Serializable entryValue = getEntryValue(name);
+    if (entryValue != null) {
+      return entryValue;
+    }
+    // check in task results, most recent first
+    // we get a copy of the tasks list, so need to synchronize etc
+    List<Task> tasks = getTasks();
+    for (int taskIdx = tasks.size() - 1; taskIdx >= 0; taskIdx--) {
+      Task task = tasks.get(taskIdx);
+      if (task.getProcessingContext().getStatus().isFinalStatus() && !Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+        entryValue = task.getProcessingContext().getEntryValue(name);
+        if (entryValue != null) {
+          return entryValue;
+        }
+      }
+    }
+    return null;
   }
 
   public Serializable getEntryValue(String name) {
