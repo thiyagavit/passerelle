@@ -397,4 +397,16 @@ public class ContextImpl implements Context {
 
   }
 
+  @Override
+  public Serializable getDeepEntryValue(String name) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Map<String, Serializable> getDeepEntryValues() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }
