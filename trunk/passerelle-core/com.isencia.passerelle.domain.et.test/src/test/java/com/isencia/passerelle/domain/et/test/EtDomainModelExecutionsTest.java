@@ -16,28 +16,17 @@ package com.isencia.passerelle.domain.et.test;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import junit.framework.TestCase;
-import ptolemy.actor.Manager;
-import ptolemy.actor.Manager.State;
-import ptolemy.kernel.util.IllegalActionException;
-import ptolemy.kernel.util.NameDuplicationException;
-import com.isencia.passerelle.actor.control.Stop;
-import com.isencia.passerelle.actor.convert.HeaderModifier;
-import com.isencia.passerelle.actor.error.ErrorObserver;
-import com.isencia.passerelle.actor.filter.HeaderFilter;
-import com.isencia.passerelle.actor.general.DevNullActor;
+
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.model.FlowNotExecutingException;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
-import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.testsupport.actor.Const;
-import com.isencia.passerelle.testsupport.actor.Delay;
-import com.isencia.passerelle.testsupport.actor.ExceptionGenerator;
+import com.isencia.passerelle.testsupport.actor.Forwarder;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
-import com.isencia.passerelle.testsupport.actor.TextSource;
 
 /**
  * Some unit tests for Passerelle's ET domain
@@ -52,28 +41,28 @@ public class EtDomainModelExecutionsTest extends TestCase {
     flowMgr = new FlowManager();
   }
 
-//  public void testHelloPasserelle() throws Exception {
-//    flow = new Flow("testHelloPasserelle", null);
-//    ETDirector director = new ETDirector(flow, "director");
-//    flow.setDirector(director);
-//
-//    Const constant = new Const(flow, "Constant");
-//    Actor helloHello = new Forwarder(flow, "HelloHello");
-//    Actor tracerConsole = new MessageHistoryStack(flow, "TracerConsole");
-//
-//    flow.connect(constant, helloHello);
-//    flow.connect(helloHello, tracerConsole);
-//
-//    Map<String, String> props = new HashMap<String, String>();
-//    props.put("director.Nr of dispatch threads", "2");
-//    props.put("director.Dispatch timeout(ms)", "250");
-//    props.put("Constant.value", "Hello world");
-//    flowMgr.executeBlockingLocally(flow, props);
-//
-//    // now check if all went as expected
-//    new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(tracerConsole, 1L).expectActorIterationCount(helloHello, 1L)
-//        .assertFlow(flow);
-//  }
+  public void testHelloPasserelle() throws Exception {
+    flow = new Flow("testHelloPasserelle", null);
+    ETDirector director = new ETDirector(flow, "director");
+    flow.setDirector(director);
+
+    Const constant = new Const(flow, "Constant");
+    Actor helloHello = new Forwarder(flow, "HelloHello");
+    Actor tracerConsole = new MessageHistoryStack(flow, "TracerConsole");
+
+    flow.connect(constant, helloHello);
+    flow.connect(helloHello, tracerConsole);
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("director.Nr of dispatch threads", "2");
+    props.put("director.Dispatch timeout(ms)", "250");
+    props.put("Constant.value", "Hello world");
+    flowMgr.executeBlockingLocally(flow, props);
+
+    // now check if all went as expected
+    new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(tracerConsole, 1L).expectActorIterationCount(helloHello, 1L)
+        .assertFlow(flow);
+  }
 
 //  private static Delay createDelayActor(boolean asynchDelay, Flow flow, String name) throws IllegalActionException, NameDuplicationException {
 //    return asynchDelay ? new AsynchDelay(flow, name) : new Delay(flow, name);
