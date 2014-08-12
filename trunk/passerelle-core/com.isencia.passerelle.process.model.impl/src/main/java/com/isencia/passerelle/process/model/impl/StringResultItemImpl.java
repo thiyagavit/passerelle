@@ -62,7 +62,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
 	 */
 	public String getValue() {
-		if (clobItem != null) {
+		if (clobItem != null && clobItem.getValue() != null) {
 			return clobItem.getValue();
 		}
 

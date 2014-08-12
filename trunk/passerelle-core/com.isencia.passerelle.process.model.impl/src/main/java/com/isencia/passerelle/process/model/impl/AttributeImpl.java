@@ -84,7 +84,7 @@ public abstract class AttributeImpl implements Attribute {
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
 	 */
 	public String getValueAsString() {
-		if (clobItem != null) {
+		if (clobItem != null && clobItem.getValue() != null) {
 			return clobItem.getValue();
 		}
 
