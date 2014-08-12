@@ -96,7 +96,7 @@ public abstract class TaskBasedActor extends Actor {
     conditionTagParameter = new StringParameter(this, CONDITION_TAG);
     registerExpertParameter(resultTagParameter);
     registerExpertParameter(conditionTagParameter);
-}
+  }
 
   @Override
   public final ProcessingMode getProcessingMode(ProcessRequest request) {
@@ -148,7 +148,7 @@ public abstract class TaskBasedActor extends Actor {
       Task task = null;
       try {
         if (!doRestart(processManager, message, procResp)) {
-          if (mustProcess(message)) {
+          if (mustProcess(message, processManager)) {
             // create attributes and entries, in case of error catch and rethrow after task creation
             Map<String, String> taskAttributes = new HashMap<String, String>();
             Map<String, Serializable> taskContextEntries = new HashMap<String, Serializable>();
@@ -209,9 +209,12 @@ public abstract class TaskBasedActor extends Actor {
   /**
    * Should perform the actual processing of the task. For most simple/fast cases, this can be done in a synchronous
    * fashion. For complex/long-running processing, the usage of a ServiceBasedActor is advisable.
-   * @param task the new task that must be processed
+   * 
+   * @param task
+   *          the new task that must be processed
    * @param processManager
-   * @param processResponse TODO
+   * @param processResponse
+   *          TODO
    * 
    * @throws ProcessingException
    */
@@ -236,7 +239,7 @@ public abstract class TaskBasedActor extends Actor {
    * @return
    * @throws MessageException
    */
-  protected boolean mustProcess(ManagedMessage message) throws MessageException {
+  protected boolean mustProcess(ManagedMessage message, ProcessManager processManager) throws MessageException {
     String conditionTagStr = conditionTagParameter.getExpression();
     if (StringUtils.isBlank(conditionTagStr)) {
       return true;
@@ -296,8 +299,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * This method creates a Task instance of the right implementation class,
-   * with the given attributes etc, and persists the new task.
+   * This method creates a Task instance of the right implementation class, with the given attributes etc, and persists
+   * the new task.
    * 
    * @param processManager
    * @param parentRequest
@@ -342,8 +345,8 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * By default reads the task type from the taskTypeParameter on the actor.
-   * Override this if other type determination logic is needed.
+   * By default reads the task type from the taskTypeParameter on the actor. Override this if other type determination
+   * logic is needed.
    * 
    * @return the task type to be used for new task instances
    */
@@ -358,8 +361,8 @@ public abstract class TaskBasedActor extends Actor {
 
   /**
    * @param parentRequest
-   * @return the java class of the Task implementation entity. Default is null.
-   *         With the default ProcessFactoryImpl this leads to using com.isencia.passerelle.process.model.impl.TaskImpl.
+   * @return the java class of the Task implementation entity. Default is null. With the default ProcessFactoryImpl this
+   *         leads to using com.isencia.passerelle.process.model.impl.TaskImpl.
    */
   protected Class<? extends Task> getTaskClass(Request parentRequest) {
     return null;
@@ -442,8 +445,7 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Callback method that is invoked after a task has been started by the actor.
-   * By default it does nothing.
+   * Callback method that is invoked after a task has been started by the actor. By default it does nothing.
    * <p>
    * This method may be overridden for special cases where extra logic is needed when starting a task.
    * </p>
@@ -451,6 +453,7 @@ public abstract class TaskBasedActor extends Actor {
    * REMARK : any implementation must be fast and non-blocking as this is invoked on the task execution thread!
    * Implementations should not throw any exceptions!
    * </p>
+   * 
    * @param task
    */
   protected void onTaskStarted(Task task) {
@@ -458,25 +461,36 @@ public abstract class TaskBasedActor extends Actor {
   }
 
   /**
-   * Callback method that is invoked after a task has been finished by the actor.
-   * By default it sends the received message on the actor's output port.
+   * Callback method that is invoked after a task has been finished by the actor. By default it sends the received
+   * message on the actor's output port.
    * <p>
-   * This method may be overridden for special cases where e.g. extra/custom output ports must be used 
-   * or extra logic must be triggered after finishing a task.
+   * This method may be overridden for special cases where e.g. extra/custom output ports must be used or extra logic
+   * must be triggered after finishing a task.
    * </p>
    * <p>
    * REMARK : any implementation must be fast and non-blocking as this is invoked on the task execution thread!
    * </p>
+   * 
    * @param task
    * @param message
    * @param processResponse
-   * @throws ProcessingException 
+   * @throws ProcessingException
    */
   protected void onTaskFinished(Task task, ManagedMessage message, ProcessResponse processResponse) throws ProcessingException {
     // by default send out on output port
     if (output != null && output.getContainer() != null) {
       processResponse.addOutputMessage(output, message);
     }
+  }
+
+  /**
+   * Callback method that is invoked after a task has been finished by the actor.
+   * 
+   * @param task
+   * @param error
+   */
+  protected void onTaskError(Task task, Throwable error) {
+
   }
 
   protected Map<String, String> createImmutableTaskAtts(Context processContext, Map<String, String> taskAttributes) throws ProcessingException {
@@ -491,7 +505,7 @@ public abstract class TaskBasedActor extends Actor {
     addActorSpecificTaskAttributes(processContext, taskAttributes);
     return taskAttributes;
   }
-  
+
   private final class TaskContextListener implements ContextProcessingCallback {
 
     private ManagedMessage message;
@@ -532,6 +546,7 @@ public abstract class TaskBasedActor extends Actor {
         Request parentrequest = task.getParentContext().getRequest();
         final String errorMsg = "Error executing task " + task.getType() + " with task ID " + task.getId() + " for request " + parentrequest.getId();
         ProcessingException exception = new ProcessingException(ErrorCode.TASK_ERROR, errorMsg, TaskBasedActor.this, message, error);
+        onTaskError(task, error);
         try {
           getErrorControlStrategy().handleFireException(TaskBasedActor.this, exception);
           setConsumed(true);
