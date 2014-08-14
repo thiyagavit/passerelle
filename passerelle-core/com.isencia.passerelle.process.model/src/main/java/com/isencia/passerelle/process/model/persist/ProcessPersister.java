@@ -7,19 +7,20 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
 
 public interface ProcessPersister {
+  /** 
+   * opens a unit of work, and starts a transaction if required.
+   */
+  boolean open(boolean transactional) throws PersistenceException;
 	/**
 	 * closes a unit of work, committing or rolling back the transaction if one is active. 
 	 */
 	void close();
+
 	Case getCase(Long id) throws PersistenceException;
 	ContextEvent getContextEvent(Request request, Long id) throws PersistenceException;
 	Request getRequest(Case caze, Long id) throws PersistenceException;
 	Task getTask(Request request, Long id) throws PersistenceException;
 	Task getTaskWithResults(Request request, Long id) throws PersistenceException;
-	/** 
-	 * opens a unit of work, and starts a transaction if required.
-	 */
-	boolean open(boolean transactional) throws PersistenceException;
 	void persistAttributes(Request request) throws PersistenceException;
 	void persistCase(Case caze) throws PersistenceException;
 	void persistContextEvent(ContextEvent event) throws PersistenceException;

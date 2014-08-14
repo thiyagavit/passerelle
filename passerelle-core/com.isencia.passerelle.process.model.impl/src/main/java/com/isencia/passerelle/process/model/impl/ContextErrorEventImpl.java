@@ -8,15 +8,15 @@ import java.io.Serializable;
 import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PrePersist;
 import javax.persistence.Transient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.model.impl.ContextEventImpl;
 import com.isencia.passerelle.process.model.impl.util.internal.ErrorItemMarshaller;
 
 /**
@@ -53,17 +53,6 @@ public class ContextErrorEventImpl extends ContextEventImpl implements ContextEr
   public ContextErrorEventImpl(Context context, ErrorItem errorItem) {
     this(context);
     this.errorItem = errorItem;
-  }
-
-  public ErrorItem getErrorItem() {
-    if (errorItem == null && getMessage() != null) {
-      errorItem = unmarshallErrorInfo(getMessage());
-    }
-    return errorItem;
-  }
-
-  @PrePersist
-  public void persistErrorInfo() {
     if (errorItem != null) {
       try {
         this.setMessage(marshallErrorInfo(errorItem));
@@ -71,6 +60,13 @@ public class ContextErrorEventImpl extends ContextEventImpl implements ContextEr
         LOGGER.error("Error marshalling errorinfo", e);
       }
     }
+  }
+
+  public ErrorItem getErrorItem() {
+    if (errorItem == null && getMessage() != null) {
+      errorItem = unmarshallErrorInfo(getMessage());
+    }
+    return errorItem;
   }
 
   protected String marshallErrorInfo(ErrorItem errorItem) throws Exception {
