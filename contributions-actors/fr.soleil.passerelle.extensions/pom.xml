@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.7.9-SNAPSHOT</version>
+	<version>4.8.0</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -146,7 +146,7 @@
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
 		</dependency>
-		
+
 		<!-- Pour Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.gui</groupId>
@@ -172,7 +172,7 @@
 			<artifactId>Pattern</artifactId>
 		</dependency>
 		<!-- End Pour Salsa V2 -->
-		
+
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
@@ -192,7 +192,7 @@
 
 		<dependency>
 			<groupId>fr.soleil.comete.bean</groupId>
-			<artifactId>CurrentScanDataModel</artifactId>		
+			<artifactId>CurrentScanDataModel</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
@@ -252,6 +252,7 @@
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>actor</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>engine</artifactId>
