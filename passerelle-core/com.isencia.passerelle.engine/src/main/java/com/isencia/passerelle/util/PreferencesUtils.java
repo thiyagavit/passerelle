@@ -29,24 +29,13 @@ public class PreferencesUtils {
 
 	public static final String APPLICATION_ROOT_KEY = "com.isencia.sherpa.preferences";
 	public static final String CONFIG_ROOT_KEY = "config";
-	public static final String THRESHOLDS_ROOT_KEY = "thresholds";
 
 	public static Preferences getRootNode() {
-		
 		Preferences root = PreferencesService.getDefault().getRootNode().node(InstanceScope.SCOPE);
-
 		return root.node(APPLICATION_ROOT_KEY);
 	}
 
 	public static Preferences getConfigNode() {
 		return getRootNode().node(CONFIG_ROOT_KEY);
 	}
-
-	public static Preferences getThresholdNode() {
-		return getRootNode().node(THRESHOLDS_ROOT_KEY);
-	}
-	
-	// ideas for more utilities :
-	// public static String substitutePreferencesInText(String text)
-	//
 }
