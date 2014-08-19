@@ -43,7 +43,20 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 
   @Override
   public ProcessManager getProcessManager(Request request) {
-    return getProcessManager(request.getProcessingContext().getProcessId());
+    if (request.getProcessingContext().getProcessId() != null) {
+      return getProcessManager(request.getProcessingContext().getProcessId());
+    } else {
+      // if the process ID is somehow unknown, we'll try to find the processmanager for the same request ID
+      ProcessManager result = null;
+      for(ProcessManager processManager : processManagers.values()) {
+        Long id = processManager.getRequest().getId();
+        if ((id != null) && (id == request.getId())) {
+          result = processManager;
+          break;
+        }
+      }
+      return result;
+    }
   }
 
   @Override
@@ -88,7 +101,7 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
   public boolean subscribeToAll(ContextProcessingCallback callback) {
     return overallCallbacks.add(callback);
   }
-  
+
   @Override
   public boolean unsubscribe(ContextProcessingCallback callback) {
     return overallCallbacks.remove(callback);
@@ -96,6 +109,6 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 
   @Override
   public Collection<ContextProcessingCallback> getOverallCallbacks() {
-  	return (overallCallbacks);
+    return (overallCallbacks);
   }
 }
