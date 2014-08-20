@@ -29,7 +29,7 @@ public abstract class AttributeImpl implements Attribute {
 	private static final int MAX_CHAR_SIZE = 250;
 
 	@Version
-	protected int version;
+	protected Integer version;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)

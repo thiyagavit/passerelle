@@ -65,7 +65,7 @@ public class ResultBlockImpl implements ResultBlock {
   private Long id;
 
   @Version
-  private int version;
+  private Integer version;
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter

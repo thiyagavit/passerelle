@@ -39,7 +39,7 @@ public class ClobItem implements Identifiable, Serializable {
 	private Date creationTS;
 
 	@Version
-	private int version;
+	private Integer version;
 	
 	@Column(name = "CLOBDATA", nullable = false, updatable = false)
 	@Lob
