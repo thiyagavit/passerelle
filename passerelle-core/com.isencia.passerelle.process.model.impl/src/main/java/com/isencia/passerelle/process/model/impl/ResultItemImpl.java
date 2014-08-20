@@ -72,7 +72,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   private Long id;
 
   @Version
-  private int version;
+  private Integer version;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "CREATION_TS", nullable = true, unique = false, updatable = false)

@@ -54,7 +54,7 @@ public class RequestImpl implements Request {
   private Long id;
 
   @Version
-  private int version;
+  private Integer version;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)

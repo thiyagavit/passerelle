@@ -49,7 +49,7 @@ public class ContextEventImpl implements ContextEvent {
 	private Long id;
 
 	@Version
-	private int version;
+	private Integer version;
 	
 	@Column(name = "TOPIC", nullable = false, unique = false, updatable = false, length = 255)
 	private String topic;

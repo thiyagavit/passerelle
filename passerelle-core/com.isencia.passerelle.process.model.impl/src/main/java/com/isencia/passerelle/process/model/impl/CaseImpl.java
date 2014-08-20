@@ -58,7 +58,7 @@ public class CaseImpl implements Case {
 	private Date creationTS;
 
 	@Version
-	private int version;
+	private Integer version;
 
 	@Column(name = "EXTERNAL_REF", nullable = true, unique = false, updatable = true, length = 50)
 	private String externalReference;
