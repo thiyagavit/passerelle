@@ -28,6 +28,12 @@ import com.isencia.util.FutureValue;
 public interface RequestProcessingService<R extends Request> {
 
   /**
+   * @return The name of the service
+   */
+  String getName();
+  
+
+  /**
    * Process the given Request within the given timeout, if this service instance is capable of handling it. If the
    * service is unable to handle it, it should simply return <code>null</code> immediately.
    * <p>
