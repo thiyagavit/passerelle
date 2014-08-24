@@ -65,8 +65,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
       if (service.canProcess(task)) {
         futResult = service.process(task, timeout, unit);
         if (futResult != null) {
-          LOGGER.debug("Task {} will be processed by service {}", task.getId(), service);
-          task.setExecutor(service.getName()+" "+svcEntry.version);
+          LOGGER.debug("Task {} will be processed by service {}", task.getId(), service.getName());
           break;
         }
       }

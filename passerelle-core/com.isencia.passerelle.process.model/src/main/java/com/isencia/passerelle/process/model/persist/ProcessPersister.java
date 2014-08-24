@@ -29,4 +29,5 @@ public interface ProcessPersister {
 	void persistTask(Task task) throws PersistenceException;
 	void updateResultBlock(ResultBlock resultBlock) throws PersistenceException;
 	void updateStatus(Request request) throws PersistenceException;
+  void updateExecutor(Request request) throws PersistenceException;
 }
