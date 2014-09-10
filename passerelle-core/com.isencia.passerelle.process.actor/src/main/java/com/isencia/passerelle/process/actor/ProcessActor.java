@@ -24,7 +24,7 @@ import com.isencia.passerelle.process.service.ProcessManager;
  *
  */
 public interface ProcessActor {
-
+  
   /**
    * Method to indicate whether the given request will be processed synchronously or asynchronously. 
    * <p>

@@ -2,6 +2,7 @@ package com.isencia.passerelle.process.service;
 
 import java.util.concurrent.TimeUnit;
 
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
@@ -52,6 +53,37 @@ public interface ProcessManager {
    * @return the Task entity that was (or is being) executed as part of this manager's process
    */
   Task getTask(long id);
+  
+  /**
+   * 
+   * @param scopeGroup
+   * @param scope
+   * @param ctxt
+   */
+  void registerScopedProcessContext(String scopeGroup, String scope, Context ctxt);
+  
+  /**
+   * 
+   * @param scopeGroup
+   * @param scope
+   * @return
+   */
+  Context getScopedProcessContext(String scopeGroup, String scope);
+
+  /**
+   * 
+   * @param task
+   * @return the process context for the given task, which might be a scoped one if the task's actor is on a scoped branch in the flow
+   */
+  Context getProcessContextForTask(Task task);
+  
+  /**
+   * 
+   * @param scopeGroup
+   * @param scope
+   * @return
+   */
+  Context removeScopedProcessContext(String scopeGroup, String scope);
 
   /**
    * Notify listeners that the processing of the request was cancelled.
@@ -189,9 +221,14 @@ public interface ProcessManager {
   void notifyTimeOut(Task task);
 
   /**
+   * Start the flow for this request.
+   */
+  boolean start();
+
+  /**
    * Pause the flow for this request.
    */
-  boolean pause();
+  boolean pause(long timeOut, TimeUnit timeOutUnit);
 
   /**
    * Restart the flow for this request from the given Task.
@@ -201,12 +238,7 @@ public interface ProcessManager {
   /**
    * Resume the flow for this request.
    */
-  boolean resume();
-
-  /**
-   * Start the flow for this request.
-   */
-  boolean start();
+  boolean resume(long timeOut, TimeUnit timeOutUnit);
 
   /**
    * Stop the flow for this request.

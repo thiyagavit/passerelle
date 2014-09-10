@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.CompositeActor;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
@@ -14,9 +15,11 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
+import com.isencia.passerelle.model.util.ModelUtils;
+import com.isencia.passerelle.process.actor.ProcessRequest;
+import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.service.ProcessManager;
 
@@ -80,12 +83,12 @@ public class Splitter extends AbstractMessageSequenceGenerator {
   }
 
   @Override
-  public void process(ProcessManager processManager, com.isencia.passerelle.process.actor.ProcessRequest request, com.isencia.passerelle.process.actor.ProcessResponse response)
+  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response)
       throws ProcessingException {
     MessageContainer message = (MessageContainer) request.getMessage(input);
     if (message != null) {
       try {
-        Context processContext = processManager.getRequest().getProcessingContext();
+        Context processContext = ProcessRequest.getContextForMessage(processManager, message);
         Long scopeId = processContext.getRequest().getId();
         registerSequenceScopeMessage(scopeId, message);
 
@@ -107,16 +110,22 @@ public class Splitter extends AbstractMessageSequenceGenerator {
             } catch (Exception e) {
               getLogger().error("Error logging audit trail", e);
             }
+            String myName = ModelUtils.getFullNameButWithoutModelName((CompositeActor) toplevel(), this);
             for (int i = 0; i < valueParts.length; ++i) {
+              String scopeName = valueParts[i];
               Context newOne = processContext.fork();
-              newOne.putEntry(splitOutItemName, valueParts[i]);
-              MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message, processContext.getRequest().getId(), // sequence
-                                                                                                                                                                      // ID
+              newOne.putEntry(splitOutItemName, scopeName);
+              processManager.registerScopedProcessContext(myName, scopeName, newOne);
+              MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(
+                  message, 
+                  processContext.getRequest().getId(), // sequence
                   new Long(i), // sequence position
                   (i == (valueParts.length - 1))); // end of sequence?
-              // enforce single Splitter name (so use setHeader i.o. addHeader)
+              // the SEQ SRC name can be the simple actor name, as the Join is always looking for it in the same (sub)flow-level
               outputMsg.setHeader(HEADER_SEQ_SRC, getName());
-              outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
+              // the CTXT SCOPE GRP must be unique across a complete flow to ensure that concurrent fork/join-s on different flow levels can not clash
+              outputMsg.setHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP, myName);
+              outputMsg.setHeader(ProcessRequest.HEADER_CTXT_SCOPE, scopeName);
               response.addOutputMessage(output, outputMsg);
             }
             doingSplit = true;

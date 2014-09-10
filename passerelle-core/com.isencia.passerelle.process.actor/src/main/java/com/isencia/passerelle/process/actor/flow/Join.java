@@ -30,7 +30,6 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageInputContext;
-import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.actor.Actor;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.service.ProcessManager;
@@ -103,10 +102,9 @@ public class Join extends Actor {
   }
 
   private ManagedMessage mergeMessage(ProcessManager processManager,ManagedMessage branchedMsg) throws ProcessingException {
-    String[] seqGeneratorNames = ((MessageContainer) branchedMsg).getHeader(MessageSequenceGenerator.HEADER_SEQ_SRC);
-    // should be length 1
-    if (seqGeneratorNames.length == 1) {
-      Entity seqGenerator = ((CompositeEntity) getContainer()).getEntity(seqGeneratorNames[0]);
+    String seqGeneratorName = branchedMsg.getSingleHeader(MessageSequenceGenerator.HEADER_SEQ_SRC);
+    if (seqGeneratorName!=null) {
+      Entity seqGenerator = ((CompositeEntity) getContainer()).getEntity(seqGeneratorName);
       if (seqGenerator != null) {
         return ((MessageSequenceGenerator) seqGenerator).aggregateProcessedMessage(processManager,branchedMsg);
       }

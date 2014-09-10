@@ -75,6 +75,8 @@ public interface ProcessFactory {
 	ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level);
 
 	Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception;
-
 	Task createTask(Request request, String initiator, String type);
+	// these are temporarily back to support frok/join scoped context handling
+  Task createTask(Class<? extends Task> taskClass, Context context, String initiator, String type) throws Exception;
+  Task createTask(Context context, String initiator, String type);
 }

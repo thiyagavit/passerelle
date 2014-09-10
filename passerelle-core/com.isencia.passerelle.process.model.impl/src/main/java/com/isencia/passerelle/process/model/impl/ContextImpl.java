@@ -470,6 +470,7 @@ public class ContextImpl implements Context {
     try {
       lock.lock();
       copy.id = id;
+      copy.processId = processId;
       copy.status = status;
       copy.request = request;
       // use addTask() to add tasks to copy, because it has to initialize the collection

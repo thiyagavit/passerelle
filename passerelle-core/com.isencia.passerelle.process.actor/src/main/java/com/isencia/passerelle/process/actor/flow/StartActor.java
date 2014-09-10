@@ -15,7 +15,6 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.actor.Actor;
 import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.actor.ProcessResponse;
@@ -57,8 +56,7 @@ public class StartActor extends Actor {
       if (!Status.STARTED.equals(processingContext.getStatus()) && !Status.RESTARTED.equals(processingContext.getStatus())) {
         processManager.notifyStarted();
       }
-      ManagedMessage message = createOutputMessage(processManager.getRequest());
-      response.addOutputMessage(output, message);
+      response.addOutputMessage(output, createMessage());
     } catch (Exception t) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating request", this, t);
     } finally {
