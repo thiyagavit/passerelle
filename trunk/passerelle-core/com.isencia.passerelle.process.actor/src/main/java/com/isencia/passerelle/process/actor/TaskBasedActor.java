@@ -143,14 +143,23 @@ public abstract class TaskBasedActor extends Actor {
   public final void process(ProcessManager processManager, ProcessRequest procReq, ProcessResponse procResp) throws ProcessingException {
     ManagedMessage message = procReq.getMessage(input);
     if (message != null) {
-      Request request = processManager.getRequest();
-      Context processContext = request.getProcessingContext();
       Task task = null;
       try {
+        // IMPORTANT : This is the right way to get the processContext from the received message,
+        // with correct retrieval of branched context scopes.
+        String scopeGroup = message.getSingleHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
+        String scope = message.getSingleHeader(ProcessRequest.HEADER_CTXT_SCOPE);
+        Context processContext = processManager.getScopedProcessContext(scopeGroup, scope);
         if (!doRestart(processManager, message, procResp)) {
           if (mustProcess(message, processManager)) {
             // create attributes and entries, in case of error catch and rethrow after task creation
             Map<String, String> taskAttributes = new HashMap<String, String>();
+            if (scopeGroup != null) {
+              taskAttributes.put(Task.HEADER_CTXT_SCOPE_GRP, scopeGroup);
+            }
+            if (scope != null) {
+              taskAttributes.put(Task.HEADER_CTXT_SCOPE, scope);
+            }
             Map<String, Serializable> taskContextEntries = new HashMap<String, Serializable>();
             Exception exceptionDuringCreation = null;
             try {
@@ -159,7 +168,7 @@ public abstract class TaskBasedActor extends Actor {
             } catch (Exception e) {
               exceptionDuringCreation = e;
             }
-            task = createTask(processManager, taskAttributes, taskContextEntries);
+            task = createTask(processManager, processContext, taskAttributes, taskContextEntries);
             if (exceptionDuringCreation != null) {
               // re-throw here, exception will be attached to taskContext
               throw new PasserelleException(ErrorCode.ACTOR_EXECUTION_FATAL, this, exceptionDuringCreation);
@@ -308,11 +317,14 @@ public abstract class TaskBasedActor extends Actor {
    * @param taskContextEntries
    * @return the new task
    * @throws Exception
+   * 
+   *           TODO ensure task is on the right scoped context if any, and then not yet on the "real" processcontext
+   *           until the Join
    */
-  protected Task createTask(ProcessManager processManager, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
+  private Task createTask(ProcessManager processManager, Context processContext, Map<String, String> taskAttributes, Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
     Request request = processManager.getRequest();
-    Task task = processManager.getFactory().createTask(getTaskClass(request), request, initiator, getTaskType());
+    Task task = processManager.getFactory().createTask(getTaskClass(request), processContext, initiator, getTaskType());
     for (Entry<String, String> attr : taskAttributes.entrySet()) {
       processManager.getFactory().createAttribute(task, attr.getKey(), attr.getValue());
     }

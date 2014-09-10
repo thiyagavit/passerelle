@@ -35,7 +35,6 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 import com.isencia.passerelle.process.actor.Actor;

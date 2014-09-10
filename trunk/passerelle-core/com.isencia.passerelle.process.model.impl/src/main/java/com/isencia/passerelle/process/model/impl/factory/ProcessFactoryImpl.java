@@ -152,6 +152,17 @@ public class ProcessFactoryImpl implements ProcessFactory {
 		return new TaskImpl(request.getProcessingContext(), initiator, type);
 	}
 
+  @Override
+  public Task createTask(Class<? extends Task> taskClass, Context processContext, String initiator, String type) throws Exception {
+    if (taskClass == null)
+      return (createTask(processContext, initiator, type));
+    return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(processContext, initiator, type);
+  }
+
+  @Override
+  public Task createTask(Context processContext, String initiator, String type) {
+    return new TaskImpl(processContext, initiator, type);
+  }
 	public void destroy() {
 		ProcessFactoryTracker.setService(null);
 	}

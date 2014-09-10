@@ -110,7 +110,7 @@ public class ContextEntryModifier extends Actor {
     ManagedMessage message = request.getMessage(input);
     if (message != null) {
       try {
-        Context diagnosisContext = processManager.getRequest().getProcessingContext();
+        Context diagnosisContext = ProcessRequest.getContextForMessage(processManager, message);
         String entryName = entryNameParameter.getExpression();
         String entryValue = entryValueParameter.getExpression();
         String scopeStr = entryScopeParameter.getExpression();

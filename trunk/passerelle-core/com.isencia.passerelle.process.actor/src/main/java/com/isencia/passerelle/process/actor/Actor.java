@@ -581,7 +581,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         MessageOutputContext[] outputs = response.getOutputs();
         if (outputs != null) {
           for (MessageOutputContext output : outputs) {
-            sendOutputMsg(output.getPort(), output.getMessage());
+            SettableMessage message = (SettableMessage) output.getMessage();
+            message.setHeader(ProcessRequest.HEADER_PROCESS_ID, processManager.getId());
+            sendOutputMsg(output.getPort(), message);
           }
         }
         outputs = response.getOutputsInSequence();
@@ -591,7 +593,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
             MessageOutputContext context = outputs[i];
             boolean isLastMsg = (i == (outputs.length - 1));
             try {
-              ManagedMessage msgInSeq = MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
+              SettableMessage msgInSeq = (SettableMessage) MessageFactory.getInstance().createMessageCopyInSequence(context.getMessage(), seqID, new Long(i), isLastMsg);
+              msgInSeq.setHeader(ProcessRequest.HEADER_PROCESS_ID, processManager.getId());
               sendOutputMsg(context.getPort(), msgInSeq);
             } catch (MessageException e) {
               throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(),
@@ -667,25 +670,6 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   protected Logger getLogger() {
     return LOGGER;
-  }
-
-  /**
-   * This is the method that should be ALWAYS used by process actors to construct output messages, optionally with
-   * causal info about received input messages.
-   * <p>
-   * The request's process ID will be stored in a message header and the message body is available for arbitrary data as
-   * needed by concrete actor implementations.
-   * </p>
-   * 
-   * @param request
-   *          the request being processed in the actor, typically by executing a child task
-   * @param causes
-   * @return
-   */
-  protected ManagedMessage createOutputMessage(Request request, ManagedMessage... causes) {
-    SettableMessage message = (SettableMessage) super.createMessageFromCauses(causes);
-    message.setHeader(ProcessRequest.HEADER_PROCESS_ID, request.getProcessingContext().getProcessId());
-    return message;
   }
 
   @Override

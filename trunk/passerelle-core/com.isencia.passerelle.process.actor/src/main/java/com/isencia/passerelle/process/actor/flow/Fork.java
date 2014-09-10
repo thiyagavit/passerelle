@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ptolemy.actor.CompositeActor;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
@@ -21,6 +22,9 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
+import com.isencia.passerelle.model.util.ModelUtils;
+import com.isencia.passerelle.process.actor.ProcessRequest;
+import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.service.ProcessManager;
 
@@ -81,12 +85,12 @@ public class Fork extends AbstractMessageSequenceGenerator {
   }
 
   @Override
-  public void process(ProcessManager processManager, com.isencia.passerelle.process.actor.ProcessRequest request, com.isencia.passerelle.process.actor.ProcessResponse response)
+  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response)
       throws ProcessingException {
     MessageContainer message = (MessageContainer) request.getMessage(input);
     if (message != null) {
       try {
-        Context processContext = processManager.getRequest().getProcessingContext();
+        Context processContext = ProcessRequest.getContextForMessage(processManager, message);
         Long scopeId = processManager.getRequest().getId();
         registerSequenceScopeMessage(scopeId, message);
 
@@ -96,17 +100,23 @@ public class Fork extends AbstractMessageSequenceGenerator {
           getLogger().error("Error logging audit trail", e);
         }
 
+        String myName = ModelUtils.getFullNameButWithoutModelName((CompositeActor) toplevel(), this);
         List<Port> outputPorts = outputPortCfgExt.getOutputPorts();
         for (int i = 0; i < outputPorts.size(); ++i) {
+          Port p = outputPorts.get(i);
+          String scopeName = p.getName();
           Context newOne = processContext.fork();
-          MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message, processContext.getRequest().getId(), // sequence
-                                                                                                                                                                  // ID
+          processManager.registerScopedProcessContext(myName, scopeName, newOne);
+          MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(message, 
+              processContext.getRequest().getId(), // sequence; should we be more specific than on request ID level?
               new Long(i), // sequence position
               (i == (outputPorts.size() - 1))); // end of sequence?
-          // enforce single Fork name
+          // the SEQ SRC name can be the simple actor name, as the Join is always looking for it in the same (sub)flow-level
           outputMsg.setHeader(HEADER_SEQ_SRC, getName());
-          outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-          response.addOutputMessage(outputPorts.get(i), outputMsg);
+          // the CTXT SCOPE GRP must be unique across a complete flow to ensure that concurrent fork/join-s on different flow levels can not clash
+          outputMsg.setHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP, myName);
+          outputMsg.setHeader(ProcessRequest.HEADER_CTXT_SCOPE, scopeName);
+          response.addOutputMessage(p, outputMsg);
         }
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating forked messages", this, message, e);
