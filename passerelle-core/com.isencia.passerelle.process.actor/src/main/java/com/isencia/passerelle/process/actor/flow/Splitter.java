@@ -101,7 +101,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
         boolean doingSplit = false;
         if (StringUtils.isNotEmpty(splitValue)) {
           String splitDelimiter = ((StringToken) splitDelimiterParameter.getToken()).stringValue();
-          String[] valueParts = splitValue.split(splitDelimiter);
+          String[] valueParts = StringUtils.split(splitValue,splitDelimiter);
           if (valueParts.length > 0) {
             try {
               if (getAuditLogger().isInfoEnabled()) {
