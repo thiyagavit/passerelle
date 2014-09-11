@@ -49,7 +49,7 @@ public class ContextAggregationStrategy implements AggregationStrategy {
         String[] scope = otherMsg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
         Context branchedCtx = null;
         if(scopeGrp.length==1 && scope.length==1) {
-          branchedCtx = processManager.getScopedProcessContext(scopeGrp[0], scope[0]);
+          branchedCtx = processManager.removeScopedProcessContext(scopeGrp[0], scope[0]);
         }
         branches[i] = (branchedCtx!=null) ? branchedCtx : mergedCtxt;
       }
