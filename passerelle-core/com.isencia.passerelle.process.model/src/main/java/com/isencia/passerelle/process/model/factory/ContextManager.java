@@ -19,6 +19,7 @@ import com.isencia.passerelle.process.model.Task;
 public interface ContextManager {
   
   String REPORT_EVENT_TYPE = "REPORTED";
+  String ALLOW_MERGE = "ALLOW_MERGE";
 
 	/**
 	 * 
