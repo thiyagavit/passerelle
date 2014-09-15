@@ -4,24 +4,24 @@
 package com.isencia.passerelle.process.actor.flow;
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.dynaport.OutputPortConfigurationExtender;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
+import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * <p>
@@ -65,14 +65,8 @@ public class Fork extends AbstractMessageSequenceGenerator {
     return LOGGER;
   }
 
-  @Override
-  protected void process(Context taskContext) throws ProcessingException {
-    
-  }
-  
-  @Override
-  protected void postProcess(ManagedMessage message, Context taskContext, com.isencia.passerelle.process.actor.ProcessResponse response) throws Exception {
-    
+  public void process(ActorContext ctx, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
+    MessageContainer message = (MessageContainer) procRequest.getMessage(input);
     if (message != null) {
       try {
         Context processContext = (Context) message.getBodyContent();
@@ -96,15 +90,25 @@ public class Fork extends AbstractMessageSequenceGenerator {
           // enforce single Fork name
           outputMsg.setHeader(HEADER_SEQ_SRC, getName());
           outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-          response.addOutputMessage(outputPorts.get(i), outputMsg);
+          procResponse.addOutputMessage(outputPorts.get(i), outputMsg);
         }
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating forked messages", this, message, e);
       }
     }
-    
-    super.postProcess(message, taskContext, response);
-    
-    ServiceRegistry.getInstance().getContextManager().notifyFinished(taskContext);
+  }
+  @Override
+  protected String getAuditTrailMessage(ManagedMessage message, Port port) {
+    try {
+      if (message.getBodyContent() instanceof Context) {
+        Context processContext = (Context) message.getBodyContent();
+        return port.getFullName() + " - msg for request " + processContext.getRequest().getId();
+      } else {
+        return super.getAuditTrailMessage(message, port);
+      }
+    } catch (MessageException e) {
+      getLogger().error("Error getting msg content", e);
+      return super.getAuditTrailMessage(message, port);
+    }
   }
 }
