@@ -3,14 +3,15 @@ package com.isencia.passerelle.process.actor.flow;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -18,7 +19,6 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * A <code>Splitter</code> actor generates a sequence of outgoing messages for each received message. The split count & output message contents are determined
@@ -75,12 +75,8 @@ public class Splitter extends AbstractMessageSequenceGenerator {
     return LOGGER;
   }
 
-  @Override
-  protected void process(Context taskContext) throws ProcessingException {
-  }
-  
-  @Override
-  protected void postProcess(ManagedMessage message, Context taskContext, com.isencia.passerelle.process.actor.ProcessResponse response) throws Exception {
+  public void process(ActorContext ctx, ProcessRequest procRequest, ProcessResponse procResponse) throws ProcessingException {
+    MessageContainer message = (MessageContainer) procRequest.getMessage(input);
     if (message != null) {
       try {
         Context processContext = (Context) message.getBodyContent();
@@ -115,7 +111,7 @@ public class Splitter extends AbstractMessageSequenceGenerator {
               // enforce single Splitter name (so use setHeader i.o. addHeader)
               outputMsg.setHeader(HEADER_SEQ_SRC, getName());
               outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-              response.addOutputMessage(output, outputMsg);
+              procResponse.addOutputMessage(output, outputMsg);
             }
             doingSplit=true;
           }
@@ -128,15 +124,11 @@ public class Splitter extends AbstractMessageSequenceGenerator {
           } catch (Exception e) {
             getLogger().error("Error logging audit trail", e);
           }
-          response.addOutputMessage(outputNoSplit, message);
+          procResponse.addOutputMessage(outputNoSplit, message);
         }
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating forked messages", this, message, e);
       }
     }
-    
-    super.postProcess(message, taskContext, response);
-    
-    ServiceRegistry.getInstance().getContextManager().notifyFinished(taskContext);
   }
 }
