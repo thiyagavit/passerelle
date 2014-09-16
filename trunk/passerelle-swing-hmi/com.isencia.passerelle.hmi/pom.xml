@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>passerelle-super-pom</artifactId>
-		<groupId>fr.soleil.passerelle</groupId>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
 		<version>RELEASE</version>
 	</parent>
 
 	<groupId>com.isencia.passerelle.gui</groupId>
 	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
-	<version>8.5.1</version>
+	<version>8.5.2-SNAPSHOT</version>
 
 	<developers>
 		<developer>
