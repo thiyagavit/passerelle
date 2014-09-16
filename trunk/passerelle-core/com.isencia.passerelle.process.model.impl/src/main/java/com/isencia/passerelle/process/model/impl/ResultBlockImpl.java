@@ -97,7 +97,8 @@ public class ResultBlockImpl implements ResultBlock {
   public static final String _CREATION_TS = "creationTS";
   public static final String _TASK = "task";
   public static final String _TYPE = "type";
-  public static final String _RESULT_ITEMS = "allItems";
+  public static final String _RESULT_ITEMS = "resultItems";
+  public static final String _ALL_ITEMS = "allItems";
   public static final String _COLOUR = "colour";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _DISCRIMINATOR = "discriminator";
