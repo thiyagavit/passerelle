@@ -198,6 +198,8 @@ public class ContextImpl implements Context {
     if (!ProcessUtils.isInitialized(tasks))
       tasks = new ArrayList<Task>();
     this.tasks.add(task);
+    // TODO check if other associations must be adapted
+    ((TaskImpl)task).setParentContext(this);
   }
 
   public List<Task> getTasks() {
@@ -438,7 +440,8 @@ public class ContextImpl implements Context {
         List<Task> tasks = contextToMerge.getTasks();
         if (tasks.size() > taskCursorIndex) {
           for (int r = taskCursorIndex; r < tasks.size(); ++r) {
-            addTask(tasks.get(r));
+            final Task task = tasks.get(r);
+            addTask(task);
           }
         }
         // add new events obtained from the related branch
