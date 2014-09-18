@@ -74,7 +74,7 @@ import com.isencia.passerelle.process.service.ServiceRegistry;
  * while until all required messages have been received for a same context. <br/>
  * Only then should the <code>process(...)</code> method be invoked with a <code>ProcessRequest</code> containing all the related messages.
  * </p>
- * 
+ *
  * @author erwin
  */
 
@@ -146,7 +146,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   public MessageQueue getMessageQueue() {
     return pushedMessages;
   }
-  
+
   protected MessageQueue newMessageQueue() throws InitializationException {
     MessageQueue result = null;
     Director d = getDirector();
@@ -376,7 +376,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   /**
    * Overridable method that triggers a first iteration, from inside the actor initialization. Default implementation calls
    * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input ports)
-   * 
+   *
    * @throws IllegalActionException
    */
   protected void triggerFirstIteration() throws IllegalActionException {
@@ -388,7 +388,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   /**
    * Overridable method that triggers a next iteration, after each actor's previous iteration. Default implementation calls
    * <code>Director.fireAtCurrentTime(this)</code> when the actor is a source. (i.e. has no connected data input ports)
-   * 
+   *
    * @throws IllegalActionException
    */
   protected void triggerNextIteration() throws IllegalActionException {
@@ -400,7 +400,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   /**
    * Check out all msgs pushed to this actor, and group them according to their context. If a ProcessRequest is found with all required inputs filled in, add it
    * to the pending queue.
-   * 
+   *
    * @throws ProcessingException
    */
   protected void aggregatePushedMessages() throws ProcessingException {
@@ -477,7 +477,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
   /**
    * Does a check on the size of the <code>pushedMessages</code> queue, protected with a <code>msgLock</code>
-   * 
+   *
    * @return true if this actor currently has msgs in its <code>pushedMessages</code> queue.
    * @throws ProcessingException
    *           if the access to the queue fails, e.g. when the lock is not available within a reasonable time
@@ -518,7 +518,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    * Actors that have asynchronous processing, should combine returning <code>ProcessingMode.ASYNCHRONOUS</code> here, with invoking
    * <code>processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response)</code> when the work is done for a given request.
    * </p>
-   * 
+   *
    * @param ctxt
    * @param request
    * @return whether the given request will be processed synchronously or asynchronously.
@@ -590,7 +590,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
    * <p>
    * E.g. it can typically be used to validate dynamic parameter settings, and/or messages received on their input ports.
    * </p>
-   * 
+   *
    * @param ctxt
    * @param request
    *          contains all messages received on the actor's input ports for the current iteration.
@@ -602,7 +602,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   /**
    * Overridable method to determine if an actor should do a validation of its state and incoming request for each iteration. <br>
    * By default, checks on its Passerelle director what must be done. If no Passerelle director is used (but e.g. a plain Ptolemy one), it returns false.
-   * 
+   *
    * @see validateIteration()
    * @see doFire()
    * @return
@@ -672,7 +672,15 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     }
     String[] ctxtHdrs = ((MessageContainer) message).getHeader(ProcessRequest.HEADER_PROCESS_CONTEXT);
     if (ctxtHdrs == null || ctxtHdrs.length == 0) {
-      throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, null);
+      try {
+        if (message.getBodyContent() instanceof Context) {
+          return (Context) message.getBodyContent();
+        } else {
+          throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
+        }
+      } catch (MessageException e) {
+        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "Error reading msg", this, message, null);
+      }
     }
     Context context = contextRepository.getContext(ctxtHdrs[0]);
     if (context != null) {
