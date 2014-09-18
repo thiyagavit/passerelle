@@ -338,6 +338,9 @@ public class PaletteBuilder implements Serializable {
     return true;
   }
 
+  public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, String name) {
+    return addSubModel(sd, gr, new MetaData(name, null));
+  }
   public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, MetaData metaData) {
     PaletteGroup group = gr;
     PaletteItemDefinition submodelDef = sd;
