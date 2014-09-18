@@ -22,13 +22,11 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 /**
  * Simple actor that reads input tokens and and forwards them to the output port
@@ -39,15 +37,15 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  */
 public class Delay extends TransformerV5 {
     /**
-	 *
-	 */
+         *
+         */
     private static final long serialVersionUID = -3055643090088110298L;
 
     private static Logger logger = LoggerFactory.getLogger(Delay.class);
 
     public Parameter timeParameter;
     private double time = 0;
- 
+
     public Parameter takePortValueParam;
     private boolean takePortValue = false;
 
@@ -76,53 +74,58 @@ public class Delay extends TransformerV5 {
     @Override
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
-        final long startTime = System.currentTimeMillis();
-        double waitingTimeInS = time;
+
+        double currentTime = time;
         final ManagedMessage timeMessage = request.getMessage(input);
         if (takePortValue) {
-            Object inputValue = PasserelleUtil.getInputValue(timeMessage);
-            if (inputValue instanceof Number) {
-                waitingTimeInS = ((Number) inputValue).doubleValue();
-            } else if (inputValue instanceof String) {
-                try {
-                    waitingTimeInS = Double.valueOf(inputValue.toString());
-                } catch (NumberFormatException e) {
-                    throw new ProcessingExceptionWithLog(this, Severity.FATAL, inputValue + " is not a number", this, e);
-                }
-            } else {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL, "input is not supported", this,
-                        new Exception("input is not supported"));
+
+            try {
+                currentTime = (Double) PasserelleUtil.getInputValue(timeMessage);
+            } catch (final ClassCastException e) {
+                // Useful for test case because input data arrived as string type 
+                currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(timeMessage));
             }
         }
-        final long waitingTime = (long) (waitingTimeInS * 1000);
-        long alreadyTakenTime = System.currentTimeMillis() - startTime;
-        while (alreadyTakenTime < waitingTime  && !isFinishRequested()) {
-            alreadyTakenTime = System.currentTimeMillis() - startTime;
+        logger.debug("currentTime : {}", currentTime);
+        if (currentTime > 0) {
+            final long millis = (long) (currentTime * 1000);
+            ExecutionTracerService.trace(this, "pausing for " + millis + " ms");
+            final long minisleep = 100;
+            long alreadysleep = 0;
+            try {
+                if (millis <= minisleep) {
+                    Thread.sleep(millis);
+                } else {
+                    while (alreadysleep < millis && !isFinishRequested()) {
+                        Thread.sleep(minisleep);
+                        alreadysleep += minisleep;
+                        // System.out.println("slept for " + alreadysleep);
+                    }
+                }
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+                // do nothing, means someone wants us to stop
+            }
         }
-        logger.debug("waitingTimeInMs : {}", (System.currentTimeMillis() - startTime));
         sendOutputMsg(output, timeMessage);
     }
-  
+
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
-        if (attribute == takePortValueParam) {
+        if (attribute == timeParameter) {
+            time = PasserelleUtil.getParameterDoubleValue(timeParameter);
+            if (time < 0) {
+                throw new IllegalActionException(this, "Time value must be upper or equal to 0.");
+            }
+        } else if (attribute == takePortValueParam) {
             takePortValue = PasserelleUtil.getParameterBooleanValue(takePortValueParam);
             if (takePortValue) {
                 input.setExpectedMessageContentType(Double.class);
             } else {
                 input.setExpectedMessageContentType(null);
             }
-        } else if (attribute == timeParameter) {
-            time = PasserelleUtil.getParameterDoubleValue(timeParameter);
-            // Check the validity of this parameter only if the value is not taken by port
         } else {
             super.attributeChanged(attribute);
-        }
-        
-        if (!takePortValue) {
-            if (time < 0) {
-                throw new IllegalActionException(this, "Time value must be upper or equal to 0");
-            }
         }
     }
 
