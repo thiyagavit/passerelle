@@ -316,12 +316,6 @@
       <plugin id="slf4j.log4j12" fragment="true"/>
    </plugins>
 
-   <features>
-      <feature id="com.isencia.passerelle.core.feature" version="8.7.2"/>
-      <feature id="com.isencia.passerelle.workbench.feature" version="8.7.2"/>
-      <feature id="ptolemy.feature" version="7.0.1"/>
-   </features>
-
    <configurations>
       <plugin id="com.isencia.passerelle.workbench" autoStart="false" startLevel="5" />
       <plugin id="com.isencia.passerelle.workbench.starter" autoStart="true" startLevel="6" />
