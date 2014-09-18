@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.7.1.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.7.2.qualifier" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
@@ -227,9 +227,9 @@
       <plugin id="org.eclipse.gmf.runtime.common.ui"/>
       <plugin id="org.eclipse.gmf.runtime.draw2d.ui"/>
       <plugin id="org.eclipse.graphiti"/>
+      <plugin id="org.eclipse.graphiti.doc"/>
       <plugin id="org.eclipse.graphiti.mm"/>
       <plugin id="org.eclipse.graphiti.pattern"/>
-      <plugin id="org.eclipse.graphiti.doc"/>
       <plugin id="org.eclipse.graphiti.ui"/>
       <plugin id="org.eclipse.graphiti.ui.capabilities"/>
       <plugin id="org.eclipse.help"/>
