@@ -150,7 +150,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
   /**
    * Starts the Generic HMI with the default Models Definition bundle, and optionally with a graphical model editor.
-   * 
+   *
    * @param showModelGraph
    *          if true, also show the graphical model editor.
    */
@@ -178,7 +178,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
     if (!showModelForms) {
       return;
     }
-    
+
     int originalScrollPosition = parameterScrollPane.getVerticalScrollBar().getValue();
 
     final URL modelURL = getModelURL();
@@ -340,7 +340,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
         if (!validationContext.isValid()) {
           boolean isError = false;
           //for (Nameable  validatedElement : validationContext.getElementsWithErrors()) {
-          for (NamedObj  validatedElement : validationContext.getElementsWithErrors()) {
+          for (Nameable validatedElement : validationContext.getElementsWithErrors()) {
             for (ValidationException e : validationContext.getErrors(validatedElement)) {
               Object obj = e.getModelElement();
               String validationErrorMsg = e.getSimpleMessage();
@@ -948,7 +948,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
 
   /**
    * Overridable method to influence
-   * 
+   *
    * @return
    */
   protected String getModelIdentifierForFilterDef(Flow model) {
@@ -990,7 +990,7 @@ public class GenericHMI extends HMIBase implements ParameterEditorAuthorizer, Qu
             HMIMessages.MENU_PARAM_VISIBILITY + HMIMessages.KEY).charAt(0));
         paramFilterMenuItem.addActionListener(new ParameterFilterOpener());
         prefsMenu.add(paramFilterMenuItem);
-        final JMenuItem clearLayoutPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_CLEAR_LAYOUTPREFS), 
+        final JMenuItem clearLayoutPrefsMenuItem = new JMenuItem(HMIMessages.getString(HMIMessages.MENU_CLEAR_LAYOUTPREFS),
             HMIMessages.getString(HMIMessages.MENU_CLEAR_LAYOUTPREFS + HMIMessages.KEY).charAt(0));
         clearLayoutPrefsMenuItem.addActionListener(new LayoutPrefsClearer());
         prefsMenu.add(clearLayoutPrefsMenuItem);
