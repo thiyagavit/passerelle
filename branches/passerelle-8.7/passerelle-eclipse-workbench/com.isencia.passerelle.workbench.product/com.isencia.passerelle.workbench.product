@@ -40,7 +40,7 @@
    <license>
         <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         <text>
-   /* Copyright 2011 - iSencia Belgium NV
+   /* Copyright 2014 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
    you may not use this file except in compliance with the License.
@@ -317,9 +317,9 @@
    </plugins>
 
    <features>
-      <feature id="com.isencia.passerelle.core.feature" version="8.7.1"/>
-      <feature id="com.isencia.passerelle.workbench.feature" version="8.7.1"/>
-      <feature id="ptolemy.feature" version="8.3.0"/>
+      <feature id="com.isencia.passerelle.core.feature" version="8.7.2"/>
+      <feature id="com.isencia.passerelle.workbench.feature" version="8.7.2"/>
+      <feature id="ptolemy.feature" version="7.0.1"/>
    </features>
 
    <configurations>
