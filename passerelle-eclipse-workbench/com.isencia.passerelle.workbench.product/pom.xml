@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>com.isencia.passerelle.workbench.product</artifactId>
-  <version>8.7.1-SNAPSHOT</version>
+  <version>8.7.2-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 
 	<build>
