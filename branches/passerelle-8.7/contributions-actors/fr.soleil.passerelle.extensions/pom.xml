@@ -140,7 +140,7 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>docgenerator</artifactId>
-			<!-- <version>8.7.4</version> -->
+			<!-- <version>8.7.5-SNAPSHOT</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.tango</groupId>
