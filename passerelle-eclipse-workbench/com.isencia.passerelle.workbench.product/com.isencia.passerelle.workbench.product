@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.7.2.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.7.5.qualifier" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
