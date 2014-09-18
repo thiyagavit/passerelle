@@ -120,6 +120,7 @@ public class PaletteBuilder implements Serializable {
 
   /**
    * An ImageDescriptor is often returned.
+   * 
    * @param clazzName
    * @return
    */
@@ -278,10 +279,10 @@ public class PaletteBuilder implements Serializable {
     }
 
     try {
-      for (MetaData metaData : RepositoryServiceTracker.getService().getAllSubmodelMetaData()) {
-
+      MetaData[] allSubmodelMetaData = RepositoryServiceTracker.getService().getAllSubmodelMetaData();
+      for (MetaData metaData : allSubmodelMetaData) {
         PaletteGroup group = getPaletteGroup(actorGroups, groups, metaData.getPath(), submodels);
-        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData.getCode());
+        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData);
         if (group != null) {
           group.addPaletteItem(item);
         }
@@ -337,7 +338,7 @@ public class PaletteBuilder implements Serializable {
     return true;
   }
 
-  public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, String name) {
+  public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, MetaData metaData) {
     PaletteGroup group = gr;
     PaletteItemDefinition submodelDef = sd;
     if (submodelDef == null) {
@@ -346,7 +347,7 @@ public class PaletteBuilder implements Serializable {
     if (group == null) {
       group = submodels;
     }
-    SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(submodelDef != null ? submodelDef.getIcon() : null, group, name, name,
+    SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(submodelDef != null ? submodelDef.getIcon() : null, group, metaData.getCode(), metaData.getName(),
         submodelDef != null ? submodelDef.getColor() : null);
 
     return item;
