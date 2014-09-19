@@ -55,6 +55,7 @@ public class PaletteBuilder implements Serializable {
   }
 
   public List<PaletteGroup> getPaletteGroups() {
+    Collections.sort(paletteGroups);
     return paletteGroups;
   }
 
@@ -229,7 +230,6 @@ public class PaletteBuilder implements Serializable {
       Collections.sort(actorGroups);
 
     } catch (Exception e) {
-      e.printStackTrace();
     }
     submodels = getSubModelGroup();
 
