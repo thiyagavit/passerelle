@@ -19,7 +19,7 @@
 
 	<properties>
 		<powermock.version>1.5</powermock.version>
-		<maven.test.skip>true</maven.test.skip>
+<!-- 		<maven.test.skip>true</maven.test.skip> -->
 	</properties>
 
 	<developers>
