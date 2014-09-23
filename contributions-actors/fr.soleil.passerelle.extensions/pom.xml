@@ -5,20 +5,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>passerelle-super-pom</artifactId>
-		<groupId>fr.soleil.passerelle</groupId>
+		<artifactId>super-pom-java</artifactId>
+		<groupId>fr.soleil</groupId>
 		<version>RELEASE</version>
 	</parent>
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.7.8</version>
+	<version>4.9.0-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
 
 	<properties>
 		<powermock.version>1.5</powermock.version>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<developers>
@@ -116,13 +117,9 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>1.4.0</version>
-		</dependency>
+
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
@@ -146,7 +143,7 @@
 			<groupId>org.tango</groupId>
 			<artifactId>TangORB</artifactId>
 		</dependency>
-		
+
 		<!-- Pour Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.gui</groupId>
@@ -172,7 +169,7 @@
 			<artifactId>Pattern</artifactId>
 		</dependency>
 		<!-- End Pour Salsa V2 -->
-		
+
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
@@ -192,7 +189,7 @@
 
 		<dependency>
 			<groupId>fr.soleil.comete.bean</groupId>
-			<artifactId>CurrentScanDataModel</artifactId>		
+			<artifactId>CurrentScanDataModel</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
@@ -210,10 +207,7 @@
 			<groupId>fr.soleil.lib.comete</groupId>
 			<artifactId>CometeSwing</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>bsf</groupId>
-			<artifactId>bsf</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -227,34 +221,38 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.commons</groupId> -->
-		<!-- <artifactId>commons-math3</artifactId> -->
-		<!-- <version>3.2</version> -->
-		<!-- </dependency> -->
+
+
+		<!-- Pour le noyau Passerelle -->
 		<dependency>
-			<groupId>com.microstar</groupId>
-			<artifactId>xml</artifactId>
+			<groupId>bsf</groupId>
+			<artifactId>bsf</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.isencia.passerelle.sherpa</groupId>
 			<artifactId>commons.reduced</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>commons</artifactId>
+			<artifactId>com.isencia.passerelle.commons</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>commons.ume</artifactId>
+			<artifactId>com.isencia.passerelle.commons.ume</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>actor</artifactId>
+			<artifactId>com.isencia.passerelle.actor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>engine</artifactId>
+			<artifactId>com.isencia.passerelle.engine</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>diva</groupId>
@@ -273,40 +271,29 @@
 			<artifactId>gui</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>quartz</groupId>
-			<artifactId>quartz</artifactId>
+			<groupId>com.microstar</groupId>
+			<artifactId>xml</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
+		<!-- <dependency> -->
+		<!-- <groupId>commons-beanutils</groupId> -->
+		<!-- <artifactId>commons-beanutils</artifactId> -->
+		<!-- <exclusions> -->
+		<!-- <exclusion> -->
+		<!-- <groupId>commons-logging</groupId> -->
+		<!-- <artifactId>commons-logging</artifactId> -->
+		<!-- </exclusion> -->
+		<!-- </exclusions> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>jython</groupId>
 			<artifactId>jython</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>junit</groupId> -->
-		<!-- <artifactId>junit</artifactId> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
@@ -353,18 +340,5 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- diagnose dependencies -->
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>javax.persistence</artifactId>
-		</dependency>
 	</dependencies>
 </project>
