@@ -76,6 +76,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
 		</dependency>
@@ -95,21 +99,21 @@
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.engine</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.slf4j</groupId> -->
-<!-- 			<artifactId>slf4j-api</artifactId> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.jgoodies</groupId> -->
-<!-- 			<artifactId>forms</artifactId> -->
-<!-- 			<version>1.0.6</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- <artifactId>slf4j-api</artifactId> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.jgoodies</groupId> -->
+		<!-- <artifactId>forms</artifactId> -->
+		<!-- <version>1.0.6</version> -->
+		<!-- </dependency> -->
 
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>commons-io</groupId> -->
-<!-- 			<artifactId>commons-io</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>commons-io</groupId> -->
+		<!-- <artifactId>commons-io</artifactId> -->
+		<!-- </dependency> -->
 
 
 		<dependency>
