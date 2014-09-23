@@ -68,33 +68,13 @@
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>SoleilActors</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>passerelle-beans</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>ptolemy</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ptolemy</groupId>
-			<artifactId>gui</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ptolemy</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ptolemy</groupId>
-			<artifactId>domains.and.actors</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>diva</groupId>
-			<artifactId>diva</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
