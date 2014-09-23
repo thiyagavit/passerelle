@@ -80,6 +80,22 @@
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>gui</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>domains.and.actors</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>diva</groupId>
+			<artifactId>diva</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
 		</dependency>
