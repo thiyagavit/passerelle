@@ -63,7 +63,7 @@ public class TaskImpl extends RequestImpl implements Task {
 
 	public boolean addResultBlock(ResultBlock block) {
 		if (!ProcessUtils.isInitialized(resultBlocks))
-			resultBlocks = new HashSet<ResultBlock>();
+			initializeResultBlocks();
 		return resultBlocks.add(block);
 	}
 
@@ -103,5 +103,9 @@ public class TaskImpl extends RequestImpl implements Task {
 		}
 		TaskImpl rhs = (TaskImpl) arg0;
 		return new EqualsBuilder().append(this.getId(), rhs.getId()).append(this.getType(), rhs.getType()).isEquals();
+	}
+	
+	public void initializeResultBlocks() {
+    resultBlocks = new HashSet<ResultBlock>();
 	}
 }
