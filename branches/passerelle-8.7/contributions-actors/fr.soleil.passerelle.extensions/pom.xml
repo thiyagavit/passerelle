@@ -19,7 +19,7 @@
 
 	<properties>
 		<powermock.version>1.5</powermock.version>
-<!-- 		<maven.test.skip>true</maven.test.skip> -->
+		<!-- <maven.test.skip>true</maven.test.skip> -->
 	</properties>
 
 	<developers>
@@ -117,7 +117,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 
 		<dependency>
@@ -218,25 +218,58 @@
 			<artifactId>slf4j-log4j12</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
+			<groupId>jython</groupId>
+			<artifactId>jython</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>JTangoCommons</artifactId>
 		</dependency>
 
-
-		<!-- Pour le noyau Passerelle -->
+		<!-- Pour les acteurs ScriptConverter -->
 		<dependency>
 			<groupId>bsf</groupId>
 			<artifactId>bsf</artifactId>
 		</dependency>
+
+		<!-- Pour ModelExecutor -->
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>1.4.0</version>
+			<groupId>com.microstar</groupId>
+			<artifactId>xml</artifactId>
 		</dependency>
 
+		<!-- Pour SoleilActors et le noyau passerelle -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+		</dependency>
+
+		<!-- Pour le noyau Passerelle -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>javax.mail</groupId> -->
+		<!-- <artifactId>mail</artifactId> -->
+		<!-- <version>1.4</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail-api</artifactId>
+			<version>1.4.1</version>
+			<classifier>isencia-bundle</classifier>
+		</dependency>
+		<dependency>
+			<groupId>quartz</groupId>
+			<artifactId>quartz</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle.sherpa</groupId>
 			<artifactId>commons.reduced</artifactId>
+			<!-- <groupId>com.isencia.sherpa</groupId> -->
+			<!-- <artifactId>com.isencia.sherpa.commons.reduced</artifactId> -->
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
@@ -271,36 +304,22 @@
 			<artifactId>gui</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.microstar</groupId>
-			<artifactId>xml</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 		</dependency>
-
-		<!-- <dependency> -->
-		<!-- <groupId>commons-beanutils</groupId> -->
-		<!-- <artifactId>commons-beanutils</artifactId> -->
-		<!-- <exclusions> -->
-		<!-- <exclusion> -->
-		<!-- <groupId>commons-logging</groupId> -->
-		<!-- <artifactId>commons-logging</artifactId> -->
-		<!-- </exclusion> -->
-		<!-- </exclusions> -->
-		<!-- </dependency> -->
 		<dependency>
-			<groupId>jython</groupId>
-			<artifactId>jython</artifactId>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 
+		<!--  TODO : Cette librairie sert à quoi ???? -->
 		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>JTangoCommons</artifactId>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
 		</dependency>
-		<!--use for devFailedUtils in test -->
 
-
+		<!-- Pour les tests -->
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
