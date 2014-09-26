@@ -67,7 +67,7 @@ public class TaskImpl extends RequestImpl implements Task {
 		return resultBlocks.add(block);
 	}
 
-	public Collection<ResultBlock> getResultBlocks() {
+	public Set<ResultBlock> getResultBlocks() {
 		if (!ProcessUtils.isInitialized(resultBlocks)) {
 			return resultBlocks;
 		}
