@@ -11,7 +11,7 @@
 	<groupId>com.isencia.passerelle.gui</groupId>
 	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
-	<version>8.6.0</version>
+	<version>8.6.1-SNASPHOT</version>
 
 	<developers>
 		<developer>
@@ -68,14 +68,26 @@
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>SoleilActors</artifactId>
-			<!-- <version>4.9.0-SNAPSHOT</version> -->
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>fr.soleil.passerelle</groupId> -->
 		<!-- <artifactId>passerelle-beans</artifactId> -->
 		<!-- <scope>runtime</scope> -->
 		<!-- </dependency> -->
-
+		<!-- Pour le MoMLParser -->
+		<dependency>
+			<groupId>com.microstar</groupId>
+			<artifactId>xml</artifactId>
+		</dependency>
+		<!-- Pour la classe Activator -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle.sherpa</groupId>
+			<artifactId>commons.reduced</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
@@ -95,6 +107,18 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>diva</groupId>
+			<artifactId>diva</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>gui</artifactId>
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.slf4j</groupId> -->
