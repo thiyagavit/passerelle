@@ -22,6 +22,7 @@ import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
+import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.util.Level;
@@ -131,8 +132,8 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
         new BooleanToken(throwExceptionOnError));
     throwExceptionOnErrorParam.setTypeEquals(BaseType.BOOLEAN);
 
-    dateParam = new DateTimeParameter(this, DATE_PARAM_NAME, DATE_FORMAT);
-    dateParam.setExpression(DATE_FORMAT.format(new Date()));
+    dateParam = new DateTimeParameter(this, DATE_PARAM_NAME/*, DATE_FORMAT*/);
+    dateParam.setExpression(DATE_PARAMETER_FORMAT.format(new Date()));
 
   }
 
@@ -234,7 +235,8 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
       break;
 
     default: // should not happen
-      new ProcessingExceptionWithLog(this, ErrorCode.FATAL, "Unknown extraction type \"" + extractionType.getDescription() + "\"", this, null);
+      new ProcessingExceptionWithLog(this, Severity.FATAL, "Unknown extraction type \""
+          + extractionType.getDescription() + "\"", this, null);
 
     }
   }

@@ -43,6 +43,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
@@ -57,7 +58,6 @@ import fr.soleil.passerelle.tango.util.ScanTask;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IConfig;
-import fr.soleil.salsa.entity.impl.ConfigImpl;
 import fr.soleil.salsa.exception.SalsaDeviceException;
 import fr.soleil.salsa.exception.ScanNotFoundException;
 
@@ -122,18 +122,18 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             
             try {
                 logger.debug("load salsa config {}", confName);
-                conf = (ConfigImpl<?>) ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
+                conf = ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
 
             } catch (final ScanNotFoundException e) {
                 ExecutionTracerService.trace(this, "Error: Unknown scan configuration " + confName);
-                throw new ValidationException("Unknown scan configuration ", confName, e);
+                throw new ValidationException(ErrorCode.ERROR, "Unknown scan configuration " + confName, this, e) ;
             }
 
             try {
                 configureRecordingSession();
             } catch (SalsaDeviceException e) {
                 ExecutionTracerService.trace(this, "Error: Recording session configuration error");
-                throw new ValidationException("Error: Recording session configuration error", confName, e);
+                throw new ValidationException(ErrorCode.ERROR, "Error: Recording session configuration error" + confName, this, e) ;
             }
 
         }
@@ -166,7 +166,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
     }
 
     private void configureRecordingSession() throws SalsaDeviceException {
-        // FIXME : http://controle.synchrotron-soleil.fr/mantis/view.php?id=25591
+        // FIXME : http://jira.synchrotron-soleil.fr/jira/browse/TANGOCORE-5
         DeviceProxyFactory.remove(ScanUtil.getCurrentSalsaApi().getDevicePreferences().getScanServer().toLowerCase());
 
         if (DataRecorder.getInstance().isSaveActive(this)) {
@@ -203,7 +203,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }
@@ -221,7 +221,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }
@@ -237,7 +237,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
                 // ignore error since it is impossible to throw it
             }
         }

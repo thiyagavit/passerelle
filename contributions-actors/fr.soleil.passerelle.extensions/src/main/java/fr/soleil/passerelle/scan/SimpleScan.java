@@ -10,6 +10,13 @@ import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
 
+/**
+ * 
+ * This class is no more useful use directly SalsaAPI
+ * See JIRA PASSERELLE-91
+ *
+ */
+@Deprecated
 public class SimpleScan {
 
     private String simpleScanName = "";
