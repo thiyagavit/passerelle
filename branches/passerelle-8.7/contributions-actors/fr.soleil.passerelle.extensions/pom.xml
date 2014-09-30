@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.9.0</version>
+	<version>4.9.1-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -243,7 +243,11 @@
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoCommons</artifactId>
 		</dependency>
-
+		<!-- Puour la classe Activator -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
 		<!-- Pour les acteurs ScriptConverter -->
 		<dependency>
 			<groupId>bsf</groupId>
@@ -356,13 +360,6 @@
 					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<!-- TODO : Cette librairie sert à quoi ???? -->
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>1.4.0</version>
 		</dependency>
 
 		<!-- Pour les tests -->
