@@ -86,6 +86,10 @@
 			<version>1.4.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.isencia.passerelle.sherpa</groupId>
+			<artifactId>commons.reduced</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
 		</dependency>
@@ -113,10 +117,10 @@
 			<groupId>ptolemy</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>ptolemy</groupId> -->
-<!-- 			<artifactId>domains.and.actors</artifactId> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>ptolemy</groupId> -->
+		<!-- <artifactId>domains.and.actors</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>ptolemy</groupId>
 			<artifactId>gui</artifactId>
