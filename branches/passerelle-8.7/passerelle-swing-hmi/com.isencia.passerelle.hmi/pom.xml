@@ -11,7 +11,7 @@
 	<groupId>com.isencia.passerelle.gui</groupId>
 	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
-	<version>8.6.1-SNASPHOT</version>
+	<version>8.6.1-SNAPSHOT</version>
 
 	<developers>
 		<developer>
@@ -27,9 +27,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</connection>
-		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
-		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</url>
+		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</connection>
+		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
+		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</url>
 	</scm>
 	<build>
 		<plugins>
