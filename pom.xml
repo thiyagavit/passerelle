@@ -74,7 +74,17 @@
 		<!-- <artifactId>passerelle-beans</artifactId> -->
 		<!-- <scope>runtime</scope> -->
 		<!-- </dependency> -->
-
+		<!-- Pour le MoMLParser -->
+		<dependency>
+			<groupId>com.microstar</groupId>
+			<artifactId>xml</artifactId>
+		</dependency>
+		<!-- Pour la classe Activator -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
