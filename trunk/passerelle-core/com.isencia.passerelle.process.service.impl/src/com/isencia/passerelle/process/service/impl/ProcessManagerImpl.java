@@ -12,6 +12,7 @@ import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ContextProcessingCallback;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
 import com.isencia.passerelle.process.model.persist.PersistenceException;
@@ -99,10 +100,10 @@ public class ProcessManagerImpl implements ProcessManager {
   @Override
   public Context getScopedProcessContext(String scopeGroup, String scope) {
     Context result = null;
-    if(scopeGroup!=null && scope!=null) {
+    if (scopeGroup != null && scope != null) {
       result = scopedContexts.get(scopeGroup + scope);
     }
-    return (result!=null) ? result : getRequest().getProcessingContext();
+    return (result != null) ? result : getRequest().getProcessingContext();
   }
 
   @Override
@@ -279,5 +280,23 @@ public class ProcessManagerImpl implements ProcessManager {
       LOGGER.error("Exception while stopping running flow.", e);
       return (false);
     }
+  }
+
+  @Override
+  public Status getStatus() {
+    Request request = getRequest();
+    if (request == null) {
+      return null;
+    }
+    return request.getProcessingContext().getStatus();
+  }
+
+  @Override
+  public Status getStatus(Task task) {
+    Task currentTask = getTask(task.getId());
+    if (currentTask == null) {
+      return null;
+    }
+    return currentTask.getProcessingContext().getStatus();
   }
 }
