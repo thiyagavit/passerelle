@@ -58,6 +58,15 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
       return result;
     }
   }
+  
+  @Override
+  public ProcessManager getProcessManager(ProcessHandle handle) {
+    ProcessManager processManager = processManagers.get(handle.getProcessId());
+    if (processManager != null)
+      return(processManager);
+    
+    return(null);
+  }
 
   @Override
   public ProcessManager getProcessManager(String id) {
