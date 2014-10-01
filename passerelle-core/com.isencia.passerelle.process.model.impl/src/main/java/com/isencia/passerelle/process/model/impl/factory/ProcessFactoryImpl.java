@@ -40,117 +40,125 @@ import com.isencia.passerelle.process.model.impl.TaskImpl;
  * 
  */
 public class ProcessFactoryImpl implements ProcessFactory {
-	@Override
-	public Attribute createAttribute(AttributeHolder holder, String name, String value) {
-		if (holder == null) {
-			throw new IllegalArgumentException("AttributeHolder can not be null");
-		}
-		if (holder instanceof Request) {
-			return new RequestAttributeImpl((Request) holder, name, value);
-		} else if (holder instanceof ResultBlock) {
-			return new ResultBlockAttributeImpl((ResultBlock) holder, name, value);
-		} else if (holder instanceof ResultItem) {
-			return new ResultItemAttributeImpl((ResultItem<?>) holder, name, value);
-		} else {
-			throw new IllegalArgumentException("Unknown AttributeHolder type " + holder.getClass());
-		}
-	}
+  @Override
+  public Attribute createAttribute(AttributeHolder holder, String name, String value) {
+    if (holder == null) {
+      throw new IllegalArgumentException("AttributeHolder can not be null");
+    }
+    if (holder instanceof Request) {
+      return new RequestAttributeImpl((Request) holder, name, value);
+    } else if (holder instanceof ResultBlock) {
+      return new ResultBlockAttributeImpl((ResultBlock) holder, name, value);
+    } else if (holder instanceof ResultItem) {
+      return new ResultItemAttributeImpl((ResultItem<?>) holder, name, value);
+    } else {
+      throw new IllegalArgumentException("Unknown AttributeHolder type " + holder.getClass());
+    }
+  }
 
-	@Override
-	public Case createCase(String externalReference) {
-		return new CaseImpl();
-	}
+  @Override
+  public Case createCase(String externalReference) {
+    return new CaseImpl();
+  }
 
-	@Override
-	public ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public ContextErrorEvent createContextErrorEvent(Context context, ErrorItem errorItem) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription,
+      String description, Set<String> relatedDataTypes) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription,
+      Throwable cause, Set<String> relatedDataTypes) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public ContextEvent createContextEvent(Context context, String topic, String message) {
-		return new ContextEventImpl(context, topic, message);
-	}
+  @Override
+  public ContextEvent createContextEvent(Context context, String topic, String message) {
+    return new ContextEventImpl(context, topic, message);
+  }
 
-	@Override
-	public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
-		return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
-	}
+  @Override
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description,
+      Set<String> relatedDataTypes) {
+    return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
+  }
 
-	@Override
-	public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
-		return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
-	}
+  @Override
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause,
+      Set<String> relatedDataTypes) {
+    return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
+  }
 
-	@Override
-	public RawResultBlock createRawResultBlock(Task task, String type) {
-		return new RawResultBlockImpl(task, type);
-	}
+  @Override
+  public RawResultBlock createRawResultBlock(Task task, String type) {
+    return new RawResultBlockImpl(task, type);
+  }
 
-	@Override
-	public Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId) {
-		return new MainRequestImpl(requestCase, initiator, type, correlationId, category);
-	}
+  @Override
+  public Request createRequest(Case requestCase, String initiator, String category, String type, String correlationId) {
+    return new MainRequestImpl(requestCase, initiator, type, correlationId, category);
+  }
 
-	@Override
-	public Request createRequest(Case requestCase, String initiator, String executor, String category, String type, String correlationId) {
-		return new MainRequestImpl(requestCase, initiator, executor, type, correlationId, category);
-	}
+  @Override
+  public Request createRequest(Case requestCase, String initiator, String executor, String category, String type, String correlationId) {
+    return new MainRequestImpl(requestCase, initiator, executor, type, correlationId, category);
+  }
 
-	@Override
-	public ResultBlock createResultBlock(Task task, String type) {
-	  return createResultBlock(task, type, new Date());
-	}
+  @Override
+  public ResultBlock createResultBlock(Task task, String type) {
+    return createResultBlock(task, type, new Date());
+  }
 
-	@Override
-	public ResultBlock createResultBlock(Task task, String type, Date date) {
-    String resultTag = (String) task.getProcessingContext().getEntryValue(AttributeNames.RESULT_TAG);
+  @Override
+  public ResultBlock createResultBlock(Task task, String type, Date date) {
     ResultBlock rb = new ResultBlockImpl(task, type, date);
-    if(resultTag!=null) {
-      createAttribute(rb, "tag", resultTag);
+    try {
+      String resultTag = (String) task.getProcessingContext().getEntryValue(AttributeNames.RESULT_TAG);
+      if (resultTag != null) {
+        createAttribute(rb, "tag", resultTag);
+      }
+    } catch (NullPointerException e) {
+      // ignore, in unit tests there is no task context nor tags and then we end up with NPE here
     }
     return rb;
-	}
+  }
 
-	@Override
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit) {
-		return createResultItem(resultBlock, name, value, unit, null, null);
-	}
+  @Override
+  public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit) {
+    return createResultItem(resultBlock, name, value, unit, null, null);
+  }
 
-	@Override
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date) {
-		return createResultItem(resultBlock, name, value, unit, null, date);
-	}
+  @Override
+  public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Date date) {
+    return createResultItem(resultBlock, name, value, unit, null, date);
+  }
 
-	@Override
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level) {
-		return createResultItem(resultBlock, name, value, unit, level, null);
-	}
+  @Override
+  public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level) {
+    return createResultItem(resultBlock, name, value, unit, level, null);
+  }
 
-	public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level, Date date) {
-		return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
-	}
+  public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level, Date date) {
+    return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
+  }
 
-	@Override
-	public Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception {
-		if (taskClass == null)
-			return (createTask(request, initiator, type));
-		return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(request.getProcessingContext(), initiator, type);
-	}
+  @Override
+  public Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception {
+    if (taskClass == null)
+      return (createTask(request, initiator, type));
+    return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(request.getProcessingContext(), initiator, type);
+  }
 
-	@Override
-	public Task createTask(Request request, String initiator, String type) {
-		return new TaskImpl(request.getProcessingContext(), initiator, type);
-	}
+  @Override
+  public Task createTask(Request request, String initiator, String type) {
+    return new TaskImpl(request.getProcessingContext(), initiator, type);
+  }
 
   @Override
   public Task createTask(Class<? extends Task> taskClass, Context processContext, String initiator, String type) throws Exception {
@@ -163,11 +171,12 @@ public class ProcessFactoryImpl implements ProcessFactory {
   public Task createTask(Context processContext, String initiator, String type) {
     return new TaskImpl(processContext, initiator, type);
   }
-	public void destroy() {
-		ProcessFactoryTracker.setService(null);
-	}
-	
-	public void init() {
-		ProcessFactoryTracker.setService(this);
-	}
+
+  public void destroy() {
+    ProcessFactoryTracker.setService(null);
+  }
+
+  public void init() {
+    ProcessFactoryTracker.setService(this);
+  }
 }
