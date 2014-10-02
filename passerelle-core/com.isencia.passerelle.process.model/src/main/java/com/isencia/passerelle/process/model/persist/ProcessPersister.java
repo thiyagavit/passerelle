@@ -19,6 +19,7 @@ public interface ProcessPersister {
 	Case getCase(Long id) throws PersistenceException;
 	ContextEvent getContextEvent(Request request, Long id) throws PersistenceException;
 	Request getRequest(Case caze, Long id) throws PersistenceException;
+	Request getRequestWithTasks(Case caze, Long id) throws PersistenceException;
 	Task getTask(Request request, Long id) throws PersistenceException;
 	Task getTaskWithResults(Request request, Long id) throws PersistenceException;
 	void persistAttributes(Request request) throws PersistenceException;
