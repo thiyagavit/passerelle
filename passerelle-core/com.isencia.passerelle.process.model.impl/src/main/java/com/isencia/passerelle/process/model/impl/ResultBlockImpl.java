@@ -170,8 +170,16 @@ public class ResultBlockImpl implements ResultBlock {
     return creationTS;
   }
 
+  public void setCreationTS(Date creationTS) {
+    this.creationTS = creationTS;
+  }
+
   public String getType() {
     return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public ResultItem<?> putItem(ResultItem<?> item) {
@@ -261,42 +269,5 @@ public class ResultBlockImpl implements ResultBlock {
     return resultItems;
   }
 
-  public ResultBlock clone(Task task) {
-    ResultBlockImpl block = null;
-    try {
-      if (task == null) {
-        block = getClass().getConstructor().newInstance();
-      } else {
-        block = getClass().getConstructor(Task.class, String.class).newInstance(task, type);
-      }
-    } catch (Exception e) {
-      if (task == null) {
-        block = new ResultBlockImpl();
-      } else {
-        block = new ResultBlockImpl(task, type);
-      }
-    }
-    block.creationTS = this.creationTS;
-    block.type = this.type;
-    block.colour = this.colour;
-    block.creationTS = this.creationTS;
-
-    ProcessFactory factory = ProcessFactoryTracker.getService();
-    for (ResultItem<?> item : getAllItems()) {
-      ResultItem<?> newItem = null;
-      try {
-        newItem = item.getClass().getConstructor(ResultBlock.class, String.class, String.class).newInstance(block, item.getName(), item.getValueAsString());
-      } catch (Exception e) {
-        newItem = factory.createResultItem(block, item.getName(), item.getValueAsString(), item.getUnit(), item.getLevel());
-      }
-      newItem.setColour(colour);
-      for (Attribute attribute : item.getAttributes()) {
-        factory.createAttribute(newItem, attribute.getName(), attribute.getValue());
-      }
-      for (Attribute attribute : getAttributes()) {
-        factory.createAttribute(block, attribute.getName(), attribute.getValue());
-      }
-    }
-    return block;
-  }
+ 
 }
