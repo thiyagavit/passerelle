@@ -3,6 +3,7 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -274,7 +275,12 @@ public class ResultBlockImpl implements ResultBlock {
 
     ProcessFactory factory = ProcessFactoryTracker.getService();
     for (ResultItem<?> item : getAllItems()) {
-      ResultItem<?> newItem = factory.createResultItem(block, item.getName(), item.getValueAsString(), item.getUnit(), item.getLevel());
+      ResultItem<?> newItem = null;
+      try {
+        newItem = item.getClass().getConstructor(ResultBlock.class, String.class, String.class).newInstance(block, item.getName(), item.getValueAsString());
+      } catch (Exception e) {
+        newItem = factory.createResultItem(block, item.getName(), item.getValueAsString(), item.getUnit(), item.getLevel());
+      }
       newItem.setColour(colour);
       for (Attribute attribute : item.getAttributes()) {
         factory.createAttribute(newItem, attribute.getName(), attribute.getValue());
