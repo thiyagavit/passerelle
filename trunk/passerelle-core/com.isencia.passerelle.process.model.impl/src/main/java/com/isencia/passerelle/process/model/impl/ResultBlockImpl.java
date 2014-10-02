@@ -263,10 +263,18 @@ public class ResultBlockImpl implements ResultBlock {
 
   public ResultBlock clone(Task task) {
     ResultBlockImpl block = null;
-    if (task == null) {
-      block = new ResultBlockImpl();
-    } else {
-      block = new ResultBlockImpl(task, type);
+    try {
+      if (task == null) {
+        block = getClass().getConstructor().newInstance();
+      } else {
+        block = getClass().getConstructor(Task.class, String.class).newInstance(task, type);
+      }
+    } catch (Exception e) {
+      if (task == null) {
+        block = new ResultBlockImpl();
+      } else {
+        block = new ResultBlockImpl(task, type);
+      }
     }
     block.creationTS = this.creationTS;
     block.type = this.type;
