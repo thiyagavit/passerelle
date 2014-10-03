@@ -251,16 +251,16 @@
 
 		<!-- Pour le noyau Passerelle -->
 
-		<!-- <dependency> -->
-		<!-- <groupId>javax.mail</groupId> -->
-		<!-- <artifactId>mail</artifactId> -->
-		<!-- <version>1.4</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>javax.mail</groupId>
-			<artifactId>mail-api</artifactId>
-			<classifier>isencia-bundle</classifier>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>javax.mail</groupId> -->
+<!-- 			<artifactId>mail-api</artifactId> -->
+<!-- 			<classifier>isencia-bundle</classifier> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.quartz</groupId>
 			<artifactId>quartz</artifactId>
