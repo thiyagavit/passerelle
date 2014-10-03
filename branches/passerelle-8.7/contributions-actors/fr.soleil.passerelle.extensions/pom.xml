@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.9.1-SNAPSHOT</version>
+	<version>4.9.1</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -37,13 +37,13 @@
 	</developers>
 	<scm>
 		<connection>
-            scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions
+            scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/contributions-actors/fr.soleil.passerelle.extensions
         </connection>
 		<developerConnection>
-            scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions
+            scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/contributions-actors/fr.soleil.passerelle.extensions
         </developerConnection>
 		<url>
-            http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/contributions-actors/fr.soleil.passerelle.extensions
+            http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/contributions-actors/fr.soleil.passerelle.extensions
         </url>
 	</scm>
 	<build>
@@ -58,52 +58,52 @@
 				</configuration>
 			</plugin>
 
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-javadoc-plugin</artifactId> -->
-<!-- 				<version>2.6.1</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>jar</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 				Surchage de la javadoc -->
-<!-- 				<configuration> -->
-<!-- 					<attach>true</attach> -->
-<!-- 					<encoding>UTF-8</encoding> -->
-<!-- 					<debug>true</debug> -->
-<!-- 					<show>public</show> -->
-<!-- 					<doclet>doc.doclets.PtDoclet</doclet> -->
-<!-- 					Dépendances de PtDoclet -->
-<!-- 					<docletArtifacts> -->
-<!-- 						<docletArtifact> -->
-<!-- 							<groupId>com.isencia.passerelle</groupId> -->
-<!-- 							<artifactId>docgenerator</artifactId> -->
-<!-- 							<version>RELEASE</version> -->
-<!-- 						</docletArtifact> -->
-<!-- 						<docletArtifact> -->
-<!-- 							<groupId>com.isencia.passerelle</groupId> -->
-<!-- 							<artifactId>engine</artifactId> -->
-<!-- 							<version>RELEASE</version> -->
-<!-- 						</docletArtifact> -->
-<!-- 						<docletArtifact> -->
-<!-- 							<groupId>ptolemy</groupId> -->
-<!-- 							<artifactId>core</artifactId> -->
-<!-- 							<version>RELEASE</version> -->
-<!-- 						</docletArtifact> -->
-<!-- 						<docletArtifact> -->
-<!-- 							<groupId>commons-logging</groupId> -->
-<!-- 							<artifactId>commons-logging</artifactId> -->
-<!-- 							<version>RELEASE</version> -->
-<!-- 						</docletArtifact> -->
-<!-- 					</docletArtifacts> -->
-<!-- 					<useStandardDocletOptions>false</useStandardDocletOptions> -->
-<!-- 					<additionalparam>-d doc/codeDoc</additionalparam> -->
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-javadoc-plugin</artifactId> -->
+			<!-- <version>2.6.1</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>jar</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- Surchage de la javadoc -->
+			<!-- <configuration> -->
+			<!-- <attach>true</attach> -->
+			<!-- <encoding>UTF-8</encoding> -->
+			<!-- <debug>true</debug> -->
+			<!-- <show>public</show> -->
+			<!-- <doclet>doc.doclets.PtDoclet</doclet> -->
+			<!-- Dépendances de PtDoclet -->
+			<!-- <docletArtifacts> -->
+			<!-- <docletArtifact> -->
+			<!-- <groupId>com.isencia.passerelle</groupId> -->
+			<!-- <artifactId>docgenerator</artifactId> -->
+			<!-- <version>RELEASE</version> -->
+			<!-- </docletArtifact> -->
+			<!-- <docletArtifact> -->
+			<!-- <groupId>com.isencia.passerelle</groupId> -->
+			<!-- <artifactId>engine</artifactId> -->
+			<!-- <version>RELEASE</version> -->
+			<!-- </docletArtifact> -->
+			<!-- <docletArtifact> -->
+			<!-- <groupId>ptolemy</groupId> -->
+			<!-- <artifactId>core</artifactId> -->
+			<!-- <version>RELEASE</version> -->
+			<!-- </docletArtifact> -->
+			<!-- <docletArtifact> -->
+			<!-- <groupId>commons-logging</groupId> -->
+			<!-- <artifactId>commons-logging</artifactId> -->
+			<!-- <version>RELEASE</version> -->
+			<!-- </docletArtifact> -->
+			<!-- </docletArtifacts> -->
+			<!-- <useStandardDocletOptions>false</useStandardDocletOptions> -->
+			<!-- <additionalparam>-d doc/codeDoc</additionalparam> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
 
 
 			<plugin>
@@ -118,25 +118,8 @@
 		</plugins>
 	</build>
 
-<!-- 	<dependencyManagement> -->
-<!-- 		<dependencies> -->
-<!-- 			<dependency> -->
-<!-- 				<groupId>com.isencia.passerelle</groupId> -->
-<!-- 				<artifactId>parent</artifactId> -->
-<!-- 				<version>8.7.4</version> -->
-<!-- 				<scope>import</scope> -->
-<!-- 				<type>pom</type> -->
-<!-- 			</dependency> -->
-<!-- 		</dependencies> -->
-<!-- 	</dependencyManagement> -->
-
 	<dependencies>
 
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.3.1</version>
-		</dependency>
 		<dependency>
 			<groupId>org.tango-project</groupId>
 			<artifactId>tango-icon-theme</artifactId>
@@ -324,6 +307,16 @@
 		<dependency>
 			<groupId>com.isencia.passerelle</groupId>
 			<artifactId>com.isencia.passerelle.engine</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.actor</artifactId>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>
