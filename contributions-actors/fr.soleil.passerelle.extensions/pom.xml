@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.9.1</version>
+	<version>4.9.2-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
@@ -251,15 +251,10 @@
 
 		<!-- Pour le noyau Passerelle -->
 
-		<!-- <dependency> -->
-		<!-- <groupId>javax.mail</groupId> -->
-		<!-- <artifactId>mail</artifactId> -->
-		<!-- <version>1.4</version> -->
-		<!-- </dependency> -->
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail-api</artifactId>
-			<classifier>isencia-bundle</classifier>
+		<groupId>javax.mail</groupId>
+		<artifactId>mail</artifactId>
+		<version>1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz</groupId>
