@@ -153,6 +153,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-simple</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>fr.esrf.tango</groupId>
+					<artifactId>TangORB</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -168,12 +172,6 @@
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
@@ -252,7 +250,7 @@
 		<!-- Pour le noyau Passerelle -->
 		<dependency>
 			<groupId>javax.mail</groupId>
-			<artifactId>javax.mail-api</artifactId>
+			<artifactId>mailapi</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
