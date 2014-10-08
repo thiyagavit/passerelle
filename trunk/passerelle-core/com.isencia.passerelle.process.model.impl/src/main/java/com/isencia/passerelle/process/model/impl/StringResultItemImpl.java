@@ -27,10 +27,6 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 
 	private static final long serialVersionUID = 1L;
 
-	@OneToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
-	private ClobItem clobItem;
-
 	public StringResultItemImpl() {
 	}
 
