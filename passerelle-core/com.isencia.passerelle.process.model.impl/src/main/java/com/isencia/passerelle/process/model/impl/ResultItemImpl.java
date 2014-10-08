@@ -27,6 +27,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -52,6 +53,10 @@ import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
   protected static final int MAX_CHAR_SIZE = 500;
+
+  @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
+  protected ClobItem clobItem;
 
   public String getScope() {
     return getType();
@@ -115,6 +120,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   public static final String _COLOUR = "colour";
   public static final String _DISCRIMINATOR = "discriminator";
   public static final String _ATTRIBUTES = "attributes";
+  public static final String _CLOB_ITEM = "clobItem";
 
   public ResultItemImpl() {
   }
