@@ -63,7 +63,7 @@ public class ResultItemAttributeImpl extends AttributeImpl implements Comparable
 		return id;
 	}
 
-	public ResultItem<?> getResultItem() {
+	public ResultItemImpl<?> getResultItem() {
 		return resultItem;
 	}
 
