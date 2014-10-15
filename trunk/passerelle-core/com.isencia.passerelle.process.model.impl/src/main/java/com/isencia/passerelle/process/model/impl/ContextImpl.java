@@ -302,7 +302,7 @@ public class ContextImpl implements Context {
     String result = null;
 
     // first check in the context entries, these have highest priority
-    Object contextEntry = getEntryValue(name);
+    Object contextEntry = getDeepEntryValue(name);
     if (contextEntry != null) {
       // need to force this into a string somehow
       result = contextEntry.toString();
