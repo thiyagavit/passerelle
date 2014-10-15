@@ -67,14 +67,14 @@ public class ProcessFactoryImpl implements ProcessFactory {
   }
 
   @Override
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription,
-      String description, Set<String> relatedDataTypes) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, String description,
+      Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription,
-      Throwable cause, Set<String> relatedDataTypes) {
+  public ContextErrorEvent createContextErrorEvent(Context context, Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause,
+      Set<String> relatedDataTypes) {
     throw new UnsupportedOperationException();
   }
 
@@ -84,14 +84,12 @@ public class ProcessFactoryImpl implements ProcessFactory {
   }
 
   @Override
-  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description,
-      Set<String> relatedDataTypes) {
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
   }
 
   @Override
-  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause,
-      Set<String> relatedDataTypes) {
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, cause, relatedDataTypes);
   }
 
@@ -145,6 +143,9 @@ public class ProcessFactoryImpl implements ProcessFactory {
   }
 
   public ResultItem<String> createResultItem(ResultBlock resultBlock, String name, String value, String unit, Integer level, Date date) {
+    if (name == null) {
+      return null;
+    }
     return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
   }
 
