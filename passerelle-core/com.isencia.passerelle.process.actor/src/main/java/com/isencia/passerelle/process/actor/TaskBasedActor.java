@@ -164,6 +164,9 @@ public abstract class TaskBasedActor extends Actor {
             Exception exceptionDuringCreation = null;
             try {
               taskAttributes = createImmutableTaskAtts(processContext, taskAttributes);
+              // allow subclasses to add their own attributes, mostly based on data in the received processContext
+              addActorSpecificTaskAttributes(message, taskAttributes);
+              addActorSpecificTaskAttributes(processContext, taskAttributes);
               addActorSpecificTaskContextEntries(processContext, taskContextEntries);
             } catch (Exception e) {
               exceptionDuringCreation = e;
@@ -414,6 +417,9 @@ public abstract class TaskBasedActor extends Actor {
     }
   }
 
+  protected void addActorSpecificTaskAttributes(final ManagedMessage message, Map<String, String> taskAttributes) throws ProcessingException {
+  }
+
   /**
    * Method to allow actor implementations to pass specific context entries into the task that will be created and
    * executed. Similar to <code>addActorSpecificTaskAttributes</code> but :
@@ -512,9 +518,6 @@ public abstract class TaskBasedActor extends Actor {
     taskAttributes.put(AttributeNames.CREATOR_ATTRIBUTE, getFullName());
     taskAttributes.put(AttributeNames.REF_ID, referenceId);
     taskAttributes.put(AttributeNames.REQUEST_ID, requestId);
-    // allow subclasses to add their own attributes, mostly based on data in the
-    // received processContext
-    addActorSpecificTaskAttributes(processContext, taskAttributes);
     return taskAttributes;
   }
 
