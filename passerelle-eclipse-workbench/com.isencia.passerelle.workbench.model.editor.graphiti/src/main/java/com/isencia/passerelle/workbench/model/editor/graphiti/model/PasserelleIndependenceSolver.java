@@ -96,6 +96,7 @@ public class PasserelleIndependenceSolver implements IIndependenceSolver {
     if (director != null) {
       registerDirector(director);
     }
+    registerAttributes(topLevel);
     registerEntities(topLevel);
     getRegisteredUUID(topLevel);
   }

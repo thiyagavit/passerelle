@@ -38,6 +38,7 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import ptolemy.actor.Director;
+import ptolemy.data.expr.Variable;
 import ptolemy.kernel.Relation;
 import ptolemy.kernel.util.NamedObj;
 import com.isencia.passerelle.actor.Actor;
@@ -53,6 +54,8 @@ import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelEleme
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementMoveFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementNameDirectEditFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ModelElementPasteFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ParameterAddFeature;
+import com.isencia.passerelle.workbench.model.editor.graphiti.feature.ParameterUpdateFeature;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
 
 /**
@@ -78,6 +81,8 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
       return new ConnectionAddFeature(this);
     } else if (context.getNewObject() instanceof Director) {
       return new DirectorAddFeature(this);
+    }  else if (context.getNewObject() instanceof Variable) {
+      return new ParameterAddFeature(this);
     }
     return super.getAddFeature(context);
   }
@@ -107,7 +112,9 @@ public class PasserelleDiagramFeatureProvider extends DefaultFeatureProvider {
     String boCategory = Graphiti.getPeService().getPropertyValue(context.getPictogramElement(), "__BO_CATEGORY");
     if ("ACTOR".equals(boCategory)) {
       return new ActorUpdateFeature(this);
-    }
+    } else if ("PARAMETER".equals(boCategory)) {
+      return new ParameterUpdateFeature(this);
+    } 
     return super.getUpdateFeature(context);
   }
 
