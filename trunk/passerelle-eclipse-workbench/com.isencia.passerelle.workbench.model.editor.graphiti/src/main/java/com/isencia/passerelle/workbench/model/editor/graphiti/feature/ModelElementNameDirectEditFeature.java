@@ -43,7 +43,7 @@ public class ModelElementNameDirectEditFeature extends AbstractDirectEditingFeat
     String boCategory = Graphiti.getPeService().getPropertyValue(pe, "__BO_CATEGORY");
     // The name of an actor (or other model element) is the only
     // Text element that is linked to it as its business object
-    if (("ACTOR".equals(boCategory) || "DIRECTOR".equals(boCategory)) && (ga instanceof Text)) {
+    if (("PARAMETER".equals(boCategory) || "ACTOR".equals(boCategory) || "DIRECTOR".equals(boCategory)) && (ga instanceof Text)) {
       return true;
     }
     return false;
