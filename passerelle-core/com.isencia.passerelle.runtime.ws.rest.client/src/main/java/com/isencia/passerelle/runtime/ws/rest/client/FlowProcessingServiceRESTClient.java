@@ -115,7 +115,7 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
   @Override
   public ProcessHandle waitUntilFinished(final ProcessHandle processHandle, final long time, final TimeUnit unit) throws FlowNotExecutingException, TimeoutException, InterruptedException, ExecutionException {
     if(LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Context {} - waitUntilFinished {} {}", new Object[]{processHandle.getProcessContextId(), time, unit});
+      LOGGER.debug("Context {} - waitUntilFinished {} {}", new Object[]{processHandle.getProcessId(), time, unit});
     }
     ProcessHandle ph = refresh(processHandle);
     if(ph.getExecutionStatus().isFinalStatus()) {
@@ -148,7 +148,7 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
         }
       }
     } else {
-        throw new TimeoutException("Timeout waitUntilFinished "+processHandle.getProcessContextId());
+        throw new TimeoutException("Timeout waitUntilFinished "+processHandle.getProcessId());
     }
   }
   
@@ -167,48 +167,48 @@ public class FlowProcessingServiceRESTClient implements FlowProcessingService {
   
   @Override
   public ProcessHandle refresh(ProcessHandle processHandle) {
-    LOGGER.info("Context {} - Refreshing execution status of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
-    ProcessHandle ph = getHandle(processHandle.getProcessContextId());
-    LOGGER.debug("Context {} - Execution status : {}", ph.getProcessContextId(), ph.getExecutionStatus());
+    LOGGER.info("Context {} - Refreshing execution status of flow {}", processHandle.getProcessId(), processHandle.getFlowHandle().getCode());
+    ProcessHandle ph = getHandle(processHandle.getProcessId());
+    LOGGER.debug("Context {} - Execution status : {}", ph.getProcessId(), ph.getExecutionStatus());
     return ph;
   }
 
   @Override
   public ProcessHandle terminate(ProcessHandle processHandle) throws FlowNotExecutingException {
-    LOGGER.info("Context {} - Terminating execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
+    LOGGER.info("Context {} - Terminating execution of flow {}", processHandle.getProcessId(), processHandle.getFlowHandle().getCode());
     try {
-      return flowProcResource.path(processHandle.getProcessContextId()).delete(ProcessHandleResource.class);
+      return flowProcResource.path(processHandle.getProcessId()).delete(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
       LOGGER.error(errorInfo.toString());
-      throw new FlowNotExecutingException(processHandle.getProcessContextId());
+      throw new FlowNotExecutingException(processHandle.getProcessId());
     }
   }
 
   @Override
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
-    LOGGER.info("Context {} - Suspending execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
+    LOGGER.info("Context {} - Suspending execution of flow {}", processHandle.getProcessId(), processHandle.getFlowHandle().getCode());
     try {
-      return flowProcResource.path(processHandle.getProcessContextId()).path("suspend").post(ProcessHandleResource.class);
+      return flowProcResource.path(processHandle.getProcessId()).path("suspend").post(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
       LOGGER.error(errorInfo.toString());
-      throw new FlowNotExecutingException(processHandle.getProcessContextId());
+      throw new FlowNotExecutingException(processHandle.getProcessId());
     }
   };
   
   @Override
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
-    LOGGER.info("Context {} - Resuming execution of flow {}", processHandle.getProcessContextId(), processHandle.getFlow().getCode());
+    LOGGER.info("Context {} - Resuming execution of flow {}", processHandle.getProcessId(), processHandle.getFlowHandle().getCode());
     try {
-      return flowProcResource.path(processHandle.getProcessContextId()).path("resume").post(ProcessHandleResource.class);
+      return flowProcResource.path(processHandle.getProcessId()).path("resume").post(ProcessHandleResource.class);
     } catch (UniformInterfaceException e) {
       LOGGER.error("REST call exception", e);
       ErrorInfo errorInfo = e.getResponse().getEntity(ErrorInfo.class);
       LOGGER.error(errorInfo.toString());
-      throw new FlowNotExecutingException(processHandle.getProcessContextId());
+      throw new FlowNotExecutingException(processHandle.getProcessId());
     }
   }
 

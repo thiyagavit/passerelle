@@ -137,7 +137,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
-        LOGGER.info("Context {} - Terminating execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
+        LOGGER.info("Context {} - Terminating execution of flow {}", localHandle.getProcessId(), localHandle.getFlowHandle().getCode());
         localHandle = getFlowProcessingService().terminate(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
@@ -154,7 +154,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
-        LOGGER.info("Context {} - Suspending execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
+        LOGGER.info("Context {} - Suspending execution of flow {}", localHandle.getProcessId(), localHandle.getFlowHandle().getCode());
         localHandle = getFlowProcessingService().suspend(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
@@ -171,7 +171,7 @@ public class FlowProcessingServiceRESTFacade {
     } else {
       ProcessHandle localHandle = getFlowProcessingService().getHandle(processContextId);
       if(localHandle!=null) {
-        LOGGER.info("Context {} - Resuming execution of flow {}", localHandle.getProcessContextId(), localHandle.getFlow().getCode());
+        LOGGER.info("Context {} - Resuming execution of flow {}", localHandle.getProcessId(), localHandle.getFlowHandle().getCode());
         localHandle = getFlowProcessingService().resume(localHandle);
         return buildRemoteHandle(localHandle);
       } else {
