@@ -15,15 +15,11 @@
 package com.isencia.passerelle.runtime.ws.rest;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.isencia.passerelle.runtime.FlowHandle;
 import com.isencia.passerelle.runtime.ProcessHandle;
-import com.isencia.passerelle.runtime.process.FlowNotExecutingException;
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
 @XmlRootElement(name="ProcessHandle")
@@ -39,7 +35,7 @@ public class ProcessHandleResource implements ProcessHandle {
   }
   
   public ProcessHandleResource(ProcessHandle handle) {
-    this(handle.getProcessContextId(), handle.getExecutionStatus(), handle.getSuspendedElements(), FlowHandleResource.buildCompactFlowHandleResource(handle.getFlow()));
+    this(handle.getProcessId(), handle.getExecutionStatus(), handle.getSuspendedElements(), FlowHandleResource.buildCompactFlowHandleResource(handle.getFlowHandle()));
   }
   
   public ProcessHandleResource(String processContextId, ProcessStatus status, String[] suspendedElements, FlowHandleResource flow) {
@@ -50,12 +46,12 @@ public class ProcessHandleResource implements ProcessHandle {
   }
 
   @Override
-  public FlowHandle getFlow() {
+  public FlowHandle getFlowHandle() {
     return flow;
   }
 
   @Override
-  public String getProcessContextId() {
+  public String getProcessId() {
     return processContextId;
   }
 

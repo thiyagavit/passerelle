@@ -26,9 +26,9 @@ public class ProcessHandleBean {
   private String[] suspendedElements;
   
   public final static ProcessHandleBean buildProcessHandleBean(ProcessHandle processHandle) {
-    return new ProcessHandleBean(processHandle.getProcessContextId(), 
+    return new ProcessHandleBean(processHandle.getProcessId(), 
         processHandle.getExecutionStatus().name(), 
-        FlowHandleBean.buildCompactFlowHandleBean(processHandle.getFlow()), 
+        FlowHandleBean.buildCompactFlowHandleBean(processHandle.getFlowHandle()), 
         processHandle.getSuspendedElements());
   }
   
