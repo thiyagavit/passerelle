@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>fr.soleil.passerelle</groupId>
-	<artifactId>fr.soleil.passerelle.actor</artifactId>
+	<artifactId>fr.soleil.passerelle.extensions</artifactId>
 	<version>4.9.2-SNAPSHOT</version>
 
 	<packaging>eclipse-plugin</packaging>
