@@ -99,7 +99,7 @@ public class FutureValue<V> implements Future<V>, Serializable {
 	 * @param t
 	 *          the cause of failure
 	 */
-	protected void setException(Throwable t) {
+	public void setException(Throwable t) {
 		setFailed(t);
 	}
 
