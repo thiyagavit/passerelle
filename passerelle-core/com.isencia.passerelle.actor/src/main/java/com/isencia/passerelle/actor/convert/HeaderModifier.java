@@ -48,6 +48,7 @@ public class HeaderModifier extends Transformer {
   private final static String MODE_ADD = "Add";
   private final static String MODE_MODIFY = "Modify";
   private final static String MODE_REMOVE = "Remove";
+  private final static String MODE_REPLICATE = "Replicate";
 
   private static Logger LOGGER = LoggerFactory.getLogger(HeaderModifier.class);
 
@@ -79,6 +80,7 @@ public class HeaderModifier extends Transformer {
     propModeParam.addChoice(MODE_ADD);
     propModeParam.addChoice(MODE_MODIFY);
     propModeParam.addChoice(MODE_REMOVE);
+    propModeParam.addChoice(MODE_REPLICATE);
   }
   
   @Override
@@ -110,6 +112,11 @@ public class HeaderModifier extends Transformer {
             message.setBodyHeader(propName, propValue);
           } else if (propMode.equalsIgnoreCase(MODE_REMOVE)) {
             message.removeBodyHeader(propName);
+          } else if (propMode.equalsIgnoreCase(MODE_REPLICATE)) {
+            String[] originalHeaders = message.getBodyHeader(propValue);
+            for (String originalHeader : originalHeaders) {
+              message.addBodyHeader(propName, originalHeader);
+            }
           }
         } catch (MessageException e) {
           throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "", this, message, e);
