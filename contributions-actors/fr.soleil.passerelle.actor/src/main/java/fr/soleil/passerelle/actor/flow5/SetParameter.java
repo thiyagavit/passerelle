@@ -16,15 +16,17 @@ package fr.soleil.passerelle.actor.flow5;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.actor.CompositeActor;
+
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.data.expr.Variable;
+import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -62,7 +64,7 @@ public class SetParameter extends Actor {
    * @throws IllegalActionException
    * @throws NameDuplicationException
    */
-  public SetParameter(CompositeActor container, String name) throws IllegalActionException, NameDuplicationException {
+  public SetParameter(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
     input = PortFactory.getInstance().createInputPort(this, null);
     output = PortFactory.getInstance().createOutputPort(this);
