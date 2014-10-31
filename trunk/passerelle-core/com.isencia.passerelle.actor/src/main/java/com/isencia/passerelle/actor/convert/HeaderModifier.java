@@ -114,8 +114,10 @@ public class HeaderModifier extends Transformer {
             message.removeBodyHeader(propName);
           } else if (propMode.equalsIgnoreCase(MODE_REPLICATE)) {
             String[] originalHeaders = message.getBodyHeader(propValue);
-            for (String originalHeader : originalHeaders) {
-              message.addBodyHeader(propName, originalHeader);
+            if (originalHeaders != null) {
+              for (String originalHeader : originalHeaders) {
+                message.addBodyHeader(propName, originalHeader);
+              }
             }
           }
         } catch (MessageException e) {
