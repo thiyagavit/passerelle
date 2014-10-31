@@ -431,7 +431,7 @@ public abstract class HMIBase implements ChangeListener {
             showModelForm(null);
           }
           // ico Bossanova or other "wild" derived GUIs, there's not always a current model URL
-          if (getModelURL() != null) {
+          if (change.isPersistent() && getModelURL() != null) {
             setChanged(getModelURL());
           }
         }
