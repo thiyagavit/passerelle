@@ -17,7 +17,6 @@
 	
 	<properties>
 		<nexus.base.url>https://ci-nexus.isencia.be</nexus.base.url>
-		
 		<passerelle.version>8.7.5-SNAPSHOT</passerelle.version>
 		<sherpabeans-be.version>6.3.3</sherpabeans-be.version>
 	</properties>
@@ -29,6 +28,12 @@
 			<name>Nexus Repository</name>
 			<url>${nexus.base.url}/content/repositories/isencia_soleil_bundles/</url>
 		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>nexus</id>
+			<name>Nexus Repository</name>
+			<url>${nexus.base.url}/content/repositories/isencia_soleil_bundles_snapshots/</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<repositories>
