@@ -15,8 +15,11 @@
 package com.isencia.passerelle.actor.io;
 
 import java.io.File;
+import java.io.FileOutputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.FileParameter;
 import ptolemy.data.expr.Parameter;
@@ -25,6 +28,7 @@ import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.message.ChannelException;
 import com.isencia.message.ISenderChannel;
 import com.isencia.message.generator.MessageTextLineGenerator;
@@ -34,6 +38,7 @@ import com.isencia.message.io.FileSenderChannel;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
+import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
@@ -45,9 +50,11 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.interceptor.MessageToTextConverter;
 
 /**
- * A new implementation of a FileWriter actor which forwards received messages on its output port (i.e. is not a Sink) and is based on the v5 Actor API. It also
- * allows to configure the path and filename separately.
- * 
+ * A new implementation of a FileWriter actor which forwards received messages on its output port (i.e. is not a Sink)
+ * and is based on the v5 Actor API. It also allows to configure the path and filename separately.
+ * <p>
+ * The path/folder should exist. The file should be writeable.
+ * </p>
  * @author erwin
  */
 public class FileWriter2 extends Actor {
@@ -103,6 +110,33 @@ public class FileWriter2 extends Actor {
         "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n" + "<line x1=\"-15\" y1=\"0\" x2=\"15\" y2=\"0\" "
         + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
         + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
+  }
+
+  @Override
+  protected void validateInitialization() throws ValidationException {
+    super.validateInitialization();
+    try {
+      File folder = destinationPathParam.asFile();
+      if (folder == null) {
+        throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "File path not specified", this, null);
+      } else if(!folder.exists()) {
+        throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "File path " + folder + " not found", this, null);
+      } else {
+        // try to get a write access to the destination file
+        FileOutputStream fos = null;
+        try {
+          fos = new FileOutputStream(new File(folder, destinationFileNameParam.stringValue()));
+        } catch (Exception e) {
+          throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Impossible to open file for writing", this, e);
+        } finally {
+          if(fos!=null) {
+            try { fos.close(); } catch (Exception e) {/*ignore*/} //NOSONAR
+          }
+        }
+      }
+    } catch (IllegalActionException e) {
+      throw new ValidationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading file params", this, e);
+    }
   }
 
   // actor life-cycle methods
@@ -188,31 +222,31 @@ public class FileWriter2 extends Actor {
     return fileEncodingParam.stringValue();
   }
 
-  protected String getDestinationPath() throws IllegalActionException {
-    return destinationPathParam.stringValue();
-  }
+  // protected String getDestinationPath() throws IllegalActionException {
+  // return destinationPathParam.stringValue();
+  // }
 
   protected String getDestinationFileName() throws IllegalActionException {
     return destinationFileNameParam.stringValue();
   }
 
   protected boolean isAppendMode() throws IllegalActionException {
-    return ((BooleanToken)appendModeParam.getToken()).booleanValue();
+    return ((BooleanToken) appendModeParam.getToken()).booleanValue();
   }
 
   // channel mgmt methods
 
   protected ISenderChannel createChannel() throws IllegalActionException {
     if (getFileEncoding() != null && getFileEncoding().length() > 0) {
-      return new FileSenderChannel(new File(getDestinationPath(), getDestinationFileName()), getFileEncoding(), new MessageTextLineGenerator());
+      return new FileSenderChannel(new File(destinationPathParam.asFile(), getDestinationFileName()), getFileEncoding(), new MessageTextLineGenerator());
     }
-    return new FileSenderChannel(new File(getDestinationPath(), getDestinationFileName()), new MessageTextLineGenerator());
+    return new FileSenderChannel(new File(destinationPathParam.asFile(), getDestinationFileName()), new MessageTextLineGenerator());
   }
 
   /**
-   * This method can be overridden to define some custom mechanism to convert outgoing passerelle messages into some desired format. The method is called by
-   * this base class, only when it is not configured in "pass-through" mode. By default, creates an interceptor chain containing a simple message-body-to-text
-   * conversion.
+   * This method can be overridden to define some custom mechanism to convert outgoing passerelle messages into some
+   * desired format. The method is called by this base class, only when it is not configured in "pass-through" mode. By
+   * default, creates an interceptor chain containing a simple message-body-to-text conversion.
    * 
    * @return
    */
