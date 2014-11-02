@@ -40,7 +40,7 @@
    <license>
         <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         <text>
-   /* Copyright 2011 - iSencia Belgium NV
+   /* Copyright 2014 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
    you may not use this file except in compliance with the License.
@@ -99,14 +99,17 @@
       <plugin id="org.apache.commons.beanutils"/>
       <plugin id="org.apache.commons.codec"/>
       <plugin id="org.apache.commons.collections"/>
+      <plugin id="org.apache.commons.dbcp"/>
       <plugin id="org.apache.commons.digester"/>
       <plugin id="org.apache.commons.io"/>
       <plugin id="org.apache.commons.lang"/>
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.apache.commons.math"/>
       <plugin id="org.apache.commons.net"/>
+      <plugin id="org.apache.commons.pool"/>
       <plugin id="org.apache.httpcomponents.httpclient"/>
       <plugin id="org.apache.httpcomponents.httpcore"/>
+      <plugin id="org.apache.jasper.glassfish"/>
       <plugin id="org.apache.log4j"/>
       <plugin id="org.apache.lucene"/>
       <plugin id="org.apache.lucene.analysis"/>
@@ -312,8 +315,8 @@
       <plugin id="ptolemy.core"/>
       <plugin id="ptolemy.domains.and.actors"/>
       <plugin id="ptolemy.gui"/>
-      <plugin id="org.slf4j.api"/>
-      <plugin id="org.slf4j.log4j"/>
+      <plugin id="slf4j.api"/>
+      <plugin id="slf4j.log4j12" fragment="true"/>
    </plugins>
 
    <features>
