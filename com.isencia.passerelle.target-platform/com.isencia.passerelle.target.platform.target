@@ -12,6 +12,5 @@
 <repository location="http://download.eclipse.org/releases/juno/"/>
 </location>
 <location path="${project_loc}/target/platform" type="Directory"/>
-<location path="${project_loc}/juno-workbench-v3" type="Directory"/>
 </locations>
 </target>
