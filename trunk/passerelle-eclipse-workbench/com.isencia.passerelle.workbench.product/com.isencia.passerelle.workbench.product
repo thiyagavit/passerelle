@@ -312,8 +312,8 @@
       <plugin id="ptolemy.core"/>
       <plugin id="ptolemy.domains.and.actors"/>
       <plugin id="ptolemy.gui"/>
-      <plugin id="slf4j.api"/>
-      <plugin id="slf4j.log4j12" fragment="true"/>
+      <plugin id="org.slf4j.api"/>
+      <plugin id="org.slf4j.log4j"/>
    </plugins>
 
    <features>
