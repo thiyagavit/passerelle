@@ -432,6 +432,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="com.isencia.passerelle.workbench.model.ui"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="slf4j.api"/>
       <import plugin="ptolemy.gui"/>
       <import plugin="org.eclipse.ui" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.emf.common" version="2.8.0" match="compatible"/>
@@ -454,7 +455,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.200" match="compatible"/>
       <import plugin="org.eclipse.core.expressions" version="3.4.300" match="compatible"/>
       <import plugin="org.eclipse.ui" version="3.7.0" match="compatible"/>
-      <import plugin="org.slf4j.api"/>
    </requires>
 
    <plugin

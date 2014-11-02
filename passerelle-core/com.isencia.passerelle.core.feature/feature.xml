@@ -431,6 +431,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.jdom"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.quartz"/>
+      <import plugin="slf4j.api"/>
       <import plugin="org.apache.commons.io"/>
       <import plugin="org.apache.commons.net" version="1.4.1" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.math" version="2.0.0" match="greaterOrEqual"/>
@@ -446,7 +447,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="javax.mail"/>
       <import plugin="org.apache.httpcomponents.httpclient"/>
       <import plugin="org.apache.httpcomponents.httpcore"/>
-      <import plugin="org.slf4j.api"/>
    </requires>
 
    <plugin
