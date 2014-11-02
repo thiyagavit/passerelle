@@ -426,7 +426,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.ui" version="3.5.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.4.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.ui" version="3.4.2" match="greaterOrEqual"/>
-      <import plugin="slf4j.api"/>
       <import plugin="org.apache.log4j" version="1.2.14" match="greaterOrEqual"/>
       <import plugin="com.microstar" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="com.isencia.passerelle.editor.common" version="1.0.0" match="greaterOrEqual"/>
@@ -476,6 +475,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.swt" version="3.0.0" match="compatible"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="compatible"/>
       <import plugin="com.isencia.passerelle.workbench.model.editor.ui" version="8.7.0" match="greaterOrEqual"/>
+      <import plugin="org.slf4j.api"/>
    </requires>
 
    <plugin
