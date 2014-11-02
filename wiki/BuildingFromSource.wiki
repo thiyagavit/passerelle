@@ -1,4 +1,5 @@
 #summary This document describes how to set-up a build from your cmd prompt.
+#labels Featured
 
 = Introduction =
 The source repository contains many modules, as explained in RepositoryStructure. 
