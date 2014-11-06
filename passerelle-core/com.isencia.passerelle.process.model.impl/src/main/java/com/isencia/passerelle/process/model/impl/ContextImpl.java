@@ -199,7 +199,7 @@ public class ContextImpl implements Context {
       tasks = new ArrayList<Task>();
     this.tasks.add(task);
     // TODO check if other associations must be adapted
-    ((TaskImpl)task).setParentContext(this);
+    ((TaskImpl) task).setParentContext(this);
   }
 
   public List<Task> getTasks() {
@@ -227,6 +227,15 @@ public class ContextImpl implements Context {
 
   public void putEntry(String name, Serializable value) {
     entries.put(name, value);
+  }
+
+  public Serializable removeDeepEntry(String name) {
+    removeEntry(name);
+    List<Task> tasks = getTasks();
+    for (Task task : tasks) {
+      task.getProcessingContext().removeEntry(name);
+    }
+    return entries.remove(name);
   }
 
   public Serializable removeEntry(String name) {
