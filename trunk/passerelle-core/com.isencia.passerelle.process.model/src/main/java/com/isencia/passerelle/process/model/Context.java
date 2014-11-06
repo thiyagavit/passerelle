@@ -125,6 +125,14 @@ public interface Context extends Identifiable, Serializable {
   Serializable removeEntry(String name);
   
   /**
+   * Remove the entry with the given name in this context and context of all linked tasks
+   * 
+   * @param name
+   * @return the entry that was present for the given name (or null if none was there)
+   */
+  Serializable removeDeepEntry(String name);
+  
+  /**
    * 
    * @param name
    * @return the entry stored under the given name in this context and context of all linked tasks, or null if not present.
