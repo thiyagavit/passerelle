@@ -409,4 +409,10 @@ public class ContextImpl implements Context {
     return null;
   }
 
+  @Override
+  public Serializable removeDeepEntry(String name) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }
