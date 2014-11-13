@@ -17,4 +17,5 @@ Import-Package: com.isencia.passerelle.core;version="8.7.0",
  org.osgi.framework;version="1.3.0",
  ptolemy.data;version="7.0.1",
  ptolemy.data.expr;version="7.0.1",
+ ptolemy.kernel;version="7.0.1",
  ptolemy.kernel.util;version="7.0.1"
