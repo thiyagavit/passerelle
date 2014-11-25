@@ -393,6 +393,10 @@ public class ContextImpl implements Context {
   }
 
   public Long getDurationInMillis() {
+    Date creationTS = this.creationTS;
+    if (creationTS == null && request != null) {
+      creationTS = request.getCreationTS();
+    }
     if (creationTS != null && endTS != null) {
       return endTS.getTime() - creationTS.getTime();
     }
