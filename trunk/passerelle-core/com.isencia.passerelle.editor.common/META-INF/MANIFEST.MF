@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle model editor Common
 Bundle-SymbolicName: com.isencia.passerelle.editor.common
-Bundle-Version: 8.8.0.qualifier
+Bundle-Version: 8.9.0.qualifier
 Bundle-Activator: com.isencia.passerelle.editor.common.activator.Activator
 Bundle-Vendor: ISENCIA
 Require-Bundle: ptolemy.core;bundle-version="7.0.1",
