@@ -1,0 +1,54 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE plot PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="convertors" class="ptolemy.moml.EntityLibrary">
+  <configure>
+    <?moml
+      <group>
+			<doc>Conversion actors</doc>
+<entity name="HeaderModifier" class="be.isencia.passerelle.actor.convert.HeaderModifier">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="XSLT Trf" class="be.isencia.passerelle.actor.convert.XSLTConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="Script Trf" class="be.isencia.passerelle.actor.convert.ScriptConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="DynaPort Script Trf" class="be.isencia.passerelle.actor.convert.DynamicPortScriptConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="Synch DynaPort Script Trf" class="be.isencia.passerelle.actor.convert.SynchronizingScriptConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="ArrayToSequenceConverter" class="be.isencia.passerelle.actor.sequence.ArrayToSequenceConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SequenceToArrayConverter" class="be.isencia.passerelle.actor.sequence.SequenceToArrayConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SequenceTracker" class="be.isencia.passerelle.actor.sequence.SequenceTracker">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="MessagesToArrayConverter" class="be.isencia.passerelle.actor.sequence.MessagesToArrayConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="ScriptConverter" class="be.isencia.passerelle.actor.convert.ScriptConverter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+      </group>
+    ?>
+  </configure>
+</entity>
+
+
