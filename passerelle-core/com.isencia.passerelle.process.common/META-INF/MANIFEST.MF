@@ -5,8 +5,8 @@ Bundle-SymbolicName: com.isencia.passerelle.process.common
 Bundle-Version: 8.9.0.qualifier
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.isencia.passerelle.process.common.exception;version="8.8.0",
- com.isencia.passerelle.process.common.util;version="8.8.0"
+Export-Package: com.isencia.passerelle.process.common.exception;version="8.9.0",
+ com.isencia.passerelle.process.common.util;version="8.9.0"
 Require-Bundle: org.eclipse.equinox.preferences;bundle-version="3.2.201" 
 Import-Package: com.isencia.passerelle.core;version="8.7.0",
  com.isencia.passerelle.process.model;version="8.8.0",
