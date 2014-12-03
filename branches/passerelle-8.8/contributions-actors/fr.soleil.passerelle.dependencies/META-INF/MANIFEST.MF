@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil specific Passerelle actor Dependencies Plug-in
 Bundle-SymbolicName: fr.soleil.passerelle.dependencies
-Bundle-Version: 4.7.3.qualifier
+Bundle-Version: 8.8.1
 Bundle-Vendor: isencia
 Eclipse-LazyStart: false
 Import-Package: com.thoughtworks.xstream,

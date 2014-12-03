@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil actor tests
 Bundle-SymbolicName: fr.soleil.passerelle.actor.test
-Bundle-Version: 8.5.0.qualifier
+Bundle-Version: 8.8.1
 Bundle-Vendor: Synchrotron Soleil
 Fragment-Host: fr.soleil.passerelle.actor;bundle-version="8.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

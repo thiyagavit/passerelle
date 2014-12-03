@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Test
 Bundle-SymbolicName: fr.soleil.passerelle.extensions.test
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 8.8.1
 Bundle-Vendor: isencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: fr.soleil.passerelle.actor;bundle-version="4.5.1",
