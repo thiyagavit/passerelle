@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.isencia.passerelle</groupId>
 		<artifactId>passerelle-core</artifactId>
-		<version>8.8.1-SNAPSHOT</version>
+		<version>8.8.1</version>
 	</parent>
 	
 	<artifactId>com.isencia.passerelle.process.service.impl</artifactId>

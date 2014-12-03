@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Python Actor
 Bundle-SymbolicName: org.passerelle.python.actor
-Bundle-Version: 8.6.0.qualifier
+Bundle-Version: 8.8.1
 Bundle-Activator: org.passerelle.python.actor.activator.Activator
 Bundle-Vendor: passerelle
 Eclipse-RegisterBuddy: ptolemy.core

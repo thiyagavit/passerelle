@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DLS Analysis RPC subset for passerelle
 Bundle-SymbolicName: uk.ac.diamond.scisoft.analysis.rpc
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 8.8.1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: uk.ac.diamond.scisoft.analysis.rpc,
  uk.ac.diamond.scisoft.analysis.rpc.flattening,

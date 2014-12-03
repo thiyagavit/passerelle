@@ -2,7 +2,7 @@
 <feature
       id="com.isencia.passerelle.workbench.graphiti.feature"
       label="Passerelle Graphiti-based editor Feature"
-      version="8.8.1.qualifier"
+      version="8.8.1"
       provider-name="ISENCIA">
 
    <description url="http://code.google.com/a/eclipselabs.org/p/passerelle/">
