@@ -104,6 +104,9 @@ public class FlowManager {
       executionError(null, e);
     }
 
+    // IMPORTANT : inside the executionError impl we can not modify anything in the flow's composition
+    // or this can lead to deadlock on ptolemy's Workspace internal locking!
+    // e.g. flow.setManager(null) is absolutely forbidden!!
     public void executionError(ptolemy.actor.Manager manager, final Throwable throwable) {
       try {
         this.throwable = throwable;
@@ -116,7 +119,7 @@ public class FlowManager {
           }
         }
       } finally {
-        FlowManager.this.executionFinished(flow);
+        FlowManager.this.executionError(flow);
       }
     }
 
@@ -900,6 +903,29 @@ public class FlowManager {
         } catch (final IllegalActionException e) {
           // ignore
         }
+      }
+    }
+  }
+
+  /**
+   * Set the flow in standby state after an error
+   * 
+   * @param flow
+   */
+  private synchronized void executionError(final Flow flow) {
+    flowExecutionListeners.remove(flow.getHandle());
+    if (flow.getHandle().isRemote()) {
+      remoteFlowExecutionsList.remove(flow);
+    } else {
+      final Manager mgr = flowExecutions.get(flow.getHandle());
+      if (mgr != null) {
+        flowExecutions.remove(flow.getHandle());
+        // this seems to lead to deadlocks inside Ptolemy!
+//        try {
+//          flow.setManager(null);
+//        } catch (final IllegalActionException e) {
+//          // ignore
+//        }
       }
     }
   }
