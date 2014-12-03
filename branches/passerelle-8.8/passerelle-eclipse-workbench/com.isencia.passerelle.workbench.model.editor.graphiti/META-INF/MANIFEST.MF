@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle model editor based on Graphiti
 Bundle-SymbolicName: com.isencia.passerelle.workbench.model.editor.graphiti;singleton:=true
-Bundle-Version: 8.8.0.qualifier
+Bundle-Version: 8.8.1.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.7.0",
