@@ -1,4 +1,4 @@
-/* Copyright 2013 - iSencia Belgium NV
+/* Copyright 2014 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
+import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
  * Continuing on the track started with the "v3" and "v5" Actor APIs, the process-context-aware API offers further
@@ -374,7 +375,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           try {
             getErrorControlStrategy().handleIterationValidationException(this, e);
           } catch (IllegalActionException e1) {
-            // interpret this is a FATAL error
+            // a validation error is a dramatic event, and when even its handling fails, we jump out of the normal actor's processing asap
             throw new ProcessingException(ErrorCode.ERROR_PROCESSING_FAILURE, "Error reporting iteration validation error", this, e);
           }
         }
@@ -386,6 +387,16 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
         if (ProcessingMode.SYNCHRONOUS.equals(getProcessingMode(currentProcessRequest))) {
           processFinished(processManager, currentProcessRequest, currentProcessResponse);
         }
+      } catch (ProcessingException ex) {
+        ExecutionTracerService.trace(this, ex.getMessage());
+        // TODO add some way to log errors on the processManager for non-TaskBasedActors
+        currentProcessResponse.setException(ex);
+        processFinished(processManager, currentProcessRequest, currentProcessResponse);
+      } catch (Throwable t) {
+        ExecutionTracerService.trace(this, t.getMessage());
+        // TODO add some way to log errors on the processManager for non-TaskBasedActors
+        currentProcessResponse.setException(new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error processing task", this, t));
+        processFinished(processManager, currentProcessRequest, currentProcessResponse);
       } finally {
         notifyFinishedFireProcessing();
       }
