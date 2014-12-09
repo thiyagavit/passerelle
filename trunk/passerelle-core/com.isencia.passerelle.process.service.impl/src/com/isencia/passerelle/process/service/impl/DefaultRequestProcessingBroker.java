@@ -50,7 +50,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
   // a collection of all registered services, ordered by version in a set per name
   private Map<String, SortedSet<ServiceEntry>> services = new ConcurrentHashMap<String, SortedSet<ServiceEntry>>();
 
-  private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
+  private static ScheduledExecutorService delayTimer = Executors.newScheduledThreadPool(50);
 
   @Override
   public Future<Task> process(Task task, Long timeout, TimeUnit unit) throws ProcessingException {

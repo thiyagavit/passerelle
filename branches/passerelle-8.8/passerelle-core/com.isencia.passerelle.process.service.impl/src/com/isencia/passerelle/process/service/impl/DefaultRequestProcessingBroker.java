@@ -50,7 +50,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
   // a collection of all registered services, ordered by version in a set per name
   private Map<String, SortedSet<ServiceEntry>> services = new ConcurrentHashMap<String, SortedSet<ServiceEntry>>();
 
-  private static ScheduledExecutorService delayTimer = Executors.newSingleThreadScheduledExecutor();
+  private static ScheduledExecutorService delayTimer = Executors.newScheduledThreadPool(50);
 
   @Override
   public Future<Task> process(Task task, Long timeout, TimeUnit unit) throws ProcessingException {
@@ -59,7 +59,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
     registerTimeOutHandler(task, timeout, unit);
 
     Future<Task> futResult = null;
-    for(SortedSet<ServiceEntry> svcSet : services.values()) {
+    for (SortedSet<ServiceEntry> svcSet : services.values()) {
       final ServiceEntry svcEntry = svcSet.last();
       RequestProcessingService<Task> service = svcEntry.service;
       if (service.canProcess(task)) {
@@ -76,7 +76,7 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
       throw new ProcessingException(ErrorCode.TASK_UNHANDLED, "No service found for " + task, null, null);
     }
   }
-  
+
   private void registerTimeOutHandler(final Task task, Long timeout, TimeUnit unit) {
     if (timeout == null || unit == null || (timeout <= 0)) {
       return;
@@ -208,30 +208,37 @@ public class DefaultRequestProcessingBroker implements RequestProcessingBroker<T
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
         return false;
+      }
       ServiceEntry other = (ServiceEntry) obj;
       if (service == null) {
-        if (other.service != null)
+        if (other.service != null) {
           return false;
-      } else if (!service.getName().equals(other.service.getName()))
+        }
+      } else if (!service.getName().equals(other.service.getName())) {
         return false;
+      }
       if (version == null) {
-        if (other.version != null)
+        if (other.version != null) {
           return false;
-      } else if (!version.equals(other.version))
+        }
+      } else if (!version.equals(other.version)) {
         return false;
+      }
       return true;
     }
 
     @Override
     public int compareTo(ServiceEntry o) {
       int res = service.getName().compareTo(o.service.getName());
-      if(res==0) {
+      if (res == 0) {
         res = version.compareTo(o.version);
       }
       return res;
