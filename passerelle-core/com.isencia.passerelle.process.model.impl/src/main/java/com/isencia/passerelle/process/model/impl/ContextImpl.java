@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.isencia.passerelle.process.model.impl;
 
@@ -112,9 +112,6 @@ public class ContextImpl implements Context {
   private ReentrantLock lock = new ReentrantLock();
 
   @Transient
-  private List<ErrorItem> errorItems;
-
-  @Transient
   private boolean minimized = false;
 
   @Transient
@@ -195,8 +192,9 @@ public class ContextImpl implements Context {
   }
 
   public void addTask(Task task) {
-    if (!ProcessUtils.isInitialized(tasks))
+    if (!ProcessUtils.isInitialized(tasks)) {
       tasks = new ArrayList<Task>();
+    }
     this.tasks.add(task);
     // TODO check if other associations must be adapted
     ((TaskImpl) task).setParentContext(this);
@@ -210,8 +208,9 @@ public class ContextImpl implements Context {
   }
 
   void addEvent(ContextEvent event) {
-    if (!ProcessUtils.isInitialized(events))
+    if (!ProcessUtils.isInitialized(events)) {
       events = new ArrayList<ContextEvent>();
+    }
     events.add(event);
     if (event instanceof ContextErrorEvent) {
       _getErrors().add(((ContextErrorEvent) event).getErrorItem());
@@ -490,11 +489,13 @@ public class ContextImpl implements Context {
       copy.status = status;
       copy.request = request;
       // use addTask() to add tasks to copy, because it has to initialize the collection
-      for (Task task : tasks)
+      for (Task task : tasks) {
         copy.addTask(task);
+      }
       // use addEvent() to add events to copy, because it has to initialize the collection
-      for (ContextEvent event : events)
+      for (ContextEvent event : events) {
         copy.addEvent(event);
+      }
       copy.entries.putAll(entries);
       copy.transientBranch = true;
       // Mark the current results size, so we're able to identify
@@ -526,13 +527,12 @@ public class ContextImpl implements Context {
   }
 
   private List<ErrorItem> _getErrors() {
-    if (errorItems == null) {
-      errorItems = new ArrayList<ErrorItem>();
-      for (ContextEvent event : events) {
-        if (event instanceof ContextErrorEvent) {
-          ErrorItem errorItem = ((ContextErrorEvent) event).getErrorItem();
-          if (errorItem != null)
-            errorItems.add(errorItem);
+    List<ErrorItem> errorItems = new ArrayList<ErrorItem>();
+    for (ContextEvent event : events) {
+      if (event instanceof ContextErrorEvent) {
+        ErrorItem errorItem = ((ContextErrorEvent) event).getErrorItem();
+        if (errorItem != null) {
+          errorItems.add(errorItem);
         }
       }
     }
