@@ -112,9 +112,6 @@ public class ContextImpl implements Context {
   private ReentrantLock lock = new ReentrantLock();
 
   @Transient
-  private List<ErrorItem> errorItems;
-
-  @Transient
   private boolean minimized = false;
 
   @Transient
@@ -526,13 +523,12 @@ public class ContextImpl implements Context {
   }
 
   private List<ErrorItem> _getErrors() {
-    if (errorItems == null) {
-      errorItems = new ArrayList<ErrorItem>();
-      for (ContextEvent event : events) {
-        if (event instanceof ContextErrorEvent) {
-          ErrorItem errorItem = ((ContextErrorEvent) event).getErrorItem();
-          if (errorItem != null)
-            errorItems.add(errorItem);
+    List<ErrorItem> errorItems = new ArrayList<ErrorItem>();
+    for (ContextEvent event : events) {
+      if (event instanceof ContextErrorEvent) {
+        ErrorItem errorItem = ((ContextErrorEvent) event).getErrorItem();
+        if (errorItem != null) {
+          errorItems.add(errorItem);
         }
       }
     }
