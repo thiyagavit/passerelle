@@ -182,6 +182,10 @@
 			<artifactId>SalsaEntity</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>fr.soleil.gui.salsa</groupId>
+			<artifactId>SalsaEntity</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.tango</groupId>
 			<artifactId>JTangoClientLang</artifactId>
 		</dependency>
