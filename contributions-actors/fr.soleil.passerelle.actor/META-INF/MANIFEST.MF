@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil Actors
 Bundle-SymbolicName: fr.soleil.passerelle.actor
-Bundle-Version: 8.8.2
+Bundle-Version: 8.8.3.qualifier
 Bundle-Activator: fr.soleil.passerelle.actor.activator.Activator
 Bundle-Vendor: Synchrotron Soleil
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
