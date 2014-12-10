@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Unified Messaging Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.commons.ume
-Bundle-Version: 8.8.2.qualifier
+Bundle-Version: 8.8.2
 Bundle-Vendor: iSencia
 Import-Package: com.isencia.util;version="8.7.0",
  javax.activation,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Basis for Fork Join Actors
 Bundle-SymbolicName: com.isencia.passerelle.actor.forkjoin
-Bundle-Version: 8.8.2.qualifier
+Bundle-Version: 8.8.2
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: ptolemy.core
