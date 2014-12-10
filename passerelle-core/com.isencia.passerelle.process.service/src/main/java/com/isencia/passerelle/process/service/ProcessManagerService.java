@@ -14,7 +14,6 @@ public interface ProcessManagerService {
 	ProcessPersister getPersister();
 	ProcessManager addProcessManager(ProcessManager processManager);
 	Set<ProcessHandle> getProcessHandles(String userId, boolean master);
-	Set<ProcessHandle> getProcessHandles(String userId, boolean master,String type);
   ProcessManager getProcessManager(Request request);
   ProcessManager getProcessManager(ProcessHandle handle);
   ProcessManager getProcessManager(String id);

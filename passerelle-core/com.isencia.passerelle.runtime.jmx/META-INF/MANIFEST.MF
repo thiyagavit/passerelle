@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JMX facade model for Passerelle runtime services
 Bundle-SymbolicName: com.isencia.passerelle.runtime.jmx
-Bundle-Version: 8.9.0.qualifier
+Bundle-Version: 8.8.2
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.isencia.passerelle.core;version="8.7.0",

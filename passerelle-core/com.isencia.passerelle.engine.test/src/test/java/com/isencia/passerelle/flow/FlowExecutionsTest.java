@@ -15,9 +15,7 @@
 package com.isencia.passerelle.flow;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import junit.framework.TestCase;
@@ -30,8 +28,6 @@ import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.CapDirector;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.testsupport.FlowBuilder;
-import com.isencia.passerelle.testsupport.FlowExecutionTester;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.testsupport.actor.Const;
@@ -269,60 +265,50 @@ public class FlowExecutionsTest extends TestCase {
     new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(sink, 0L).expectActorIterationCount(excGenerator, 1L).assertFlow(flow);
   }
 
-  public void testProcessExceptionInSequentialAsyncExecutions() throws Exception {
-    FlowStatisticsAssertion flowStatsAssertion = new FlowStatisticsAssertion().
-        expectMsgSentCount("const.output", 1L).
-        expectMsgReceiptCount("sink.input", 0L).
-        expectActorIterationCount("excGenerator", 1L);
+  public void testProcessExceptionInAsyncExecution() throws Exception {
+    for (int i = 0; i < 100; ++i) {
+      flow = new Flow("testProcessException"+i, null);
+      Director director = createProcessDirector(false, flow, "director");
+      flow.setDirector(director);
 
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("const.value", "Hello world");
-    props.put("excGenerator.process Exception", "true");
-    props.put("excGenerator.RuntimeException", "true");
-    
-    FlowBuilder builder = new FlowBuilder() {
-      public Flow buildFlow(String name) throws Exception {
-        final Flow flow = new Flow(name, null);
-        Director director = createProcessDirector(false, flow, "director");
-        flow.setDirector(director);
-        Const constant = new Const(flow, "const");
-        Actor excGenerator = new ExceptionGenerator(flow, "excGenerator");
-        Actor sink = new MessageHistoryStack(flow, "sink");
-        flow.connect(constant, excGenerator);
-        flow.connect(excGenerator, sink);
-        return flow;
+      Const constant = new Const(flow, "const");
+      Actor excGenerator = new ExceptionGenerator(flow, "excGenerator");
+      Actor sink = new MessageHistoryStack(flow, "sink");
+
+      flow.connect(constant, excGenerator);
+      flow.connect(excGenerator, sink);
+
+      Map<String, String> props = new HashMap<String, String>();
+      props.put("const.value", "Hello world");
+      props.put("excGenerator.process Exception", "true");
+      props.put("excGenerator.RuntimeException", "true");
+      final FutureValue<Boolean> modelFinished = new FutureValue<Boolean>();
+      flowMgr.execute(flow, props, new ExecutionListener() {
+        public void managerStateChanged(Manager manager) {
+        }
+        public void executionFinished(Manager manager) {
+          modelFinished.set(Boolean.TRUE);
+        }
+        public void executionError(Manager manager, Throwable throwable) {
+          modelFinished.set(Boolean.FALSE);
+        }
+      });
+      try {
+        modelFinished.get(5, TimeUnit.SECONDS);
+        System.out.println("run [" + i + "] finished");
+        // now check if all went as expected
+        // remark that in case of a deaddlock in the ptolemy Manager error reporting
+        // (combined with flow component changes inside our listener, e.g. flow.setManager(null))
+        // the future above may return, but the assertions below may be blocked in the deaddlock as well!
+        new FlowStatisticsAssertion().
+          expectMsgSentCount(constant, 1L).
+          expectMsgReceiptCount(sink, 0L).
+          expectActorIterationCount(excGenerator, 1L).
+          assertFlow(flow);
+      } catch (TimeoutException e) {
+        fail("Flow execution timed out, probable deadlock");
       }
-    };
-    
-    FlowExecutionTester.runFlowSequentially(100, "testProcessExceptionInSequentialAsyncExecutions", builder, props, flowStatsAssertion);
-  }
-
-  public void testProcessExceptionInConcurrentAsyncExecutions() throws Exception {
-    FlowStatisticsAssertion flowStatsAssertion = new FlowStatisticsAssertion().
-      expectMsgSentCount("const.output", 1L).
-      expectMsgReceiptCount("sink.input", 0L).
-      expectActorIterationCount("excGenerator", 1L);
-
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("const.value", "Hello world");
-    props.put("excGenerator.process Exception", "true");
-    props.put("excGenerator.RuntimeException", "true");
-    
-    FlowBuilder builder = new FlowBuilder() {
-      public Flow buildFlow(String name) throws Exception {
-        final Flow flow = new Flow(name, null);
-        Director director = createProcessDirector(false, flow, "director");
-        flow.setDirector(director);
-        Const constant = new Const(flow, "const");
-        Actor excGenerator = new ExceptionGenerator(flow, "excGenerator");
-        Actor sink = new MessageHistoryStack(flow, "sink");
-        flow.connect(constant, excGenerator);
-        flow.connect(excGenerator, sink);
-        return flow;
-      }
-    };
-    
-    FlowExecutionTester.runFlowConcurrently(100, "testProcessExceptionInConcurrentAsyncExecutions", builder, props, flowStatsAssertion);
+    }
   }
 
   // utility for whenever we would like to get the moml from a java-coded flow

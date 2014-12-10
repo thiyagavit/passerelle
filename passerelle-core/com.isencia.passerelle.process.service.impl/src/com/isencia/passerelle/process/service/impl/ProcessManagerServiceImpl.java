@@ -48,7 +48,7 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
     } else {
       // if the process ID is somehow unknown, we'll try to find the processmanager for the same request ID
       ProcessManager result = null;
-      for (ProcessManager processManager : processManagers.values()) {
+      for(ProcessManager processManager : processManagers.values()) {
         Long id = processManager.getRequest().getId();
         if ((id != null) && (id == request.getId())) {
           result = processManager;
@@ -58,14 +58,14 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
       return result;
     }
   }
-
+  
   @Override
   public ProcessManager getProcessManager(ProcessHandle handle) {
     ProcessManager processManager = processManagers.get(handle.getProcessId());
     if (processManager != null)
-      return (processManager);
-
-    return (null);
+      return(processManager);
+    
+    return(null);
   }
 
   @Override
@@ -75,18 +75,13 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
 
   @Override
   public Set<ProcessHandle> getProcessHandles(String userId, boolean master) {
-    return getProcessHandles(userId, master, null);
-  }
-
-  @Override
-  public Set<ProcessHandle> getProcessHandles(String userId, boolean master, String type) {
     Set<ProcessHandle> set = new HashSet<ProcessHandle>();
 
     for (ProcessManager processManager : processManagers.values()) {
       // skip processes that the user is not allowed to see
       String initiator = processManager.getRequest().getInitiator();
-      String requestType = processManager.getRequest().getType();
-      if (!master && (type == null || type.equals(requestType)) &&(userId != null && initiator == null || userId == null && initiator != null || userId != null && initiator != null && !userId.equals(initiator)))
+      if (!master
+          && (userId != null && initiator == null || userId == null && initiator != null || userId != null && initiator != null && !userId.equals(initiator)))
         continue;
 
       set.add(processManager.getHandle());
