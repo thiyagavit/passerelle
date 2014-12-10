@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle actors and tools for Diagnosis solutions
 Bundle-SymbolicName: com.isencia.passerelle.process.actor
-Bundle-Version: 8.8.2
+Bundle-Version: 8.8.3.qualifier
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core

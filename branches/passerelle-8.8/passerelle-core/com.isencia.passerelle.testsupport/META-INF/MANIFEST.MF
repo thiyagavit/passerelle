@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Test Support
 Bundle-SymbolicName: com.isencia.passerelle.testsupport
-Bundle-Version: 8.8.2
+Bundle-Version: 8.8.3.qualifier
 Bundle-Vendor: ISENCIA
 Eclipse-RegisterBuddy: com.isencia.passerelle.engine, ptolemy.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

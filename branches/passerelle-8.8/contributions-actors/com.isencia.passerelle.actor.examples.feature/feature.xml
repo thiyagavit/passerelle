@@ -2,7 +2,7 @@
 <feature
       id="com.isencia.passerelle.actor.examples.feature"
       label="Feature for example actors"
-      version="8.8.2"
+      version="8.8.3.qualifier"
       provider-name="ISENCIA">
 
    <description>

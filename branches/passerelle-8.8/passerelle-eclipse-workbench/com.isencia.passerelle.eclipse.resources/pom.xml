@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.isencia.passerelle</groupId>
     <artifactId>passerelle-eclipse-workbench</artifactId>
-    <version>8.8.2</version>
+    <version>8.8.3-SNAPSHOT</version>
   </parent>
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.eclipse.resources</artifactId>
-  <version>8.8.2</version>
+  <version>8.8.3-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 </project>
