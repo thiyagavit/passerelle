@@ -1,8 +1,5 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration;
 
-import org.tango.utils.DevFailedUtils;
-
-import fr.esrf.Tango.DevFailed;
 
 /**
  * There are 3 types of motor encoder:
@@ -18,8 +15,8 @@ import fr.esrf.Tango.DevFailed;
 public enum EncoderType {
     NONE, INCREMENTAL, ABSOLUTE;
 
-    public static EncoderType getValueFromOrdinal(final int ordinal) throws DevFailed {
-        EncoderType type = null;
+    public static EncoderType getValueFromOrdinal(final int ordinal){
+        EncoderType type = NONE;
         switch (ordinal) {
             case 1:
                 type = INCREMENTAL;
@@ -31,8 +28,7 @@ public enum EncoderType {
                 type = NONE;
                 break;
             default:
-                DevFailedUtils.throwDevFailed("Encoder type: " + ordinal + " is unknown");
-
+                type = NONE;
         }
         return type;
     }
