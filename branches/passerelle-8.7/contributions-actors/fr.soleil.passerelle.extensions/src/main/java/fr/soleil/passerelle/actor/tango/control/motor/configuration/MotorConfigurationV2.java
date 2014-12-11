@@ -19,12 +19,16 @@ import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
 
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
+import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
+
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.ErrorCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.InitCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.MicroCodeCommand;
@@ -55,6 +59,7 @@ public class MotorConfigurationV2 {
     private final DeviceProxy axisProxy;
     private final String controlBoxDeviceClass;
     private EncoderType encoder;
+    private double axisInitPosition = Double.NaN;
     private InitType initStrategy;
     /**
      * indicate if we have to switch the motor in off state after executing InitReferencePosition or
@@ -75,8 +80,7 @@ public class MotorConfigurationV2 {
      * @throws fr.esrf.Tango.DevFailed if the deviceProxy to the motor can not be created of
      *             Devfailed is raised
      */
-    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName,
-            boolean useSimulatedMotor) throws DevFailed {
+    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName, boolean useSimulatedMotor) throws DevFailed {
         this.deviceName = deviceName;
 
         if (proxy == null) {
@@ -103,32 +107,62 @@ public class MotorConfigurationV2 {
         retrieveProperties();
     }
 
+    private String getDeviceProperty(String deviceName, String propertyName) {
+        String value = null;
+        Database database = TangoDeviceHelper.getDatabase();
+        if (database != null && !isNullOrEmpty(deviceName) && !isNullOrEmpty(propertyName)) {
+            try {
+                DbDatum dbDatum = database.get_device_property(deviceName, propertyName);
+                if (dbDatum != null && !dbDatum.is_empty()) {
+                    value = dbDatum.extractString();
+                }
+            } catch (DevFailed e) {
+                DevFailedUtils.printDevFailed(e);
+            }
+        }
+        return value;
+    }
+
+    private boolean isNullOrEmpty(String stringValue) {
+        return (stringValue == null || stringValue.isEmpty());
+    }
+
     /**
      * retrieve the motor characteristics (encoder, init strategy, initPosition)
      * 
      * @throws DevFailed
      */
     public void retrieveProperties() throws DevFailed {
-        final String[] props = { AXIS_ENCODER_TYPE_PROPERTY, AXIS_INIT_TYPE_PROPERTY };
-        final DbDatum[] datum = axisProxy.get_property(props);
 
-        try {
-            encoder = EncoderType.getValueFromOrdinal(datum[0].extractLong());
-        }
-        catch (NumberFormatException e) {
-            DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT);
-        }
-        initStrategy = InitType.getValuefromString(datum[1].extractString());
+        String encoderType = getDeviceProperty(deviceName, AXIS_ENCODER_TYPE_PROPERTY);
+        if (!isNullOrEmpty(encoderType)) {
+            int encoderInt = 0;
 
-        try {
-            if (initStrategy == OTHER) {
-                // initializeReference command is available. to the command works the
-                // AxisInitPosition property must be a number.
-                axisProxy.get_property(AXIS_INIT_POSITION_PROPERTY).extractDouble();
+            try {
+                encoderInt = Integer.parseInt(encoderType);
+            } catch (NumberFormatException e) {
+                DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT + " for device " + deviceName);
             }
+
+            encoder = EncoderType.getValueFromOrdinal(encoderInt);
         }
-        catch (NumberFormatException e) {
-            DevFailedUtils.throwDevFailed(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
+
+        String initStrategyString = getDeviceProperty(deviceName, AXIS_INIT_TYPE_PROPERTY);
+        if (!isNullOrEmpty(initStrategyString)) {
+            initStrategy = InitType.getValuefromString(initStrategyString);
+        }
+
+        if (initStrategy == InitType.OTHER) {
+            // initializeReference command is available. to the command works the
+            // AxisInitPosition property must be a number.
+            String initPosition = getDeviceProperty(deviceName, getDeviceProperty(deviceName, AXIS_INIT_TYPE_PROPERTY));
+            if (!isNullOrEmpty(initPosition)) {
+                try {
+                    axisInitPosition = Double.parseDouble(initPosition);
+                } catch (NumberFormatException e) {
+                    DevFailedUtils.throwDevFailed(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
+                }
+            }
         }
     }
 
@@ -161,8 +195,7 @@ public class MotorConfigurationV2 {
             // 1 - Init the controlBox
             TangoCommand stateCmd = new TangoCommand(controlBoxName, "State");
 
-            executeCmdAccordingState(new InitCommand(actor, controlBoxName, stateCmd), FAULT,
-                    UNKNOWN);
+            executeCmdAccordingState(new InitCommand(actor, controlBoxName, stateCmd), FAULT, UNKNOWN);
             executeCmdAccordingState(new MicroCodeCommand(actor, controlBoxName, stateCmd), ALARM);
 
             // 2- Init the galil
@@ -170,8 +203,7 @@ public class MotorConfigurationV2 {
 
             executeCmdAccordingState(new InitCommand(actor, deviceName, stateCmd), FAULT, UNKNOWN);
             executeCmdAccordingState(new ErrorCommand(actor, deviceName, stateCmd), MOVING, DISABLE);
-            switchToOffAfterInit = executeCmdAccordingState(new OnCommand(actor, deviceName,
-                    stateCmd), OFF);
+            switchToOffAfterInit = executeCmdAccordingState(new OnCommand(actor, deviceName, stateCmd), OFF);
 
             // checks galil is in expected state
             DevState galilState = stateCmd.execute(DevState.class);
@@ -180,8 +212,7 @@ public class MotorConfigurationV2 {
                         + " insteadof  StandBy or On", this, null);
             }
 
-        }
-        catch (DevFailed e) {
+        } catch (DevFailed e) {
             throw new DevFailedProcessingException(e, PasserelleException.Severity.FATAL, actor);
         }
     }
@@ -190,23 +221,20 @@ public class MotorConfigurationV2 {
         assertEncoderIsValidForInitalization();
 
         if (initStrategy != DP) {
-            throw new MotorConfigurationException(deviceName
-                    + DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE);
+            throw new MotorConfigurationException(deviceName + DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE);
         }
     }
 
     public void assertInitRefPosBeApplyOnMotor() throws MotorConfigurationException {
         assertEncoderIsValidForInitalization();
         if (initStrategy != OTHER) {
-            throw new MotorConfigurationException(deviceName
-                    + INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE);
+            throw new MotorConfigurationException(deviceName + INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE);
         }
     }
 
     public void assertEncoderIsValidForInitalization() throws MotorConfigurationException {
         if (encoder == ABSOLUTE) {
-            throw new MotorConfigurationException(deviceName
-                    + INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER);
+            throw new MotorConfigurationException(deviceName + INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER);
         }
     }
 
