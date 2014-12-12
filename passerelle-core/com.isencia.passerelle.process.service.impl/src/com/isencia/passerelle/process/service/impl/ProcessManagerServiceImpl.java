@@ -86,7 +86,7 @@ public class ProcessManagerServiceImpl implements ProcessManagerService {
       // skip processes that the user is not allowed to see
       String initiator = processManager.getRequest().getInitiator();
       String requestType = processManager.getRequest().getType();
-      if (!master && (type == null || type.equals(requestType)) &&(userId != null && initiator == null || userId == null && initiator != null || userId != null && initiator != null && !userId.equals(initiator)))
+      if (!master && (type != null && !type.equals(requestType)) &&(userId != null && initiator == null || userId == null && initiator != null || userId != null && initiator != null && !userId.equals(initiator)))
         continue;
 
       set.add(processManager.getHandle());
