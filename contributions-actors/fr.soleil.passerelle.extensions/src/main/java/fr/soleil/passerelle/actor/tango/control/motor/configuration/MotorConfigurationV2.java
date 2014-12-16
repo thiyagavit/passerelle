@@ -136,14 +136,14 @@ public class MotorConfigurationV2 {
 
         String encoderType = getDeviceProperty(deviceName, AXIS_ENCODER_TYPE_PROPERTY);
         if (!isNullOrEmpty(encoderType)) {
-            int encoderInt = 0;
+            int encoderInt = EncoderType.NONE.ordinal();
 
             try {
                 encoderInt = Integer.parseInt(encoderType);
             } catch (NumberFormatException e) {
+                //encoderInt = EncoderType.NONE.ordinal();
                 DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT + " for device " + deviceName);
             }
-
             encoder = EncoderType.getValueFromOrdinal(encoderInt);
         }
 
