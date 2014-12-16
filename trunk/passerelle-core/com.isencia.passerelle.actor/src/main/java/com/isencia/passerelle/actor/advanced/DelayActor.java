@@ -38,7 +38,6 @@ public class DelayActor extends Actor {
     output = PortFactory.getInstance().createOutputPort(this);
 
     delayParameter = new Parameter(this, "Delay [s]", new IntToken(3));
-    delayTimer = new Timer("Timer for " + name);
   }
   
   @Override
@@ -50,6 +49,7 @@ public class DelayActor extends Actor {
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
     pendingTasks = 0;
+    delayTimer = new Timer("Timer for " + getName());
   }
 
   @Override
