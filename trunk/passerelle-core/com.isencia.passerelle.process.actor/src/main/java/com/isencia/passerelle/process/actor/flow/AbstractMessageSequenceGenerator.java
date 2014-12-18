@@ -38,6 +38,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
 import com.isencia.passerelle.process.actor.Actor;
+import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.service.ProcessManager;
 
@@ -187,7 +188,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
         Long scopeId = seqMsg.getSequenceID();
         Context branchedCtxt = null;
         if (sequenceScopeMessages.get(scopeId) != null) {
-          branchedCtxt = processManager.getRequest().getProcessingContext();
+          branchedCtxt = getBranchedContextFor(processManager, seqMsg);
         }
         ManagedMessage mergedMsg = null;
         if (branchedCtxt != null) {
@@ -227,6 +228,16 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
     } else {
       return seqMsg;
     }
+  }
+  
+  protected Context getBranchedContextFor(ProcessManager processManager, ManagedMessage msg) {
+    String[] scopeGrp = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
+    String[] scope = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
+    Context branchedCtx = null;
+    if(scopeGrp!=null && scope!=null && scopeGrp.length==1 && scope.length==1) {
+      branchedCtx = processManager.getScopedProcessContext(scopeGrp[0], scope[0]);
+    }
+    return (branchedCtx!=null) ? branchedCtx : processManager.getRequest().getProcessingContext();
   }
 
   public void evict(Long seqID) {
