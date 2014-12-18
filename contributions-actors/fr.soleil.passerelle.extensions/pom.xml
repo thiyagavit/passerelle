@@ -12,7 +12,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>SoleilActors</artifactId>
-	<version>4.9.2</version>
+	<version>4.9.3-SNAPSHOT</version>
 
 	<name>Passerelle Soleil</name>
 	<description>Soleil actors for passerelle</description>
