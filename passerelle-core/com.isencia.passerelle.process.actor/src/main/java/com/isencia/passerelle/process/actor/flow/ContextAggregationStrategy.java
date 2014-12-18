@@ -33,7 +33,7 @@ public class ContextAggregationStrategy implements AggregationStrategy {
   public ManagedMessage aggregateMessages(ProcessManager processManager, ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
     MessageContainer scopeMsg = (MessageContainer) initialMsg;
     ManagedMessage msg = scopeMsg.copy();
-    Context mergedCtxt = processManager.getRequest().getProcessingContext();
+    Context mergedCtxt = getBranchedContextFor(processManager, initialMsg);
     Context[] branches = new Context[otherMessages.length];
     for (int i = 0; i < otherMessages.length; i++) {
       MessageContainer otherMsg = (MessageContainer) otherMessages[i];
@@ -56,5 +56,15 @@ public class ContextAggregationStrategy implements AggregationStrategy {
     }
     mergedCtxt.join(branches);
     return msg;
+  }
+  
+  protected Context getBranchedContextFor(ProcessManager processManager, ManagedMessage msg) {
+    String[] scopeGrp = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
+    String[] scope = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
+    Context branchedCtx = null;
+    if(scopeGrp!=null && scope!=null && scopeGrp.length==1 && scope.length==1) {
+      branchedCtx = processManager.getScopedProcessContext(scopeGrp[0], scope[0]);
+    }
+    return (branchedCtx!=null) ? branchedCtx : processManager.getRequest().getProcessingContext();
   }
 }
