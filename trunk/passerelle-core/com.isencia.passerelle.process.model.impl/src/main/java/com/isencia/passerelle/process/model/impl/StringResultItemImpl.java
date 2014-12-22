@@ -23,7 +23,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 @Cacheable(false)
 @Entity
 @DiscriminatorValue("STRING_RESULT")
-public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable {
+public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable , Comparable<StringResultItemImpl> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -85,4 +85,5 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 	public String getDataType() {
 		return DataTypes.STRING;
 	}
+
 }
