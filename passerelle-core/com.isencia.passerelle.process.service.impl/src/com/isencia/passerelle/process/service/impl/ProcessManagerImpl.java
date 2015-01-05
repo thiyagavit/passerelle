@@ -73,18 +73,28 @@ public class ProcessManagerImpl implements ProcessManager {
 
   @Override
   public Task getTask(long id) throws PersistenceException {
-    for (Task task : request.getProcessingContext().getTasks())
-      if (task.getId().longValue() == id)
-        return (task);
-
-    boolean shouldClose = false;
-    try {
-      shouldClose = getPersister().open(false);
-      return getPersister().getTask(request, id);
-    } finally {
-      if (shouldClose)
-        getPersister().close();
+    Context mainProcessingContext = request.getProcessingContext();
+    Task t = getTaskFromProcessingContext(mainProcessingContext, id);
+    if (t == null) {
+      for (Context scopedCtxt : scopedContexts.values()) {
+        t = getTaskFromProcessingContext(scopedCtxt, id);
+        if (t != null) {
+          break;
+        }
+      }
     }
+    return t;
+  }
+
+  protected Task getTaskFromProcessingContext(Context processingContext, long id) {
+    Task result = null;
+    for (Task task : processingContext.getTasks()) {
+      if (task.getId().longValue() == id) {
+        result = task;
+        break;
+      }
+    }
+    return result;
   }
 
   @Override
