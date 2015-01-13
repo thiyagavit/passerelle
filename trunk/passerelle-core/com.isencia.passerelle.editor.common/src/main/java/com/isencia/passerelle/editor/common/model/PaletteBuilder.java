@@ -269,8 +269,10 @@ public class PaletteBuilder implements Serializable {
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
 
                 item.setHelpUrl(generateHelpUrl(item));
-                actorBundleMap.put(clazz.getName(), bundleId);
-                paletteItemMap.put(item.getClazz().getName(), item);
+                if (isPaletteItemVisible(item)) {
+                  actorBundleMap.put(clazz.getName(), bundleId);
+                  paletteItemMap.put(item.getClazz().getName(), item);
+                }
               }
             }
           }
@@ -292,6 +294,10 @@ public class PaletteBuilder implements Serializable {
       // logError(e);
     }
     return actorGroups;
+  }
+
+  protected boolean isPaletteItemVisible(PaletteItemDefinition item) {
+    return true;
   }
 
   protected String generateHelpUrl(PaletteItemDefinition item) {
@@ -341,6 +347,7 @@ public class PaletteBuilder implements Serializable {
   public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, String name) {
     return addSubModel(sd, gr, new MetaData(name, null));
   }
+
   public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, MetaData metaData) {
     PaletteGroup group = gr;
     PaletteItemDefinition submodelDef = sd;
