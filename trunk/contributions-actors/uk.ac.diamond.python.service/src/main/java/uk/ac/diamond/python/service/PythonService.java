@@ -34,6 +34,8 @@ import com.isencia.util.commandline.ManagedCommandline;
  */
 public class PythonService {
 
+  public final static String SYSTEM_SCRIPTS_HOME = System.getProperty("org.passerelle.python.scripts.system");
+
   private ManagedCommandline command;
   private AnalysisRpcClient client;
   private Thread stopThread;
@@ -71,13 +73,12 @@ public class PythonService {
       pyBuf.append(File.pathSeparatorChar);
     }
     final int port = NetUtils.getFreePort(getServiceStartPort());
-    String scriptsPath = System.getProperty("org.passerelle.python.scripts");
-    String script = scriptsPath+"/python_service_runscript.py";
+    String script = SYSTEM_SCRIPTS_HOME + "/python_service_runscript.py";
 
     service.command = new ManagedCommandline();
     service.command.addArguments(new String[] { pythonInterpreter, "-u", script, String.valueOf(port), "-1" });
 
-    env.put("PYTHONPATH", pyBuf.append(scriptsPath).toString());
+    env.put("PYTHONPATH", pyBuf.append(SYSTEM_SCRIPTS_HOME).toString());
     service.command.setEnv(env);
 
     // Currently log back python output directly to the log file.
