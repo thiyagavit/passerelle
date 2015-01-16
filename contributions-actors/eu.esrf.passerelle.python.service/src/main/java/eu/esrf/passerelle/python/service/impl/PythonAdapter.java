@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package eu.esrf.passerelle.python.service.impl;
 
 import java.io.File;
@@ -20,17 +20,19 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import uk.ac.diamond.python.service.PythonService;
-
+import org.osgi.service.prefs.Preferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.python.service.PythonService;
 
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.edm.backend.service.common.AbstractAdapter;
 import com.isencia.passerelle.edm.backend.service.common.Result;
 import com.isencia.passerelle.edm.backend.service.common.Result.ResultType;
+import com.isencia.passerelle.edm.common.util.PreferenceUtils;
 import com.isencia.passerelle.edm.request.service.ServiceException;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
@@ -42,16 +44,19 @@ import eu.esrf.passerelle.python.service.Constants;
 import eu.esrf.passerelle.python.service.activator.Activator;
 
 /**
- * Remark : depends on a base class that is not yet in open source.
- * When we migrate the ESRF Python actor to the latest Passerelle EDM, this will change.
+ * Remark : depends on a base class that is not yet in open source. When we migrate the ESRF Python actor to the latest
+ * Passerelle EDM, this will change.
  * 
  * @author erwindl
- *
+ * 
  */
 public class PythonAdapter extends AbstractAdapter {
 
+  private static final String SCRIPTS_HOME_PROPNAME = "org.passerelle.python.scripts.user";
   public static final String RESOURCE_NAME = "PYTHON";
   public static final String SERVICE_NAME = "eu.esrf.services.python.v2.6";
+
+  public final static String USER_SCRIPTS_HOME = System.getProperty(SCRIPTS_HOME_PROPNAME);
 
   private final static Logger LOGGER = LoggerFactory.getLogger(PythonAdapter.class);
 
@@ -93,6 +98,14 @@ public class PythonAdapter extends AbstractAdapter {
         }
       } else {
         scriptPath = getOptionalParameterValue(Constants.PATH_ATTRNAME, task);
+        // if the user-defined script path is relative, we look for the configured home path for user-defined scripts
+        if (!new File(scriptPath).isAbsolute()) {
+          Preferences prefsNode = PreferenceUtils.getBackendsConfigNode().node(getPreferencesNodeName());
+          String userScriptsHome = prefsNode.get(SCRIPTS_HOME_PROPNAME, USER_SCRIPTS_HOME);
+          if (!StringUtils.isBlank(userScriptsHome)) {
+            scriptPath = userScriptsHome + File.separator + scriptPath;
+          }
+        }
       }
 
       String resultType = "python";
