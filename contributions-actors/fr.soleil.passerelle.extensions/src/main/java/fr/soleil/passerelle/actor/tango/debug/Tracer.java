@@ -84,13 +84,13 @@ public class Tracer extends Sink {
 			throws IllegalActionException {
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " :" + attribute);
+			logger.trace(getName() + " :" + attribute);
 
 		if (attribute == chopLengthParam) {
 			IntToken chopLengthToken = (IntToken) chopLengthParam.getToken();
 			if (chopLengthToken != null) {
 				chopLength = chopLengthToken.intValue();
-				logger.debug("Chop length changed to : " + chopLength);
+				logger.trace("Chop length changed to : " + chopLength);
 			}
 		}
 		if (attribute == titleParam) {
@@ -99,14 +99,14 @@ public class Tracer extends Sink {
 			super.attributeChanged(attribute);
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " - exit ");
+			logger.trace(getName() + " - exit ");
 	}
 
 	@Override
 	protected void sendMessage(ManagedMessage message)
 			throws ProcessingException {
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+			logger.trace(getName());
 
 		if (message != null) {
 			if (isPassThrough()) {
@@ -141,7 +141,7 @@ public class Tracer extends Sink {
 		}
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " - exit ");
+			logger.trace(getName() + " - exit ");
 	}
 
 	/**
