@@ -13,22 +13,13 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitT
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.OTHER;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command.executeCmdAccordingState;
 
-import org.tango.utils.DevFailedUtils;
-
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
 
-
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.Database;
-import fr.esrf.TangoApi.DbDatum;
-import fr.esrf.TangoApi.DeviceData;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
-import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
-
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.ErrorCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.InitCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.MicroCodeCommand;
@@ -36,30 +27,20 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 //TODO CHANGE TO THOWS MotorConfigurationException anywhere
 public class MotorConfigurationV2 {
 
-    public static final String AXIS_ENCODER_TYPE_PROPERTY = "AxisEncoderType";
-    public static final String AXIS_INIT_TYPE_PROPERTY = "AxisInitType";
-    public static final String AXIS_INIT_POSITION_PROPERTY = "AxisInitPosition";
-
     // Errors messages
+    public static final String NO_CONTROL_BOX_ATTACHED_TO = "No control box attached to ";
     public static final String DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE = "  has an initialization strategy, must use ReferenceInitPosition";
     public static final String INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE = "  has no initialization strategy, must use DefinePosition";
     public static final String INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER = " has an absolute encoder, no need to initialize";
-    public static final String NO_CONTROL_BOX_ATTACHED_TO = "No control box attached to ";
-    public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
-            + " does not exist or is not an integer";
-    public static final String AXIS_INIT_POSITION_PROPERTY_IS_NAN = AXIS_INIT_POSITION_PROPERTY
-            + " does not exist or is not a number";
-
+    
+  
+    
     private final String deviceName;
-    private final DeviceProxy axisProxy;
-    private final String controlBoxDeviceClass;
     private EncoderType encoder;
-    private double axisInitPosition = Double.NaN;
     private InitType initStrategy;
     /**
      * indicate if we have to switch the motor in off state after executing InitReferencePosition or
@@ -80,14 +61,8 @@ public class MotorConfigurationV2 {
      * @throws fr.esrf.Tango.DevFailed if the deviceProxy to the motor can not be created of
      *             Devfailed is raised
      */
-    public MotorConfigurationV2(DeviceProxy proxy, final String deviceName, boolean useSimulatedMotor) throws DevFailed {
+    public MotorConfigurationV2(final String deviceName) throws DevFailed {
         this.deviceName = deviceName;
-
-        if (proxy == null) {
-            proxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-        }
-        axisProxy = proxy;
-        controlBoxDeviceClass = useSimulatedMotor ? "SimulatedControlBox" : "ControlBox";
         switchToOffAfterInit = false;
 
     }
@@ -107,26 +82,6 @@ public class MotorConfigurationV2 {
         retrieveProperties();
     }
 
-    private String getDeviceProperty(String deviceName, String propertyName) {
-        String value = null;
-        Database database = TangoDeviceHelper.getDatabase();
-        if (database != null && !isNullOrEmpty(deviceName) && !isNullOrEmpty(propertyName)) {
-            try {
-                DbDatum dbDatum = database.get_device_property(deviceName, propertyName);
-                if (dbDatum != null && !dbDatum.is_empty()) {
-                    value = dbDatum.extractString();
-                }
-            } catch (DevFailed e) {
-                DevFailedUtils.printDevFailed(e);
-            }
-        }
-        return value;
-    }
-
-    private boolean isNullOrEmpty(String stringValue) {
-        return (stringValue == null || stringValue.isEmpty());
-    }
-
     /**
      * retrieve the motor characteristics (encoder, init strategy, initPosition)
      * 
@@ -134,37 +89,12 @@ public class MotorConfigurationV2 {
      */
     public void retrieveProperties() throws DevFailed {
 
-        String encoderType = getDeviceProperty(deviceName, AXIS_ENCODER_TYPE_PROPERTY);
-        if (!isNullOrEmpty(encoderType)) {
-            int encoderInt = EncoderType.NONE.ordinal();
-
-            try {
-                encoderInt = Integer.parseInt(encoderType);
-            } catch (NumberFormatException e) {
-                //encoderInt = EncoderType.NONE.ordinal();
-                DevFailedUtils.throwDevFailed(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT + " for device " + deviceName);
-            }
-            encoder = EncoderType.getValueFromOrdinal(encoderInt);
-        }
-
-        String initStrategyString = getDeviceProperty(deviceName, AXIS_INIT_TYPE_PROPERTY);
-        if (!isNullOrEmpty(initStrategyString)) {
-            initStrategy = InitType.getValuefromString(initStrategyString);
-        }
-
-        if (initStrategy == InitType.OTHER) {
-            // initializeReference command is available. to the command works the
-            // AxisInitPosition property must be a number.
-            String initPosition = getDeviceProperty(deviceName, getDeviceProperty(deviceName, AXIS_INIT_TYPE_PROPERTY));
-            if (!isNullOrEmpty(initPosition)) {
-                try {
-                    axisInitPosition = Double.parseDouble(initPosition);
-                } catch (NumberFormatException e) {
-                    DevFailedUtils.throwDevFailed(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
-                }
-            }
-        }
+        encoder =  MotorManager.getEncoderType(deviceName) ;
+     
+        initStrategy = MotorManager.getInitType( deviceName);
+      
     }
+  
 
     /**
      * retrieve the controlBox associated to the device
@@ -172,16 +102,7 @@ public class MotorConfigurationV2 {
      * @throws DevFailed
      */
     public void retrieveMyControlBox() throws DevFailed {
-        String cbName = null;
-        final DeviceData dd = axisProxy.get_adm_dev().command_inout("QueryDevice");
-        final String[] devices = dd.extractStringArray();
-        for (final String device : devices) {
-            final String[] classAndDevice = device.split("::");
-            if (classAndDevice[0].equals(controlBoxDeviceClass)) {
-                cbName = classAndDevice[1];
-                break;
-            }
-        }
+        String cbName = MotorManager.getControlBoxForMotor(deviceName);
         if (cbName == null) {
             Except.throw_exception("TANGO_ERROR", NO_CONTROL_BOX_ATTACHED_TO + deviceName,
                     "MotorConfiguration.retrieveMyControlBox");

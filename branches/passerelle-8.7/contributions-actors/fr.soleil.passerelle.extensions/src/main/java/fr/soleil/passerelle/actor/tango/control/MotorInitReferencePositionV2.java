@@ -10,7 +10,6 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-import ptolemy.kernel.util.Settable;
 
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -30,6 +29,7 @@ import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
@@ -58,11 +58,9 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
 
   private static final long serialVersionUID = 6385413377074403283L;
 
-  public static final String INITIALIZE_REFERENCE_POSITION = "InitializeReferencePosition";
-  public static final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
-  public static final String USE_SIMULATED_MOTOR = "Use simulated motor";
+ 
   public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
-  public static final String DEFAULT_ACTORNAME = "MotorInitReferencePosition.";
+  public static final String DEFAULT_ACTORNAME = "MotorInitReferencePositionV2.";
 
   private MotorConfigurationV2 conf;
   private WaitStateTask waitTask;
@@ -75,13 +73,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
   public Parameter shouldInitDevicesParam;
   private boolean shouldInitDevice = false;
 
-  /**
-   * flag to indicate whether the actor must use the simulated devices
-   */
-  @ParameterName(name = USE_SIMULATED_MOTOR)
-  public Parameter useSimulatedMotorParam;
-  private boolean useSimulatedMotor = false;
-
+ 
   public MotorInitReferencePositionV2(CompositeEntity container, String name)
       throws IllegalActionException, NameDuplicationException {
     super(container, name);
@@ -108,20 +100,13 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
         shouldInitDevice));
     shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
-
-    useSimulatedMotorParam = new Parameter(this, USE_SIMULATED_MOTOR, new BooleanToken(
-        useSimulatedMotor));
-    useSimulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
-    useSimulatedMotorParam.setVisibility(Settable.EXPERT);
   }
 
   @Override
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
     if (attribute == shouldInitDevicesParam) {
       shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
-    } else if (attribute == useSimulatedMotorParam) {
-      useSimulatedMotor = PasserelleUtil.getParameterBooleanValue(useSimulatedMotorParam);
-    }
+    } 
     super.attributeChanged(attribute);
   }
 
@@ -141,10 +126,11 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     try {
       // test if commands exists, otherwise this device is not a motor
       final DeviceProxy dev = getDeviceProxy();
-      dev.command_query("MotorON");
-      dev.command_query(INITIALIZE_REFERENCE_POSITION);
+      dev.command_query(MotorManager.MOTOR_ON);
+      dev.command_query(MotorManager.MOTOR_OFF);
+      dev.command_query(MotorManager.INITIALIZE_REFERENCE_POSITION);
 
-      conf = new MotorConfigurationV2(dev, getDeviceName(), useSimulatedMotor);
+      conf = new MotorConfigurationV2(getDeviceName());
       conf.retrieveFullConfig();
       conf.assertInitRefPosBeApplyOnMotor();
     }
@@ -170,8 +156,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
     } else {
       try {
         DeviceProxy dev = getDeviceProxy();
-
-        if (!dev.status().contains(AXIS_NOT_INIT)) {
+        if (!dev.status().contains(MotorManager.AXIS_NOT_INIT)) {
           ExecutionTracerService.trace(this, "Warning: " + deviceName
               + " is already initialized, nothing done");
 
@@ -184,13 +169,11 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
           runInitRefAndWaitEndMovement(deviceName, dev);
 
           // Bug 22954
-          final DevState currentState = TangoAccess.getCurrentState(deviceName);
+          TangoAccess.getCurrentState(deviceName);
 
           // check init has been correctly executed
           final String status = dev.status();
-          if (currentState.equals(DevState.FAULT) || currentState.equals(DevState.ALARM)
-              && status.contains(AXIS_NOT_INIT)) {
-
+          if (status.contains(MotorManager.AXIS_NOT_INIT)) {
             ExecutionTracerService.trace(this, deviceName
                 + " has not been correcty inialized: " + status);
             throw new ProcessingExceptionWithLog(this,
@@ -203,7 +186,6 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             }
             ExecutionTracerService.trace(this, deviceName
                 + " reference position initialized");
-            response.addOutputMessage(output, createMessage());
           }
         }
 
@@ -216,12 +198,14 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
         throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
             e.getMessage(), ctxt, e);
       }
+      
+      response.addOutputMessage(output, createMessage());
 
     }
   }
 
   private void runInitRefAndWaitEndMovement(String deviceName, DeviceProxy dev) throws DevFailed {
-    dev.command_inout(INITIALIZE_REFERENCE_POSITION);
+    dev.command_inout(MotorManager.INITIALIZE_REFERENCE_POSITION);
     ExecutionTracerService.trace(this, "initializing reference position of " + deviceName);
     // since I am not sure that the device motor switch immediately to the moving state, do a
     // little sleep
