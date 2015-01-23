@@ -96,7 +96,8 @@ public class ServiceBasedActor extends TaskBasedActor {
     
     attributeMappingParameter = new StringParameter(this, AttributeNames.ATTR_MAPPING);
     new TextStyle(attributeMappingParameter, "textarea");
-    
+    registerExpertParameter(attributeMappingParameter);
+
     timeOutParameter = new Parameter(this, AttributeNames.TIMEOUT_TIME, new LongToken(getDefaultTimeOutValue()));
     timeOutParameter.setTypeEquals(BaseType.LONG);
     
