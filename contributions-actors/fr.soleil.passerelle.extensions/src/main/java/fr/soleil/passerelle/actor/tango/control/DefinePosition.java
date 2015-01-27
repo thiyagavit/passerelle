@@ -57,8 +57,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
 
   public static final String DEFAULT_ACTORNAME = "DefinePosition.";
   public static final String OUTPUT_PORT_NAME = "InitOK";
-  public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
-
+  
   public final Port offsetPort;
 
   private MotorConfigurationV2 conf;
@@ -67,7 +66,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
    * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
    * execute InitializeReferencePosition
    */
-  @ParameterName(name = INIT_DEVICES)
+  @ParameterName(name = MotorManager.INIT_DEVICES)
   public Parameter shouldInitDevicesParam;
   private boolean shouldInitDevice = false;
 
@@ -98,7 +97,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
     offsetPort = PortFactory.getInstance().createInputPort(this, MotorManager.OFFSET, null);
 
     input.setName("position");
-    shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
+    shouldInitDevicesParam = new Parameter(this, MotorManager.INIT_DEVICES, new BooleanToken(
         shouldInitDevice));
     shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
   }

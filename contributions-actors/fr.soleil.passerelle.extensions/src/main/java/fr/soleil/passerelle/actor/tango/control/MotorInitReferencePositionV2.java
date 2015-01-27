@@ -59,7 +59,6 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
   private static final long serialVersionUID = 6385413377074403283L;
 
  
-  public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
   public static final String DEFAULT_ACTORNAME = "MotorInitReferencePositionV2.";
 
   private MotorConfigurationV2 conf;
@@ -69,7 +68,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
    * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
    * execute InitializeReferencePosition
    */
-  @ParameterName(name = INIT_DEVICES)
+  @ParameterName(name = MotorManager.INIT_DEVICES)
   public Parameter shouldInitDevicesParam;
   private boolean shouldInitDevice = false;
 
@@ -97,7 +96,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
         + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
         + "\"/>\n" + "</svg>\n");
 
-    shouldInitDevicesParam = new Parameter(this, INIT_DEVICES, new BooleanToken(
+    shouldInitDevicesParam = new Parameter(this, MotorManager.INIT_DEVICES, new BooleanToken(
         shouldInitDevice));
     shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
   }

@@ -31,6 +31,9 @@ public class MotorManager {
     public static final String POSITION = "position";
     public static final String OFFSET = "offset";
     
+    //Parameter
+    public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+    
 
     // Errors messages
     public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
