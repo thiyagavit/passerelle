@@ -164,10 +164,15 @@ public class DefinePosition extends ATangoDeviceActorV5 {
           offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
           // message is not empty
           if (!offset.isEmpty()) {
-
-            // set the offset
-            dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, Double
-                .parseDouble(offset)));
+              try {
+                  double offsetValue = Double.parseDouble(offset);
+                  // set the offset
+                  dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET,offsetValue ));
+              }
+              catch (NumberFormatException e) {
+                  ExecutionTracerService.trace(this, "offset is not a number " +offset );
+                  //Do not throw a error for offset
+              }
           }
         }
 
@@ -196,7 +201,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
       }
       catch (NumberFormatException e) {
         throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-            "Error: position or offset is not a number", context, null);
+            "Error: position is not a number", context, null);
       }
 
       catch (DevFailed e) {
