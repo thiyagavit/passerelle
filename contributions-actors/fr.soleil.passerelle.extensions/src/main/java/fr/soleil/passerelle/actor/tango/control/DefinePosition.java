@@ -1,5 +1,7 @@
 package fr.soleil.passerelle.actor.tango.control;
 
+import static fr.esrf.Tango.DevState.OFF;
+
 import java.net.URL;
 
 import ptolemy.data.BooleanToken;
@@ -24,6 +26,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
@@ -31,7 +34,8 @@ import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
-import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command;
+import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
@@ -53,178 +57,137 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  */
 public class DefinePosition extends ATangoDeviceActorV5 {
 
-  private static final long serialVersionUID = 8283763328387658706L;
+    private static final long serialVersionUID = 8283763328387658706L;
 
-  public static final String DEFAULT_ACTORNAME = "DefinePosition.";
-  public static final String OUTPUT_PORT_NAME = "InitOK";
-  
-  public final Port offsetPort;
+    public static final String DEFAULT_ACTORNAME = "DefinePosition.";
+    public static final String OUTPUT_PORT_NAME = "InitOK";
 
-  private MotorConfigurationV2 conf;
+    public final Port offsetPort;
 
-  /**
-   * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
-   * execute InitializeReferencePosition
-   */
-  @ParameterName(name = MotorManager.INIT_DEVICES)
-  public Parameter shouldInitDevicesParam;
-  private boolean shouldInitDevice = false;
+    private MotorConfigurationV2 conf;
 
-  public DefinePosition(CompositeEntity container, String name) throws IllegalActionException,
-  NameDuplicationException {
-    super(container, name);
+    /**
+     * flag that indicate whether the actor must initialize the devices (Cb an Galil) prior to
+     * execute InitializeReferencePosition
+     */
+    @ParameterName(name = MotorManager.INIT_DEVICES)
+    public Parameter shouldInitDevicesParam;
+    private boolean shouldInitDevice = false;
 
-    final URL url = this.getClass().getResource(
-        "/org/tango-project/tango-icon-theme/32x32/categories/applications-system.png");
-    _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
-        + "height=\"40\" style=\"fill:cyan;stroke:black\"/>\n"
-        + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-        + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-        + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-        + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-        + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-        + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-        + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-        + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-        + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-        + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-        + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-        + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-        + "\"/>\n" + "</svg>\n");
+    public DefinePosition(CompositeEntity container, String name) throws IllegalActionException,
+            NameDuplicationException {
+        super(container, name);
 
-    output.setName(OUTPUT_PORT_NAME);
-    offsetPort = PortFactory.getInstance().createInputPort(this, MotorManager.OFFSET, null);
+        final URL url = this.getClass().getResource(
+                "/org/tango-project/tango-icon-theme/32x32/categories/applications-system.png");
+        _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
+                + "height=\"40\" style=\"fill:cyan;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
 
-    input.setName("position");
-    shouldInitDevicesParam = new Parameter(this, MotorManager.INIT_DEVICES, new BooleanToken(
-        shouldInitDevice));
-    shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
-  }
+        output.setName(OUTPUT_PORT_NAME);
+        offsetPort = PortFactory.getInstance().createInputPort(this, MotorManager.OFFSET, null);
 
-  @Override
-  public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (attribute == shouldInitDevicesParam) {
-      shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
-    } 
-    super.attributeChanged(attribute);
-  }
-
-  @Override
-  protected void validateInitialization() throws ValidationException {
-    super.validateInitialization();
-
-    try {
-      // test if commands exists, otherwise this device is not a motor
-      final DeviceProxy dev = getDeviceProxy();
-      dev.command_query(MotorManager.MOTOR_OFF);
-      dev.command_query(MotorManager.DEFINE_POSITION);
-      conf = new MotorConfigurationV2(getDeviceName());
-      conf.retrieveFullConfig();
-      conf.assertDefinePositionCanBeApplyOnMotor();
+        input.setName("position");
+        shouldInitDevicesParam = new Parameter(this, MotorManager.INIT_DEVICES, new BooleanToken(shouldInitDevice));
+        shouldInitDevicesParam.setTypeEquals(BaseType.BOOLEAN);
     }
-    catch (DevFailed devFailed) {
-      throw new DevFailedValidationException(devFailed, this);
-    }
-    catch (PasserelleException e) {
-      throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
-    }
-    catch (MotorConfigurationException e) {
-      throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, e.getMessage(), this,
-          e);
-    }
-  }
 
-  @Override
-  protected void process(ActorContext context, ProcessRequest request, ProcessResponse response)
-      throws ProcessingException {
-    String deviceName = getDeviceName();
-    if (isMockMode()) {
-      ExecutionTracerService.trace(this, "MOCK - initializing reference position of "
-          + deviceName);
-    } else {
-      try {
-        DeviceProxy dev = getDeviceProxy();
-
-        if (shouldInitDevice) {
-          conf.initDevice(this);
+    @Override
+    public void attributeChanged(Attribute attribute) throws IllegalActionException {
+        if (attribute == shouldInitDevicesParam) {
+            shouldInitDevice = PasserelleUtil.getParameterBooleanValue(shouldInitDevicesParam);
         }
-
-        // run DefinePosition
-
-        double position = 0;
-        String offset = "";
-
-        position = Double.parseDouble((String) PasserelleUtil.getInputValue(request
-            .getMessage(input)));
-
-        // if port is Connected
-        ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
-        if (offsetManagedMsg != null) {
-          offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
-          // message is not empty
-          if (!offset.isEmpty()) {
-              try {
-                  double offsetValue = Double.parseDouble(offset);
-                  // set the offset
-                  dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET,offsetValue ));
-              }
-              catch (NumberFormatException e) {
-                  ExecutionTracerService.trace(this, "offset is not a number " +offset );
-                  //Do not throw a error for offset
-              }
-          }
-        }
-
-        // set the position
-        DeviceData value = new DeviceData();
-        value.insert(position);
-        dev.command_inout(MotorManager.DEFINE_POSITION, value);
-
-        raiseExceptionIfDefinePositionFailed(dev, context);
-
-        // if the motor was off before the init, we switch it to off again
-        if (conf.isSwitchToOffAfterInit()) {
-          dev.command_inout(MotorManager.MOTOR_OFF);
-        }
-
-        StringBuilder msg = new StringBuilder(deviceName);
-        msg.append("define position applied with position: ");
-        msg.append(position);
-        if (!offset.isEmpty()) {
-          msg.append(" ; offset: ");
-          msg.append(offset);
-        }
-        ExecutionTracerService.trace(this, msg.toString());
-        response.addOutputMessage(output, createMessage());
-
-      }
-      catch (NumberFormatException e) {
-        throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-            "Error: position is not a number", context, null);
-      }
-
-      catch (DevFailed e) {
-        throw new DevFailedProcessingException(e, this);
-      }
-      catch (PasserelleException e) {
-        throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-            e.getMessage(), context, e);
-      }
+        super.attributeChanged(attribute);
     }
-  }
 
-  private void raiseExceptionIfDefinePositionFailed(DeviceProxy dev, ActorContext context)
-      throws DevFailed, ProcessingExceptionWithLog {
-    String deviceName = getDeviceName();
+    @Override
+    protected void validateInitialization() throws ValidationException {
+        super.validateInitialization();
 
-    // Bug 22954
-    TangoAccess.getCurrentState(deviceName);
+        try {
+            // test if commands exists, otherwise this device is not a motor
+            final DeviceProxy dev = getDeviceProxy();
+            dev.command_query(MotorManager.MOTOR_OFF);
+            dev.command_query(MotorManager.DEFINE_POSITION);
+            conf = new MotorConfigurationV2(getDeviceName());
+            conf.retrieveFullConfig();
+            conf.assertDefinePositionCanBeApplyOnMotor();
+        } catch (DevFailed devFailed) {
+            throw new DevFailedValidationException(devFailed, this);
+        } catch (PasserelleException e) {
+            throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+        } catch (MotorConfigurationException e) {
+            throw new ValidationException(ErrorCode.FLOW_CONFIGURATION_ERROR, e.getMessage(), this, e);
+        }
+    }
 
-    // if the motor is at the end of the rail (on the stop), the state is Alarm but it's ok.
-    // So to be sure the definePosition command was successful we must check the status
-    if (dev.status().contains(MotorManager.AXIS_NOT_INIT))
-      throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-          deviceName + " has not been correcty inialized: " + dev.status(), context, null);
-  }
+    @Override
+    protected void process(ActorContext context, ProcessRequest request, ProcessResponse response)
+            throws ProcessingException {
+        String deviceName = getDeviceName();
+        if (isMockMode()) {
+            ExecutionTracerService.trace(this, "MOCK - initializing reference position of " + deviceName);
+        } else {
+            String positionStringValue = (String) PasserelleUtil.getInputValue(request.getMessage(input));
+            try {
+                //Check position input before
+                double position = Double.parseDouble(positionStringValue);
+                // run DefinePosition
+                DeviceProxy dev = getDeviceProxy();
+                // Call Init if necessary before initialized process
+                if (MotorManager.isMotorIsInit(conf, this, shouldInitDevice, dev)) {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName
+                            + " is already initialized, nothing done");
+                } else {
+                    String offset = "";
+
+                    // if port is Connected
+                    ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
+                    if (offsetManagedMsg != null) {
+                        offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
+                        // message is not empty
+                        if (!offset.isEmpty()) {
+                            try {
+                                double offsetValue = Double.parseDouble(offset);
+                                // set the offset
+                                dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, offsetValue));
+                                ExecutionTracerService.trace(this, "write " + offsetValue + " on " + deviceName + "/" + MotorManager.OFFSET);
+                                
+                            } catch (NumberFormatException e) {
+                                ExecutionTracerService.trace(this, offset + " offset value is not a number");
+                                // Do not throw a error for offset
+                            }
+                        }
+                    }
+
+                    // set the position
+                    DeviceData value = new DeviceData();
+                    value.insert(position);
+                    dev.command_inout(MotorManager.DEFINE_POSITION, value);
+                    ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.DEFINE_POSITION + " with " + position);
+                    MotorManager.raiseExceptionIfInitFailed(dev, context,this);
+                    ExecutionTracerService.trace(this, deviceName + " define position succeed");
+                    response.addOutputMessage(output, createMessage());
+                }
+                
+                MotorManager.motorOff(conf, this, dev);
+            } catch (NumberFormatException e) {
+                throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                        positionStringValue + " position value is not a number", context, null);
+            }
+            catch (DevFailed e) {
+                throw new DevFailedProcessingException(e, this);
+            } catch (PasserelleException e) {
+                throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL, e.getMessage(), context,
+                        e);
+            }
+          
+        }
+    }
 }

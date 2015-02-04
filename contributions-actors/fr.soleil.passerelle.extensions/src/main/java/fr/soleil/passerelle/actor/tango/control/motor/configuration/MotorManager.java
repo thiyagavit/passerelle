@@ -7,33 +7,42 @@ import java.util.Map;
 
 import org.tango.utils.DevFailedUtils;
 
+import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
+import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.Database;
+import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.tango.util.WaitStateTask;
+import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 public class MotorManager {
 
     public static final String AXIS_ENCODER_TYPE_PROPERTY = "AxisEncoderType";
     public static final String AXIS_INIT_TYPE_PROPERTY = "AxisInitType";
     public static final String AXIS_INIT_POSITION_PROPERTY = "AxisInitPosition";
-    
-    //Device status
+
+    // Device status
     public static final String AXIS_NOT_INIT = "axis not initialized";
-    
-    //Device command
+
+    // Device command
     public static final String MOTOR_ON = "MotorON";
     public static final String MOTOR_OFF = "MotorOFF";
     public static final String INITIALIZE_REFERENCE_POSITION = "InitializeReferencePosition";
     public static final String DEFINE_POSITION = "DefinePosition";
-    
-    //Attribute
+
+    // Attribute
     public static final String POSITION = "position";
     public static final String OFFSET = "offset";
-    
-    //Parameter
+
+    // Parameter
     public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
-    
 
     // Errors messages
     public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
@@ -52,24 +61,24 @@ public class MotorManager {
         // Simulated motor
         motorClassesMap.put("SimulatedControlBox", "SimulatedMotor");
         motorClassesMap.put("SimulatedMotor", "SimulatedControlBox");
-      
+
         // GalilAxis
         motorClassesMap.put("ControlBox", "GalilAxis");
         motorClassesMap.put("GalilAxis", "ControlBox");
-        
-        //Control box classes
+
+        // Control box classes
         controlBoxClasses.add("SimulatedControlBox");
         controlBoxClasses.add("ControlBox");
-        
-        //motor classes
+
+        // motor classes
         motorClasses.add("GalilAxis");
         motorClasses.add("SimulatedMotor");
     }
 
     public static String getAssociatedClassForMotorClass(String motorNameClass) {
-        return  motorClassesMap.get(motorNameClass);
+        return motorClassesMap.get(motorNameClass);
     }
-    
+
     public static String getAssociatedClassForMotor(String motorName) {
         String assiociatedClass = null;
         if (!isNullOrEmpty(motorName)) {
@@ -83,13 +92,13 @@ public class MotorManager {
                 }
             }
         }
-        return  assiociatedClass;
+        return assiociatedClass;
     }
 
     public static List<String> getControlBoxClasses() {
         return controlBoxClasses;
     }
-    
+
     public static List<String> getMotorClasses() {
         return motorClasses;
     }
@@ -119,8 +128,8 @@ public class MotorManager {
 
         return cb;
     }
-    
-    public static boolean isMotorClass(String motorName){
+
+    public static boolean isMotorClass(String motorName) {
         boolean isMotorClass = false;
         if (!isNullOrEmpty(motorName)) {
             Database database = TangoDeviceHelper.getDatabase();
@@ -175,7 +184,7 @@ public class MotorManager {
 
     public static Double getAxisInitPosition(String motorName) throws DevFailed {
         Double axisInitPosition = null;
-        String initPosition = TangoAccess.getDeviceProperty(motorName,AXIS_INIT_TYPE_PROPERTY);
+        String initPosition = TangoAccess.getDeviceProperty(motorName, AXIS_INIT_TYPE_PROPERTY);
         if (!isNullOrEmpty(initPosition)) {
             try {
                 axisInitPosition = Double.parseDouble(initPosition);
@@ -185,7 +194,48 @@ public class MotorManager {
         }
         return axisInitPosition;
     }
+
+    public static boolean isMotorIsInit(MotorConfigurationV2 config, Actor actor, boolean shouldInit, DeviceProxy dev)
+            throws ProcessingException, DevFailed {
+        boolean init = false;
+        // Call Init if necessary before initialized process
+        if (shouldInit) {
+            config.initDevice(actor);
+        }
+
+        if (dev != null) {
+            DevState state = dev.state();
+            if (state != DevState.FAULT && state != DevState.UNKNOWN) {
+                init = !dev.status().contains(MotorManager.AXIS_NOT_INIT);
+            }
+        }
+        return init;
+    }
     
-   
+    public static void motorOff (MotorConfigurationV2 config,Actor actor,DeviceProxy dev) throws DevFailed {
+        // if the motor was off before the init, we switch it to off again wait good state
+        if (config.isSwitchToOffAfterInit() && dev != null) {
+            String deviceName = dev.fullName();
+            WaitStateTask waitTask = new WaitStateTask(deviceName, DevState.MOVING, 100, false);
+            waitTask.run();
+            if (waitTask.hasFailed()) {
+                throw waitTask.getDevFailed();
+            }
+            dev.command_inout(MotorManager.MOTOR_OFF);
+            ExecutionTracerService.trace(actor, "Call " + deviceName + "/" + MotorManager.MOTOR_OFF);
+        }
+    }
+
+    public static void raiseExceptionIfInitFailed(DeviceProxy dev, ActorContext context, Actor actor) throws DevFailed,
+            ProcessingExceptionWithLog {
+        String deviceName = dev.fullName();
+        // Bug 22954
+        DevState currentState = TangoAccess.getCurrentState(deviceName);
+        // if the motor is at the end of the rail (on the stop), the state is Alarm but it's ok.
+        // So to be sure the definePosition command was successful we must check the status
+        if (dev.status().contains(MotorManager.AXIS_NOT_INIT) || currentState == DevState.FAULT || currentState == DevState.UNKNOWN)
+            throw new ProcessingExceptionWithLog(actor, PasserelleException.Severity.FATAL, deviceName
+                    + " has not been correctly inialized: " + dev.status(), context, null);
+    }
 
 }
