@@ -5,8 +5,6 @@ import static fr.esrf.Tango.DevState.DISABLE;
 import static fr.esrf.Tango.DevState.FAULT;
 import static fr.esrf.Tango.DevState.MOVING;
 import static fr.esrf.Tango.DevState.OFF;
-import static fr.esrf.Tango.DevState.ON;
-import static fr.esrf.Tango.DevState.STANDBY;
 import static fr.esrf.Tango.DevState.UNKNOWN;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType.ABSOLUTE;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.DP;
@@ -16,6 +14,7 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initD
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
@@ -125,12 +124,15 @@ public class MotorConfigurationV2 {
             executeCmdAccordingState(new InitCommand(actor, deviceName, stateCmd), FAULT, UNKNOWN);
             executeCmdAccordingState(new ErrorCommand(actor, deviceName, stateCmd), MOVING, DISABLE);
             switchToOffAfterInit = executeCmdAccordingState(new OnCommand(actor, deviceName, stateCmd), OFF);
+            
+            if(switchToOffAfterInit){
+                ExecutionTracerService.trace(actor, "Call " +  deviceName + "/" + MotorManager.MOTOR_ON );
+            }
 
             // checks galil is in expected state
             DevState galilState = stateCmd.execute(DevState.class);
-            if (galilState != STANDBY && galilState != ON) {
-                throw new ProcessingExceptionWithLog(actor, "Motor is " + galilState.toString()
-                        + " insteadof  StandBy or On", this, null);
+            if (galilState == FAULT || galilState == UNKNOWN) {
+                throw new ProcessingExceptionWithLog(actor, deviceName + " is down"  , this, null);
             }
 
         } catch (DevFailed e) {
