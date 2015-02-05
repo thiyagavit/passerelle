@@ -5,6 +5,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
@@ -18,7 +19,7 @@ public class InitCommand extends Command {
 
     public InitCommand(Actor actor, String deviceName, TangoCommand stateCommand) throws DevFailed {
         super(actor, deviceName, stateCommand);
-        command = new TangoCommand(deviceName, "Init");
+        command = new TangoCommand(deviceName, MotorManager.INIT_CMD);
     }
 
     @Override
