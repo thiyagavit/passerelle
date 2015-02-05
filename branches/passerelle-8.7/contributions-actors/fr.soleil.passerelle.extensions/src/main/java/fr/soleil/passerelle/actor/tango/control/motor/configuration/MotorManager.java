@@ -33,6 +33,7 @@ public class MotorManager {
 
     // Device command
     public static final String MOTOR_ON = "MotorON";
+    public static final String INIT_CMD = "Init";
     public static final String MOTOR_OFF = "MotorOFF";
     public static final String INITIALIZE_REFERENCE_POSITION = "InitializeReferencePosition";
     public static final String DEFINE_POSITION = "DefinePosition";
