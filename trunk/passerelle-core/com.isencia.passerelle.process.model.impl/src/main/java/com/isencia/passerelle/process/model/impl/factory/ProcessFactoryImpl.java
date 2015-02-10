@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.impl.factory;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import com.isencia.passerelle.core.ErrorCategory;
@@ -84,8 +85,8 @@ public class ProcessFactoryImpl implements ProcessFactory {
   }
 
   @Override
-  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes) {
-    return new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, List<String> detailedDescriptions, Set<String> relatedDataTypes) {
+    return new ErrorItemImpl(severity, category, code, shortDescription, description, detailedDescriptions, relatedDataTypes);
   }
 
   @Override

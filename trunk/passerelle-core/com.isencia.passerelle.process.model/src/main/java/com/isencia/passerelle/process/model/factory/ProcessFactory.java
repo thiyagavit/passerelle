@@ -4,6 +4,7 @@
 package com.isencia.passerelle.process.model.factory;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import com.isencia.passerelle.core.ErrorCategory;
@@ -46,7 +47,7 @@ public interface ProcessFactory {
 
 	ContextEvent createContextEvent(Context context, String topic, String message);
 
-	ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, Set<String> relatedDataTypes);
+	ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, List<String> detailedDescriptions, Set<String> relatedDataTypes);
 
 	ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, Throwable cause, Set<String> relatedDataTypes);
 

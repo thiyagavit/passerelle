@@ -6,6 +6,8 @@ package com.isencia.passerelle.process.model.impl;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,10 +26,9 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
   private Severity severity;
   private String code;
   private Set<String> relatedDataTypes = new TreeSet<String>();
-  // limited to length 100
   private String shortDescription;
-  // limited to length 1000
   private String description;
+  private List<String> details = new ArrayList<String>();
 
   /**
    * 
@@ -75,6 +76,13 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     setDescription(buildDescription(cause));
   }
 
+  public ErrorItemImpl(Severity severity, ErrorCategory category, String code, String shortDescription, String description, List<String> details, Set<String> relatedDataTypes) {
+    this(severity, category, code, shortDescription, description, relatedDataTypes);
+    if(details!=null) {
+      this.details.addAll(details);
+    }
+  }
+
   private String buildDescription(Throwable cause) {
     final StringWriter sw = new StringWriter();
     final PrintWriter pw = new PrintWriter(sw, true);
@@ -98,28 +106,35 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     return shortDescription;
   }
 
-  // limit the size to ensure it can be serialized in a context event,
-  // where msg length is max 2000
   protected void setShortDescription(String shortDescr) {
-    if (shortDescr != null && shortDescr.length() > 100) {
-      this.shortDescription = shortDescr.substring(0, 100);
-    } else {
-      this.shortDescription = shortDescr;
-    }
+    this.shortDescription = shortDescr;
   }
 
   public String getDescription() {
     return description;
   }
-
-  // limit the size to ensure it can be serialized in a context event,
-  // where msg length is max 2000
-  protected void setDescription(String descr) {
-    if (descr != null && descr.length() > 1000) {
-      this.description = descr.substring(0, 1000);
-    } else {
-      this.description = descr;
+  
+  @Override
+  public List<String> getDetails() {
+    return details;
+  }
+  
+  // remark : this rebuilds the result string, no caching to avoid memory consumption
+  @Override
+  public String getDescriptionWithDetails() {
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("description = ");
+    sb.append(description);
+    for (String d : details) {
+      sb.append("\n    detail=");
+      sb.append(d);
     }
+    sb.append("\n");
+    return sb.toString();
+  }
+
+  protected void setDescription(String descr) {
+    this.description = descr;
   }
 
   public Severity getSeverity() {
@@ -210,6 +225,8 @@ public class ErrorItemImpl implements ErrorItem, Serializable {
     builder.append(shortDescription);
     builder.append(", description=");
     builder.append(description);
+    builder.append(", details=");
+    builder.append(details);
     builder.append("]");
     return builder.toString();
   }

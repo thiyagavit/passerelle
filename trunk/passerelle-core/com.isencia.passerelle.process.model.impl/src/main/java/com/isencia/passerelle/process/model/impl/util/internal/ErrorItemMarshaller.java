@@ -1,8 +1,11 @@
 package com.isencia.passerelle.process.model.impl.util.internal;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -13,7 +16,10 @@ import com.isencia.passerelle.process.model.impl.ErrorItemImpl;
 
 public class ErrorItemMarshaller {
   
+  private static final int MAX_DESCR_LENGTH = 1250;
+  
   private static final String DESCR = "descr";
+  private static final String DETAILS = "details";
   private static final String SHORT_DESCR = "shortDescr";
   private static final String CODE = "code";
   private static final String CATEGORY = "category";
@@ -34,6 +40,18 @@ public class ErrorItemMarshaller {
     jsonObject.put(RELATED_DATATYPE, dtBldr.toString());
     jsonObject.put(SHORT_DESCR, errorItem.getShortDescription());
     jsonObject.put(DESCR, errorItem.getDescription());
+    // as we want to limit the total size of the JSON, so it can fit in a ContextEvent,
+    // we need to customize the details serialization a bit...
+    int descrLength = errorItem.getShortDescription().length() + errorItem.getDescription().length();
+    List<String> choppedDetails = new ArrayList<String>();
+    for (String dt : errorItem.getDetails()) {
+      descrLength += dt.length();
+      if(descrLength > MAX_DESCR_LENGTH) {
+        break;
+      }
+      choppedDetails.add(dt);
+    }
+    jsonObject.put(DETAILS, choppedDetails);
     String msg = jsonObject.toString();
     return msg;
   }
@@ -70,7 +88,17 @@ public class ErrorItemMarshaller {
           // ignore, as this info is not available for old/historical error items
           // and we don't want to break compatibility.
         }
-        errorItem = new ErrorItemImpl(severity, category, code, shortDescription, description, relatedDataTypes);
+        List<String> details = new ArrayList<String>();
+        try {
+          JSONArray dts = jsonObject.getJSONArray(DETAILS);
+          for (int i = 0; i < dts.length(); ++i) {
+            details.add(dts.getString(i));
+          }
+        } catch (Exception e) { //NOSONAR
+          // ignore, as this info is not available for old/historical error items
+          // and we don't want to break compatibility.
+        }
+        errorItem = new ErrorItemImpl(severity, category, code, shortDescription, description, details, relatedDataTypes);
       } catch (JSONException e) { //NOSONAR
         // no logging, it is not guaranteed that the event msg represents an error item so...
       }
