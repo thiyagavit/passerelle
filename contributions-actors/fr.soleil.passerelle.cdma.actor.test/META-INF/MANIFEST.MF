@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle CDMA Tests
 Bundle-SymbolicName: fr.soleil.passerelle.cdma.actor.test
-Bundle-Version: 8.7.5
+Bundle-Version: 8.7.6.qualifier
 Bundle-Vendor: Soleil
 Fragment-Host: fr.soleil.passerelle.cdma.actor;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

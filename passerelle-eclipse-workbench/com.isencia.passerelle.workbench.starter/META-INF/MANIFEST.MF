@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OSGI Starter Plug-in
 Bundle-SymbolicName: com.isencia.passerelle.workbench.starter
-Bundle-Version: 8.7.5
+Bundle-Version: 8.7.6.qualifier
 Bundle-Activator: com.isencia.passerelle.starter.Activator
 Bundle-Vendor: iSencia SL
 Import-Package: org.apache.log4j;version="1.2.0",

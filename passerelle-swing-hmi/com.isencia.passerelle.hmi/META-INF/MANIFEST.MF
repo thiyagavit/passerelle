@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle HMI
 Bundle-SymbolicName: com.isencia.passerelle.hmi
-Bundle-Version: 8.7.5
+Bundle-Version: 8.7.6.qualifier
 Bundle-Activator: com.isencia.passerelle.hmi.activator.Activator
 Bundle-Vendor: isencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

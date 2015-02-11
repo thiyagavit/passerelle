@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>eu.esrf.edm</groupId>
 		<artifactId>esrf-edm</artifactId>
-		<version>8.7.5</version>
+		<version>8.7.6-SNAPSHOT</version>
 		<relativePath>../eu.esrf.edm.parent</relativePath>
 	</parent>
 	
 	<artifactId>eu.esrf.passerelle.python.service</artifactId>
-	<version>8.7.5</version>
+	<version>8.7.6-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 </project>
