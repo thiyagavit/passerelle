@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Flow and task scheduling
 Bundle-SymbolicName: com.isencia.passerelle.process.scheduler
-Bundle-Version: 8.7.5
+Bundle-Version: 8.7.6.qualifier
 Bundle-Activator: com.isencia.passerelle.process.scheduler.activator.Activator
 Bundle-Vendor: iSencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

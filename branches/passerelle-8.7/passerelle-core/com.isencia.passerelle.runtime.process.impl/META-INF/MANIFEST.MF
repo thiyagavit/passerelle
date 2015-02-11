@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Runtime FlowProcessingService Impl
 Bundle-SymbolicName: com.isencia.passerelle.runtime.process.impl
-Bundle-Version: 8.7.5
+Bundle-Version: 8.7.6.qualifier
 Bundle-Activator: com.isencia.passerelle.runtime.process.impl.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
