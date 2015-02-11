@@ -99,12 +99,13 @@ public class RequestImpl implements Request {
   public static final String _EXECUTOR = "executor";
   public static final String _ID = "id";
   public static final String _ATTRIBUTES = "attributes";
-  public static final String _CASE = "case";
+  public static final String _CASE = "requestCase";
   public static final String _CORRELATION_ID = "correlationId";
   public static final String _TYPE = "type";
   public static final String _CATEGORY = "category";
   public static final String _CONTEXT = "processingContext";
   public static final String _REFERENCE = "requestCase.id";
+  public static final String _EXTERNAL_REFERENCE = "requestCase.externalReference";
   public static final String _TASKS = "processingContext.tasks";
   public static final String _EVENTS = "processingContext.events";
   public static final String _CREATION_TS = "creationTS";
