@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Python Service
 Bundle-SymbolicName: eu.esrf.passerelle.python.service
-Bundle-Version: 1.5.6.qualifier
+Bundle-Version: 8.7.5
 Bundle-Activator: eu.esrf.passerelle.python.service.activator.Activator
 Bundle-Vendor: isencia
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

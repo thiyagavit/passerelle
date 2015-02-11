@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle CDMA pilot actors
 Bundle-SymbolicName: fr.soleil.passerelle.cdma.actor
-Bundle-Version: 8.7.5.qualifier
+Bundle-Version: 8.7.5
 Bundle-Activator: fr.soleil.passerelle.cdma.actor.activator.Activator
 Bundle-Vendor: Soleil
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
