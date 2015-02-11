@@ -31,36 +31,19 @@ public interface RepositoryService {
 
   String PROJECT_ROOT = "com.isencia.passerelle.project.root";
   String SUBMODEL_ROOT = "com.isencia.passerelle.submodel.root";
+  String SYSTEM_PARAMETERS = "systemParameters";
+  String APPLICATION_PARAMETERS = "applicationParameters";
   String REFERENCE = "REFERENCE";
   String FLOW_NAME = "flowname";
-  String SUBMODEL_NAME = "submodelname";
   String USER_ID = "userID";
   String JOB_ID = "jobID";
 
-  void commitFlow(Flow flow, String comment) throws Exception;
-
-  void createSubmodel(CompositeActor flow);
-
-  void deleteSubmodel(String flow);
-
   /**
    * 
-   * @param flowCode
-   * @return exists a new version of the project in the repository
+   * @param submodelCode
+   * @return the submodel for the given flowCode, or null if not found
    */
-  boolean existNewSubModel(String flowCode);
-
-  /**
-   * 
-   * @return an array of the metadata for all submodels in the Repository, this avoids double call
-   */
-  MetaData[] getAllSubmodelMetaData();
-
-  /**
-   * 
-   * @return an array of the codes for all submodels in the Repository
-   */
-  String[] getAllSubmodels();
+  Flow getSubmodel(String flowCode);
 
   /**
    * 
@@ -76,7 +59,12 @@ public interface RepositoryService {
    */
   MetaData getFlowMetaData(String flowCode);
 
-  List<IEventLog> getLogs(String name, Integer maxResult);
+  /**
+   * 
+   * @param flowCode
+   * @return the metadata for the given submodel, or null if not found
+   */
+  MetaData getSubmodelMetaData(String flowCode);
 
   /**
    * 
@@ -87,20 +75,33 @@ public interface RepositoryService {
 
   /**
    * 
-   * @param submodelCode
-   * @return the submodel for the given flowCode, or null if not found
+   * @return an array of the codes for all submodels in the Repository
    */
-  Flow getSubmodel(String flowCode);
+  String[] getAllSubmodels();
 
-  File getSubmodelFolder();
+  /**
+   * 
+   * @return an array of the metadata for all submodels in the Repository, this avoids double call
+   */
+  MetaData[] getAllSubmodelMetaData();
 
   /**
    * 
    * @param flowCode
-   * @return the metadata for the given submodel, or null if not found
+   * @return exists a new version of the project in the repository
    */
-  MetaData getSubmodelMetaData(String flowCode);
+  boolean existNewSubModel(String flowCode);
+
+  void commitFlow(Flow flow, String comment) throws Exception;
+
+  void createSubmodel(CompositeActor flow);
+
+  void deleteSubmodel(String flow);
+
+  List<IEventLog> getLogs(String name, Integer maxResult);
 
   void setSubmodelFolder(File folder);
+
+  File getSubmodelFolder();
 
 }

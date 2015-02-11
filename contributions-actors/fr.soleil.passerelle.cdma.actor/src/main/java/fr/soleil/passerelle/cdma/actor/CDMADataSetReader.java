@@ -14,23 +14,17 @@
 */
 package fr.soleil.passerelle.cdma.actor;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
-
 import org.cdma.Factory;
-import org.cdma.engine.hdf.navigation.HdfDataset;
 import org.cdma.interfaces.IDataset;
 import org.cdma.interfaces.IDatasource;
-import org.cdma.plugin.soleil.nexus.navigation.NxsDataset;
-
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
@@ -80,7 +74,7 @@ public class CDMADataSetReader extends Actor {
     }
 
     Factory.getLogger().setLevel(Level.WARNING);
-    Factory.setDictionariesFolder("C:/data/workspaces/passerelle-edm-branch-1_3/fr.soleil.passerelle.cdma.actor.test/CDMA_Dictionaries");
+    Factory.setDictionariesFolder("C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_Dictionaries");
     Factory.setActiveView("DATA_REDUCTION");
   }
 
@@ -90,7 +84,7 @@ public class CDMADataSetReader extends Actor {
     try {
       URI dataSetURI = new URI(dataSetURIParameter.getExpression());
 
-      dataSet = NxsDataset.instanciate(dataSetURI);  //Factory.openDataset(dataSetURI);
+      dataSet = Factory.openDataset(dataSetURI);
 
       if (dataSet == null) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "No data set found for " + dataSetURI, this, null);

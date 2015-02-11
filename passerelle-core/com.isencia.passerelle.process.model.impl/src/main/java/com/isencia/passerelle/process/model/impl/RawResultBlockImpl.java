@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -16,7 +15,6 @@ import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.ResultItemFromRawBuilder;
 import com.isencia.passerelle.process.model.Task;
 
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("RAW_RESULTBLOCK")
 public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBlock {

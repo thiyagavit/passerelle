@@ -16,41 +16,41 @@ package com.isencia.passerelle.process.service;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.process.model.Request;
+import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Task;
 
 /**
  * 
  * @author erwin
  *
  */
-public interface RequestProcessingBroker<R extends Request> {
+public interface RequestProcessingBroker {
   
   /**
-   * @param request the {@link Request} that must be processed
+   * @param context the {@link Context} of the {@link Task} that must be processed
    * @param timeout the timeout period; null or <=0 values indicate : no timeout should be set.
    * @param unit the {@link TimeUnit} of the timeunit period
    * @return null if this service is unable to process the given task; 
-   * a Future to the task after processing is finished.
-   * @throws ProcessingException when the delivery has failed of the {@link Request} to a service able to process it.
+   * a Future to the task's context after processing is finished.
+   * @throws ProcessingException when the delivery has failed of the {@link Task} to a service able to process it.
    * E.g. when no service is found for it.
    */
-  Future<R> process(R request, Long timeout, TimeUnit unit) throws ProcessingException;
+  Future<Context> process(Context context, Long timeout, TimeUnit unit) throws ProcessingException;
   
   /**
    * 
    * @param service
    * @return <tt>true</tt> if the new service was successfully registered
    */
-  boolean registerService(RequestProcessingService<R> service);
+  boolean registerService(RequestProcessingService service);
   
   /**
    * 
    * @param service
    * @return <tt>true</tt> if the service was registered and was successfully removed
    */
-  boolean removeService(RequestProcessingService<R> service);
+  boolean removeService(RequestProcessingService service);
   
   /**
    * remove all registered services

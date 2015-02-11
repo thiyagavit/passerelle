@@ -89,6 +89,7 @@ public class Fork extends AbstractMessageSequenceGenerator {
         List<Port> outputPorts = outputPortCfgExt.getOutputPorts();
         for (int i = 0; i < outputPorts.size(); ++i) {
           Context newOne = processContext.fork();
+          newOne = getContextRepository().storeContext(newOne);
           MessageContainer outputMsg = (MessageContainer) MessageFactory.getInstance().createMessageCloneInSequence(
               message,
               processContext.getRequest().getId(),  // sequence ID
@@ -97,7 +98,7 @@ public class Fork extends AbstractMessageSequenceGenerator {
           // enforce single Fork name
           outputMsg.setHeader(HEADER_SEQ_SRC, getName());
           outputMsg.setBodyContent(newOne, ManagedMessage.objectContentType);
-          ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getProcessId());
+          ((SettableMessage)outputMsg).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, newOne.getContextRepositoryID());
           procResponse.addOutputMessage(outputPorts.get(i), outputMsg);
         }
       } catch (Exception e) {

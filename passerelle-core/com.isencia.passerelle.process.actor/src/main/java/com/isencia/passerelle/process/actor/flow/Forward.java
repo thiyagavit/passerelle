@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.ObjectToken;
 import ptolemy.data.StringToken;
@@ -32,7 +30,6 @@ import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
@@ -46,10 +43,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.process.actor.activator.Activator;
+import com.isencia.passerelle.process.common.util.ContextUtils;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
-import com.isencia.passerelle.process.model.util.ProcessModelUtils;
+import com.isencia.passerelle.process.model.factory.EntityFactory;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.project.repository.api.Project;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
 
@@ -162,7 +159,7 @@ public class Forward extends Actor {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
           String paramName = paramKeyValue[0].trim();
-          String paramValue = ProcessModelUtils.lookupValueForPlaceHolder(processContext, paramKeyValue[1].trim());
+          String paramValue = ContextUtils.lookupValueForPlaceHolder(processContext, paramKeyValue[1].trim());
           try {
             // TODO When moving to trunk, and using new FlowProcessingService, this extra check is not needed anymore.
             // but on the edm v1.0 branch invalid parameter overrides generate exceptions!
@@ -190,9 +187,14 @@ public class Forward extends Actor {
 
   @SuppressWarnings("unchecked")
   protected Flow setRedirected(Flow flow) throws Exception {
-    Map<String, String> systemParameterMap = FlowUtils.getParameterMap(flow, FlowUtils.SYSTEM_PARAMETERS);
-    if(systemParameterMap!=null) {
-        systemParameterMap.put(FlowUtils.REDIRECTED, "true");
+    Parameter p = (Parameter) flow.getAttribute(RepositoryService.SYSTEM_PARAMETERS, Parameter.class);
+    Map<String, String> systemParameterMap = null;
+    if ((p != null) && (p.getToken() instanceof ObjectToken)) {
+      Object o = ((ObjectToken) p.getToken()).getValue();
+      if (o instanceof Map<?, ?>) {
+        systemParameterMap = (Map<String, String>) o;
+        systemParameterMap.put("com.isencia.passerelle.edm.redirected", "true");
+      }
     }
     return flow;
   }
@@ -201,7 +203,7 @@ public class Forward extends Actor {
     return Activator.getDefault().getRepositoryService();
   }
 
-  protected ProcessFactory getEntityFactory() {
-    return ProcessFactoryTracker.getService();
+  protected EntityFactory getEntityFactory() {
+    return ServiceRegistry.getInstance().getEntityFactory();
   }
 }

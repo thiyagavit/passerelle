@@ -11,60 +11,38 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
+*/
 package com.isencia.passerelle.process.actor.flow;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
-import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
- * A <code>AggregationStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages, and
- * aggregates their tasks and results.
+ * A <code>AggregationStrategy</code> that looks for processing <code>Context</code>s in the sequenced messages,
+ * and aggregates their tasks and results.
  * 
  * @author erwin
- * 
+ *
  */
 public class ContextAggregationStrategy implements AggregationStrategy {
 
-  public ManagedMessage aggregateMessages(ProcessManager processManager, ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
+  public ManagedMessage aggregateMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
     MessageContainer scopeMsg = (MessageContainer) initialMsg;
     ManagedMessage msg = scopeMsg.copy();
-    Context mergedCtxt = getBranchedContextFor(processManager, initialMsg);
-    Context[] branches = new Context[otherMessages.length];
-    for (int i = 0; i < otherMessages.length; i++) {
-      MessageContainer otherMsg = (MessageContainer) otherMessages[i];
-      msg.addCauseID(otherMsg.getID());
-      Object bodyContent = otherMsg.getBodyContent();
-      if (bodyContent instanceof Context) {
-        // this is for legacy flows/actors that still send the Context in the msg body
-        Context branchedCtx = (Context) bodyContent;
-        branches[i] = branchedCtx;
-      } else {
-        // this is for the new approach since 8.8, where Context identifiers are sent as msg headers
-        String[] scopeGrp = otherMsg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
-        String[] scope = otherMsg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
-        Context branchedCtx = null;
-        if(scopeGrp.length==1 && scope.length==1) {
-          branchedCtx = processManager.removeScopedProcessContext(scopeGrp[0], scope[0]);
-        }
-        branches[i] = (branchedCtx!=null) ? branchedCtx : mergedCtxt;
-      }
+    Context mergedCtxt = (Context) scopeMsg.getBodyContent();
+    List<Context> branches = new ArrayList<Context>();
+    for (ManagedMessage branchMsg : otherMessages) {
+      Context branchedCtx = (Context)branchMsg.getBodyContent();
+      msg.addCauseID(branchMsg.getID());
+      branches.add(branchedCtx);
     }
-    mergedCtxt.join(branches);
+    mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
+    msg.setBodyContent(mergedCtxt, ManagedMessage.objectContentType);
     return msg;
-  }
-  
-  protected Context getBranchedContextFor(ProcessManager processManager, ManagedMessage msg) {
-    String[] scopeGrp = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
-    String[] scope = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
-    Context branchedCtx = null;
-    if(scopeGrp!=null && scope!=null && scopeGrp.length==1 && scope.length==1) {
-      branchedCtx = processManager.getScopedProcessContext(scopeGrp[0], scope[0]);
-    }
-    return (branchedCtx!=null) ? branchedCtx : processManager.getRequest().getProcessingContext();
   }
 }

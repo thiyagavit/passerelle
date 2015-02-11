@@ -3,7 +3,6 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -13,7 +12,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -42,15 +40,11 @@ import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
-import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
  * @author "puidir"
  * 
  */
-@Cacheable(false)
 @Entity
 @Table(name = "PAS_RESULTBLOCK")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
@@ -65,8 +59,9 @@ public class ResultBlockImpl implements ResultBlock {
   @GeneratedValue(generator = "pas_resultblock")
   private Long id;
 
+  @SuppressWarnings("unused")
   @Version
-  private Integer version;
+  private int version;
 
   // Remark: need to use the implementation class instead of the interface
   // here to ensure jpa implementations like EclipseLink will generate setter
@@ -75,9 +70,9 @@ public class ResultBlockImpl implements ResultBlock {
   @JoinColumn(name = "TASK_ID")
   private TaskImpl task;
 
-  @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ResultBlockAttributeImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @MapKey(name = "name")
-  private Map<String, Attribute> attributes = ProcessUtils.emptyMap();
+  private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
   @Column(name = "COLOR", nullable = true, unique = false, updatable = true, length = 20)
   private String colour;
@@ -89,17 +84,15 @@ public class ResultBlockImpl implements ResultBlock {
   @Column(name = "TYPE", nullable = false, unique = false, updatable = false, length = 250)
   private String type;
 
-  @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "RESULTBLOCK_ID")
   @MapKey(name = "name")
-  private Map<String, ResultItem<?>> resultItems = ProcessUtils.emptyMap();
+  private Map<String, ResultItem<?>> resultItems = new HashMap<String, ResultItem<?>>();
 
   public static final String _ID = "id";
   public static final String _CREATION_TS = "creationTS";
-  public static final String _TASK = "task";
   public static final String _TYPE = "type";
-  public static final String _RESULT_ITEMS = "resultItems";
-  public static final String _ALL_ITEMS = "allItems";
+  public static final String _RESULT_ITEMS = "allItems";
   public static final String _COLOUR = "colour";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _DISCRIMINATOR = "discriminator";
@@ -111,9 +104,8 @@ public class ResultBlockImpl implements ResultBlock {
     this.creationTS = creationTS;
     this.task = (TaskImpl) task;
     this.type = type;
-    if (task != null) {
-      this.task.addResultBlock(this);
-    }
+
+    this.task.addResultBlock(this);
   }
 
   public ResultBlockImpl(Task task, String type) {
@@ -141,8 +133,6 @@ public class ResultBlockImpl implements ResultBlock {
   }
 
   public Attribute putAttribute(Attribute attribute) {
-    if (!ProcessUtils.isInitialized(attributes))
-      attributes = new HashMap<String, Attribute>();
     return attributes.put(attribute.getName(), attribute);
   }
 
@@ -150,11 +140,8 @@ public class ResultBlockImpl implements ResultBlock {
     return attributes.keySet().iterator();
   }
 
+  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultBlockAttributeImpl.class)
   public Set<Attribute> getAttributes() {
-    if (!ProcessUtils.isInitialized(attributes)) {
-      return ProcessUtils.emptySet();
-    }
-
     return new HashSet<Attribute>(attributes.values());
   }
 
@@ -170,31 +157,16 @@ public class ResultBlockImpl implements ResultBlock {
     return creationTS;
   }
 
-  public void setCreationTS(Date creationTS) {
-    this.creationTS = creationTS;
-  }
-
   public String getType() {
     return type;
   }
 
-  public void setType(String type) {
-    this.type = type;
-  }
-
   public ResultItem<?> putItem(ResultItem<?> item) {
-    if (!ProcessUtils.isInitialized(resultItems))
-      resultItems = new HashMap<String, ResultItem<?>>();
     return resultItems.put(item.getName(), item);
   }
 
   public Collection<ResultItem<?>> getAllItems() {
-    Map<String, ResultItem<?>> map = getResultItemMap();
-    if (!ProcessUtils.isInitialized(map)) {
-      return ProcessUtils.EMPTY_SET;
-    }
-
-    return Collections.unmodifiableCollection(map.values());
+    return Collections.unmodifiableCollection(getResultItemMap().values());
   }
 
   public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
@@ -206,20 +178,19 @@ public class ResultBlockImpl implements ResultBlock {
     return results;
   }
 
+  @OneToMany(mappedBy = "resultBlock", targetEntity = ResultItemImpl.class)
   public Set<ResultItem> getResultItems() {
-    Map<String, ResultItem<?>> map = getResultItemMap();
-    if (!ProcessUtils.isInitialized(map)) {
-      return ProcessUtils.EMPTY_SET;
-    }
-
-    return new HashSet<ResultItem>(map.values());
+    return new HashSet<ResultItem>(getResultItemMap().values());
   }
 
   public ResultItem<?> getItemForName(String name) {
+    if (name == null) {
+      return null;
+    }
     return getResultItemMap().get(name);
   }
 
-  public TaskImpl getTask() {
+  public Task getTask() {
     return task;
   }
 
@@ -239,6 +210,7 @@ public class ResultBlockImpl implements ResultBlock {
     return builder.toString();
   }
 
+  @SuppressWarnings("unused")
   @Column(name = "DTYPE", updatable = false)
   private String discriminator;
 
@@ -268,6 +240,4 @@ public class ResultBlockImpl implements ResultBlock {
   protected Map<String, ResultItem<?>> getResultItemMap() {
     return resultItems;
   }
-
- 
 }

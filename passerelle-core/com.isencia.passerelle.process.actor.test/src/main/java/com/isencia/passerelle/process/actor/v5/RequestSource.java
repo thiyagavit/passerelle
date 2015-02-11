@@ -88,12 +88,12 @@ public class RequestSource extends Actor {
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
       String extRef = ((StringToken)extRefParameter.getToken()).stringValue();
-      Case caze = ServiceRegistry.getInstance().getProcessFactory().createCase(extRef);
+      Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);
       String processType = ((StringToken)processTypeParameter.getToken()).stringValue();
       String category = ((StringToken)categoryParameter.getToken()).stringValue();
       String correlationID = ((StringToken)corrIDParameter.getToken()).stringValue();
       String initiator = ((StringToken)initiatorParameter.getToken()).stringValue();
-      Request req = ServiceRegistry.getInstance().getProcessFactory().createRequest(caze, initiator, category, processType, correlationID);
+      Request req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, category, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
@@ -101,12 +101,12 @@ public class RequestSource extends Actor {
       while ((paramDef = reader.readLine()) != null) {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
-          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
+          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
         } else {
           getLogger().warn("Invalid mapping definition: " + paramDef);
         }
       }
-      ServiceRegistry.getInstance().getProcessPersistenceService().persistRequest(req);
+      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
       Context context = req.getProcessingContext();
       context.setStatus(Status.STARTED);
       ManagedMessage message = createMessage(context, ManagedMessage.objectContentType);

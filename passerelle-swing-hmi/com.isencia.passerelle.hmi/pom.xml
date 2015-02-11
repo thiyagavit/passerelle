@@ -11,7 +11,7 @@
 	<groupId>com.isencia.passerelle.gui</groupId>
 	<artifactId>passerelleHMI</artifactId>
 	<name>passerelle HMI</name>
-	<version>8.5.2</version>
+	<version>8.7.5</version>
 
 	<developers>
 		<developer>
@@ -27,9 +27,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</connection>
-		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
-		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/trunk/passerelle-swing-hmi/com.isencia.passerelle.hmi</url>
+		<connection>scm:svn:http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</connection>
+		<developerConnection>scm:svn:https://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</developerConnection>
+		<url>http://svn.codespot.com/a/eclipselabs.org/passerelle/branches/passerelle-8.7/passerelle-swing-hmi/com.isencia.passerelle.hmi</url>
 	</scm>
 	<build>
 		<plugins>
@@ -69,96 +69,77 @@
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>SoleilActors</artifactId>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>fr.soleil.passerelle</groupId> -->
+		<!-- <artifactId>passerelle-beans</artifactId> -->
+		<!-- <scope>runtime</scope> -->
+		<!-- </dependency> -->
+		<!-- Pour le MoMLParser -->
 		<dependency>
-			<groupId>fr.soleil.passerelle</groupId>
-			<artifactId>passerelle-beans</artifactId>
-			<scope>runtime</scope>
+			<groupId>com.microstar</groupId>
+			<artifactId>xml</artifactId>
 		</dependency>
+		<!-- Pour la classe Activator -->
 		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>hmi.definition</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>commons</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>commons.ume</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>actor</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>engine</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>forms</artifactId>
-			<version>1.0.6</version>
-		</dependency>
-
-		<!-- diagnose dependencies -->
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis-actor</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis-impl-filesystem</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>diagnosis-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>project-repository-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>project-repository-impl-filesystem</artifactId>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.isencia.passerelle.sherpa</groupId>
 			<artifactId>commons.reduced</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.hmi.definition</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.commons.ume</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.actor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>com.isencia.passerelle.engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>diva</groupId>
+			<artifactId>diva</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ptolemy</groupId>
+			<artifactId>gui</artifactId>
+		</dependency>
 		<!-- <dependency> -->
-		<!-- <groupId>org.drools</groupId> -->
-		<!-- <artifactId>drools-api</artifactId> -->
+		<!-- <groupId>org.slf4j</groupId> -->
+		<!-- <artifactId>slf4j-api</artifactId> -->
 		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.drools</groupId> -->
-		<!-- <artifactId>drools-compiler</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.codehaus.janino</groupId> -->
-		<!-- <artifactId>janino</artifactId> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>forms</artifactId>
+		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.hibernate</groupId> -->
-		<!-- <artifactId>hibernate-annotations</artifactId> -->
-		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.httpclient</artifactId>
-		</dependency>
+		<!-- Pour l'accès à SES -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.commons</groupId> -->
+		<!-- <artifactId>com.springsource.org.apache.commons.httpclient</artifactId> -->
+		<!-- </dependency> -->
 	</dependencies>
 </project>

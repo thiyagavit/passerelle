@@ -295,6 +295,8 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     }
 
     actorMsgHeaders.put(ManagedMessage.SystemHeader.HEADER_SOURCE_REF, getFullName());
+
+    statistics = new ActorStatistics(this);
   }
 
   public DirectorAdapter getDirectorAdapter() {
@@ -421,9 +423,6 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
     getLogger().trace("{} - preinitialize() - entry", getFullName());
 
     super.preinitialize();
-
-    statistics = new ActorStatistics(this);
-
     try {
       doPreInitialize();
 
@@ -829,9 +828,7 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   final public void wrapup() throws IllegalActionException {
     getLogger().trace("{} - wrapup() - entry", getFullName());
-    
-    StatisticsServiceFactory.getService().unregisterStatistics(statistics);
-    
+
     try {
       getLogger().trace("{} doWrapUp() - entry", getFullName());
       doWrapUp();

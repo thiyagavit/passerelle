@@ -15,9 +15,6 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.imageio.spi.ServiceRegistry;
-
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
@@ -28,6 +25,7 @@ import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author "puidir"
@@ -200,6 +198,23 @@ public class ContextImpl implements Context {
       }
 
       // if still nothin found, check in the historical data
+      if (result == null) {
+        HistoricalDataProvider historicalDataProvider = ServiceRegistry.getInstance().getHistoricalDataProvider();
+        if (historicalDataProvider != null) {
+          List<ResultBlock> historicalBlocks = historicalDataProvider.getResultBlocks(this);
+          if (historicalBlocks != null) {
+            for (ResultBlock block : historicalBlocks) {
+              if (dataType == null || block.getType().equalsIgnoreCase(dataType)) {
+                ResultItem<?> item = block.getItemForName(name);
+                if (item != null) {
+                  result = item.getValueAsString();
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     return result;
@@ -238,8 +253,7 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result
-   * entry that will be added.
+   * Adds the current task list size to the cursor stack. I.e. this cursor identifies the position of the next result entry that will be added.
    */
   protected void pushCurrentTaskCursorIndex() {
     taskCursorStack.push(tasks.size());
@@ -260,8 +274,7 @@ public class ContextImpl implements Context {
   }
 
   /**
-   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event
-   * entry that will be added.
+   * Adds the current event list size to the cursor stack. I.e. this cursor identifies the position of the next event entry that will be added.
    */
   protected void pushCurrentEventCursorIndex() {
     eventCursorStack.push(events.size());
@@ -269,7 +282,6 @@ public class ContextImpl implements Context {
 
   /*
    * (non-Javadoc)
-   * 
    * @see com.isencia.passerelle.process.model.Context#join(com.isencia.passerelle .process.model.Context)
    */
   public void join(Context other) {
@@ -305,7 +317,6 @@ public class ContextImpl implements Context {
 
   /*
    * (non-Javadoc)
-   * 
    * @see com.isencia.passerelle.process.model.Context#fork()
    */
   public Context fork() {
@@ -332,13 +343,12 @@ public class ContextImpl implements Context {
 
   /*
    * (non-Javadoc)
-   * 
    * @see com.isencia.passerelle.process.model.Context#isForkedContext()
    */
   public boolean isForkedContext() {
     return transientBranch;
   }
-
+  
   public List<Context> getForkedChildContexts() {
     return Collections.unmodifiableList(forkedContexts);
   }
@@ -370,49 +380,12 @@ public class ContextImpl implements Context {
 
   /*
    * (non-Javadoc)
-   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-    return "ContextImpl [id=" + id + ", status=" + status + ", creationTS=" + creationTS + ", endTS=" + endTS + ",\n request=" + request + ",\n tasks=" + tasks + ",\n events="
-        + events + "]";
-  }
-
-  @Override
-  public String getProcessId() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setProcessId(String processId) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void join(Context... contexts) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public Serializable getDeepEntryValue(String name) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Map<String, Serializable> getDeepEntryValues() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Serializable removeDeepEntry(String name) {
-    // TODO Auto-generated method stub
-    return null;
+    return "ContextImpl [id=" + id + ", status=" + status + ", creationTS=" + creationTS + ", endTS=" + endTS + ",\n request=" + request + ",\n tasks=" + tasks
+        + ",\n events=" + events + "]";
   }
 
 }

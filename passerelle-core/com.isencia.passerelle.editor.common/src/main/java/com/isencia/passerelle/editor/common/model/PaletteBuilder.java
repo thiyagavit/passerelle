@@ -27,7 +27,6 @@ import com.isencia.passerelle.editor.common.utils.EditorUtils;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.project.repository.api.MetaData;
 import com.isencia.passerelle.project.repository.api.RepositoryService;
-import com.isencia.passerelle.project.repository.api.RepositoryServiceTracker;
 
 public class PaletteBuilder implements Serializable {
   private static final long serialVersionUID = 5998773152255762310L;
@@ -55,7 +54,6 @@ public class PaletteBuilder implements Serializable {
   }
 
   public List<PaletteGroup> getPaletteGroups() {
-    Collections.sort(paletteGroups);
     return paletteGroups;
   }
 
@@ -121,7 +119,6 @@ public class PaletteBuilder implements Serializable {
 
   /**
    * An ImageDescriptor is often returned.
-   * 
    * @param clazzName
    * @return
    */
@@ -230,6 +227,7 @@ public class PaletteBuilder implements Serializable {
       Collections.sort(actorGroups);
 
     } catch (Exception e) {
+      e.printStackTrace();
     }
     submodels = getSubModelGroup();
 
@@ -269,10 +267,8 @@ public class PaletteBuilder implements Serializable {
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
 
                 item.setHelpUrl(generateHelpUrl(item));
-                if (isPaletteItemVisible(item)) {
-                  actorBundleMap.put(clazz.getName(), bundleId);
-                  paletteItemMap.put(item.getClazz().getName(), item);
-                }
+                actorBundleMap.put(clazz.getName(), bundleId);
+                paletteItemMap.put(item.getClazz().getName(), item);
               }
             }
           }
@@ -281,10 +277,11 @@ public class PaletteBuilder implements Serializable {
     }
 
     try {
-      MetaData[] allSubmodelMetaData = RepositoryServiceTracker.getService().getAllSubmodelMetaData();
-      for (MetaData metaData : allSubmodelMetaData) {
+      RepositoryService repositoryService = Activator.getDefault().getRepositoryService();
+      for (MetaData metaData : repositoryService.getAllSubmodelMetaData()) {
+
         PaletteGroup group = getPaletteGroup(actorGroups, groups, metaData.getPath(), submodels);
-        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData);
+        SubModelPaletteItemDefinition item = addSubModel(submodelDefinition, group, metaData.getCode());
         if (group != null) {
           group.addPaletteItem(item);
         }
@@ -294,10 +291,6 @@ public class PaletteBuilder implements Serializable {
       // logError(e);
     }
     return actorGroups;
-  }
-
-  protected boolean isPaletteItemVisible(PaletteItemDefinition item) {
-    return true;
   }
 
   protected String generateHelpUrl(PaletteItemDefinition item) {
@@ -345,10 +338,6 @@ public class PaletteBuilder implements Serializable {
   }
 
   public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, String name) {
-    return addSubModel(sd, gr, new MetaData(name, null));
-  }
-
-  public SubModelPaletteItemDefinition addSubModel(PaletteItemDefinition sd, PaletteGroup gr, MetaData metaData) {
     PaletteGroup group = gr;
     PaletteItemDefinition submodelDef = sd;
     if (submodelDef == null) {
@@ -357,7 +346,7 @@ public class PaletteBuilder implements Serializable {
     if (group == null) {
       group = submodels;
     }
-    SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(submodelDef != null ? submodelDef.getIcon() : null, group, metaData.getCode(), metaData.getName(),
+    SubModelPaletteItemDefinition item = new SubModelPaletteItemDefinition(submodelDef != null ? submodelDef.getIcon() : null, group, name, name,
         submodelDef != null ? submodelDef.getColor() : null);
 
     return item;

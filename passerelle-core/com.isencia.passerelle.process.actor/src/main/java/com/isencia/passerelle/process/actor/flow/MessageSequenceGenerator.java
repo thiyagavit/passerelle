@@ -16,7 +16,6 @@ package com.isencia.passerelle.process.actor.flow;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * Defines the contract for actors that generate message sequences.
@@ -74,7 +73,7 @@ public interface MessageSequenceGenerator {
    * null otherwise, i.e. when there are still messages from the sequence that have not yet returned from their processing.
    * @throws ProcessingException
    */
-  ManagedMessage aggregateProcessedMessage(ProcessManager processManager,ManagedMessage seqMsg) throws ProcessingException;
+  ManagedMessage aggregateProcessedMessage(ManagedMessage seqMsg) throws ProcessingException;
 
   /**
    * 

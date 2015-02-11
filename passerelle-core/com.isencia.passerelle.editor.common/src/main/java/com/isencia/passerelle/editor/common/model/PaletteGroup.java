@@ -3,7 +3,6 @@ package com.isencia.passerelle.editor.common.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,6 @@ public class PaletteGroup implements Serializable, Comparable<PaletteGroup> {
   }
 
   public Collection<PaletteGroup> getChildren() {
-    Collections.sort(children);
     return children;
   }
 

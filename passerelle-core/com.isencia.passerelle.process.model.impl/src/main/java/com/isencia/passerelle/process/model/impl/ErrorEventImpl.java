@@ -1,6 +1,5 @@
 package com.isencia.passerelle.process.model.impl;
 
-import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -10,13 +9,12 @@ import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
 import com.isencia.passerelle.process.model.Status;
 
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("ERROREVENT")
 public class ErrorEventImpl extends ContextEventImpl implements ContextErrorEvent {
-	private static final long serialVersionUID = 1L;
-	
-@Transient
+
+
+  @Transient
   private ErrorItem errorItem;
   
   protected ErrorEventImpl() {

@@ -1,13 +1,11 @@
 package com.isencia.passerelle.process.model.impl;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Context;
@@ -138,11 +136,6 @@ public class RequestImpl implements Request {
     return "RequestImpl [id=" + id + ", correlationId=" + correlationId
         + ", type=" + type + ", initiator=" + initiator + ", executor=" + executor + ", category=" + category 
         + ", \n requestAttributes=" + requestAttributes + ", \n requestCase=" + requestCase + "]";
-  }
-
-  @Override
-  public Date getCreationTS() {
-    return getProcessingContext().getCreationTS();
   }
 	
 	

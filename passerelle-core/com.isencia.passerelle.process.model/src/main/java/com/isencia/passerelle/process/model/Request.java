@@ -16,7 +16,6 @@
 package com.isencia.passerelle.process.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * A <code>Request</code> instance is an (almost) immutable container for the original data received from an initiator, 
@@ -81,6 +80,4 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
    * @return the context containing all current status info about the lifecycle of the request processing, tasks that were executed, results obtained etc.
    */
   Context getProcessingContext();
-  
-  Date getCreationTS();
 }

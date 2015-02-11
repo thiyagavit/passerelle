@@ -15,7 +15,6 @@
 package com.isencia.passerelle.process.actor;
 
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * Minimal contract for process-context-aware actors.
@@ -24,7 +23,7 @@ import com.isencia.passerelle.process.service.ProcessManager;
  *
  */
 public interface ProcessActor {
-  
+
   /**
    * Method to indicate whether the given request will be processed synchronously or asynchronously. 
    * <p>
@@ -36,7 +35,7 @@ public interface ProcessActor {
    * @param request
    * @return whether the given request will be processed synchronously or asynchronously.
    */
-  ProcessingMode getProcessingMode(ProcessRequest request);
+  ProcessingMode getProcessingMode(ActorContext ctxt, ProcessRequest request);
 
   /**
    * The actual method where the functional processing of the actor must be implemented.
@@ -45,8 +44,8 @@ public interface ProcessActor {
    * but to put this in a service layer, and to have actors and services communicating via <code>Task</code>s.
    * </p>
    * 
-   * @param processManager
-   *          the manager for the request processing lifecycle
+   * @param ctxt
+   *          the context in which the request must be processed
    * @param request
    *          the request that must be processed
    * @param response
@@ -54,16 +53,16 @@ public interface ProcessActor {
    *          processing. (However, normally, for synchronous processing, exceptions will just be thrown.)
    * @throws ProcessingException
    */
-  void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException;
+  void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException;
 
   /**
-   * @param processManager
-   *          the manager for the request processing lifecycle
+   * @param ctxt
+   *          the context in which the request was processed
    * @param request
    *          the request that was processed
    * @param response
    *          contains the output messages that the actor should send, or a ProcessingException if some error was encountered during processing.
    */
-  void processFinished(ProcessManager processManager, ProcessRequest request, ProcessResponse response);
+  void processFinished(ActorContext ctxt, ProcessRequest request, ProcessResponse response);
 
 }

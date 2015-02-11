@@ -14,12 +14,14 @@
 */
 package com.isencia.passerelle.process.actor.forkjoin;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ContextRepository;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
@@ -31,7 +33,10 @@ import com.isencia.passerelle.process.service.ServiceRegistry;
  */
 public class ContextAggregationStrategy implements AggregationStrategy {
 
-  public ContextAggregationStrategy() {
+  private ContextRepository contextRepository;
+
+  public ContextAggregationStrategy(ContextRepository contextRepository) {
+    this.contextRepository = contextRepository;
   }
 
   public ManagedMessage aggregateMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException {
@@ -42,16 +47,16 @@ public class ContextAggregationStrategy implements AggregationStrategy {
       // not a context-aware msg flow it would seem, so just return the initial msg
       return initialMsg;
     }
-    Context[] branches = new Context[otherMessages.length];
-    for (int i = 0; i < otherMessages.length; i++) {
-      Context branchedCtx = getRequiredContextForMessage(otherMessages[i]);
+    List<Context> branches = new ArrayList<Context>();
+    for (ManagedMessage branchMsg : otherMessages) {
+      Context branchedCtx = getRequiredContextForMessage(branchMsg);
       // if no branched context is found, there's nothing to merge... 
       if(branchedCtx!=null) {
-        msg.addCauseID(otherMessages[i].getID());
-        branches[i] = branchedCtx;
+        msg.addCauseID(branchMsg.getID());
+        branches.add(branchedCtx);
       }
     }
-    mergedCtxt.join(branches);
+    mergedCtxt = ServiceRegistry.getInstance().getEntityManager().mergeWithBranchedContexts(mergedCtxt, branches);
     msg.setBodyContent(mergedCtxt, ManagedMessage.objectContentType);
     return msg;
   }
@@ -64,7 +69,6 @@ public class ContextAggregationStrategy implements AggregationStrategy {
     if (ctxtHdrs == null || ctxtHdrs.length == 0) {
       return null;
     }
-    ProcessManager processManager = ServiceRegistry.getInstance().getProcessManagerService().getProcessManager(ctxtHdrs[0]);
-    return processManager.getRequest().getProcessingContext();
+    return contextRepository.getContext(ctxtHdrs[0]);
   }
 }

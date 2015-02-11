@@ -5,12 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ptolemy.actor.Director;
-import ptolemy.data.BooleanToken;
-import ptolemy.data.expr.ExpertParameter;
-import ptolemy.data.expr.Parameter;
-import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
-import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Settable;
@@ -25,7 +20,6 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -36,11 +30,11 @@ import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorMoverV5;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.MoveNumericAttribute;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
@@ -56,21 +50,13 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
 
   public static final String MOTOR_NAME_LABEL = "Motor name";
-  public static final String SIMULATED_MOTOR_LABEL = "Simulated Motor";
-  public static final String OFFSET_PORT_NAME = "offset";
-  public static final String SIMULATED_MOTOR_CLASS = "SimulatedMotor";
-  public static final String REAL_MOTOR_CLASS = "GalilAxis";
   public static final String DEFAULT_ACTORNAME = "MoveMotorV5.";
   protected static List<String> attributeList = new ArrayList<String>();
-
-  @ParameterName(name = SIMULATED_MOTOR_LABEL)
-  public Parameter simulatedMotorParam;
-  private boolean simulatedMotor;
 
   public Port offsetPort;
 
   static {
-    attributeList.add("position");
+    attributeList.add(MotorManager.POSITION);
   }
 
   public GalilAxisV5(final CompositeEntity container, final String name)
@@ -95,44 +81,22 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
         + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
         + "\"/>\n" + "</svg>\n");
 
-    offsetPort = PortFactory.getInstance().createInputPort(this, OFFSET_PORT_NAME, null);
+    offsetPort = PortFactory.getInstance().createInputPort(this, MotorManager.OFFSET, null);
 
     mouvementTypeParam.setVisibility(Settable.EXPERT);
-    mouvementTypeParam.addChoice("position");
-    mouvementTypeParam.setExpression("position");
-
-    simulatedMotorParam = new ExpertParameter(this, SIMULATED_MOTOR_LABEL);
-    simulatedMotorParam.setToken(new BooleanToken(false));
-    simulatedMotorParam.setTypeEquals(BaseType.BOOLEAN);
+    mouvementTypeParam.addChoice(MotorManager.POSITION);
+    mouvementTypeParam.setExpression(MotorManager.POSITION);
 
     deviceNameParam.setDisplayName(MOTOR_NAME_LABEL);
-  }
-
-  @Override
-  public void attributeChanged(Attribute attribute) throws IllegalActionException {
-    if (attribute == simulatedMotorParam) {
-      simulatedMotor = PasserelleUtil.getParameterBooleanValue(simulatedMotorParam);
-    } else {
-      super.attributeChanged(attribute);
-    }
   }
 
   @Override
   protected void validateInitialization() throws ValidationException {
     super.validateInitialization();
 
-    try {
-      String motorClass = simulatedMotor ? SIMULATED_MOTOR_CLASS : REAL_MOTOR_CLASS;
-      if (!getDeviceProxy().get_class().equals(motorClass))
+    if(!MotorManager.isMotorClass(getDeviceName())){
         throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, "The device: \""
-            + getDeviceName() + "\" is not a " + motorClass, this, null);
-    }
-    catch (DevFailed devFailed) {
-      throw new DevFailedValidationException(devFailed, this);
-    }
-    catch (PasserelleException e) {
-      ExecutionTracerService.trace(this, e);
-      throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
+                + getDeviceName() + "\" is not supported, expected " + MotorManager.getMotorClasses(), this, null);
     }
   }
 
@@ -155,7 +119,7 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
         // set the offset
         try {
           getDeviceProxy().write_attribute(
-              new DeviceAttribute("offset", Double.parseDouble(offset)));
+              new DeviceAttribute(MotorManager.OFFSET, Double.parseDouble(offset)));
 
           ExecutionTracerService.trace(this, "apply offset " + offset);
         }

@@ -59,9 +59,6 @@ public class ResultItemFromRawBuilderRegistryImpl implements ResultItemFromRawBu
    * @return
    */
   public static ResultItemFromRawBuilderRegistry getInstance() {
-    if (INSTANCE == null) {
-      INSTANCE = new ResultItemFromRawBuilderRegistryImpl();
-    }
     return INSTANCE;
   }
 

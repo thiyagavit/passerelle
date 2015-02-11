@@ -25,7 +25,7 @@ import com.isencia.passerelle.message.ManagedMessage;
  */
 public class PortStatistics implements PortStatisticsMBean, NamedStatistics {
 	
-	private String portName;
+	private Port port;
 	
 	/**
 	 * Some performance statistics. Could be usefull for monitoring purposes.
@@ -35,7 +35,7 @@ public class PortStatistics implements PortStatisticsMBean, NamedStatistics {
 
 
 	public PortStatistics(Port port) {
-		this.portName=port.getFullName();
+		this.port=port;
 		receiptStatistics = new EventStatistics();
 		sendingStatistics = new EventStatistics();
 	}
@@ -46,6 +46,10 @@ public class PortStatistics implements PortStatisticsMBean, NamedStatistics {
 
 	public void acceptSentMessage(ManagedMessage msg) {
 		sendingStatistics.acceptEvent(msg);
+	}
+
+	public Port getPort() {
+		return port;
 	}
 
 	public EventStatistics getReceiptStatistics() {
@@ -92,6 +96,6 @@ public class PortStatistics implements PortStatisticsMBean, NamedStatistics {
 	}
 
 	public String getName() {
-		return portName;
+		return getPort().getFullName();
 	}
 }

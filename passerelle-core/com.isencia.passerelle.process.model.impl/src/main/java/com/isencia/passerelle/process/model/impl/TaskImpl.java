@@ -1,11 +1,10 @@
 package com.isencia.passerelle.process.model.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,9 +19,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("TASK")
 public class TaskImpl extends RequestImpl implements Task {
@@ -36,8 +33,8 @@ public class TaskImpl extends RequestImpl implements Task {
 	@JoinColumn(name = "PARENT_CONTEXT_ID", nullable = false, updatable = true)
 	private ContextImpl parentContext;
 
-	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY)
-	private Set<ResultBlock> resultBlocks = ProcessUtils.emptySet();
+	@OneToMany(targetEntity = ResultBlockImpl.class, mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<ResultBlock> resultBlocks = new HashSet<ResultBlock>();
 
 	public static final String _PARENT_CONTEXT = "parentContext";
 	public static final String _RESULT_BLOCKS = "resultBlocks";
@@ -53,32 +50,24 @@ public class TaskImpl extends RequestImpl implements Task {
 		this.parentContext.addTask(this);
 	}
 
-	public ContextImpl getParentContext() {
+	public Context getParentContext() {
 		return parentContext;
-	}
-	
-	public void setParentContext(ContextImpl parentContext) {
-		this.parentContext = parentContext;
 	}
 
 	public boolean addResultBlock(ResultBlock block) {
-		if (!ProcessUtils.isInitialized(resultBlocks))
-			initializeResultBlocks();
 		return resultBlocks.add(block);
 	}
 
-	public Set<ResultBlock> getResultBlocks() {
-		if (!ProcessUtils.isInitialized(resultBlocks)) {
-			return resultBlocks;
-		}
-			
-		// TODO check if returning an unmodifiable collection still gives difficulties for sherpa when used to show resultBlocks
-		return Collections.unmodifiableSet(resultBlocks);
+	public Collection<ResultBlock> getResultBlocks() {
+		// TODO this was unmodifiable set but this gave difficulties for sherpa
+		// when used to show resultBlocks
+		return resultBlocks;
 	}
 
-	// this is a utility getter for sherpa
+	// this is a utitlity getter for sherpa
 	@OneToMany(targetEntity = ResultItemImpl.class, mappedBy = "resultBlock.task")
 	public Set<ResultItem> getResultItems() {
+
 		return null;
 	}
 
@@ -103,9 +92,5 @@ public class TaskImpl extends RequestImpl implements Task {
 		}
 		TaskImpl rhs = (TaskImpl) arg0;
 		return new EqualsBuilder().append(this.getId(), rhs.getId()).append(this.getType(), rhs.getType()).isEquals();
-	}
-	
-	public void initializeResultBlocks() {
-    resultBlocks = new HashSet<ResultBlock>();
 	}
 }

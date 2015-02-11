@@ -5,7 +5,6 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.Date;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -20,70 +19,72 @@ import com.isencia.passerelle.process.model.ResultBlock;
  * @author "puidir"
  * 
  */
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("STRING_RESULT")
-public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable , Comparable<StringResultItemImpl> {
+public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable, Comparable<StringResultItemImpl> {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public StringResultItemImpl() {
-	}
+  @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
+  private ClobItem clobItem;
 
-	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
-		this(resultBlock, name, value, unit, creationTS, null);
-	}
+  public StringResultItemImpl() {
+  }
 
-	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS,
-			Integer level) {
-		super(resultBlock, name, unit, creationTS == null ? new Date() : creationTS, level);
-		setValue(value);
-	}
+  public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS) {
+    this(resultBlock, name, value, unit, creationTS, null);
+  }
 
-	public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
-		this(resultBlock, name, value, null, creationTS, null);
-	}
+  public StringResultItemImpl(ResultBlock resultBlock, String name, String value, String unit, Date creationTS, Integer level) {
+    super(resultBlock, name, unit, creationTS == null ? new Date() : creationTS, level);
+    setValue(value);
+  }
 
-	public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
-		this(resultBlock, name, value, new Date());
-	}
-	
-	public int compareTo(StringResultItemImpl other) {
-	    return this.getValueAsString().compareTo(other.getValueAsString());
-	}
+  public StringResultItemImpl(ResultBlock resultBlock, String name, String value, Date creationTS) {
+    this(resultBlock, name, value, null, creationTS, null);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
-	 */
-	public String getValue() {
-		if (clobItem != null && clobItem.getValue() != null) {
-			return clobItem.getValue();
-		}
+  public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
+    this(resultBlock, name, value, new Date());
+  }
 
-		return value;
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.isencia.passerelle.process.model.NamedValue#getValue()
+   */
+  public String getValue() {
+    if (clobItem != null) {
+      return clobItem.getValue();
+    }
 
-	public String getValueAsString() {
-		return getValue();
-	}
+    return value;
+  }
 
-	public void setValue(String value) {
-		if (value != null && value.length() > MAX_CHAR_SIZE) {
-			this.clobItem = new ClobItem(value);
-		} else {
-			this.value = value;
-		}
-	}
+  public String getValueAsString() {
+    return getValue();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
-	 */
-	public String getDataType() {
-		return DataTypes.STRING;
-	}
+  public void setValue(String value) {
+    if (value != null && value.length() > MAX_CHAR_SIZE) {
+      this.clobItem = new ClobItem(value);
+    } else {
+      this.value = value;
+    }
+  }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.isencia.passerelle.process.model.ResultItem#getDataType()
+   */
+  public String getDataType() {
+    return DataTypes.STRING;
+  }
+
+  @Override
+  public int compareTo(StringResultItemImpl other) {
+    return this.getValueAsString().compareTo(other.getValueAsString());
+  }
 }

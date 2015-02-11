@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.isencia.passerelle</groupId>
     <artifactId>passerelle-core</artifactId>
-    <version>8.9.0-SNAPSHOT</version>
+    <version>8.7.5</version>
   </parent>
   <groupId>com.isencia.passerelle</groupId>
   <artifactId>com.isencia.passerelle.domain.et.test</artifactId>
-  <version>8.9.0-SNAPSHOT</version>
+  <version>8.7.5</version>
   <packaging>eclipse-test-plugin</packaging>
 </project>

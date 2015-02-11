@@ -14,9 +14,7 @@
 */
 package com.isencia.passerelle.runtime;
 
-import java.io.Serializable;
 import java.net.URI;
-
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.runtime.repository.VersionSpecification;
 
@@ -30,7 +28,7 @@ import com.isencia.passerelle.runtime.repository.VersionSpecification;
  * @author erwin
  *
  */
-public interface FlowHandle extends Serializable {
+public interface FlowHandle {
   
   /**
    * 

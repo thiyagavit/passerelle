@@ -21,15 +21,12 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeBodyPart;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.AuditTrailEntry;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -243,12 +240,6 @@ public class MessageContainer implements ManagedMessage, SettableMessage {
     headers.put(name, new Header(name, value));
   }
 
-  @Override
-  public String getSingleHeader(String name) {
-    String[] hdrs = getHeader(name);
-    return ((hdrs!=null)&&(hdrs.length>0)) ? hdrs[0] : null;
-  }
-  
   public String[] getHeader(String name) {
     ArrayList<String> values = new ArrayList<String>();
     Collection<?> c = (Collection<?>) headers.get(name);

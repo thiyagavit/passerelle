@@ -19,15 +19,13 @@ import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.isencia.passerelle.core.ErrorCode;
 
 /**
  * 
@@ -39,74 +37,96 @@ import com.isencia.passerelle.core.ErrorCode;
  *
  */
 class StatisticsServiceImpl extends StatisticsServiceDummyImpl implements StatisticsService {
-  private static final String PASSERELLE_STATISTICS_SERVICE = "Passerelle.StatisticsService";
-
-  private final static Logger LOGGER = LoggerFactory.getLogger(StatisticsServiceImpl.class);
 	
 	private MBeanServer svr;
+//	private ObjectName adapterName;
 	private Set<ObjectName> registeredNames = new HashSet<ObjectName>();
+//	private CommunicatorServer adapter;
 	
 	protected StatisticsServiceImpl() {
 		try {
 			svr = ManagementFactory.getPlatformMBeanServer();
+			
 			start();
 		} catch (Exception e) {
-			LOGGER.error(ErrorCode.SYSTEM_CONFIGURATION_ERROR+" - Error starting StatisticsService",e);
+			// todo Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
+	private String getServerName() {
+		return "TestSvr";
+	}
+
+//	private int getServerPort() {
+//		return 8000;
+//	}
+//	
 	public void registerStatistics(NamedStatistics s) {
-	  if(s==null)
-	    throw new IllegalArgumentException("registerStatistics : null argument not allowed");
 		try {
-			ObjectName objName = new ObjectName(PASSERELLE_STATISTICS_SERVICE+":name="+s.getName());
-      if(svr.isRegistered(objName)) {
-        try {
-          svr.unregisterMBean(objName);
-        } catch (InstanceNotFoundException e) {
-          // should not happen...
-        }
-      }
-      svr.registerMBean(s,objName);
-      registeredNames.add(objName);
+			ObjectName objName = new ObjectName(getServerName()+":name="+s.getName());
+			registerMBean(s, objName);
 		} catch (Exception e) {
-			LOGGER.warn(ErrorCode.SYSTEM_CONFIGURATION_ERROR+" - Error registering statistics MBean "+s.getName(), e);
+			e.printStackTrace();
 		}
 	}
-	
-  public void unregisterStatistics(NamedStatistics s) {
-    if(s==null)
-      throw new IllegalArgumentException("unregisterStatistics : null argument not allowed");
-    try {
-      ObjectName objName = new ObjectName(PASSERELLE_STATISTICS_SERVICE+":name="+s.getName());
-      unregisterMBean(objName);
-    } catch (Exception e) {
-      LOGGER.error(ErrorCode.SYSTEM_CONFIGURATION_ERROR+" - Error unregistering statistics MBean "+s.getName(), e);
-    }
-  }
 
-  private void unregisterMBean(ObjectName objName) throws MBeanRegistrationException, InstanceNotFoundException {
-    registeredNames.remove(objName);
-    if(svr.isRegistered(objName)) {
-      svr.unregisterMBean(objName);
-    }
-  }
+	private void registerMBean(Object s, ObjectName objName) throws MBeanRegistrationException, NotCompliantMBeanException {
+		try {
+			if(svr.isRegistered(objName)) {
+				try {
+					svr.unregisterMBean(objName);
+				} catch (InstanceNotFoundException e) {
+					// should not happen...
+				}
+			}
+			svr.registerMBean(s,objName);
+			registeredNames.add(objName);
+		} catch (InstanceAlreadyExistsException e) {
+			// should not happen...
+		}
+	}
 	
 	public synchronized void start() {
+//		if(adapter==null || !adapter.isActive()) {
+//			try {
+//				adapterName = new ObjectName(getServerName()+":name=htmladapter,port="+getServerPort());
+//	
+//				adapter = new HtmlAdaptorServer();
+//				adapter.setPort(getServerPort());
+//				registerMBean(adapter, adapterName);
+//				adapter.start();
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	public synchronized void stop() {
-	  reset();
+//		if(adapter!=null) {
+//			try {
+//				adapter.stop();
+//				svr.unregisterMBean(adapterName);
+//				adapterName=null;
+//				adapter=null;
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
 	public void reset() {
+		stop();
 		for (Iterator<ObjectName> mbNameItr = registeredNames.iterator(); mbNameItr.hasNext();) {
 			ObjectName mbName = mbNameItr.next();
 			try {
-        unregisterMBean(mbName);
-      } catch (Exception e) {
-        LOGGER.error(ErrorCode.SYSTEM_CONFIGURATION_ERROR+" - Error unregistering statistics MBean "+mbName, e);
-      }
+				svr.unregisterMBean(mbName);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

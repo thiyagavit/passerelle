@@ -31,7 +31,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
@@ -73,7 +73,7 @@ public class AddRequestAttributes extends Actor {
       throw new ProcessingException(ErrorCode.REQUEST_CONTENTS_ERROR,"Error reading msg contents", this, message, ex);
     }
     if (requestContext != null) {
-      ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
+      EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
       for (Entry<String, String> entry : params.entrySet()) {
         entityFactory.createAttribute(requestContext.getRequest(), entry.getKey(), entry.getValue());
       }

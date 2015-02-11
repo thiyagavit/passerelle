@@ -54,7 +54,7 @@ public interface ContextProcessingCallback {
 	 * has encountered an error.
 	 *
 	 * @param event
-	 * @param error can be null
+	 * @param error
 	 */
 	void contextError(ContextEvent event, Throwable error);
 

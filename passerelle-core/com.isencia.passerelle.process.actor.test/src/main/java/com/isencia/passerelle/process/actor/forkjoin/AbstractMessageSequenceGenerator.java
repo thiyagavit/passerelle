@@ -93,7 +93,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
           msgSequences = new HashMap<Long, SequenceTrace>();
           sequenceScopeMessages = new HashMap<Long, MsgTimeEntry>();
           sequenceTimeEntries = new LinkedList<MsgTimeEntry>();
-          aggregationStrategy = new ContextAggregationStrategy();
+          aggregationStrategy = new ContextAggregationStrategy(getContextRepository());
           if(evictedMessagesHandler==null) {
             // has not been explicitly set, so take the default one
             evictedMessagesHandler = new ErrorThrowingEvictedMessageHandler(this);

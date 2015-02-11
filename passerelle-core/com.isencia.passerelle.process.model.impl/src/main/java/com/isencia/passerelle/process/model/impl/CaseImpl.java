@@ -5,11 +5,10 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -28,13 +27,11 @@ import javax.persistence.Version;
 
 import com.isencia.passerelle.process.model.Case;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
  * @author "puidir"
  * 
  */
-@Cacheable(false)
 @Entity
 @Table(name = "PAS_CASE")
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
@@ -57,14 +54,15 @@ public class CaseImpl implements Case {
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
 	private Date creationTS;
 
+	@SuppressWarnings("unused")
 	@Version
-	private Integer version;
+	private int version;
 
 	@Column(name = "EXTERNAL_REF", nullable = true, unique = false, updatable = true, length = 50)
 	private String externalReference;
 
-	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY)
-	private List<Request> requests = ProcessUtils.emptyList();
+	@OneToMany(targetEntity = RequestImpl.class, mappedBy = "requestCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Request> requests = new ArrayList<Request>();
 
 	public static final String _ID = "id";
 	public static final String _REFERENCE = "id";
@@ -92,16 +90,13 @@ public class CaseImpl implements Case {
 	}
 
 	public Collection<Request> getRequests() {
-		if (!ProcessUtils.isInitialized(requests)) {
-			return requests;
-		}
-
-		return Collections.unmodifiableList(requests);
+		// This avoids concurrent modifications
+		List<Request> requestCopies = new ArrayList<Request>();
+		requestCopies.addAll(requests);
+		return requestCopies;
 	}
 
 	public void addRequest(Request request) {
-		if (!ProcessUtils.isInitialized(requests))
-			requests = new ArrayList<Request>();
 		this.requests.add(request);
 	}
 }

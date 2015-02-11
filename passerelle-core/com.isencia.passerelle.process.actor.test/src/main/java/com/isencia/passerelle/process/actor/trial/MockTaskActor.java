@@ -17,7 +17,7 @@ import com.isencia.passerelle.process.common.exception.ErrorCode;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.EntityFactory;
 import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -43,7 +43,7 @@ public class MockTaskActor extends TaskBasedActor {
   protected void process(Context taskContext) throws ProcessingException {
     SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     try {
-      ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
+      EntityFactory entityFactory = ServiceRegistry.getInstance().getEntityFactory();
       ResultBlock rb = entityFactory.createResultBlock((Task)taskContext.getRequest(), resultTypeParam.stringValue());
       String paramDefs = resultItemsParameter.stringValue();
         BufferedReader reader = new BufferedReader(new StringReader(paramDefs));

@@ -5,11 +5,6 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.Encod
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType.NONE;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.DP;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.InitType.OTHER;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY_IS_NAN;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_TYPE_PROPERTY;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.DEFINE_POS_CANT_BE_APPLY_WITH_OTHER_STRATEGIE;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.INIT_NOT_POSSIBLE_WITH_ABSOLUTE_ENCODER;
 import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.INIT_REF_CANT_BE_APPLY_WITH_DP_STATEGIE;
@@ -36,17 +31,14 @@ public class MotorConfigurationV2InitConfigTest {
 
     public static final String MOTOR_2_2 = "test/motor/2-2";
     public static final String MOTOR_1_1 = "test/motor/1-1";
-    public static final DbDatum DP_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "DP");
-    public static final DbDatum OTHER_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "LDWP");
+    public static final DbDatum DP_INIT_TYPE = new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "DP");
+    public static final DbDatum OTHER_INIT_TYPE = new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "LDWP");
 
-    public static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, NONE.ordinal());
-    public static final DbDatum ABSOLUTE_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY,
+    public static final DbDatum NO_ENCODER = new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, NONE.ordinal());
+    public static final DbDatum ABSOLUTE_ENCODER = new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY,
             ABSOLUTE.ordinal());
 
-    public static final DbDatum INIT_POS_IS_2 = new DbDatum(AXIS_INIT_POSITION_PROPERTY, 2);
-
-    private DeviceProxy proxyMotor11;
-    private DeviceProxy proxyMotor22;
+    public static final DbDatum INIT_POS_IS_2 = new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, 2);
 
     private static void putProperties(String deviceName, DbDatum... properties) throws DevFailed {
         DeviceProxy motorProxy = new DeviceProxy(deviceName);
@@ -55,8 +47,6 @@ public class MotorConfigurationV2InitConfigTest {
 
     @BeforeClass
     public void setUp() throws DevFailed {
-        proxyMotor11 = new DeviceProxy(MOTOR_1_1);
-        proxyMotor22 = new DeviceProxy(MOTOR_2_2);
     }
 
     @AfterClass
@@ -66,14 +56,14 @@ public class MotorConfigurationV2InitConfigTest {
 
     @Test
     public void should_retrieve_the_controlBox_2_for_the_motor_2_2() throws DevFailed {
-        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_2_2);
         config.retrieveMyControlBox();
         assertThat(config.getControlBoxName()).isEqualTo("test/cb/2");
     }
 
     @Test
     public void should_retrieve_the_controlBox_1_for_the_motor_1_1() throws DevFailed {
-        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_1_1);
         config.retrieveMyControlBox();
         assertThat(config.getControlBoxName()).isEqualTo("test/cb/1");
     }
@@ -84,7 +74,7 @@ public class MotorConfigurationV2InitConfigTest {
         final String deviceName = "test/gs/1";
         try {
             // TODO change device Name
-            config = new MotorConfigurationV2(new DeviceProxy(deviceName), deviceName, true);
+            config = new MotorConfigurationV2(deviceName);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -103,9 +93,9 @@ public class MotorConfigurationV2InitConfigTest {
     @DataProvider(name = "noIntEncoderProvider")
     public Object[][] noIntEncoderProvider() {
         return new Object[][] { //
-        new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, "") }, //
-                new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, "not a number") }, //
-                new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0.3) } //
+        new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, "") }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, "not a number") }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 0.3) } //
         };
     }
 
@@ -115,7 +105,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
 
         }
         catch (DevFailed devFailed) {
@@ -127,16 +117,16 @@ public class MotorConfigurationV2InitConfigTest {
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
-            assertThat(DevFailedUtils.toString(e)).contains(AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT);
+            assertThat(DevFailedUtils.toString(e)).contains(MotorManager.AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT);
         }
     }
 
     @DataProvider(name = "validEncoderProvider")
     public Object[][] validEncoderProvider() {
         return new Object[][] { //
-        new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0), NONE }, //
-                new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 1), INCREMENTAL }, //
-                new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 2), ABSOLUTE }, //
+        new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 0), NONE }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 1), INCREMENTAL }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 2), ABSOLUTE }, //
         };
     }
 
@@ -147,7 +137,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -160,8 +150,8 @@ public class MotorConfigurationV2InitConfigTest {
     @DataProvider(name = "invalidEncoderProvider")
     public Object[][] encoderErrorProvider() {
         return new Object[][] { //
-        new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, -1), -1 },//
-                new Object[] { new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 3), 3 }, //
+        new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, -1), -1 },//
+                new Object[] { new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 3), 3 }, //
         };
     }
 
@@ -171,7 +161,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, encoderType, DP_INIT_TYPE, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -191,10 +181,10 @@ public class MotorConfigurationV2InitConfigTest {
     @DataProvider(name = "strategyProvider")
     public Object[][] strategyProvider() {
         return new Object[][] { //
-        new Object[] { new DbDatum(AXIS_INIT_TYPE_PROPERTY, ""), DP }, //
-                new Object[] { new DbDatum(AXIS_INIT_TYPE_PROPERTY, "DP"), DP }, //
-                new Object[] { new DbDatum(AXIS_INIT_TYPE_PROPERTY, "dP"), DP }, //
-                new Object[] { new DbDatum(AXIS_INIT_TYPE_PROPERTY, "LDPD"), OTHER }, //
+        new Object[] { new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, ""), DP }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "DP"), DP }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "dP"), DP }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "LDPD"), OTHER }, //
         };
     }
 
@@ -204,7 +194,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_2_2, strategy, NO_ENCODER, INIT_POS_IS_2);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -217,8 +207,8 @@ public class MotorConfigurationV2InitConfigTest {
     @DataProvider(name = "invalidInitPosProvider")
     public Object[][] invalidInitPosProvider() {
         return new Object[][] { //
-        new Object[] { new DbDatum(AXIS_INIT_POSITION_PROPERTY, "") },//
-                new Object[] { new DbDatum(AXIS_INIT_POSITION_PROPERTY, "not a number") }, //
+        new Object[] { new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, "") },//
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, "not a number") }, //
         };
     }
 
@@ -229,7 +219,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, OTHER_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -240,7 +230,7 @@ public class MotorConfigurationV2InitConfigTest {
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
-            assertThat(DevFailedUtils.toString(e)).contains(AXIS_INIT_POSITION_PROPERTY_IS_NAN);
+            assertThat(DevFailedUtils.toString(e)).contains(MotorManager.AXIS_INIT_POSITION_PROPERTY_IS_NAN);
         }
     }
 
@@ -251,7 +241,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, DP_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -264,9 +254,9 @@ public class MotorConfigurationV2InitConfigTest {
     public Object[][] validInitPosProvider() {
         return new Object[][] { //
         new Object[] { INIT_POS_IS_2 },//
-                new Object[] { new DbDatum(AXIS_INIT_POSITION_PROPERTY, -2) },//
-                new Object[] { new DbDatum(AXIS_INIT_POSITION_PROPERTY, 3.5) }, //
-                new Object[] { new DbDatum(AXIS_INIT_POSITION_PROPERTY, -3.5) }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, -2) },//
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, 3.5) }, //
+                new Object[] { new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, -3.5) }, //
         };
     }
 
@@ -277,7 +267,7 @@ public class MotorConfigurationV2InitConfigTest {
 
         try {
             putProperties(MOTOR_2_2, initPosition, OTHER_INIT_TYPE, NO_ENCODER);
-            config = new MotorConfigurationV2(proxyMotor22, MOTOR_2_2, true);
+            config = new MotorConfigurationV2(MOTOR_2_2);
         }
         catch (DevFailed devFailed) {
             fail("Can not create configuration");
@@ -292,7 +282,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
-            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config = new MotorConfigurationV2(MOTOR_1_1);
             config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
@@ -308,7 +298,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, OTHER_INIT_TYPE);
-            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config = new MotorConfigurationV2(MOTOR_1_1);
             config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
@@ -324,7 +314,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
-            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config = new MotorConfigurationV2(MOTOR_1_1);
             config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
@@ -339,7 +329,7 @@ public class MotorConfigurationV2InitConfigTest {
             throws Exception {
 
         putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, OTHER_INIT_TYPE);
-        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_1_1);
         config.retrieveProperties();
 
         // if exception is raised the test failed
@@ -352,7 +342,7 @@ public class MotorConfigurationV2InitConfigTest {
         MotorConfigurationV2 config = null;
         try {
             putProperties(MOTOR_1_1, INIT_POS_IS_2, ABSOLUTE_ENCODER, DP_INIT_TYPE);
-            config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+            config = new MotorConfigurationV2(MOTOR_1_1);
             config.retrieveProperties();
         }
         catch (DevFailed devFailed) {
@@ -367,7 +357,7 @@ public class MotorConfigurationV2InitConfigTest {
             throws Exception {
 
         putProperties(MOTOR_1_1, INIT_POS_IS_2, NO_ENCODER, DP_INIT_TYPE);
-        MotorConfigurationV2 config = new MotorConfigurationV2(proxyMotor11, MOTOR_1_1, true);
+        MotorConfigurationV2 config = new MotorConfigurationV2(MOTOR_1_1);
         config.retrieveProperties();
 
         // if exception is raised the test failed

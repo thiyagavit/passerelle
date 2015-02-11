@@ -97,7 +97,7 @@ public class EditorUtils {
     return null;
   }
 
-  public static String getStackTrace(Throwable e) {
+  public static String getStackTrace(Exception e) {
     StringWriter sw = new StringWriter();
     e.printStackTrace(new PrintWriter(sw));
     String stacktrace = sw.toString();

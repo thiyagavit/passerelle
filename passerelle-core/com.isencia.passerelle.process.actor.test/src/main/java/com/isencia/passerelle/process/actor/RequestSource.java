@@ -16,17 +16,14 @@ package com.isencia.passerelle.process.actor;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
@@ -36,7 +33,6 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.service.ServiceRegistry;
-import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
 
 /**
  * @author erwin
@@ -86,13 +82,13 @@ public class RequestSource extends Actor {
   public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
       String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
-      Case caze = ServiceRegistry.getInstance().getProcessFactory().createCase(extRef);
-      ServiceRegistry.getInstance().getProcessPersistenceService().persistCase(caze);
+      Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);
+      caze = ServiceRegistry.getInstance().getEntityManager().persistCase(caze);
       String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
       String category = ((StringToken) categoryParameter.getToken()).stringValue();
       String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
       String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
-      Request req = ServiceRegistry.getInstance().getProcessFactory().createRequest(caze, initiator, category, processType, correlationID);
+      Request req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, category, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
@@ -100,15 +96,15 @@ public class RequestSource extends Actor {
       while ((paramDef = reader.readLine()) != null) {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
-          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
+          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
         } else {
           getLogger().warn("Invalid mapping definition: " + paramDef);
         }
       }
-      ServiceRegistry.getInstance().getProcessManagerService().addProcessManager(new ProcessManagerImpl(req));
 //      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
       Context context = req.getProcessingContext();
       context.setStatus(Status.STARTED);
+      context = getContextRepository().storeContext(context);
       response.addOutputMessage(output, createMessageForContext(context));
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, e);

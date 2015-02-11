@@ -243,12 +243,12 @@ public class BatchRequestSequenceSource extends Actor {
         String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
         String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
 
-        req = ServiceRegistry.getInstance().getProcessFactory()
+        req = ServiceRegistry.getInstance().getEntityFactory()
             .createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
         for (Entry<String, String> reqAttr : requestAttributes.entrySet()) {
-          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
+          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
         }
-        ServiceRegistry.getInstance().getProcessPersistenceService().persistRequest(req);
+        req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
 //      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
 //        ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generated request", Long.toString(req.getId()));
       } catch (Exception e) {

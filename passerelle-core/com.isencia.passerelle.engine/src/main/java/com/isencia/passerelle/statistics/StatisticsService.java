@@ -22,7 +22,6 @@ package com.isencia.passerelle.statistics;
 public interface StatisticsService {
 
 	void registerStatistics(NamedStatistics s);
-  void unregisterStatistics(NamedStatistics s);
 	void start();
 	void stop();
 	void reset();

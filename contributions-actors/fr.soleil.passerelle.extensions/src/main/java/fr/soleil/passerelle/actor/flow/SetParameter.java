@@ -16,6 +16,7 @@ package fr.soleil.passerelle.actor.flow;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.gui.style.CheckBoxStyle;
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
@@ -25,6 +26,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.ChangeRequest;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -34,17 +36,6 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
-
-/**
- * A basic actor that reads an input message and sets its body as the value of a selected
- * parameter. The parameter can be anywhere in the model, e.g. as a (sub)model parameter or
- * as an actor parameter.
- * <p>
- * The name of the parameter-to-be-modified must be manually specified. 
- * I.e. there is no automated lookup (yet) of all parameters present in the actor's parent model.
- * </p>
- * @author delerw
- */
 
 /**
  * A basic actor that reads an input message and sets its body as the value of a selected parameter. The parameter can be anywhere in the model, e.g. as a

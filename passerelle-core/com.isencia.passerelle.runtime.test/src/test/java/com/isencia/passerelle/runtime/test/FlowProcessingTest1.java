@@ -90,10 +90,10 @@ public class FlowProcessingTest1 extends TestCase {
     FlowHandle flowHandle = repositoryService.commit("testStartAndCheckProcessHandle", buildTrivialFlow("testStartAndCheckProcessHandle"));
     ProcessHandle procHandle = processingService.start(StartMode.RUN, flowHandle, null, null, null);
     assertNotNull("Process handle must be not-null", procHandle);
-    assertNotNull("Process handle must have a non-null process context ID", procHandle.getProcessId());
+    assertNotNull("Process handle must have a non-null process context ID", procHandle.getProcessContextId());
     assertNotNull("Process status must be not-null", procHandle.getExecutionStatus());
-    assertNotNull("Process's flow must be not-null", procHandle.getFlowHandle());
-    assertEquals("Process's flow code must be as defined", "testStartAndCheckProcessHandle", procHandle.getFlowHandle().getCode());
+    assertNotNull("Process's flow must be not-null", procHandle.getFlow());
+    assertEquals("Process's flow code must be as defined", "testStartAndCheckProcessHandle", procHandle.getFlow().getCode());
   }
 
   public final void testStartFlowWithPreinitError() throws Exception {
@@ -132,7 +132,7 @@ public class FlowProcessingTest1 extends TestCase {
   public final void testGetHandle() throws Exception {
     FlowHandle flowHandle = repositoryService.commit("testGetHandle", buildDelay100msFlow("testGetHandle"));
     ProcessHandle procHandle = processingService.start(StartMode.RUN, flowHandle, null, null, null);
-    ProcessHandle procHandle2 = processingService.getHandle(procHandle.getProcessId());
+    ProcessHandle procHandle2 = processingService.getHandle(procHandle.getProcessContextId());
     assertEquals("Process handle from start() should be equal to one returned by getHandle()", procHandle, procHandle2);
   }
 

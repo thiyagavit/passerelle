@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A <code>Context</code> maintains all status information and executed work for a certain <code>Request</code>.
@@ -56,16 +55,16 @@ public interface Context extends Identifiable, Serializable {
    * 
    * @return the unique ID identifying each <code>Context</code> in a runtime's <code>ContextRepository</code>.
    */
-  String getProcessId();
+  String getContextRepositoryID();
 
   /**
    * Set the <code>Context</code>'s <code>repositoryID</code>
    * 
    * REMARK this is only to be used by ContextRepository implementations!
    * 
-   * @param processId
+   * @param contextReposID
    */
-  void setProcessId(String processId);
+  void setContextRepositoryID(String contextReposID);
 
   /**
    * @return current status of this context
@@ -123,31 +122,7 @@ public interface Context extends Identifiable, Serializable {
    * @return the entry that was present for the given name (or null if none was there)
    */
   Serializable removeEntry(String name);
-  
-  /**
-   * Remove the entry with the given name in this context and context of all linked tasks
-   * 
-   * @param name
-   * @return the entry that was present for the given name (or null if none was there)
-   */
-  Serializable removeDeepEntry(String name);
-  
-  /**
-   * 
-   * @param name
-   * @return the entry stored under the given name in this context and context of all linked tasks, or null if not present.
-   */
-  Serializable getDeepEntryValue(String name);
 
-  /**
-   * 
-   * @param name
-   * @return merged map of all entries stored in this context and context of all linked tasks.
-   * entries on the main context have priority on entries on tasks
-   * 
-   */
-  Map<String, Serializable> getDeepEntryValues();
-  
   /**
    * 
    * @param name
@@ -221,9 +196,9 @@ public interface Context extends Identifiable, Serializable {
 
   /**
    * 
-   * @param contexts
+   * @param other
    */
-  void join(Context... contexts);
+  void join(Context other);
 
   /**
    * 
@@ -258,6 +233,8 @@ public interface Context extends Identifiable, Serializable {
    * @return whether the context is minimized
    */
   boolean isMinimized();
+
+  void reattachTask(Task task);
 
   void addTask(Task task);
 }
