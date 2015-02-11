@@ -11,7 +11,7 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>fr.soleil.passerelle.dependencies</artifactId>
-	<version>4.9.2-SNAPSHOT</version>
+	<version>8.7.5</version>
 
 	<packaging>eclipse-plugin</packaging>
 
