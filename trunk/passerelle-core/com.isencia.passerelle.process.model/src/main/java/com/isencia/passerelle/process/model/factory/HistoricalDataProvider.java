@@ -14,6 +14,7 @@ public interface HistoricalDataProvider {
 	String ALLOWED_TASK_TYPES = "com.isencia.passerelle.process.model.allowed.tasketypes";
 	String ALLOWED_DATA_TYPES = "com.isencia.passerelle.process.model.allowed.datatypes";
 	String INCLUDE_REQUEST_ATTRIBUTES = "com.isencia.passerelle.process.model.include.request.attributes";
+	String INCLUDE_RESULTBLOCK_ATTRIBUTES = "com.isencia.passerelle.process.model.include.resultblock.attributes";
 
 	void setAllowHistoricalData(Context context, boolean value);
 
@@ -26,6 +27,8 @@ public interface HistoricalDataProvider {
 	void setAllowedDataTypes(Context context, String[] value);
 
 	void setIncludeRequestAttributes(Context context, boolean value);
+	
+	void setIncludeResultBlockAttributes(Context context, boolean value);
 
 	List<ResultBlock> getResultBlocks(Context context);
 
