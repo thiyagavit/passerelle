@@ -31,13 +31,13 @@ import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessManager;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
@@ -67,14 +67,13 @@ public class TaskResultActor extends AsynchDelay {
   }
 
   @Override
-  public void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    ManagedMessage message = request.getMessage(input);
-    Context processContext = getRequiredContextForMessage(message);
+  public void doProcess(ProcessManager processManager, ProcessRequest processRequest, ProcessResponse processResponse) throws ProcessingException {
+    ManagedMessage message = processRequest.getMessage(input);
+    Request request = processManager.getRequest();
     String resultType = resultTypeParam.getExpression();
     try {
-      ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
-      ProcessPersistenceService persistenceService = ServiceRegistry.getInstance().getProcessPersistenceService();
-      Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
+      ProcessFactory entityFactory = processManager.getFactory();
+      Task task = entityFactory.createTask(request, FlowUtils.getFullNameWithoutFlow(this), resultType);
       task.getProcessingContext().setStatus(Status.STARTED);
       ResultBlock rb = entityFactory.createResultBlock(task, resultType);
       String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
@@ -89,8 +88,19 @@ public class TaskResultActor extends AsynchDelay {
         }
       }
       task.getProcessingContext().setStatus(Status.FINISHED);
-      persistenceService.persistTask(task);
-      response.addOutputMessage(output, message);
+      ProcessPersister procPersister = processManager.getPersister();
+      boolean shouldClose = false;
+      try {
+        shouldClose = procPersister.open(true);
+        procPersister.persistTask(task);
+        procPersister.persistResultBlocks(rb);
+        processManager.notifyFinished(task);
+      } finally {
+        if (shouldClose) {
+          procPersister.close();
+        }
+      }
+      processResponse.addOutputMessage(output, message);
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);
     }

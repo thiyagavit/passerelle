@@ -16,15 +16,18 @@ package com.isencia.passerelle.process.actor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
+import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * Simple actor for testing, that mocks some work for each incoming msg,
@@ -57,7 +60,8 @@ public class Delay extends Forwarder {
     registerConfigurableParameter(timeParameter);
   }
 
-  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  @Override
+  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     fireInterrupted = false;
     try {
       int time = ((IntToken)timeParameter.getToken()).intValue();
@@ -75,7 +79,7 @@ public class Delay extends Forwarder {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in delay processing", this, e);
     }
 
-    super.process(ctxt, request, response);
+    super.process(processManager, request, response);
   }
 
   @Override
