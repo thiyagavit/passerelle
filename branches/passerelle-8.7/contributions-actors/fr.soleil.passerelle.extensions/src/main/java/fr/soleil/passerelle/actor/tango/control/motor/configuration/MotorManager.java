@@ -19,6 +19,7 @@ import fr.esrf.TangoApi.Database;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
@@ -35,6 +36,7 @@ public class MotorManager {
     public static final String MOTOR_ON = "MotorON";
     public static final String INIT_CMD = "Init";
     public static final String MOTOR_OFF = "MotorOFF";
+    public static final String MOTOR_STOP = "Stop";
     public static final String INITIALIZE_REFERENCE_POSITION = "InitializeReferencePosition";
     public static final String DEFINE_POSITION = "DefinePosition";
 
@@ -213,19 +215,22 @@ public class MotorManager {
         return init;
     }
     
-    public static void motorOff (MotorConfigurationV2 config,Actor actor,DeviceProxy dev) throws DevFailed {
-        // if the motor was off before the init, we switch it to off again wait good state
-        if (config.isSwitchToOffAfterInit() && dev != null) {
-            String deviceName = dev.fullName();
-            WaitStateTask waitTask = new WaitStateTask(deviceName, DevState.MOVING, 100, false);
-            waitTask.run();
-            if (waitTask.hasFailed()) {
-                throw waitTask.getDevFailed();
+    public static void stopMotor(String deviceName,Actor actor,WaitStateTask waitTask ){
+        if (waitTask != null) {
+            waitTask.cancel();
+        }
+        try {
+            // bug 22954
+            if (TangoAccess.executeCmdAccordingState(deviceName, DevState.MOVING, MOTOR_STOP)) {
+                ExecutionTracerService.trace(actor, "Call " + deviceName + "/" + MOTOR_STOP);
             }
-            dev.command_inout(MotorManager.MOTOR_OFF);
-            ExecutionTracerService.trace(actor, "Call " + deviceName + "/" + MotorManager.MOTOR_OFF);
+        } catch (final DevFailed e) {
+            TangoToPasserelleUtil.getDevFailedString(e, actor);
+        } catch (final Exception e) {
+            ExecutionTracerService.trace(actor, e.getMessage());
         }
     }
+    
 
     public static void raiseExceptionIfInitFailed(DeviceProxy dev, ActorContext context, Actor actor) throws DevFailed,
             ProcessingExceptionWithLog {

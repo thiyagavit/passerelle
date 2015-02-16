@@ -1,5 +1,7 @@
 package fr.soleil.passerelle.actor.tango.control;
 
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command.executeCmdAccordingState;
+
 import java.net.URL;
 
 import ptolemy.actor.Director;
@@ -11,7 +13,6 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
-import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
@@ -31,14 +32,15 @@ import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OffCommand;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
-import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
  * this actor initialize the devices (cb and Galil) according to shouldInitDevice parameter and run
@@ -117,7 +119,6 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
             // test if commands exists, otherwise this device is not a motor
             final DeviceProxy dev = getDeviceProxy();
             dev.command_query(MotorManager.MOTOR_ON);
-            dev.command_query(MotorManager.MOTOR_OFF);
             dev.command_query(MotorManager.INITIALIZE_REFERENCE_POSITION);
 
             conf = new MotorConfigurationV2(getDeviceName());
@@ -147,15 +148,24 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
                     ExecutionTracerService.trace(this, "Warning: " + deviceName
                             + " is already initialized, nothing done");
                 }
-                 else {
+                else if(TangoAccess.getCurrentState(deviceName) != DevState.OFF){
                      // run InitReferencePosition
                     runInitRefAndWaitEndMovement(deviceName, dev);
                     // Bug 22954
                     TangoAccess.getCurrentState(deviceName);
                     MotorManager.raiseExceptionIfInitFailed(dev, ctxt,this);
                     ExecutionTracerService.trace(this, deviceName + " reference position succeed");
+                    
+                    // if the motor was off before the init, we switch it to off again
+                    if (conf.isSwitchToOffAfterInit()) {
+                        TangoCommand stateCmd = new TangoCommand(getDeviceName(), "State");
+                        executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,DevState.STANDBY,DevState.ALARM);
+                    }
                 }
-                MotorManager.motorOff(conf, this, dev);
+                else {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName
+                            + " is OFF, nothing done");
+                }
 
             } catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
@@ -171,15 +181,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
 
     private void runInitRefAndWaitEndMovement(String deviceName, DeviceProxy dev) throws DevFailed {
         dev.command_inout(MotorManager.INITIALIZE_REFERENCE_POSITION);
-        ExecutionTracerService.trace(this, "initializing reference position of " + deviceName);
-        // since I am not sure that the device motor switch immediately to the moving state, do a
-        // little sleep
-        try {
-            Thread.sleep(1000);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-            // TODO
-        }
+        ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.INITIALIZE_REFERENCE_POSITION);
         waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
         waitTask.run();
         if (waitTask.hasFailed())
@@ -188,19 +190,7 @@ public class MotorInitReferencePositionV2 extends ATangoDeviceActorV5 implements
 
     private void stopMotor() {
         if (!isMockMode()) {
-            if (waitTask != null) {
-                waitTask.cancel();
-            }
-            try {
-                // bug 22954
-                if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
-                    ExecutionTracerService.trace(this, "motor has been stop");
-                }
-            } catch (final DevFailed e) {
-                TangoToPasserelleUtil.getDevFailedString(e, this);
-            } catch (final Exception e) {
-                ExecutionTracerService.trace(this, e.getMessage());
-            }
+            MotorManager.stopMotor(getDeviceName(),this,waitTask);
         }
     }
 

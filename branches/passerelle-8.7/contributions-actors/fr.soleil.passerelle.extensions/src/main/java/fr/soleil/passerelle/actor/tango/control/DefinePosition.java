@@ -1,8 +1,10 @@
 package fr.soleil.passerelle.actor.tango.control;
 
-import static fr.esrf.Tango.DevState.OFF;
+import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command.executeCmdAccordingState;
 
 import java.net.URL;
+
+import org.tango.utils.DevFailedUtils;
 
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
@@ -30,16 +32,18 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
+import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command;
-import fr.soleil.passerelle.tango.util.WaitStateTask;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OffCommand;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
  * this actor initialize the devices (cb and Galil) according to shouldInitDevice parameter and run
@@ -113,7 +117,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
         try {
             // test if commands exists, otherwise this device is not a motor
             final DeviceProxy dev = getDeviceProxy();
-            dev.command_query(MotorManager.MOTOR_OFF);
+            dev.command_query(MotorManager.MOTOR_ON);
             dev.command_query(MotorManager.DEFINE_POSITION);
             conf = new MotorConfigurationV2(getDeviceName());
             conf.retrieveFullConfig();
@@ -144,42 +148,46 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 if (MotorManager.isMotorIsInit(conf, this, shouldInitDevice, dev)) {
                     ExecutionTracerService.trace(this, "Warning: " + deviceName
                             + " is already initialized, nothing done");
-                } else {
+                } else if(TangoAccess.getCurrentState(deviceName) != DevState.OFF){
+                    // set the position
+                    DeviceData value = new DeviceData();
+                    value.insert(position);
+                    ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.DEFINE_POSITION + " with " + position);
+                    dev.command_inout(MotorManager.DEFINE_POSITION, value);
+                    MotorManager.raiseExceptionIfInitFailed(dev, context,this);
+                    ExecutionTracerService.trace(this, deviceName + " define position succeed");
+                    
+                    //Offset management
                     String offset = "";
-
                     // if port is Connected
                     ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
                     if (offsetManagedMsg != null) {
                         offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
                         // message is not empty
                         if (!offset.isEmpty()) {
-                            try {
                                 double offsetValue = Double.parseDouble(offset);
                                 // set the offset
-                                dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, offsetValue));
                                 ExecutionTracerService.trace(this, "write " + offsetValue + " on " + deviceName + "/" + MotorManager.OFFSET);
-                                
-                            } catch (NumberFormatException e) {
-                                ExecutionTracerService.trace(this, offset + " offset value is not a number");
-                                // Do not throw a error for offset
-                            }
+                                dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, offsetValue));
                         }
                     }
-
-                    // set the position
-                    DeviceData value = new DeviceData();
-                    value.insert(position);
-                    dev.command_inout(MotorManager.DEFINE_POSITION, value);
-                    ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.DEFINE_POSITION + " with " + position);
-                    MotorManager.raiseExceptionIfInitFailed(dev, context,this);
-                    ExecutionTracerService.trace(this, deviceName + " define position succeed");
+                    
+                    // if the motor was off before the init, we switch it to off again
+                    if (conf.isSwitchToOffAfterInit()) {
+                        TangoCommand stateCmd = new TangoCommand(getDeviceName(), "State");
+                        executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,DevState.STANDBY,DevState.ALARM);
+                    }
+                    
                     response.addOutputMessage(output, createMessage());
                 }
-                
-                MotorManager.motorOff(conf, this, dev);
+                else {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName
+                            + " is OFF, nothing done");
+                }
+              
             } catch (NumberFormatException e) {
                 throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
-                        positionStringValue + " position value is not a number", context, null);
+                        "position or offset value is not a number", context, null);
             }
             catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
@@ -187,7 +195,6 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL, e.getMessage(), context,
                         e);
             }
-          
         }
     }
 }
