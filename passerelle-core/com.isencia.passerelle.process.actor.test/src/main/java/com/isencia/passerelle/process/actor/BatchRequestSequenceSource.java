@@ -47,12 +47,13 @@ import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageInputContext;
-import com.isencia.passerelle.message.internal.SettableMessage;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
 
 /**
@@ -232,38 +233,41 @@ public class BatchRequestSequenceSource extends Actor {
   }
 
   @Override
-  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     if (requestAttrsQueue.isEmpty()) {
-//      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
-//      ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generation done", null);
+      processManager.notifyEvent("Batch generation done", null);
       requestFinish();
     } else {
+      ProcessFactory entityFactory = processManager.getFactory();
       Request req = null;
       Map<String, String> requestAttributes = requestAttrsQueue.poll();
+      ProcessManager subProcMgr = null;
       try {
         String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
         String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
 
-        req = ServiceRegistry.getInstance().getProcessFactory()
-            .createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
+        req = entityFactory.createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
         for (Entry<String, String> reqAttr : requestAttributes.entrySet()) {
-          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
+          entityFactory.createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
         }
-//        req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
-//      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
-//        ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generated request", Long.toString(req.getId()));
-        ServiceRegistry.getInstance().getProcessManagerService().addProcessManager(new ProcessManagerImpl(req));
-
+        processManager.notifyEvent("Batch generated request", Long.toString(req.getId()));
+        subProcMgr = new ProcessManagerImpl(ProcessManagerServiceTracker.getService(), req);
+        ProcessPersister persister = processManager.getPersister();
+        boolean shouldClose = false;
+        try {
+          shouldClose = persister.open(true);
+          persister.persistRequest(req);
+        } finally {
+          if(shouldClose) {
+            persister.close();
+          }
+        }
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to persist request " + requestAttributes, this, e);
       }
       try {
-        Context context = req.getProcessingContext();
-        context.setStatus(Status.STARTED);
         boolean isSeqEnd = requestAttrsQueue.size() == 0;
         ManagedMessage outputMessage = MessageFactory.getInstance().createMessageInSequence(seqID, seqPos++, isSeqEnd, getStandardMessageHeaders());
-        outputMessage.setBodyContent(context, ManagedMessage.objectContentType);
-        ((SettableMessage)outputMessage).setHeader(ProcessRequest.HEADER_PROCESS_CONTEXT, context.getProcessId());
         response.addOutputMessage(output, outputMessage);
         // trigger ourselves again
         offer(new MessageInputContext(0, input.getName(), outputMessage));

@@ -18,10 +18,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+
 import junit.framework.TestCase;
 import ptolemy.actor.IOPort;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.et.ETDirector;
 import com.isencia.passerelle.model.Flow;
@@ -31,10 +33,10 @@ import com.isencia.passerelle.process.actor.BatchRequestSequenceSource;
 import com.isencia.passerelle.process.actor.DelimitedResultLineGenerator;
 import com.isencia.passerelle.process.actor.RequestSource;
 import com.isencia.passerelle.process.actor.TaskResultActor;
-import com.isencia.passerelle.process.actor.forkjoin.CollectingEvictedMessageHandler;
-import com.isencia.passerelle.process.actor.forkjoin.Fork;
-import com.isencia.passerelle.process.actor.forkjoin.Join;
-import com.isencia.passerelle.process.actor.forkjoin.Splitter;
+import com.isencia.passerelle.process.actor.flow.CollectingEvictedMessageHandler;
+import com.isencia.passerelle.process.actor.flow.Fork;
+import com.isencia.passerelle.process.actor.flow.Join;
+import com.isencia.passerelle.process.actor.flow.Splitter;
 import com.isencia.passerelle.process.actor.trial.ContextTracerConsole;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.DevNullActor;

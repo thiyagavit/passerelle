@@ -31,12 +31,17 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.process.model.Case;
-import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.Status;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.factory.ProcessFactory;
+import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
+import com.isencia.passerelle.process.service.impl.ProcessHandleImpl;
 import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
+import com.isencia.passerelle.runtime.ProcessHandle;
 
 /**
  * @author erwin
@@ -83,16 +88,17 @@ public class RequestSource extends Actor {
     return LOGGER;
   }
 
-  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  @Override
+  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
+      ProcessFactory entityFactory = ProcessFactoryTracker.getService();
       String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
-      Case caze = ServiceRegistry.getInstance().getProcessFactory().createCase(extRef);
-      ServiceRegistry.getInstance().getProcessPersistenceService().persistCase(caze);
+      Case caze = entityFactory.createCase(extRef);
       String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
       String category = ((StringToken) categoryParameter.getToken()).stringValue();
       String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
       String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
-      Request req = ServiceRegistry.getInstance().getProcessFactory().createRequest(caze, initiator, category, processType, correlationID);
+      Request req = entityFactory.createRequest(caze, initiator, category, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
@@ -100,16 +106,28 @@ public class RequestSource extends Actor {
       while ((paramDef = reader.readLine()) != null) {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
-          ServiceRegistry.getInstance().getProcessFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
+          entityFactory.createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
         } else {
           getLogger().warn("Invalid mapping definition: " + paramDef);
         }
       }
-      ServiceRegistry.getInstance().getProcessManagerService().addProcessManager(new ProcessManagerImpl(req));
-//      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
-      Context context = req.getProcessingContext();
-      context.setStatus(Status.STARTED);
-      response.addOutputMessage(output, createMessageForContext(context));
+      
+      ProcessHandle handle = req.getId() == null ? new ProcessHandleImpl((Flow)toplevel()) : new ProcessHandleImpl(req.getId().toString(),(Flow)toplevel());
+      ProcessManager procManager = new ProcessManagerImpl(ProcessManagerServiceTracker.getService(), handle, req);
+      ProcessPersister persister = procManager.getPersister();
+      boolean shouldClose = false; 
+      try {
+        shouldClose = persister.open(true);
+        persister.persistCase(caze);
+        persister.persistRequest(req);
+        procManager.notifyStarted();
+      } finally {
+        if(shouldClose) {
+          persister.close();
+        }
+      }
+      
+      response.addOutputMessage(output, createMessage());
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, e);
     } finally {

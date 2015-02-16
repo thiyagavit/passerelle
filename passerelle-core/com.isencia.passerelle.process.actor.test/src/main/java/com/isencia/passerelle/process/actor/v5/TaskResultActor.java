@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 package com.isencia.passerelle.process.actor.v5;
 
 import java.io.BufferedReader;
@@ -35,11 +35,14 @@ import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.process.model.Context;
+import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
+import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.service.ProcessPersistenceService;
-import com.isencia.passerelle.process.service.ServiceRegistry;
+import com.isencia.passerelle.process.model.persist.ProcessPersister;
+import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
 import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -47,7 +50,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
  * A mock impl of an asynch task actor with configurable result items.
  * 
  * @author erwin
- *
+ * 
  */
 public class TaskResultActor extends AsynchDelay {
   private static final long serialVersionUID = 1L;
@@ -70,36 +73,49 @@ public class TaskResultActor extends AsynchDelay {
   }
 
   @Override
-  protected void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    ManagedMessage message = request.getMessage(input);
+  protected void doProcess(ActorContext ctxt, ProcessRequest processRequest, ProcessResponse processResponse) throws ProcessingException {
+    ManagedMessage message = processRequest.getMessage(input);
     String resultType = resultTypeParam.getExpression();
-    if (message != null) {
-      try {
-        ProcessFactory entityFactory = ServiceRegistry.getInstance().getProcessFactory();
-        ProcessPersistenceService persistenceService = ServiceRegistry.getInstance().getProcessPersistenceService();
-        
-        Context processContext = (Context) message.getBodyContent();
-        Task task = entityFactory.createTask(processContext, FlowUtils.getFullNameWithoutFlow(this), resultType);
-        
-        persistenceService.persistTask(task);
-        
-        ResultBlock rb = entityFactory.createResultBlock(task, resultType);
-
-        String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
-        BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
-        String paramDef = null;
-        while ((paramDef = reader.readLine()) != null) {
-          String[] paramKeyValue = paramDef.split("=");
-          if (paramKeyValue.length == 2) {
-            entityFactory.createResultItem(rb, paramKeyValue[0], paramKeyValue[1], null);
-          } else {
-            ExecutionTracerService.trace(this, "Invalid mapping definition: " + paramDef);
-          }
-        }
-        response.addOutputMessage(output, message);
-      } catch (Exception e) {
-        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);
+    try {
+      Context processContext = null;
+      if (message.getBodyContent() instanceof Context) {
+        processContext = (Context) message.getBodyContent();
+      } else {
+        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
       }
+      Request request = processContext.getRequest();
+      ProcessManager processManager = ProcessManagerServiceTracker.getService().getProcessManager(request);
+      ProcessFactory entityFactory = processManager.getFactory();
+      Task task = entityFactory.createTask(request, FlowUtils.getFullNameWithoutFlow(this), resultType);
+      task.getProcessingContext().setStatus(Status.STARTED);
+      ResultBlock rb = entityFactory.createResultBlock(task, resultType);
+      String paramDefs = ((StringToken) resultItemsParameter.getToken()).stringValue();
+      BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
+      String paramDef = null;
+      while ((paramDef = reader.readLine()) != null) {
+        String[] paramKeyValue = paramDef.split("=");
+        if (paramKeyValue.length == 2) {
+          entityFactory.createResultItem(rb, paramKeyValue[0], paramKeyValue[1], null);
+        } else {
+          ExecutionTracerService.trace(this, "Invalid mapping definition: " + paramDef);
+        }
+      }
+      task.getProcessingContext().setStatus(Status.FINISHED);
+      ProcessPersister procPersister = processManager.getPersister();
+      boolean shouldClose = false;
+      try {
+        shouldClose = procPersister.open(true);
+        procPersister.persistTask(task);
+        procPersister.persistResultBlocks(rb);
+        processManager.notifyFinished(task);
+      } finally {
+        if (shouldClose) {
+          procPersister.close();
+        }
+      }
+      processResponse.addOutputMessage(output, message);
+    } catch (Exception e) {
+      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error generating dummy results for " + resultType, this, message, e);
     }
   }
 
