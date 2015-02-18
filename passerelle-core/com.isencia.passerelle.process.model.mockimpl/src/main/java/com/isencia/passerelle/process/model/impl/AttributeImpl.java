@@ -60,4 +60,11 @@ public abstract class AttributeImpl implements Attribute {
 		return value;
 	}
 	
+	 @Override
+	  public AttributeImpl clone() throws CloneNotSupportedException {
+	    AttributeImpl clone = (AttributeImpl)super.clone();
+
+	    return(clone);
+	  }
+	
 }
