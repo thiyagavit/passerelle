@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Runtime Test bundle
 Bundle-SymbolicName: com.isencia.passerelle.runtime.test
-Bundle-Version: 8.6.3
+Bundle-Version: 8.6.4.qualifier
 Bundle-Activator: com.isencia.passerelle.runtime.test.activator.Activator
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
