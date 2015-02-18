@@ -5,13 +5,17 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -150,5 +154,15 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   @Override
   public String toString() {
     return "ResultItemImpl [id=" + id + ", name=" + name + ", value=" + value + ", unit=" + unit + ", colour=" + colour + "]";
+  }
+  @Override
+  public ResultItemImpl<V> clone() throws CloneNotSupportedException {
+  ResultItemImpl<V> clone = (ResultItemImpl<V>)super.clone();
+  
+  // clone attributes
+    clone.attributes = new HashMap<String,AttributeImpl>(attributes.size());
+    for (Entry<String,AttributeImpl> entry : attributes.entrySet())
+      clone.attributes.put(entry.getKey(),entry.getValue().clone());  
+  return(clone);
   }
 }
