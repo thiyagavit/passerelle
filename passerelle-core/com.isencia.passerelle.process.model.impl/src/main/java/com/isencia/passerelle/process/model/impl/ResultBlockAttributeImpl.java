@@ -26,10 +26,9 @@ import com.isencia.passerelle.process.model.ResultBlock;
 @Entity
 @Table(name = "PAS_RESULTBLOCKATTRIBUTE")
 public class ResultBlockAttributeImpl extends AttributeImpl implements Comparable<ResultBlockAttributeImpl> {
+  private static final long serialVersionUID = 1L;
 
   public static final String SCOPE_RESULTBLOCK = "resultblock";
-
-  private static final long serialVersionUID = 1L;
 
   @Id
   @Column(name = "ID")

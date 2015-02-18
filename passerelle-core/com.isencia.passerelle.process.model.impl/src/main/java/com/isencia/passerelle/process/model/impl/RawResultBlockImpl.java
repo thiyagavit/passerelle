@@ -1,8 +1,10 @@
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -15,6 +17,7 @@ import com.isencia.passerelle.process.model.RawResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.ResultItemFromRawBuilder;
 import com.isencia.passerelle.process.model.Task;
+import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 @Cacheable(false)
 @Entity
@@ -35,6 +38,20 @@ public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBloc
 
   public RawResultBlockImpl(Task task, String type) {
     super(task, type);
+  }
+  
+  @Override
+  public RawResultBlockImpl clone() throws CloneNotSupportedException {
+	RawResultBlockImpl clone = (RawResultBlockImpl)super.clone();
+		
+	// clone generatedResultItems
+    if (ProcessUtils.isInitialized(generatedResultItems)) {
+	  clone.generatedResultItems = new HashMap<String,ResultItem<?>>(generatedResultItems.size());
+	  for (Entry<String,ResultItem<?>> entry : generatedResultItems.entrySet())
+	    clone.generatedResultItems.put(entry.getKey(),(ResultItem<?>)entry.getValue().clone());
+    }
+		
+	return(clone);
   }
 
   /*

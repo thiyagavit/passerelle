@@ -34,10 +34,9 @@ import com.isencia.passerelle.process.model.Request;
 @DiscriminatorValue("RequestAttributeImpl")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class RequestAttributeImpl extends AttributeImpl implements Comparable<RequestAttributeImpl> {
+	private static final long serialVersionUID = 1L;
 
 	public static final String REQUEST = "request";
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "ID")

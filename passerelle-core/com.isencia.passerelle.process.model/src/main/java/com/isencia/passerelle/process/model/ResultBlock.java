@@ -24,7 +24,12 @@ import java.util.Date;
  * @author erwin
  * 
  */
-public interface ResultBlock extends Serializable, Identifiable, AttributeHolder, Coloured {
+public interface ResultBlock extends Serializable, Cloneable, Identifiable, AttributeHolder, Coloured {
+
+  /**
+  * @return a deep clone of the instance
+  */	
+  ResultBlock clone() throws CloneNotSupportedException;
 
   /**
    * @return the creation timestamp of the resultblock
