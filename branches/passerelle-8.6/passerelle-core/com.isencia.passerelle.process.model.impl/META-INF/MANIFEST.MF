@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle ProcessContext JPA implementation
 Bundle-SymbolicName: com.isencia.passerelle.process.model.impl
-Bundle-Version: 8.6.3.qualifier
+Bundle-Version: 8.6.3
 Bundle-Vendor: ISENCIA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: javax.persistence;bundle-version="2.0.1"

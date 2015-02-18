@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Passerelle Runtime Services REST Server
 Bundle-SymbolicName: com.isencia.passerelle.runtime.ws.rest.server
-Bundle-Version: 8.6.3.qualifier
+Bundle-Version: 8.6.3
 Bundle-Activator: com.isencia.passerelle.runtime.ws.rest.server.activator.Activator
 Bundle-Vendor: ISENCIA
 Import-Package: com.isencia.passerelle.core;version="8.6.0",
