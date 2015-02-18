@@ -27,12 +27,17 @@ import java.io.Serializable;
  * @author erwin
  * 
  */
-public interface NamedValue<V extends Serializable> extends Serializable {
+public interface NamedValue<V extends Serializable> extends Serializable, Cloneable {
 
-	/**
-	 * 
-	 * @return the name
-	 */
+  /**
+  * @return a deep clone of the instance
+  */	
+  NamedValue<V> clone() throws CloneNotSupportedException;
+  
+  /**
+  * 
+  * @return the name
+  */
   String getName();
 
   /**

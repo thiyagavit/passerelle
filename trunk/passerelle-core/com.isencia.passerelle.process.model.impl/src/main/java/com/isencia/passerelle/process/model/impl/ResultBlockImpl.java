@@ -3,7 +3,6 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -42,8 +42,6 @@ import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
 import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 
 /**
@@ -57,7 +55,6 @@ import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 @DiscriminatorValue("RESULTBLOCK")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class ResultBlockImpl implements ResultBlock {
-
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -118,6 +115,27 @@ public class ResultBlockImpl implements ResultBlock {
 
   public ResultBlockImpl(Task task, String type) {
     this(task, type, new Date());
+  }
+  
+  @Override
+  public ResultBlockImpl clone() throws CloneNotSupportedException {
+    ResultBlockImpl clone = (ResultBlockImpl)super.clone();
+		
+	// clone attributes
+    if (ProcessUtils.isInitialized(attributes)) {
+	  clone.attributes = new HashMap<String,Attribute>(attributes.size());
+	  for (Entry<String,Attribute> entry : attributes.entrySet())
+	    clone.attributes.put(entry.getKey(),(Attribute)entry.getValue().clone());
+    }
+		
+	// clone resultItems
+    if (ProcessUtils.isInitialized(resultItems)) {
+	  clone.resultItems = new HashMap<String,ResultItem<?>>(resultItems.size());
+	  for (Entry<String,ResultItem<?>> entry : resultItems.entrySet())
+	    clone.resultItems.put(entry.getKey(),(ResultItem<?>)entry.getValue().clone());
+    }
+		
+	return(clone);
   }
 
   public Long getId() {

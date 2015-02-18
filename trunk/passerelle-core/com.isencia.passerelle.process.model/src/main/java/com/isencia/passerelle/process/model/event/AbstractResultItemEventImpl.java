@@ -20,21 +20,41 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.runtime.SimpleEvent;
 
+//FIXME this class should not be defined in the bundle with the interfaces !!!
+// it should be moved to the impl bundle
 public abstract class AbstractResultItemEventImpl<V extends Serializable> extends SimpleEvent implements ResultItem<V> {
-  private static final long serialVersionUID = 3619256178951715634L;
-  private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+  private static final long serialVersionUID = 1L;
+  
+  // FIXME use ProcessUtils.emptyMap() that initializes to an empty singleton
+  private Map<String,Attribute> attributes = new HashMap<String,Attribute>();
   private String colour;
   private V value;
 
   protected AbstractResultItemEventImpl(String topic, V value, Date creationTS, Long duration) {
     super(topic, creationTS, duration);
     this.value = value;
+  }
+  
+  @Override
+  public AbstractResultItemEventImpl<V> clone() throws CloneNotSupportedException {
+    @SuppressWarnings("unchecked")
+	AbstractResultItemEventImpl<V> clone = (AbstractResultItemEventImpl<V>)super.clone();
+
+    if (attributes != null) {
+	  clone.attributes = new HashMap<String,Attribute>(attributes.size());
+	  for (Entry<String,Attribute> entry : attributes.entrySet())
+	    clone.attributes.put(entry.getKey(),(Attribute)entry.getValue().clone());
+    }
+    
+    return(clone);
   }
 
   @Override

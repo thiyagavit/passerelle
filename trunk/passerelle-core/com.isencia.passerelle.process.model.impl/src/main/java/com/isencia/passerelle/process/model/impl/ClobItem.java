@@ -26,7 +26,7 @@ import com.isencia.passerelle.process.model.Identifiable;
 @Cacheable(false)
 @Entity
 @Table(name = "PAS_CLOBITEM")
-public class ClobItem implements Identifiable, Serializable {
+public class ClobItem implements Identifiable, Serializable, Cloneable {
 	private static final long serialVersionUID = 7731827652936465986L;
 
 	@Id
@@ -56,9 +56,11 @@ public class ClobItem implements Identifiable, Serializable {
 		this.value = value;
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.isencia.passerelle.process.model.Identifiable#getId()
-	 */
+	@Override
+	public ClobItem clone() throws CloneNotSupportedException {
+		return((ClobItem)super.clone());
+	}
+
 	public Long getId() {
 		return id;
 	}

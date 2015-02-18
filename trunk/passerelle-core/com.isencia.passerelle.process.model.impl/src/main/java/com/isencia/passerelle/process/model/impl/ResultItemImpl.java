@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -52,24 +53,22 @@ import com.isencia.passerelle.process.model.impl.util.ProcessUtils;
 @DiscriminatorValue("RESULT")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ResultItemImpl<V extends Serializable> implements ResultItem<V> {
-  protected static final int MAX_CHAR_SIZE = 500;
-
-  @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  @JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
-  protected ClobItem clobItem;
-
-  public String getScope() {
-    return getType();
-  }
-
-  public String getType() {
-    if (getResultBlock() == null) {
-      return null;
-    }
-    return getResultBlock().getType();
-  }
-
   private static final long serialVersionUID = 1L;
+
+  public static final String _ID = "id";
+  public static final String _NAME = "name";
+  public static final String _VALUE = "valueAsString";
+  public static final String _CREATION_TS = "creationTS";
+  public static final String _UNIT = "unit";
+  public static final String _DATA_TYPE = "dataType";
+  public static final String _RESULT_BLOCK = "resultBlock";
+  public static final String _RESULT_BLOCK_TYPE = "resultBlock.type";
+  public static final String _COLOUR = "colour";
+  public static final String _DISCRIMINATOR = "discriminator";
+  public static final String _ATTRIBUTES = "attributes";
+  public static final String _CLOB_ITEM = "clobItem";
+
+  protected static final int MAX_CHAR_SIZE = 500;
 
   @Id
   @Column(name = "ID", nullable = false, unique = true, updatable = false)
@@ -109,18 +108,12 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   @Column(name = "DETAILLEVEL", nullable = true, unique = false, updatable = true)
   private Integer level;
 
-  public static final String _ID = "id";
-  public static final String _NAME = "name";
-  public static final String _VALUE = "valueAsString";
-  public static final String _CREATION_TS = "creationTS";
-  public static final String _UNIT = "unit";
-  public static final String _DATA_TYPE = "dataType";
-  public static final String _RESULT_BLOCK = "resultBlock";
-  public static final String _RESULT_BLOCK_TYPE = "resultBlock.type";
-  public static final String _COLOUR = "colour";
-  public static final String _DISCRIMINATOR = "discriminator";
-  public static final String _ATTRIBUTES = "attributes";
-  public static final String _CLOB_ITEM = "clobItem";
+  @Column(name = "DTYPE", updatable = false)
+  private String discriminator;
+
+  @OneToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
+  protected ClobItem clobItem;
 
   public ResultItemImpl() {
   }
@@ -142,7 +135,23 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     // TODO when resultblock is null then the TransientResultItemImpl should be used
     if (this.resultBlock != null)
       this.resultBlock.putItem(this);
-
+  }
+  
+  @Override
+  public ResultItemImpl<V> clone() throws CloneNotSupportedException {
+	ResultItemImpl<V> clone = (ResultItemImpl<V>)super.clone();
+	
+	// clone attributes
+	if (ProcessUtils.isInitialized(attributes)) {
+		clone.attributes = new HashMap<String,AttributeImpl>(attributes.size());
+		for (Entry<String,AttributeImpl> entry : attributes.entrySet())
+			clone.attributes.put(entry.getKey(),entry.getValue().clone());
+	}
+	
+	if (clobItem != null)
+		clone.clobItem = clobItem.clone();
+	
+	return(clone);
   }
 
   public Long getId() {
@@ -211,8 +220,16 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return level;
   }
 
-  @Column(name = "DTYPE", updatable = false)
-  private String discriminator;
+  public String getScope() {
+    return getType();
+  }
+
+  public String getType() {
+    if (getResultBlock() == null) {
+      return null;
+    }
+    return getResultBlock().getType();
+  }
 
   @SuppressWarnings("all")
   public int hashCode() {
