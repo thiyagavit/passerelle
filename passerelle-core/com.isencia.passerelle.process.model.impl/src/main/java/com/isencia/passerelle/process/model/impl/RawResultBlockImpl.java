@@ -1,33 +1,26 @@
 package com.isencia.passerelle.process.model.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
-import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import com.isencia.passerelle.process.model.RawResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.ResultItemFromRawBuilder;
 import com.isencia.passerelle.process.model.Task;
 
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("RAW_RESULTBLOCK")
 public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBlock {
   private static final long serialVersionUID = 1L;
+
   public static final String RESULT_ITEM_FROM_RAW_BUILDER_ATT_NAME = "ResultItemFromRawBuilderName";
 
-  // treemap to have natural ordering on keys
-  @Transient
-  private Map<String, ResultItem<?>> generatedResultItems = new TreeMap<String, ResultItem<?>>();
-
-  @Transient
+  private Map<String, ResultItem<?>> generatedResultItems = new HashMap<String, ResultItem<?>>();
   private Set<String> generationFlags = new HashSet<String>();
 
   public RawResultBlockImpl() {
@@ -37,12 +30,8 @@ public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBloc
     super(task, type);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * com.isencia.passerelle.process.model.RawResultBlock#putRawResultItem(com.isencia.passerelle.process.model.ResultItem
-   * , com.isencia.passerelle.process.model.ResultItemFromRawBuilder)
+  /* (non-Javadoc)
+   * @see com.isencia.passerelle.process.model.RawResultBlock#putRawResultItem(com.isencia.passerelle.process.model.ResultItem, com.isencia.passerelle.process.model.ResultItemFromRawBuilder)
    */
   public ResultItem<?> putRawResultItem(ResultItem<?> rawResultitem, ResultItemFromRawBuilder builder) {
     testBuilderExistence(builder);
@@ -66,9 +55,7 @@ public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBloc
         }
       }
     }
-    // linked hashmap so that the insertion order is kept, want to first show the result items from DB, followed by
-    // generated ones
-    Map<String, ResultItem<?>> merged = new LinkedHashMap<String, ResultItem<?>>();
+    Map<String, ResultItem<?>> merged = new HashMap<String, ResultItem<?>>();
     merged.putAll(resultItemMap);
     merged.putAll(generatedResultItems);
     return merged;

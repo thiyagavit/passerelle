@@ -6,19 +6,24 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.digester.substitution.MultiVariableExpander;
 import org.apache.commons.digester.substitution.VariableSubstitutor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.Actor;
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.IOPort;
@@ -35,7 +40,8 @@ import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Nameable;
 import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Workspace;
-import com.isencia.passerelle.eclipse.resources.util.ResourceUtils;
+import ptolemy.moml.Vertex;
+
 import com.isencia.passerelle.editor.common.utils.EditorUtils;
 
 public class ModelUtils {
@@ -255,8 +261,18 @@ public class ModelUtils {
 
   public static IFile getProjectFile(final String modelPath) {
 
-	    return ResourceUtils.getProjectFile(modelPath);
+    final String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 
+    // We must tell the composite actor the containing project name
+    String relPath = modelPath.substring(workspacePath.length());
+    IFile projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
+    if (projFile == null) {
+      relPath = modelPath.substring(workspacePath.length() + 2);
+      projFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
+
+    }
+
+    return projFile;
   }
 
   /**
@@ -268,7 +284,23 @@ public class ModelUtils {
    */
   public static IProject getProject(final NamedObj actor) throws Exception {
 
-	  return ResourceUtils.getProject(actor);
+    // Get top level actor, which knows the project we have.
+    CompositeActor comp = (CompositeActor) actor.getContainer();
+    while (comp.getContainer() != null) {
+      comp = (CompositeActor) comp.getContainer();
+    }
+
+    String name = comp.workspace().getName();
+    IProject project = null;
+    if (!name.equals("")) {
+      project = (IProject) ResourcesPlugin.getWorkspace().getRoot().findMember(name);
+    }
+    if (project == null) {
+      // If this .moml is in .passerelle we return that project
+      project = ModelUtils.getPasserelleProject();
+    }
+
+    return project;
   }
 
   /**
@@ -300,7 +332,7 @@ public class ModelUtils {
     String contents = "<?xml version=\"1.0\" standalone=\"no\"?> \r\n"
         + "<!DOCTYPE entity PUBLIC \"-//UC Berkeley//DTD MoML 1//EN\" \"http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd\"> \r\n" + "<entity name=\""
         + fileName.substring(0, fileName.length() - 5) + "\" class=\"ptolemy.actor.TypedCompositeActor\"> \r\n"
-        + "   <property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1.4\" /> \r\n"
+        + "   <property name=\"_createdBy\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"7.0.1\" /> \r\n"
         + "   <property name=\"_workbenchVersion\" class=\"ptolemy.kernel.attributes.VersionAttribute\" value=\"" + System.getProperty("passerelle.workbench.version")
         + "\" /> \r\n" + "   <property name=\"Director\" class=\"com.isencia.passerelle.domain.cap.Director\" > \r\n"
         + "      <property name=\"_location\" class=\"ptolemy.kernel.util.Location\" value=\"{20, 20}\" /> \r\n" + "   </property> \r\n" + "</entity>";
@@ -318,7 +350,20 @@ public class ModelUtils {
 
   public static IProject getPasserelleProject() throws Exception {
 
-    return ResourceUtils.getPasserelleProject();
+    final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    final IProject project = root.getProject(".passerelle");
+    if (!project.exists()) {
+      project.create(new NullProgressMonitor());
+      try {
+        project.setHidden(true);
+      } catch (Exception ignored) {
+        // It is not hidden for the test decks
+      }
+    }
+    if (!project.isOpen()) {
+      project.open(new NullProgressMonitor());
+    }
+    return project;
   }
 
   /**

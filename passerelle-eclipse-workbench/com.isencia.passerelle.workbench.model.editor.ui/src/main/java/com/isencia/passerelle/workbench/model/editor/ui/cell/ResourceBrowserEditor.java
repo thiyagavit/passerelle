@@ -7,22 +7,26 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.IllegalActionException;
+
 import com.isencia.passerelle.actor.Actor;
-import com.isencia.passerelle.eclipse.resources.util.ResourceUtils;
 import com.isencia.passerelle.util.ptolemy.ResourceParameter;
 import com.isencia.passerelle.workbench.model.utils.ModelUtils;
+import com.isencia.passerelle.workbench.util.ResourceUtils;
 
 public class ResourceBrowserEditor extends DialogBrowserEditor {
 
 	private static final Logger logger = LoggerFactory.getLogger(ResourceBrowserEditor.class);
 	protected String            stringValue = "";
 	protected ResourceParameter param;
+	private Text text;
 
 	public ResourceBrowserEditor(Composite aComposite, ResourceParameter param) {
 		super(aComposite);
@@ -82,10 +86,8 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 
 		if (value==null) return textValue;
 		
+		final String fullPath = value.getRawLocation().toOSString();
 		if (value.isLinked(IResource.CHECK_ANCESTORS)) {
-			// DO NOT USE RawLocation here or the logic for full path
-			// will not work
-			final String fullPath = value.getLocation().toOSString();
 			if (relative!=null) {
 				try {
 					relative.setToken(new BooleanToken(false));
@@ -95,7 +97,6 @@ public class ResourceBrowserEditor extends DialogBrowserEditor {
 			}
 			return fullPath.replace('\\', '/');
 		} else {
-			final String fullPath = value.getRawLocation().toOSString();
 			try {
 				if (relative!=null) relative.setToken(new BooleanToken(true));
 			} catch (IllegalActionException e) {

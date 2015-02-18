@@ -6,7 +6,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ptolemy.actor.NoTokenException;
 import ptolemy.data.IntToken;
 import ptolemy.data.ScalarToken;
 import ptolemy.data.Token;
@@ -62,7 +61,7 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
   private boolean up;
   // number of steps in the loop
   private long stepNumber;
-
+  
   // marker for first iteration
   private volatile boolean firstIteration = true;
 
@@ -77,8 +76,8 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
 
     startValueParam = PortFactory.getInstance().createPortParameter(this, START_VALUE_PARAM_NAME, Integer.class);
     startValueParam.setToken(new IntToken(0));
-    // startPort.setName("trigger (start loop)");
-
+    //startPort.setName("trigger (start loop)");
+    
     endValueParam = PortFactory.getInstance().createPortParameter(this, END_VALUE_PARAM_NAME, Integer.class);
     endValueParam.setToken(new IntToken(3));
     stepWidthParam = PortFactory.getInstance().createPortParameter(this, STEP_WIDTH_PARAM_NAME, Integer.class);
@@ -109,7 +108,7 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
   public void attributeChanged(final Attribute arg0) throws IllegalActionException {
     // check the stepWidth param on each change, so we can complain immediately if it has an invalid value
     if (arg0 == stepWidthParam) {
-      stepWidth = getValueFromPortParameter(stepWidthParam, 1L);
+      stepWidth =  getValueFromPortParameter(stepWidthParam, 1L);
       if (stepWidth <= 0) {
         throw new IllegalActionException(stepWidthParam, "Step Width must be positive");
       }
@@ -117,7 +116,7 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
       super.attributeChanged(arg0);
     }
   }
-
+  
   @Override
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
@@ -125,8 +124,10 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
   }
 
   /**
-   * In this actor impl, we need to obtain the loop config once, from the PortParameters, i.o. from simple parameters as in the plain ForLoop. For this purpose,
-   * this utility method is called from within the processing loop. But it should only do it's stuff one time.
+   * In this actor impl, we need to obtain the loop config once, from the PortParameters,
+   * i.o. from simple parameters as in the plain ForLoop.
+   * For this purpose, this utility method is called from within the processing loop.
+   * But it should only do it's stuff one time.
    * 
    * @throws ProcessingException
    */
@@ -135,15 +136,13 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
       startValueParam.setOnce();
       endValueParam.setOnce();
       stepWidthParam.setOnce();
-
+      
       startValue = getValueFromPortParameter(startValueParam, 0L);
       endValue = getValueFromPortParameter(endValueParam, 3L);
       stepWidth = getValueFromPortParameter(stepWidthParam, 1L);
       if (stepWidth <= 0) {
         throw new IllegalActionException(stepWidthParam, "Step Width must be positive");
       }
-    } catch (NoTokenException e) {
-      // ignore; may happen at the end of an execution, during model shutdown
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error reading loop start/end values", this, e);
     }
@@ -154,13 +153,14 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
     final BigDecimal div = totalWidth.divide(new BigDecimal(stepWidth), MathContext.DECIMAL32);
     stepNumber = (long) Math.floor(div.doubleValue()) + 1;
     getLogger().debug("stepNumber {}", stepNumber);
+    clearStepQueue();
   }
 
   protected double getValueFromPortParameter(PortParameter portParam, double defValue) throws IllegalActionException {
     Token t = portParam.getToken();
-    if (t instanceof PasserelleToken) {
+    if(t instanceof PasserelleToken) {
       try {
-        Object res = ((PasserelleToken) t).getMessage().getBodyContent();
+        Object res = ((PasserelleToken)t).getMessage().getBodyContent();
         return Double.parseDouble(res.toString());
       } catch (Exception e) {
         throw new IllegalActionException(this, e, "error reading msg content");
@@ -176,12 +176,9 @@ public class ForLoopWithPortCfg extends AbstractSequenceStepper {
    */
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    if (firstIteration || request.getMessage(startPort) != null) {
+    if(firstIteration) {
       setLoopConfiguration();
-      if (firstIteration) {
-        clearStepQueue();
-        firstIteration = false;
-      }
+      firstIteration = false;
     }
     super.process(ctxt, request, response);
   }

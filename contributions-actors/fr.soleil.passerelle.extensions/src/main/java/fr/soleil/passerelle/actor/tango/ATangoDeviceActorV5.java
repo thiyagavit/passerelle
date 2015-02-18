@@ -30,7 +30,8 @@ import fr.soleil.tango.clientapi.factory.ProxyFactory;
 public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
 
     public static final String DEVICE_NAME = "Device Name";
-    public static final String ERROR_DEVICE_NAME_EMPTY = DEVICE_NAME + "  parameter can not be empty";
+    public static final String ERROR_DEVICE_NAME_EMPTY = DEVICE_NAME
+            + "  parameter can not be empty";
     private static final Logger LOGGER = LoggerFactory.getLogger(ATangoDeviceActorV5.class);
     /**
      * The Tango device name (e.g domain/family/member).
@@ -47,16 +48,14 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
     private DeviceProxy deviceProxy;
     private boolean createDeviceProxy = true;
 
-    protected boolean checkIsAliveAtValidateInit = true;
-
     /**
      * @throws ptolemy.kernel.util.NameDuplicationException
      * 
      * @throws ptolemy.kernel.util.IllegalActionException
      * 
      */
-    public ATangoDeviceActorV5(final CompositeEntity container, final String name) throws NameDuplicationException,
-            IllegalActionException {
+    public ATangoDeviceActorV5(final CompositeEntity container, final String name)
+            throws NameDuplicationException, IllegalActionException {
         super(container, name);
         deviceNameParam = new StringParameter(this, DEVICE_NAME);
         deviceNameParam.setExpression(deviceName);
@@ -71,12 +70,11 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
             super.attributeChanged(attribute);
         }
     }
-
+    
     @Override
     protected Logger getLogger() {
-        return LOGGER;
+      return LOGGER;
     }
-
     /**
      * extract from parameter and check if the deviceName is correct (ie not empty)
      * 
@@ -107,15 +105,16 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
                 // see bug 22954 : The deviceProxy is still created here because the daughter
                 // classes need of it
                 deviceProxy = ProxyFactory.getInstance().createDeviceProxy(deviceName);
-                if (checkIsAliveAtValidateInit) {
-                    // deviceProxy.ping();
-                    new TangoCommand(deviceName, "State").execute();
-                }
+             // deviceProxy.ping();
+                new TangoCommand(deviceName, "State").execute();
 
-            } catch (final DevFailed e) {
+            }
+            catch (final DevFailed e) {
                 throw new DevFailedValidationException(e, this);
-            } catch (IllegalActionException e) {
-                throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e); // TODO
+            }
+            catch (IllegalActionException e) {
+                throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(),
+                        this, e); // TODO
             }
 
         }
@@ -150,7 +149,8 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
      */
     protected final DeviceProxy getDeviceProxy() throws PasserelleException {
         if (deviceProxy == null) {
-            throw new PasserelleException(ErrorCode.ERROR, "device proxy not initialized", this, null);
+            throw new PasserelleException(ErrorCode.ERROR, "device proxy not initialized", this,
+                    null);
         }
         return deviceProxy;
     }

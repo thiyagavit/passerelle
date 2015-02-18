@@ -15,23 +15,15 @@
 package com.isencia.passerelle.flow;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import junit.framework.TestCase;
-import ptolemy.actor.Director;
-import ptolemy.actor.ExecutionListener;
-import ptolemy.actor.Manager;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.domain.cap.CapDirector;
+import ptolemy.actor.Director;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.testsupport.FlowBuilder;
-import com.isencia.passerelle.testsupport.FlowExecutionTester;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
 import com.isencia.passerelle.testsupport.actor.AsynchDelay;
 import com.isencia.passerelle.testsupport.actor.Const;
@@ -39,7 +31,6 @@ import com.isencia.passerelle.testsupport.actor.Delay;
 import com.isencia.passerelle.testsupport.actor.ExceptionGenerator;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
 import com.isencia.passerelle.testsupport.actor.TextSource;
-import com.isencia.util.FutureValue;
 
 /**
  * Some unit tests for Passerelle's ET domain
@@ -57,7 +48,6 @@ public class FlowExecutionsTest extends TestCase {
   private static Director createProcessDirector(boolean createCapDirector, Flow flow, String name) throws IllegalActionException, NameDuplicationException {
     return createCapDirector ? new CapDirector(flow, name) : new com.isencia.passerelle.domain.cap.Director(flow, name);
   }
-
   private static Delay createDelayActor(boolean asynchDelay, Flow flow, String name) throws IllegalActionException, NameDuplicationException {
     return asynchDelay ? new AsynchDelay(flow, name) : new Delay(flow, name);
   }
@@ -91,8 +81,11 @@ public class FlowExecutionsTest extends TestCase {
     flowMgr.executeBlockingLocally(flow, props);
 
     // now check if all went as expected
-    new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(tracerConsole, 1L).expectActorIterationCount(helloHello, 1L)
-        .assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount(constant, 1L)
+      .expectMsgReceiptCount(tracerConsole, 1L)
+      .expectActorIterationCount(helloHello, 1L)
+      .assertFlow(flow);
   }
 
   /**
@@ -135,7 +128,9 @@ public class FlowExecutionsTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 3L).assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgReceiptCount(sink, 3L)
+      .assertFlow(flow);
   }
 
   public void testConcurrentInputsOnDelay() throws Exception {
@@ -188,7 +183,9 @@ public class FlowExecutionsTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgReceiptCount(sink, 9L).assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgReceiptCount(sink, 9L)
+      .assertFlow(flow);
   }
 
   /**
@@ -245,7 +242,10 @@ public class FlowExecutionsTest extends TestCase {
 
     flowMgr.executeBlockingLocally(flow, props);
 
-    new FlowStatisticsAssertion().expectMsgReceiptCount(sink1, 3L).expectMsgReceiptCount(sink2, 3L).assertFlow(flow);
+    new FlowStatisticsAssertion()
+      .expectMsgReceiptCount(sink1, 3L)
+      .expectMsgReceiptCount(sink2, 3L)
+      .assertFlow(flow);
   }
 
   public void testProcessException() throws Exception {
@@ -266,63 +266,11 @@ public class FlowExecutionsTest extends TestCase {
     flowMgr.executeBlockingLocally(flow, props);
 
     // now check if all went as expected
-    new FlowStatisticsAssertion().expectMsgSentCount(constant, 1L).expectMsgReceiptCount(sink, 0L).expectActorIterationCount(excGenerator, 1L).assertFlow(flow);
-  }
-
-  public void testProcessExceptionInSequentialAsyncExecutions() throws Exception {
-    FlowStatisticsAssertion flowStatsAssertion = new FlowStatisticsAssertion().
-        expectMsgSentCount("const.output", 1L).
-        expectMsgReceiptCount("sink.input", 0L).
-        expectActorIterationCount("excGenerator", 1L);
-
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("const.value", "Hello world");
-    props.put("excGenerator.process Exception", "true");
-    props.put("excGenerator.RuntimeException", "true");
-    
-    FlowBuilder builder = new FlowBuilder() {
-      public Flow buildFlow(String name) throws Exception {
-        final Flow flow = new Flow(name, null);
-        Director director = createProcessDirector(false, flow, "director");
-        flow.setDirector(director);
-        Const constant = new Const(flow, "const");
-        Actor excGenerator = new ExceptionGenerator(flow, "excGenerator");
-        Actor sink = new MessageHistoryStack(flow, "sink");
-        flow.connect(constant, excGenerator);
-        flow.connect(excGenerator, sink);
-        return flow;
-      }
-    };
-    
-    FlowExecutionTester.runFlowSequentially(100, "testProcessExceptionInSequentialAsyncExecutions", builder, props, flowStatsAssertion);
-  }
-
-  public void testProcessExceptionInConcurrentAsyncExecutions() throws Exception {
-    FlowStatisticsAssertion flowStatsAssertion = new FlowStatisticsAssertion().
-      expectMsgSentCount("const.output", 1L).
-      expectMsgReceiptCount("sink.input", 0L).
-      expectActorIterationCount("excGenerator", 1L);
-
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("const.value", "Hello world");
-    props.put("excGenerator.process Exception", "true");
-    props.put("excGenerator.RuntimeException", "true");
-    
-    FlowBuilder builder = new FlowBuilder() {
-      public Flow buildFlow(String name) throws Exception {
-        final Flow flow = new Flow(name, null);
-        Director director = createProcessDirector(false, flow, "director");
-        flow.setDirector(director);
-        Const constant = new Const(flow, "const");
-        Actor excGenerator = new ExceptionGenerator(flow, "excGenerator");
-        Actor sink = new MessageHistoryStack(flow, "sink");
-        flow.connect(constant, excGenerator);
-        flow.connect(excGenerator, sink);
-        return flow;
-      }
-    };
-    
-    FlowExecutionTester.runFlowConcurrently(100, "testProcessExceptionInConcurrentAsyncExecutions", builder, props, flowStatsAssertion);
+    new FlowStatisticsAssertion()
+      .expectMsgSentCount(constant, 1L)
+      .expectMsgReceiptCount(sink, 0L)
+      .expectActorIterationCount(excGenerator, 1L)
+      .assertFlow(flow);
   }
 
   // utility for whenever we would like to get the moml from a java-coded flow

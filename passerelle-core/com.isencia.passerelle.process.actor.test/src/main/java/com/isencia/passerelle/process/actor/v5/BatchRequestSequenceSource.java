@@ -11,7 +11,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- */
+*/
 package com.isencia.passerelle.process.actor.v5;
 
 import java.io.BufferedReader;
@@ -24,10 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.IntToken;
 import ptolemy.data.StringToken;
@@ -36,7 +34,6 @@ import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
@@ -54,11 +51,8 @@ import com.isencia.passerelle.message.MessageInputContext;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.persist.ProcessPersister;
-import com.isencia.passerelle.process.service.ProcessManager;
-import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
+import com.isencia.passerelle.process.model.Status;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * A batch-oriented source actor generating a lot of <code>Requests</code> in a sequence of Passerelle messages. It
@@ -185,7 +179,7 @@ public class BatchRequestSequenceSource extends Actor {
     int paramNr = paramNames.length;
     // For each parameter name, read a line from the param values text area
     // but also check if the parent request does not contain an overridden value list.
-    // Then check the length of the value list and, if all's well,
+    // Then check the length of the value list and, if all's well, 
     // set the values for each corresponding request attribute map.
     for (int i = 0; i < paramNr; ++i) {
       String paramName = paramNames[i].trim();
@@ -213,8 +207,8 @@ public class BatchRequestSequenceSource extends Actor {
           requestAttributes.put(paramName, paramValue);
         }
       } else {
-        throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Incompatible parameter value count for " + paramName + ". Expected "
-            + requestAttributesList.size() + " but was " + paramValues.length, this, null);
+        throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Incompatible parameter value count for " + paramName + ". Expected " + requestAttributesList.size() + " but was "
+            + paramValues.length, this, null);
       }
     }
 
@@ -237,66 +231,47 @@ public class BatchRequestSequenceSource extends Actor {
   }
 
   @Override
-  protected void process(ActorContext ctxt, ProcessRequest processRequest, ProcessResponse processResponse) throws ProcessingException {
-    ManagedMessage message = processRequest.getMessage(input);
-    try {
-      Context processContext = null;
-      if (message.getBodyContent() instanceof Context) {
-        processContext = (Context) message.getBodyContent();
-      } else {
-        throw new ProcessingException(ErrorCode.MSG_CONTENT_TYPE_ERROR, "No context present in msg", this, message, null);
-      }
-      Request request = processContext.getRequest();
-      ProcessManager processManager = ProcessManagerServiceTracker.getService().getProcessManager(request);
-      if (requestAttrsQueue.isEmpty()) {
-        processManager.notifyEvent("Batch generation done", null);
-        requestFinish();
-      } else {
-        ProcessFactory entityFactory = processManager.getFactory();
-        Request req = null;
-        Map<String, String> requestAttributes = requestAttrsQueue.poll();
-        try {
-          String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
-          String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    if (requestAttrsQueue.isEmpty()) {
+//      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
+//      ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generation done", null);
+      requestFinish();
+    } else {
+      Request req = null;
+      Map<String, String> requestAttributes = requestAttrsQueue.poll();
+      try {
+        String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
+        String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
 
-          req = entityFactory.createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
-          for (Entry<String, String> reqAttr : requestAttributes.entrySet()) {
-            entityFactory.createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
-          }
-          processManager.notifyEvent("Batch generated request", Long.toString(req.getId()));
-          new ProcessManagerImpl(ProcessManagerServiceTracker.getService(), req);
-          ProcessPersister persister = processManager.getPersister();
-          boolean shouldClose = false;
-          try {
-            shouldClose = persister.open(true);
-            persister.persistRequest(req);
-          } finally {
-            if (shouldClose) {
-              persister.close();
-            }
-          }
-        } catch (Exception e) {
-          throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to persist request " + requestAttributes, this, e);
+        req = ServiceRegistry.getInstance().getEntityFactory()
+            .createRequest(parentRequest.getCase(), initiator, parentRequest.getCategory(), processType, parentRequest.getCorrelationId());
+        for (Entry<String, String> reqAttr : requestAttributes.entrySet()) {
+          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, reqAttr.getKey(), reqAttr.getValue());
         }
+        req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
+//      this simplified access to a ContextManager is not yet ported from Passerelle EDM to the open-source repos
+//        ContextManagerProxy.notifyEvent(parentRequest.getProcessingContext(), "Batch generated request", Long.toString(req.getId()));
+      } catch (Exception e) {
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to persist request " + requestAttributes, this, e);
+      }
+      try {
+        Context context = req.getProcessingContext();
+        context.setStatus(Status.STARTED);
+        boolean isSeqEnd = requestAttrsQueue.size() == 0;
+        ManagedMessage outputMessage = MessageFactory.getInstance().createMessageInSequence(seqID, seqPos++, isSeqEnd, getStandardMessageHeaders());
+        outputMessage.setBodyContent(context, ManagedMessage.objectContentType);
+        response.addOutputMessage(output, outputMessage);
+        // trigger ourselves again
+        offer(new MessageInputContext(0, input.getName(), outputMessage));
+      } catch (Exception e) {
+        throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to send request " + req.getId(), this, e);
+      } finally {
         try {
-          boolean isSeqEnd = requestAttrsQueue.size() == 0;
-          ManagedMessage outputMessage = MessageFactory.getInstance().createMessageInSequence(seqID, seqPos++, isSeqEnd, getStandardMessageHeaders());
-          outputMessage.setBodyContent(req.getProcessingContext(), ManagedMessage.objectContentType);
-          processResponse.addOutputMessage(output, outputMessage);
-          // trigger ourselves again
-          offer(new MessageInputContext(0, input.getName(), outputMessage));
-        } catch (Exception e) {
-          throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Failed to send request " + req.getId(), this, e);
-        } finally {
-          try {
-            Thread.sleep(throttleInterval);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
+          Thread.sleep(throttleInterval);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
       }
-    } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error in actor processing", this, e);
     }
   }
 

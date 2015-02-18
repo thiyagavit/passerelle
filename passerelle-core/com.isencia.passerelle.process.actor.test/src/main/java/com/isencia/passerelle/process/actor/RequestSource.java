@@ -16,32 +16,23 @@ package com.isencia.passerelle.process.actor;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.process.model.Case;
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.model.factory.ProcessFactory;
-import com.isencia.passerelle.process.model.factory.ProcessFactoryTracker;
-import com.isencia.passerelle.process.model.persist.ProcessPersister;
-import com.isencia.passerelle.process.service.ProcessManager;
-import com.isencia.passerelle.process.service.ProcessManagerServiceTracker;
-import com.isencia.passerelle.process.service.impl.ProcessHandleImpl;
-import com.isencia.passerelle.process.service.impl.ProcessManagerImpl;
-import com.isencia.passerelle.runtime.ProcessHandle;
+import com.isencia.passerelle.process.model.Status;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 
 /**
  * @author erwin
@@ -88,17 +79,16 @@ public class RequestSource extends Actor {
     return LOGGER;
   }
 
-  @Override
-  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     try {
-      ProcessFactory entityFactory = ProcessFactoryTracker.getService();
       String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
-      Case caze = entityFactory.createCase(extRef);
+      Case caze = ServiceRegistry.getInstance().getEntityFactory().createCase(extRef);
+      caze = ServiceRegistry.getInstance().getEntityManager().persistCase(caze);
       String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
       String category = ((StringToken) categoryParameter.getToken()).stringValue();
       String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
       String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
-      Request req = entityFactory.createRequest(caze, initiator, category, processType, correlationID);
+      Request req = ServiceRegistry.getInstance().getEntityFactory().createRequest(caze, initiator, category, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));
@@ -106,28 +96,16 @@ public class RequestSource extends Actor {
       while ((paramDef = reader.readLine()) != null) {
         String[] paramKeyValue = paramDef.split("=");
         if (paramKeyValue.length == 2) {
-          entityFactory.createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
+          ServiceRegistry.getInstance().getEntityFactory().createAttribute(req, paramKeyValue[0], paramKeyValue[1]);
         } else {
           getLogger().warn("Invalid mapping definition: " + paramDef);
         }
       }
-      
-      ProcessHandle handle = req.getId() == null ? new ProcessHandleImpl((Flow)toplevel()) : new ProcessHandleImpl(req.getId().toString(),(Flow)toplevel());
-      ProcessManager procManager = new ProcessManagerImpl(ProcessManagerServiceTracker.getService(), handle, req);
-      ProcessPersister persister = procManager.getPersister();
-      boolean shouldClose = false; 
-      try {
-        shouldClose = persister.open(true);
-        persister.persistCase(caze);
-        persister.persistRequest(req);
-        procManager.notifyStarted();
-      } finally {
-        if(shouldClose) {
-          persister.close();
-        }
-      }
-      
-      response.addOutputMessage(output, createMessage());
+//      req = ServiceRegistry.getInstance().getEntityManager().persistRequest(req);
+      Context context = req.getProcessingContext();
+      context.setStatus(Status.STARTED);
+      context = getContextRepository().storeContext(context);
+      response.addOutputMessage(output, createMessageForContext(context));
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error creating request", this, e);
     } finally {

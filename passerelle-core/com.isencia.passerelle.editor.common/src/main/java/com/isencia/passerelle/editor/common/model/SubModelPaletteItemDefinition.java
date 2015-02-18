@@ -12,7 +12,7 @@ public class SubModelPaletteItemDefinition extends PaletteItemDefinition {
   public Flow getFlow() {
     if (flow == null) {
       try {
-        flow = (Flow) Activator.getDefault().getActorOrientedClassProvider().getActorOrientedClass(getId(), null);
+        flow = (Flow) Activator.getDefault().getActorOrientedClassProvider().getActorOrientedClass(getName(), null);
       } catch (ClassNotFoundException e) {
 
       }

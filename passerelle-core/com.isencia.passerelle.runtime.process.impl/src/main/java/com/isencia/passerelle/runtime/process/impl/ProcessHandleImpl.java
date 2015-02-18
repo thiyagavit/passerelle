@@ -41,12 +41,12 @@ public class ProcessHandleImpl implements ProcessHandle {
   }
 
   @Override
-  public FlowHandle getFlowHandle() {
+  public FlowHandle getFlow() {
     return flowHandle;
   }
 
   @Override
-  public String getProcessId() {
+  public String getProcessContextId() {
     return processContextId;
   }
 

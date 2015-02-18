@@ -20,27 +20,23 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.message.ManagedMessage;
+import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.internal.MessageContainer;
 import com.isencia.passerelle.message.internal.sequence.SequenceTrace;
-import com.isencia.passerelle.process.actor.Actor;
-import com.isencia.passerelle.process.actor.ProcessRequest;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * @author erwin
@@ -58,20 +54,18 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
   private AggregationStrategy aggregationStrategy;
   private EvictedMessagesHandler evictedMessagesHandler;
   private boolean stateful;
-  // < 1 for unlimited, or the max number of message sequences that will be retained. When this limit is passed while
-  // adding a new entry, the oldest entry is evicted.
+  // < 1 for unlimited, or the max number of message sequences that will be retained. When this limit is passed while adding a new entry, the oldest entry is evicted.
   private long maxRetentionCount;
   // < 1 for unlimited, or a time in ms. Entries that pass this age/time limit will be evicted.
   private long maxRetentionTime;
-
+  
   public Parameter stateFulParameter;
   public Parameter maxRetentionCountParameter;
   public Parameter maxRetentionTimeParameter;
 
   /**
-   * Construct an instance without eviction info. I.e. any state (i.c.o. a stateful one) will stay forever, or at least
-   * until the aggregation has been done. By default, for stateful instances, a <code>ContextAggregationStrategy</code>
-   * is set.
+   * Construct an instance without eviction info. I.e. any state (i.c.o. a stateful one) will stay forever, or at least until the aggregation has been done. By
+   * default, for stateful instances, a <code>ContextAggregationStrategy</code> is set.
    * 
    * @param container
    * @param name
@@ -84,9 +78,9 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
     this.stateful = stateful;
     if (stateful) {
       aggregationStrategy = new ContextAggregationStrategy();
-      maxRetentionCountParameter = new Parameter(this, "maxRetentionCount", new IntToken(-1));
+      maxRetentionCountParameter = new Parameter(this,"maxRetentionCount", new IntToken(-1));
       maxRetentionCountParameter.setDisplayName("Max retention count");
-      maxRetentionTimeParameter = new Parameter(this, "maxRetentionTime", new IntToken(-1));
+      maxRetentionTimeParameter = new Parameter(this,"maxRetentionTime", new IntToken(-1));
       maxRetentionTimeParameter.setDisplayName("Max retention time (s)");
     }
   }
@@ -102,21 +96,18 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
           sequenceScopeMessages = new HashMap<Long, MsgTimeEntry>();
           sequenceTimeEntries = new LinkedList<MsgTimeEntry>();
           aggregationStrategy = new ContextAggregationStrategy();
-          if (evictedMessagesHandler == null) {
+          if(evictedMessagesHandler==null) {
             // has not been explicitly set, so take the default one
             evictedMessagesHandler = new ErrorThrowingEvictedMessageHandler(this);
           }
-
-          maxRetentionCount = ((IntToken) maxRetentionCountParameter.getToken()).longValue();
-          maxRetentionTime = ((IntToken) maxRetentionTimeParameter.getToken()).longValue();
+          
+          maxRetentionCount = ((IntToken)maxRetentionCountParameter.getToken()).longValue();
+          maxRetentionTime = ((IntToken)maxRetentionTimeParameter.getToken()).longValue();
           // TODO activate eviction-by-time mechanism(s)
         } catch (IllegalActionException e) {
           throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading retention parameters", this, e);
         } finally {
-          try {
-            seqTELock.unlock();
-          } catch (Exception e) {/* ignore */
-          }
+          try {seqTELock.unlock();} catch (Exception e) {/* ignore */}
         }
       } else {
         throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Could not acquire seq trace Q lock", this, null);
@@ -131,7 +122,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
   public boolean wasGeneratedHere(ManagedMessage seqMsg) {
     if (isStateful()) {
       try {
-        if (!seqTELock.tryLock(10, TimeUnit.SECONDS)) {
+        if(!seqTELock.tryLock(10, TimeUnit.SECONDS)) {
           // if we did not get the lock, bad luck
           // we'll try to do our thing without it then
           getLogger().warn("{} - wasGeneratedHere() - Unable to acquire lock, trying without it", getFullName());
@@ -140,10 +131,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
       } catch (Exception e) {
         return false;
       } finally {
-        try {
-          seqTELock.unlock();
-        } catch (Exception e) {/* ignore */
-        }
+        try {seqTELock.unlock();} catch (Exception e) {/* ignore */}
       }
     } else {
       return false;
@@ -169,15 +157,12 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error registering sequence scope message", this, message, e);
       } finally {
-        try {
-          seqTELock.unlock();
-        } catch (Exception e) {/* ignore */
-        }
+        try {seqTELock.unlock();} catch (Exception e) {/* ignore */}
       }
     }
   }
 
-  public ManagedMessage aggregateProcessedMessage(ProcessManager processManager, ManagedMessage seqMsg) throws ProcessingException {
+  public ManagedMessage aggregateProcessedMessage(ManagedMessage seqMsg) throws ProcessingException {
     if (isStateful()) {
       try {
         if (!seqTELock.tryLock(10, TimeUnit.SECONDS)) {
@@ -188,7 +173,11 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
         Long scopeId = seqMsg.getSequenceID();
         Context branchedCtxt = null;
         if (sequenceScopeMessages.get(scopeId) != null) {
-          branchedCtxt = getBranchedContextFor(processManager, seqMsg);
+          try {
+            branchedCtxt = (Context) sequenceScopeMessages.get(scopeId).message.getBodyContent();
+          } catch (MessageException e) {
+            getLogger().error("Error getting context for scope " + scopeId, e);
+          }
         }
         ManagedMessage mergedMsg = null;
         if (branchedCtxt != null) {
@@ -203,7 +192,7 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
               getAuditLogger().debug("{} All sequence messages received for scope {}", getFullName(), scopeId);
               ManagedMessage[] messages = seqTrace.getMessagesInSequence();
               MessageContainer scopeMsg = (MessageContainer) sequenceScopeMessages.get(seqTrace.getSequenceID()).message;
-              mergedMsg = aggregationStrategy != null ? aggregationStrategy.aggregateMessages(processManager,scopeMsg, messages) : scopeMsg;
+              mergedMsg = aggregationStrategy != null ? aggregationStrategy.aggregateMessages(scopeMsg, messages) : scopeMsg;
             } catch (Exception e) {
               throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error aggregating messages for scope " + scopeId, this, e);
             } finally {
@@ -220,24 +209,11 @@ public abstract class AbstractMessageSequenceGenerator extends Actor implements 
       } catch (Exception e) {
         throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error handling sequence message", this, seqMsg, e);
       } finally {
-        try {
-          seqTELock.unlock();
-        } catch (Exception e) {/* ignore */
-        }
+        try {seqTELock.unlock();} catch (Exception e) {/* ignore */}
       }
     } else {
       return seqMsg;
     }
-  }
-  
-  protected Context getBranchedContextFor(ProcessManager processManager, ManagedMessage msg) {
-    String[] scopeGrp = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE_GRP);
-    String[] scope = msg.getHeader(ProcessRequest.HEADER_CTXT_SCOPE);
-    Context branchedCtx = null;
-    if(scopeGrp!=null && scope!=null && scopeGrp.length==1 && scope.length==1) {
-      branchedCtx = processManager.getScopedProcessContext(scopeGrp[0], scope[0]);
-    }
-    return (branchedCtx!=null) ? branchedCtx : processManager.getRequest().getProcessingContext();
   }
 
   public void evict(Long seqID) {

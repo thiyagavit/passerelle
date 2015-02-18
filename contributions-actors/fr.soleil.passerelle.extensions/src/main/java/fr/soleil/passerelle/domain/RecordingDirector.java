@@ -20,7 +20,7 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 @SuppressWarnings("serial")
 public class RecordingDirector extends BasicDirector {
 
-  private final static Logger logger = LoggerFactory.getLogger(RecordingDirector.class);
+  private final static Logger logger = LoggerFactory.getLogger(BasicDirector.class);
 
   private boolean asyncRecording = true;
   public Parameter asyncRecordingParam;
@@ -33,7 +33,7 @@ public class RecordingDirector extends BasicDirector {
 
   private String dataRecorderName;
   private final Parameter dataRecorderNameParam;
-  
+
   public RecordingDirector() throws IllegalActionException, NameDuplicationException {
     super();
 
@@ -94,11 +94,8 @@ public class RecordingDirector extends BasicDirector {
         // .getDevicesFromClass("DataRecorder")[0];
         // }
         dataRecorderName = PasserelleUtil.getParameterValue(dataRecorderNameParam);
-        logger.debug("using datarecorder {} ", dataRecorderName);
-        if(DataRecorder.getInstance().isRecordingStarted(dataRecorderName)){
-            throw new IllegalActionException("DataRecorder session is already Running. Stop it before starting a new one.");
-        }
-        DataRecorder.getInstance().startSession();       
+        logger.info("using datarecorder " + dataRecorderName);
+        DataRecorder.getInstance().startSession();
         DataRecorder.getInstance().setAsyncMode(dataRecorderName, asyncRecording);
         if (asyncRecording) {
           ExecutionTracerService.trace(this, "using asynchronous recording");
@@ -144,12 +141,10 @@ public class RecordingDirector extends BasicDirector {
     if (!getAdapter(null).isMockMode()) {
       try {
         DataRecorder.getInstance().cancel();
-        if(DataRecorder.getInstance().isStartRecording()){
-            DataRecorder.getInstance().endRecording(dataRecorderName);
-        }
+        DataRecorder.getInstance().endRecording(dataRecorderName);
       } catch (final DevFailed e) {
         // ignore error
-         e.printStackTrace();
+        // e.printStackTrace();
       }
     }
     super.wrapup();

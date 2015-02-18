@@ -19,13 +19,10 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v5.ActorContext;
-import com.isencia.passerelle.actor.v5.ProcessRequest;
-import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.actor.Transformer;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
-import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -35,10 +32,10 @@ import fr.soleil.passerelle.util.PasserelleUtil;
  * @version 1.0
  * @author erwin.de.ley@isencia.be
  */
-public class Delay extends TransformerV5 {
+public class Delay extends Transformer {
     /**
-         *
-         */
+	 *
+	 */
     private static final long serialVersionUID = -3055643090088110298L;
 
     private static Logger logger = LoggerFactory.getLogger(Delay.class);
@@ -62,8 +59,8 @@ public class Delay extends TransformerV5 {
      * @exception NameDuplicationException
      *                If the container already has an actor with this name.
      */
-    public Delay(final CompositeEntity container, final String name) throws NameDuplicationException,
-            IllegalActionException {
+    public Delay(final CompositeEntity container, final String name)
+            throws NameDuplicationException, IllegalActionException {
         super(container, name);
         timeParameter = new StringParameter(this, "time(s)");
         timeParameter.setExpression("1");
@@ -72,21 +69,20 @@ public class Delay extends TransformerV5 {
     }
 
     @Override
-    protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
-            throws ProcessingException {
+    public void doFire(final ManagedMessage message) throws ProcessingException {
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " doFire() - entry");
+        }
 
         double currentTime = time;
-        final ManagedMessage timeMessage = request.getMessage(input);
         if (takePortValue) {
-
             try {
-                currentTime = (Double) PasserelleUtil.getInputValue(timeMessage);
-            } catch (final ClassCastException e) {
-                // Useful for test case because input data arrived as string type 
-                currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(timeMessage));
+                currentTime = Double.valueOf((String) PasserelleUtil.getInputValue(message));
+            } catch (final NumberFormatException e) {
+                throw new ProcessingException(
+                        getInfo() + " - doFire() delay must be a number " + e, message, e);
             }
         }
-        logger.debug("currentTime : {}", currentTime);
         if (currentTime > 0) {
             final long millis = (long) (currentTime * 1000);
             ExecutionTracerService.trace(this, "pausing for " + millis + " ms");
@@ -107,16 +103,26 @@ public class Delay extends TransformerV5 {
                 // do nothing, means someone wants us to stop
             }
         }
-        sendOutputMsg(output, timeMessage);
+        try {
+            sendOutputMsg(output, message);
+        } catch (final IllegalArgumentException e) {
+            throw new ProcessingException(getInfo() + " - doFire() generated exception " + e,
+                    message, e);
+        }
+        // System.out.println("end sleep");
+
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " doFire() - exit");
+        }
     }
 
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " attributeChanged() - entry :" + attribute);
+        }
         if (attribute == timeParameter) {
             time = PasserelleUtil.getParameterDoubleValue(timeParameter);
-            if (time < 0) {
-                throw new IllegalActionException(this, "Time value must be upper or equal to 0.");
-            }
         } else if (attribute == takePortValueParam) {
             takePortValue = PasserelleUtil.getParameterBooleanValue(takePortValueParam);
             if (takePortValue) {
@@ -127,11 +133,13 @@ public class Delay extends TransformerV5 {
         } else {
             super.attributeChanged(attribute);
         }
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " attributeChanged() - exit");
+        }
     }
 
     @Override
     protected String getExtendedInfo() {
         return time + " (s)";
     }
-
 }

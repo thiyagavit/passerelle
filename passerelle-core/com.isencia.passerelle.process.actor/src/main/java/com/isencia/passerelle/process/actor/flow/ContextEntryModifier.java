@@ -26,30 +26,31 @@ import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
+import com.isencia.passerelle.actor.v5.Actor;
+import com.isencia.passerelle.actor.v5.ActorContext;
+import com.isencia.passerelle.actor.v5.ProcessRequest;
+import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.process.actor.Actor;
-import com.isencia.passerelle.process.actor.ProcessRequest;
-import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.model.Context;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * A transformer actor that allows to manipulate Context entries.
  * <p>
- * An entry is identified by a <code>scope</code>, a <code>name</code> and a <code>value</code>. The scope acts as a
- * parent "namespace", within which each specific entry has a unique name. <br/>
- * Technically this is implemented in a basic way by maintaining a separate <code>Map<String,String></code> for each
- * scope and storing each entry as a simple entry in such a map. <br/>
+ * An entry is identified by a <code>scope</code>, a <code>name</code> and a <code>value</code>. 
+ * The scope acts as a parent "namespace", within which each specific entry has a
+ * unique name. <br/>
+ * Technically this is implemented in a basic way by maintaining a separate <code>Map<String,String></code> 
+ * for each scope and storing each entry as a simple entry in such a map. <br/>
  * An empty scope identifies the "main" level, i.e. directly into the received <code>Context</code>'s entries map.
  * </p>
  * <p>
  * <ul>
  * <li>Set : set a new entry or overwrite an existing with same scope&name</li>
- * <li>Remove : remove an existing entry; do nothing if it is not found. <br/>
- * A remove with only a scope and no entry name will remove the complete scope in one shot.</li>
+ * <li>Remove : remove an existing entry; do nothing if it is not found.
+ * <br/>A remove with only a scope and no entry name will remove the complete scope in one shot.</li>
  * </ul>
  * </p>
  */
@@ -89,8 +90,8 @@ public class ContextEntryModifier extends Actor {
   }
 
   /**
-   * An illustration of validating the parameter settings. E.g. for the mode parameter, we expect either Add, Modify or
-   * Remove, but this constraint can not be enforced with 100% certainty in model files. So we can check it again here.
+   * An illustration of validating the parameter settings. E.g. for the mode parameter, we expect either Add, Modify or Remove, but this constraint can not be enforced with 100%
+   * certainty in model files. So we can check it again here.
    */
   @Override
   protected void validateInitialization() throws ValidationException {
@@ -105,11 +106,11 @@ public class ContextEntryModifier extends Actor {
   }
 
   @Override
-  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage message = request.getMessage(input);
     if (message != null) {
       try {
-        Context diagnosisContext = ProcessRequest.getContextForMessage(processManager, message);
+        Context diagnosisContext = (Context) message.getBodyContent();
         String entryName = entryNameParameter.getExpression();
         String entryValue = entryValueParameter.getExpression();
         String scopeStr = entryScopeParameter.getExpression();
@@ -134,10 +135,8 @@ public class ContextEntryModifier extends Actor {
    * @param scopeStr
    * @param entryName
    * @param entryValue
-   * @throws IllegalStateException
-   *           e.g. when the Context has a conflicting entry for e.g. scope
-   * @throws IllegalArgumentException
-   *           e.g. when an invalid mode is passed
+   * @throws IllegalStateException e.g. when the Context has a conflicting entry for e.g. scope
+   * @throws IllegalArgumentException e.g. when an invalid mode is passed
    */
   @SuppressWarnings("unchecked")
   private void doItOnScope(Context diagnosisContext, String modeStr, String scopeStr, String entryName, String entryValue) throws IllegalStateException, IllegalArgumentException {
@@ -161,7 +160,7 @@ public class ContextEntryModifier extends Actor {
       break;
     case Remove:
       if (scopeMap != null) {
-        if (StringUtils.isEmpty(entryName)) {
+        if(StringUtils.isEmpty(entryName)) {
           // it's a remove for the complete scope
           diagnosisContext.removeEntry(scopeStr);
         } else {
@@ -184,5 +183,4 @@ public class ContextEntryModifier extends Actor {
       break;
     }
   }
-
 }

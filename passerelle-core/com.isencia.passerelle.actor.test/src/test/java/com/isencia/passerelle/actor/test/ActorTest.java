@@ -16,6 +16,8 @@ package com.isencia.passerelle.actor.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +42,6 @@ import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
 import com.isencia.passerelle.model.FlowNotExecutingException;
 import com.isencia.passerelle.testsupport.FlowStatisticsAssertion;
-import com.isencia.passerelle.testsupport.actor.AsynchDelay;
-import com.isencia.passerelle.testsupport.actor.ForLoop;
 import com.isencia.passerelle.testsupport.actor.MapBasedRouter;
 import com.isencia.passerelle.testsupport.actor.MapSource;
 import com.isencia.passerelle.testsupport.actor.MessageHistoryStack;
@@ -115,39 +115,6 @@ public class ActorTest extends TestCase {
 
     new FlowStatisticsAssertion()
     .expectMsgSentCount(source, 1L)
-    .expectMsgReceiptCount(sink, 1L)
-    .assertFlow(flow);
-  }
-
-  /**
-   * A unit test for a plain looping model.
-   * 
-   * @throws Exception
-   */
-  public void testLoop() throws Exception {
-    flow = new Flow("testHelloPasserelle", null);
-    flow.setDirector(new Director(flow, "director"));
-
-    Const source = new Const(flow, "src");
-    ForLoop loopCtrl = new ForLoop(flow, "loop");
-    AsynchDelay delay = new AsynchDelay(flow, "delay");
-    DevNullActor sink = new DevNullActor(flow, "sink");
-
-    flow.connect(source.output, loopCtrl.startPort);
-    flow.connect(loopCtrl.outputPort, delay.input);
-    flow.connect(delay.output, loopCtrl.nextPort);
-    flow.connect(loopCtrl.endPort, sink.input);
-
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("src.value", "Hello world");
-    props.put("loop.Max Count", "2");
-    props.put("delay.time(ms)", "100");
-    flowMgr.executeBlockingLocally(flow, props);
-
-    new FlowStatisticsAssertion()
-    .expectMsgSentCount(source, 1L)
-    .expectMsgSentCount(loopCtrl.outputPort, 3L)
-    .expectMsgReceiptCount(loopCtrl.nextPort, 3L)
     .expectMsgReceiptCount(sink, 1L)
     .assertFlow(flow);
   }

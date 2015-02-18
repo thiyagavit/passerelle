@@ -27,12 +27,11 @@ import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.process.model.Request;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
@@ -108,21 +107,20 @@ public class DelimitedResultLineGenerator extends Actor {
     }
   }
 
-  @Override
-  public void process(ProcessManager processManager, ProcessRequest processRequest, ProcessResponse processResponse) throws ProcessingException {
-    ManagedMessage message = processRequest.getMessage(input);
+  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    ManagedMessage message = request.getMessage(input);
+    Context processContext = getRequiredContextForMessage(message);
     try {
-      Request request = processManager.getRequest();
       StringBuilder buffer = new StringBuilder();
       for (String resultName : resultNames) {
         if (REFID_NAME.equalsIgnoreCase(resultName)) {
-          buffer.append(request.getCase().getId() + delimiter);
+          buffer.append(processContext.getRequest().getCase().getId() + delimiter);
         } else if (REQUESTID_NAME.equalsIgnoreCase(resultName)) {
-          buffer.append(request.getId() + delimiter);
+          buffer.append(processContext.getRequest().getId() + delimiter);
         } else if (PROCESSTYPE_NAME.equalsIgnoreCase(resultName)) {
-          buffer.append(request.getType() + delimiter);
+          buffer.append(processContext.getRequest().getType() + delimiter);
         } else {
-          String resultValue = request.getProcessingContext().lookupValue(resultName);
+          String resultValue = processContext.lookupValue(resultName);
           buffer.append(resultValue + delimiter);
         }
       }
@@ -132,7 +130,7 @@ public class DelimitedResultLineGenerator extends Actor {
 
       ManagedMessage resultMsg = createMessageFromCauses(message);
       resultMsg.setBodyContent(msg, "text/plain");
-      processResponse.addOutputMessage(output, resultMsg);
+      response.addOutputMessage(output, resultMsg);
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error constructing delimited result line", this, message, e);
     }

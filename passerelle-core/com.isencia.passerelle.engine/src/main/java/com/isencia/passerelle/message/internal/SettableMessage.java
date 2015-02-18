@@ -14,8 +14,9 @@
 */
 package com.isencia.passerelle.message.internal;
 
-import javax.mail.Multipart;
+import java.util.Collection;
 
+import javax.mail.Multipart;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 
@@ -33,9 +34,12 @@ public interface SettableMessage extends ManagedMessage {
 	void setBody(PasserelleBodyPart body);
 	void setBodyContent(Multipart body) throws MessageException;
 
-  void addHeader(String name, String value);
-  void setHeader(String name, String value);
-  void removeHeader(String name);
-  void saveChanges() throws MessageException;
+	Collection getAllHeaders() throws MessageException;
+    boolean hasHeader(String name);
+    String[] getHeader(String name);
+    void addHeader(String name, String value);
+    void setHeader(String name, String value);
+    void removeHeader(String name);
+    void saveChanges() throws MessageException;
 
 }

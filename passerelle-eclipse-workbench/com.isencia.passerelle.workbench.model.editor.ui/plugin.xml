@@ -14,7 +14,7 @@
             id="com.isencia.passerelle.workbench.model.editor.ui.editors.modelEditor"
             name="Passerelle Model">
          <contentTypeBinding
-               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml">
+               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml.content.type">
          </contentTypeBinding>
       </editor>
       <editor
@@ -34,7 +34,7 @@
             id="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
             name="Passerelle Wizard">
          <contentTypeBinding
-               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml">
+               contentTypeId="com.isencia.passerelle.workbench.model.editor.ui.moml.content.type">
          </contentTypeBinding>
       </editor>
    </extension>
@@ -46,9 +46,9 @@
          	<propertyCategory category="actor" />
          </propertyContributor>
          <propertyContributor 
-            contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
-            labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
-            <propertyCategory category="actor" />
+         	contributorId="com.isencia.passerelle.workbench.model.editor.ui.editors.wizardEditor"
+         	labelProvider="com.isencia.passerelle.workbench.model.editor.ui.properties.ActorLabelProvider">
+         	<propertyCategory category="actor" />
          </propertyContributor>
    </extension>
    <extension
@@ -72,12 +72,12 @@
                   id="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general"
                   label="General">
             </propertyTab>
-            <propertyTab
+         	<propertyTab
                 afterTab="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.general"
                 category="actor"
                 id="com.isencia.passerelle.workbench.model.editor.ui.properties.tab.parameters"
                 label="Properties">
-            </propertyTab>  
+         	</propertyTab>	
         </propertyTabs>        
    </extension>
    
@@ -92,7 +92,7 @@
          name="Workflow Preferences"
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.dawnsci.preferences.root"
+            category="org.edna.workbench.preferences.root"
             class="com.isencia.passerelle.workbench.model.editor.ui.PasserellePreferencePage"
             id="com.isencia.passerelle.workbench.model.editor.ui.PasserellePreferences"
             name="Workflow Preferences">
@@ -102,13 +102,13 @@
 
    <extension point="org.eclipse.core.contenttype.contentTypes">
    
-        <content-type id="com.isencia.passerelle.workbench.model.editor.ui.moml" name="MOML"    
-                      base-type="org.eclipse.core.runtime.xml"
-                      priority="low"
-                      file-extensions="moml">           
-            <property name="org.eclipse.core.runtime.charset" default="UTF-8"/>
-            <describer class="org.eclipse.core.runtime.content.XMLContentDescriber"/>
-        </content-type>
+        <content-type id="com.isencia.passerelle.workbench.model.editor.ui.moml" name="MOML" 	
+			          base-type="org.eclipse.core.runtime.xml"
+			          priority="low"
+			          file-extensions="moml">			
+			<property name="org.eclipse.core.runtime.charset" default="UTF-8"/>
+			<describer class="org.eclipse.core.runtime.content.XMLContentDescriber"/>
+		</content-type>
    
    </extension>
    <extension

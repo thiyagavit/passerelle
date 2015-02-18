@@ -36,7 +36,7 @@ public class StopAction extends ExecutionAction implements IEditorActionDelegate
 
     try {
       if (System.getProperty("eclipse.debug.session") != null) {
-        if (ModelRunner.getRunningInstance()!=null) ModelRunner.getRunningInstance().stop();
+        ModelRunner.getRunningInstance().stop();
 
       } else {
         final MBeanServerConnection client = RemoteManagerAgent.getServerConnection(2000);

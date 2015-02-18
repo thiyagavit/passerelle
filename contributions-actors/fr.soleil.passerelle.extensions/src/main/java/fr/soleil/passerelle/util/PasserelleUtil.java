@@ -15,9 +15,6 @@ import com.isencia.passerelle.message.MessageFactory;
 public final class PasserelleUtil{
 
 	public static Object getInputValue(ManagedMessage message) throws ProcessingException{
-	        if(message == null){
-	            throw new ProcessingException("INPUT PORT ERROR - input message is null", message, null);
-	        }
 		try {
 			return message.getBodyContent();
 		} catch (MessageException e) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.9.0.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="PasserelleWorkbench" uid="com.isencia.passerelle.workbench.product" id="com.isencia.passerelle.workbench.product" application="com.isencia.passerelle.workbench.application" version="8.6.3.qualifier" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="icons/about.gif"/>
@@ -40,7 +40,7 @@
    <license>
         <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         <text>
-   /* Copyright 2014 - iSencia Belgium NV
+   /* Copyright 2011 - iSencia Belgium NV
 
    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
    you may not use this file except in compliance with the License.
@@ -62,20 +62,24 @@
       <plugin id="com.isencia.passerelle.actor"/>
       <plugin id="com.isencia.passerelle.actor.conf"/>
       <plugin id="com.isencia.passerelle.actor.help"/>
+      <plugin id="com.isencia.passerelle.actor.test" fragment="true"/>
       <plugin id="com.isencia.passerelle.commons"/>
+      <plugin id="com.isencia.passerelle.commons.test" fragment="true"/>
       <plugin id="com.isencia.passerelle.commons.ume"/>
+      <plugin id="com.isencia.passerelle.commons.ume.test" fragment="true"/>
       <plugin id="com.isencia.passerelle.domain.et"/>
-      <plugin id="com.isencia.passerelle.eclipse.resources"/>
+      <plugin id="com.isencia.passerelle.domain.et.test" fragment="true"/>
       <plugin id="com.isencia.passerelle.editor.common"/>
       <plugin id="com.isencia.passerelle.engine"/>
+      <plugin id="com.isencia.passerelle.engine.test" fragment="true"/>
       <plugin id="com.isencia.passerelle.project.repository.api"/>
       <plugin id="com.isencia.passerelle.project.repository.impl.filesystem"/>
       <plugin id="com.isencia.passerelle.runtime"/>
       <plugin id="com.isencia.passerelle.testsupport"/>
       <plugin id="com.isencia.passerelle.workbench"/>
       <plugin id="com.isencia.passerelle.workbench.logging.development" fragment="true"/>
+      <plugin id="com.isencia.passerelle.workbench.logging.production" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model"/>
-      <plugin id="com.isencia.passerelle.workbench.model.editor.graphiti"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui.cocoa.macosx.x86_64" fragment="true"/>
       <plugin id="com.isencia.passerelle.workbench.model.editor.ui.linux.x86" fragment="true"/>
@@ -88,6 +92,7 @@
       <plugin id="com.isencia.sherpa.commons.reduced"/>
       <plugin id="com.microstar"/>
       <plugin id="com.sun.packages" fragment="true"/>
+      <plugin id="com.teaminabox.eclipse.wiki"/>
       <plugin id="com.thoughtworks.xstream"/>
       <plugin id="diva"/>
       <plugin id="javax.el"/>
@@ -107,7 +112,6 @@
       <plugin id="org.apache.commons.net"/>
       <plugin id="org.apache.httpcomponents.httpclient"/>
       <plugin id="org.apache.httpcomponents.httpcore"/>
-      <plugin id="org.apache.jasper.glassfish"/>
       <plugin id="org.apache.log4j"/>
       <plugin id="org.apache.lucene"/>
       <plugin id="org.apache.lucene.analysis"/>
@@ -129,19 +133,9 @@
       <plugin id="org.eclipse.core.externaltools"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.net"/>
-      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.net.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.net.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.resources"/>
-      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility"/>
       <plugin id="org.eclipse.core.variables"/>
@@ -157,14 +151,8 @@
       <plugin id="org.eclipse.emf.common"/>
       <plugin id="org.eclipse.emf.common.ui"/>
       <plugin id="org.eclipse.emf.ecore"/>
-      <plugin id="org.eclipse.emf.ecore.change"/>
-      <plugin id="org.eclipse.emf.ecore.edit"/>
-      <plugin id="org.eclipse.emf.ecore.xmi"/>
       <plugin id="org.eclipse.emf.edit"/>
       <plugin id="org.eclipse.emf.edit.ui"/>
-      <plugin id="org.eclipse.emf.transaction"/>
-      <plugin id="org.eclipse.emf.validation"/>
-      <plugin id="org.eclipse.emf.workspace"/>
       <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.concurrent"/>
@@ -178,12 +166,6 @@
       <plugin id="org.eclipse.equinox.jsp.jasper"/>
       <plugin id="org.eclipse.equinox.jsp.jasper.registry"/>
       <plugin id="org.eclipse.equinox.launcher"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.p2.artifact.repository"/>
       <plugin id="org.eclipse.equinox.p2.console"/>
       <plugin id="org.eclipse.equinox.p2.core"/>
@@ -215,10 +197,7 @@
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
-      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.ui"/>
-      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.security.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.simpleconfigurator"/>
       <plugin id="org.eclipse.equinox.simpleconfigurator.manipulator"/>
       <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
@@ -227,12 +206,6 @@
       <plugin id="org.eclipse.gmf.runtime.common.core"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui"/>
       <plugin id="org.eclipse.gmf.runtime.draw2d.ui"/>
-      <plugin id="org.eclipse.graphiti"/>
-      <plugin id="org.eclipse.graphiti.doc"/>
-      <plugin id="org.eclipse.graphiti.mm"/>
-      <plugin id="org.eclipse.graphiti.pattern"/>
-      <plugin id="org.eclipse.graphiti.ui"/>
-      <plugin id="org.eclipse.graphiti.ui.capabilities"/>
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.help.base"/>
       <plugin id="org.eclipse.help.ui"/>
@@ -265,15 +238,8 @@
       <plugin id="org.eclipse.pde.core"/>
       <plugin id="org.eclipse.pde.launching"/>
       <plugin id="org.eclipse.pde.ui"/>
-      <plugin id="org.eclipse.persistence.jpa.equinox.weaving" fragment="true"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.team.core"/>
       <plugin id="org.eclipse.team.ui"/>
       <plugin id="org.eclipse.text"/>
@@ -290,7 +256,6 @@
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.log"/>
       <plugin id="org.eclipse.ui.views.properties.tabbed"/>
-      <plugin id="org.eclipse.ui.win32" fragment="true"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.eclipse.update.configurator"/>
@@ -318,9 +283,9 @@
    </plugins>
 
    <features>
-      <feature id="com.isencia.passerelle.core.feature" version="8.8.0"/>
-      <feature id="com.isencia.passerelle.workbench.feature" version="8.8.0"/>
-      <feature id="ptolemy.feature" version="7.0.1"/>
+      <feature id="com.isencia.passerelle.core.feature" version="8.3.0"/>
+      <feature id="com.isencia.passerelle.workbench.feature" version="8.3.0"/>
+      <feature id="ptolemy.feature" version="8.3.0"/>
    </features>
 
    <configurations>

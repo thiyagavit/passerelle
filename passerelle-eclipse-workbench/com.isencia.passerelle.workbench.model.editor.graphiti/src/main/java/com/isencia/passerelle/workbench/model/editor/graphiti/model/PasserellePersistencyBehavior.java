@@ -25,26 +25,23 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
-import org.eclipse.graphiti.ui.editor.DiagramBehavior;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.FlowManager;
-import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramBehavior;
 
 public class PasserellePersistencyBehavior extends DefaultPersistencyBehavior {
 
-  public PasserellePersistencyBehavior(DiagramBehavior diagramBehavior) {
-    super(diagramBehavior);
-  }
-  
-  protected PasserelleDiagramBehavior getDiagramBehavior() {
-    return (PasserelleDiagramBehavior) diagramBehavior;
+  public PasserellePersistencyBehavior(DiagramEditor diagramEditor) {
+    super(diagramEditor);
   }
 
   @Override
   public Diagram loadDiagram(URI uri) {
     Diagram diagram = super.loadDiagram(uri);
-    final IFile diagramFile = getDiagramBehavior().getDiagramFile();
+    final IFile diagramFile = getDiagramFile();
     IFile momlFile = getMomlFileForDiagram(diagramFile);
     if (momlFile.exists()) {
       try {
@@ -60,7 +57,7 @@ public class PasserellePersistencyBehavior extends DefaultPersistencyBehavior {
   @Override
   public void saveDiagram(IProgressMonitor monitor) {
     super.saveDiagram(monitor);
-    final Diagram diagram = getDiagramBehavior().getDiagramTypeProvider().getDiagram();
+    final Diagram diagram = diagramEditor.getDiagramTypeProvider().getDiagram();
     saveToMOML(DiagramFlowRepository.getFlowForDiagram(diagram), monitor);
   }
 
@@ -70,7 +67,7 @@ public class PasserellePersistencyBehavior extends DefaultPersistencyBehavior {
         StringWriter writer = new StringWriter();
         f.exportMoML(writer);
 
-        final IFile diagramFile = getDiagramBehavior().getDiagramFile();
+        final IFile diagramFile = getDiagramFile();
         IFile momlFile = getMomlFileForDiagram(diagramFile);
 
         if (!momlFile.exists()) {
@@ -97,4 +94,10 @@ public class PasserellePersistencyBehavior extends DefaultPersistencyBehavior {
     return momlFile;
   }
 
+  private IFile getDiagramFile() {
+    IEditorInput editorInput = diagramEditor.getEditorInput();
+    final IFile diagramFile = (editorInput instanceof FileEditorInput) ? ((FileEditorInput) editorInput).getFile() : (IFile) editorInput
+        .getAdapter(IFile.class);
+    return diagramFile;
+  }
 }

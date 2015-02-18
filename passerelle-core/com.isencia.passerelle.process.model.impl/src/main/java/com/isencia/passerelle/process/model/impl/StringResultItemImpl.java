@@ -5,7 +5,6 @@ package com.isencia.passerelle.process.model.impl;
 
 import java.util.Date;
 
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -20,12 +19,15 @@ import com.isencia.passerelle.process.model.ResultBlock;
  * @author "puidir"
  * 
  */
-@Cacheable(false)
 @Entity
 @DiscriminatorValue("STRING_RESULT")
-public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable , Comparable<StringResultItemImpl> {
+public class StringResultItemImpl extends ResultItemImpl<String> implements Mutable {
 
 	private static final long serialVersionUID = 1L;
+
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
+	private ClobItem clobItem;
 
 	public StringResultItemImpl() {
 	}
@@ -47,10 +49,6 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 	public StringResultItemImpl(ResultBlock resultBlock, String name, String value) {
 		this(resultBlock, name, value, new Date());
 	}
-	
-	public int compareTo(StringResultItemImpl other) {
-	    return this.getValueAsString().compareTo(other.getValueAsString());
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -58,7 +56,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
 	 */
 	public String getValue() {
-		if (clobItem != null && clobItem.getValue() != null) {
+		if (clobItem != null) {
 			return clobItem.getValue();
 		}
 
@@ -85,5 +83,4 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 	public String getDataType() {
 		return DataTypes.STRING;
 	}
-
 }

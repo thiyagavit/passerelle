@@ -2,14 +2,15 @@ package com.isencia.passerelle.actor.advanced;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
 import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.TerminationException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
@@ -38,6 +39,7 @@ public class DelayActor extends Actor {
     output = PortFactory.getInstance().createOutputPort(this);
 
     delayParameter = new Parameter(this, "Delay [s]", new IntToken(3));
+    delayTimer = new Timer("Timer for " + name);
   }
   
   @Override
@@ -49,7 +51,6 @@ public class DelayActor extends Actor {
   protected void doInitialize() throws InitializationException {
     super.doInitialize();
     pendingTasks = 0;
-    delayTimer = new Timer("Timer for " + getName());
   }
 
   @Override
@@ -90,14 +91,6 @@ public class DelayActor extends Actor {
       return false;
     }
     return true;
-  }
-  
-  @Override
-  protected void doWrapUp() throws TerminationException {
-    if(delayTimer!=null) {
-      delayTimer.cancel();
-    }
-    super.doWrapUp();
   }
 
   /**

@@ -23,7 +23,7 @@ import com.isencia.passerelle.actor.Actor;
  */
 public class ActorStatistics implements ActorStatisticsMBean, NamedStatistics {
 	
-	private String actorName;
+	private Actor actor;
 	
 	/**
 	 * Some performance statistics. Could be usefull for monitoring purposes.
@@ -32,7 +32,7 @@ public class ActorStatistics implements ActorStatisticsMBean, NamedStatistics {
 
 
 	public ActorStatistics(Actor actor) {
-		this.actorName=actor.getFullName();
+		this.actor=actor;
 	}
 	
 	public void beginCycle() {
@@ -43,6 +43,10 @@ public class ActorStatistics implements ActorStatisticsMBean, NamedStatistics {
 		cycleStatistics.acceptCycleEnd();
 	}
 	
+	public Actor getActor() {
+		return actor;
+	}
+
 	public long getNrCycles() {
 		return cycleStatistics.getNrCycles();
 	}
@@ -52,7 +56,7 @@ public class ActorStatistics implements ActorStatisticsMBean, NamedStatistics {
 	}
 
 	public String getName() {
-		return actorName;
+		return getActor().getFullName();
 	}
 
 	public long getAvgCycleTime() {

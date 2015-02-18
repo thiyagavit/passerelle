@@ -76,11 +76,9 @@ public class EditSubmodelAction extends Action {
 		
 		// Check if the sub model directory is inside the workspace
 		if (subModelDirectoryPath.startsWith(workspaceDirectoryPath)) {
-		  // The previous approach with subModelDirectoryPath.split(workspaceDirectoryPath) 
-		  // doesn't work well with windows paths.
-			String subModelsPath = subModelDirectoryPath.substring(workspaceDirectoryPath.length());
-			String subModelFilePath = subModelsPath+"/"+name+".moml";
-			file = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(subModelFilePath);
+			String[] subPaths = subModelDirectoryPath.split(workspaceDirectoryPath);
+			String subPath = subPaths[1]+"/"+name+".moml";
+			file = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(subPath);
 		} else {
 			Flow flow = Activator.getDefault().getRepositoryService().getSubmodel(name);
 			final IProject pass = ModelUtils.getPasserelleProject();

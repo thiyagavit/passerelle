@@ -20,24 +20,21 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.actor.TaskBasedActor;
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ResultItem;
-import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.model.event.DoubleValuedEventImpl;
 import com.isencia.passerelle.process.model.event.StringValuedEventImpl;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.runtime.Event;
 
 /**
@@ -85,13 +82,12 @@ public abstract class AbstractEventsGenerator extends TaskBasedActor {
   }
 
   @Override
-  protected void postProcess(ManagedMessage message, Task task, ProcessResponse response) throws Exception {
+  protected void postProcess(ManagedMessage message, Context taskContext, ProcessResponse response) throws Exception {
     Collections.sort(events, new EventComparator());
     sendEventBatch(events, response);
-    ProcessManager procMgr  = response.getProcessManager();
-    procMgr.notifyEvent(task, "EVENTS_SENT", events.toString());
-    procMgr.notifyFinished(task);
-    processFinished(response.getProcessManager(), response.getRequest(), response);
+    ServiceRegistry.getInstance().getContextManager().notifyEvent(taskContext, "EVENTS_SENT", events.toString());
+    ServiceRegistry.getInstance().getContextManager().notifyFinished(taskContext);
+    processFinished(response.getContext(), response.getRequest(), response);
   }
 
   private void sendEventBatch(Collection<Event> batch, ProcessResponse response) throws MessageException {

@@ -106,7 +106,7 @@ public class CDMAActorItemRetrievalTest extends TestCase {
     flow.connect(itemSelector.errorPort, errorSink.input);
     
     Map<String, String> props = new HashMap<String, String>();
-    props.put("NxsReader.DataSet URI", "C:/data/workspaces/passerelle-edm-branch-1_3/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/FlyscanSwing_2011-04-11_15-44-11.nxs");
+    props.put("NxsReader.DataSet URI", "C:/data/workspaces/CDMA-plain/fr.soleil.passerelle.cdma.actor.test/CDMA_samples/FlyscanSwing_2011-04-11_15-44-11.nxs");
     props.put("ItemSelector.Item name",itemName);
     props.put("ItemSelector.Logical selection mode",Boolean.toString(useLogicalLookup));
     flowMgr.executeBlockingLocally(flow,props);

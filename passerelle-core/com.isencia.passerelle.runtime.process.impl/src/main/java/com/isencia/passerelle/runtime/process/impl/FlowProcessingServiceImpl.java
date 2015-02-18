@@ -109,13 +109,13 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle refresh(ProcessHandle processHandle) {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     return fet!=null ? new ProcessHandleImpl(fet) : processHandle;
   }
 
   @Override
   public ProcessHandle waitUntilFinished(ProcessHandle processHandle, long time, TimeUnit unit) throws TimeoutException, InterruptedException, FlowNotExecutingException, ExecutionException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     if (fet != null) {
       try {
         fet.get(time, unit);
@@ -124,7 +124,7 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
       }
       return new ProcessHandleImpl(fet);
     } else {
-      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     }
   }
 
@@ -133,9 +133,9 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
    */
   @Override
   public ProcessHandle terminate(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
       fet.cancel(true);
       return new ProcessHandleImpl(fet);
@@ -144,9 +144,9 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle suspend(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
       // TODO check if we can/need to do something with the boolean result...
       fet.suspend();
@@ -156,9 +156,9 @@ public class FlowProcessingServiceImpl implements FlowProcessingService {
 
   @Override
   public ProcessHandle resume(ProcessHandle processHandle) throws FlowNotExecutingException {
-    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessId());
+    FlowExecutionFuture fet = flowExecutions.get(processHandle.getProcessContextId());
     if(fet==null) {
-      throw new FlowNotExecutingException(processHandle.getFlowHandle().getCode());
+      throw new FlowNotExecutingException(processHandle.getFlow().getCode());
     } else {
       // TODO check if we can/need to do something with the boolean result...
       fet.resume();

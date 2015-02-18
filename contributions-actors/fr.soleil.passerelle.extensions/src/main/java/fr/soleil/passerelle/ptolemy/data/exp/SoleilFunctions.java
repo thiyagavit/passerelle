@@ -19,10 +19,9 @@ public class SoleilFunctions {
         // use static classes of commons-maths
         PtParser.registerFunctionClass(StatUtils.class.getName());
         PtParser.registerFunctionClass(MathUtils.class.getName());
-        
+
         PtParser.registerFunctionClass(Analysis.class.getName());
         PtParser.registerFunctionClass(BeamCalculations.class.getName());
-        // use static classes of commons.lang
         PtParser.registerFunctionClass(StringUtils.class.getName());
     }
 
@@ -35,6 +34,4 @@ public class SoleilFunctions {
         logger.debug("test2 - in");
         return test[0].toString();
     }
-    
-    
 }

@@ -37,8 +37,8 @@ public class PropertyLabelProvider extends ColumnLabelProvider {
 	public Color getBackground(Object element) {
 		if (element instanceof GeneralAttribute) return lightGrey;
 		return null;
-	}
-	
+}
+
 	public void dispose() {
 		super.dispose();
 		lightGrey.dispose();

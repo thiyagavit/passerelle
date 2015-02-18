@@ -209,8 +209,6 @@ public class PortHandler {
             channelIsDead = true;
           }
         }
-      } catch (NoTokenException e) {
-        channelIsDead = true;
       } catch (Exception e) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(getPort().getFullName()+" - readTokenFromPort() exception", e);

@@ -59,22 +59,18 @@ public class HdbExtractorProxy {
      */
     public String getLastScalarAttrValue(String completeAttributeName) throws DevFailed {
 
-        String result = "0";
-        if (newestValueCommand != null) {
-            // res should contains the timestamp and the read part of the attribute separated by a
-            // semicolon
-            // eg 1363947098786; -10.176605465035054
-            String res = newestValueCommand.execute(String.class, completeAttributeName);
+        // res should contains the timestamp and the read part of the attribute separated by a
+        // semicolon
+        // eg 1363947098786; -10.176605465035054
+        String res = newestValueCommand.execute(String.class, completeAttributeName);
 
-            String[] attrWithTimeStamp = res.split(";");
+        String[] attrWithTimeStamp = res.split(";");
 
-            if (attrWithTimeStamp.length != 2) {
-                DevFailedUtils.throwDevFailed(WRONG_FORMAT);
-            }
-            result = attrWithTimeStamp[1].trim();
+        if (attrWithTimeStamp.length != 2) {
+            DevFailedUtils.throwDevFailed(WRONG_FORMAT);
         }
-        
-        return result;
+
+        return attrWithTimeStamp[1].trim();
     }
 
     /**
@@ -95,23 +91,20 @@ public class HdbExtractorProxy {
      *             <li>command result as not the expected format</li>
      *             <ul>
      */
-    public String getNearestScalarAttrValue(String completeAttributeName, String date) throws DevFailed {
+    public String getNearestScalarAttrValue(String completeAttributeName, String date)
+            throws DevFailed {
+        // res should contains the timestamp and the read part of the attribute separated by a
+        // semicolon
+        // eg 1363947098786; -10.176605465035054
+        String res = nearestValueCommand.execute(String.class, completeAttributeName, date);
 
-        String result = "0";
-        if (nearestValueCommand != null) {
-            // res should contains the timestamp and the read part of the attribute separated by a
-            // semicolon
-            // eg 1363947098786; -10.176605465035054
-            String res = nearestValueCommand.execute(String.class, completeAttributeName, date);
+        String[] attrWithTimeStamp = res.split(";");
 
-            String[] attrWithTimeStamp = res.split(";");
-
-            if (attrWithTimeStamp.length != 2) {
-                DevFailedUtils.throwDevFailed(WRONG_FORMAT);
-            }
-            result = attrWithTimeStamp[1].trim();
+        if (attrWithTimeStamp.length != 2) {
+            DevFailedUtils.throwDevFailed(WRONG_FORMAT);
         }
-        return result;
+
+        return attrWithTimeStamp[1].trim();
 
     }
 

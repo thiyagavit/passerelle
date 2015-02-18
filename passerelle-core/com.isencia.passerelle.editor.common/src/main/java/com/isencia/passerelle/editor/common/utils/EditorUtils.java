@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import ptolemy.actor.Director;
 import ptolemy.actor.TypedIOPort;
 import ptolemy.actor.TypedIORelation;
-import ptolemy.data.expr.Variable;
 import ptolemy.kernel.ComponentEntity;
 import ptolemy.kernel.ComponentRelation;
 import ptolemy.kernel.CompositeEntity;
@@ -97,7 +96,7 @@ public class EditorUtils {
     return null;
   }
 
-  public static String getStackTrace(Throwable e) {
+  public static String getStackTrace(Exception e) {
     StringWriter sw = new StringWriter();
     e.printStackTrace(new PrintWriter(sw));
     String stacktrace = sw.toString();
@@ -168,8 +167,6 @@ public class EditorUtils {
         ((TypedIORelation) ((Vertex) child).getContainer()).setContainer((CompositeEntity) container);
       } else if (child instanceof TextAttribute) {
         ((TextAttribute) child).setContainer((CompositeEntity) container);
-      } else if (child instanceof Variable) {
-        ((Variable) child).setContainer((CompositeEntity) container);
       } else if (child instanceof TypedIOPort) {
         ((TypedIOPort) child).setContainer((CompositeEntity) container);
       }

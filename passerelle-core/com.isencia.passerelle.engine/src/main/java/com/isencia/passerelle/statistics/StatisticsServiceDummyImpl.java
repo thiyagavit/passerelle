@@ -26,23 +26,15 @@ class StatisticsServiceDummyImpl implements StatisticsService {
 		super();
 	}
 
-	@Override
 	public void registerStatistics(NamedStatistics s) {
 	}
 
-  @Override
-  public void unregisterStatistics(NamedStatistics s) {
-  }
-
-  @Override
-  public void start() {
+	public void start() {
 	}
 
-  @Override
 	public void stop() {
 	}
 
-  @Override
 	public void reset() {
 	}
 }

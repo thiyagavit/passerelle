@@ -29,7 +29,7 @@ public abstract class AttributeImpl implements Attribute {
 	private static final int MAX_CHAR_SIZE = 250;
 
 	@Version
-	protected Integer version;
+	protected int version;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATION_TS", nullable = false, unique = false, updatable = false)
@@ -41,7 +41,7 @@ public abstract class AttributeImpl implements Attribute {
 	@Column(name = "VALUE", nullable = false, unique = false, updatable = false, length = MAX_CHAR_SIZE)
 	private String value;
 	
-	@OneToOne(optional = true, cascade = CascadeType.ALL)
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "LOB_ID", unique = true, nullable = true, updatable = false)
 	private ClobItem clobItem;
 
@@ -84,7 +84,7 @@ public abstract class AttributeImpl implements Attribute {
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValueAsString()
 	 */
 	public String getValueAsString() {
-		if (clobItem != null && clobItem.getValue() != null) {
+		if (clobItem != null) {
 			return clobItem.getValue();
 		}
 

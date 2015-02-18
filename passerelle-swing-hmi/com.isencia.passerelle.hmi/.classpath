@@ -10,7 +10,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/skinlf-1.2.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-worker-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar" sourcepath="C:/Users/delerw/.m2/repository/org/swinglabs/swingx/1.6/swingx-1.6-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

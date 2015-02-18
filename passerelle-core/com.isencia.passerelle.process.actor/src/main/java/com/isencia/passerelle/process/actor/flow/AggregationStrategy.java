@@ -16,7 +16,6 @@ package com.isencia.passerelle.process.actor.flow;
 
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 /**
  * A <code>AggregationStrategy</code> instance can be plugged in <code>MessageSequenceGenerator</code>s and other things handling
@@ -35,6 +34,6 @@ public interface AggregationStrategy {
    * 
    * @throws MessageException
    */
-  ManagedMessage aggregateMessages(ProcessManager processManager,ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException;
+  ManagedMessage aggregateMessages(ManagedMessage initialMsg, ManagedMessage... otherMessages) throws MessageException;
 
 }

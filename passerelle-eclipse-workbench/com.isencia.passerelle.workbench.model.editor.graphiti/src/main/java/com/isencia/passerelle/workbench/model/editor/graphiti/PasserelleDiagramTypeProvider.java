@@ -15,11 +15,12 @@
 package com.isencia.passerelle.workbench.model.editor.graphiti;
 
 import java.net.URL;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.platform.IDiagramBehavior;
+import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.ui.part.EditorPart;
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.DiagramFlowRepository;
 import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIndependenceSolver;
@@ -28,8 +29,6 @@ import com.isencia.passerelle.workbench.model.editor.graphiti.model.PasserelleIn
  * @author erwin
  */
 public class PasserelleDiagramTypeProvider extends AbstractDiagramTypeProvider {
-  
-  public final static String ID = "com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramTypeProvider";
 
   private IToolBehaviorProvider[] toolBehaviorProviders;
   private PasserelleIndependenceSolver independenceSolver;
@@ -43,13 +42,13 @@ public class PasserelleDiagramTypeProvider extends AbstractDiagramTypeProvider {
   }
 
   @Override
-  public void init(Diagram diagram, IDiagramBehavior diagramBehavior) {
-    super.init(diagram, diagramBehavior);
+  public void init(Diagram diagram, IDiagramEditor diagramEditor) {
+    super.init(diagram, diagramEditor);
     Flow flow = DiagramFlowRepository.getFlowForDiagram(diagram);
-    if (flow == null && diagramBehavior != null) {
+    if (flow == null && diagramEditor != null) {
       try {
-        IFile dei = ((PasserelleDiagramBehavior)diagramBehavior).getDiagramFile();
-        flow = new Flow(diagram.getName(), new URL(dei.getLocationURI().toString()));
+        DiagramEditorInput dei = (DiagramEditorInput) ((EditorPart) diagramEditor).getEditorInput();
+        flow = new Flow(diagram.getName(), new URL(dei.getUri().toString()));
         DiagramFlowRepository.registerDiagramAndFlow(diagram, flow);
       } catch (Exception e) {
         // TODO Auto-generated catch block

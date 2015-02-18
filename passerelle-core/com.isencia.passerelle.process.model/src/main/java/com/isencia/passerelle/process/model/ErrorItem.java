@@ -3,11 +3,9 @@
  */
 package com.isencia.passerelle.process.model;
 
-import java.util.List;
 import java.util.Set;
-
-import com.isencia.passerelle.core.ErrorCategory;
 import com.isencia.passerelle.core.ErrorCode.Severity;
+import com.isencia.passerelle.core.ErrorCategory;
 
 
 /**
@@ -50,13 +48,4 @@ public interface ErrorItem {
    */
   String getDescription();
 
-  /**
-   * @return an optional list of extra error details. When no details available this should return an empty list.
-   */
-  List<String> getDetails();
-  
-  /**
-   * @return a default-formatted full description, incl all details
-   */
-  String getDescriptionWithDetails();
 }

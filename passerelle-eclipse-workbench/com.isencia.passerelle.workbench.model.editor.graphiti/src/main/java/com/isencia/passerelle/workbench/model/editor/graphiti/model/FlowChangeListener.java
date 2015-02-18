@@ -2,6 +2,7 @@ package com.isencia.passerelle.workbench.model.editor.graphiti.model;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +15,14 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
   
   private final static Logger LOGGER = LoggerFactory.getLogger(FlowChangeListener.class);
   
-  private IDiagramTypeProvider dtp;
+  private IDiagramEditor editor;
 
   /**
    * 
    * @param editor
    */
-  public FlowChangeListener(IDiagramTypeProvider editor) {
-    this.dtp = editor;
+  public FlowChangeListener(IDiagramEditor editor) {
+    this.editor = editor;
   }
 
   /**
@@ -48,7 +49,7 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
             getDiagramTypeProvider().getNotificationService().updatePictogramElements(dirtyPes);
           }
         } else {
-          getDiagramTypeProvider().getDiagramBehavior().refresh();
+          getDiagramTypeProvider().getDiagramEditor().refresh();
         }
       }
 
@@ -70,10 +71,10 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
             // The notification service takes care of not only the
             // linked BOs but also asks the diagram provider about
             // related BOs.
-            getDiagramTypeProvider().getNotificationService().updatePictogramElements(new PictogramElement[] {getDiagramTypeProvider().getDiagram()});
+            getDiagramTypeProvider().getNotificationService().updatePictogramElements(new PictogramElement[] {editor.getDiagramTypeProvider().getDiagram()});
           }
         } else {
-          getDiagramTypeProvider().getDiagramBehavior().refresh();
+          getDiagramTypeProvider().getDiagramEditor().refresh();
         }
       }
 
@@ -87,7 +88,7 @@ public class FlowChangeListener implements ChangeListener, ValueListener {
   }
   
   protected IDiagramTypeProvider getDiagramTypeProvider() {
-    return dtp;
+    return editor.getDiagramTypeProvider();
   }
 
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.LongToken;
 import ptolemy.data.StringToken;
@@ -16,16 +15,12 @@ import ptolemy.data.type.BaseType;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
-import com.isencia.passerelle.process.model.AttributeNames;
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.util.ProcessModelUtils;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.service.ServiceRegistry;
 import com.isencia.passerelle.process.service.RequestProcessingBroker;
-import com.isencia.passerelle.process.service.RequestProcessingBrokerTracker;
 
 /**
  * This is a generic base class for service based actors.
@@ -96,8 +91,7 @@ public class ServiceBasedActor extends TaskBasedActor {
     
     attributeMappingParameter = new StringParameter(this, AttributeNames.ATTR_MAPPING);
     new TextStyle(attributeMappingParameter, "textarea");
-    registerExpertParameter(attributeMappingParameter);
-
+    
     timeOutParameter = new Parameter(this, AttributeNames.TIMEOUT_TIME, new LongToken(getDefaultTimeOutValue()));
     timeOutParameter.setTypeEquals(BaseType.LONG);
     
@@ -115,7 +109,7 @@ public class ServiceBasedActor extends TaskBasedActor {
    * will delegate its {@link Task} processing.
    */
   protected RequestProcessingBroker getProcessingBroker() {
-    return RequestProcessingBrokerTracker.getService();
+    return ServiceRegistry.getInstance().getRequestProcessingBroker();
   }
   
   @Override
@@ -124,7 +118,7 @@ public class ServiceBasedActor extends TaskBasedActor {
     try {
       Map<String, String> attrMappings = getAttributeMappings();
       for(Entry<String, String> attrEntry : attrMappings.entrySet()) {
-        ProcessModelUtils.storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), (String)null);
+        storeContextItemValueInMap(taskAttributes, processContext, attrEntry.getKey(), attrEntry.getValue(), (String)null);
       }
     } catch (Exception e) {
       throw new ProcessingException(ErrorCode.TASK_ERROR, "Unable to obtain task attributes", this, e);
@@ -132,15 +126,15 @@ public class ServiceBasedActor extends TaskBasedActor {
   }
 
   @Override
-  protected void process(Task task, ProcessManager processManager, ProcessResponse processResponse) throws ProcessingException {
+  protected void process(Context taskContext) throws ProcessingException {
     try {
       Long timeOutValue = getTimeOutValue();
       TimeUnit timeUnit = getTimeOutUnit();
-      getProcessingBroker().process(task, timeOutValue, timeUnit);
+      getProcessingBroker().process(taskContext, timeOutValue, timeUnit);
     } catch (ProcessingException e) {
       throw e;
     } catch (Exception e) {
-      throw new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task "+task.getId(), this, null, e);
+      throw new ProcessingException(ErrorCode.TASK_ERROR, "Error processing task "+taskContext.getId(), this, null, e);
     }
   }
   

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.isencia.passerelle</groupId>
 		<artifactId>ptolemy</artifactId>
-		<version>8.8.0-SNAPSHOT</version>
+		<version>8.6.3</version>
 	</parent>
 
 	<groupId>com.isencia.passerelle</groupId>
@@ -14,9 +14,4 @@
 	<packaging>eclipse-plugin</packaging>
 	
 	<name>Passerelle :: Ptolemy :: ptolemy.domains.and.actors</name>
-
-	<properties>
-		<!-- ptolemy versions are final, no re-deploy in nexus -->
-		<deploy.plugin.skip>true</deploy.plugin.skip>
-	</properties>
 </project>

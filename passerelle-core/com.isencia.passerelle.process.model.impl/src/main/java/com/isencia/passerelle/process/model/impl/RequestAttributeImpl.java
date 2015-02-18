@@ -3,12 +3,12 @@
  */
 package com.isencia.passerelle.process.model.impl;
 
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -16,18 +16,15 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
 import com.isencia.passerelle.process.model.Request;
 
 /**
  * @author "puidir"
  * 
  */
-@Cacheable(false)
 @Entity
 @Table(name = "PAS_REQUESTATTRIBUTE")
 @DiscriminatorColumn(name = "DTYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
@@ -47,7 +44,7 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	// Remark: need to use the implementation class instead of the interface
 	// here to ensure jpa implementations like EclipseLink will generate setter
 	// methods
-	@ManyToOne
+	@ManyToOne(targetEntity = RequestImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "REQUEST_ID")
 	private RequestImpl request;
 
@@ -75,7 +72,7 @@ public class RequestAttributeImpl extends AttributeImpl implements Comparable<Re
 	/**
 	 * @return the request
 	 */
-	public RequestImpl getRequest() {
+	public Request getRequest() {
 		return request;
 	}
 

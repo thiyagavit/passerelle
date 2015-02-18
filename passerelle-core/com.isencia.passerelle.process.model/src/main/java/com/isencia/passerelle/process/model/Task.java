@@ -26,16 +26,6 @@ import java.util.Collection;
  *
  */
 public interface Task extends Request {
-  /**
-   * Header name where an individual scope name is stored in messages travelling between actors that are inside a
-   * context scope, e.g. inside a Fork/Splitter-...->Join construct, on a specific branch.
-   */
-  String HEADER_CTXT_SCOPE = "__PSRL_CTXT_SCOPE";
-  /**
-   * Header name where a scope group is stored in messages travelling between actors that are inside a context scope,
-   * e.g. inside a Fork/Splitter-...->Join construct.
-   */
-  String HEADER_CTXT_SCOPE_GRP = "__PSRL_CTXT_SCOPE_GRP";
 
   /**
    * 

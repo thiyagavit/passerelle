@@ -38,17 +38,19 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.Workspace;
 
+import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxyFactory;
+import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
@@ -58,6 +60,7 @@ import fr.soleil.passerelle.tango.util.ScanTask;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IConfig;
+import fr.soleil.salsa.entity.impl.ConfigImpl;
 import fr.soleil.salsa.exception.SalsaDeviceException;
 import fr.soleil.salsa.exception.ScanNotFoundException;
 
@@ -113,27 +116,33 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
     @Override
     public void validateInitialization() throws ValidationException {
         super.validateInitialization();
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " validateInitialization() - entry");
+        }
 
         if (!isMockMode()) {
             final Director dir = getDirector();
             if (dir instanceof BasicDirector) {
                 ((BasicDirector) dir).registerFinalizer(this);
             }
-            
+
+            if (logger.isTraceEnabled()) {
+                logger.trace(getInfo() + "load salsa config");
+            }
+
             try {
-                logger.debug("load salsa config {}", confName);
-                conf = ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
+                conf = (ConfigImpl<?>) ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
 
             } catch (final ScanNotFoundException e) {
                 ExecutionTracerService.trace(this, "Error: Unknown scan configuration " + confName);
-                throw new ValidationException(ErrorCode.ERROR, "Unknown scan configuration " + confName, this, e) ;
+                throw new ValidationException("Unknown scan configuration ", confName, e);
             }
 
             try {
                 configureRecordingSession();
             } catch (SalsaDeviceException e) {
                 ExecutionTracerService.trace(this, "Error: Recording session configuration error");
-                throw new ValidationException(ErrorCode.ERROR, "Error: Recording session configuration error" + confName, this, e) ;
+                throw new ValidationException("Error: Recording session configuration error", confName, e);
             }
 
         }
@@ -144,7 +153,11 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
      */
     @Override
     protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
-            throws ProcessingException {       
+            throws ProcessingException {
+
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " process() - entry");
+        }
         if (isMockMode()) {
             ExecutionTracerService.trace(this, "MOCK - Scan started with config: " + confName);
             ExecutionTracerService.trace(this, "MOCK - Scan finished");
@@ -163,17 +176,21 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
         }
 
         sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
+
+        if (logger.isTraceEnabled()) {
+            logger.trace(getInfo() + " doFire() - exit");
+        }
     }
 
     private void configureRecordingSession() throws SalsaDeviceException {
-        // FIXME : http://jira.synchrotron-soleil.fr/jira/browse/TANGOCORE-5
+        // FIXME : http://controle.synchrotron-soleil.fr/mantis/view.php?id=25591
         DeviceProxyFactory.remove(ScanUtil.getCurrentSalsaApi().getDevicePreferences().getScanServer().toLowerCase());
 
         if (DataRecorder.getInstance().isSaveActive(this)) {
             ScanUtil.getCurrentSalsaApi().setDataRecorderPartialMode(true);
             // System.out.println("setDataRecorderPartialMode(true)");
         } else {
-
+            
             ScanUtil.getCurrentSalsaApi().setDataRecorderPartialMode(false);
             // System.out.println("setDataRecorderPartialMode(false)");
         }
@@ -203,7 +220,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                logger.warn(e.getMessage());
+                e.printStackTrace();
                 // ignore error since it is impossible to throw it
             }
         }
@@ -221,7 +238,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
                     }
                 }
             } catch (final Exception e) {
-                logger.warn(e.getMessage());
+                e.printStackTrace();
                 // ignore error since it is impossible to throw it
             }
         }
@@ -232,12 +249,12 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             try {
                 if (scanTask != null) {
                     if (scanTask.isRunning()) {
-                        ScanUtil.getCurrentSalsaApi().stopScan();
+                        ScanUtil.getCurrentSalsaApi().stopScan(conf);
                         ExecutionTracerService.trace(this, "Scan aborted");
                     }
                 }
             } catch (final Exception e) {
-                logger.warn(e.getMessage());
+                e.printStackTrace();
                 // ignore error since it is impossible to throw it
             }
         }

@@ -17,10 +17,7 @@ package com.isencia.passerelle.process.actor;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v5.ActorContext;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 @SuppressWarnings("serial")
 public class AsynchDelay extends Delay {
@@ -29,7 +26,7 @@ public class AsynchDelay extends Delay {
     super(container, name);
   }
 
-  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     new Thread(new DelayedSender(response)).start();
   }
   
@@ -46,11 +43,11 @@ public class AsynchDelay extends Delay {
 
     public void run() {
       try {
-        AsynchDelay.super.process(response.getProcessManager(), response.getRequest(), response);
+        AsynchDelay.super.process(response.getContext(), response.getRequest(), response);
       } catch (ProcessingException e) {
         response.setException(e);
       } finally {
-        AsynchDelay.this.processFinished(response.getProcessManager(), response.getRequest(), response);
+        AsynchDelay.this.processFinished(response.getContext(), response.getRequest(), response);
       }
     }
   }

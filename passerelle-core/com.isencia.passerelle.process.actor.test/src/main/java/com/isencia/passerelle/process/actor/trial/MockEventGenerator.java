@@ -8,25 +8,20 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TerminationException;
-import com.isencia.passerelle.process.actor.ProcessResponse;
 import com.isencia.passerelle.process.actor.event.AbstractEventsGenerator;
 import com.isencia.passerelle.process.common.exception.ErrorCode;
-import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 /**
@@ -80,9 +75,9 @@ public class MockEventGenerator extends AbstractEventsGenerator {
       throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error initializing event batches", this, e);
     }
   }
-  
+
   @Override
-  protected void process(Task task, ProcessManager processManager, ProcessResponse processResponse) throws ProcessingException {
+  protected void process(Context taskContext) throws ProcessingException {
     String eventDef = null;
     boolean noEvents = true;
     try {

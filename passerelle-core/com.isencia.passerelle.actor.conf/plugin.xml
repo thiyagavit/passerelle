@@ -3,12 +3,6 @@
 <fragment>
 	<extension point="com.isencia.passerelle.engine.actors">
 	
-        <actor class="ptolemy.data.expr.StringParameter"
-            group="com.isencia.passerelle.actor.actorgroup.utilities" 
-            icon="icons/input_field.gif"
-            id="ptolemy.data.expr.StringParameter" 
-            name="StringParameter">
-        </actor>
 		<actor class="ptolemy.vergil.kernel.attributes.TextAttribute"
 			group="com.isencia.passerelle.actor.actorgroup.utilities" 
 			icon="icons/comment.png"

@@ -166,17 +166,17 @@ public class CapDirector extends PNDirector implements PasserelleDirector {
     super.removeThread(thread);
     myThreads.remove(thread);
 
-    Set<Actor> activeActorsWithoutInputs = DirectorUtils.getRootActorsForActiveBranchesAndLoops(this);
+    Set<com.isencia.passerelle.actor.Actor> activeActorsWithoutInputs = DirectorUtils.getActiveActorsWithoutInputs(this);
     boolean areAllDaemon = true;
-    for (Actor actor : activeActorsWithoutInputs) {
-      if (!(actor instanceof com.isencia.passerelle.actor.Actor) || !((com.isencia.passerelle.actor.Actor)actor).isDaemon()) {
+    for (com.isencia.passerelle.actor.Actor actor : activeActorsWithoutInputs) {
+      if (!actor.isDaemon()) {
         areAllDaemon = false;
         break;
       }
     }
     if (areAllDaemon) {
-      for (Actor actor : activeActorsWithoutInputs) {
-        ((com.isencia.passerelle.actor.Actor)actor).requestFinish();
+      for (com.isencia.passerelle.actor.Actor actor : activeActorsWithoutInputs) {
+        actor.requestFinish();
       }
     }
   }

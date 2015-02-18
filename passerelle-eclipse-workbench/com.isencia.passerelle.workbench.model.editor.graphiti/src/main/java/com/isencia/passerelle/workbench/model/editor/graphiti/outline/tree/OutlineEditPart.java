@@ -32,7 +32,6 @@ import ptolemy.kernel.util.NamedObj;
 import ptolemy.kernel.util.Settable;
 import ptolemy.kernel.util.ValueListener;
 import com.isencia.passerelle.workbench.model.editor.graphiti.ImageConstants;
-import com.isencia.passerelle.workbench.model.editor.graphiti.PasserelleDiagramTypeProvider;
 
 /**
  * EditPart for components in the Tree.
@@ -99,20 +98,20 @@ public class OutlineEditPart extends org.eclipse.gef.editparts.AbstractTreeEditP
   protected Image getImage() {
     NamedObj flowModel = (NamedObj) getModel();
     if (flowModel instanceof Director)
-      return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_DIRECTOR);
+      return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_DIRECTOR);
     else if (flowModel instanceof Parameter)
-      return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_PARAMETER);
+      return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_PARAMETER);
     else if (flowModel instanceof IOPort) {
       IOPort port = (IOPort) flowModel;
       if (port.isInput()) {
-        return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_INPUTPORT);
+        return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_INPUTPORT);
       } else {
-        return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_OUTPUTPORT);
+        return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_OUTPUTPORT);
       }
     } else if (flowModel instanceof TypedAtomicActor) {
-      return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_ACTOR);
+      return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_ACTOR);
     } else if (flowModel instanceof CompositeActor) {
-      return GraphitiUi.getImageService().getImageForId(PasserelleDiagramTypeProvider.ID, ImageConstants.IMG_COMPOSITE);
+      return GraphitiUi.getImageService().getImageForId(ImageConstants.IMG_COMPOSITE);
     } else {
       return super.getImage();
     }

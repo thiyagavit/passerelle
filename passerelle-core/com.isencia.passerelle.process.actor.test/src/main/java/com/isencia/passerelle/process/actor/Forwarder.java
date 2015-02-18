@@ -17,7 +17,6 @@ package com.isencia.passerelle.process.actor;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
-
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
@@ -25,7 +24,6 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
-import com.isencia.passerelle.process.service.ProcessManager;
 
 @SuppressWarnings("serial")
 public class Forwarder extends Actor {
@@ -39,12 +37,11 @@ public class Forwarder extends Actor {
     output = PortFactory.getInstance().createOutputPort(this);
   }
 
-  @Override
-  public void process(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
-    doProcess(processManager, request, response);
+  public void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+    doProcess(ctxt, request, response);
   }
 
-  protected void doProcess(ProcessManager processManager, ProcessRequest request, ProcessResponse response) throws ProcessingException {
+  protected void doProcess(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     ManagedMessage receivedMsg = request.getMessage(input);
     // Create a new outgoing msg, "caused by" the received input msg
     // and for the rest a complete copy of the received msg

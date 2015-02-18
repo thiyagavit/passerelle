@@ -147,31 +147,37 @@ public abstract class ASnapExtractor extends Transformer {
                     break;
             }
             int i = 0;
-            for (final String name : attributeNames) {
-
-                switch (extractionType) {
-                    case READ:
-                        ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID + " : [read = "
-                                + snapReadValues[i] + "]");
-                        sendOutputMsg(output, PasserelleUtil.createContentMessage(this, snapReadValues[i]));
-                        break;
-                    case WRITE:
-                        ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID + " : [write = "
-                                + snapWriteValues[i] + "]");
-                        sendOutputMsg(writePort, PasserelleUtil.createContentMessage(this, snapWriteValues[i]));
-                        break;
-                    default:
-                        ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID + " : [read = "
-                                + snapReadValues[i] + "] [write = " + snapWriteValues[i] + "]");
-                        sendOutputMsg(output, PasserelleUtil.createContentMessage(this, snapReadValues[i]));
-                        sendOutputMsg(writePort, PasserelleUtil.createContentMessage(this, snapWriteValues[i]));
-                        break;
-                }
-                i++;
-                if (isFinishRequested()) {
-                    break;
-                }
-            }
+            // for (final String name : attributeNames) {
+            //
+            // final Date date = new Date(System.currentTimeMillis());
+            // switch (extractionType) {
+            // case READ:
+            // ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID +
+            // " : [read = " + snapReadValues[i] + "]");
+            // final Event evtRead = new ResultItemImpl(name, snapReadValues[i], null, date);
+            // sendOutputMsg(output, PasserelleUtil.createContentMessage(this, evtRead));
+            // break;
+            // case WRITE:
+            // ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID +
+            // " : [write = " + snapWriteValues[i] + "]");
+            // final Event evtWrite = new ResultItemImpl(name, snapWriteValues[i], null, date);
+            // sendOutputMsg(writePort, PasserelleUtil.createContentMessage(this, evtWrite));
+            // break;
+            // default:
+            // ExecutionTracerService.trace(this, name + " snap values for snap ID " + snapID +
+            // " : [read = " + snapReadValues[i] + "] [write = "
+            // + snapWriteValues[i] + "]");
+            // final Event evtReadBoth = new ResultItemImpl(name, snapReadValues[i], null, date);
+            // sendOutputMsg(output, PasserelleUtil.createContentMessage(this, evtReadBoth));
+            // final Event evtWriteBoth = new ResultItemImpl(name, snapWriteValues[i], null, date);
+            // sendOutputMsg(writePort, PasserelleUtil.createContentMessage(this, evtWriteBoth));
+            // break;
+            // }
+            // i++;
+            // if (isFinishRequested()) {
+            // break;
+            // }
+            // }
         }
     }
 

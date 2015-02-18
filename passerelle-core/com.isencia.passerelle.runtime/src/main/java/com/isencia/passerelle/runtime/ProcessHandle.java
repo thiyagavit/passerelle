@@ -14,8 +14,6 @@
 */
 package com.isencia.passerelle.runtime;
 
-import java.io.Serializable;
-
 import com.isencia.passerelle.runtime.process.ProcessStatus;
 
 
@@ -28,17 +26,17 @@ import com.isencia.passerelle.runtime.process.ProcessStatus;
  * @author erwin
  *
  */
-public interface ProcessHandle extends Serializable {
+public interface ProcessHandle {
   
   /**
    * 
-   * @return the flowHandle of the flow that is running the process
+   * @return the flow that is running the process
    */
-  FlowHandle getFlowHandle();
+  FlowHandle getFlow();
   
   /**
    * For context-aware executions, this can be used to retrieve 
-   * the <code>ProcessManager</code> from the <code>ProcessManagerService</code> if needed.
+   * the <code>Context</code> from the <code>ContextRepository</code> if needed.
    * <b>Remark that such retrieval can be a heavy operation and should only be attempted when really necessary.</b> 
    * <br/>
    * For the rare process executions without assigned <code>Context</code>s, this returns an id that can be used to
@@ -47,7 +45,7 @@ public interface ProcessHandle extends Serializable {
    * @return the UUID of the process execution;
    * 
    */
-  String getProcessId();
+  String getProcessContextId();
   
   /**
    * 
