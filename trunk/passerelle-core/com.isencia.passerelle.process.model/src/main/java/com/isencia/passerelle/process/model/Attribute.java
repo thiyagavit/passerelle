@@ -23,5 +23,5 @@ package com.isencia.passerelle.process.model;
  *
  */
 public interface Attribute extends NamedValue<String>, Identifiable {
-
+	  Attribute clone() throws CloneNotSupportedException;
 }

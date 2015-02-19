@@ -31,6 +31,10 @@ import java.util.Date;
  * 
  */
 public interface ResultItem<V extends Serializable> extends NamedValue<V>, Identifiable, AttributeHolder, Coloured {
+	  /**
+	  * @return a deep clone of the instance
+	  */	
+	  ResultItem<V> clone() throws CloneNotSupportedException;
 
 	/**
 	 * This can indicate the timestamp when the result item was created inside a
