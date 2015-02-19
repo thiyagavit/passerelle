@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.isencia.passerelle.edm.common.util.ProcessUtils;
 import com.isencia.passerelle.process.model.Attribute;
 import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.ResultBlock;
