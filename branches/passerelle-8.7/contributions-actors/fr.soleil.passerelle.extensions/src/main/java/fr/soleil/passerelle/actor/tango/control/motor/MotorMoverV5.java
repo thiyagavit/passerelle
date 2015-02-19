@@ -1,7 +1,5 @@
 package fr.soleil.passerelle.actor.tango.control.motor;
 
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.Command.executeCmdAccordingState;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,17 +26,13 @@ import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.Tango.DevState;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OffCommand;
-import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OnCommand;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.util.DevFailedInitializationException;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
-import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
  * An base class actor that is able to move all equipments to a wanted position.
@@ -71,7 +65,7 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
     protected String mouvementType;
     private List<TangoAttribute> attrList;
     private IMoveAction action;
-
+  
     public MotorMoverV5(final CompositeEntity container, final String name,
             final List<String> outputList) throws NameDuplicationException, IllegalActionException {
         super(container, name);
@@ -143,11 +137,6 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
             }
         } else {
             try {
-                
-                //Turn On the motor if it is OFF before
-                TangoCommand stateCmd = new TangoCommand(getDeviceName(), "State");
-                boolean switchToOffAfterInit = executeCmdAccordingState(new OnCommand(this, getDeviceName(), stateCmd), DevState.OFF);
-                
                 final String desiredPosition = (String) PasserelleUtil.getInputValue(request
                         .getMessage(input));
                 ExecutionTracerService.trace(this, "Moving " + getDeviceName() + " to "
@@ -160,12 +149,7 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
                 if (isRecordData()) {
                     DataRecorder.getInstance().saveDevice(this, getDeviceName());
                 }
-                
-                // if the motor was off before the init, we switch it to off again
-                if (switchToOffAfterInit) {
-                    executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,DevState.STANDBY,DevState.ALARM);
-                }
-
+              
                 for (int i = 0; i < attrOutputPortList.size(); i++) {
                     final TangoAttribute attHelper = attrList.get(i);
                     final Port currentPort = attrOutputPortList.get(i);

@@ -10,7 +10,7 @@ import org.tango.utils.DevFailedUtils;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
@@ -46,6 +46,7 @@ public class MotorManager {
 
     // Parameter
     public static final String INIT_DEVICES = "Should init controlBox and galilAxis devices";
+    public static final String ON_IF_NEEDED = "Turn on as needed";
 
     // Errors messages
     public static final String AXIS_ENCODER_TYPE_PROPERTY_IS_NOT_INT = AXIS_ENCODER_TYPE_PROPERTY
@@ -240,7 +241,7 @@ public class MotorManager {
         // if the motor is at the end of the rail (on the stop), the state is Alarm but it's ok.
         // So to be sure the definePosition command was successful we must check the status
         if (dev.status().contains(MotorManager.AXIS_NOT_INIT) || currentState == DevState.FAULT || currentState == DevState.UNKNOWN)
-            throw new ProcessingExceptionWithLog(actor, PasserelleException.Severity.FATAL, deviceName
+            throw new ProcessingExceptionWithLog(actor, ErrorCode.FATAL, deviceName
                     + " has not been correctly inialized: " + dev.status(), context, null);
     }
 
