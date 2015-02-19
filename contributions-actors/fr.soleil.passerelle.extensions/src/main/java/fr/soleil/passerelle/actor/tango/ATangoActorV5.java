@@ -1,6 +1,8 @@
 package fr.soleil.passerelle.actor.tango;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
@@ -79,5 +81,10 @@ public abstract class ATangoActorV5 extends Actor {
      */
     public boolean isRecordData() {
         return recordData;
+    }
+    
+    @Override
+    public List<Port> outputPortList() {
+       return super.outputPortList();
     }
 }

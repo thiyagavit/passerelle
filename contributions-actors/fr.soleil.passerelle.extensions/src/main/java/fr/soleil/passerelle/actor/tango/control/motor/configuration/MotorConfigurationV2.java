@@ -13,7 +13,7 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initD
 
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
@@ -136,7 +136,7 @@ public class MotorConfigurationV2 {
             }
 
         } catch (DevFailed e) {
-            throw new DevFailedProcessingException(e, PasserelleException.Severity.FATAL, actor);
+            throw new DevFailedProcessingException(e, ErrorCode.FATAL, actor);
         }
     }
 

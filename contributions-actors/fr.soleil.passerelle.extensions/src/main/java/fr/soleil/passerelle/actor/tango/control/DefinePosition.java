@@ -4,8 +4,6 @@ import static fr.soleil.passerelle.actor.tango.control.motor.configuration.initD
 
 import java.net.URL;
 
-import org.tango.utils.DevFailedUtils;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.type.BaseType;
@@ -32,7 +30,6 @@ import fr.esrf.Tango.DevState;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationException;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2;
@@ -77,6 +74,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
     @ParameterName(name = MotorManager.INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
+   
 
     public DefinePosition(CompositeEntity container, String name) throws IllegalActionException,
             NameDuplicationException {
@@ -140,7 +138,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
         } else {
             String positionStringValue = (String) PasserelleUtil.getInputValue(request.getMessage(input));
             try {
-                //Check position input before
+                // Check position input before
                 double position = Double.parseDouble(positionStringValue);
                 // run DefinePosition
                 DeviceProxy dev = getDeviceProxy();
@@ -148,16 +146,8 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 if (MotorManager.isMotorIsInit(conf, this, shouldInitDevice, dev)) {
                     ExecutionTracerService.trace(this, "Warning: " + deviceName
                             + " is already initialized, nothing done");
-                } else if(TangoAccess.getCurrentState(deviceName) != DevState.OFF){
-                    // set the position
-                    DeviceData value = new DeviceData();
-                    value.insert(position);
-                    ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.DEFINE_POSITION + " with " + position);
-                    dev.command_inout(MotorManager.DEFINE_POSITION, value);
-                    MotorManager.raiseExceptionIfInitFailed(dev, context,this);
-                    ExecutionTracerService.trace(this, deviceName + " define position succeed");
-                    
-                    //Offset management
+                } else if (TangoAccess.getCurrentState(deviceName) != DevState.OFF) {
+                    // Offset management
                     String offset = "";
                     // if port is Connected
                     ManagedMessage offsetManagedMsg = request.getMessage(offsetPort);
@@ -165,34 +155,42 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                         offset = ((String) PasserelleUtil.getInputValue(offsetManagedMsg)).trim();
                         // message is not empty
                         if (!offset.isEmpty()) {
-                                double offsetValue = Double.parseDouble(offset);
-                                // set the offset
-                                ExecutionTracerService.trace(this, "write " + offsetValue + " on " + deviceName + "/" + MotorManager.OFFSET);
-                                dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, offsetValue));
+                            double offsetValue = Double.parseDouble(offset);
+                            // set the offset
+                            ExecutionTracerService.trace(this, "write " + offsetValue + " on " + deviceName + "/"
+                                    + MotorManager.OFFSET);
+                            dev.write_attribute(new DeviceAttribute(MotorManager.OFFSET, offsetValue));
                         }
                     }
-                    
+
+                    // Call DefinePosition with position
+                    DeviceData value = new DeviceData();
+                    value.insert(position);
+                    ExecutionTracerService.trace(this, "Call " + deviceName + "/" + MotorManager.DEFINE_POSITION
+                            + " with " + position);
+                    dev.command_inout(MotorManager.DEFINE_POSITION, value);
+                    MotorManager.raiseExceptionIfInitFailed(dev, context, this);
+                    ExecutionTracerService.trace(this, deviceName + " define position succeed");
+
                     // if the motor was off before the init, we switch it to off again
                     if (conf.isSwitchToOffAfterInit()) {
                         TangoCommand stateCmd = new TangoCommand(getDeviceName(), "State");
-                        executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,DevState.STANDBY,DevState.ALARM);
+                        executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,
+                                DevState.STANDBY, DevState.ALARM);
                     }
-                    
+
                     response.addOutputMessage(output, createMessage());
+                } else {
+                    ExecutionTracerService.trace(this, "Warning: " + deviceName + " is OFF, nothing done");
                 }
-                else {
-                    ExecutionTracerService.trace(this, "Warning: " + deviceName
-                            + " is OFF, nothing done");
-                }
-              
+
             } catch (NumberFormatException e) {
-                throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL,
+                throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL,
                         "position or offset value is not a number", context, null);
-            }
-            catch (DevFailed e) {
+            } catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
             } catch (PasserelleException e) {
-                throw new ProcessingExceptionWithLog(this, PasserelleException.Severity.FATAL, e.getMessage(), context,
+                throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), context,
                         e);
             }
         }
