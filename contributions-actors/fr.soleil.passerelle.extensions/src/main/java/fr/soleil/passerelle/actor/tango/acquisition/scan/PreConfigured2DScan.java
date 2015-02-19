@@ -11,6 +11,7 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
+import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -24,6 +25,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.impl.scan2d.Config2DImpl;
@@ -92,7 +94,7 @@ public class PreConfigured2DScan extends Scan {
 			String errorMessage = "Error: " + conf.getFullPath()
 					+ " is not 2D configuration.";
 			ExecutionTracerService.trace(this, errorMessage);
-			throw new ValidationException(errorMessage, this, null);
+			ExceptionUtil.throwValidationException(errorMessage, this) ;
 		}
 	}
 

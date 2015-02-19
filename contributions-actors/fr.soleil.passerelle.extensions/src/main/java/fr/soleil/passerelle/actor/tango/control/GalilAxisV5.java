@@ -44,8 +44,8 @@ import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -154,13 +154,11 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
 
                     ExecutionTracerService.trace(this, "apply offset " + offset);
                 } catch (NumberFormatException e) {
-                    throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL,
-                            "Error: offset is not a number", ctxt, null);
+                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   "Error: offset is not a number",ctxt);
                 } catch (DevFailed e) {
                     throw new DevFailedProcessingException(e, this);
                 } catch (PasserelleException e) {
-                    throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(),
-                            ctxt, e);
+                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   e.getMessage(),ctxt,e);
                 }
             }
         }
