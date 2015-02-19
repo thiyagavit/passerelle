@@ -125,14 +125,14 @@ public class ResultBlockImpl implements ResultBlock {
     if (ProcessUtils.isInitialized(attributes)) {
 	  clone.attributes = new HashMap<String,Attribute>(attributes.size());
 	  for (Entry<String,Attribute> entry : attributes.entrySet())
-	    clone.attributes.put(entry.getKey(),(Attribute)entry.getValue().clone());
+	    clone.attributes.put(entry.getKey(),entry.getValue().clone());
     }
 		
 	// clone resultItems
     if (ProcessUtils.isInitialized(resultItems)) {
 	  clone.resultItems = new HashMap<String,ResultItem<?>>(resultItems.size());
 	  for (Entry<String,ResultItem<?>> entry : resultItems.entrySet())
-	    clone.resultItems.put(entry.getKey(),(ResultItem<?>)entry.getValue().clone());
+	    clone.resultItems.put(entry.getKey(),entry.getValue().clone());
     }
 		
 	return(clone);

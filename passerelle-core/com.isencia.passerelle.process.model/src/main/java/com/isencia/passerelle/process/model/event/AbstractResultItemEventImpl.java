@@ -51,7 +51,7 @@ public abstract class AbstractResultItemEventImpl<V extends Serializable> extend
     if (attributes != null) {
 	  clone.attributes = new HashMap<String,Attribute>(attributes.size());
 	  for (Entry<String,Attribute> entry : attributes.entrySet())
-	    clone.attributes.put(entry.getKey(),(Attribute)entry.getValue().clone());
+	    clone.attributes.put(entry.getKey(),entry.getValue().clone());
     }
     
     return(clone);

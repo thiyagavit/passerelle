@@ -48,7 +48,7 @@ public class RawResultBlockImpl extends ResultBlockImpl implements RawResultBloc
     if (ProcessUtils.isInitialized(generatedResultItems)) {
 	  clone.generatedResultItems = new HashMap<String,ResultItem<?>>(generatedResultItems.size());
 	  for (Entry<String,ResultItem<?>> entry : generatedResultItems.entrySet())
-	    clone.generatedResultItems.put(entry.getKey(),(ResultItem<?>)entry.getValue().clone());
+	    clone.generatedResultItems.put(entry.getKey(),entry.getValue().clone());
     }
 		
 	return(clone);
