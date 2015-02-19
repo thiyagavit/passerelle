@@ -1,6 +1,5 @@
 package fr.soleil.passerelle.actor.tango.archiving;
 
-import static fr.soleil.passerelle.actor.tango.archiving.HdbExtractorProxy.WRONG_FORMAT;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.mockito.Matchers.eq;
@@ -28,7 +27,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
     @Test
     public void should_throw_devFailed_when_extractor_return_a_wrong_format_to_getLastScalarAttrValue()
             throws DevFailed {
-        HdbExtractorProxy proxy = new HdbExtractorProxy(false);
+        HdbExtractorProxy proxy = new HdbExtractorProxy();
         String completeAttrName = "tango/tangotes/titan/double_scalar";
 
         TangoCommand command = mock(TangoCommand.class);
@@ -41,7 +40,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
-            assertThat(DevFailedUtils.toString(e)).contains(WRONG_FORMAT);
+            assertThat(DevFailedUtils.toString(e)).contains(HdbExtractorProxy.NEWEST_CMD);
         }
     }
 
@@ -51,7 +50,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
         String completeAttributeName = "tango/tangotest/titan/double_scalar";
         String expectedValue = " -10.686";
 
-        HdbExtractorProxy proxy = new HdbExtractorProxy(false);
+        HdbExtractorProxy proxy = new HdbExtractorProxy();
 
         TangoCommand command = mock(TangoCommand.class);
 
@@ -71,7 +70,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
         String date = "03-07-2013 16:39:00";
         String expectedValue = " -10.686";
 
-        HdbExtractorProxy proxy = new HdbExtractorProxy(false);
+        HdbExtractorProxy proxy = new HdbExtractorProxy();
 
         TangoCommand command = mock(TangoCommand.class);
         when(command.execute(eq(String.class), eq(completeAttributeName), eq(date))).thenReturn(
@@ -86,7 +85,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
     @Test
     public void should_throw_devFailed_when_extractor_return_a_wrong_format_to_getNearestScalarAttrValue()
             throws DevFailed {
-        HdbExtractorProxy proxy = new HdbExtractorProxy(false);
+        HdbExtractorProxy proxy = new HdbExtractorProxy();
         String completeAttrName = "tango/tangotes/titan/double_scalar";
         String date = "03-07-2013 16:39:00";
 
@@ -101,7 +100,7 @@ public class HdbExtractorProxyTest extends PowerMockTestCase {
             failBecauseExceptionWasNotThrown(DevFailed.class);
         }
         catch (DevFailed e) {
-            assertThat(DevFailedUtils.toString(e)).contains(WRONG_FORMAT);
+            assertThat(DevFailedUtils.toString(e)).contains(HdbExtractorProxy.NEAREST_CMD);
         }
     }
 }
