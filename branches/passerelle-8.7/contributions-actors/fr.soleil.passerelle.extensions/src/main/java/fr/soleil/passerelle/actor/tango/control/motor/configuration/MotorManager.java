@@ -21,7 +21,7 @@ import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 public class MotorManager {
 
@@ -234,15 +234,17 @@ public class MotorManager {
     
 
     public static void raiseExceptionIfInitFailed(DeviceProxy dev, ActorContext context, Actor actor) throws DevFailed,
-            ProcessingExceptionWithLog {
+            ProcessingException {
         String deviceName = dev.fullName();
         // Bug 22954
         DevState currentState = TangoAccess.getCurrentState(deviceName);
         // if the motor is at the end of the rail (on the stop), the state is Alarm but it's ok.
         // So to be sure the definePosition command was successful we must check the status
-        if (dev.status().contains(MotorManager.AXIS_NOT_INIT) || currentState == DevState.FAULT || currentState == DevState.UNKNOWN)
-            throw new ProcessingExceptionWithLog(actor, ErrorCode.FATAL, deviceName
-                    + " has not been correctly inialized: " + dev.status(), context, null);
+        if (dev.status().contains(MotorManager.AXIS_NOT_INIT) || currentState == DevState.FAULT || currentState == DevState.UNKNOWN){
+            ExceptionUtil.throwProcessingExceptionWithLog(actor, ErrorCode.FATAL,   deviceName
+                    + " has not been correctly inialized: " + dev.status(),context);
+        }
+         
     }
 
 }

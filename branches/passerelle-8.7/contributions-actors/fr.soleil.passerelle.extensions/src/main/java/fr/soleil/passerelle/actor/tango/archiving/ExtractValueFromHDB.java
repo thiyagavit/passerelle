@@ -29,6 +29,7 @@ import com.isencia.passerelle.util.ptolemy.DateTimeParameter;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoActorV5;
 import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
@@ -217,9 +218,9 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
                 break;
 
             default: // should not happen
-                new ProcessingExceptionWithLog(this,ErrorCode.FATAL, "Unknown extraction type \""
-                        + extractionType.getDescription() + "\"", this, null);
-
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "Unknown extraction type \""
+                        + extractionType.getDescription() + "\"",this);
+     
         }
     }
 

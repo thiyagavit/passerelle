@@ -23,7 +23,7 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.InitCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.MicroCodeCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OnCommand;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
@@ -136,7 +136,7 @@ public class MotorConfigurationV2 {
             }
 
         } catch (DevFailed e) {
-            throw new DevFailedProcessingException(e, ErrorCode.FATAL, actor);
+            ExceptionUtil.throwDevFailedProcessingException( actor,ErrorCode.FATAL,e);
         }
     }
 

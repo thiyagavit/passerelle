@@ -7,11 +7,6 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 public class ProcessingExceptionWithLog extends ProcessingException {
 
-    public ProcessingExceptionWithLog(Actor actor, ErrorCode errorCode, String message, Object context,
-            Throwable rootException) {
-        this(actor,ProcessingSoleilException.getSeverityFromErrorCode(errorCode), message, context, rootException);
-    }
-
     public ProcessingExceptionWithLog(Actor actor, String message, Object context, Throwable rootException) {
         super(message, context, rootException);
         ExecutionTracerService.trace(actor, "Error: " + message);

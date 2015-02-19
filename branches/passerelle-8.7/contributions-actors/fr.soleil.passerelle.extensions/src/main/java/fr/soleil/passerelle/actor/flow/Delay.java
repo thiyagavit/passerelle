@@ -22,13 +22,12 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
-import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.TransformerV5;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 /**
  * Simple actor that reads input tokens and and forwards them to the output port
@@ -87,11 +86,10 @@ public class Delay extends TransformerV5 {
                 try {
                     waitingTimeInS = Double.valueOf(inputValue.toString());
                 } catch (NumberFormatException e) {
-                    throw new ProcessingExceptionWithLog(this, Severity.FATAL, inputValue + " is not a number", this, e);
+                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,inputValue + " is not a number",this,e);
                 }
             } else {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL, "input is not supported", this,
-                        new Exception("input is not supported"));
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,"input is not supported",this,new Exception("input is not supported"));
             }
         }
         final long waitingTime = (long) (waitingTimeInS * 1000);

@@ -38,8 +38,8 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -185,13 +185,11 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 }
 
             } catch (NumberFormatException e) {
-                throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL,
-                        "position or offset value is not a number", context, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,  "position or offset value is not a number",context);
             } catch (DevFailed e) {
                 throw new DevFailedProcessingException(e, this);
             } catch (PasserelleException e) {
-                throw new ProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), context,
-                        e);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   e.getMessage(),context);
             }
         }
     }
