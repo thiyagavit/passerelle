@@ -284,27 +284,32 @@ public abstract class TaskBasedActor extends Actor {
     if (Status.RESTARTED.equals(processContext.getStatus())) {
       for (int taskIdx = processContext.getTasks().size() - 1; taskIdx >= 0; taskIdx--) {
         Task task = processContext.getTasks().get(taskIdx);
-        try {
-          URI uri = new URI(task.getInitiator());
-          if (FlowUtils.getOriginalFullName(this).substring(1).equals(uri.getPath().substring(1))) {
-            if (task.getProcessingContext().isFinished()) {
-              beforeRestart(task, processContext);
-              onTaskFinished(task, message, response);
-              return true;
+        if (!Status.CANCELLED.equals(task.getProcessingContext().getStatus())) {
+          try {
+            URI uri = new URI(task.getInitiator());
+            if (FlowUtils.getOriginalFullName(this).substring(1).equals(uri.getPath().substring(1))) {
+              if (task.getProcessingContext().isFinished()) {
+                beforeRestart(task, processContext);
+                onTaskFinished(task, message, response);
+                return true;
+              }
+              if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
+                processManager.notifyStarted();
+                processManager.notifyCancelled(task);
+                onRestart(task, processContext);
+                break;
+              }
             }
-            if (Status.RESTARTED.equals(task.getProcessingContext().getStatus())) {
-              processManager.notifyStarted();
-              processManager.notifyCancelled(task);
-              break;
-            }
+          } catch (URISyntaxException e) {
+            continue;
           }
-        } catch (URISyntaxException e) {
-          continue;
         }
-
       }
     }
     return false;
+  }
+
+  protected void onRestart(Task task, Context flowContext) {
   }
 
   protected void beforeRestart(Task task, Context flowContext) {
