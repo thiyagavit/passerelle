@@ -235,7 +235,7 @@ public class MotorManager {
 
     public static void raiseExceptionIfInitFailed(DeviceProxy dev, ActorContext context, Actor actor) throws DevFailed,
             ProcessingException {
-        String deviceName = dev.fullName();
+        String deviceName = dev.name();
         // Bug 22954
         DevState currentState = TangoAccess.getCurrentState(deviceName);
         // if the motor is at the end of the rail (on the stop), the state is Alarm but it's ok.
