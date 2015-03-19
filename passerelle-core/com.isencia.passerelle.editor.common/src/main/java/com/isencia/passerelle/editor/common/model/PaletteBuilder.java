@@ -249,6 +249,7 @@ public class PaletteBuilder implements Serializable {
             String iconAttribute = configurationElement.getAttribute("icon");
             String priorityAttribute = configurationElement.getAttribute("priority");
             String iconLocationAttribute = configurationElement.getAttribute("iconClass");
+            String helpUrlAttribute = configurationElement.getAttribute("helpUrl");
             final String bundleId = configurationElement.getDeclaringExtension().getContributor().getName();
 
             Object icon = createIcon(null, iconLocationAttribute, iconAttribute, bundleId);
@@ -268,7 +269,7 @@ public class PaletteBuilder implements Serializable {
                 }
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
 
-                item.setHelpUrl(generateHelpUrl(item));
+                item.setHelpUrl(helpUrlAttribute);
                 if (isPaletteItemVisible(item)) {
                   actorBundleMap.put(clazz.getName(), bundleId);
                   paletteItemMap.put(item.getClazz().getName(), item);
