@@ -301,10 +301,6 @@ public class PaletteBuilder implements Serializable {
     return true;
   }
 
-  protected String generateHelpUrl(PaletteItemDefinition item) {
-    return null;
-  }
-
   public String getHelpUrl(String clazzName) {
 
     PaletteItemDefinition itemDefinition = getPaletteItem(clazzName);
