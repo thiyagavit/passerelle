@@ -17,7 +17,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -36,8 +36,8 @@ public abstract class ATangoAttributeActor extends ATangoActor {
 
     private TangoAttribute tangoAttribute;
 
-    public ATangoAttributeActor(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public ATangoAttributeActor(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
         attributeNameParam = new StringParameter(this, ATTRIBUTE_NAME);
         attributeNameParam.setExpression(attributeName);
@@ -50,8 +50,7 @@ public abstract class ATangoAttributeActor extends ATangoActor {
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == attributeNameParam) {
             attributeName = PasserelleUtil.getParameterValue(attributeNameParam);
-        }
-        else {
+        } else {
             super.attributeChanged(arg0);
         }
     }
@@ -66,21 +65,20 @@ public abstract class ATangoAttributeActor extends ATangoActor {
     protected void validateInitialization() throws ValidationException {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - entry");
+            logger.trace(getName() + " validateInitialization() - entry");
         }
 
         if (!isMockMode()) {
             try {
                 tangoAttribute = new TangoAttribute(attributeName);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedValidationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwValidationException(this, e);
             }
         }
         super.validateInitialization();
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - exit");
+            logger.trace(getName() + " validateInitialization() - exit");
         }
     }
 
@@ -99,7 +97,7 @@ public abstract class ATangoAttributeActor extends ATangoActor {
      */
     public TangoAttribute getTangoAttribute() throws PasserelleException {
         if (tangoAttribute == null) {
-            throw new PasserelleException("field not initialized", attributeName, null);
+            ExceptionUtil.throwPasserelleException("field not initialized", attributeName);
         }
         return tangoAttribute;
     }

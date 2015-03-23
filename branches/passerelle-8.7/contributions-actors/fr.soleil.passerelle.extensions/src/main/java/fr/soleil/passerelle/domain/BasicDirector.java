@@ -170,8 +170,6 @@ public class BasicDirector extends com.isencia.passerelle.domain.cap.Director {
         if (getAdapter(null).isMockMode()) {
             ExecutionTracerService.trace(this, "MOCK - ###START " + modelName + "###");
         } else {
-            final String tangoHost = System.getProperty("TANGO_HOST");
-
             // get tango host from file if needed
             // if (tangoHost == null && propsFileParameter.getExpression() !=
             // null) {

@@ -72,7 +72,7 @@ public class SimpleScan {
     }
 
     private class SimpleScanTask {
-        private final String[] args;
+        private final Object[] args;
         private final int pollingPeriod;
 
         private volatile boolean isRunning = false;

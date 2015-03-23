@@ -8,11 +8,11 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import fr.soleil.comete.definition.widget.IChartViewer;
-import fr.soleil.comete.swing.ChartViewer;
+import fr.soleil.comete.swing.Chart;
 
 @SuppressWarnings("serial")
 public class AttributeMultipleSpectrumPanel extends javax.swing.JPanel {
-    private ChartViewer widget;
+    private Chart widget;
 
     public AttributeMultipleSpectrumPanel() {
         super();
@@ -20,7 +20,7 @@ public class AttributeMultipleSpectrumPanel extends javax.swing.JPanel {
     }
 
     private void initGUI() {
-        widget = new ChartViewer();
+        widget = new Chart();
 
         widget.setAutoHighlightOnLegend(true);
         widget.setFreezePanelVisible(false);

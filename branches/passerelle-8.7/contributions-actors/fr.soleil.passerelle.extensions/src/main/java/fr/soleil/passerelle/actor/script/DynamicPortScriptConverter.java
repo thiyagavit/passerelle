@@ -39,6 +39,8 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageInputContext;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 /**
  * A DynamicPortsActor that feeds each incoming message, from one of the dynamically configured input ports, to a common script. The script can create an
  * arbitrary number of output messages, each targeted to one of the dynamically configured output ports. Since Passerelle v4.1.1 this actor is based on the new
@@ -122,7 +124,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
    */
   public void attributeChanged(Attribute attribute) throws IllegalActionException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " attributeChanged()- entry - attribute :" + attribute);
+      logger.trace(getName() + " attributeChanged()- entry - attribute :" + attribute);
     }
 
     // Define actions to be taken when a parameter/attribute has been changed
@@ -151,13 +153,13 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
     }
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " attributeChanged()- exit");
+      logger.trace(getName() + " attributeChanged()- exit");
     }
   }
 
   public void doInitialize() throws InitializationException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - entry");
+      logger.trace(getName() + " doInitialize() - entry");
     }
 
     if (!isMockMode()) {
@@ -167,7 +169,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
         script = IOUtils.getStringFromReader(scriptReader);
         scriptReader.close();
       } catch (IOException e) {
-        throw new InitializationException("Could not read script file", this, e);
+          ExceptionUtil.throwInitializationException("Could not read script file", this,e);
       }
 
       initializeScriptingEngines();
@@ -191,7 +193,7 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
     super.doInitialize();
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - exit");
+      logger.trace(getName() + " doInitialize() - exit");
     }
   }
 
@@ -213,21 +215,21 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
 
   public void doWrapUp() throws TerminationException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doWrapUp() - entry");
+      logger.trace(getName() + " doWrapUp() - entry");
     }
     for (Iterator<BSFManager> iter = bsfManagers.iterator(); iter.hasNext();) {
       BSFManager element = iter.next();
       element.terminate();
     }
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doWrapUp() - exit");
+      logger.trace(getName() + " doWrapUp() - exit");
     }
   }
 
   @Override
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " process() - entry - request : " + request);
+      logger.trace(getName() + " process() - entry - request : " + request);
     }
     try {
       Iterator<MessageInputContext> allInputContexts = request.getAllInputContexts();
@@ -250,10 +252,10 @@ public class DynamicPortScriptConverter extends DynamicPortsActor {
         }
       }
     } catch (BSFException e) {
-      throw new ProcessingException("", scriptPath, e);
+        ExceptionUtil.throwProcessingException(e.getMessage(), scriptPath, e);
     }
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " process() - exit");
+      logger.trace(getName() + " process() - exit");
     }
   }
 

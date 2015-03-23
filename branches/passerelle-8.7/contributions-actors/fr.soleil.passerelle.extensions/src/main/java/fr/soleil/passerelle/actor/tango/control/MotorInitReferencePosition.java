@@ -29,8 +29,7 @@ import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 @SuppressWarnings("serial")
@@ -53,20 +52,13 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                 "/org/tango-project/tango-icon-theme/32x32/categories/applications-system.png");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:cyan;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
     }
 
     @Override
@@ -87,32 +79,26 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                 encoder = conf.getEncoder();
                 initStrategy = conf.getInitStrategy();
                 // System.out.println(encoder + " " + initStrategy);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
-            }
-            catch (final PasserelleException e) {
-                throw new InitializationException(e.getMessage(), null, e);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
+            } catch (final PasserelleException e) {
+                ExceptionUtil.throwInitializationException(e.getMessage(), this, e);
             }
         }
     }
 
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
         final String deviceName = getDeviceName();
         if (isMockMode()) {
-            ExecutionTracerService.trace(this, "MOCK - initializing reference position of "
-                    + deviceName);
+            ExecutionTracerService.trace(this, "MOCK - initializing reference position of " + deviceName);
         } else {
             DeviceProxy dev = null;
             try {
                 dev = getDeviceProxy();
-            }
-            catch (final PasserelleException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-                throw new ProcessingException("Invalide DeviceProxy " + e1.getMessage(), this,null);
+            } catch (final PasserelleException e1) {
+                ExceptionUtil.throwProcessingException("Invalide DeviceProxy " + e1.getMessage(), this);
             }
             try {
                 conf.initMotor(this);
@@ -120,16 +106,14 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                 // Do an InitializeReferencePosition when possible
                 final String AXIS_NOT_INIT = "axis not initialized [no initial ref. pos.]";
                 if (!dev.status().contains(AXIS_NOT_INIT)) {
-                    ExecutionTracerService.trace(this, deviceName
-                            + " is already initialized, nothing done");
+                    ExecutionTracerService.trace(this, deviceName + " is already initialized, nothing done");
                     // output data on output to mean that init is OK
                     // sendOutputMsg(output,
                     // PasserelleUtil.createTriggerMessage());
                     response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
 
                 } else if (encoder.equals(EncoderType.ABSOLUTE)) {
-                    ExecutionTracerService.trace(this, deviceName
-                            + " has an absolute encoder, no need to intialize");
+                    ExecutionTracerService.trace(this, deviceName + " has an absolute encoder, no need to intialize");
                     // sendOutputMsg(noInitDone, PasserelleUtil
                     // .createTriggerMessage());
                     response.addOutputMessage(1, noInitDone, PasserelleUtil.createTriggerMessage());
@@ -142,14 +126,12 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                     response.addOutputMessage(1, noInitDone, PasserelleUtil.createTriggerMessage());
                 } else {
                     dev.command_inout("InitializeReferencePosition");
-                    ExecutionTracerService.trace(this, "initializing reference position of "
-                            + deviceName);
+                    ExecutionTracerService.trace(this, "initializing reference position of " + deviceName);
                     // since I am not sure that the device motor switch
                     // immediatly to the moving state, do a little sleep
                     try {
                         Thread.sleep(1000);
-                    }
-                    catch (final InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         // ignore
                     }
                     waitTask = new WaitStateTask(deviceName, DevState.MOVING, 1000, false);
@@ -163,13 +145,11 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                     if (currentState.equals(DevState.FAULT) || currentState.equals(DevState.ALARM)
                             && dev.status().contains(AXIS_NOT_INIT)) {
                         final String status = dev.status();
-                        ExecutionTracerService.trace(this, deviceName
-                                + " has not been correcty inialized: " + status);
-                        throw new ProcessingException(deviceName
-                                + " has not been correcty inialized: " + status, deviceName, null);
+                        ExecutionTracerService.trace(this, deviceName + " has not been correcty inialized: " + status);
+                        ExceptionUtil.throwProcessingException(deviceName + " has not been correcty inialized: "
+                                + status, deviceName);
                     } else {
-                        ExecutionTracerService.trace(this, deviceName
-                                + " reference position initialized");
+                        ExecutionTracerService.trace(this, deviceName + " reference position initialized");
                         // sendOutputMsg(output, PasserelleUtil
                         // .createTriggerMessage());
                         response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
@@ -177,9 +157,8 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                     }
                 }
 
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
     }
@@ -206,11 +185,9 @@ public class MotorInitReferencePosition extends ATangoDeviceActor implements IAc
                 if (TangoAccess.executeCmdAccordingState(getDeviceName(), DevState.MOVING, "Stop")) {
                     ExecutionTracerService.trace(this, "motor has been stop");
                 }
-            }
-            catch (final DevFailed e) {
+            } catch (final DevFailed e) {
                 TangoToPasserelleUtil.getDevFailedString(e, this);
-            }
-            catch (final Exception e) {
+            } catch (final Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

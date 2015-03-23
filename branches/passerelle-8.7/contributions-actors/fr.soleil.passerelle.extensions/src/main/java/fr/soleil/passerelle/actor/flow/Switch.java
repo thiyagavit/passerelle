@@ -36,6 +36,7 @@ import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.PortUtilities;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -112,7 +113,7 @@ public class Switch extends Actor {
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " :" + attribute);
+            logger.trace(getName() + " :" + attribute);
         }
 
         if (attribute == numberOfOutputs) {
@@ -185,7 +186,7 @@ public class Switch extends Actor {
         }
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - exit ");
+            logger.trace(getName() + " - exit ");
         }
     }
 
@@ -197,9 +198,9 @@ public class Switch extends Actor {
     @Override
     protected void doFire() throws ProcessingException {
         int outNr = 0;
-        System.out.println(getInfo());
+        System.out.println(getName());
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo());
+            logger.trace(getName());
         }
         Token token = null;
 
@@ -221,7 +222,7 @@ public class Switch extends Actor {
                 token = MessageHelper.getMessageAsToken(input);
             } catch (final PasserelleException e) {
                 requestFinish();
-                throw new ProcessingException(getInfo()
+                ExceptionUtil.throwProcessingException(getName()
                         + " - doFire() generated exception in MessageHelper.getMessageAsToken() "
                         + e, token, e);
             }
@@ -234,13 +235,13 @@ public class Switch extends Actor {
                 outNr = selected;
                 if (selected < 0) {
                     outNr = 0;
-                    logger.debug(getInfo() + " : Selected port = " + selected + ". Using port "
+                    logger.debug(getName() + " : Selected port = " + selected + ". Using port "
                             + outNr + ".");
                     ExecutionTracerService.trace(this, "Selected port = " + selected
                             + ". Using port " + outNr + ".");
                 } else if (selected >= outputCount) {
                     outNr = outputCount - 1;
-                    logger.debug(getInfo() + " : Selected port = " + selected + ". Using port "
+                    logger.debug(getName() + " : Selected port = " + selected + ". Using port "
                             + outNr + ".");
                     ExecutionTracerService.trace(this, "Selected port = " + selected
                             + ". Using port " + outNr + ".");
@@ -253,9 +254,8 @@ public class Switch extends Actor {
                             PasserelleUtil.createCopyMessage(this,
                                     MessageHelper.getMessageFromToken(token)));
                 } catch (final PasserelleException e1) {
-                    throw new ProcessingException(getInfo()
-                            + " - doFire() generated exception in outputPorts...broadcast() ",
-                            token, e1);
+                    ExceptionUtil.throwProcessingException(getName()
+                            + " - doFire() generated exception in outputPorts...broadcast()", token, e1);
                 }
 
             }
@@ -264,7 +264,7 @@ public class Switch extends Actor {
             }
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - exit " + " - Output " + outNr + " has sent message "
+            logger.trace(getName() + " - exit " + " - Output " + outNr + " has sent message "
                     + token);
         }
     }
@@ -278,7 +278,7 @@ public class Switch extends Actor {
     protected void doInitialize() throws InitializationException {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo());
+            logger.trace(getName());
         }
 
         super.doInitialize();
@@ -321,12 +321,12 @@ public class Switch extends Actor {
         // Only one port is connected
         else if ((select.getWidth() == 0 && input.getWidth() != 0)
                 || (select.getWidth() != 0 && input.getWidth() == 0)) {
-            throw new InitializationException(select.getName() + " port and " + input.getName()
-                    + " have to be connected", (select.getWidth() == 0) ? select : input, null);
+            ExceptionUtil.throwInitializationException(select.getName() + " port and " + input.getName()
+                    + " have to be connected", (select.getWidth() == 0) ? select : input);
         }
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - exit ");
+            logger.trace(getName() + " - exit ");
         }
 
     }

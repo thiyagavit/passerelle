@@ -28,10 +28,8 @@ import com.isencia.passerelle.util.ptolemy.DateTimeParameter;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoActorV5;
-import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 @SuppressWarnings("serial")
 public class ExtractValueFromHDB extends ATangoActorV5 {
@@ -197,7 +195,7 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
                         Level.DEBUG);
             }
         } catch (DevFailed e) {
-            throw new DevFailedValidationException(e, this);
+            ExceptionUtil.throwValidationException(this, e);
         } catch (IllegalActionException e) {
             throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
         }
@@ -219,8 +217,8 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
 
             default: // should not happen
                 ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "Unknown extraction type \""
-                        + extractionType.getDescription() + "\"",this);
-     
+                        + extractionType.getDescription() + "\"", this);
+
         }
     }
 
@@ -249,10 +247,10 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
                     + " is \"" + extractedValue + "\"");
             sendOutputMsg(output, PasserelleUtil.createContentMessage(this, extractedValue));
         } catch (DevFailed devFailed) {
-            if (throwExceptionOnError)
-                throw new ProcessingExceptionWithLog(this, completeAttributeName
+            if (throwExceptionOnError) {
+                ExceptionUtil.throwProcessingExceptionWithLog(this, completeAttributeName
                         + " is not in Hdb or can not be read: ", context, devFailed);
-            else {
+            } else {
                 sendOutputMsg(output, PasserelleUtil.createContentMessage(this, ""));
             }
         }
@@ -284,14 +282,14 @@ public class ExtractValueFromHDB extends ATangoActorV5 {
 
             ExecutionTracerService.trace(this, "The lasted value of " + completeAttributeName + " is \""
                     + extractedValue + "\"");
-           
+
             sendOutputMsg(output, PasserelleUtil.createContentMessage(this, extractedValue));
 
         } catch (DevFailed devFailed) {
-            if (throwExceptionOnError)
-                throw new ProcessingExceptionWithLog(this, completeAttributeName + " cannot be extracted from hdb:",
-                        context, devFailed);
-            else {
+            if (throwExceptionOnError) {
+                ExceptionUtil.throwProcessingExceptionWithLog(this, completeAttributeName
+                        + " cannot be extracted from hdb:", context, devFailed);
+            } else {
                 sendOutputMsg(output, PasserelleUtil.createContentMessage(this, ""));
             }
         }

@@ -29,9 +29,6 @@ import java.awt.Point;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -51,7 +48,7 @@ import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.tangoatk.core.ConnectionException;
 import fr.soleil.passerelle.util.AttrScalarPanel;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -63,8 +60,6 @@ import fr.soleil.tango.clientapi.TangoAttribute;
  */
 @SuppressWarnings("serial")
 public class ScalarViewer extends Sink {
-
-    private final static Logger logger = LoggerFactory.getLogger(ScalarViewer.class);
 
     private JFrame frame;
     private TangoAttribute ap = null;
@@ -118,11 +113,11 @@ public class ScalarViewer extends Sink {
     @Override
     protected void sendMessage(final ManagedMessage outgoingMessage) throws ProcessingException {
         if (isMockMode()) {
-            String value;
+            String value = null;
             try {
                 value = outgoingMessage.getBodyContentAsString();
             } catch (final MessageException e) {
-                throw new ProcessingException("Cannot get input message", this.getName(), e);
+                ExceptionUtil.throwProcessingException("Cannot get input message", this.getName(), e);
             }
             asp.setIsAttribute(false);
             asp.setValue(value);
@@ -131,7 +126,7 @@ public class ScalarViewer extends Sink {
             try {
                 asp.postInitGUI();
             } catch (final ConnectionException e1) {
-                throw new ProcessingException("Cannot start panel", this.getName(), e1);
+                ExceptionUtil.throwProcessingException("Cannot start panel", this.getName(), e1);
             }
         } else {
             try {
@@ -153,7 +148,7 @@ public class ScalarViewer extends Sink {
                     try {
                         asp.postInitGUI();
                     } catch (final ConnectionException e1) {
-                        throw new ProcessingException("Cannot start panel", this.getName(), e1);
+                        ExceptionUtil.throwProcessingException("Cannot start panel", this.getName(), e1);
                     }
 
                 } else {
@@ -172,7 +167,7 @@ public class ScalarViewer extends Sink {
                             asp.setAttributeName(ap.getAttributeProxy().fullName());
                         }
                     } catch (final DevFailed e) {
-                        throw new DevFailedProcessingException(e, this);
+                        ExceptionUtil.throwProcessingException(this, e);
                     }
                     frame.setTitle(title + " - " + ap.getAttributeProxy().fullName());
 
@@ -181,11 +176,11 @@ public class ScalarViewer extends Sink {
                 try {
                     asp.postInitGUI();
                 } catch (final ConnectionException e1) {
-                    throw new ProcessingException("Cannot start panel for " + ap.getAttributeProxy().fullName(),
-                            this.getName(), e1);
+                    ExceptionUtil.throwProcessingException("Cannot start panel for "
+                            + ap.getAttributeProxy().fullName(), this.getName(), e1);
                 }
             } catch (final MessageException e) {
-                throw new ProcessingException("Cannot get input message", this.getName(), e);
+                ExceptionUtil.throwProcessingException("Cannot get input message", this.getName(), e);
             }
         }
         frame.getContentPane().add(asp);

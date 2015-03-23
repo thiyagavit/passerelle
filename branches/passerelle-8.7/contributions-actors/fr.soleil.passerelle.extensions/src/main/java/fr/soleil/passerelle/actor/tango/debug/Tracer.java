@@ -18,12 +18,15 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Sink;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 //////////////////////////////////////////////////////////////////////////
 //// Const
@@ -131,9 +134,7 @@ public class Tracer extends Sink {
 								+ " !! CHOPPED !! ";
 					}
 				} catch (MessageException e) {
-					throw new ProcessingException(
-							PasserelleException.Severity.NON_FATAL, "",
-							message, e);
+				    ExceptionUtil.throwProcessingException(ErrorCode.FATAL,e.getMessage(),message, e);
 				}
 				if (content != null)
 					ExecutionTracerService.trace(this, content);

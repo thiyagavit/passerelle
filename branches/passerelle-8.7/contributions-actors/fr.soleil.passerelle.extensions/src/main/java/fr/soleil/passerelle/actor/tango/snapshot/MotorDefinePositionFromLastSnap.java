@@ -16,8 +16,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.EncoderType;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfiguration;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
@@ -54,9 +53,8 @@ public class MotorDefinePositionFromLastSnap extends ASnapExtractor {
                 definePosition = new TangoCommand(motorName, "DefinePosition");
                 conf = new MotorConfiguration(motorName);
                 conf.retrieveConfig();
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
         }
 
@@ -73,35 +71,29 @@ public class MotorDefinePositionFromLastSnap extends ASnapExtractor {
                 final String attributeName = motorName + "/position";
                 String position;
                 if (getExtractionType().equals(ExtractionType.READ)) {
-                    final String[] snapValues = getGetSnapExtractor().getReadValues(snapID,
-                            attributeName);
+                    final String[] snapValues = getGetSnapExtractor().getReadValues(snapID, attributeName);
                     position = snapValues[0];
                 } else {
-                    final String[] snapValues = getGetSnapExtractor().getWriteValues(snapID,
-                            attributeName);
+                    final String[] snapValues = getGetSnapExtractor().getWriteValues(snapID, attributeName);
                     position = snapValues[1];
                 }
                 try {
                     Double.parseDouble(position);
-                }
-                catch (final NumberFormatException nfe) {
-                    throw new ProcessingException("the snapshot does not contains a number",
-                            position, null);
+                } catch (final NumberFormatException nfe) {
+                    ExceptionUtil.throwProcessingException("the snapshot does not contains a number", position);
                 }
                 if (conf.getEncoder().equals(EncoderType.ABSOLUTE)) {
-                    ExecutionTracerService.trace(this, motorName
-                            + " has an absolute encoder, no define position done ");
+                    ExecutionTracerService
+                            .trace(this, motorName + " has an absolute encoder, no define position done ");
                     sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
                 } else {
                     definePosition.execute(position);
-                    ExecutionTracerService.trace(this, "define position on " + motorName + " with "
-                            + position);
+                    ExecutionTracerService.trace(this, "define position on " + motorName + " with " + position);
                     sendOutputMsg(output, PasserelleUtil.createContentMessage(this, position));
                 }
 
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
     }

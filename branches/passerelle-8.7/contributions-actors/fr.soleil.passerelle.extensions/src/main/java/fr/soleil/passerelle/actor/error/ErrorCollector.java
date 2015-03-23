@@ -14,6 +14,7 @@ import ptolemy.data.Token;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
@@ -21,7 +22,6 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortHandler;
-import com.isencia.passerelle.domain.cap.Director;
 
 /**
  * ErrorCollector
@@ -66,7 +66,7 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 	 */	
 	protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo());
+			logger.trace(getName());
 		}
 		error = null;
 		inputHandler = new PortHandler(input);
@@ -80,11 +80,11 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 			// means the actor is used without a Passerelle Director
 			// just log this. Only consequence is that we'll never receive
 			// any error messages via acceptError
-			logger.info(getInfo()+" - used without Passerelle Director!!");
+			logger.info(getName()+" - used without Passerelle Director!!");
 		}
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo()+" - exit ");
+			logger.trace(getName()+" - exit ");
 		}
 	}
 
@@ -93,7 +93,7 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 	 */
 	protected void doFire() throws ProcessingException {
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+			logger.trace(getName());
 		
 		isFiring = false;	
 		if (error != null) {
@@ -108,7 +108,7 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 		isFiring = true;
 
 		if(logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
+			logger.trace(getName()+" - exit ");
 	}
 
 	/* (non-Javadoc)
@@ -123,12 +123,12 @@ public class ErrorCollector extends Actor implements com.isencia.passerelle.ext.
 	 */
 	public void acceptError(PasserelleException e) {
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " - received :" + e);
+			logger.trace(getName() + " - received :" + e);
 		}
 		error = e;
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo()+" - exit ");
+			logger.trace(getName()+" - exit ");
 		}
 	}
 }

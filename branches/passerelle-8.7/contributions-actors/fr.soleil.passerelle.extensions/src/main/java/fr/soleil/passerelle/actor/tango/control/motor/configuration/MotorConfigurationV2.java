@@ -24,7 +24,6 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.MicroCodeCommand;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OnCommand;
 import fr.soleil.passerelle.util.ExceptionUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 //TODO CHANGE TO THOWS MotorConfigurationException anywhere
@@ -132,11 +131,11 @@ public class MotorConfigurationV2 {
             // checks galil is in expected state
             DevState galilState = stateCmd.execute(DevState.class);
             if (galilState == FAULT || galilState == UNKNOWN) {
-                throw new ProcessingExceptionWithLog(actor, deviceName + " is down"  , this, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(actor, deviceName + " is down", this);
             }
 
         } catch (DevFailed e) {
-            ExceptionUtil.throwDevFailedProcessingException( actor,ErrorCode.FATAL,e);
+            ExceptionUtil.throwProcessingException(ErrorCode.FATAL,actor,e);
         }
     }
 
