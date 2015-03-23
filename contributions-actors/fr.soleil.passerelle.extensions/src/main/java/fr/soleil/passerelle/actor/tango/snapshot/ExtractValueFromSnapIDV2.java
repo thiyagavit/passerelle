@@ -4,9 +4,6 @@ import static fr.soleil.passerelle.util.PasserelleUtil.createContentMessage;
 
 import java.net.URL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ptolemy.data.BooleanToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -23,7 +20,6 @@ import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
@@ -31,8 +27,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import com.isencia.passerelle.util.Level;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -53,16 +48,15 @@ import fr.soleil.passerelle.util.PasserelleUtil;
  * 
  * <ul>
  * <li>
- * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
- * is true then an exception is throw</li>
+ * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is true then an
+ * exception is throw</li>
  * <li>
- * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
- * is false then an empty message is send to outport</li>
+ * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is false then an
+ * empty message is send to outport</li>
  * </ul>
  * 
  * the outport are dynamically changed when the extraction type changed ({@link
- * fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.attributeChanged(Attribute)}
- * thanks to field
+ * fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.attributeChanged(Attribute)} thanks to field
  * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts} and
  * methods {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.createPort(int,
  * String)}, {@link
@@ -75,14 +69,12 @@ import fr.soleil.passerelle.util.PasserelleUtil;
 public class ExtractValueFromSnapIDV2 extends Actor {
 
     /**
-     * the index of read port in
-     * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
+     * the index of read port in {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
      */
     public static final int READ_PORT = 0;
 
     /**
-     * the index of write port in
-     * {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
+     * the index of write port in {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.outputPorts}
      */
     public static final int WRITE_PORT = 1;
 
@@ -112,14 +104,11 @@ public class ExtractValueFromSnapIDV2 extends Actor {
     /**
      * the error message when attribute Name parameter is empty (its used for unit test)
      */
-    public static final String ERROR_ATTR_NAME_PARAM_EMPTY = ATTRIBUTE_NAME_LABEL
-            + " can not be empty";
-
-    private final static Logger logger = LoggerFactory.getLogger(ExtractValueFromSnapIDV2.class);
+    public static final String ERROR_ATTR_NAME_PARAM_EMPTY = ATTRIBUTE_NAME_LABEL + " can not be empty";
 
     /**
-     * Manage all request to the snapshot db see
-     * {@link fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy} for more details
+     * Manage all request to the snapshot db see {@link fr.soleil.passerelle.actor.tango.snapshot.SnapExtractorProxy}
+     * for more details
      */
     private SnapExtractorProxy extractor;
 
@@ -173,28 +162,21 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         }
         extractionTypeParam.setExpression(ExtractionType.READ.getName());
 
-        throwExceptionOnErrorParam = new Parameter(this, THROW_EXCEPTION_ON_ERROR_LABEL,
-                new BooleanToken(throwExceptionOnError));
+        throwExceptionOnErrorParam = new Parameter(this, THROW_EXCEPTION_ON_ERROR_LABEL, new BooleanToken(
+                throwExceptionOnError));
         throwExceptionOnErrorParam.setTypeEquals(BaseType.BOOLEAN);
 
         final URL url = this.getClass().getResource(
                 "/org/tango-project/tango-icon-theme/32x32/devices/camera-photo.png");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:orange;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
     }
 
     @Override
@@ -204,8 +186,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
 
         } else if (attribute == extractionTypeParam) {
             // throws IllegalActionException if invalid
-            extractionType = ExtractionType.fromDescription(PasserelleUtil
-                    .getParameterValue(extractionTypeParam));
+            extractionType = ExtractionType.fromDescription(PasserelleUtil.getParameterValue(extractionTypeParam));
 
             switch (extractionType) {
                 case READ:
@@ -228,8 +209,7 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                     break;
             }
         } else if (attribute == throwExceptionOnErrorParam) {
-            throwExceptionOnError = ((BooleanToken) throwExceptionOnErrorParam.getToken())
-                    .booleanValue();
+            throwExceptionOnError = ((BooleanToken) throwExceptionOnErrorParam.getToken()).booleanValue();
         } else {
             super.attributeChanged(attribute);
         }
@@ -243,13 +223,10 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             if (extractor == null) {// FIXME extractor== null if we are in prod env
                 extractor = new SnapExtractorProxy();
             }
-            ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(),
-                    Level.DEBUG);
-        }
-        catch (DevFailed e) {
-            throw new DevFailedValidationException(e, this);
-        }
-        catch (IllegalActionException e) {
+            ExecutionTracerService.trace(this, "using snap Extractor " + extractor.getName(), Level.DEBUG);
+        } catch (DevFailed e) {
+            ExceptionUtil.throwValidationException(this, e);
+        } catch (IllegalActionException e) {
             throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e);
         }
         super.validateInitialization();
@@ -274,12 +251,10 @@ public class ExtractValueFromSnapIDV2 extends Actor {
      * happen
      * 
      * @param portIndex the index of port must equals to
-     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT}
-     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT} or
      *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT}
      * @param name the label of the port. Must be equals to
-     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL}
-     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL} or
      *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT_LABEL}
      * 
      * @throws IllegalActionException is thrown port already exists. Normally this should never
@@ -293,10 +268,9 @@ public class ExtractValueFromSnapIDV2 extends Actor {
             } else if (outputPorts[portIndex].getContainer() == null) {
                 outputPorts[portIndex].setContainer(this);
             }
-        }
-        catch (NameDuplicationException e) { // normally that should not happen
-            throw new IllegalActionException(e.getNameable1(), e.getNameable2(), e,
-                    "Error: can create " + name + " port");
+        } catch (NameDuplicationException e) { // normally that should not happen
+            throw new IllegalActionException(e.getNameable1(), e.getNameable2(), e, "Error: can create " + name
+                    + " port");
         }
     }
 
@@ -305,12 +279,10 @@ public class ExtractValueFromSnapIDV2 extends Actor {
      * happen
      * 
      * @param portIndex the index of port. Must equals to
-     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT}
-     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT} or
      *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT}
      * @param name the label of the port. Must be equals to
-     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL}
-     *            or
+     *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.READ_PORT_LABEL} or
      *            {@link fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.WRITE_PORT_LABEL}
      * 
      * @throws IllegalActionException is thrown port not exists. Normally this should never happen
@@ -320,10 +292,9 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         if (outputPorts[portIndex] != null) {
             try {
                 outputPorts[portIndex].setContainer(null);
-            }
-            catch (NameDuplicationException e) {
-                throw new IllegalActionException(e.getNameable1(), e.getNameable2(), e,
-                        "Error: can not remove " + name + " port");
+            } catch (NameDuplicationException e) {
+                throw new IllegalActionException(e.getNameable1(), e.getNameable2(), e, "Error: can not remove " + name
+                        + " port");
             }
         }
     }
@@ -349,32 +320,28 @@ public class ExtractValueFromSnapIDV2 extends Actor {
         try {
             int snapIDAsInt = Integer.parseInt(snapID);
             if (snapIDAsInt < SnapExtractorProxy.ID_MIN) {
-                throw new ProcessingException(Severity.FATAL,
-                        SnapExtractorProxy.ERROR_SNAP_ID_INF_ID_MIN, this, null);
+                ExceptionUtil.throwProcessingException(ErrorCode.FATAL, SnapExtractorProxy.ERROR_SNAP_ID_INF_ID_MIN,
+                        this);
             }
-        }
-        catch (NumberFormatException e) {
-            throw new ProcessingException(Severity.FATAL, SnapExtractorProxy.ERROR_SNAP_ID_NAN,
-                    this, null);
+        } catch (NumberFormatException e) {
+            ExceptionUtil.throwProcessingException(ErrorCode.FATAL, SnapExtractorProxy.ERROR_SNAP_ID_NAN, this);
         }
     }
 
     /**
      * extract the attribute value(s) and send it (their) on output port(s). If the extraction
-     * failed an
-     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     * is true then an exception is thrown, otherwise an empty message is sent
+     * failed an {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is true
+     * then an exception is thrown, otherwise an empty message is sent
      * 
      * @param snapID the ID of the snapshot
      * @throws ProcessingException is thrown if
-     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     *             is true and an error occurred during extraction
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is
+     *             true and an error occurred during extraction
      * @throws IllegalArgumentException if the snap id is invalid see {@link
      *             fr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.
      *             checkSnapIdIsAnInt(String)} for more details
      */
-    protected void extractAndSendValues(final String snapID) throws ProcessingException,
-            IllegalArgumentException {
+    protected void extractAndSendValues(final String snapID) throws ProcessingException, IllegalArgumentException {
 
         checkSnapIdIsAnInt(snapID);
 
@@ -390,38 +357,34 @@ public class ExtractValueFromSnapIDV2 extends Actor {
                 break;
 
             default:// should not happen
-                new ProcessingException(Severity.FATAL, "Unknown extration type: "
-                        + extractionType.getName(), this, null);
+                ExceptionUtil.throwProcessingException(ErrorCode.FATAL,
+                        "Unknown extration type: " + extractionType.getName(), this);
         }
     }
 
     /**
      * extract the read and the write value of the attribute and send it to the output ports. If the
      * extraction failed an
-     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     * is true then an exception is thrown, otherwise an empty message is sent
+     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is true then an
+     * exception is thrown, otherwise an empty message is sent
      * 
      * @param snapID the id of the snapshot
      * @throws ProcessingException is thrown if
-     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     *             is true and an error occurred during extraction
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is
+     *             true and an error occurred during extraction
      * @throws DevFailedProcessingException is thrown if
-     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     *             is true and an error occurred during extraction
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is
+     *             true and an error occurred during extraction
      */
-    private void extractAndSendReadAndWriteValues(final String snapID) throws ProcessingException,
-            DevFailedProcessingException {
+    private void extractAndSendReadAndWriteValues(final String snapID) throws ProcessingException {
         try {
             String[] snapReadAndWriteValues = extractor.getSnapValue(snapID, attributeName);
 
-            sendOutputMsg(outputPorts[READ_PORT],
-                    createContentMessage(this, snapReadAndWriteValues[0]));
-            sendOutputMsg(outputPorts[WRITE_PORT],
-                    createContentMessage(this, snapReadAndWriteValues[1]));
-        }
-        catch (DevFailed e) {
+            sendOutputMsg(outputPorts[READ_PORT], createContentMessage(this, snapReadAndWriteValues[0]));
+            sendOutputMsg(outputPorts[WRITE_PORT], createContentMessage(this, snapReadAndWriteValues[1]));
+        } catch (DevFailed e) {
             if (throwExceptionOnError) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             } else {
                 sendOutputMsg(outputPorts[READ_PORT], createMessage());
                 sendOutputMsg(outputPorts[WRITE_PORT], createMessage());
@@ -432,31 +395,29 @@ public class ExtractValueFromSnapIDV2 extends Actor {
     /**
      * extract the read or wirte part of the attribute according to the read parameter and send
      * extracted value on the ouptport.If the extraction failed an
-     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     * is true then an exception is thrown, otherwise an empty message is sent
+     * {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is true then an
+     * exception is thrown, otherwise an empty message is sent
      * 
      * @param read flag that indicate which part must be extracted. if its true then the read part
      *            is extracted write part otherwise
      * @param snapID the id of the snaphot
      * @throws ProcessingException is thrown if
-     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     *             is true and an error occurred during extraction
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is
+     *             true and an error occurred during extraction
      * @throws DevFailedProcessingException is thrown if
-     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError}
-     *             is true and an error occurred during extraction
+     *             {@linkfr.soleil.passerelle.actor.tango.snapshot.ExtractValueFromSnapIDV2.throwExceptionOnError} is
+     *             true and an error occurred during extraction
      */
-    private void extractAndSendReadOrWriteValue(boolean read, String snapID)
-            throws ProcessingException, DevFailedProcessingException {
+    private void extractAndSendReadOrWriteValue(boolean read, String snapID) throws ProcessingException {
         int portIndex = (read) ? READ_PORT : WRITE_PORT;
         try {
-            String[] snapValues = (read) ? extractor.getReadValues(snapID, attributeName)
-                    : extractor.getWriteValues(snapID, attributeName);
+            String[] snapValues = (read) ? extractor.getReadValues(snapID, attributeName) : extractor.getWriteValues(
+                    snapID, attributeName);
 
             sendOutputMsg(outputPorts[portIndex], createContentMessage(this, snapValues[0]));
-        }
-        catch (DevFailed e) {
+        } catch (DevFailed e) {
             if (throwExceptionOnError) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             } else {
                 sendOutputMsg(outputPorts[portIndex], createMessage());
             }

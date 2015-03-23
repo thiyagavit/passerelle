@@ -30,18 +30,20 @@ import org.slf4j.LoggerFactory;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoAttributeActor;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -79,7 +81,7 @@ public class AttributeReader extends ATangoAttributeActor {
 	    final ProcessResponse response) throws ProcessingException {
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - entry");
+	    logger.trace(getName() + " doFire() - entry");
 	}
 
 	if (isMockMode()) {
@@ -127,15 +129,14 @@ public class AttributeReader extends ATangoAttributeActor {
 			getTangoAttribute()));
 
 	    } catch (final DevFailed e) {
-		throw new DevFailedProcessingException(e, this);
+	        ExceptionUtil.throwProcessingException(this, e);
 	    } catch (final PasserelleException e) {
-		throw new ProcessingException(e.getMessage(), getAttributeName(), e);
+	        ExceptionUtil.throwProcessingException(e.getMessage(), getAttributeName(),e);
 	    }
-
 	}
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - exit");
+	    logger.trace(getName() + " doFire() - exit");
 	}
     }
 

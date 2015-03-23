@@ -43,7 +43,6 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
@@ -131,7 +130,7 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
                 switchToOffAfterInit = executeCmdAccordingState(new OnCommand(this, getDeviceName(), stateCmd),
                         DevState.OFF);
             } catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
 
@@ -154,11 +153,12 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
 
                     ExecutionTracerService.trace(this, "apply offset " + offset);
                 } catch (NumberFormatException e) {
-                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   "Error: offset is not a number",ctxt);
+                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                            "Error: offset is not a number", ctxt);
                 } catch (DevFailed e) {
-                    throw new DevFailedProcessingException(e, this);
+                    ExceptionUtil.throwProcessingException(this, e);
                 } catch (PasserelleException e) {
-                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   e.getMessage(),ctxt,e);
+                    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), ctxt, e);
                 }
             }
         }
@@ -171,7 +171,7 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
                 executeCmdAccordingState(new OffCommand(this, getDeviceName(), stateCmd), DevState.ON,
                         DevState.STANDBY, DevState.ALARM);
             } catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
 

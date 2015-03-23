@@ -26,7 +26,6 @@ import com.isencia.passerelle.ext.ModelElementClassProvider;
  *
  */
 public class Activator implements BundleActivator {
-  @SuppressWarnings("rawtypes")
   private ServiceRegistration apSvcReg;
   
   public void start(BundleContext context) throws Exception {

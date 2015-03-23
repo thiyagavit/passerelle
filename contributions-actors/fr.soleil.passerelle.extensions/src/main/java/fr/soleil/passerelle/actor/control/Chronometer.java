@@ -22,6 +22,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -35,7 +37,9 @@ import fr.soleil.passerelle.util.PasserelleUtil;
  */
 public class Chronometer extends Transformer {
 
-  private static Logger logger = LoggerFactory.getLogger(Chronometer.class);
+   private static final long serialVersionUID = 15219111900378353L;
+
+   private static Logger logger = LoggerFactory.getLogger(Chronometer.class);
 
   // public Port setInputPort = null;
   public Port resetInputPort = null;
@@ -68,7 +72,7 @@ public class Chronometer extends Transformer {
   @Override
   protected void doFire(final ManagedMessage arg0) throws ProcessingException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - entry");
+      logger.trace(getName() + " doFire() - entry");
     }
 
     ManagedMessage message = null;
@@ -78,7 +82,7 @@ public class Chronometer extends Transformer {
     try {
       MessageHelper.getMessage(resetInputPort);
     } catch (final PasserelleException e1) {
-      throw new ProcessingException("can't get input message", resetInputPort, e1);
+        ExceptionUtil.throwProcessingException("can't get input message", resetInputPort, e1);
     }
     resetTime = new Date().getTime();
 
@@ -89,11 +93,11 @@ public class Chronometer extends Transformer {
     try {
       sendOutputMsg(output, message);
     } catch (final IllegalArgumentException e) {
-      throw new ProcessingException(getInfo() + " - doFire() generated exception " + e, message, e);
+        ExceptionUtil.throwProcessingException(getName() + " - doFire() generated exception " + e, message, e);
     }
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - exit");
+      logger.trace(getName() + " doFire() - exit");
     }
   }
 

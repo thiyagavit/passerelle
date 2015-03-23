@@ -11,14 +11,13 @@ import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
-import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
@@ -27,7 +26,6 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.impl.scan2d.Config2DImpl;
 import fr.soleil.salsa.entity.scan2D.IConfig2D;
 
@@ -149,7 +147,7 @@ public class PreConfigured2DScan extends Scan {
 				+ " steps] + integration time: " + intTime;
 
 		if (!isMockMode()) {
-			// allow to access Config2DImpl functions
+		 	// allow to access Config2DImpl functions
 			final Config2DImpl confTemp = (Config2DImpl) conf;
 
 			final ScanRangeX scanRangeX = new ScanRangeX(fromX, toX, nbStepsX,
@@ -159,8 +157,7 @@ public class PreConfigured2DScan extends Scan {
 			try {
 				ScanUtil.setTrajectory2D(confTemp, scanRangeX, scanRangeY);
 			} catch (PasserelleException e) {
-				throw new ProcessingExceptionWithLog(this, Severity.FATAL, e.getMessage(),
-						this, null);
+			    ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), this);
 			}
 			conf = confTemp;
 

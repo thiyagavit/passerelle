@@ -18,13 +18,12 @@ import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.tango.acquisition.Scan;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IDevice;
 import fr.soleil.salsa.entity.impl.scan1d.Range1DImpl;
 import fr.soleil.salsa.entity.scan1d.IConfig1D;
@@ -90,7 +89,7 @@ public class PreConfiguredTimeScan extends Scan {
             try {
                 ScanUtil.setTimeScanTrajectory(conf, range);
             } catch (PasserelleException e) {
-                throw new ProcessingExceptionWithLog(this,Severity.FATAL, e.getMessage(), this, e);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), this, e);
             }
             ExecutionTracerService.trace(this, logMessage.toString());
         } else {

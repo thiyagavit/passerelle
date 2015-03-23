@@ -23,20 +23,20 @@ import ptolemy.kernel.util.NameDuplicationException;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.ValidationException;
-import com.isencia.passerelle.actor.v3.Actor;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.actor.ActorV3;
 import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 /**
  * Allow to store/restore a list of brace Key/Value.</br> </br>
@@ -53,11 +53,10 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * fill in the list name parameter which indicate on which list you work.
  * 
  * <p>
- * <b>Store Action:</b> store a brace Key/Value in the list .If the list does not exist, it is
- * automatically created. The actor get a String from his inputPort. This String is cut in two part(
- * Key and Value) thanks to a separator defined thought the separator Parameter (@see
- * KeyValueListMemorizer.DEFAULT_SEPARATOR).</br> If the separator appear many times then only the
- * first is used to cut the String, others are integrated in value.</br>
+ * <b>Store Action:</b> store a brace Key/Value in the list .If the list does not exist, it is automatically created.
+ * The actor get a String from his inputPort. This String is cut in two part( Key and Value) thanks to a separator
+ * defined thought the separator Parameter (@see KeyValueListMemorizer.DEFAULT_SEPARATOR).</br> If the separator appear
+ * many times then only the first is used to cut the String, others are integrated in value.</br>
  * 
  * eg: separator = ":", stringToCut ="just:a:test) => key= "just", value= "a:test").</br></br>
  * 
@@ -65,27 +64,24 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * </p>
  * 
  * <p>
- * <b>Restore Action:</b> send the next brace Key/Value of the list on the key and value ports. Also
- * send the index of brace Key/Value on "current index"port. </br> If the list does not exist then a
- * ProcessingException is raised and sequence is stopped. </br> If there no more element in list and
- * fixedNumberOfValueParam is:
+ * <b>Restore Action:</b> send the next brace Key/Value of the list on the key and value ports. Also send the index of
+ * brace Key/Value on "current index"port. </br> If the list does not exist then a ProcessingException is raised and
+ * sequence is stopped. </br> If there no more element in list and fixedNumberOfValueParam is:
  * <ul>
  * <li>True: a ProcessingException is raised and sequence is stopped.</li>
- * <li>False: a empty brace Key/Value is send on Key/Value Port and an empty message is send on
- * "current index" port.</li>
+ * <li>False: a empty brace Key/Value is send on Key/Value Port and an empty message is send on "current index" port.</li>
  * </ul>
  * </p>
  * 
  * <p>
- * <b>Clear Action:</b> clear the list. If the list does not exist then a ProcessingException is
- * raised and sequence is stopped.
+ * <b>Clear Action:</b> clear the list. If the list does not exist then a ProcessingException is raised and sequence is
+ * stopped.
  * </p>
  * 
  * <p>
- * <b>Position value Action:</b> define the next brace Key/Value to restore. The fist element of the
- * list is at position 0 and the last at (number_of_element_in_list - 1). A position less than 0 can
- * not be entered. If the position is superior to (the number of element - 1) a ProcessingException
- * is raised and sequence is stopped.
+ * <b>Position value Action:</b> define the next brace Key/Value to restore. The fist element of the list is at position
+ * 0 and the last at (number_of_element_in_list - 1). A position less than 0 can not be entered. If the position is
+ * superior to (the number of element - 1) a ProcessingException is raised and sequence is stopped.
  * </p>
  * 
  * <p>
@@ -95,7 +91,7 @@ import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
  * @author GRAMER
  * 
  */
-public final class KeyValueListMemorizer extends Actor implements IActorFinalizer {
+public final class KeyValueListMemorizer extends ActorV3 implements IActorFinalizer {
 
     private static final long serialVersionUID = 2970371209844116199L;
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyValueListMemorizer.class);
@@ -168,8 +164,8 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
     public Parameter FilteredKeysParam;
     private final List<String> filteredKeysList = new ArrayList<String>();
 
-    public KeyValueListMemorizer(final CompositeEntity container, final String name)
-            throws IllegalActionException, NameDuplicationException {
+    public KeyValueListMemorizer(final CompositeEntity container, final String name) throws IllegalActionException,
+            NameDuplicationException {
         super(container, name);
 
         inputPort = PortFactory.getInstance().createInputPort(this, null);
@@ -190,8 +186,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
         }
         operationParam.setExpression(Operation.MEMORIZE.getDescription());
 
-        fixedNumberOfValueParam = new Parameter(this, FIXED_NUMBER_OF_VALUE_LABEL,
-                new BooleanToken(fixedNumberOfValue));
+        fixedNumberOfValueParam = new Parameter(this, FIXED_NUMBER_OF_VALUE_LABEL, new BooleanToken(fixedNumberOfValue));
         fixedNumberOfValueParam.setTypeEquals(BaseType.BOOLEAN);
 
         positionValueParam = new Parameter(this, POSITION_VALUE_LABEL, new IntToken(positionValue));
@@ -202,25 +197,17 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
 
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:lightgrey;stroke:lightgrey\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n" +
 
                 "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n"
-                + "<line x1=\"-15\" y1=\"0\" x2=\"15\" y2=\"0\" "
-                + "style=\"stroke-width:2.0\"/>\n"
-                + "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" "
-                + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" "
-                + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
+                + "<line x1=\"-15\" y1=\"0\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
+                + "<line x1=\"12\" y1=\"-3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
+                + "<line x1=\"12\" y1=\"3\" x2=\"15\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "</svg>\n");
 
     }
 
@@ -235,15 +222,13 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
             separator = PasserelleUtil.getParameterValue(separatorParam);
         } else if (attribute == operationParam) {
             // throw an IllegalActionException if operation is unknown
-            operation = Operation.fromDescription(PasserelleUtil.getParameterValue(operationParam)
-                    .trim());
+            operation = Operation.fromDescription(PasserelleUtil.getParameterValue(operationParam).trim());
         } else if (attribute == FilteredKeysParam) {
             filteredKeysList.clear();
 
             final String filteredKeys = PasserelleUtil.getParameterValue(FilteredKeysParam);
             if (!filteredKeys.isEmpty()) {
-                final StringTokenizer tokenizer = new StringTokenizer(filteredKeys,
-                        FILTERED_KEYS_SEPARATOR);
+                final StringTokenizer tokenizer = new StringTokenizer(filteredKeys, FILTERED_KEYS_SEPARATOR);
 
                 // key is added to list only if it's not empty
                 while (tokenizer.hasMoreTokens()) {
@@ -268,8 +253,8 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
     }
 
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
         switch (operation) {
             case MEMORIZE:
                 memorizeAction(request, response);
@@ -284,8 +269,8 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                     LOGGER.debug("clear list \"" + listName + "\"");
                     ExecutionTracerService.trace(this, "List " + listName + " has been cleared");
                     if (memorizedKeyValues.remove(listName) == null) {
-                        throw new ProcessingExceptionWithLog(this, Severity.FATAL, "list Name :\""
-                                + listName + "\" is unknown; => can not be clear", this, null);
+                        ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "list Name :\"" + listName
+                                + "\" is unknown; => can not be clear", this);
                     }
                     response.addOutputMessage(2, outputValuePort, createMessage());
                 }
@@ -293,31 +278,27 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
 
             case GOTO:
                 synchronized (memorizedKeyValues) {
-                    LOGGER.debug("set goto position to {} for  list \"{}\"", positionValue,
-                            listName);
+                    LOGGER.debug("set goto position to {} for  list \"{}\"", positionValue, listName);
 
                     if (memorizedKeyValues.containsKey(listName)) {
                         try {
-                            ExecutionTracerService.trace(this, "Goto " + positionValue
-                                    + " for the list " + listName);
+                            ExecutionTracerService.trace(this, "Goto " + positionValue + " for the list " + listName);
                             memorizedKeyValues.get(listName).setCursor(positionValue);
                             response.addOutputMessage(2, outputValuePort, createMessage());
-                        }
-                        catch (final IndexOutOfBoundsException e) {
-                            throw new ProcessingExceptionWithLog(this, Severity.FATAL, "list: \""
-                                    + listName + "\" " + e.getMessage(), this, e);
+                        } catch (final IndexOutOfBoundsException e) {
+                            ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "list: \"" + listName
+                                    + "\" " + e.getMessage(), this, e);
                         }
                     } else {
-                        throw new ProcessingExceptionWithLog(this, Severity.FATAL, "list Name :\""
-                                + listName + "\" is unknown; => can not set goto Position", this,
-                                null);
+                        ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "list Name :\"" + listName
+                                + "\" is unknown; => can not set goto Position", this);
                     }
                 }
                 break;
 
             default:
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL, "Unknown operation \""
-                        + operation.getDescription() + "\"", this, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                        "Unknown operation \"" + operation.getDescription() + "\"", this);
         }
     }
 
@@ -341,8 +322,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
         switch (operation) {
             case MEMORIZE:
                 if (separator.trim().isEmpty()) {
-                    throw new ValidationException(Severity.FATAL, "separator can not be empty",
-                            this, null);
+                    ExceptionUtil.throwValidationException(ErrorCode.FATAL, "separator can not be empty", this);
                 }
                 break;
             // The listName validity test "if (memorizedKeyValues.containsKey(listName))" cannot be
@@ -354,24 +334,22 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                 break;
 
             default:
-                throw new ValidationException(Severity.FATAL, "Unknown operation \""
-                        + operation.getDescription() + "\"", this, null);
+                ExceptionUtil.throwValidationException(ErrorCode.FATAL,
+                        "Unknown operation \"" + operation.getDescription() + "\"", this);
         }
-
     }
 
     @Override
     protected void doInitialize() throws InitializationException {
         super.doInitialize();
-
         final Director dir = getDirector();
         if (dir instanceof BasicDirector) {
             // register this actor as Finalizer to clear memorizedKeyValues at
             // the end of sequence
             ((BasicDirector) dir).registerFinalizer(this);
         } else {
-            throw new InitializationException(Severity.FATAL,
-                    "this actor can only use with Soleil directrors", this, null);
+            ExceptionUtil.throwInitializationException(ErrorCode.FATAL, "this actor can only use with Soleil director",
+                    this);
         }
     }
 
@@ -391,8 +369,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
     private void memorizeAction(final ProcessRequest request, final ProcessResponse response)
             throws ProcessingException {
 
-        final String inputMessage = (String) PasserelleUtil.getInputValue(request
-                .getMessage(inputPort));
+        final String inputMessage = (String) PasserelleUtil.getInputValue(request.getMessage(inputPort));
 
         final int index = inputMessage.indexOf(separator);
         // if we found the separator in inputMessage. we don't use split
@@ -412,44 +389,39 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                     // else we create the list and add Key/Value to it
 
                     if (memorizedKeyValues.containsKey(listName)) {
-                        LOGGER.debug("Memorization mode: add new value {} to \"{}\" = {}",
-                                new String[] { keyValue.toString(), listName,
-                                        memorizedKeyValues.get(listName).toString() });
+                        Object logValue = new String[] { keyValue.toString(), listName,
+                                memorizedKeyValues.get(listName).toString() };
+                        LOGGER.debug("Memorization mode: add new value {} to \"{}\" = {}", logValue);
 
                         memorizedKeyValues.get(listName).add(keyValue);
 
-                        ExecutionTracerService.trace(this, "Memorization mode: add  new brace  "
-                                + keyValue + " to list " + listName);
+                        ExecutionTracerService.trace(this, "Memorization mode: add  new brace  " + keyValue
+                                + " to list " + listName);
                     } else {
-                        LOGGER.debug(
-                                "Memorization mode: create new list \"{}\" and add new value {} ",
-                                listName, keyValue);
+                        LOGGER.debug("Memorization mode: create new list \"{}\" and add new value {} ", listName,
+                                keyValue);
 
                         final StringPairList temp = new StringPairList();
                         temp.add(keyValue);
 
                         memorizedKeyValues.put(listName, temp);
-                        ExecutionTracerService.trace(this, "Memorization mode: create new list "
-                                + listName + " and add new brace " + keyValue);
+                        ExecutionTracerService.trace(this, "Memorization mode: create new list " + listName
+                                + " and add new brace " + keyValue);
                     }
 
                     // Finally we send on output ports the key and
                     // value.(Like MessageMemorizer
                     // actor)
-                    response.addOutputMessage(0, keyPort,
-                            PasserelleUtil.createContentMessage(this, keyValue.key));
-                    response.addOutputMessage(1, valuePort,
-                            PasserelleUtil.createContentMessage(this, keyValue.value));
+                    response.addOutputMessage(0, keyPort, PasserelleUtil.createContentMessage(this, keyValue.key));
+                    response.addOutputMessage(1, valuePort, PasserelleUtil.createContentMessage(this, keyValue.value));
                 }
-            }
-            catch (final IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 LOGGER.debug("separator \"{}\" has beed founded but key was empty", separator);
             }
         } else {
             LOGGER.debug("separator \"{}\" not found", separator);
         }
-        response.addOutputMessage(2, outputValuePort,
-                PasserelleUtil.createContentMessage(this, inputMessage));
+        response.addOutputMessage(2, outputValuePort, PasserelleUtil.createContentMessage(this, inputMessage));
 
     }
 
@@ -457,8 +429,8 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
      * do the outputAction of actor. ie send the next key and value contains in listName on KeyPort
      * and ValuePort.
      * <ul>
-     * <li>if the list is not register in map(ie user never memorize key/value whith this list Name)
-     * a ProcessingException is thrown</li>
+     * <li>if the list is not register in map(ie user never memorize key/value whith this list Name) a
+     * ProcessingException is thrown</li>
      * <li>if there are no more key/ value a ProcessingException is thrown.</li>
      * </ul>
      * 
@@ -467,8 +439,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
      *             <ul>
      *             <li>list list name is unknown</li>
      *             <li>there are no more element in list</li>
-     *             <li>outMessage can be created @see
-     *             fr.soleil.passerelle.util.PasserelleUtil#createContentMessage</li>
+     *             <li>outMessage can be created @see fr.soleil.passerelle.util.PasserelleUtil#createContentMessage</li>
      *             </ul>
      */
     private void outPutAction(final ProcessResponse response) throws ProcessingException {
@@ -479,28 +450,22 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                     final StringPair temp = valueList.getNextElement(filteredKeysList);
                     // -1 to have the last extracted value
                     final int currentIndexValue = valueList.getCursor() - 1;
+                    Object logValue = new String[] { listName, memorizedKeyValues.get(listName).toString(),
+                            temp.toString() };
+                    LOGGER.debug("output mode: getNextValue in \"{}\" = {} is {}", logValue);
 
-                    LOGGER.debug("output mode: getNextValue in \"{}\" = {} is {}",
-                            new String[] { listName, memorizedKeyValues.get(listName).toString(),
-                                    temp.toString() });
-
-                    response.addOutputMessage(0, keyPort,
-                            PasserelleUtil.createContentMessage(this, temp.key));
-                    response.addOutputMessage(1, valuePort,
-                            PasserelleUtil.createContentMessage(this, temp.value));
+                    response.addOutputMessage(0, keyPort, PasserelleUtil.createContentMessage(this, temp.key));
+                    response.addOutputMessage(1, valuePort, PasserelleUtil.createContentMessage(this, temp.value));
                     response.addOutputMessage(2, outputValuePort, createMessage());
                     response.addOutputMessage(3, currentOutputIndexPort,
                             PasserelleUtil.createContentMessage(this, currentIndexValue));
 
-                    ExecutionTracerService.trace(this, "key: " + temp.key + " value: " + temp.value
-                            + " index: " + currentIndexValue);
+                    ExecutionTracerService.trace(this, "key: " + temp.key + " value: " + temp.value + " index: "
+                            + currentIndexValue);
 
-                }
-                catch (final IndexOutOfBoundsException e) {
+                } catch (final IndexOutOfBoundsException e) {
                     if (fixedNumberOfValue) {
-                        throw new ProcessingExceptionWithLog(this, Severity.FATAL,
-                                "There are no more element in list name :\"" + listName + "\"",
-                                this, null);
+                        ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "There are no more element in list name :\"" + listName + "\"", this);
                     } else {
                         response.addOutputMessage(0, keyPort, createMessage());
                         response.addOutputMessage(1, valuePort, createMessage());
@@ -509,8 +474,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
                     }
                 }
             } else {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL, "list Name :\""
-                        + listName + "\" is unknown", this, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "list Name :\"" + listName + "\" is unknown", this);
             }
         }
     }
@@ -541,16 +505,15 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
          */
         public void setCursor(final int cursor) {
             if (cursor < 0 || cursor >= size()) {
-                throw new IndexOutOfBoundsException("invalid position value: " + cursor
-                        + ". The list have " + size() + " element(s)");
+                throw new IndexOutOfBoundsException("invalid position value: " + cursor + ". The list have " + size()
+                        + " element(s)");
             }
             this.cursor = cursor;
         }
 
         /**
          * 
-         * @return the position of cursor (ie the index of next element given by
-         *         {@link getNextElement} method
+         * @return the position of cursor (ie the index of next element given by {@link getNextElement} method
          */
         public int getCursor() {
             return cursor;
@@ -663,8 +626,7 @@ public final class KeyValueListMemorizer extends Actor implements IActorFinalize
      * 
      */
     public static enum Operation {
-        MEMORIZE("do memorization"), OUTPUT("output value"), CLEAR("Clear list"), GOTO(
-                "Go to position");
+        MEMORIZE("do memorization"), OUTPUT("output value"), CLEAR("Clear list"), GOTO("Go to position");
 
         /**
          * the label which is display in parameter editing window

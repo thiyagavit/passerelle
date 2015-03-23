@@ -24,7 +24,7 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.doc.generator.ParameterName;
@@ -35,7 +35,7 @@ import fr.esrf.TangoApi.AttributeProxy;
 import fr.esrf.TangoApi.DeviceAttribute;
 import fr.soleil.passerelle.actor.TransformerV5;
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.salsa.entity.IActuator;
 import fr.soleil.salsa.entity.IScanResult;
@@ -81,8 +81,8 @@ public abstract class AbstractGetScanData extends TransformerV5 {
     protected final List<Port> actuatorsPorts = Collections.synchronizedList(new ArrayList<Port>());
     protected final List<Port> sensorsPorts = Collections.synchronizedList(new ArrayList<Port>());
 
-    public AbstractGetScanData(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public AbstractGetScanData(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
 
         actuatorsParam = new StringParameter(this, getActuatorParamName());
@@ -115,12 +115,11 @@ public abstract class AbstractGetScanData extends TransformerV5 {
 
     @Override
     protected void validateInitialization() throws ValidationException {
-        // TODO Auto-generated method stub
         super.validateInitialization();
         // IL doit y avoir au minimum 1 ou plusieurs sensors/actuators
         if (getNbRequieredActuator() == 0 || getNbRequieredSensor() == 0) {
-            throw new ValidationException(Severity.FATAL,
-                    "Actuators and Sensors list must not be empties !", this, null);
+            ExceptionUtil.throwValidationException(ErrorCode.FATAL, "Actuators and Sensors list must not be empties !",
+                    this);
         }
     }
 
@@ -130,22 +129,19 @@ public abstract class AbstractGetScanData extends TransformerV5 {
         if (attribute == actuatorsParam) {
             readActuatorValue();
             constructOutputPorts(ACTUATOR, getNbRequieredActuator(), actuatorsPorts);
-        }
-        else if (attribute == sensorsParam) {
+        } else if (attribute == sensorsParam) {
             readSensorValue();
             constructOutputPorts(SENSOR, getNbRequieredSensor(), sensorsPorts);
-        }
-        else if (attribute == trajectoryParam) {
+        } else if (attribute == trajectoryParam) {
             isTrajectoryValue = ((BooleanToken) trajectoryParam.getToken()).booleanValue();
-        }
-        else {
+        } else {
             super.attributeChanged(attribute);
         }
 
     }
 
-    private void constructOutputPorts(final String constantPortName, final int newPortCount,
-            List<Port> portList) throws IllegalActionException {
+    private void constructOutputPorts(final String constantPortName, final int newPortCount, List<Port> portList)
+            throws IllegalActionException {
 
         int currentNbPorts = portList.size();
 
@@ -158,8 +154,7 @@ public abstract class AbstractGetScanData extends TransformerV5 {
                     logger.debug("remove port :" + portList.get(i).getName());
                     portList.get(i).setContainer(null);
                     portList.remove(i);
-                }
-                catch (final NameDuplicationException e) {
+                } catch (final NameDuplicationException e) {
                     throw new IllegalActionException(this, e, "Error for index " + i);
                 }
             }
@@ -172,14 +167,12 @@ public abstract class AbstractGetScanData extends TransformerV5 {
                     final String portName = constantPortName + i;
                     Port extraOutputPort = (Port) getPort(portName);
                     if (extraOutputPort == null) {
-                        extraOutputPort = PortFactory.getInstance()
-                                .createOutputPort(this, portName);
+                        extraOutputPort = PortFactory.getInstance().createOutputPort(this, portName);
                     }
                     logger.debug("adding port :" + extraOutputPort.getName());
                     portList.add(extraOutputPort);
 
-                }
-                catch (final NameDuplicationException e) {
+                } catch (final NameDuplicationException e) {
                     throw new IllegalActionException(this, e, "Error for index " + i);
                 }
             }
@@ -192,9 +185,8 @@ public abstract class AbstractGetScanData extends TransformerV5 {
         return this.getName();
     }
 
-    protected abstract void realProcessImpl(final IScanResult res,
-            final List<IActuator> actuatorList, final List<ISensor> sensorList)
-            throws ProcessingException, DevFailed;
+    protected abstract void realProcessImpl(final IScanResult res, final List<IActuator> actuatorList,
+            final List<ISensor> sensorList) throws ProcessingException, DevFailed;
 
     @Override
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
@@ -208,14 +200,12 @@ public abstract class AbstractGetScanData extends TransformerV5 {
                 }
                 sendOutputMsg(port, PasserelleUtil.createContentMessage(this, "1,2,3"));
             }
-        }
-        else {
+        } else {
             try {
                 final IScanResult res;
                 if (isTrajectoryValue) {
                     res = ScanUtil.getCurrentSalsaApi().readScanResultWithTrajectories();
-                }
-                else {
+                } else {
                     res = ScanUtil.getCurrentSalsaApi().readScanResult();
                 }
                 final List<IActuator> actuatorList = res.getActuatorsXList();
@@ -230,22 +220,18 @@ public abstract class AbstractGetScanData extends TransformerV5 {
 
                 realProcessImpl(res, actuatorList, sensorList);
 
+            } catch (final SalsaDeviceException e) {
+                ExceptionUtil.throwProcessingException(e.getMessage(), this, e);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
+            } catch (final SalsaScanConfigurationException e) {
+                ExceptionUtil.throwProcessingException(e.getMessage(), this, e);
             }
-            catch (final SalsaDeviceException e) {
-                throw new ProcessingException(e.getMessage(), this, e);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
-            }
-            catch (final SalsaScanConfigurationException e) {
-                throw new ProcessingException(e.getMessage(), this, e);
-            }
-
         }
     }
 
-    protected void sendTimestampsOnOutputPort(final String TimeStampsCompleteName)
-            throws ProcessingException, DevFailed {
+    protected void sendTimestampsOnOutputPort(final String TimeStampsCompleteName) throws ProcessingException,
+            DevFailed {
         // output timestamps
         final TangoAttribute timestamps = new TangoAttribute(TimeStampsCompleteName);
         // read attribute is done by the TangoAttribute constructor

@@ -28,6 +28,8 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 //TODO: mock mode
 @SuppressWarnings("serial")
 public class SpectrumPeakFinder extends Actor {
@@ -88,7 +90,7 @@ public class SpectrumPeakFinder extends Actor {
     yReceived = false;
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - entry");
+      logger.trace(getName() + " doInitialize() - entry");
     }
 
     // If something connected to the set port, install a handler
@@ -206,7 +208,7 @@ public class SpectrumPeakFinder extends Actor {
 
     }
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - exit");
+      logger.trace(getName() + " doInitialize() - exit");
     }
   }
 
@@ -246,7 +248,7 @@ public class SpectrumPeakFinder extends Actor {
   @Override
   protected void doFire() throws ProcessingException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - entry");
+      logger.trace(getName() + " doFire() - entry");
     }
 
     // wait for the 2 inputs
@@ -269,7 +271,7 @@ public class SpectrumPeakFinder extends Actor {
       }
 
       if (xVect.size() != yVect.size()) {
-        throw new ProcessingException("The two input tables must have the same size", null, null);
+          ExceptionUtil.throwProcessingException("The two input tables must have the same size", this);
       }
 
       // find the max
@@ -351,7 +353,7 @@ public class SpectrumPeakFinder extends Actor {
         sendOutputMsg(maxValue, resultMsg2);
 
       } catch (final MessageException e) {
-        throw new ProcessingException("Cannot sand output data", null, e);
+          ExceptionUtil.throwProcessingException("Cannot sand output data", this,e);
       }
 
     } else {
@@ -363,7 +365,7 @@ public class SpectrumPeakFinder extends Actor {
     yReceived = false;
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - exit");
+      logger.trace(getName() + " doFire() - exit");
     }
   }
 

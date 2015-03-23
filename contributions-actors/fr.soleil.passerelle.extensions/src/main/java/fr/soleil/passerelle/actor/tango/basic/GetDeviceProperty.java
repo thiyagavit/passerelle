@@ -13,33 +13,31 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DbDatum;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 @SuppressWarnings("serial")
 public class GetDeviceProperty extends DeviceProperty {
 
-    public GetDeviceProperty(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
+    public GetDeviceProperty(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
+        super(container, name);
     }
 
     @Override
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
-     
-	try {
-	    final DbDatum result = getDeviceProxy().get_property(propertyName);
-	    final String value = result.extractString();
-	    ExecutionTracerService.trace(this, "property " + propertyName + " of "
-		    + getDeviceName() + " is " + value);
-	    sendOutputMsg(output, PasserelleUtil.createContentMessage(this, value));
-	} catch (final DevFailed e) {
-	    throw new DevFailedProcessingException(e, this);
-	} catch (final PasserelleException e) {
-	    throw new ProcessingExceptionWithLog(this,"cannot get property", null, e);
-	}
+
+        try {
+            final DbDatum result = getDeviceProxy().get_property(propertyName);
+            final String value = result.extractString();
+            ExecutionTracerService.trace(this, "property " + propertyName + " of " + getDeviceName() + " is " + value);
+            sendOutputMsg(output, PasserelleUtil.createContentMessage(this, value));
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
+        } catch (final PasserelleException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "cannot get property", this, e);
+        }
 
     }
 }

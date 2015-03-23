@@ -52,9 +52,8 @@ import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.DynamicPortsActor;
 import fr.soleil.passerelle.ptolemy.PtolemyType;
 import fr.soleil.passerelle.ptolemy.data.exp.SoleilFunctions;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
@@ -80,8 +79,7 @@ public class Expression extends DynamicPortsActor {
     private ParseTreeEvaluator _parseTreeEvaluator = null;
     private VariableScope _scope = null;
     private Map<String, Token> _tokenMap;
-    private static Map<String, Token> memorizedResults = Collections
-            .synchronizedMap(new HashMap<String, Token>());
+    private static Map<String, Token> memorizedResults = Collections.synchronizedMap(new HashMap<String, Token>());
 
     private boolean assignement;
 
@@ -95,8 +93,8 @@ public class Expression extends DynamicPortsActor {
      * @throws ptolemy.kernel.util.IllegalActionException
      * @throws ptolemy.kernel.util.NameDuplicationException
      */
-    public Expression(final CompositeEntity container, final String name)
-            throws IllegalActionException, NameDuplicationException {
+    public Expression(final CompositeEntity container, final String name) throws IllegalActionException,
+            NameDuplicationException {
         super(container, name);
 
         super.setIdxOffsetPort(1);
@@ -128,7 +126,7 @@ public class Expression extends DynamicPortsActor {
         Locale.setDefault(Locale.US);
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doInitialize() - entry");
+            logger.trace(getName() + " doInitialize() - entry");
         }
 
         assignement = false;
@@ -137,7 +135,7 @@ public class Expression extends DynamicPortsActor {
         _tokenMap = new HashMap<String, Token>();
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doInitialize() - exit");
+            logger.trace(getName() + " doInitialize() - exit");
         }
     }
 
@@ -170,28 +168,24 @@ public class Expression extends DynamicPortsActor {
                 // step two we detect "X" thanks to regex and throws exception.
 
                 final String exp = "\n" + expression.getExpression() + "\n";
-                final Pattern p = Pattern.compile("[\\+*\\-/ (),\\n]" + portName.toUpperCase()
-                        + "[1-" + nrInputPorts + "]+[\\+*\\-/ (),\\n]");
+                final Pattern p = Pattern.compile("[\\+*\\-/ (),\\n]" + portName.toUpperCase() + "[1-" + nrInputPorts
+                        + "]+[\\+*\\-/ (),\\n]");
                 final Matcher m = p.matcher(exp);
 
                 if (m.find()) {
-                    throw new IllegalActionException("Port Name with capital detect near column "
-                            + (m.start() + 1));
+                    throw new IllegalActionException("Port Name with capital detect near column " + (m.start() + 1));
                 }
 
             }
-        }
-        else if (attribute == inputTypesParam) {
-            final String[] types = ((StringToken) inputTypesParam.getToken()).stringValue().split(
-                    ",");
+        } else if (attribute == inputTypesParam) {
+            final String[] types = ((StringToken) inputTypesParam.getToken()).stringValue().split(",");
             inputTypes = new PtolemyType[types.length];
             for (int i = 0; i < types.length; i++) {
                 inputTypes[i] = PtolemyType.valueOf(types[i]);
             }
             // } else if (attribute == resultNameParam) {
             // resultName = PasserelleUtil.getParameterValue(resultNameParam);
-        }
-        else {
+        } else {
 
             super.attributeChanged(attribute);
         }
@@ -209,12 +203,11 @@ public class Expression extends DynamicPortsActor {
         return expression.getExpression();
     }
 
-    private Token extractPtolemyToken(final ManagedMessage msg, final int portNr)
-            throws ProcessingException {
+    private Token extractPtolemyToken(final ManagedMessage msg, final int portNr) throws ProcessingException {
 
         Token t = null;
         String input = null;
-        
+
         try {
             // put input in ptolemy type
             final Object inputValue = msg.getBodyContent();
@@ -224,49 +217,39 @@ public class Expression extends DynamicPortsActor {
                 final TangoAttribute attr = (TangoAttribute) inputValue;
                 if (attr.isScalar()) {
                     input = attr.extract(String.class);
-                }
-                else if (attr.isSpectrum()) {
+                } else if (attr.isSpectrum()) {
                     input = attr.extractToString(",", "");
-                }
-                else {// image
+                } else {// image
                     input = attr.extractToString(",", ";");
                 }
-            }
-            else if (inputValue.getClass().isArray()) {
+            } else if (inputValue.getClass().isArray()) {
                 // try to convert array to a string
                 final String[] values = new String[Array.getLength(inputValue)];
                 for (int i = 0; i < values.length; i++) {
                     values[i] = Array.get(inputValue, i).toString();
                 }
                 input = Arrays.toString(values);
-            }
-            else {
+            } else {
                 input = inputValue.toString();
             }
-            
-            final int typeIndex = portNr -1;
-            if (inputTypes.length <= typeIndex ) {
+
+            final int typeIndex = portNr - 1;
+            if (inputTypes.length <= typeIndex) {
                 // Take the fisrt by default ! Good practice ?
                 t = inputTypes[0].getTokenForString(input);
-            }
-            else {
+            } else {
                 // TAke care : port number start to 1 and inputTypes array start to 0
                 t = inputTypes[typeIndex].getTokenForString(input);
             }
-        }
-        catch(final ArrayIndexOutOfBoundsException e){
-            throw new ProcessingExceptionWithLog(this,"Invalid configuration (see the input types number)", input, e);
-        }
-        catch (final IllegalActionException e) {
-            throw new ProcessingExceptionWithLog(this,"input message is not correct", input, e);
-            // t = Token.NIL;
-        }
-        catch (final MessageException e) {
-            throw new ProcessingExceptionWithLog(this,"cannot get input value", msg, e);
-            // t = Token.NIL;
-        }
-        catch (final DevFailed e) {
-            throw new DevFailedProcessingException(e, this);
+        } catch (final ArrayIndexOutOfBoundsException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Invalid configuration (see the input types number)",
+                    input, e);
+        } catch (final IllegalActionException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "input message is not correct", input, e);
+        } catch (final MessageException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "cannot get input value", input, e);
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
         }
 
         return t;
@@ -283,7 +266,7 @@ public class Expression extends DynamicPortsActor {
         @Override
         public Token get(final String name) throws IllegalActionException {
             if (name.equals("time")) {
-                return new DoubleToken(getDirector().getCurrentTime());
+                return new DoubleToken(getDirector().getModelTime().getDoubleValue());
             } /*
               * else if (name.equals("iteration")) { return new
               * IntToken(_iterationCount); }
@@ -318,8 +301,7 @@ public class Expression extends DynamicPortsActor {
         public Type getType(final String name) throws IllegalActionException {
             if (name.equals("time")) {
                 return BaseType.DOUBLE;
-            }
-            else if (name.equals("iteration")) {
+            } else if (name.equals("iteration")) {
                 return BaseType.INT;
             }
 
@@ -345,12 +327,10 @@ public class Expression extends DynamicPortsActor {
          *                cannot be evaluated.
          */
         @Override
-        public ptolemy.graph.InequalityTerm getTypeTerm(final String name)
-                throws IllegalActionException {
+        public ptolemy.graph.InequalityTerm getTypeTerm(final String name) throws IllegalActionException {
             if (name.equals("time")) {
                 return new TypeConstant(BaseType.DOUBLE);
-            }
-            else if (name.equals("iteration")) {
+            } else if (name.equals("iteration")) {
                 return new TypeConstant(BaseType.INT);
             }
 
@@ -380,10 +360,10 @@ public class Expression extends DynamicPortsActor {
     }
 
     @Override
-    protected void process(final ActorContext arg0, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext arg0, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doFire() - entry");
+            logger.trace(getName() + " doFire() - entry");
         }
         String log = " where ";
         // get all inputs' messages
@@ -397,10 +377,8 @@ public class Expression extends DynamicPortsActor {
 
                 if (expressionToken != null) {
                     if (!(expressionToken instanceof MatrixToken)) {
-                        log += messageInputContext.getPortName() + "=" + expressionToken.toString()
-                                + " ";
-                    }
-                    else {
+                        log += messageInputContext.getPortName() + "=" + expressionToken.toString() + " ";
+                    } else {
                         log += messageInputContext.getPortName() + "= matrix ";
                     }
                     // System.out.println(getFullName() + " " +
@@ -408,21 +386,16 @@ public class Expression extends DynamicPortsActor {
                     // + " = " + expressionToken.toString() + " ");
                     _tokenMap.put(messageInputContext.getPortName(), expressionToken);
                 }
-            }
-            else {
-                System.err.println(getFullName() + " " + messageInputContext.getPortName()
-                        + " not received ");
+            } else {
+                System.err.println(getFullName() + " " + messageInputContext.getPortName() + " not received ");
                 // return;
                 // we can be here when stop is called and not all inputs has be
                 // received
                 if (isFinishRequested()) {
-                    System.err.println(getFullName() + " " + messageInputContext.getPortName()
-                            + " finished ");
+                    System.err.println(getFullName() + " " + messageInputContext.getPortName() + " finished ");
                     return;
-                }
-                else {
-                    System.err.println(getFullName() + " " + messageInputContext.getPortName()
-                            + " has no data ");
+                } else {
+                    System.err.println(getFullName() + " " + messageInputContext.getPortName() + " has no data ");
                     // throw new ProcessingException("Input port " +
                     // messageInputContext.getPortName()
                     // + " has no data.", this, null);
@@ -475,20 +448,14 @@ public class Expression extends DynamicPortsActor {
             }
             ExecutionTracerService.trace(this, "calculating " + expression.getExpression() + log);
 
-        }
-        catch (final IllegalActionException ex) {
-            ex.printStackTrace();
+        } catch (final IllegalActionException ex) {
+            // ex.printStackTrace();
             // Chain exceptions to get the actor that threw the exception.
-            throw new ProcessingExceptionWithLog(this, "Expression invalid : " + ex.getMessage(),
-                    this, ex);
-            // throw new ProcessingException("Expression invalid." ,this, ex);
-
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Expression invalid : " + ex.getMessage(), this, ex);
         }
         if (result == null) {
-            // throw new ProcessingException("Expression yields a null result: "
-            // + expression.getExpression(), this, null);
-            throw new ProcessingExceptionWithLog(this, "Expression yields a null result: "
-                    + expression.getExpression(), this, null);
+            ExceptionUtil.throwProcessingExceptionWithLog(this,
+                    "Expression yields a null result: " + expression.getExpression(), this);
         }
         if (assignement) {
             ExecutionTracerService.trace(this, "result memorized in " + targetName);
@@ -498,18 +465,16 @@ public class Expression extends DynamicPortsActor {
         final String resultAsString;
         if (result instanceof StringToken) {
             resultAsString = ((StringToken) result).stringValue();
-            response.addOutputMessage(output,
-                    PasserelleUtil.createContentMessage(this, resultAsString));
-        }
-        else {// Token can be an instance of DoubleToken or what ever... (depends of input type)
-            resultAsString = result.toString();           
+            response.addOutputMessage(output, PasserelleUtil.createContentMessage(this, resultAsString));
+        } else {// Token can be an instance of DoubleToken or what ever... (depends of input type)
+            resultAsString = result.toString();
             response.addOutputMessage(output, PasserelleUtil.createContentMessage(this, result));
         }
-        
+
         ExecutionTracerService.trace(this, "result is " + resultAsString);
-        
+
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doFire() - exit");
+            logger.trace(getName() + " doFire() - exit");
         }
 
     }

@@ -18,7 +18,7 @@ import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.TangoApi.DeviceProxy;
-import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
@@ -113,7 +113,7 @@ public abstract class ATangoDeviceActorV5 extends ATangoActorV5 {
                 }
 
             } catch (final DevFailed e) {
-                throw new DevFailedValidationException(e, this);
+                ExceptionUtil.throwValidationException(this, e);
             } catch (IllegalActionException e) {
                 throw new ValidationException(ErrorCode.FLOW_VALIDATION_ERROR, e.getMessage(), this, e); // TODO
             }

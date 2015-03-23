@@ -56,7 +56,6 @@ import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.ScanTask;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.api.SalsaAPI;
 import fr.soleil.salsa.entity.IConfig;
 import fr.soleil.salsa.exception.SalsaDeviceException;

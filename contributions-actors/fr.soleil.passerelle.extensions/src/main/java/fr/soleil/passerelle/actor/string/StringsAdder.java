@@ -43,6 +43,7 @@ import ptolemy.kernel.util.Workspace;
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
@@ -53,6 +54,7 @@ import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.PortUtilities;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -160,7 +162,6 @@ public class StringsAdder extends Actor {
           inputsPorts.get(j).setMultiport(false);
         }
       } catch (final IllegalActionException e) {
-        e.printStackTrace();
         throw e;
       }
     }
@@ -170,7 +171,7 @@ public class StringsAdder extends Actor {
   protected void doFire() throws ProcessingException {
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - entry");
+      logger.trace(getName() + " doFire() - entry");
     }
     inputValues.clear();
     final List<Port> list = PortUtilities.getOrderedInputPorts(this, X, 1);
@@ -180,11 +181,11 @@ public class StringsAdder extends Actor {
       final PortHandler portHandler = inputsHandlers.get(i);
       if (port.getWidth() > 0) {
         final Token inputToken = portHandler.getToken();
-        ManagedMessage mes;
+        ManagedMessage mes = null;
         try {
           mes = MessageHelper.getMessageFromToken(inputToken);
         } catch (final PasserelleException e) {
-          throw new ProcessingException("", inputToken, e);
+            ExceptionUtil.throwProcessingException(e.getMessage(), inputToken, e);
         }
         if (mes != null) {
           String inputValue = "";
@@ -200,7 +201,7 @@ public class StringsAdder extends Actor {
               inputValues.add(inputValue);
             }
           } catch (final MessageException e) {
-            throw new ProcessingException("cannot get input value", mes, e);
+              ExceptionUtil.throwProcessingException("cannot get input value", mes, e);
           }
 
         } else {
@@ -208,7 +209,7 @@ public class StringsAdder extends Actor {
           requestFinish();
         }
       } else {// if (port.getWidth() > 0)
-        throw new ProcessingException(PasserelleException.Severity.FATAL, "Input port " + port.getName() + " has no data.", this, null);
+          ExceptionUtil.throwProcessingException(ErrorCode.FATAL,"Input port " + port.getName() + " has no data.", this);
       }
     }// For
     if (!finishRequested) {
@@ -231,7 +232,7 @@ public class StringsAdder extends Actor {
     }
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doFire() - exit");
+      logger.trace(getName() + " doFire() - exit");
     }
 
   }
@@ -240,7 +241,7 @@ public class StringsAdder extends Actor {
   public void doInitialize() throws InitializationException {
 
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - entry");
+      logger.trace(getName() + " doInitialize() - entry");
     }
     inputValues.clear();
     inputsHandlers.clear();
@@ -256,7 +257,7 @@ public class StringsAdder extends Actor {
 
     super.doInitialize();
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " doInitialize() - exit");
+      logger.trace(getName() + " doInitialize() - exit");
     }
 
   }

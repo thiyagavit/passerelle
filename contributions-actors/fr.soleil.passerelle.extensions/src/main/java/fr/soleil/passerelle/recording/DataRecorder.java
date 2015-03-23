@@ -137,7 +137,7 @@ public class DataRecorder {
                 ExecutionTracerService.trace(actor, "saving scan data on datarecorder " + dataRecorderName);
                 final TangoCommand command = new TangoCommand(dataRecorderName, "WriteScanData");
 
-                final String[] devicesNames = { scanDeviceName, scan1DDeviceName, scan2DDeviceName };
+                final Object[] devicesNames = { scanDeviceName, scan1DDeviceName, scan2DDeviceName };
                 command.execute(devicesNames);
                 if (DataRecorder.asyncMode) {
                     waitEndMoving(command.getDeviceProxy());
@@ -155,7 +155,7 @@ public class DataRecorder {
                 final String dataRecorderName = ((RecordingDirector) actor.getDirector()).getDataRecorderName();
                 logger.debug("Setting symbol " + symbolName + " on " + dataRecorderName);
                 final TangoCommand command = new TangoCommand(dataRecorderName, "SetSymbol");
-                final String[] argin = { symbolName, symbolValue };
+                final Object[] argin = { symbolName, symbolValue };
                 command.execute(argin);
             }
         }

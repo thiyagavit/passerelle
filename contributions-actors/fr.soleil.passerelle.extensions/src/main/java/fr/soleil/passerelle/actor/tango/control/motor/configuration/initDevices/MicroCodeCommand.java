@@ -1,11 +1,12 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -23,7 +24,7 @@ public class MicroCodeCommand extends Command {
     }
 
     @Override
-    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingException {
         ExecutionTracerService.trace(actor, "StartMicrocode command executed on" + deviceName);
         command.execute();
 
@@ -37,7 +38,7 @@ public class MicroCodeCommand extends Command {
         DevState deviceState = stateCommand.execute(DevState.class);
         for (DevState state : states) {
             if (state == deviceState) {
-                throw new ProcessingExceptionWithLog(actor, MICRO_CODE_ERROR_MSG, null, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(actor, MICRO_CODE_ERROR_MSG, this);
             }
         }
     }

@@ -36,8 +36,6 @@ import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigu
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices.OffCommand;
 import fr.soleil.passerelle.tango.util.TangoAccess;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.DevFailedValidationException;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
@@ -74,7 +72,6 @@ public class DefinePosition extends ATangoDeviceActorV5 {
     @ParameterName(name = MotorManager.INIT_DEVICES)
     public Parameter shouldInitDevicesParam;
     private boolean shouldInitDevice = false;
-   
 
     public DefinePosition(CompositeEntity container, String name) throws IllegalActionException,
             NameDuplicationException {
@@ -121,7 +118,7 @@ public class DefinePosition extends ATangoDeviceActorV5 {
             conf.retrieveFullConfig();
             conf.assertDefinePositionCanBeApplyOnMotor();
         } catch (DevFailed devFailed) {
-            throw new DevFailedValidationException(devFailed, this);
+            ExceptionUtil.throwValidationException(this, devFailed);
         } catch (PasserelleException e) {
             throw new ValidationException(e.getErrorCode(), e.getMessage(), this, e);
         } catch (MotorConfigurationException e) {
@@ -185,11 +182,12 @@ public class DefinePosition extends ATangoDeviceActorV5 {
                 }
 
             } catch (NumberFormatException e) {
-                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,  "position or offset value is not a number",context);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                        "position or offset value is not a number", context);
             } catch (DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             } catch (PasserelleException e) {
-                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,   e.getMessage(),context);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, e.getMessage(), context);
             }
         }
     }

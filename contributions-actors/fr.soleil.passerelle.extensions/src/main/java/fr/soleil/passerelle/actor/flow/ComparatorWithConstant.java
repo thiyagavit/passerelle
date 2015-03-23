@@ -8,6 +8,7 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
 import com.isencia.passerelle.core.Port;
@@ -16,8 +17,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonNature;
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonType;
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 @SuppressWarnings("serial")
 public class ComparatorWithConstant extends Transformer {
@@ -108,7 +111,7 @@ public class ComparatorWithConstant extends Transformer {
 		try {
 			leftValue = (String) message.getBodyContent();
 		} catch (final MessageException e) {
-			throw new ProcessingException("get input data failed", null, e);
+		    ExceptionUtil.throwProcessingException("get input data failed", this,e);
 		}
 		final ComparisonType compType = ComparatorHelper.getComparisonType(
 				leftValue, rightValue);
@@ -142,17 +145,9 @@ public class ComparatorWithConstant extends Transformer {
 			// } catch (TerminateProcessException e) {
 			// requestFinish();
 		} catch (final NoRoomException e) {
-			e.printStackTrace();
-			throw new ProcessingException("send output message failed ", this,
-					e);
+		        ExceptionUtil.throwProcessingException("send output message failed", this,e);
 		}
 
-	}
-
-	@Override
-	protected String getExtendedInfo() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

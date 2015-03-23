@@ -1,7 +1,6 @@
 package fr.soleil.passerelle.actor.tango;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import ptolemy.data.BooleanToken;

@@ -1,12 +1,13 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -23,13 +24,13 @@ public class OffCommand extends Command {
     }
 
     @Override
-    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingException {
         ExecutionTracerService.trace(actor, "Motor is On, try to execute Off command" + deviceName);
         command.execute();
         DevState deviceState = stateCommand.execute(DevState.class);
         for (DevState state : states) {
             if (state == deviceState) {
-                throw new ProcessingExceptionWithLog(actor, OFF_ERROR_MSG, null, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(actor, OFF_ERROR_MSG, this);
             }
         }
     }

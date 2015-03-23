@@ -54,6 +54,7 @@ import fr.soleil.passerelle.actor.IActorFinalizer;
 import fr.soleil.passerelle.actor.TransformerV3;
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanApi;
 import fr.soleil.passerelle.domain.BasicDirector;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -124,7 +125,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
     @Override
     public void doInitialize() throws InitializationException {
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - entry");
+	    logger.trace(getName() + " doInitialize() - entry");
 	}
 
 	if (!isMockMode()) {
@@ -133,7 +134,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 		((BasicDirector) dir).registerFinalizer(this);
 	    }
 	    if (logger.isTraceEnabled()) {
-		logger.trace(getInfo() + "load salsa config");
+		logger.trace(getName() + "load salsa config");
 	    }
 	    File file = null;
 	    boolean isURL = false;
@@ -146,7 +147,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 	    } catch (final MalformedURLException e) {
 		// ignore
 	    } catch (final URISyntaxException e) {
-		throw new InitializationException("salsa file not loaded", fileName, e);
+	        ExceptionUtil.throwInitializationException("salsa file not loaded", fileName, e);
 	    }
 	    // 2. The string fileName is not an URL (/usr/..)
 	    if (!isURL) {
@@ -162,7 +163,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 			    file = new File(fileName);
 			}
 		    } catch (final IOException e1) {
-			throw new InitializationException("salsa file not loaded", fileName, e1);
+		        ExceptionUtil.throwInitializationException("salsa file not loaded", fileName, e1);
 		    }
 
 		    // allow to not specify file extention
@@ -175,8 +176,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 	    }
 
 	    if (!file.exists() || !file.isFile()) {
-		throw new InitializationException("file not loaded (does not exist)", fileName,
-			null);
+	        ExceptionUtil.throwInitializationException("file not loaded (does not exist)", fileName);
 	    }
 
 	    logger.debug("Loading " + file.getAbsolutePath());
@@ -190,7 +190,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 	    final ProcessResponse response) throws ProcessingException {
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - entry");
+	    logger.trace(getName() + " doFire() - entry");
 	}
 	if (isMockMode()) {
 	    ExecutionTracerService.trace(this, "MOCK - Scan started with config: " + fileName);
@@ -204,7 +204,7 @@ public class ScanOLD extends TransformerV3 implements IActorFinalizer {
 	response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - exit");
+	    logger.trace(getName() + " doFire() - exit");
 	}
     }
 

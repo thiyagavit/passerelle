@@ -1,10 +1,11 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -18,9 +19,9 @@ public class ErrorCommand extends Command {
     }
 
     @Override
-    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingException {
         DevState deviceState = stateCommand.execute(DevState.class);
-        throw new ProcessingExceptionWithLog(actor, "Error device " + deviceName + " is in  "
-                + deviceState + " state", null, null);
+        ExceptionUtil.throwProcessingExceptionWithLog(actor, "Error device " + deviceName + " is in  "
+                + deviceState + " state", this);
     }
 }

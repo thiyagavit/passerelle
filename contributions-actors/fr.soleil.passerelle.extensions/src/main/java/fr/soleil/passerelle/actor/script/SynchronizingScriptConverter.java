@@ -19,6 +19,8 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageInputContext;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 /**
  * An actor that synchronizes the messages on all input ports, and then offers them to a script. It can have a configurable nr of input and output ports. The
  * input ports are all single-channel.
@@ -26,7 +28,9 @@ import com.isencia.passerelle.message.MessageInputContext;
  * @author erwin.de.ley@isencia.be
  */
 public class SynchronizingScriptConverter extends DynamicPortScriptConverter {
-  private static Logger logger = LoggerFactory.getLogger(SynchronizingScriptConverter.class);
+    private static final long serialVersionUID = 2264919642605026024L;
+
+private static Logger logger = LoggerFactory.getLogger(SynchronizingScriptConverter.class);
 
   private BSFManager scriptManager = new BSFManager();
 
@@ -84,7 +88,7 @@ public class SynchronizingScriptConverter extends DynamicPortScriptConverter {
       }
       // small soleil code to limit usage of scripts
       if (script.contains("import fr.esrf.Tango") || script.contains("PyTango")) {
-        throw new InitializationException("Tango is not allowed", this, null);
+          ExceptionUtil.throwInitializationException("Tango is not allowed", this);
       }
     }
   }
@@ -139,7 +143,7 @@ public class SynchronizingScriptConverter extends DynamicPortScriptConverter {
 
   protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response) throws ProcessingException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " process() - entry - request : " + request);
+      logger.trace(getName() + " process() - entry - request : " + request);
     }
 
     // build composite container to transport all input messages into the script
@@ -159,7 +163,7 @@ public class SynchronizingScriptConverter extends DynamicPortScriptConverter {
           i++;
         }
       } catch (MessageException e) {
-        throw new ProcessingException(getInfo() + " - OUTPUT PORT ERROR - Error creating output message", null, e);
+          ExceptionUtil.throwProcessingException(getName() + " - OUTPUT PORT ERROR - Error creating output message",this,e);
       }
     } else {
       processMessages(messages);
@@ -172,29 +176,29 @@ public class SynchronizingScriptConverter extends DynamicPortScriptConverter {
         try {
           sendOutputMsg(outputPort, msgAndPort.message);
         } catch (IllegalArgumentException e) {
-          throw new ProcessingException(getInfo() + " - process() generated exception " + e, msgAndPort.message, e);
+            ExceptionUtil.throwProcessingException(getName() + " - process() generated exception " + e,msgAndPort.message,e);
         }
       }
     }
 
     if (logger.isTraceEnabled())
-      logger.trace(getInfo() + " doFire() - exit");
+      logger.trace(getName() + " doFire() - exit");
   }
 
   private void processMessages(MultiMessageFlowElement messages) throws ProcessingException {
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " processMessage() - entry - input : " + messages);
+      logger.trace(getName() + " processMessage() - entry - input : " + messages);
     }
     if (messages != null) {
       try {
         scriptManager.declareBean(containerName, messages, messages.getClass());
         scriptManager.exec(language, scriptPath, -1, -1, script);
       } catch (BSFException e) {
-        throw new ProcessingException("", scriptPath, e);
+          ExceptionUtil.throwProcessingException(e.getMessage(),scriptPath,e);
       }
     }
     if (logger.isTraceEnabled()) {
-      logger.trace(getInfo() + " processMessage() - exit");
+      logger.trace(getName() + " processMessage() - exit");
     }
   }
 }
