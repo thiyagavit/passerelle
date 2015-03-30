@@ -58,8 +58,8 @@ public class ErrorGeneratorV3 extends ActorV3 {
         ErrorCode error = ErrorCode.INFO;
         if (ExceptionUtil.FATAL_ERROR.equals(severity)) {
             error = ErrorCode.FATAL;
+            ExceptionUtil.throwProcessingException(error, this.message,this);
         }
-        ExceptionUtil.throwProcessingException(error, this.message,this);
     }
 
     @Override

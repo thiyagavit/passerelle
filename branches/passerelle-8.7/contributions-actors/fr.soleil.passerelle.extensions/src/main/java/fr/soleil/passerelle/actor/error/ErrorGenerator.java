@@ -49,8 +49,8 @@ public class ErrorGenerator extends Transformer {
         ErrorCode error = ErrorCode.INFO;
         if (ExceptionUtil.FATAL_ERROR.equals(severity)) {
             error = ErrorCode.FATAL;
+            ExceptionUtil.throwProcessingException(error, this.message,this);
         }
-        ExceptionUtil.throwProcessingException(error, this.message,this);
     }
 
     @Override
