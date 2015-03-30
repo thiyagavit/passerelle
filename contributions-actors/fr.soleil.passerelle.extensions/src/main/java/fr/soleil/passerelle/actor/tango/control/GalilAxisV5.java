@@ -202,8 +202,7 @@ public class GalilAxisV5 extends MotorMoverV5 implements IActorFinalizer {
             } catch (final DevFailed e) {
                 TangoToPasserelleUtil.getDevFailedString(e, this);
             } catch (final Exception e) {
-                // TODO change to log
-                e.printStackTrace();
+                ExecutionTracerService.trace(this, e.getMessage());
             }
         }
     }
