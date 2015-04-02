@@ -16,11 +16,17 @@ package com.isencia.passerelle.testsupport;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 import ptolemy.actor.Actor;
 import ptolemy.actor.Receiver;
 import ptolemy.actor.TypedIOPort;
+import ptolemy.data.expr.Parameter;
 import ptolemy.kernel.util.Attribute;
+import ptolemy.kernel.util.IllegalActionException;
+
 import com.isencia.passerelle.model.Flow;
 import com.isencia.passerelle.model.util.ModelUtils;
 
@@ -48,6 +54,7 @@ public class FlowDefinitionAssertion {
   
   private Collection<String> expectedActorNames = new ArrayList<String>();
   private Collection<String> expectedParameterNames = new ArrayList<String>();
+  private Map<String, String> expectedParameterValues = new HashMap<String,String>();
   private Collection<Relation> expectedRelations = new ArrayList<Relation>();
   
   public FlowDefinitionAssertion clear() {
@@ -68,13 +75,19 @@ public class FlowDefinitionAssertion {
    * @return this FlowDefinitionAssertion instance to allow fluent method chaining
    */
   public FlowDefinitionAssertion assertFlow(Flow flow) {
+    try {
     assertActorNames(flow, expectedActorNames);
     assertParameterNames(flow, expectedParameterNames);
+    assertParameterValues(flow, expectedParameterValues);
     assertRelations(flow, expectedRelations);
+    } catch (Exception e) {
+      Assert.fail("Exception "+e);
+      e.printStackTrace();
+    }
     return this;
   }
   
-  protected void assertActorNames(Flow flow, Collection<String> expectedActorNames) {
+  protected static void assertActorNames(Flow flow, Collection<String> expectedActorNames) {
     for (String name : expectedActorNames) {
       Object actor = flow.getEntity(ModelUtils.getFullNameButWithoutModelName(flow, name));
       Assert.assertNotNull("No actor "+name+" found in flow "+flow.getFullName(), actor);
@@ -87,6 +100,16 @@ public class FlowDefinitionAssertion {
       Object parameter = flow.getAttribute(ModelUtils.getFullNameButWithoutModelName(flow, name));
       Assert.assertNotNull("No parameter "+name+" found in flow "+flow.getFullName(), parameter);
       Assert.assertTrue(name + " is not an Attribute in flow "+flow.getFullName(), (parameter instanceof Attribute));
+    }
+  }
+
+  protected void assertParameterValues(Flow flow, Map<String, String> expectedParameterValues) throws IllegalActionException {
+    for (Map.Entry<String, String> expectedParam : expectedParameterValues.entrySet()) {
+      String name = expectedParam.getKey();
+      Object parameter = flow.getAttribute(ModelUtils.getFullNameButWithoutModelName(flow, name));
+      Assert.assertNotNull("No parameter "+name+" found in flow "+flow.getFullName(), parameter);
+      Assert.assertTrue(name + " is not an Parameter in flow "+flow.getFullName(), (parameter instanceof Parameter));
+      Assert.assertEquals(name + " has wrong value", expectedParam.getValue(), ((Parameter) parameter).getToken().toString());
     }
   }
 
@@ -116,7 +139,7 @@ public class FlowDefinitionAssertion {
 
   /**
    * 
-   * @param actorName the NamedObj.getFullName() of the actor
+   * @param actorName the NamedObj.getFullName() (but without the toplevel flow name) of the actor
    * @return
    */
   public FlowDefinitionAssertion expectActor(String actorName) {
@@ -126,7 +149,7 @@ public class FlowDefinitionAssertion {
   
   /**
    * 
-   * @param parameterName the NamedObj.getFullName() of the parameter
+   * @param parameterName the NamedObj.getFullName() (but without the toplevel flow name) of the parameter
    * @return
    */
   public FlowDefinitionAssertion expectParameter(String parameterName) {
@@ -136,8 +159,20 @@ public class FlowDefinitionAssertion {
   
   /**
    * 
-   * @param from the NamedObj.getFullName() of the output port that must be connected to the <b>to</b> port
-   * @param to the NamedObj.getFullName() of the input port that must be connected to the <b>from</b> port
+   * @param parameterName the NamedObj.getFullName() (but without the toplevel flow name) of the parameter; must not be null
+   * @param value the expected value of the parameter; must not be null
+   * @return
+   */
+  public FlowDefinitionAssertion expectParameterValue(String parameterName, String value) {
+    // add the extra quotes to take care of Ptolemy's internal default approach to store string values
+    expectedParameterValues.put(parameterName, '"'+value+'"');
+    return this;
+  }
+  
+  /**
+   * 
+   * @param from the NamedObj.getFullName() (but without the toplevel flow name) of the output port that must be connected to the <b>to</b> port
+   * @param to the NamedObj.getFullName() (but without the toplevel flow name) of the input port that must be connected to the <b>from</b> port
    * @return
    */
   public FlowDefinitionAssertion expectRelation(String from, String to) {

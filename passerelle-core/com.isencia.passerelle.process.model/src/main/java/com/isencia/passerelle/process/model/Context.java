@@ -101,6 +101,12 @@ public interface Context extends Identifiable, Serializable {
   List<ContextEvent> getEvents();
 
   /**
+   * @return the list of all events that have happened in this context's lifecycle up-to "now",
+   * and matching the criteria of the given Matcher.
+   */
+  List<ContextEvent> getMatchingEvents(Matcher<ContextEvent> matcher);
+
+  /**
    * 
    * @return the list of errors that happened during the processing of the associated request. This also includes the
    *         errors for any subtask executed in the this context.

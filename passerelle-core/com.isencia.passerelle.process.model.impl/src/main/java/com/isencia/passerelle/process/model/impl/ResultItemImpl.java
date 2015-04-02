@@ -136,22 +136,19 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     if (this.resultBlock != null)
       this.resultBlock.putItem(this);
   }
-  
+
   @Override
   public ResultItemImpl<V> clone() throws CloneNotSupportedException {
-	ResultItemImpl<V> clone = (ResultItemImpl<V>)super.clone();
-	
-	// clone attributes
-	if (ProcessUtils.isInitialized(attributes)) {
-		clone.attributes = new HashMap<String,AttributeImpl>(attributes.size());
-		for (Entry<String,AttributeImpl> entry : attributes.entrySet())
-			clone.attributes.put(entry.getKey(),entry.getValue().clone());
-	}
-	
-	if (clobItem != null)
-		clone.clobItem = clobItem.clone();
-	
-	return(clone);
+    ResultItemImpl<V> clone = (ResultItemImpl<V>) super.clone();
+    // clone attributes
+    if (ProcessUtils.isInitialized(attributes)) {
+      clone.attributes = new HashMap<String, AttributeImpl>(attributes.size());
+      for (Entry<String, AttributeImpl> entry : attributes.entrySet())
+        clone.attributes.put(entry.getKey(), entry.getValue().clone());
+    }
+    if (clobItem != null)
+      clone.clobItem = clobItem.clone();
+    return (clone);
   }
 
   public Long getId() {
@@ -183,8 +180,8 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   }
 
   public Attribute putAttribute(Attribute attribute) {
-	  if (!ProcessUtils.isInitialized(attributes))
-		  attributes = new HashMap<String,AttributeImpl>();
+    if (!ProcessUtils.isInitialized(attributes))
+      attributes = new HashMap<String, AttributeImpl>();
     return attributes.put(attribute.getName(), (AttributeImpl) attribute);
   }
 
@@ -193,10 +190,10 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   }
 
   public Set<Attribute> getAttributes() {
-	if (!ProcessUtils.isInitialized(attributes)) {
-		return ProcessUtils.emptySet();
-	}
-	  
+    if (!ProcessUtils.isInitialized(attributes)) {
+      return ProcessUtils.emptySet();
+    }
+
     return new HashSet<Attribute>(attributes.values());
   }
 

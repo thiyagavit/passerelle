@@ -215,6 +215,7 @@ public class ResultBlockImpl implements ResultBlock {
     return Collections.unmodifiableCollection(map.values());
   }
 
+  @Override
   public Collection<ResultItem<?>> getMatchingItems(Matcher<ResultItem<?>> matcher) {
     Collection<ResultItem<?>> results = new HashSet<ResultItem<?>>();
     for (ResultItem<?> item : getResultItemMap().values()) {
