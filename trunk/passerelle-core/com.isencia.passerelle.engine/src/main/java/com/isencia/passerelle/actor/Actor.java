@@ -34,6 +34,7 @@ import ptolemy.actor.process.TerminateProcessException;
 import ptolemy.data.IntToken;
 import ptolemy.data.Token;
 import ptolemy.data.expr.Parameter;
+import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
@@ -1066,6 +1067,25 @@ public abstract class Actor extends TypedAtomicActor implements IMessageCreator 
 
   protected Logger getLogger() {
     return LOGGER;
+  }
+
+  /**
+   * Utility method to read the current value from a parameter if it is present and can be read.
+   * 
+   * @param parameter
+   * @return the evaluated string value of the parameter, or null if parameter is null
+   * @throws InitializationException if the parameter is not-null but its value can not be evaluated or read.
+   */
+  protected String readParameter(StringParameter parameter) throws InitializationException {
+    String result = null;
+    if (parameter != null) {
+      try {
+        result = parameter.stringValue();
+      } catch (IllegalActionException e) {
+        throw new InitializationException(ErrorCode.ACTOR_INITIALISATION_ERROR, "Error reading "+parameter.getName(), this, e);
+      }
+    }
+    return result;
   }
 
   final protected ErrorControlStrategy getErrorControlStrategy() throws IllegalActionException {

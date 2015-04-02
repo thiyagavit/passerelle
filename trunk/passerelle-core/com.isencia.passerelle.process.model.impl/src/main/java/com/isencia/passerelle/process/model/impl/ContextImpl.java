@@ -35,6 +35,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 import com.isencia.passerelle.process.model.Attribute;
@@ -42,6 +44,7 @@ import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextErrorEvent;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
+import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.NamedValue;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
@@ -220,6 +223,20 @@ public class ContextImpl implements Context {
       return events;
     }
     return Collections.unmodifiableList(events);
+  }
+
+  @Override
+  public List<ContextEvent> getMatchingEvents(Matcher<ContextEvent> matcher) {
+    if (matcher == null || !ProcessUtils.isInitialized(events)) {
+      return events;
+    }
+    List<ContextEvent> results = new ArrayList<>();
+    for (ContextEvent contextEvent : events) {
+      if(matcher.matches(contextEvent)) {
+        results.add(contextEvent);
+      }
+    }
+    return results;
   }
 
   public void putEntry(String name, Serializable value) {
@@ -564,5 +581,4 @@ public class ContextImpl implements Context {
   public synchronized boolean isMinimized() {
     return minimized;
   }
-
 }

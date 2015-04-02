@@ -36,15 +36,16 @@ import com.isencia.util.FutureValue;
 public class FlowExecutionTester {
   
   /**
-   * Execute a flow a number of times, and assert the results each time using the given assertion.
+   * Execute a flow a number of times, one-after-the-other, and assert the results each time using the given assertion.
    * <p>
    * For each execution, a new instance of the Flow is constructed, using the given builder.
-   * The flowName 
+   * The flow gets as name the given flowName + the run's index as postfix.
+   * The actors in the flow will be configured using the given paramOverrides map.
    * </p>
    * @param count
    * @param flowName
    * @param builder
-   * @param paramOverrides
+   * @param paramOverrides a map between full names of selected model parameters, and their desired values 
    * @param assertion
    * @throws Exception
    */
@@ -67,9 +68,9 @@ public class FlowExecutionTester {
         modelFinished.get(5, TimeUnit.SECONDS);
 //        System.out.println("run [" + i + "] finished");
         // now check if all went as expected
-        // remark that in case of a deaddlock in the ptolemy Manager error reporting
+        // remark that in case of a deadlock in the ptolemy Manager error reporting
         // (combined with flow component changes inside our listener, e.g. flow.setManager(null))
-        // the future above may return, but the assertions below may be blocked in the deaddlock as well!
+        // the future above may return, but the assertions below may be blocked in the deadlock as well!
         assertion.assertFlow(flow);
       } catch (TimeoutException e) {
         Assert.fail("Flow execution timed out, probable deadlock in "+flow.getName());
@@ -77,6 +78,20 @@ public class FlowExecutionTester {
     }
   }
 
+  /**
+   * Execute a flow a number of times, concurrently, and assert the results each time using the given assertion.
+   * <p>
+   * For each execution, a new instance of the Flow is constructed, using the given builder.
+   * The flow gets as name the given flowName + the run's index as postfix.
+   * The actors in the flow will be configured using the given paramOverrides map.
+   * </p>
+   * @param count
+   * @param flowName
+   * @param builder
+   * @param paramOverrides a map between full names of selected model parameters, and their desired values 
+   * @param assertion
+   * @throws Exception
+   */
   public static void runFlowConcurrently(int count, String flowName, FlowBuilder builder, Map<String, String> paramOverrides, FlowStatisticsAssertion assertion) throws Exception {
     FlowManager flowManager = new FlowManager();
     Set<FutureValue<Flow>> modelFinishedFutures = new HashSet<FutureValue<Flow>>();
@@ -100,9 +115,9 @@ public class FlowExecutionTester {
         Flow flow = modelFinished.get(5, TimeUnit.SECONDS);
 //        System.out.println("run [" + flow.getName() + "] finished");
         // now check if all went as expected
-        // remark that in case of a deaddlock in the ptolemy Manager error reporting
+        // remark that in case of a deadlock in the ptolemy Manager error reporting
         // (combined with flow component changes inside our listener, e.g. flow.setManager(null))
-        // the future above may return, but the assertions below may be blocked in the deaddlock as well!
+        // the future above may return, but the assertions below may be blocked in the deadlock as well!
         assertion.assertFlow(flow);
       } catch (TimeoutException e) {
         Assert.fail("Flow execution timed out, probable deadlock");

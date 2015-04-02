@@ -138,11 +138,9 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
   // must be sent out etc.
   private Queue<ProcessResponse> finishedProcessResponses = new LinkedBlockingQueue<ProcessResponse>();
 
-  // Parameter to specify an optional buffer time between actor processing
-  // iterations.
+  // Parameter to specify an optional buffer time between actor processing iterations.
   // This can be useful for streaming-mode executions, where actors may be able
-  // to optimize their work
-  // when they can process many msgs/events in one shot, i.o. one-by-one.
+  // to optimize their work when they can process many msgs/events in one shot, i.o. one-by-one.
   public Parameter bufferTimeParameter;
 
   /**
@@ -156,6 +154,12 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
 
     bufferTimeParameter = new Parameter(this, "Buffer time (ms)", new IntToken(0));
     registerExpertParameter(bufferTimeParameter);
+
+    // At this level we don't use such queue capacity settings anymore.
+    // If queues with limited capacity are needed, our CAP domain Director must be used.
+    // So we drop these parameters here.
+    receiverQueueCapacityParam.setContainer(null);
+    receiverQueueWarningSizeParam.setContainer(null);
   }
 
   @Override
