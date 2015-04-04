@@ -14,6 +14,8 @@
   <name>Passerelle :: Parent</name>
   <properties>
     <nexus.base.url>https://ci-nexus.isencia.be</nexus.base.url>
+    <target.execution.env>JavaSE-1.7</target.execution.env>
+    <target.compiler.compliance>1.7</target.compiler.compliance>
     <sonar.skippedModules> com.isencia.passerelle.actor.test, com.isencia.passerelle.commons.test, com.isencia.passerelle.commons.ume.test,
       com.isencia.passerelle.domain.et.test, com.isencia.passerelle.engine.test, com.isencia.passerelle.testsupport 
     </sonar.skippedModules>
