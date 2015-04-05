@@ -15,19 +15,16 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.imageio.spi.ServiceRegistry;
-
 import com.isencia.passerelle.process.model.Context;
 import com.isencia.passerelle.process.model.ContextEvent;
 import com.isencia.passerelle.process.model.ErrorItem;
+import com.isencia.passerelle.process.model.Matcher;
 import com.isencia.passerelle.process.model.NamedValue;
 import com.isencia.passerelle.process.model.Request;
 import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Status;
 import com.isencia.passerelle.process.model.Task;
-import com.isencia.passerelle.process.model.factory.HistoricalDataProvider;
 
 /**
  * @author "puidir"
@@ -151,6 +148,21 @@ public class ContextImpl implements Context {
   public List<ContextEvent> getEvents() {
     return Collections.unmodifiableList(events);
   }
+  
+  @Override
+  public List<ContextEvent> getMatchingEvents(Matcher<ContextEvent> matcher) {
+    if (matcher == null) {
+      return events;
+    }
+    List<ContextEvent> results = new ArrayList<>();
+    for (ContextEvent contextEvent : events) {
+      if(matcher.matches(contextEvent)) {
+        results.add(contextEvent);
+      }
+    }
+    return results;
+  }
+
 
   public void putEntry(String name, Serializable value) {
     entries.put(name, value);
