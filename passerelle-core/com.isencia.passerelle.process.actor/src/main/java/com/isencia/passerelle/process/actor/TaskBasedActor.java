@@ -129,12 +129,12 @@ public abstract class TaskBasedActor extends Actor {
       setErrorControlStrategy(new DefaultActorErrorControlStrategy());
     }
     String taskType = readParameter(taskTypeParam);
-    if (StringUtils.isBlank(taskType)) {
+    if (taskTypeParam != null && taskTypeParam.getContainer() != null && StringUtils.isBlank(taskType)) {
       taskType = getName();
       taskTypeParam.setExpression(taskType);
     }
     String resultType = readParameter(resultTypeParam);
-    if (StringUtils.isBlank(resultType)) {
+    if (resultTypeParam != null && resultTypeParam.getContainer() != null && StringUtils.isBlank(resultType)) {
       resultTypeParam.setExpression(resultType);
     }
   }
