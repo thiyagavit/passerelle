@@ -322,6 +322,10 @@ public abstract class TaskBasedActor extends Actor {
 
   /**
    * This method creates a Task instance of the right implementation class, with the given attributes etc, and persists the new task.
+   * <p>
+   * Remark that it is not the intention to override this method in concrete actor implementations!
+   * Only fwk-actor-baseclasses may play around a bit with this method...
+   * </p>
    * 
    * @param processManager
    * @param parentRequest
@@ -331,7 +335,7 @@ public abstract class TaskBasedActor extends Actor {
    * @throws Exception
    *           TODO ensure task is on the right scoped context if any, and then not yet on the "real" processcontext until the Join
    */
-  private Task createTask(ProcessManager processManager, Context processContext, Map<String, String> taskAttributes,
+  protected Task createTask(ProcessManager processManager, Context processContext, Map<String, String> taskAttributes,
       Map<String, Serializable> taskContextEntries) throws Exception {
     String initiator = getTaskInitiator();
     Request request = processManager.getRequest();
