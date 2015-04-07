@@ -135,7 +135,7 @@ public abstract class TaskBasedActor extends Actor {
     }
     String resultType = readParameter(resultTypeParam);
     if (StringUtils.isBlank(resultType)) {
-      taskTypeParam.setExpression(taskType);
+      resultTypeParam.setExpression(resultType);
     }
   }
 
