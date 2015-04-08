@@ -83,7 +83,7 @@ public class TaskImpl extends RequestImpl implements Task {
 	}
 
 	public ResultBlock getResultBlock(String type) {
-		for (ResultBlock block : resultBlocks) {
+		for (ResultBlock block : getResultBlocks()) {
 			if (type.equals(block.getType())) {
 				return block;
 			}
