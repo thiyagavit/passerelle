@@ -100,6 +100,7 @@ public class ResultBlockImpl implements ResultBlock {
   public static final String _COLOUR = "colour";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _DISCRIMINATOR = "discriminator";
+  public static final String _VERSION = "version";
 
   public ResultBlockImpl() {
   }
@@ -240,6 +241,10 @@ public class ResultBlockImpl implements ResultBlock {
 
   public TaskImpl getTask() {
     return task;
+  }
+  
+  public void setTask(TaskImpl task) {
+	this.task = task;
   }
 
   public String toString() {

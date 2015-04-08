@@ -67,6 +67,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   public static final String _DISCRIMINATOR = "discriminator";
   public static final String _ATTRIBUTES = "attributes";
   public static final String _CLOB_ITEM = "clobItem";
+  public static final String _LEVEL = "level";
 
   protected static final int MAX_CHAR_SIZE = 500;
 
@@ -159,6 +160,14 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
     return creationTS != null ? creationTS : (resultBlock != null ? resultBlock.getCreationTS() : null);
   }
 
+  public Date getCreationTSAsIs() {
+	  return(creationTS);
+  }
+  
+  public void setCreationTS(Date creationTS) {
+	this.creationTS = creationTS;
+  }
+  
   public String getName() {
     return name;
   }
@@ -208,6 +217,10 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   public String getUnit() {
     return unit;
   }
+  
+  public void setUnit(String unit) {
+	this.unit = unit;
+  }
 
   public ResultBlockImpl getResultBlock() {
     return resultBlock;
@@ -215,6 +228,10 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 
   public Integer getLevel() {
     return level;
+  }
+  
+  public void setLevel(Integer level) {
+	this.level = level;
   }
 
   public String getScope() {
