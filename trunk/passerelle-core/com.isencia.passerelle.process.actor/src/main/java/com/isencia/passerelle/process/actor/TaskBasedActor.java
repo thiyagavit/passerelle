@@ -77,7 +77,6 @@ public abstract class TaskBasedActor extends Actor {
 
     taskTypeParam = new StringParameter(this, AttributeNames.TASK_TYPE);
     resultTypeParam = new StringParameter(this, AttributeNames.RESULT_TYPE);
-    resultTypeParam.setExpression(name);
     // TODO: the default should come from the DirectorAdapter
     errorStrategyParameter = new StringParameter(this, ERROR_STRATEGY);
     errorStrategyParameter.addChoice(CONTINUE_VIA_OUTPUT_PORT);
@@ -135,7 +134,7 @@ public abstract class TaskBasedActor extends Actor {
     }
     String resultType = readParameter(resultTypeParam);
     if (resultTypeParam != null && resultTypeParam.getContainer() != null && StringUtils.isBlank(resultType)) {
-      resultTypeParam.setExpression(resultType);
+      resultTypeParam.setExpression(taskType);
     }
   }
 
