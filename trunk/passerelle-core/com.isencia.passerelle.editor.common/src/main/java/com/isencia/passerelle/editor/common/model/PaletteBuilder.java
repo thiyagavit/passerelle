@@ -35,8 +35,7 @@ public class PaletteBuilder implements Serializable {
   private static Logger logger = LoggerFactory.getLogger(PaletteBuilder.class);
 
   public static final String SUBMODELS = "com.isencia.passerelle.actor.actorgroup.submodels";
-  List<PaletteGroup> paletteGroups;
-  List<PaletteGroup> editablePaletteGroups;
+  private List<PaletteGroup> paletteGroups;
 
   private Map<String, String> actorBundleMap = new HashMap<String, String>();
 
@@ -70,14 +69,10 @@ public class PaletteBuilder implements Serializable {
   }
 
   public List<PaletteGroup> getEditablePaletteGroups() {
-    if (editablePaletteGroups == null) {
-      editablePaletteGroups = new ArrayList<PaletteGroup>();
-      for (PaletteGroup group : paletteGroups) {
-        if (
-        // !UTILITIES.equals(group.getId()) &&
-        !SUBMODELS.equals(group.getId()) && group.getParent() == null && group.isAuthorized()) {
-          editablePaletteGroups.add(group);
-        }
+    List<PaletteGroup> editablePaletteGroups = new ArrayList<PaletteGroup>();
+    for (PaletteGroup group : paletteGroups) {
+      if (!SUBMODELS.equals(group.getId()) && group.getParent() == null) {
+        editablePaletteGroups.add(group);
       }
     }
     return editablePaletteGroups;
@@ -90,6 +85,10 @@ public class PaletteBuilder implements Serializable {
 
   protected Map<String, PaletteGroup> groups;
   protected Map<String, PaletteItemDefinition> paletteItemMap;
+
+  public PaletteItemDefinition getPaletteItem(Class clazz) {
+    return getPaletteItem(clazz.getName());
+  }
 
   public PaletteItemDefinition getPaletteItem(String clazz) {
 
@@ -176,9 +175,9 @@ public class PaletteBuilder implements Serializable {
           String parentAttribute = configurationElement.getAttribute("parent");
           String priorityAttribute = configurationElement.getAttribute("priority");
           String expandedAttribute = configurationElement.getAttribute("open");
+          String secureAttribute = configurationElement.getAttribute("secure");
           String iconAttribute = configurationElement.getAttribute("icon");
           String iconLocationAttribute = configurationElement.getAttribute("iconClass");
-          String featureAttribute = configurationElement.getAttribute("features");
           final String bundleId = configurationElement.getDeclaringExtension().getContributor().getName();
           Object icon = null;
           try {
@@ -196,19 +195,8 @@ public class PaletteBuilder implements Serializable {
 
             }
           }
-          if (e.getParent() == null && !StringUtils.isEmpty(featureAttribute)) {
-            e.setAuthorized(false);
-            try {
-              String[] features = featureAttribute.split(",");
-              for (String feature : features) {
-                if (checkPermission(feature)) {
-                  e.setAuthorized(true);
-                  break;
-                }
-              }
-            } catch (Exception exp) {
-              e.setAuthorized(true);
-            }
+          if (secureAttribute != null) {
+            e.setSecure(Boolean.parseBoolean(secureAttribute));
           }
           if (expandedAttribute != null) {
             try {
@@ -250,6 +238,7 @@ public class PaletteBuilder implements Serializable {
             String priorityAttribute = configurationElement.getAttribute("priority");
             String iconLocationAttribute = configurationElement.getAttribute("iconClass");
             String helpUrlAttribute = configurationElement.getAttribute("helpUrl");
+            String deprecatedAttribute = configurationElement.getAttribute("deprecated");
             final String bundleId = configurationElement.getDeclaringExtension().getContributor().getName();
 
             Object icon = createIcon(null, iconLocationAttribute, iconAttribute, bundleId);
@@ -268,7 +257,7 @@ public class PaletteBuilder implements Serializable {
                   }
                 }
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
-
+                item.setDeprecated(deprecatedAttribute);
                 item.setHelpUrl(helpUrlAttribute);
                 if (isPaletteItemVisible(item)) {
                   actorBundleMap.put(clazz.getName(), bundleId);
