@@ -54,6 +54,7 @@ import com.isencia.passerelle.process.service.ProcessManager;
  * </p>
  */
 @SuppressWarnings("serial")
+@Deprecated
 public class ContextEntryModifier extends Actor {
 
   private enum Mode {
