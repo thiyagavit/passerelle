@@ -38,10 +38,14 @@ public class PaletteGroup implements Serializable, Comparable<PaletteGroup> {
   private Map<String, PaletteItemDefinition> paletteItemMap = new HashMap<String, PaletteItemDefinition>();
   private SortedSet<PaletteItemDefinition> paletteItems = new TreeSet<PaletteItemDefinition>();
   private List<PaletteGroup> children = new ArrayList<PaletteGroup>();
-  private boolean authorized = true;
+  private boolean secure;
 
-  public void setAuthorized(boolean authorized) {
-    this.authorized = authorized;
+  public boolean isSecure() {
+    return secure;
+  }
+
+  public void setSecure(boolean secure) {
+    this.secure = secure;
   }
 
   public boolean isVisible() {
@@ -110,10 +114,6 @@ public class PaletteGroup implements Serializable, Comparable<PaletteGroup> {
   }
 
   private String parentId;
-
-  public boolean isAuthorized() {
-    return authorized;
-  }
 
   public void init(PaletteBuilder builder) {
     if (parentId == null) {
