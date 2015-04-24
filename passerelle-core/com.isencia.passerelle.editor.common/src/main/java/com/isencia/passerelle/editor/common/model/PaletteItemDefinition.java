@@ -34,8 +34,10 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
     this.name = name;
     this.priority = priority;
     this.bundleId = bundleId;
-    if (clazz != null)
+    if (clazz != null) {
       this.clazz = clazz.getName();
+      this.deprecated = clazz.getAnnotation(Deprecated.class) != null;
+    }
     if (group != null)
       group.addPaletteItem(this);
     if (color != null && !color.contains("rgb")) {
@@ -49,14 +51,27 @@ public class PaletteItemDefinition implements Serializable, Comparable<PaletteIt
 
   }
 
-  private String deprecated;
+  private boolean deprecated;
 
-  public String getDeprecated() {
+  public boolean isDeprecated() {
+    if (deprecatedMessage != null) {
+      return true;
+    }
     return deprecated;
   }
 
-  public void setDeprecated(String deprecated) {
+  public void setDeprecated(boolean deprecated) {
     this.deprecated = deprecated;
+  }
+
+  private String deprecatedMessage;
+
+  public String getDeprecatedMessage() {
+    return deprecatedMessage;
+  }
+
+  public void setDeprecatedMessage(String deprecated) {
+    this.deprecatedMessage = deprecated;
   }
 
   private String bundleId;

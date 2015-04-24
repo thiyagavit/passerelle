@@ -257,7 +257,7 @@ public class PaletteBuilder implements Serializable {
                   }
                 }
                 PaletteItemDefinition item = new PaletteItemDefinition(icon, group, idAttribute, nameAttribute, colorAttribute, clazz, bundleId, priority);
-                item.setDeprecated(deprecatedAttribute);
+                item.setDeprecatedMessage(deprecatedAttribute);
                 item.setHelpUrl(helpUrlAttribute);
                 if (isPaletteItemVisible(item)) {
                   actorBundleMap.put(clazz.getName(), bundleId);
