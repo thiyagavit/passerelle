@@ -36,6 +36,7 @@ import ptolemy.data.IntToken;
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
+import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
@@ -160,6 +161,18 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     // So we drop these parameters here.
     receiverQueueCapacityParam.setContainer(null);
     receiverQueueWarningSizeParam.setContainer(null);
+  }
+
+  @Override
+  public void attributeChanged(Attribute attribute) throws IllegalActionException {
+    if (attribute.getName().equals("Receiver Q Capacity (-1)") || attribute.getName().equals("Receiver Q warning size (-1)")) {
+      try {
+        attribute.setContainer(null);
+      } catch (NameDuplicationException e) {
+      }
+      return;
+    }
+    super.attributeChanged(attribute);
   }
 
   @Override
@@ -379,7 +392,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
           try {
             getErrorControlStrategy().handleIterationValidationException(this, e);
           } catch (IllegalActionException e1) {
-            // a validation error is a dramatic event, and when even its handling fails, we jump out of the normal actor's processing asap
+            // a validation error is a dramatic event, and when even its handling fails, we jump out of the normal
+            // actor's processing asap
             throw new ProcessingException(ErrorCode.ERROR_PROCESSING_FAILURE, "Error reporting iteration validation error", this, e);
           }
         }
@@ -490,7 +504,7 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
                   processRequest.setIterationCount(iterationCount);
                   incompleteProcessRequests.put(ctxtHdr, processRequest);
                 } else {
-                  throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager for processID "+ctxtHdr, this, managedMessage, null);
+                  throw new ProcessingException(ErrorCode.ACTOR_EXECUTION_ERROR, "Error obtaining ProcessManager for processID " + ctxtHdr, this, managedMessage, null);
                 }
               }
               if (processRequest != null) {
@@ -612,8 +626,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
               msgInSeq.setHeader(ProcessRequest.HEADER_PROCESS_ID, processManager.getId());
               sendOutputMsg(context.getPort(), msgInSeq);
             } catch (MessageException e) {
-              throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(),
-                  this, context.getMessage(), e);
+              throw new ProcessingException(ErrorCode.MSG_CONSTRUCTION_ERROR, "Error creating output sequence msg for msg " + context.getMessage().getID(), this,
+                  context.getMessage(), e);
             }
           }
         }
