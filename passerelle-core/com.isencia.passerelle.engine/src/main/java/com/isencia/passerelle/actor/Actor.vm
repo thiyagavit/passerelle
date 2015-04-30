@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>${object.getDisplayName()}</title>
+	</head>
+<body>
+<h1><b>${object.getDisplayName()}</b></h1>
+
+<h2>Details</h2>
+<table>
+	<tr>
+		<td><b>Parent Flow:</b></td>
+		<td><a href="../${object.getContainer().getName()}.html">${object.getContainer().getDisplayName()}</a></td>
+	</tr>
+</table>
+
+#if (${parameters})
+<h2>Parameters</h2>
+<table>
+#foreach (${parameter} in ${parameters})
+	<tr>
+		<td align="right"><b>${parameter.getDisplayName()}:</b></td>
+		<td>${parameter.getValueAsString()}</td>
+	</tr>
+#end
+</table>
+#end
+
+</body>
+</html>
