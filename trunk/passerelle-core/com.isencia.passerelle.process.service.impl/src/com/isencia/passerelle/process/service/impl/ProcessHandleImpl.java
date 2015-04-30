@@ -31,7 +31,9 @@ public class ProcessHandleImpl implements ProcessHandle {
 
   public ProcessHandleImpl(String processId, Flow flow) {
     this.processId = processId;
-    this.flowHandle = new FlowHandleImpl(flow);
+    if (flow != null) {
+      this.flowHandle = new FlowHandleImpl(flow);
+    }
     this.creationTS = new Date();
   }
 
