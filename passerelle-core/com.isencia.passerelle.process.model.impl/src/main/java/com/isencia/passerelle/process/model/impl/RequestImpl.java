@@ -89,7 +89,7 @@ public class RequestImpl implements Request {
   private String executor;
 
   @Column(name = "CATEGORY", nullable = true, unique = false, updatable = true, length = 250)
-  private String category;
+  private String dataTypes;
 
   @Column(name = "DTYPE", updatable = false)
   private String discriminator;
@@ -102,7 +102,7 @@ public class RequestImpl implements Request {
   public static final String _CASE = "requestCase";
   public static final String _CORRELATION_ID = "correlationId";
   public static final String _TYPE = "type";
-  public static final String _CATEGORY = "category";
+  public static final String _DATATYPES = "dataTypes";
   public static final String _CONTEXT = "processingContext";
   public static final String _REFERENCE = "requestCase.id";
   public static final String _EXTERNAL_REFERENCE = "requestCase.externalReference";
@@ -144,16 +144,16 @@ public class RequestImpl implements Request {
     this.correlationId = correlationId;
   }
 
-  public RequestImpl(Case requestCase, String initiator, String type, String correlationId, String category) {
+  public RequestImpl(Case requestCase, String initiator, String type, String correlationId, String dataTypes) {
     this(requestCase, initiator, type);
     this.correlationId = correlationId;
-    this.category = category;
+    this.dataTypes = dataTypes;
   }
 
-  public RequestImpl(Case requestCase, String initiator, String executor, String type, String correlationId, String category) {
-    this(requestCase, initiator, type, correlationId, category);
+  public RequestImpl(Case requestCase, String initiator, String executor, String type, String correlationId, String dataTypes) {
+    this(requestCase, initiator, type, correlationId, dataTypes);
     this.correlationId = correlationId;
-    this.category = category;
+    this.dataTypes = dataTypes;
     this.executor = executor;
   }
 
@@ -182,12 +182,12 @@ public class RequestImpl implements Request {
     this.executor = executor;
   }
 
-  public String getCategory() {
-    return category;
+  public String getDataTypes() {
+    return dataTypes;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  public void setDataTypes(String dataTypes) {
+    this.dataTypes = dataTypes;
   }
 
   public Attribute getAttribute(String name) {

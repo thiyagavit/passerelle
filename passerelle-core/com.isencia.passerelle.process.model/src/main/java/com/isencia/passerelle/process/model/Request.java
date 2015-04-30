@@ -54,7 +54,7 @@ public interface Request extends Serializable, Identifiable, AttributeHolder {
 	 * @return a unique identifier of the request category
 	 * 
 	 */
-	String getCategory();
+	String getDataTypes();
 	
 	/**
 	 * 
