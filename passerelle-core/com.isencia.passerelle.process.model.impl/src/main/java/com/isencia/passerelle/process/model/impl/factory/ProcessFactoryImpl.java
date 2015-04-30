@@ -85,7 +85,8 @@ public class ProcessFactoryImpl implements ProcessFactory {
   }
 
   @Override
-  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, List<String> detailedDescriptions, Set<String> relatedDataTypes) {
+  public ErrorItem createErrorItem(Severity severity, ErrorCategory category, String code, String shortDescription, String description, List<String> detailedDescriptions,
+      Set<String> relatedDataTypes) {
     return new ErrorItemImpl(severity, category, code, shortDescription, description, detailedDescriptions, relatedDataTypes);
   }
 
@@ -150,10 +151,12 @@ public class ProcessFactoryImpl implements ProcessFactory {
     return new StringResultItemImpl(resultBlock, name, value, unit, date, level);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Task createTask(Class<? extends Task> taskClass, Request request, String initiator, String type) throws Exception {
-    if (taskClass == null)
-      return (createTask(request, initiator, type));
+  public <T extends Task> T createTask(Class<T> taskClass, Request request, String initiator, String type) throws Exception {
+    if (taskClass == null) {
+      return (T) (createTask(request, initiator, type));
+    }
     return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(request.getProcessingContext(), initiator, type);
   }
 
@@ -162,10 +165,12 @@ public class ProcessFactoryImpl implements ProcessFactory {
     return new TaskImpl(request.getProcessingContext(), initiator, type);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Task createTask(Class<? extends Task> taskClass, Context processContext, String initiator, String type) throws Exception {
-    if (taskClass == null)
-      return (createTask(processContext, initiator, type));
+  public <T extends Task> T createTask(Class<T> taskClass, Context processContext, String initiator, String type) throws Exception {
+    if (taskClass == null) {
+      return (T) (createTask(processContext, initiator, type));
+    }
     return taskClass.getConstructor(Context.class, String.class, String.class).newInstance(processContext, initiator, type);
   }
 
