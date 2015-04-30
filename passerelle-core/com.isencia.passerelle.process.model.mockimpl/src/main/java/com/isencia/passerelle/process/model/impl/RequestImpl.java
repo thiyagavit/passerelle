@@ -25,7 +25,7 @@ public class RequestImpl implements Request {
 	private Context processingContext;
 	private String initiator;
 	private String executor;
-	private String category;
+	private String dataTypes;
 
 	public RequestImpl() {
 	}
@@ -56,7 +56,7 @@ public class RequestImpl implements Request {
 	public RequestImpl(Case requestCase, String initiator, String type, String correlationId, String category) {
 		this(requestCase, initiator, type);
 		this.correlationId = correlationId;
-		this.category = category;
+		this.dataTypes = category;
 	}
 
 	public Long getId() {
@@ -79,12 +79,12 @@ public class RequestImpl implements Request {
 		this.executor = executor;
 	}
 
-	public String getCategory() {
-		return category;
+	public String getDataTypes() {
+		return dataTypes;
 	}
 
-	public void setCategory(String category) {
-		this.category = category;
+	public void setDataTypes(String dataTypes) {
+		this.dataTypes = dataTypes;
 	}
 
 	public Attribute getAttribute(String name) {
@@ -136,7 +136,7 @@ public class RequestImpl implements Request {
   @Override
   public String toString() {
     return "RequestImpl [id=" + id + ", correlationId=" + correlationId
-        + ", type=" + type + ", initiator=" + initiator + ", executor=" + executor + ", category=" + category 
+        + ", type=" + type + ", initiator=" + initiator + ", executor=" + executor + ", category=" + dataTypes 
         + ", \n requestAttributes=" + requestAttributes + ", \n requestCase=" + requestCase + "]";
   }
 
