@@ -88,7 +88,6 @@ public abstract class TaskBasedActor extends Actor {
     conditionTagParameter = new StringParameter(this, CONDITION_TAG);
     registerExpertParameter(taskTypeParam);
     registerExpertParameter(resultTypeParam);
-    registerExpertParameter(errorStrategyParameter);
     registerExpertParameter(resultTagParameter);
     registerExpertParameter(conditionTagParameter);
   }
