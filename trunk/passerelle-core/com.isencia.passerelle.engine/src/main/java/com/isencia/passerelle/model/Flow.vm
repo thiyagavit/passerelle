@@ -1,6 +1,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>${object.getDisplayName()}</title>
+		#if (${diagramHeaders})
+		#foreach (${header} in ${diagramHeaders})
+			${header}
+		#end
+		#end
 	</head>
 <body>
 <h1><b>${object.getDisplayName()}</b></h1>
@@ -12,15 +17,13 @@
 		<td><b>Parent Flow:</b></td>
 		<td><a href="../${object.getContainer().getName()}.html">${object.getContainer().getDisplayName()}</a></td>
 	</tr>
+	#elseif (${object.getDirector()})
+	<tr>
+		<td><b>Director:</b></td>
+		<td><a href="${object.getName()}/${object.getDirector().getName()}.html">${object.getDirector().getDisplayName()}</a></td>
+	</tr>
 	#end
 </table>
-
-#if (!${object.getContainer()} && ${object.getDirector()})
-<h2>Director</h2>
-<a href="${path}${object.getDirector().getName()}.html">${object.getDirector().getDisplayName()}</a>
-#end
-
-<h2>Diagram</h2>
 
 #if (${parameters})
 <h2>Parameters</h2>
@@ -39,11 +42,17 @@
 <table>
 #foreach (${actor} in ${actors})
 	<tr>
-		<td><a href="${path}${actor.getName()}.html">${actor.getDisplayName()}</a></td>
+		<td><a href="${object.getName()}/${actor.getName()}.html">${actor.getDisplayName()}</a></td>
 	</tr>
 #end
 </table>
 #end
+
+<h2>Diagram</h2>
+<div>
+${diagram}
+</div>
+
 
 </body>
 </html>
