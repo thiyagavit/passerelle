@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.fitting.CurveFitter;
 import org.apache.commons.math.optimization.fitting.ParametricRealFunction;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.actor.ProcessingException;
 
+import fr.soleil.lib.project.math.ArrayUtils;
 import fr.soleil.passerelle.util.ExceptionUtil;
 
 //TODO: intersection de 2 dtes
@@ -101,10 +101,11 @@ public class BeamCalculations {
      * retrieve the 2 positions x1 and x2 at half maximum
      */
     public static double[] getHmPositions(final double[] x, final double[] y) {
-        final List<Double> yVal = Arrays.asList(ArrayUtils.toObject(y));
-
+    	// Sort the array as ascending, the last value will be the max
+    	Arrays.sort(y);
+    
         // calculate half maximum
-        final double halfMax = Collections.max(yVal) * 0.5;
+        final double halfMax =y[y.length - 1] * 0.5;
         // System.out.println("max "+Collections.max(yVal));
         // System.out.println("halfMax "+halfMax);
         // finding the 2 nearest positions for first width point x1
