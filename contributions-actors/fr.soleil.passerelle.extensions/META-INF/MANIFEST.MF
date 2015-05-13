@@ -14,10 +14,10 @@ Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.7.0",
  com.isencia.passerelle.commons;bundle-version="8.7.0",
  com.isencia.passerelle.commons.ume;bundle-version="8.7.0",
  javax.persistence;bundle-version="2.0.1",
- fr.soleil.passerelle.dependencies;bundle-version="4.9.2"
+ fr.soleil.passerelle.dependencies;bundle-version="8.7.6"
 Import-Package: com.isencia.sherpa.commons,
  com.microstar.xml,
- org.osgi.framework;version="1.6.0",
+ org.osgi.framework;version="1.7.0",
  org.slf4j;version="1.6.0"
 Export-Package: fr.soleil.math,
  fr.soleil.passerelle,

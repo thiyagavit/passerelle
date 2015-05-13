@@ -2,7 +2,6 @@ package fr.soleil.passerelle.actor.calculation;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,7 +191,7 @@ public class AttributeImageCalculation extends TransformerV3 {
                 // System.out.println("DimX = " + dimx + ", dimy = " + dimy + ", accumul.length" +
                 // accumul.length);
 
-                storedTangoAttribute.writeImage(dimx, dimy, (Object[]) ArrayUtils.toObject(accumul));
+                storedTangoAttribute.writeImage(dimx, dimy,accumul);
                 ExecutionTracerService.trace(this, "write Attribute " + storedAttributeName);
 
                 // storedTangoAttribute.writeImage(dimx, dimy, accumul);

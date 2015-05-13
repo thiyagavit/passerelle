@@ -1,6 +1,7 @@
 package fr.soleil.passerelle.actor.tango.snapshot;
 
-import org.apache.commons.lang.ArrayUtils;
+import java.util.Collections;
+import java.util.Vector;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.tango.clientapi.TangoCommand;
@@ -39,7 +40,12 @@ public class SnapExtractorProxy {
      */
     public String[] getReadValues(final String snapID, final String... attributeNames)
             throws DevFailed {
-        final Object[] array = ArrayUtils.addAll(new String[] { snapID, "true" }, attributeNames);
+    	Vector<Object> vector = new Vector<Object>();
+    	vector.add(snapID);
+    	vector.add("true");
+    	Collections.addAll(vector, attributeNames);
+    	
+        final Object[] array = vector.toArray();
         return getSnapValues.execute(String[].class, array);
     }
 
@@ -55,7 +61,11 @@ public class SnapExtractorProxy {
      */
     public String[] getWriteValues(final String snapID, final String... attributeNames)
             throws DevFailed {
-        final Object[] array = ArrayUtils.addAll(new String[] { snapID, "false" }, attributeNames);
+    	Vector<Object> vector = new Vector<Object>();
+    	vector.add(snapID);
+    	vector.add("false");
+    	Collections.addAll(vector, attributeNames);
+        final Object[] array =  vector.toArray();
         return getSnapValues.execute(String[].class, array);
     }
 

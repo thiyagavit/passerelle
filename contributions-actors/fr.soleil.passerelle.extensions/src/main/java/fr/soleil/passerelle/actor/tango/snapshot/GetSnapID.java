@@ -1,8 +1,7 @@
 package fr.soleil.passerelle.actor.tango.snapshot;
 
 import java.net.URL;
-
-import org.apache.commons.lang.ArrayUtils;
+import java.util.Arrays;
 
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
@@ -82,7 +81,7 @@ public class GetSnapID extends Transformer {
             try {
                 final String[] snapIDs = extractor.getSnapIDs(contextID, searchfilter);
                 if (snapIDs.length >= 1) {
-                    ExecutionTracerService.trace(this, "snap ID found " + ArrayUtils.toString(snapIDs, "empty")
+                    ExecutionTracerService.trace(this, "snap ID found " + Arrays.toString(snapIDs)
                             + " - using " + snapIDs[0]);
                     sendOutputMsg(output, PasserelleUtil.createContentMessage(this, snapIDs[0]));
                 } else {
