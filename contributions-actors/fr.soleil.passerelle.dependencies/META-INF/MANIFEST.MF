@@ -5,32 +5,6 @@ Bundle-SymbolicName: fr.soleil.passerelle.dependencies
 Bundle-Version: 8.7.6.qualifier
 Bundle-Vendor: isencia
 Eclipse-LazyStart: false
-Import-Package: com.thoughtworks.xstream,
- com.thoughtworks.xstream.converters,
- com.thoughtworks.xstream.converters.collections,
- com.thoughtworks.xstream.io,
- com.thoughtworks.xstream.mapper,
- org.apache.commons.beanutils,
- org.apache.commons.lang.builder;version="2.4.0",
- org.apache.commons.logging,
- org.apache.commons.math;version="2.0.0",
- org.apache.commons.math.complex;version="2.0.0",
- org.apache.commons.math.transform;version="2.0.0",
- org.apache.log4j;version="1.2.0",
- org.apache.log4j.spi;version="1.2.0",
- org.apache.log4j.xml;version="1.2.0",
- org.omg.CORBA;version="4.5.0",
- org.omg.CORBA.ContainedPackage;version="4.5.0",
- org.omg.CORBA.ContainerPackage;version="4.5.0",
- org.omg.CORBA.InterfaceDefPackage;version="4.5.0",
- org.omg.CORBA.ORBPackage;version="4.5.0",
- org.omg.CORBA.TypeCodePackage;version="4.5.0",
- org.omg.CORBA.ValueDefPackage;version="4.5.0",
- org.omg.CORBA.portable;version="4.5.0",
- org.omg.CORBA_2_3;version="4.5.0",
- org.omg.CORBA_2_3.portable;version="4.5.0",
- org.omg.CORBA_2_5;version="4.5.0",
- org.slf4j;version="1.5.8"
 Bundle-ClassPath: lib/antlr-2.7.6.jar,
  lib/Application-2.0.13.jar,
  lib/ATKCore-4.0.13.jar,
@@ -1293,4 +1267,3 @@ Export-Package: .,
  org.zeromq,
  viewer.panel,
  zmq
-Require-Bundle: system.bundle
