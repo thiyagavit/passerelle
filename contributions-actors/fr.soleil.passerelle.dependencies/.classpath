@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/BasicUtilities-1.2.6-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Application-2.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ATKCore-4.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ATKWidget-4.0.16.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/avalon-framework-4.1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/AwtUtilities-1.2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/BasicUtilities-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cal10n-api-0.7.4.jar"/>
@@ -34,7 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/hb-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/idw-gpl-1.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ij-1.45s.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ImageJUtilities-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jacorb-2.3.1jboss.patch01-brew.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jacorb-3.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jacorb-omgapi-3.4.jar"/>
@@ -79,14 +77,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/SalsaUtils-3.5.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet-api-2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/silk-1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-ext-1.6.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/snakeyaml-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/SoleilUtilities-2.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Swing-2.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swing-worker-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/SwingUtilities-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swingx-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tango-icon-theme-0.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/TangoCore-2.0.13.jar"/>
@@ -101,6 +96,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/xml-1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3_min-1.1.3.4.O.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xstream-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ImageJUtilities-1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/AwtUtilities-1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SwingUtilities-1.2.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="target/classes"/>
