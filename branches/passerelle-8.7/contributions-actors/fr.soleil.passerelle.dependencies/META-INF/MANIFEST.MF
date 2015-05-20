@@ -1258,3 +1258,6 @@ Export-Package: .,
  org.zeromq,
  viewer.panel,
  zmq
+Require-Bundle: org.slf4j.api;bundle-version="1.6.4",
+ org.apache.log4j;bundle-version="1.2.14",
+ org.apache.commons.lang;bundle-version="2.4.0"
