@@ -15,7 +15,8 @@ Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.7.0",
  com.isencia.passerelle.commons.ume;bundle-version="8.7.0",
  javax.persistence;bundle-version="2.0.1",
  fr.soleil.passerelle.dependencies;bundle-version="8.7.6",
- org.slf4j.api;bundle-version="1.6.4"
+ org.slf4j.api;bundle-version="1.6.4",
+ org.junit;bundle-version="4.10.0"
 Import-Package: com.isencia.sherpa.commons,
  com.microstar.xml,
  org.osgi.framework;version="1.7.0",
