@@ -11,13 +11,13 @@
 
 	<groupId>fr.soleil.passerelle</groupId>
 	<artifactId>fr.soleil.passerelle.extensions</artifactId>
-	<version>4.9.2-SNAPSHOT</version>
+	<version>8.7.6-SNAPSHOT</version>
 
 	<packaging>eclipse-plugin</packaging>
 	
 	<properties>
 		<nexus.base.url>https://ci-nexus.isencia.be</nexus.base.url>
-		<passerelle.version>8.7.5-SNAPSHOT</passerelle.version>
+		<passerelle.version>8.7.6-SNAPSHOT</passerelle.version>
 		<sherpabeans-be.version>6.3.3</sherpabeans-be.version>
 	</properties>
 
@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>fr.soleil.passerelle</groupId>
 			<artifactId>fr.soleil.passerelle.dependencies</artifactId>
-			<version>4.9.2-SNAPSHOT</version>
+			<version>8.7.6-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Ptolemy dependencies -->
