@@ -62,7 +62,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 			return clobItem.getValue();
 		}
 
-		return value;
+		return valueAsString;
 	}
 
 	public String getValueAsString() {
@@ -73,7 +73,7 @@ public class StringResultItemImpl extends ResultItemImpl<String> implements Muta
 		if (value != null && value.length() > MAX_CHAR_SIZE) {
 			this.clobItem = new ClobItem(value);
 		} else {
-			this.value = value;
+			this.valueAsString = value;
 		}
 	}
 
