@@ -25,7 +25,7 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 	
 	public DoubleResultItemImpl(ResultBlock resultBlock, String name, String unit, Double value) {
 		super(resultBlock, name, unit);
-		this.value = Double.toString(value);
+		this.valueAsString = Double.toString(value);
 	}
 	
 	public DoubleResultItemImpl(ResultBlock resultBlock, String name, Double value) {
@@ -43,7 +43,7 @@ public class DoubleResultItemImpl extends ResultItemImpl<Double> {
 	 * @see com.isencia.passerelle.process.model.NamedValue#getValue()
 	 */
 	public Double getValue() {
-		return Double.parseDouble(value);
+		return Double.parseDouble(valueAsString);
 	}
 
 }

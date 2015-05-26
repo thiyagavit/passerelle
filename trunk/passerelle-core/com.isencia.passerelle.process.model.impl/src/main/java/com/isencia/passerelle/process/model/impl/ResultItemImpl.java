@@ -87,7 +87,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   private String name;
 
   @Column(name = "VALUE", nullable = true, unique = false, updatable = false, length = MAX_CHAR_SIZE)
-  protected String value;
+  protected String valueAsString;
 
   @Column(name = "UNIT", nullable = true, unique = false, updatable = false, length = 20)
   private String unit;
@@ -173,7 +173,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
   }
 
   public String getValueAsString() {
-    return value;
+    return valueAsString;
   }
 
   public Attribute getAttribute(String name) {
@@ -247,7 +247,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
 
   @SuppressWarnings("all")
   public int hashCode() {
-    return new HashCodeBuilder(31, 71).append(id).append(name).append(unit).append(value).toHashCode();
+    return new HashCodeBuilder(31, 71).append(id).append(name).append(unit).append(valueAsString).toHashCode();
   }
 
   @Override
@@ -256,7 +256,7 @@ public abstract class ResultItemImpl<V extends Serializable> implements ResultIt
       return false;
     }
     ResultItemImpl<?> rhs = (ResultItemImpl<?>) arg0;
-    return new EqualsBuilder().append(this.id, rhs.id).append(this.name, rhs.name).append(this.unit, rhs.unit).append(this.value, rhs.value).isEquals();
+    return new EqualsBuilder().append(this.id, rhs.id).append(this.name, rhs.name).append(this.unit, rhs.unit).append(this.valueAsString, rhs.valueAsString).isEquals();
   }
 
   @Override
