@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Vector;
 
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.util.SoleilUtilities;
 
 public class SnapExtractorProxy {
 
@@ -18,8 +18,8 @@ public class SnapExtractorProxy {
     private String snapExtractorName = "";
 
     public SnapExtractorProxy() throws DevFailed {
-        snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
-
+    	snapExtractorName = TangoAccess.getFirstDeviceExportedForClass("SnapExtractor");
+        
         getSnapValues = new TangoCommand(snapExtractorName, "GetSnapValues");
         getSnapID = new TangoCommand(snapExtractorName, "GetSnapID");
     }

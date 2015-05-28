@@ -22,9 +22,9 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public abstract class ASnapExtractor extends Transformer {
@@ -210,7 +210,7 @@ public abstract class ASnapExtractor extends Transformer {
     @Deprecated
     public String getSnapExtractorName() throws DevFailed {
         if (snapExtractorName == null) {
-            snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
+        		snapExtractorName =  TangoAccess.getFirstDeviceExportedForClass("SnapExtractor") ;
         }
         return snapExtractorName;
     }

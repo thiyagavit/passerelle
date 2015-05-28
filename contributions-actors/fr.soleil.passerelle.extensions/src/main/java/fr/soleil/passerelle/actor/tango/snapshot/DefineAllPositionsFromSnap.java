@@ -22,13 +22,13 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfiguration;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public class DefineAllPositionsFromSnap extends Transformer {
@@ -73,7 +73,7 @@ public class DefineAllPositionsFromSnap extends Transformer {
     protected void doInitialize() throws InitializationException {
         if (!isMockMode()) {
             try {
-                snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
+            	snapExtractorName =  TangoAccess.getFirstDeviceExportedForClass("SnapExtractor");
                 getSnap = new TangoCommand(snapExtractorName, "GetSnap");
                 removeDynAttrs = new TangoCommand(snapExtractorName, "RemoveDynAttrs");
                 logger.debug(snapExtractorName);
