@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/NumericalComputing-2.1.5-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/JTangoClientLang-9.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/TangORB-9.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/TangORB-javacommon-9.0.1.jar"/>
@@ -44,7 +45,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.9.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mockito-core-1.9.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.15.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/NumericalComputing-2.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/objenesis-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PictureLibrary-5.0.10.jar"/>
