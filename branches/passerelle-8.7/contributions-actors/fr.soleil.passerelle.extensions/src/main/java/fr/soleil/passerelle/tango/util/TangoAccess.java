@@ -95,4 +95,22 @@ public final class TangoAccess {
         }
         return cmdExecuted;
     }
+    
+    public static String[] getDeviceExportedForClass(String className) throws DevFailed {
+    	String[] deviceList = null;
+        if (className != null) {
+        	Database database = TangoDeviceHelper.getDatabase();
+        	deviceList = database.get_device_exported_for_class(className);
+        }
+        return deviceList;
+    }
+    
+    public static String getFirstDeviceExportedForClass(String className) throws DevFailed {
+    	String[] deviceList =getDeviceExportedForClass( className);
+    	String deviceName = null;
+        if (deviceList != null && deviceList.length > 0) {
+        	deviceName = deviceList[0];
+        }
+        return deviceName;
+    }
 }

@@ -23,11 +23,11 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
 import fr.soleil.passerelle.actor.TransformerV3;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public class LaunchSnapShot extends TransformerV3 {
@@ -72,7 +72,7 @@ public class LaunchSnapShot extends TransformerV3 {
         super.doInitialize();
         if (!isMockMode()) {
             try {
-                final String snapManagerName = SoleilUtilities.getDevicesFromClass("SnapManager")[0];
+                final String snapManagerName = TangoAccess.getFirstDeviceExportedForClass("SnapManager");
                 launchCmd = new TangoCommand(snapManagerName, "LaunchSnapShot");
                 commentCmd = new TangoCommand(snapManagerName, "UpdateSnapComment");
                 getSnapIdCmd = new TangoCommand(snapManagerName, "GetSnapShotResult");

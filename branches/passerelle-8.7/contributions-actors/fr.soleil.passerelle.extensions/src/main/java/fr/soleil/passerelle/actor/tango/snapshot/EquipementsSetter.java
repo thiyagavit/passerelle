@@ -17,10 +17,10 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public class EquipementsSetter extends Transformer {
@@ -65,7 +65,7 @@ public class EquipementsSetter extends Transformer {
     protected void doInitialize() throws InitializationException {
         if (!isMockMode()) {
             try {
-                final String snapManagerName = SoleilUtilities.getDevicesFromClass("SnapManager")[0];
+            	final String snapManagerName = TangoAccess.getFirstDeviceExportedForClass("SnapManager");
                 cmd = new TangoCommand(snapManagerName, "SetEquipments");
             } catch (final DevFailed e) {
                 ExceptionUtil.throwInitializationException(this, e);

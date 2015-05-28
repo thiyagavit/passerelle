@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.util.SoleilUtilities;
 
 public class HdbExtractorProxy {
     
@@ -28,9 +28,9 @@ public class HdbExtractorProxy {
      * @throws DevFailed
      */
     public HdbExtractorProxy() throws DevFailed {
-        String[] devicesFromClass = SoleilUtilities.getDevicesFromClass(HDBEXTRACTOR);
-        if (devicesFromClass != null && devicesFromClass.length > 0) {
-            hdbExtractorName = devicesFromClass[0];
+    	
+        String hdbExtractorName =  TangoAccess.getFirstDeviceExportedForClass(HDBEXTRACTOR);
+        if (hdbExtractorName != null ) {
             newestValueCommand = new TangoCommand(hdbExtractorName, NEWEST_CMD);
             nearestValueCommand = new TangoCommand(hdbExtractorName, NEAREST_CMD);
         } else {
