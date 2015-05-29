@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/TangORB-9.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cal10n-api-0.7.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jacorb-3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jacorb-omgapi-3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jacorb-services-3.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javascript-1.6R5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JavaTangoIDL-5.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jeromq-0.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JTangoClientLang-9.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/JTangoCommons-9.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/picocontainer-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/TangORB-javacommon-9.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/transmorph-3.1.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
