@@ -130,11 +130,11 @@ public class RecordingDirector extends BasicDirector {
     try {
       if (!getAdapter(null).isMockMode()) {
         DataRecorder.getInstance().cancel();
+        ExecutionTracerService.trace(this,dataRecorderName +  "/endRecording called");
         DataRecorder.getInstance().endRecording(dataRecorderName);
       }
     } catch (final Exception e) {
-      // ignore error
-      e.printStackTrace();
+        ExecutionTracerService.trace(this, e.getMessage());
     }
     super.stopFire();
   }
@@ -145,11 +145,11 @@ public class RecordingDirector extends BasicDirector {
       try {
         DataRecorder.getInstance().cancel();
         if(DataRecorder.getInstance().isStartRecording()){
+            ExecutionTracerService.trace(this,dataRecorderName +  "/endRecording called");
             DataRecorder.getInstance().endRecording(dataRecorderName);
         }
       } catch (final DevFailed e) {
-        // ignore error
-         e.printStackTrace();
+          ExecutionTracerService.trace(this,TangoToPasserelleUtil.getDevFailedString(e, this));
       }
     }
     super.wrapup();
