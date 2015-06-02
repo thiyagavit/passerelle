@@ -58,54 +58,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-javadoc-plugin</artifactId> -->
-			<!-- <version>2.6.1</version> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <phase>package</phase> -->
-			<!-- <goals> -->
-			<!-- <goal>jar</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- Surchage de la javadoc -->
-			<!-- <configuration> -->
-			<!-- <attach>true</attach> -->
-			<!-- <encoding>UTF-8</encoding> -->
-			<!-- <debug>true</debug> -->
-			<!-- <show>public</show> -->
-			<!-- <doclet>doc.doclets.PtDoclet</doclet> -->
-			<!-- Dépendances de PtDoclet -->
-			<!-- <docletArtifacts> -->
-			<!-- <docletArtifact> -->
-			<!-- <groupId>com.isencia.passerelle</groupId> -->
-			<!-- <artifactId>docgenerator</artifactId> -->
-			<!-- <version>RELEASE</version> -->
-			<!-- </docletArtifact> -->
-			<!-- <docletArtifact> -->
-			<!-- <groupId>com.isencia.passerelle</groupId> -->
-			<!-- <artifactId>engine</artifactId> -->
-			<!-- <version>RELEASE</version> -->
-			<!-- </docletArtifact> -->
-			<!-- <docletArtifact> -->
-			<!-- <groupId>ptolemy</groupId> -->
-			<!-- <artifactId>core</artifactId> -->
-			<!-- <version>RELEASE</version> -->
-			<!-- </docletArtifact> -->
-			<!-- <docletArtifact> -->
-			<!-- <groupId>commons-logging</groupId> -->
-			<!-- <artifactId>commons-logging</artifactId> -->
-			<!-- <version>RELEASE</version> -->
-			<!-- </docletArtifact> -->
-			<!-- </docletArtifacts> -->
-			<!-- <useStandardDocletOptions>false</useStandardDocletOptions> -->
-			<!-- <additionalparam>-d doc/codeDoc</additionalparam> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
-
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -119,27 +71,34 @@
 	</build>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>org.tango-project</groupId>
-			<artifactId>tango-icon-theme</artifactId>
-		</dependency>
+		<!-- GUI -->
 		<dependency>
 			<groupId>fr.soleil.globalscreen</groupId>
 			<artifactId>PictureLibrary</artifactId>
 			<version>[5.0.3,)</version>
 		</dependency>
 		<dependency>
-			<groupId>com.isencia.passerelle</groupId>
-			<artifactId>docgenerator</artifactId>
-			<!-- <version>8.7.6-SNAPSHOT</version> -->
+			<groupId>fr.esrf.atk</groupId>
+			<artifactId>ATKCore</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>TangORB</artifactId>
+			<groupId>fr.esrf.atk</groupId>
+			<artifactId>ATKWidget</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>fr.soleil.lib.comete</groupId>
+			<artifactId>CometeSwing</artifactId>
+		</dependency>
+		<!-- End GUI -->
 
-		<!-- Pour Salsa V2 -->
+		<!-- Tango -->
+		<dependency>
+			<groupId>org.tango</groupId>
+			<artifactId>JTangoClientLang</artifactId>
+		</dependency>
+		<!-- End Tango -->
+
+		<!-- Salsa V2 -->
 		<dependency>
 			<groupId>fr.soleil.gui</groupId>
 			<artifactId>salsa</artifactId>
@@ -159,16 +118,9 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
-			<artifactId>Display</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
-			<artifactId>Pattern</artifactId>
-		</dependency>
-		<!-- End Pour Salsa V2 -->
+		<!-- End Salsa V2 -->
 
+		<!-- Salsa V3 -->
 		<dependency>
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaAPI</artifactId>
@@ -177,53 +129,23 @@
 			<groupId>fr.soleil.gui.salsa</groupId>
 			<artifactId>SalsaLocal</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>JTangoClientLang</artifactId>
-		</dependency>
+		<!-- End Salsa V3 -->
 
-		<dependency>
-			<groupId>fr.soleil.comete.bean</groupId>
-			<artifactId>CurrentScanDataModel</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.soleil.lib.SoleilUtilities</groupId>
-			<artifactId>TangoCore</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.esrf.atk</groupId>
-			<artifactId>ATKCore</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.esrf.atk</groupId>
-			<artifactId>ATKWidget</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.soleil.lib.comete</groupId>
-			<artifactId>CometeSwing</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>jython</groupId>
-			<artifactId>jython</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.tango</groupId>
-			<artifactId>JTangoCommons</artifactId>
-		</dependency>
-		<!-- Puour la classe Activator -->
+		<!-- Pour la classe Activator -->
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 		</dependency>
 		<!-- Pour les acteurs ScriptConverter -->
 		<dependency>
+			<groupId>jython</groupId>
+			<artifactId>jython</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>bsf</groupId>
 			<artifactId>bsf</artifactId>
+			<version>2.4.0</version>
 		</dependency>
 
 		<!-- Pour ModelExecutor -->
@@ -231,8 +153,13 @@
 			<groupId>com.microstar</groupId>
 			<artifactId>xml</artifactId>
 		</dependency>
-
-		<!-- Pour SoleilActors et le noyau passerelle -->
+		
+ 		<!-- 	Pour SoleilActors et le noyau passerelle -->
+ 		<dependency>
+			<groupId>com.isencia.passerelle</groupId>
+			<artifactId>docgenerator</artifactId>
+			<!-- <version>8.7.6-SNAPSHOT</version> -->
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
@@ -311,7 +238,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Pour les tests -->
+		<!-- Tests -->
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -350,6 +277,7 @@
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- End Tests -->
 
 	</dependencies>
 </project>
