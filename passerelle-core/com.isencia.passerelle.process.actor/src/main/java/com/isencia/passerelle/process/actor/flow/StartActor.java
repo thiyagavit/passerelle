@@ -1,16 +1,17 @@
 package com.isencia.passerelle.process.actor.flow;
 
 import java.util.Map;
+
 import org.slf4j.MDC;
-import ptolemy.actor.gui.style.TextStyle;
+
 import ptolemy.data.ObjectToken;
 import ptolemy.data.expr.Parameter;
-import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 import ptolemy.kernel.util.NamedObj;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v5.Actor;
 import com.isencia.passerelle.actor.v5.ActorContext;
@@ -38,13 +39,8 @@ public class StartActor extends Actor {
 
   private static final long serialVersionUID = 1L;
 
-  public static final String APPLICATION_PARAMETERS = "Application parameters";
-  public static final String MOCK_REQUEST = "Mock Request";
-
   public Port trigger; // NOSONAR
   public Port output; // NOSONAR
-
-  public StringParameter applicationParameters;
 
   public StartActor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
@@ -58,8 +54,6 @@ public class StartActor extends Actor {
         + "<circle cx=\"0\" cy=\"0\" r=\"10\"" + "style=\"fill:white;stroke-width:2.0\"/>\n" + "<line x1=\"-15\" y1=\"0\" x2=\"0\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
         + "<line x1=\"-3\" y1=\"-3\" x2=\"0\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n" + "<line x1=\"-3\" y1=\"3\" x2=\"0\" y2=\"0\" " + "style=\"stroke-width:2.0\"/>\n"
         + "</svg>\n");
-    applicationParameters = new StringParameter(this, APPLICATION_PARAMETERS);
-    new TextStyle(applicationParameters, "paramsTextArea");
   }
 
   @Override
