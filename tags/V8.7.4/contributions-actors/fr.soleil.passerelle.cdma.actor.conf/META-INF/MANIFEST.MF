@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: CDMA Actor pallete conf
-Bundle-SymbolicName: fr.soleil.passerelle.cdma.actor.conf;singleton:=true
-Bundle-Version: 8.7.4
-Bundle-Vendor: Soleil
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
