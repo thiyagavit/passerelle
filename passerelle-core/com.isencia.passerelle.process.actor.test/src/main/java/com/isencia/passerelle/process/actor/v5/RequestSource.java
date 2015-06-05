@@ -59,7 +59,7 @@ public class RequestSource extends Actor {
   public Port output;
 
   public StringParameter processTypeParameter;
-  public StringParameter categoryParameter;
+  public StringParameter dataTypesParameter;
   public StringParameter initiatorParameter;
   public StringParameter corrIDParameter;
   public StringParameter extRefParameter;
@@ -71,8 +71,8 @@ public class RequestSource extends Actor {
 
     processTypeParameter = new StringParameter(this, "process type");
     processTypeParameter.setExpression("greet");
-    categoryParameter = new StringParameter(this, "category");
-    categoryParameter.setExpression("test");
+    dataTypesParameter = new StringParameter(this, "data types");
+    dataTypesParameter.setExpression("test");
     initiatorParameter = new StringParameter(this, "initiator");
     initiatorParameter.setExpression(getName());
     corrIDParameter = new StringParameter(this, "correlation ID");
@@ -100,10 +100,10 @@ public class RequestSource extends Actor {
       String extRef = ((StringToken) extRefParameter.getToken()).stringValue();
       Case caze = entityFactory.createCase(extRef);
       String processType = ((StringToken) processTypeParameter.getToken()).stringValue();
-      String category = ((StringToken) categoryParameter.getToken()).stringValue();
+      String dataTypes = ((StringToken) dataTypesParameter.getToken()).stringValue();
       String correlationID = ((StringToken) corrIDParameter.getToken()).stringValue();
       String initiator = ((StringToken) initiatorParameter.getToken()).stringValue();
-      Request req = entityFactory.createRequest(caze, initiator, category, processType, correlationID);
+      Request req = entityFactory.createRequest(caze, initiator, dataTypes, processType, correlationID);
       req.setExecutor(toplevel().getName());
       String paramDefs = reqParamsParameter.getExpression();
       BufferedReader reader = new BufferedReader(new StringReader(paramDefs));

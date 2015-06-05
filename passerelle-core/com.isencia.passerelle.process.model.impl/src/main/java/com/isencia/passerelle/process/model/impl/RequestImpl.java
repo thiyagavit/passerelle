@@ -88,6 +88,7 @@ public class RequestImpl implements Request {
   @Column(name = "EXECUTOR", nullable = true, unique = false, updatable = true, length = 250)
   private String executor;
 
+  // FIXME adapt to correct column name "dataTypes" + DB schema script update
   @Column(name = "CATEGORY", nullable = true, unique = false, updatable = true, length = 250)
   private String dataTypes;
 

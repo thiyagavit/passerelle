@@ -17,11 +17,11 @@ public class MainRequestImpl extends RequestImpl {
     super();
   }
 
-  public MainRequestImpl(Case requestCase, String initiator, String type, String correlationId, String category) {
-    super(requestCase, initiator, type, correlationId, category);
+  public MainRequestImpl(Case requestCase, String initiator, String type, String correlationId, String dataTypes) {
+    super(requestCase, initiator, type, correlationId, dataTypes);
   }
-  public MainRequestImpl(Case requestCase, String initiator,String executor, String type, String correlationId, String category) {
-    super(requestCase, initiator,executor, type, correlationId, category);
+  public MainRequestImpl(Case requestCase, String initiator,String executor, String type, String correlationId, String dataTypes) {
+    super(requestCase, initiator,executor, type, correlationId, dataTypes);
   }
 
   public MainRequestImpl(Case requestCase, String initiator, String type, String correlationId) {
