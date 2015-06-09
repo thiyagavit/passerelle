@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.slf4j.MDC;
 
-import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.IllegalActionException;
@@ -32,7 +31,6 @@ public class StartActor extends Actor {
 
   private static final long serialVersionUID = 1L;
 
-  public static final String APPLICATION_PARAMETERS = "Application parameters";
   public static final String MOCK_REQUEST = "Mock Request";
 
   public Port trigger; // NOSONAR
@@ -43,8 +41,6 @@ public class StartActor extends Actor {
   public StartActor(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
     output = PortFactory.getInstance().createOutputPort(this);
-    applicationParameters = new StringParameter(this, APPLICATION_PARAMETERS);
-    new TextStyle(applicationParameters, "paramsTextArea");
   }
 
   @Override
