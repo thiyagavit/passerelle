@@ -15,6 +15,7 @@
 package com.isencia.passerelle.process.model.event;
 
 import java.util.Date;
+
 import com.isencia.passerelle.process.model.DataTypes;
 import com.isencia.passerelle.runtime.Event;
 
@@ -41,4 +42,10 @@ public class DoubleValuedEventImpl extends AbstractResultItemEventImpl<Double> {
   public Event createDerivedResultItem(String namePrefix,Event otherEvent,String separator) {
     return new DoubleValuedEventImpl(namePrefix + "//" + getName()+"//" + "(" + getFormattedCreationTS() + ")", getValue());
   }
+  @Override
+  public String getScope() {
+    return getTopic();
+  }
+
+  
 }
