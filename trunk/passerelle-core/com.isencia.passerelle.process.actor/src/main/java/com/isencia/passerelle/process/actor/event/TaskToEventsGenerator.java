@@ -22,6 +22,7 @@ import com.isencia.passerelle.process.model.ResultBlock;
 import com.isencia.passerelle.process.model.ResultItem;
 import com.isencia.passerelle.process.model.Task;
 import com.isencia.passerelle.process.service.ProcessManager;
+import com.isencia.passerelle.runtime.Event;
 import com.isencia.passerelle.runtime.SimpleEvent;
 
 /**
@@ -59,7 +60,7 @@ public class TaskToEventsGenerator extends AbstractEventsGenerator {
     new CheckBoxStyle(sendContextEventsParameter, "checkbox");
     sendResultItemEventsParameter = new Parameter(this, "Send ResultItem Events", BooleanToken.TRUE);
     new CheckBoxStyle(sendResultItemEventsParameter, "checkbox");
-    resultItemsAsPropertiesParameter = new Parameter(this, "ResultItems as Properties", BooleanToken.TRUE);
+    resultItemsAsPropertiesParameter = new Parameter(this, "ResultItems as Properties", BooleanToken.FALSE);
     new CheckBoxStyle(resultItemsAsPropertiesParameter, "checkbox");
   }
 
@@ -95,9 +96,13 @@ public class TaskToEventsGenerator extends AbstractEventsGenerator {
           Collection<ResultBlock> resultBlocks = selectedTask.getResultBlocks();
           if (resultItemsAsProperties) {
             // create one event per resultblock and set the resultitem values as event properties
-            List<ResultBlockEvent> eventList = new ArrayList<ResultBlockEvent>(resultBlocks.size());
+            List<Event> eventList = new ArrayList<Event>(resultBlocks.size());
             for (ResultBlock block : resultBlocks) {
-              eventList.add(new ResultBlockEvent(block));
+              SimpleEvent event = new SimpleEvent(block.getType(), block.getCreationTS(), 0L);
+              for (ResultItem<?> item : block.getAllItems()) {
+                event.setProperty(getItemName(item), item.getValueAsString());
+              }
+              eventList.add(event);
             }
             addEvents(eventList);
           } else {
@@ -115,24 +120,12 @@ public class TaskToEventsGenerator extends AbstractEventsGenerator {
     }
   }
 
-  private String getItemName(ResultItem<?> item) {
+  protected String getItemName(ResultItem<?> item) {
     String itemName = item.getName();
     int arrayIndexPos = itemName.lastIndexOf('[');
     if (arrayIndexPos > 0) {
       itemName = itemName.substring(0, arrayIndexPos);
     }
     return itemName;
-  }
-
-  public final class ResultBlockEvent extends SimpleEvent {
-    private static final long serialVersionUID = 1L;
-
-    private ResultBlockEvent(ResultBlock block) {
-      super(block.getType(), block.getCreationTS(), 0L);
-
-      for (ResultItem<?> item : block.getAllItems()) {
-        setProperty(getItemName(item), item.getValueAsString());
-      }
-    }
   }
 }
