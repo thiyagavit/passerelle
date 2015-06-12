@@ -25,6 +25,7 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.message.ManagedMessage;
 import fr.soleil.passerelle.actor.DynamicPortsActor;
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 /**
  * An actor that synchronizes the messages on all input ports, and then sends
@@ -109,17 +110,17 @@ public class MultipleOutputsSynchronizer extends DynamicPortsActor {
     protected void doInitialize() throws InitializationException {
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - entry");
+	    logger.trace(getName() + " doInitialize() - entry");
 	}
 	for (final Port port : getInputPorts()) {
 	    if (port.getWidth() == 0) {
-		throw new InitializationException(port.getName() + " is not connected", port, null);
+	        ExceptionUtil.throwInitializationException( port.getName() + " is not connected", port);
 	    }
 	}
 	super.doInitialize();
 
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doInitialize() - exit");
+	    logger.trace(getName() + " doInitialize() - exit");
 	}
     }
 

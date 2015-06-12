@@ -50,6 +50,8 @@ import com.isencia.passerelle.message.MessageFactory;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 @SuppressWarnings("serial")
 public class SimpleLoop extends Actor {
 
@@ -148,7 +150,7 @@ public class SimpleLoop extends Actor {
     @Override
     protected void doInitialize() throws InitializationException {
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doInitialize() - entry");
+            logger.trace(getName() + " - doInitialize() - entry");
         }
 
         triggerPortExhausted = !(triggerPort.getWidth() > 0);
@@ -160,7 +162,7 @@ public class SimpleLoop extends Actor {
         // loopNumber = valuesList.length;
         super.doInitialize();
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doInitialize() - exit");
+            logger.trace(getName() + " - doInitialize() - exit");
         }
     }
 
@@ -195,7 +197,7 @@ public class SimpleLoop extends Actor {
     protected void doFire() throws ProcessingException {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doFire() - entry");
+            logger.trace(getName() + " - doFire() - entry");
         }
 
         ManagedMessage inputMsg = null;
@@ -206,18 +208,18 @@ public class SimpleLoop extends Actor {
                 if (inputMsg != null) {
 
                     if (logger.isDebugEnabled()) {
-                        logger.debug(getInfo() + " doFire() - received msg on port "
+                        logger.debug(getName() + " doFire() - received msg on port "
                                 + triggerPort.getName() + " msg :" + inputMsg);
                     }
                 } else {
                     triggerPortExhausted = true;
                     if (logger.isDebugEnabled()) {
-                        logger.debug(getInfo() + " doFire() - found exhausted port "
+                        logger.debug(getName() + " doFire() - found exhausted port "
                                 + triggerPort.getName());
                     }
                 }
             } catch (final PasserelleException e) {
-                throw new ProcessingException("Error reading from port", triggerPort, e);
+                ExceptionUtil.throwProcessingException("Error reading from port", triggerPort, e);
             }
         }
 
@@ -226,7 +228,7 @@ public class SimpleLoop extends Actor {
             sendLoopData();
             currentStep++;
             if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+                logger.trace(getName() + " - doFire() - iteration " + currentStep);
             }
             // and now do the loop, each time after receiving a loop iteration
             // handled notification.
@@ -240,14 +242,14 @@ public class SimpleLoop extends Actor {
                         handledMsg = MessageHelper.getMessage(handledPort);
                         if (handledMsg != null) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug(getInfo() + " doFire() - received msg on port "
+                                logger.debug(getName() + " doFire() - received msg on port "
                                         + handledPort.getName());
                             }
 
                         } else {
                             handledPortExhausted = true;
                             if (logger.isDebugEnabled()) {
-                                logger.debug(getInfo() + " doFire() - found exhausted port "
+                                logger.debug(getName() + " doFire() - found exhausted port "
                                         + handledPort.getName());
                             }
                         }
@@ -265,12 +267,12 @@ public class SimpleLoop extends Actor {
                     }
                     currentStep++;
                     if (logger.isTraceEnabled()) {
-                        logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+                        logger.trace(getName() + " - doFire() - iteration " + currentStep);
                     }
                 } catch (final PasserelleException e) {
-                    throw new ProcessingException("Error on loop", null, e);
+                    ExceptionUtil.throwProcessingException("Error on loop", this, e);
                 } catch (final NoRoomException e) {
-                    throw new ProcessingException("Error on loop", null, e);
+                    ExceptionUtil.throwProcessingException("Error on loop", this, e);
                 }
             }
         }
@@ -281,7 +283,7 @@ public class SimpleLoop extends Actor {
 
         if (triggerPortExhausted && handledPortExhausted) {
             if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + " - doFire() - exit");
+                logger.trace(getName() + " - doFire() - exit");
             }
         }
 
@@ -299,7 +301,7 @@ public class SimpleLoop extends Actor {
                         .setBodyContent(valuesList[currentIndex], ManagedMessage.objectContentType);
                 ExecutionTracerService.trace(this, "Loop with value: " + valuesList[currentIndex]);
             } catch (final MessageException e) {
-                throw new ProcessingException("Cannot send message out", this, e);
+                ExceptionUtil.throwProcessingException("Cannot send message out", this, e);
             }
             if (currentIndex == valuesList.length - 1) {
                 currentIndex = 0;
@@ -315,8 +317,7 @@ public class SimpleLoop extends Actor {
         try {
             sendOutputMsg(outputPort, resultMsg);
         } catch (final NoRoomException e) {
-            e.printStackTrace();
-            throw new ProcessingException("No room exception", this, e);
+            ExceptionUtil.throwProcessingException("No room exception", this, e);
         }
     }
 

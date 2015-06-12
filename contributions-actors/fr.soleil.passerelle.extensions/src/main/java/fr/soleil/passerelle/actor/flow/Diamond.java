@@ -24,10 +24,4 @@ public class Diamond extends Transformer{
 		sendOutputMsg(output, PasserelleUtil.createCopyMessage(this,arg0));
 	}
 
-	@Override
-	protected String getExtendedInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

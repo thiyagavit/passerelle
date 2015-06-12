@@ -29,8 +29,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
 import fr.soleil.passerelle.recording.DataRecorder;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -66,8 +65,8 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
     private List<TangoAttribute> attrList;
     private IMoveAction action;
 
-    public MotorMoverV5(final CompositeEntity container, final String name,
-            final List<String> outputList) throws NameDuplicationException, IllegalActionException {
+    public MotorMoverV5(final CompositeEntity container, final String name, final List<String> outputList)
+            throws NameDuplicationException, IllegalActionException {
         super(container, name);
         input.setExpectedMessageContentType(String.class);
         attrList = new ArrayList<TangoAttribute>();
@@ -79,8 +78,7 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
 
         attrOutputPortList.add(output);
         for (int i = 1; i < outputList.size(); i++) {
-            attrOutputPortList.add(PortFactory.getInstance().createOutputPort(this,
-                    outputList.get(i)));
+            attrOutputPortList.add(PortFactory.getInstance().createOutputPort(this, outputList.get(i)));
         }
 
         mouvementTypeParam = new StringParameter(this, MOUVEMENT_TYPE);
@@ -101,13 +99,11 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
 
                 attrList.clear();
                 for (int i = 0; i < outputList.size(); i++) {
-                    final TangoAttribute attHelper = new TangoAttribute(getDeviceName() + "/"
-                            + outputList.get(i));
+                    final TangoAttribute attHelper = new TangoAttribute(getDeviceName() + "/" + outputList.get(i));
                     attrList.add(attHelper);
                 }
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
         }
         super.doInitialize();
@@ -117,12 +113,9 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
     protected void process(ActorContext ctxt, ProcessRequest request, ProcessResponse response)
             throws ProcessingException {
         if (isMockMode()) {
-            final String desiredPosition = (String) PasserelleUtil.getInputValue(request
-                    .getMessage(input));
-            ExecutionTracerService.trace(this, "MOCK - Moving " + mouvementType + " to "
-                    + desiredPosition);
-            ExecutionTracerService.trace(this, "MOCK - " + mouvementType + " has been to "
-                    + desiredPosition);
+            final String desiredPosition = (String) PasserelleUtil.getInputValue(request.getMessage(input));
+            ExecutionTracerService.trace(this, "MOCK - Moving " + mouvementType + " to " + desiredPosition);
+            ExecutionTracerService.trace(this, "MOCK - " + mouvementType + " has been to " + desiredPosition);
             final List<Port> outputPortList = outputPortList();
             int i = 0;
             for (final Port port : outputPortList) {
@@ -130,17 +123,14 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
                 if (!port.equals(errorPort) && !port.getName().equals("hasFired")
                         && !port.getName().equals("hasFinished")) {
                     logger.debug("MOCK output " + " on " + port.getFullName());
-                    sendOutputMsg(output,
-                            PasserelleUtil.createContentMessage(this, desiredPosition));
+                    sendOutputMsg(output, PasserelleUtil.createContentMessage(this, desiredPosition));
                 }
                 i++;
             }
         } else {
             try {
-                final String desiredPosition = (String) PasserelleUtil.getInputValue(request
-                        .getMessage(input));
-                ExecutionTracerService.trace(this, "Moving " + getDeviceName() + " to "
-                        + desiredPosition);
+                final String desiredPosition = (String) PasserelleUtil.getInputValue(request.getMessage(input));
+                ExecutionTracerService.trace(this, "Moving " + getDeviceName() + " to " + desiredPosition);
 
                 action.setDesiredPosition(desiredPosition);
                 action.move();
@@ -159,9 +149,8 @@ public abstract class MotorMoverV5 extends ATangoDeviceActorV5 {
                             + currentPort.getFullName());
                     sendOutputMsg(currentPort, PasserelleUtil.createContentMessage(this, attHelper));
                 }
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
     }

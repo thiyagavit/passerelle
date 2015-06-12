@@ -13,11 +13,14 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Sink;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 //////////////////////////////////////////////////////////////////////////
 //// Const
@@ -73,7 +76,7 @@ public class Console extends Sink {
 			throws IllegalActionException {
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " :" + attribute);
+			logger.trace(getName() + " :" + attribute);
 
 		if (attribute == chopLengthParam) {
 			IntToken chopLengthToken = (IntToken) chopLengthParam.getToken();
@@ -85,14 +88,14 @@ public class Console extends Sink {
 			super.attributeChanged(attribute);
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " - exit ");
+			logger.trace(getName() + " - exit ");
 	}
 
 	@Override
 	protected void sendMessage(ManagedMessage message)
 			throws ProcessingException {
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+			logger.trace(getName());
 
 		if (message != null) {
 			if (isPassThrough()) {
@@ -106,9 +109,7 @@ public class Console extends Sink {
 								+ " !! CHOPPED !! ";
 					}
 				} catch (MessageException e) {
-					throw new ProcessingException(
-							PasserelleException.Severity.NON_FATAL, "",
-							message, e);
+				    ExceptionUtil.throwProcessingException(ErrorCode.FATAL, e.getMessage(), message, e);
 				}
 				if (content != null)
 					System.out.println(content);
@@ -118,7 +119,7 @@ public class Console extends Sink {
 		}
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " - exit ");
+			logger.trace(getName() + " - exit ");
 	}
 
 	/**

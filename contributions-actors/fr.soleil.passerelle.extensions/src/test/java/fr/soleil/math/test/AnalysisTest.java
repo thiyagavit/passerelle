@@ -76,7 +76,7 @@ public class AnalysisTest {
          * e.printStackTrace(); }
          */
         try {
-            final double[] d = Analysis.numericalDerivative(x, y);
+            Analysis.numericalDerivative(x, y);
 
         } catch (final ProcessingException e) {
             // TODO Auto-generated catch block

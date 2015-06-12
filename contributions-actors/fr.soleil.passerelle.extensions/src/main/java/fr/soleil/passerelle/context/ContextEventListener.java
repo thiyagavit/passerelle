@@ -2,6 +2,7 @@ package fr.soleil.passerelle.context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import ptolemy.actor.CompositeActor;
 import ptolemy.actor.Director;
 import ptolemy.actor.FiringEvent;
@@ -12,14 +13,16 @@ import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.director.DirectorUtils;
 import com.isencia.passerelle.ext.FiringEventListener;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public class ContextEventListener extends Attribute implements FiringEventListener {
@@ -80,7 +83,7 @@ public class ContextEventListener extends Attribute implements FiringEventListen
       // setter on device name added to be able to perform tests on a
       // specific BeamlineStatus
       if (deviceName == null) {
-        deviceName = SoleilUtilities.getDevicesFromClass("BeamlineStatus")[0];
+    	  deviceName = TangoAccess.getFirstDeviceExportedForClass("BeamlineStatus");
       }
       try {
         attribute = new TangoAttribute(deviceName + "/" + contextName);

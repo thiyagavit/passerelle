@@ -22,14 +22,13 @@ import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.ATangoActor;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.FilterHelper;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoGroupAttribute;
 
 /**
  * Write a value on a group of devices
- *
+ * 
  * @author ABEILLE
  */
 @SuppressWarnings("serial")
@@ -53,99 +52,91 @@ public class GroupedAttributeWriter extends ATangoActor {
 
     private TangoGroupAttribute attr;
 
-    public GroupedAttributeWriter(final CompositeEntity arg0, final String arg1)
-	    throws NameDuplicationException, IllegalActionException {
-	super(arg0, arg1);
+    public GroupedAttributeWriter(final CompositeEntity arg0, final String arg1) throws NameDuplicationException,
+            IllegalActionException {
+        super(arg0, arg1);
 
-	// inputValue = PortFactory.getInstance().createInputPort(this, "Value",
-	// null);
-	// output = PortFactory.getInstance().createOutputPort(this,"Output");
+        // inputValue = PortFactory.getInstance().createInputPort(this, "Value",
+        // null);
+        // output = PortFactory.getInstance().createOutputPort(this,"Output");
 
-	input.setName("Value");
-	input.setExpectedMessageContentType(String.class);
+        input.setName("Value");
+        input.setExpectedMessageContentType(String.class);
 
-	attributeNameParam = new StringParameter(this, ATTRIBUTE_NAMES);
-	attributeNameParam
-		.setExpression("tango/tangotest/1/short_scalar,tango/tangotest/1/double_scalar");
+        attributeNameParam = new StringParameter(this, ATTRIBUTE_NAMES);
+        attributeNameParam.setExpression("tango/tangotest/1/short_scalar,tango/tangotest/1/double_scalar");
     }
 
     @Override
     protected void doInitialize() throws InitializationException {
-	if (!isMockMode()) {
-	    try {
-		if (attributeNames.contains(",")) {
-		    attributeNameList = attributeNames.split(",");
-		} else {
-		    attributeNameList = FilterHelper.getDevicesForPatternAsArray(attributeNames);
-		}
-		attr = new TangoGroupAttribute(attributeNameList);
-	    } catch (final DevFailed e) {
-		throw new DevFailedInitializationException(e, this);
-	    }
-	}
-	super.doInitialize();
+        if (!isMockMode()) {
+            try {
+                if (attributeNames.contains(",")) {
+                    attributeNameList = attributeNames.split(",");
+                } else {
+                    attributeNameList = FilterHelper.getDevicesForPatternAsArray(attributeNames);
+                }
+                attr = new TangoGroupAttribute(attributeNameList);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
+            }
+        }
+        super.doInitialize();
     }
 
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-	    final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
-	final ManagedMessage message = request.getMessage(input);
+        final ManagedMessage message = request.getMessage(input);
 
-	if (isMockMode()) {
-	    ExecutionTracerService.trace(this, "MOCK - Writing attributes");
-	} else {
-	    try {
-		ExecutionTracerService.trace(this, "Writing attributes on ");
-		for (final String attributeName : attributeNameList) {
-		    ExecutionTracerService.trace(this, "\t - " + attributeName);
-		}
-		final String inputValue = (String) PasserelleUtil.getInputValue(message);
-		attr.write(inputValue);
-		// GroupReplyList reply = grp.write_attribute_reply(10);
-		// ExecutionTracerService.trace(this,"has failed:
-		// "+reply.has_failed());
-		/*
-		 * GroupAttrReplyList reply = grp.read_attribute_reply();
-		 * ExecutionTracerService .trace(this,"has failed:
-		 * "+reply.has_failed()); GroupAttrReply r1 =
-		 * (GroupAttrReply)reply.get(0); DeviceAttribute da1 =
-		 * r1.get_data(); ExecutionTracerService.trace (this,"result:
-		 * "+da1.extractShort()); GroupAttrReply r =
-		 * (GroupAttrReply)reply.get(1); DeviceAttribute da =
-		 * r.get_data(); ExecutionTracerService.trace(this,"result:
-		 * "+da. extractDouble());
-		 */
-		if (isRecordData()) {
-		    for (final String attributeName : attributeNameList) {
-			final String deviceName = TangoUtil
-				.getfullDeviceNameForAttribute(attributeName);
-			DataRecorder.getInstance().saveDevice(this, deviceName);
-			if (isFinishRequested()) {
-			    break;
-			}
-		    }
-		}
-	    } catch (final DevFailed e) {
-		throw new DevFailedProcessingException(e, this);
-	    }
-	}
-	// sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
-	response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
+        if (isMockMode()) {
+            ExecutionTracerService.trace(this, "MOCK - Writing attributes");
+        } else {
+            try {
+                ExecutionTracerService.trace(this, "Writing attributes on ");
+                for (final String attributeName : attributeNameList) {
+                    ExecutionTracerService.trace(this, "\t - " + attributeName);
+                }
+                final String inputValue = (String) PasserelleUtil.getInputValue(message);
+                attr.write(inputValue);
+                // GroupReplyList reply = grp.write_attribute_reply(10);
+                // ExecutionTracerService.trace(this,"has failed:
+                // "+reply.has_failed());
+                /*
+                 * GroupAttrReplyList reply = grp.read_attribute_reply();
+                 * ExecutionTracerService .trace(this,"has failed:
+                 * "+reply.has_failed()); GroupAttrReply r1 =
+                 * (GroupAttrReply)reply.get(0); DeviceAttribute da1 =
+                 * r1.get_data(); ExecutionTracerService.trace (this,"result:
+                 * "+da1.extractShort()); GroupAttrReply r =
+                 * (GroupAttrReply)reply.get(1); DeviceAttribute da =
+                 * r.get_data(); ExecutionTracerService.trace(this,"result:
+                 * "+da. extractDouble());
+                 */
+                if (isRecordData()) {
+                    for (final String attributeName : attributeNameList) {
+                        final String deviceName = TangoUtil.getfullDeviceNameForAttribute(attributeName);
+                        DataRecorder.getInstance().saveDevice(this, deviceName);
+                        if (isFinishRequested()) {
+                            break;
+                        }
+                    }
+                }
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
+            }
+        }
+        // sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
+        response.addOutputMessage(0, output, PasserelleUtil.createTriggerMessage());
     }
 
     @Override
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
-	if (arg0 == attributeNameParam) {
-	    attributeNames = PasserelleUtil.getParameterValue(attributeNameParam);
-	} else {
-	    super.attributeChanged(arg0);
-	}
-    }
-
-    @Override
-    protected String getExtendedInfo() {
-	// TODO Auto-generated method stub
-	return null;
+        if (arg0 == attributeNameParam) {
+            attributeNames = PasserelleUtil.getParameterValue(attributeNameParam);
+        } else {
+            super.attributeChanged(arg0);
+        }
     }
 }

@@ -101,12 +101,6 @@ public class BooleanSelection extends TransformerV3 {
 	}
 
 	@Override
-	protected String getExtendedInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected void process(final ActorContext arg0, final ProcessRequest request, final ProcessResponse reponse) throws ProcessingException {
 		if (outputTrue) {
 			reponse.addOutputMessage(0, output, PasserelleUtil.createContentMessage(this, "true"));

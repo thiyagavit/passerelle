@@ -40,6 +40,7 @@ import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
@@ -79,7 +80,7 @@ public class SpectrumCalculator extends Transformer {
     @Override
     protected void doFire(final ManagedMessage message) throws ProcessingException {
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - entry");
+	    logger.trace(getName() + " doFire() - entry");
 	}
 
 	TangoAttribute attrHelp = null;
@@ -89,8 +90,7 @@ public class SpectrumCalculator extends Transformer {
 		attrHelp = (TangoAttribute) obj;
 	    }
 	} catch (final MessageException e) {
-	    e.printStackTrace();
-	    throw new ProcessingException("Message Exception", null, e);
+	    ExceptionUtil.throwProcessingException("Message Exception", this, e);
 	}
 
 	double result = 0;
@@ -111,28 +111,25 @@ public class SpectrumCalculator extends Transformer {
 	    }
 
 	} catch (final DevFailed e) {
-	    e.printStackTrace();
-	    throw new ProcessingException(TangoToPasserelleUtil.getDevFailedString(e, this),
-		    attrHelp.getAttributeProxy().fullName(), e);
+	    ExceptionUtil.throwProcessingException(TangoToPasserelleUtil.getDevFailedString(e, this),
+                    attrHelp.getAttributeProxy().fullName(),e);
 	}
 
 	final ManagedMessage resultMsg = createMessage();
 	try {
 	    resultMsg.setBodyContent(new Double(result), ManagedMessage.objectContentType);
 	} catch (final MessageException e1) {
-	    e1.printStackTrace();
-	    throw new ProcessingException("Message Exception", attrHelp.getAttributeProxy()
-		    .fullName(), e1);
-	}
+	    ExceptionUtil.throwProcessingException("Message Exception",attrHelp.getAttributeProxy()
+                    .fullName(),e1);
+        }
 	try {
 	    sendOutputMsg(output, resultMsg);
 	} catch (final NoRoomException e2) {
-	    e2.printStackTrace();
-	    throw new ProcessingException("No room exception", attrHelp.getAttributeProxy()
-		    .fullName(), e2);
+	    ExceptionUtil.throwProcessingException("No room exception",attrHelp.getAttributeProxy()
+                    .fullName(),e2);
 	}
 	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - exit");
+	    logger.trace(getName() + " doFire() - exit");
 	}
     }
 

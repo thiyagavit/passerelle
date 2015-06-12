@@ -1,6 +1,5 @@
 package fr.soleil.passerelle.actor.tango.util;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,11 +19,9 @@ import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.esrf.TangoApi.AttributeProxy;
-import fr.esrf.TangoApi.DeviceAttribute;
 import fr.soleil.passerelle.actor.PortUtilities;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IActuator;
 import fr.soleil.salsa.entity.IScanResult;
 import fr.soleil.salsa.entity.ISensor;
@@ -58,8 +55,8 @@ public class GetScanData extends AbstractGetScanData {
     private final Map<String, String> actuatorsSources = new HashMap<String, String>();
     private final Map<String, String> sensorsSources = new HashMap<String, String>();
 
-    public GetScanData(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public GetScanData(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
     }
 
@@ -105,45 +102,39 @@ public class GetScanData extends AbstractGetScanData {
         for (i = 0; i < actuators.length; i++) {
             scanDataName = actuatorsSources.get(actuators[i]);
             if (scanDataName == null) {
-                throw new ProcessingExceptionWithLog(this, "Actuator " + actuators[i]
-                        + " does not exists on current scan", actuators[i], null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, "Actuator " + actuators[i]
+                        + " does not exists on current scan", actuators[i]);
             }
         }
 
         for (i = 0; i < sensors.length; i++) {
             scanDataName = sensorsSources.get(sensors[i]);
             if (scanDataName == null) {
-                throw new ProcessingExceptionWithLog(this, "Sensor " + sensors[i]
-                        + " does not exists on current scan", sensors[i], null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, "Sensor " + sensors[i]
+                        + " does not exists on current scan", sensors[i]);
             }
         }
 
         /** Envoie des informations sur les ports de sorties **/
         // output sensor and actuators
-        final List<Port> orderedActuatorPorts = PortUtilities.getOrderedOutputPorts(this, ACTUATOR,
-                0);
+        final List<Port> orderedActuatorPorts = PortUtilities.getOrderedOutputPorts(this, ACTUATOR, 0);
         if (isTrajectoryValue) {
             Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);
-           // Map<IActuator, double[]> realTrajectoryValues = res.getTrajectoryMap();
-            
+            // Map<IActuator, double[]> realTrajectoryValues = res.getTrajectoryMap();
+
             for (i = 0; i < actuators.length; i++) {
                 double[] trajectory = realTrajectoryValues.get(actuators[i]);
                 if (trajectory != null) {
-                   // System.out.println("trajectory " + Arrays.toString(trajectory));
-                    sendOutputMsg(orderedActuatorPorts.get(i),
-                            PasserelleUtil.createContentMessage(this, trajectory));
+                    // System.out.println("trajectory " + Arrays.toString(trajectory));
+                    sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, trajectory));
                     ExecutionTracerService.trace(this, "reading trajectory for actuator " + actuators[i]);
-                }
-                else {
-                    sendOutputMsg(orderedActuatorPorts.get(i),
-                            PasserelleUtil.createContentMessage(this, new double[0]));
-                    ExecutionTracerService.trace(this, "No reading trajectory for actuator "
-                            + actuators[i]);
+                } else {
+                    sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, new double[0]));
+                    ExecutionTracerService.trace(this, "No reading trajectory for actuator " + actuators[i]);
                 }
             }
-        }
-        else {
-            //System.out.println("===============> actuators " + Arrays.toString(actuators));
+        } else {
+            // System.out.println("===============> actuators " + Arrays.toString(actuators));
 
             for (i = 0; i < actuators.length; i++) {
                 scanDataName = actuatorsSources.get(actuators[i]);
@@ -151,11 +142,10 @@ public class GetScanData extends AbstractGetScanData {
                 final TangoAttribute act = new TangoAttribute(scanDataName);
                 // read attribute is done by the TangoAttribute constructor
                 ExecutionTracerService.trace(this, "reading data for actuator " + actuators[i]);
-                sendOutputMsg(orderedActuatorPorts.get(i),
-                        PasserelleUtil.createContentMessage(this, act));
+                sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, act));
             }
         }
-        
+
         final List<Port> orderedSensorPorts = PortUtilities.getOrderedOutputPorts(this, SENSOR, 0);
         for (i = 0; i < sensors.length; i++) {
             scanDataName = sensorsSources.get(sensors[i]);
@@ -163,15 +153,13 @@ public class GetScanData extends AbstractGetScanData {
             final TangoAttribute sensor = new TangoAttribute(scanDataName);
             // read attribute is done by the TangoAttribute constructor
             ExecutionTracerService.trace(this, "reading data for sensor " + sensors[i]);
-            sendOutputMsg(orderedSensorPorts.get(i),
-                    PasserelleUtil.createContentMessage(this, sensor));
+            sendOutputMsg(orderedSensorPorts.get(i), PasserelleUtil.createContentMessage(this, sensor));
         }
 
         super.sendTimestampsOnOutputPort(res.getActuatorsTimeStampsCompleteName());
     }
 
-    private String[] readScanParameter(final Parameter paramObj, String paramValue)
-            throws IllegalActionException {
+    private String[] readScanParameter(final Parameter paramObj, String paramValue) throws IllegalActionException {
 
         String[] elementList = {};
         paramValue = PasserelleUtil.getParameterValue(paramObj);

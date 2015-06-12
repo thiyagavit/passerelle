@@ -1,9 +1,10 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -45,7 +46,7 @@ public abstract class Command {
      *                                 if the device is particular state after the execution of
      *                                 the command
      */
-    public static boolean executeCmdAccordingState(Command command, DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public static boolean executeCmdAccordingState(Command command, DevState... states) throws DevFailed, ProcessingException {
         boolean commandAsBeenExecuted = false;
         DevState deviceState = command.getStateCommand().execute(DevState.class);
         for (DevState state : states) {
@@ -76,5 +77,5 @@ public abstract class Command {
      * @throws ProcessingExceptionWithLog (if the device in if device is in state defined by
      *                                    parameter states after the execution of the command)
      */
-    public abstract void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog;
+    public abstract void execute(DevState... states) throws DevFailed, ProcessingException;
 }

@@ -188,7 +188,7 @@ public class ExtractValueFromHDBTest {
         HdbExtractorProxy mockedProxy = mock(HdbExtractorProxy.class);
 
         Date date = new Date();
-        String dateParam = ExtractValueFromHDB.DATE_PARAMETER_FORMAT.format(date);
+        String dateParam = HdbExtractorProxy.DATE_FORMAT.format(date);
         String dateProxy = HdbExtractorProxy.DATE_FORMAT.format(date);
 
         when(mockedProxy.getNearestScalarAttrValue(eq("domain/family/member/attr"), eq(dateProxy)))
@@ -217,7 +217,7 @@ public class ExtractValueFromHDBTest {
         HdbExtractorProxy mockedProxy = mock(HdbExtractorProxy.class);
 
         Date date = new Date();
-        String dateParam = ExtractValueFromHDB.DATE_PARAMETER_FORMAT.format(date);
+        String dateParam = HdbExtractorProxy.DATE_FORMAT.format(date);
         String dateProxy = HdbExtractorProxy.DATE_FORMAT.format(date);
 
         when(mockedProxy.getNearestScalarAttrValue(eq("domain/family/member/attr"), eq(dateProxy)))

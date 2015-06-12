@@ -1,8 +1,5 @@
 package fr.soleil.passerelle.actor.tango.control;
 
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_ENCODER_TYPE_PROPERTY;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_POSITION_PROPERTY;
-import static fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfigurationV2.AXIS_INIT_TYPE_PROPERTY;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.HashMap;
@@ -17,15 +14,16 @@ import com.isencia.passerelle.core.PasserelleException;
 import fr.esrf.TangoApi.DbDatum;
 import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
 import fr.soleil.passerelle.testUtils.Constants;
 import fr.soleil.passerelle.testUtils.MomlRule;
 
 public class MotorInitReferencePositionV2Test {
 
-    public static final DbDatum OTHER_INIT_TYPE = new DbDatum(AXIS_INIT_TYPE_PROPERTY, "LDWP");
+    public static final DbDatum OTHER_INIT_TYPE = new DbDatum(MotorManager.AXIS_INIT_TYPE_PROPERTY, "LDWP");
     private static final String ACTOR_NAME = "MotorInitReferencePositionV2";
-    private static final DbDatum NO_ENCODER = new DbDatum(AXIS_ENCODER_TYPE_PROPERTY, 0);
-    private static final DbDatum INIT_POS_IS_0_5 = new DbDatum(AXIS_INIT_POSITION_PROPERTY, 0.5);
+    private static final DbDatum NO_ENCODER = new DbDatum(MotorManager.AXIS_ENCODER_TYPE_PROPERTY, 0);
+    private static final DbDatum INIT_POS_IS_0_5 = new DbDatum(MotorManager.AXIS_INIT_POSITION_PROPERTY, 0.5);
     private static String CB_NAME = "test/cb/1";
     private static String MOTOR_NAME = "test/motor/1-1";
     public final MomlRule moml = new MomlRule(Constants.SEQUENCES_PATH

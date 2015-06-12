@@ -1,7 +1,12 @@
 package fr.soleil.passerelle.tango.util;
 
+import org.tango.utils.DevFailedUtils;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
+import fr.esrf.TangoApi.Database;
+import fr.esrf.TangoApi.DbDatum;
+import fr.soleil.comete.tango.data.service.helper.TangoDeviceHelper;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 public final class TangoAccess {
@@ -51,6 +56,27 @@ public final class TangoAccess {
         return state;
           
     }
+    
+    
+    public static String getDeviceProperty(String deviceName, String propertyName) {
+        String value = null;
+        Database database = TangoDeviceHelper.getDatabase();
+        if (database != null && !isNullOrEmpty(deviceName) && !isNullOrEmpty(propertyName)) {
+            try {
+                DbDatum dbDatum = database.get_device_property(deviceName, propertyName);
+                if (dbDatum != null && !dbDatum.is_empty()) {
+                    value = dbDatum.extractString();
+                }
+            } catch (DevFailed e) {
+                DevFailedUtils.printDevFailed(e);
+            }
+        }
+        return value;
+    }
+    
+    private static boolean isNullOrEmpty(String stringValue) {
+        return (stringValue == null || stringValue.isEmpty());
+    }
     /**
      * Execute a Tango Command if the device is in a particular state. Return
      * true if the command has been executed
@@ -68,5 +94,23 @@ public final class TangoAccess {
             cmdExecuted = true;
         }
         return cmdExecuted;
+    }
+    
+    public static String[] getDeviceExportedForClass(String className) throws DevFailed {
+    	String[] deviceList = null;
+        if (className != null) {
+        	Database database = TangoDeviceHelper.getDatabase();
+        	deviceList = database.get_device_exported_for_class(className);
+        }
+        return deviceList;
+    }
+    
+    public static String getFirstDeviceExportedForClass(String className) throws DevFailed {
+    	String[] deviceList =getDeviceExportedForClass( className);
+    	String deviceName = null;
+        if (deviceList != null && deviceList.length > 0) {
+        	deviceName = deviceList[0];
+        }
+        return deviceName;
     }
 }

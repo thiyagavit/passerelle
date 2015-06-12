@@ -16,6 +16,7 @@ import com.isencia.passerelle.actor.Transformer;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 @SuppressWarnings("serial")
@@ -52,7 +53,7 @@ public class MessageMemoriser extends Transformer {
             ExecutionTracerService.trace(this, "Outputting value " + messageName);
             final ManagedMessage memorizedMessage = memorizedMessages.get(messageName);
             if (memorizedMessage == null) { // message not found
-                throw new ProcessingException("memorized message not found", messageName, null);
+                ExceptionUtil.throwProcessingException("memorized message not found", messageName);
             }
             sendOutputMsg(output, PasserelleUtil.createCopyMessage(this, memorizedMessage));
         }
@@ -63,13 +64,6 @@ public class MessageMemoriser extends Transformer {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /*
-     * @Override protected void doInitialize() throws InitializationException {
-     * System.out.println(this.getFullName() +" doInitialize");
-     * if(!memorizedMessages.isEmpty()) memorizedMessages.clear();
-     * super.doInitialize(); }
-     */
 
     @Override
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {

@@ -1,24 +1,27 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Soleil's Passerelle Actors/Extensions
-Bundle-SymbolicName: fr.soleil.passerelle.actor
-Bundle-Version: 4.7.7.qualifier
+Bundle-SymbolicName: fr.soleil.passerelle.extensions
+Bundle-Version: 8.10.0.qualifier
 Bundle-Vendor: synchrotron soleil
 Eclipse-RegisterBuddy: ptolemy.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.3.0",
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: com.isencia.passerelle.engine;bundle-version="8.7.0",
  ptolemy.core;bundle-version="7.0.1",
  ptolemy.domains.and.actors;bundle-version="7.0.1",
  ptolemy.gui;bundle-version="7.0.1",
- com.isencia.passerelle.actor;bundle-version="8.3.0",
- com.isencia.passerelle.commons;bundle-version="8.3.0",
- com.isencia.passerelle.commons.ume;bundle-version="8.0.0",
+ com.isencia.passerelle.actor;bundle-version="8.7.0",
+ com.isencia.passerelle.commons;bundle-version="8.7.0",
+ com.isencia.passerelle.commons.ume;bundle-version="8.7.0",
  javax.persistence;bundle-version="2.0.1",
- fr.soleil.passerelle.dependencies;bundle-version="4.7.3"
+ fr.soleil.passerelle.dependencies;bundle-version="8.7.6",
+ org.junit;bundle-version="4.10.0",
+ org.apache.commons.math;bundle-version="2.0.0",
+ org.tango;bundle-version="9.0.3"
 Import-Package: com.isencia.sherpa.commons,
  com.microstar.xml,
- org.osgi.framework;version="1.6.0",
- org.slf4j;version="1.6.0"
+ org.osgi.framework;version="1.7.0",
+ org.slf4j;version="1.6.4"
 Export-Package: fr.soleil.math,
  fr.soleil.passerelle,
  fr.soleil.passerelle.actor,

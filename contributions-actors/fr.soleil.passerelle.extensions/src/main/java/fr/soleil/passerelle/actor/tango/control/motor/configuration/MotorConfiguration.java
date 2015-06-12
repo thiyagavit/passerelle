@@ -17,6 +17,7 @@ import fr.esrf.TangoApi.DeviceData;
 import fr.esrf.TangoApi.DeviceProxy;
 import fr.esrf.TangoDs.Except;
 import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
@@ -137,9 +138,7 @@ public class MotorConfiguration {
 
             currentStateOnCb = TangoAccess.getCurrentState(cmdStateOnCb);
             if (currentStateOnCb.equals(FAULT) || currentStateOnCb.equals(UNKNOWN)) {
-                throw new ProcessingException(
-                        "error while after command init on control box, device is still in error",
-                        null, null);
+                ExceptionUtil.throwProcessingException( "error while after command init on control box, device is still in error");
             }
         }
 
@@ -169,8 +168,7 @@ public class MotorConfiguration {
         }
         currentStateOnAxis = TangoAccess.getCurrentState(cmdStateOnAxis);
         if (currentStateOnAxis.equals(FAULT) || currentStateOnAxis.equals(UNKNOWN)) {
-            throw new ProcessingException(
-                    "error while after command init on axis, device is still in error", null, null);
+            ExceptionUtil.throwProcessingException(  "error while after command init on axis, device is still in error");
         }
 
         // 2- chech if axis needs an On command

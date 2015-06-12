@@ -1,24 +1,24 @@
-/*	Synchrotron Soleil
- *
- *   File          :  MultipleSpectrumViewer.java
- *
- *   Project       :  passerelle-soleil
- *
- *   Description   :
- *
- *   Author        :  ABEILLE
- *
- *   Original      :  20 mai 2005
- *
- *   Revision:  					Author:
- *   Date: 							State:
- *
- *   Log: MultipleSpectrumViewer.java,v
- *
+/*
+ * Synchrotron Soleil
+ * 
+ * File : MultipleSpectrumViewer.java
+ * 
+ * Project : passerelle-soleil
+ * 
+ * Description :
+ * 
+ * Author : ABEILLE
+ * 
+ * Original : 20 mai 2005
+ * 
+ * Revision: Author:
+ * Date: State:
+ * 
+ * Log: MultipleSpectrumViewer.java,v
  */
 /*
  * Created on 20 mai 2005
- *
+ * 
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
@@ -58,8 +58,7 @@ import fr.esrf.tangoatk.core.ConnectionException;
 import fr.soleil.passerelle.actor.PortUtilities;
 import fr.soleil.passerelle.util.AttrScalarPanel;
 import fr.soleil.passerelle.util.AttributeMultipleSpectrumPanel;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
@@ -87,8 +86,8 @@ public class MultipleSpectrumViewer extends Sink {
      * @throws ptolemy.kernel.util.NameDuplicationException
      * @throws ptolemy.kernel.util.IllegalActionException
      */
-    public MultipleSpectrumViewer(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public MultipleSpectrumViewer(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
 
         input.setName("X");
@@ -107,8 +106,7 @@ public class MultipleSpectrumViewer extends Sink {
         frame.setLocation(new Point(250, 50));
         if (isMockMode()) {
             mockPanel = new AttrScalarPanel();
-        }
-        else {
+        } else {
             mainPanel = new AttributeMultipleSpectrumPanel();
         }
         super.doInitialize();
@@ -127,36 +125,29 @@ public class MultipleSpectrumViewer extends Sink {
                     for (int i = 0; i < xValues.length; i++) {
                         xValues[i] = Double.valueOf(input[i]);
                     }
-                }
-                catch (final ClassCastException e) {
+                } catch (final ClassCastException e) {
                     if (!mydata.getClass().isArray()) {
-                        throw new ProcessingExceptionWithLog(this,
-                                "Input message has not the good type (not "
-                                        + mydata.getClass().getName() + ")", this.getName(), null);
+                        ExceptionUtil.throwProcessingExceptionWithLog(this, "Input message has not the good type (not "
+                                + mydata.getClass().getName() + ")", this.getName());
                     }
                     // Can be an array of Double - GetScanData
                     // try/except si ce n'est pas du double
                     xValues = Arrays.copyOf((double[]) mydata, ((double[]) mydata).length);
                 }
-            }
-            else {
+            } else {
                 TangoAttribute attribute = (TangoAttribute) mydata;
                 if (logger.isTraceEnabled()) {
-                    logger.trace(getInfo() + "" + attribute.getAttributeProxy().fullName());
+                    logger.trace(getName() + "" + attribute.getAttributeProxy().fullName());
                 }
                 xValues = (double[]) attribute.extractArray(double.class);
             }
-        }
-        catch (final MessageException e) {
-            throw new ProcessingExceptionWithLog(this, "Cannot get input message", this.getName(),
-                    e);
-        }
-        catch (final DevFailed e) {
-            throw new DevFailedProcessingException(e, this);
-        }
-        catch (final Exception e) {
-            throw new ProcessingExceptionWithLog(this, "Cannot get input message", this.getName(),
-                    e);
+        } catch (final MessageException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot get input message", this.getName(), e);
+
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
+        } catch (final Exception e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot get input message", this.getName(), e);
         }
 
         return xValues;
@@ -167,7 +158,7 @@ public class MultipleSpectrumViewer extends Sink {
 
         // TODO: checker que tous les attributs ont le m^ type
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " sendMessage() - entry");
+            logger.trace(getName() + " sendMessage() - entry");
         }
 
         if (isMockMode()) {
@@ -177,13 +168,11 @@ public class MultipleSpectrumViewer extends Sink {
             frame.getContentPane().add(mockPanel);
             try {
                 mockPanel.postInitGUI();
+            } catch (final ConnectionException e1) {
+                // e1.printStackTrace();
+                ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot start panel", this.getName(), e1);
             }
-            catch (final ConnectionException e1) {
-                e1.printStackTrace();
-                throw new ProcessingExceptionWithLog(this, "Cannot start panel", this.getName(), e1);
-            }
-        }
-        else {
+        } else {
             try {
                 // get X input
                 double[] xValues = getDataFromPort(outgoingMessage);
@@ -200,24 +189,18 @@ public class MultipleSpectrumViewer extends Sink {
                     data[1] = Arrays.copyOf(yValues, yValues.length);
                     String trendName;
                     if (message.getBodyContent() instanceof TangoAttribute) {
-                        trendName = ((TangoAttribute) message.getBodyContent()).getAttributeProxy()
-                                .name();
-                    }
-                    else {
+                        trendName = ((TangoAttribute) message.getBodyContent()).getAttributeProxy().name();
+                    } else {
                         trendName = "Trend " + (i + 1);
                     }
                     chartData.put(trendName, data);
                 }
 
                 mainPanel.addChartData(chartData);
-            }
-            catch (final MessageException e) {
-                throw new ProcessingExceptionWithLog(this, "Cannot get input message",
-                        this.getName(), e);
-            }
-            catch (final PasserelleException e) {
-                throw new ProcessingExceptionWithLog(this, "Cannot get input message",
-                        this.getName(), e);
+            } catch (final MessageException e) {
+                ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot get input message", this.getName(), e);
+            } catch (final PasserelleException e) {
+                ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot get input message", this.getName(), e);
             }
             frame.setTitle("Multiple Spectrum Viewer");
             frame.getContentPane().add(mainPanel);
@@ -228,7 +211,7 @@ public class MultipleSpectrumViewer extends Sink {
         frame.setVisible(true);
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " sendMessage() - exit");
+            logger.trace(getName() + " sendMessage() - exit");
         }
     }
 
@@ -252,8 +235,7 @@ public class MultipleSpectrumViewer extends Sink {
                              */
                             inputsPorts.get(i).setContainer(null);
                             inputsPorts.remove(i);
-                        }
-                        catch (final NameDuplicationException e) {
+                        } catch (final NameDuplicationException e) {
                             throw new IllegalActionException(this, e, "Error for index " + i);
                         }
                     }
@@ -266,24 +248,20 @@ public class MultipleSpectrumViewer extends Sink {
                             // System.out.println("add:" + intputPortName);
                             Port extraInputPort = (Port) getPort(intputPortName);
                             if (extraInputPort == null) {
-                                extraInputPort = PortFactory.getInstance().createInputPort(this,
-                                        intputPortName, null);
+                                extraInputPort = PortFactory.getInstance().createInputPort(this, intputPortName, null);
                             }
                             // extraInputPort.setTypeEquals(BaseType.OBJECT);
                             inputsPorts.add(extraInputPort);
-                        }
-                        catch (final NameDuplicationException e) {
+                        } catch (final NameDuplicationException e) {
                             throw new IllegalActionException(this, e, "Error for index " + i);
                         }
                     }
                 }
-            }
-            catch (final IllegalActionException e) {
+            } catch (final IllegalActionException e) {
                 e.printStackTrace();
                 throw e;
             }
-        }
-        else {
+        } else {
             super.attributeChanged(attribute);
         }
     }

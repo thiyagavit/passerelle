@@ -22,14 +22,13 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorConfiguration;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
 import fr.soleil.tango.clientapi.factory.ProxyFactory;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public class DefineAllPositionsFromSnap extends Transformer {
@@ -58,20 +57,13 @@ public class DefineAllPositionsFromSnap extends Transformer {
                 "/org/tango-project/tango-icon-theme/32x32/devices/camera-photo.png");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:orange;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
     }
 
     @Override
@@ -81,13 +73,12 @@ public class DefineAllPositionsFromSnap extends Transformer {
     protected void doInitialize() throws InitializationException {
         if (!isMockMode()) {
             try {
-                snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
+            	snapExtractorName =  TangoAccess.getFirstDeviceExportedForClass("SnapExtractor");
                 getSnap = new TangoCommand(snapExtractorName, "GetSnap");
                 removeDynAttrs = new TangoCommand(snapExtractorName, "RemoveDynAttrs");
                 logger.debug(snapExtractorName);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
         }
         super.doInitialize();
@@ -112,39 +103,36 @@ public class DefineAllPositionsFromSnap extends Transformer {
                         final String snapValueAttr = (getReadPart) ? result[i + 1] : result[i + 2];
 
                         try {
-                            final TangoAttribute attr = new TangoAttribute(snapExtractorName + "/"
-                                    + snapValueAttr);
+                            final TangoAttribute attr = new TangoAttribute(snapExtractorName + "/" + snapValueAttr);
                             snapValue = attr.read(Double.class);
 
-                            equipmentDeviceName = TangoUtil
-                                    .getfullDeviceNameForAttribute(attributeName);
+                            equipmentDeviceName = TangoUtil.getfullDeviceNameForAttribute(attributeName);
 
-                            if (ProxyFactory.getInstance().createDeviceProxy(equipmentDeviceName)
-                                    .get_class().equals(GALIL_AXIS)) {
-                                final MotorConfiguration motorConf = new MotorConfiguration(
-                                        equipmentDeviceName);
+                            if (ProxyFactory.getInstance().createDeviceProxy(equipmentDeviceName).get_class()
+                                    .equals(GALIL_AXIS)) {
+                                final MotorConfiguration motorConf = new MotorConfiguration(equipmentDeviceName);
 
                                 // init devices if necessary
                                 motorConf.initMotor(this);
 
                                 // set offset
                                 if (attributeName.endsWith("offset")) {
-                                    final TangoAttribute offsetAttr = new TangoAttribute(
-                                            equipmentDeviceName + "/offset");
+                                    final TangoAttribute offsetAttr = new TangoAttribute(equipmentDeviceName
+                                            + "/offset");
 
-                                    ExecutionTracerService.trace(this, "Writing offset "
-                                            + snapValue + " to " + equipmentDeviceName);
+                                    ExecutionTracerService.trace(this, "Writing offset " + snapValue + " to "
+                                            + equipmentDeviceName);
 
                                     offsetAttr.write(snapValue);
 
                                 } else {
                                     // define position only for attribute
                                     // position
-                                    final TangoCommand setterCommand = new TangoCommand(
-                                            equipmentDeviceName, "DefinePosition");
+                                    final TangoCommand setterCommand = new TangoCommand(equipmentDeviceName,
+                                            "DefinePosition");
 
-                                    ExecutionTracerService.trace(this, "Defining " + snapValue
-                                            + " to " + equipmentDeviceName);
+                                    ExecutionTracerService.trace(this, "Defining " + snapValue + " to "
+                                            + equipmentDeviceName);
 
                                     setterCommand.execute(snapValue);
                                     // wait for the completion of define pos
@@ -156,30 +144,26 @@ public class DefineAllPositionsFromSnap extends Transformer {
                                         + " is not a GalilAxis, nothing done");
                             }
 
-                        }
-                        catch (final DevFailed e) {
+                        } catch (final DevFailed e) {
                             final String completeAttrName = (equipmentDeviceName == null) ? attributeName
                                     : equipmentDeviceName;
 
-                            ExecutionTracerService.trace(this, "DefinePosition error for "
-                                    + completeAttrName);
+                            ExecutionTracerService.trace(this, "DefinePosition error for " + completeAttrName);
                             TangoToPasserelleUtil.getDevFailedString(e, this);
 
-                        }
-                        catch (final ProcessingException e) {
+                        } catch (final ProcessingException e) {
                             final String completeAttrName = (equipmentDeviceName == null) ? attributeName
                                     : equipmentDeviceName;
 
-                            ExecutionTracerService.trace(this, "DefinePosition error for "
-                                    + completeAttrName + " " + e.getMessage());
+                            ExecutionTracerService.trace(this,
+                                    "DefinePosition error for " + completeAttrName + " " + e.getMessage());
                         }
                     }
 
                     removeDynAttrs.execute(result[i + 1], result[i + 2]);
                 }
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
         sendOutputMsg(output, PasserelleUtil.createTriggerMessage());
@@ -189,8 +173,7 @@ public class DefineAllPositionsFromSnap extends Transformer {
     @Override
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == snapExtractionTypeParam) {
-            final String snapExtractionType = PasserelleUtil
-                    .getParameterValue(snapExtractionTypeParam);
+            final String snapExtractionType = PasserelleUtil.getParameterValue(snapExtractionTypeParam);
             if (snapExtractionType.compareTo(ExtractionType.READ.toString()) == 0) {
                 getReadPart = true;
             } else {
@@ -216,8 +199,7 @@ public class DefineAllPositionsFromSnap extends Transformer {
     private void sleep(final long millis) {
         try {
             Thread.sleep(100);
-        }
-        catch (final InterruptedException e) {
+        } catch (final InterruptedException e) {
         }
     }
 }

@@ -80,7 +80,7 @@ public class StringsGenerator extends Transformer {
 	protected void doFire(ManagedMessage arg0) throws ProcessingException {
 		
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doFire() - entry");
+			logger.trace(getName()+" doFire() - entry");
 		
 		String currentString = stringsList[currentIndex];
 		if (currentIndex == stringsList.length - 1)
@@ -92,7 +92,7 @@ public class StringsGenerator extends Transformer {
 		
 		
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" doFire() - exit");
+			logger.trace(getName()+" doFire() - exit");
 
 	}
 

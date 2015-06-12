@@ -23,6 +23,8 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.MiscellaneousUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
@@ -151,8 +153,7 @@ public class MultiRangeLoop extends Actor {
 					triggerPortExhausted = true;
 				}
 			} catch (PasserelleException e) {
-				throw new ProcessingException("Error reading from port",
-						triggerPort, e);
+			    ExceptionUtil.throwProcessingException("Error reading from port", triggerPort, e);
 			}
 		}
 		if (inputMsg != null) {
@@ -171,8 +172,7 @@ public class MultiRangeLoop extends Actor {
 					try {
 						handledMsg = MessageHelper.getMessage(handledPort);
 					} catch (PasserelleException e) {
-						throw new ProcessingException(
-								"Error reading from port", handledPort, e);
+					    ExceptionUtil.throwProcessingException("Error reading from port", handledPort, e);
 					}
 					if (handledMsg == null) {
 						handledPortExhausted = true;
@@ -211,8 +211,7 @@ public class MultiRangeLoop extends Actor {
 					try {
 						handledMsg = MessageHelper.getMessage(handledPort);
 					} catch (PasserelleException e) {
-						throw new ProcessingException(
-								"Error reading from port", handledPort, e);
+					    ExceptionUtil.throwProcessingException("Error reading from port", handledPort, e);
 					}
 					if (handledMsg == null) {
 						handledPortExhausted = true;
@@ -251,12 +250,6 @@ public class MultiRangeLoop extends Actor {
 				+ "- outputting value " + currentValue);
 		sendOutputMsg(outputPort, PasserelleUtil.createContentMessage(this,
 				currentValue));
-	}
-
-	@Override
-	protected String getExtendedInfo() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

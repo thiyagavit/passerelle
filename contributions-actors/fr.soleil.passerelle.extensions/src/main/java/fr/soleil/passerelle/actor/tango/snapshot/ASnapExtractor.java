@@ -4,8 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tango.utils.TangoUtil;
 
 import ptolemy.actor.gui.style.TextStyle;
@@ -24,14 +22,13 @@ import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
+import fr.soleil.passerelle.tango.util.TangoAccess;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.util.SoleilUtilities;
 
 @SuppressWarnings("serial")
 public abstract class ASnapExtractor extends Transformer {
 
-    private final static Logger logger = LoggerFactory.getLogger(ASnapExtractor.class);
     private SnapExtractorProxy extractor;
 
     public Parameter attributeNameParam;
@@ -48,8 +45,8 @@ public abstract class ASnapExtractor extends Transformer {
 
     private ExtractionType extractionType;
 
-    public ASnapExtractor(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public ASnapExtractor(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name);
         attributeNameParam = new StringParameter(this, "Attribute to extract");
         attributeNameParam.setExpression("name");
@@ -68,20 +65,13 @@ public abstract class ASnapExtractor extends Transformer {
                 "/org/tango-project/tango-icon-theme/32x32/devices/camera-photo.png");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:orange;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n");
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-15\" y=\"-15\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
     }
 
     @Override
@@ -103,15 +93,13 @@ public abstract class ASnapExtractor extends Transformer {
                     }
                 }
                 attributeNames = list.toArray(new String[list.size()]);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
             try {
                 extractor = new SnapExtractorProxy();
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
         }
         super.doInitialize();
@@ -126,8 +114,8 @@ public abstract class ASnapExtractor extends Transformer {
      */
     protected void getAndSendValues() throws DevFailed, ProcessingException {
         if (isMockMode()) {
-            ExecutionTracerService.trace(this, "MOCK - snap values for snap ID " + snapID
-                    + " : [read = " + 1 + "] [write = " + 2 + "]");
+            ExecutionTracerService.trace(this, "MOCK - snap values for snap ID " + snapID + " : [read = " + 1
+                    + "] [write = " + 2 + "]");
             sendOutputMsg(output, PasserelleUtil.createContentMessage(this, 1));
             sendOutputMsg(writePort, PasserelleUtil.createContentMessage(this, 2));
         } else {
@@ -222,7 +210,7 @@ public abstract class ASnapExtractor extends Transformer {
     @Deprecated
     public String getSnapExtractorName() throws DevFailed {
         if (snapExtractorName == null) {
-            snapExtractorName = SoleilUtilities.getDevicesFromClass("SnapExtractor")[0];
+        		snapExtractorName =  TangoAccess.getFirstDeviceExportedForClass("SnapExtractor") ;
         }
         return snapExtractorName;
     }

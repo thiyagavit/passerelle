@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
+import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.general.Const;
 import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.domain.cap.Director;
@@ -29,7 +30,6 @@ import com.isencia.passerelle.model.FlowManager;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.testUtils.MessageListener;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 public class ExtractValueFromSnapIDV2Test {
@@ -226,7 +226,7 @@ public class ExtractValueFromSnapIDV2Test {
     }
 
     // TODO TEST ERROR MSG
-    @Test(expectedExceptions = DevFailedProcessingException.class)
+    @Test(expectedExceptions = ProcessingException.class)
     public void should_throw_exception_when_read_extract_failed_and_throwException_param_is_true()
             throws DevFailed, NameDuplicationException, IllegalActionException,
             FlowAlreadyExecutingException, PasserelleException {
@@ -344,7 +344,7 @@ public class ExtractValueFromSnapIDV2Test {
     }
 
     // TODO TEST ERROR MSG
-    @Test(expectedExceptions = DevFailedProcessingException.class)
+    @Test(expectedExceptions = ProcessingException.class)
     public void should_throw_exception_when_write_extract_failed_and_throwException_param_is_true()
             throws DevFailed, NameDuplicationException, IllegalActionException,
             FlowAlreadyExecutingException, PasserelleException {
@@ -369,7 +369,7 @@ public class ExtractValueFromSnapIDV2Test {
     }
 
     // TODO TEST ERROR MSG
-    @Test(expectedExceptions = DevFailedProcessingException.class)
+    @Test(expectedExceptions = ProcessingException.class)
     public void should_throw_exception_when_read_write_extract_failed_and_throwException_param_is_true()
             throws DevFailed, NameDuplicationException, IllegalActionException,
             FlowAlreadyExecutingException, PasserelleException {

@@ -13,16 +13,18 @@ import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Transformer;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 @SuppressWarnings("serial")
 public class ErrorGenerator extends Transformer {
 
     private final static Logger logger = LoggerFactory.getLogger(ErrorGenerator.class);
     public Parameter severityParam;
-    public String severity = Severity.FATAL.toString();
+    public String severity = ExceptionUtil.FATAL_ERROR;
 
     public Parameter messageParam;
     public String message;
@@ -35,8 +37,8 @@ public class ErrorGenerator extends Transformer {
 
         severityParam = new StringParameter(this, "severity");
         severityParam.setExpression(severity);
-        severityParam.addChoice(Severity.FATAL.toString());
-        severityParam.addChoice(Severity.NON_FATAL.toString());
+        severityParam.addChoice(ExceptionUtil.FATAL_ERROR);
+        severityParam.addChoice(ExceptionUtil.NON_FATAL_ERROR);
 
     }
 
@@ -44,11 +46,11 @@ public class ErrorGenerator extends Transformer {
     protected void doFire(final ManagedMessage message) throws ProcessingException {
         logger.debug("error doFire actor ");
         ExecutionTracerService.trace(this, "Error message: " + this.message);
-        Severity s = Severity.NON_FATAL;
-        if (Severity.FATAL.toString().equals(severity)) {
-            s = Severity.FATAL;
+        ErrorCode error = ErrorCode.INFO;
+        if (ExceptionUtil.FATAL_ERROR.equals(severity)) {
+            error = ErrorCode.FATAL;
+            ExceptionUtil.throwProcessingException(error, this.message,this);
         }
-        throw new ProcessingException(s, this.message, null, null);
     }
 
     @Override
@@ -61,11 +63,5 @@ public class ErrorGenerator extends Transformer {
             super.attributeChanged(attribute);
         }
     }
-
-    @Override
-    protected String getExtendedInfo() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+   
 }

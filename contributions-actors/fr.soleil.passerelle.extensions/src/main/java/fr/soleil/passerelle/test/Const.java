@@ -18,6 +18,8 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.TriggeredSource;
 import com.isencia.passerelle.message.ManagedMessage;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 //////////////////////////////////////////////////////////////////////////
 //// Const
 /**
@@ -26,84 +28,87 @@ import com.isencia.passerelle.message.ManagedMessage;
 @SuppressWarnings("serial")
 public class Const extends TriggeredSource {
 
-	private static Logger logger = LoggerFactory.getLogger(Const.class);
-	private boolean messageSent = false;
-	private ManagedMessage dataMsg = null;
-	/** Construct a constant source with the given container and name.
-	 *  Create the <i>value</i> parameter, initialize its value to
-	 *  the default value of an IntToken with value 1.
-	 *  @param container The container.
-	 *  @param name The name of this actor.
-	 *  @exception IllegalActionException If the entity cannot be contained
-	 *   by the proposed container.
-	 *  @exception NameDuplicationException If the container already has an
-	 *   actor with this name.
-	 */
-	public Const(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
-		super(container, name);
-		value = new StringParameter(this, "value");
-		value.setExpression("");
-		registerConfigurableParameter(value);
-		
-	}
+    private static Logger logger = LoggerFactory.getLogger(Const.class);
+    private boolean messageSent = false;
+    private ManagedMessage dataMsg = null;
 
-	///////////////////////////////////////////////////////////////////
-	////                     ports and parameters                  ////
+    /**
+     * Construct a constant source with the given container and name.
+     * Create the <i>value</i> parameter, initialize its value to
+     * the default value of an IntToken with value 1.
+     * 
+     * @param container The container.
+     * @param name The name of this actor.
+     * @exception IllegalActionException If the entity cannot be contained
+     *                by the proposed container.
+     * @exception NameDuplicationException If the container already has an
+     *                actor with this name.
+     */
+    public Const(CompositeEntity container, String name) throws NameDuplicationException, IllegalActionException {
+        super(container, name);
+        value = new StringParameter(this, "value");
+        value.setExpression("");
+        registerConfigurableParameter(value);
 
-	/** The value produced by this constant source.
-	 *  By default, it contains an StringToken with an empty string.  
-	 */
-	public Parameter value;
+    }
 
-	/*
-	 *  (non-Javadoc)
-	 * @see com.isencia.passerelle.actor.Actor#doInitialize()
-	 */
-	protected void doInitialize() throws InitializationException {
+    // /////////////////////////////////////////////////////////////////
+    // // ports and parameters ////
+
+    /**
+     * The value produced by this constant source.
+     * By default, it contains an StringToken with an empty string.
+     */
+    public Parameter value;
+
+    /*
+     *  (non-Javadoc)
+     * @see com.isencia.passerelle.actor.Actor#doInitialize()
+     */
+    protected void doInitialize() throws InitializationException {
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
+			logger.trace(getName());
 
 		messageSent = false;
 		try {
 			String tokenMessage = ((StringToken) value.getToken()).stringValue();
 			dataMsg = createMessage(tokenMessage, "text/plain");
 		} catch (Exception e) {
-			throw new InitializationException(getInfo()+" - getMessage() generated exception "+e,value,e);
+		    ExceptionUtil.throwInitializationException(getName()+" - getMessage() generated exception "+e,value,e);
 		} 
 		super.doInitialize();
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
-	}
-	
-	protected ManagedMessage getMessage() throws ProcessingException {
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo());
-
-		if( messageSent && !isTriggerConnected())
-			return null;	
-
-		messageSent = true;
-		
-		if (logger.isTraceEnabled())
-			logger.trace(getInfo()+" - exit ");
-		
-		return dataMsg;
-	}
-	/**
-	 * @see be.tuple.passerelle.engine.actor.Source#getInfo()
-	 */
-	protected String getExtendedInfo() {
-		return value.getExpression();
+			logger.trace(getName()+" - exit ");
 	}
 
+    protected ManagedMessage getMessage() throws ProcessingException {
+        if (logger.isTraceEnabled())
+            logger.trace(getName());
 
-	/**
-	 * @see be.tuple.passerelle.engine.actor.TriggeredSource#doWaitForTrigger()
-	 */
-	protected boolean mustWaitForTrigger() {
-		return true;
-	}
+        if (messageSent && !isTriggerConnected())
+            return null;
 
+        messageSent = true;
+
+        if (logger.isTraceEnabled())
+            logger.trace(getName() + " - exit ");
+
+        return dataMsg;
+    }
+
+    /**
+     * @see be.tuple.passerelle.engine.actor.Source#getInfo()
+     */
+    protected String getExtendedInfo() {
+        return value.getExpression();
+    }
+
+    /**
+     * @see be.tuple.passerelle.engine.actor.TriggeredSource#doWaitForTrigger()
+     */
+    protected boolean mustWaitForTrigger() {
+        return true;
+    }
 
 }

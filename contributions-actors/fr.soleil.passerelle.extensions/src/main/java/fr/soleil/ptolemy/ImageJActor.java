@@ -1,32 +1,33 @@
-/* An actor that uses the ImageJ system for displaying an image. This
-   actor is based on the ImageReader actor.
-
-   Dan Higgins - NCEAS
-
-   @Copyright (c) 2001-2004 The Regents of the University of California.
-   All rights reserved.
-
-   Permission is hereby granted, without written agreement and without
-   license or royalty fees, to use, copy, modify, and distribute this
-   software and its documentation for any purpose, provided that the
-   above copyright notice and the following two paragraphs appear in all
-   copies of this software.
-
-   IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY
-   FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
-   ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
-   THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF
-   SUCH DAMAGE.
-
-   THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
-   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE
-   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
-   CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-   ENHANCEMENTS, OR MODIFICATIONS.
-
-   PT_COPYRIGHT_VERSION 2
-   COPYRIGHTENDKEY
+/*
+ * An actor that uses the ImageJ system for displaying an image. This
+ * actor is based on the ImageReader actor.
+ * 
+ * Dan Higgins - NCEAS
+ * 
+ * @Copyright (c) 2001-2004 The Regents of the University of California.
+ * All rights reserved.
+ * 
+ * Permission is hereby granted, without written agreement and without
+ * license or royalty fees, to use, copy, modify, and distribute this
+ * software and its documentation for any purpose, provided that the
+ * above copyright notice and the following two paragraphs appear in all
+ * copies of this software.
+ * 
+ * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY
+ * FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+ * THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * 
+ * THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE
+ * PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+ * CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+ * ENHANCEMENTS, OR MODIFICATIONS.
+ * 
+ * PT_COPYRIGHT_VERSION 2
+ * COPYRIGHTENDKEY
  */
 
 package fr.soleil.ptolemy;
@@ -36,14 +37,17 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.Sink;
-import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
+
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,13 +79,13 @@ public class ImageJActor extends Sink {
      * @exception NameDuplicationException
      *                If the container already has an actor with this name.
      */
-    public ImageJActor(final CompositeEntity container, final String name)
-	    throws IllegalActionException, NameDuplicationException {
-	super(container, name);
+    public ImageJActor(final CompositeEntity container, final String name) throws IllegalActionException,
+            NameDuplicationException {
+        super(container, name);
 
-	fileOrURL = new FileParameter(this, "fileOrURL");
-	fileOrURL.setExpression(fileName);
-	registerConfigurableParameter(fileOrURL);
+        fileOrURL = new FileParameter(this, "fileOrURL");
+        fileOrURL.setExpression(fileName);
+        registerConfigurableParameter(fileOrURL);
     }
 
     // /////////////////////////////////////////////////////////////////
@@ -116,108 +120,102 @@ public class ImageJActor extends Sink {
      *                cannot be opened.
      */
     @Override
-    public void attributeChanged(final Attribute attribute)
-	    throws IllegalActionException {
-	if (attribute == fileOrURL) {
-	    fileName = fileOrURL.asFile().getPath();
-	} else {
-	    super.attributeChanged(attribute);
-	}
+    public void attributeChanged(final Attribute attribute) throws IllegalActionException {
+        if (attribute == fileOrURL) {
+            fileName = fileOrURL.asFile().getPath();
+        } else {
+            super.attributeChanged(attribute);
+        }
     }
 
     /**
    *
    */
     @Override
-    protected void sendMessage(final ManagedMessage outgoingMessage)
-	    throws ProcessingException {
-	String className = "";
-	try {
-	    if (!(outgoingMessage.getBodyContent() instanceof TangoAttribute)) {
-		final Exception e = null;
-		className = outgoingMessage.getBodyContent().getClass()
-			.getName();
-		throw new ProcessingException(
-			"Input message must of type AttributeProxy (not "
-				+ className + ")", this.getName(), e);
-	    }
-	    ap = (TangoAttribute) outgoingMessage.getBodyContent();
-	} catch (final MessageException e) {
-	    e.printStackTrace();
-	    throw new ProcessingException(PasserelleException.Severity.FATAL,
-		    "Cannot get input message", this.getName(), e);
-	}
-	AttrDataFormat data_format;
-	try {
-	    data_format = ap.getAttributeProxy().get_info().data_format;
-	} catch (final DevFailed e2) {
-	    e2.printStackTrace();
-	    throw new ProcessingException(TangoToPasserelleUtil
-		    .getDevFailedString(e2, this), ap.getAttributeProxy()
-		    .fullName(), e2);
-	}
-	if (!data_format.equals(AttrDataFormat.IMAGE)) {
-	    final Exception e = new Exception();
-	    throw new ProcessingException("Attribute is not an image", ap
-		    .getAttributeProxy().fullName(), e);
-	}
-	Double image_d[] = null;
-	short image_s[] = null;
-	// int width = 0;
-	// int height = 0;
-	try {
-	    image_d = ap.readSpecOrImage(Double.class);
-	    image_s = new short[image_d.length];
-	    for (int i = 0; i < image_d.length; i++) {
-		image_s[i] = (short) image_d[i].doubleValue();
-	    }
+    protected void sendMessage(final ManagedMessage outgoingMessage) throws ProcessingException {
+        String className = "";
+        try {
+            if (!(outgoingMessage.getBodyContent() instanceof TangoAttribute)) {
+                final Exception e = null;
+                className = outgoingMessage.getBodyContent().getClass().getName();
 
-	    // width = ap.getDeviceAttribute().getDimX();
-	    // height = ap.getDeviceAttribute().getDimY();
-	} catch (final DevFailed e2) {
-	    e2.printStackTrace();
-	    throw new ProcessingException(TangoToPasserelleUtil
-		    .getDevFailedString(e2, this), ap.getAttributeProxy()
-		    .fullName(), e2);
-	}
-	System.out.println("get image " + ap.getAttributeProxy().fullName());
-	// ImagePlus imp = null;
-	// ImageProcessor ip = new ShortProcessor(width, height);
-	// ip.setPixels(image_s);
-	// ip.setColor(Color.red);
-	// ip.fill();
-	// imp = new ImagePlus();
-	// imp = new
-	// ImagePlus("Tango image - "+ap.getAttributeProxy().fullName(), new
-	// ShortProcessor(width, height));
-	// ImageCanvas cc = new ImageCanvas(imp);
-	// new CustomWindow(imp, cc);
+                ExceptionUtil.throwProcessingException("Input message must of type AttributeProxy (not " + className
+                        + ")", this.getName(), e);
 
-	// imp.getProcessor().setPixels(image_s);
-	// imp.getProcessor().setRoi(0,50,0,50);
-	// imp.getProcessor().d
-	System.out.println("show image " + ap.getAttributeProxy().fullName());
+            }
+            ap = (TangoAttribute) outgoingMessage.getBodyContent();
+        } catch (final MessageException e) {
+            // e.printStackTrace();
+            ExceptionUtil.throwProcessingException(ErrorCode.FATAL, "Cannot get input message", this.getName(), e);
+        }
+        AttrDataFormat data_format = null;
+        try {
+            data_format = ap.getAttributeProxy().get_info().data_format;
+        } catch (final DevFailed e2) {
+            // e2.printStackTrace();
+            ExceptionUtil.throwProcessingException(TangoToPasserelleUtil.getDevFailedString(e2, this), ap
+                    .getAttributeProxy().fullName(), e2);
+        }
+        if (data_format != null && !data_format.equals(AttrDataFormat.IMAGE)) {
+            ExceptionUtil.throwProcessingException("Attribute is not an image", ap.getAttributeProxy().fullName(),
+                    new Exception());
+        }
+        Double image_d[] = null;
+        short image_s[] = null;
+        // int width = 0;
+        // int height = 0;
+        try {
+            image_d = ap.readSpecOrImage(Double.class);
+            image_s = new short[image_d.length];
+            for (int i = 0; i < image_d.length; i++) {
+                image_s[i] = (short) image_d[i].doubleValue();
+            }
 
-	// imp.show("coucou");
+            // width = ap.getDeviceAttribute().getDimX();
+            // height = ap.getDeviceAttribute().getDimY();
+        } catch (final DevFailed e2) {
+            // e2.printStackTrace();
+            ExceptionUtil.throwProcessingException(TangoToPasserelleUtil.getDevFailedString(e2, this), ap
+                    .getAttributeProxy().fullName(), e2);
+        }
+//        System.out.println("get image " + ap.getAttributeProxy().fullName());
+        // ImagePlus imp = null;
+        // ImageProcessor ip = new ShortProcessor(width, height);
+        // ip.setPixels(image_s);
+        // ip.setColor(Color.red);
+        // ip.fill();
+        // imp = new ImagePlus();
+        // imp = new
+        // ImagePlus("Tango image - "+ap.getAttributeProxy().fullName(), new
+        // ShortProcessor(width, height));
+        // ImageCanvas cc = new ImageCanvas(imp);
+        // new CustomWindow(imp, cc);
 
-	System.out.println("firing ImageJActor");
+        // imp.getProcessor().setPixels(image_s);
+        // imp.getProcessor().setRoi(0,50,0,50);
+        // imp.getProcessor().d
+        System.out.println("show image " + ap.getAttributeProxy().fullName());
 
-	/*
-	 * if (ij == null) { if (IJMacro.ij!=null) {// IJMacro may already have
-	 * a static instance of an ImageJ class; if so, use it ij = IJMacro.ij;
-	 * } else { ij = new ImageJ(); } } if (ij!=null && !ij.isShowing()) {
-	 * ij.show(); System.out.println("show image"); }
-	 */
-	/*
-	 * if (fileName != null) { // new ImagePlus(fileName).show();
-	 * imp.show(); System.out.println("show image fileName"); }
-	 */
+        // imp.show("coucou");
+
+        System.out.println("firing ImageJActor");
+
+        /*
+         * if (ij == null) { if (IJMacro.ij!=null) {// IJMacro may already have
+         * a static instance of an ImageJ class; if so, use it ij = IJMacro.ij;
+         * } else { ij = new ImageJ(); } } if (ij!=null && !ij.isShowing()) {
+         * ij.show(); System.out.println("show image"); }
+         */
+        /*
+         * if (fileName != null) { // new ImagePlus(fileName).show();
+         * imp.show(); System.out.println("show image fileName"); }
+         */
     }
 
     @Override
     protected String getExtendedInfo() {
-	// TODO Auto-generated method stub
-	return null;
+        // TODO Auto-generated method stub
+        return null;
     }
 
     // /////////////////////////////////////////////////////////////////

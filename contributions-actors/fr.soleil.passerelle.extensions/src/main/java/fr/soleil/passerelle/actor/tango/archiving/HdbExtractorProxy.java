@@ -5,14 +5,16 @@ import java.text.SimpleDateFormat;
 import org.tango.utils.DevFailedUtils;
 
 import fr.esrf.Tango.DevFailed;
+import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.util.SoleilUtilities;
 
 public class HdbExtractorProxy {
-    public static final String WRONG_FORMAT = "Error call ICA :  method GetNewestValue of hdbExtractor not returns the expected format which is timestamp; attribute_value";
-
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy H:m:s");
-
+    
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    private static final String HDBEXTRACTOR = "HdbExtractor";
+    public static final String NEWEST_CMD = "GetNewestValue";
+    public static final String NEAREST_CMD = "GetNearestValue";
+    private static final String VALUE_SEP = ";";
     private TangoCommand newestValueCommand;
     private TangoCommand nearestValueCommand;
     private String hdbExtractorName = "";
@@ -25,11 +27,14 @@ public class HdbExtractorProxy {
      * 
      * @throws DevFailed
      */
-    public HdbExtractorProxy(boolean defaultConfig) throws DevFailed {
-        if (defaultConfig) {
-            hdbExtractorName = SoleilUtilities.getDevicesFromClass("HdbExtractor")[0];
-            newestValueCommand = new TangoCommand(hdbExtractorName, "GetNewestValue");
-            nearestValueCommand = new TangoCommand(hdbExtractorName, "GetNearestValue");
+    public HdbExtractorProxy() throws DevFailed {
+    	
+        String hdbExtractorName =  TangoAccess.getFirstDeviceExportedForClass(HDBEXTRACTOR);
+        if (hdbExtractorName != null ) {
+            newestValueCommand = new TangoCommand(hdbExtractorName, NEWEST_CMD);
+            nearestValueCommand = new TangoCommand(hdbExtractorName, NEAREST_CMD);
+        } else {
+            DevFailedUtils.throwDevFailed("No " + HDBEXTRACTOR + " device found !");
         }
     }
 
@@ -59,21 +64,22 @@ public class HdbExtractorProxy {
      */
     public String getLastScalarAttrValue(String completeAttributeName) throws DevFailed {
 
-        String result = "0";
+        String result = null;
         if (newestValueCommand != null) {
-            // res should contains the timestamp and the read part of the attribute separated by a
-            // semicolon
+            // res should contains the timestamp and the read part of the attribute separated by ;
             // eg 1363947098786; -10.176605465035054
             String res = newestValueCommand.execute(String.class, completeAttributeName);
-
-            String[] attrWithTimeStamp = res.split(";");
-
-            if (attrWithTimeStamp.length != 2) {
-                DevFailedUtils.throwDevFailed(WRONG_FORMAT);
+            if(res != null){
+                String[] attrWithTimeStamp = res.split(VALUE_SEP);
+                if (attrWithTimeStamp != null && attrWithTimeStamp.length == 2) {
+                    result = attrWithTimeStamp[1].trim();
+                }
             }
-            result = attrWithTimeStamp[1].trim();
         }
-        
+        if(result == null || result.isEmpty()){
+            DevFailedUtils.throwDevFailed("No result found executing " + hdbExtractorName + "/" + NEWEST_CMD + " for " + completeAttributeName);
+        }
+
         return result;
     }
 
@@ -97,20 +103,23 @@ public class HdbExtractorProxy {
      */
     public String getNearestScalarAttrValue(String completeAttributeName, String date) throws DevFailed {
 
-        String result = "0";
+        String result = null;
         if (nearestValueCommand != null) {
-            // res should contains the timestamp and the read part of the attribute separated by a
-            // semicolon
+            // res should contains the timestamp and the read part of the attribute separated by ;
             // eg 1363947098786; -10.176605465035054
             String res = nearestValueCommand.execute(String.class, completeAttributeName, date);
-
-            String[] attrWithTimeStamp = res.split(";");
-
-            if (attrWithTimeStamp.length != 2) {
-                DevFailedUtils.throwDevFailed(WRONG_FORMAT);
+            if(res != null){
+                String[] attrWithTimeStamp = res.split(VALUE_SEP);
+                if (attrWithTimeStamp != null && attrWithTimeStamp.length == 2) {
+                    result = attrWithTimeStamp[1].trim();
+                }
             }
-            result = attrWithTimeStamp[1].trim();
         }
+        
+        if(result == null || result.isEmpty()){
+            DevFailedUtils.throwDevFailed("No result found executing " + hdbExtractorName + "/" + NEAREST_CMD + " for " + completeAttributeName + " at " + date );
+        }
+        
         return result;
 
     }
