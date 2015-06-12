@@ -63,7 +63,6 @@
    <groupId>org.tango</groupId>
    <artifactId>org.tango</artifactId>
    <version>9.0.3</version>
-   <classifier>isencia-bundle</classifier>
   </dependency>
   <dependency>
    <groupId>org.slf4j</groupId>
