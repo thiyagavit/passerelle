@@ -11,10 +11,12 @@ package fr.soleil.passerelle.errorcontrol;
 import ptolemy.actor.Director;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.Actor;
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 /**
  * @author erwin
@@ -42,7 +44,7 @@ public class RetryStrategy extends DefaultErrorControlStrategy {
 	public void handleFireException(Actor a, ProcessingException e) throws IllegalActionException {
 		//System.out.println("RetryStrategy.handleFireException");
 		//TODO: gerer nbRetry par acteur
-		if(e.getSeverity() == Severity.NON_FATAL){
+		if(!ExceptionUtil.isSeverityFatal(e.getSeverity())){
 			if(nbRetry < totalnbRetry){
 				ExecutionTracerService.trace(a, e.getMessage());
 				ExecutionTracerService.trace(a, "!!!ERROR occured - Retrying step!!!");

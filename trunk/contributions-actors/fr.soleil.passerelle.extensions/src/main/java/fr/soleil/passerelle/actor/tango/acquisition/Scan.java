@@ -44,7 +44,6 @@ import com.isencia.passerelle.actor.v5.ActorContext;
 import com.isencia.passerelle.actor.v5.ProcessRequest;
 import com.isencia.passerelle.actor.v5.ProcessResponse;
 import com.isencia.passerelle.core.ErrorCode;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
@@ -55,8 +54,9 @@ import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.ScanTask;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.salsa.api.SalsaAPI;
 import fr.soleil.salsa.entity.IConfig;
 import fr.soleil.salsa.exception.SalsaDeviceException;
 import fr.soleil.salsa.exception.ScanNotFoundException;
@@ -122,7 +122,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             
             try {
                 logger.debug("load salsa config {}", confName);
-                conf = ScanUtil.getCurrentSalsaApi().getConfigByPath(confName);
+                conf = SalsaAPI.getConfigByPath(confName);
 
             } catch (final ScanNotFoundException e) {
                 ExecutionTracerService.trace(this, "Error: Unknown scan configuration " + confName);
@@ -154,8 +154,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
             scanTask = new ScanTask(conf, 1000);
             scanTask.run();
             if (scanTask.hasFailed()) {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL, scanTask.getError().getMessage(), this,
-                        scanTask.getError());
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, scanTask.getError().getMessage(),this, scanTask.getError());
             } else {
                 ExecutionTracerService.trace(this, "Scan finished");
             }
@@ -167,7 +166,7 @@ public class Scan extends TransformerV5 implements IActorFinalizer {
 
     private void configureRecordingSession() throws SalsaDeviceException {
         // FIXME : http://jira.synchrotron-soleil.fr/jira/browse/TANGOCORE-5
-        DeviceProxyFactory.remove(ScanUtil.getCurrentSalsaApi().getDevicePreferences().getScanServer().toLowerCase());
+        DeviceProxyFactory.remove(SalsaAPI.getDevicePreferences().getScanServer().toLowerCase());
 
         if (DataRecorder.getInstance().isSaveActive(this)) {
             ScanUtil.getCurrentSalsaApi().setDataRecorderPartialMode(true);

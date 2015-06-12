@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.optimization.OptimizationException;
 import org.apache.commons.math.optimization.fitting.CurveFitter;
 import org.apache.commons.math.optimization.fitting.ParametricRealFunction;
 import org.apache.commons.math.optimization.general.LevenbergMarquardtOptimizer;
@@ -14,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.isencia.passerelle.actor.ProcessingException;
+
+import fr.soleil.lib.project.math.ArrayUtils;
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 //TODO: intersection de 2 dtes
 public class BeamCalculations {
@@ -100,10 +101,11 @@ public class BeamCalculations {
      * retrieve the 2 positions x1 and x2 at half maximum
      */
     public static double[] getHmPositions(final double[] x, final double[] y) {
-        final List<Double> yVal = Arrays.asList(ArrayUtils.toObject(y));
-
+    	// Sort the array as ascending, the last value will be the max
+    	Arrays.sort(y);
+    
         // calculate half maximum
-        final double halfMax = Collections.max(yVal) * 0.5;
+        final double halfMax =y[y.length - 1] * 0.5;
         // System.out.println("max "+Collections.max(yVal));
         // System.out.println("halfMax "+halfMax);
         // finding the 2 nearest positions for first width point x1
@@ -135,13 +137,12 @@ public class BeamCalculations {
     }
 
     public static double fwhm(final double[] x, final double[] y) throws ProcessingException {
-        final double res;
+        double res = Double.NaN;
         try {
             final double[] values = getHmPositions(x, y);
             res = Math.abs(values[1] - values[0]);
         } catch (Exception e) {
-            //e.printStackTrace();
-            throw new ProcessingException("Invalid Input Values to calculate fwhm  ", null, e);
+            ExceptionUtil.throwProcessingException("Invalid Input Values to calculate fwhm",BeamCalculations.class.getName(),e);
         }
         return res;
     }
@@ -187,6 +188,7 @@ public class BeamCalculations {
         for (int i = 0; i < x.length; i++) {
             fitter.addObservedPoint(x[i], y[i]);
         }
+        double result = Double.NaN;
         // paramaters {x0, a, p}
         // final int max = y.length - 1;
         // final double[] initialGuess = new double[3];
@@ -211,17 +213,13 @@ public class BeamCalculations {
                 logger.debug(String.valueOf(new BeamCalculations.FunctionForFittingDualRamp()
                         .value(element, parameters)));
             }
-            return parameters[0];
-        } catch (final OptimizationException e) {
-            e.printStackTrace();
-            throw new ProcessingException("impossible to fit ", null, e);
-        } catch (final FunctionEvaluationException e) {
-            e.printStackTrace();
-            throw new ProcessingException("impossible to fit ", null, e);
-        } catch (final IllegalArgumentException e) {
-            e.printStackTrace();
-            throw new ProcessingException("impossible to fit ", null, e);
+            result = parameters[0];
+        } catch (final Exception e) {
+            //e.printStackTrace();
+            ExceptionUtil.throwProcessingException("Impossible to fit",BeamCalculations.class.getName(),e);
         }
+        
+        return result ;
     }
 
     /**
@@ -238,14 +236,18 @@ public class BeamCalculations {
             final double p = parameters[2];
             double dydx0, dyda, dydp;
             if (x <= x0) {
-                gradient[0] = dydx0 = 0;
-                gradient[1] = dyda = 1;
-                gradient[2] = dydp = 0;
+                dydx0 = 0;
+                dyda = 1;
+                dydp = 0;
             } else {
-                gradient[1] = dydx0 = 1;
-                gradient[0] = dyda = -p;
-                gradient[2] = dydp = x - x0;
+                dydx0 = 1;
+                dyda = -p;
+                dydp = x - x0;
             }
+            
+            gradient[0] = dydx0;
+            gradient[1] = dyda;
+            gradient[2] = dydp;
             return gradient;
         }
 

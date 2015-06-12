@@ -1,11 +1,13 @@
 package fr.soleil.passerelle.actor.tango.control.motor.configuration.initDevices;
 
 import com.isencia.passerelle.actor.Actor;
+import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
+import fr.soleil.passerelle.actor.tango.control.motor.configuration.MotorManager;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
 /**
@@ -18,25 +20,17 @@ public class OnCommand extends Command {
 
     public OnCommand(Actor actor, String deviceName, TangoCommand stateCommand) throws DevFailed {
         super(actor, deviceName, stateCommand);
-        command = new TangoCommand(deviceName, "MotorON");
+        command = new TangoCommand(deviceName, MotorManager.MOTOR_ON);
     }
 
     @Override
-    public void execute(DevState... states) throws DevFailed, ProcessingExceptionWithLog {
+    public void execute(DevState... states) throws DevFailed, ProcessingException {
         ExecutionTracerService.trace(actor, "Motor is off, try to execute On command" + deviceName);
         command.execute();
-
-//        try {
-//            Thread.sleep(200);
-//        }
-//        catch (InterruptedException e) {
-//            e.printStackTrace();// TODO log
-//        }
-
         DevState deviceState = stateCommand.execute(DevState.class);
         for (DevState state : states) {
             if (state == deviceState) {
-                throw new ProcessingExceptionWithLog(actor, ON_ERROR_MSG, null, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(actor, ON_ERROR_MSG, this);
             }
         }
     }

@@ -2,7 +2,6 @@ package fr.soleil.passerelle.actor.calculation;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +17,16 @@ import com.isencia.passerelle.actor.ValidationException;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
 import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.TransformerV3;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
-import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
@@ -62,7 +59,7 @@ public class AttributeImageCalculation extends TransformerV3 {
      */
     @ParameterName(name = OPERATION_PARAM_NAME)
     public Parameter operationParam;
-    private Operation operation;
+    // private Operation operation;
 
     // Use to cumulate the image data : when the image come from Tango, it can
     // be exploited as a simple array
@@ -89,14 +86,12 @@ public class AttributeImageCalculation extends TransformerV3 {
 
         if (arg0 == storedAttributeNameParam) {
             storedAttributeName = PasserelleUtil.getParameterValue(storedAttributeNameParam);
-        }
-        else if (arg0 == operationParam) {
+        } else if (arg0 == operationParam) {
             // final String value = PasserelleUtil.getParameterValue(operationParam);
             // if (value.equals(Operation.ACCUMULATE.toString())) {
-            operation = Operation.ACCUMULATE;
+            // operation = Operation.ACCUMULATE;
             // }
-        }
-        else
+        } else
             super.attributeChanged(arg0);
     }
 
@@ -108,41 +103,38 @@ public class AttributeImageCalculation extends TransformerV3 {
         super.validateInitialization();
         accumul = null;
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - entry");
+            logger.trace(getName() + " validateInitialization() - entry");
         }
         if (!isMockMode() && !storedAttributeName.isEmpty()) {
             try {
                 storedTangoAttribute = new TangoAttribute(storedAttributeName);
 
                 if (!storedTangoAttribute.isImage()) {
-                    throw new ValidationException("Invalid Stored Attribute Format", this, null);
+                    ExceptionUtil.throwValidationException("Invalid Stored Attribute Format", this);
                 }
 
                 if (!storedTangoAttribute.isNumber() && !storedTangoAttribute.isBoolean()) {
-                    throw new ValidationException("Invalid Stored Attribute Type", this, null);
+                    ExceptionUtil.throwValidationException("Invalid Stored Attribute Type", this);
                 }
 
                 if (!storedTangoAttribute.isWritable()) {
-                    throw new ValidationException("Invalid Stored Attribute is not Writable", this,
-                            null);
+                    ExceptionUtil.throwValidationException("Invalid Stored Attribute is not Writable", this);
                 }
 
-            }
-            catch (DevFailed e) {
-                throw new DevFailedValidationException(e, this);
-            }
-            catch (PasserelleException e) {
-                throw new ValidationException(e.getMessage(), this, e);
+            } catch (DevFailed e) {
+                ExceptionUtil.throwValidationException(this, e);
+            } catch (PasserelleException e) {
+                ExceptionUtil.throwValidationException(e.getMessage(), this, e);
             }
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - exit");
+            logger.trace(getName() + " validateInitialization() - exit");
         }
     }
 
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
         final ManagedMessage message = request.getMessage(input);
         final Object inputValue = PasserelleUtil.getInputValue(message);
@@ -154,39 +146,36 @@ public class AttributeImageCalculation extends TransformerV3 {
             // TangoAttribute is read and it must be a Image of number
             if (inputValue instanceof TangoAttribute) {
                 attrHelp = (TangoAttribute) inputValue;
-            }
-            else {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL,
-                        "the input data must be a TangoAttribute.", this, null);
+            } else {
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                        "the input data must be a TangoAttribute.", this);
             }
 
             // Format
             if (!attrHelp.isImage()) {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL,
-                        "the input data must be an Image.", this, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                        "the input data must be an Image.", this);
             }
 
             // Type
             if (!attrHelp.isNumber() && !attrHelp.isBoolean()) {
-                throw new ProcessingExceptionWithLog(this, Severity.FATAL,
-                        "the input data must contain numericals values.", this, null);
+                ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL,
+                        "the input data must contain numericals values.", this);
             }
             // Extract image value : The input TangoAttribute must contain the image value
             newValue = (double[]) attrHelp.extractArray(double.class);
 
-        }
-        catch (final DevFailed e) {
-            throw new DevFailedProcessingException(e, this);
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
         }
 
         // Accumulation table initialization
         if (accumul == null) {
             accumul = new double[newValue.length];
             Arrays.fill(accumul, 0.0);
-        }
-        else if (newValue.length != accumul.length) {
-            throw new ProcessingExceptionWithLog(this, Severity.FATAL, "Size of input must be "
-                    + accumul.length, this, null);
+        } else if (newValue.length != accumul.length) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, ErrorCode.FATAL, "Size of input must be "
+                    + accumul.length, this);
         }
 
         // accumulation realization
@@ -202,16 +191,12 @@ public class AttributeImageCalculation extends TransformerV3 {
                 // System.out.println("DimX = " + dimx + ", dimy = " + dimy + ", accumul.length" +
                 // accumul.length);
 
-                storedTangoAttribute
-                        .writeImage(dimx, dimy, (Object[]) ArrayUtils.toObject(accumul));
+                storedTangoAttribute.writeImage(dimx, dimy,accumul);
                 ExecutionTracerService.trace(this, "write Attribute " + storedAttributeName);
 
                 // storedTangoAttribute.writeImage(dimx, dimy, accumul);
-            }
-            catch (DevFailed e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                throw new DevFailedProcessingException(e, Severity.FATAL, this);
+            } catch (DevFailed e) {
+                ExceptionUtil.throwProcessingException(ErrorCode.FATAL, this, e);
             }
         }
         ExecutionTracerService.trace(this, "Calculation is done ");

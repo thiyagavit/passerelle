@@ -64,7 +64,7 @@ public class SpectrumAverager extends Transformer {
 	protected void doFire(final ManagedMessage message)
 			throws ProcessingException {
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " doFire() - entry");
+			logger.trace(getName() + " doFire() - entry");
 		}
 
 		final String[] values = ((String) PasserelleUtil.getInputValue(message))
@@ -80,7 +80,7 @@ public class SpectrumAverager extends Transformer {
 				.createContentMessage(this, average));
 
 		if (logger.isTraceEnabled()) {
-			logger.trace(getInfo() + " doFire() - exit");
+			logger.trace(getName() + " doFire() - exit");
 		}
 	}
 

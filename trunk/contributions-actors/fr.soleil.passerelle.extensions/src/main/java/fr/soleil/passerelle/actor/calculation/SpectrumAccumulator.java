@@ -2,15 +2,13 @@ package fr.soleil.passerelle.actor.calculation;
 
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ptolemy.data.expr.Parameter;
 import ptolemy.data.expr.StringParameter;
 import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.InitializationException;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
@@ -18,13 +16,13 @@ import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
+
 import fr.soleil.passerelle.actor.TransformerV3;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 @SuppressWarnings("serial")
 public class SpectrumAccumulator extends TransformerV3 {
-
-    private final static Logger logger = LoggerFactory.getLogger(SpectrumAccumulator.class);
 
     private double[] values;
     private double[] accumul;
@@ -70,8 +68,7 @@ public class SpectrumAccumulator extends TransformerV3 {
 	} else if (inputValue.getClass().isArray()) {
 	    newValueS = (String[]) inputValue;
 	} else {
-	    throw new ProcessingException("cannot get input data of type " + inputValue.getClass(),
-		    null, null);
+	    ExceptionUtil.throwProcessingException("cannot get input data of type " + inputValue.getClass(), this);
 	}
 
 	if (values == null) {
@@ -80,7 +77,7 @@ public class SpectrumAccumulator extends TransformerV3 {
 	    Arrays.fill(values, 0);
 	    Arrays.fill(accumul, 0);
 	} else if (newValueS.length != values.length) {
-	    throw new ProcessingException("size of input must be " + values.length, null, null);
+	    ExceptionUtil.throwProcessingException("size of input must be " + values.length, this);
 	}
 	accumulations++;
 	System.out.println(Arrays.toString(values));

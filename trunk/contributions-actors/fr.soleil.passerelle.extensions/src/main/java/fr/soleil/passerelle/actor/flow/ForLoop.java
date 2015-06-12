@@ -55,6 +55,7 @@ import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageHelper;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 /**
@@ -178,7 +179,7 @@ public class ForLoop extends Actor {
     @Override
     protected void doInitialize() throws InitializationException {
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doInitialize() - entry");
+            logger.trace(getName() + " - doInitialize() - entry");
         }
 
         handleReceived = false;
@@ -227,7 +228,7 @@ public class ForLoop extends Actor {
         stepNumber = (long) Math.floor(div.doubleValue()) + 1;
         logger.debug("stepNumber " + stepNumber);
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doInitialize() - exit");
+            logger.trace(getName() + " - doInitialize() - exit");
         }
     }
 
@@ -276,7 +277,7 @@ public class ForLoop extends Actor {
     protected void doFire() throws ProcessingException {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " - doFire() - entry");
+            logger.trace(getName() + " - doFire() - entry");
         }
 
         ManagedMessage inputMsg = null;
@@ -286,18 +287,18 @@ public class ForLoop extends Actor {
                 inputMsg = MessageHelper.getMessage(triggerPort);
                 if (inputMsg != null) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(getInfo() + " doFire() - received msg on port "
+                        logger.debug(getName() + " doFire() - received msg on port "
                                 + triggerPort.getName() + " msg :" + inputMsg);
                     }
                 } else {
                     triggerPortExhausted = true;
                     if (logger.isDebugEnabled()) {
-                        logger.debug(getInfo() + " doFire() - found exhausted port "
+                        logger.debug(getName() + " doFire() - found exhausted port "
                                 + triggerPort.getName());
                     }
                 }
             } catch (final PasserelleException e) {
-                throw new ProcessingException("Error reading from port", triggerPort, e);
+                ExceptionUtil.throwProcessingException("Error reading from port", triggerPort, e);
             }
         }
 
@@ -306,7 +307,7 @@ public class ForLoop extends Actor {
             sendLoopData();
             currentStep++;
             if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+                logger.trace(getName() + " - doFire() - iteration " + currentStep);
             }
             // and now do the loop, each time after receiving a loop iteration
             // handled notification.
@@ -329,10 +330,10 @@ public class ForLoop extends Actor {
                     }
                     currentStep++;
                     if (logger.isTraceEnabled()) {
-                        logger.trace(getInfo() + " - doFire() - iteration " + currentStep);
+                        logger.trace(getName() + " - doFire() - iteration " + currentStep);
                     }
                 } catch (final PasserelleException e) {
-                    throw new ProcessingException("Error on loop", null, e);
+                    ExceptionUtil.throwProcessingException("Error on loop", this, e);
                 }
             } // while
 
@@ -358,7 +359,7 @@ public class ForLoop extends Actor {
 
         if (triggerPortExhausted && handledPortExhausted) {
             if (logger.isTraceEnabled()) {
-                logger.trace(getInfo() + " - doFire() - exit");
+                logger.trace(getName() + " - doFire() - exit");
             }
         }
 
@@ -375,8 +376,7 @@ public class ForLoop extends Actor {
             resultMsg.setBodyContent(new Double(currentValue), ManagedMessage.objectContentType);
             ExecutionTracerService.trace(this, "Loop with value: " + currentValue);
         } catch (final MessageException e) {
-            e.printStackTrace();
-            throw new ProcessingException("Cannot send message out", this, e);
+            ExceptionUtil.throwProcessingException("Cannot send message out", this, e);
         }
         if (up) {
             // use formater to remove the "problem" of precision
@@ -394,8 +394,7 @@ public class ForLoop extends Actor {
         try {
             sendOutputMsg(outputPort, resultMsg);
         } catch (final NoRoomException e) {
-            e.printStackTrace();
-            throw new ProcessingException("No room exception", this, e);
+            ExceptionUtil.throwProcessingException("No room exception", this, e);
         }
     }
 

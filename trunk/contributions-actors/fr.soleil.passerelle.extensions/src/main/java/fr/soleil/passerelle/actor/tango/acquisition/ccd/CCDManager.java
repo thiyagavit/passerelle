@@ -4,16 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.kernel.util.IllegalActionException;
+
 import com.isencia.passerelle.actor.Actor;
+
 import fr.esrf.Tango.DevFailed;
 import fr.esrf.Tango.DevState;
-import fr.esrf.TangoApi.DeviceProxy;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.CancellableTangoTask;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
 import fr.soleil.tango.clientapi.TangoAttribute;
 import fr.soleil.tango.clientapi.TangoCommand;
-import fr.soleil.tango.clientapi.factory.ProxyFactory;
 
 public class CCDManager {
     protected String deviceName = "CX/EX/CCD.1";

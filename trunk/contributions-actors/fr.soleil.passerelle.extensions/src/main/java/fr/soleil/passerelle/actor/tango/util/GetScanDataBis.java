@@ -20,8 +20,8 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.PortUtilities;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 import fr.soleil.salsa.entity.IActuator;
 import fr.soleil.salsa.entity.IScanResult;
 import fr.soleil.salsa.entity.ISensor;
@@ -61,19 +61,17 @@ public class GetScanDataBis extends AbstractGetScanData {
             final List<ISensor> sensorList) throws ProcessingException, DevFailed {
 
         if (actuatorList.size() != actuatorsNb) {
-            throw new ProcessingExceptionWithLog(this,
-                    "Actuator number port is incorect. Correct number is " + actuatorList.size(),
-                    this, null);
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Actuator number port is incorect. Correct number is "
+                    + actuatorList.size(), this);
+
         }
         if (sensorList.size() != sensorsNb) {
-            throw new ProcessingExceptionWithLog(this,
-                    "Sensor number port is incorect. Correct number is " + sensorList.size(), this,
-                    null);
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Sensor number port is incorect. Correct number is "
+                    + sensorList.size(), this);
         }
 
         // output sensor and actuators
-        final List<Port> orderedActuatorPorts = PortUtilities.getOrderedOutputPorts(this, ACTUATOR,
-                0);
+        final List<Port> orderedActuatorPorts = PortUtilities.getOrderedOutputPorts(this, ACTUATOR, 0);
         final Iterator<IActuator> iteratorAct = actuatorList.iterator();
         String realScanDataName;
         String scanDataName;
@@ -81,38 +79,33 @@ public class GetScanDataBis extends AbstractGetScanData {
         IActuator iact;
         if (isTrajectoryValue) {
 
-            //Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);           
+            // Map<String, double[]> realTrajectoryValues = super.getRealTrajectory(res);
             Map<IActuator, double[]> realTrajectoryValues = res.getTrajectoryMap();
-            
+
             while (iteratorAct.hasNext()) {
                 iact = iteratorAct.next();
                 realScanDataName = iact.getScanServerAttributeName();
                 scanDataName = iact.getName();
-                //double[] trajectory = realTrajectoryValues.get(scanDataName);
+                // double[] trajectory = realTrajectoryValues.get(scanDataName);
                 double[] trajectory = realTrajectoryValues.get(iact);
 
                 if (trajectory != null) {
                     System.out.println("trajectory " + Arrays.toString(trajectory));
 
                     logger.debug("source act name " + realScanDataName + " for attribute " + i + " : " + scanDataName);
-                
+
                     // read attribute is done by the TangoAttribute constructor
                     ExecutionTracerService.trace(this, "reading trajectory for actuator " + i + " : " + scanDataName);
-                    sendOutputMsg(orderedActuatorPorts.get(i),
-                            PasserelleUtil.createContentMessage(this, trajectory));
-                }
-                else {
-                    sendOutputMsg(orderedActuatorPorts.get(i),
-                            PasserelleUtil.createContentMessage(this, new double[0]));
-                    ExecutionTracerService.trace(this, "No reading trajectory for actuator "
-                            + scanDataName);
+                    sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, trajectory));
+                } else {
+                    sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, new double[0]));
+                    ExecutionTracerService.trace(this, "No reading trajectory for actuator " + scanDataName);
                 }
                 i++;
 
             }
-        }
-        else {
-            while (iteratorAct.hasNext()) {               
+        } else {
+            while (iteratorAct.hasNext()) {
                 iact = iteratorAct.next();
                 realScanDataName = iact.getScanServerAttributeName();
                 scanDataName = iact.getName();
@@ -120,8 +113,7 @@ public class GetScanDataBis extends AbstractGetScanData {
                 final TangoAttribute attr = new TangoAttribute(realScanDataName);
                 // read attribute is done by the TangoAttribute constructor
                 ExecutionTracerService.trace(this, "reading data for actuator " + i + " : " + scanDataName);
-                sendOutputMsg(orderedActuatorPorts.get(i),
-                        PasserelleUtil.createContentMessage(this, attr));
+                sendOutputMsg(orderedActuatorPorts.get(i), PasserelleUtil.createContentMessage(this, attr));
                 i++;
 
             }
@@ -140,10 +132,9 @@ public class GetScanDataBis extends AbstractGetScanData {
             final TangoAttribute sensor = new TangoAttribute(realScanDataName);
             // read attribute is done by the TangoAttribute
             // constructor
-            //System.err.println(sensor.getDataType() == AttrDataFormat._IMAGE);
+            // System.err.println(sensor.getDataType() == AttrDataFormat._IMAGE);
             ExecutionTracerService.trace(this, "reading data for sensor " + i + " : " + scanDataName);
-            sendOutputMsg(orderedSensorPorts.get(i),
-                    PasserelleUtil.createContentMessage(this, sensor));
+            sendOutputMsg(orderedSensorPorts.get(i), PasserelleUtil.createContentMessage(this, sensor));
             i++;
         }
 

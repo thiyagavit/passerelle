@@ -39,7 +39,7 @@ import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
 import fr.soleil.passerelle.tango.util.WaitStateTask;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -56,34 +56,34 @@ import fr.soleil.tango.clientapi.TangoAttribute;
 @SuppressWarnings("serial")
 public class ScientaAcquisition extends ATangoDeviceActor implements IActorFinalizer {
 
-    private final static Logger logger     = LoggerFactory.getLogger(ScientaAcquisition.class);
+    private final static Logger logger = LoggerFactory.getLogger(ScientaAcquisition.class);
 
-    public Port                 sumDataPort;
-    public Port                 dataPort;
+    public Port sumDataPort;
+    public Port dataPort;
     // public Port contextPort;
     // private double excitationEnergy = new Double(0);
-    public Parameter            modeParam;
-    private String              mode       = "Fixed";
-    public Parameter            lowEnergyParam;
-    private double              lowEnergy  = 0;
-    public Parameter            fixEnergyParam;
-    private double              fixEnergy  = 1;
-    public Parameter            highEnergyParam;
-    private double              highEnergy = 1;
-    public Parameter            energyStepParam;
-    private double              energyStep = 0.1;
-    public Parameter            stepTimeParam;
-    private double              stepTime   = 1;
-    public Parameter            lensModeParam;
-    private String              lensMode   = "Transmission";
-    public Parameter            passEnergyParam;
-    private double              passEnergy = 2;
+    public Parameter modeParam;
+    private String mode = "Fixed";
+    public Parameter lowEnergyParam;
+    private double lowEnergy = 0;
+    public Parameter fixEnergyParam;
+    private double fixEnergy = 1;
+    public Parameter highEnergyParam;
+    private double highEnergy = 1;
+    public Parameter energyStepParam;
+    private double energyStep = 0.1;
+    public Parameter stepTimeParam;
+    private double stepTime = 1;
+    public Parameter lensModeParam;
+    private String lensMode = "Transmission";
+    public Parameter passEnergyParam;
+    private double passEnergy = 2;
 
-    public ParameterGroup       detectorParam;
-    public ParameterGroup       energyParam;
-    public ParameterGroup       stepParam;
+    public ParameterGroup detectorParam;
+    public ParameterGroup energyParam;
+    public ParameterGroup stepParam;
 
-    private WaitStateTask       waitTask;
+    private WaitStateTask waitTask;
 
     /**
      * @param arg0
@@ -190,7 +190,7 @@ public class ScientaAcquisition extends ATangoDeviceActor implements IActorFinal
         // final ManagedMessage message = request.getMessage(input);
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doFire() - entry");
+            logger.trace(getName() + " doFire() - entry");
         }
         if (isMockMode()) {
             ExecutionTracerService.trace(this, "MOCK - Starting acquisition");
@@ -307,13 +307,13 @@ public class ScientaAcquisition extends ATangoDeviceActor implements IActorFinal
                 response.addOutputMessage(2, dataPort, PasserelleUtil.createContentMessage(this, dataProxy));
 
             } catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+                ExceptionUtil.throwProcessingException(this, e);
             } catch (final PasserelleException e) {
-                throw new ProcessingException("Passerelle Exception", null, e);
+                ExceptionUtil.throwProcessingException("Passerelle Exception", this, e);
             }
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " doFire() - exit");
+            logger.trace(getName() + " doFire() - exit");
         }
     }
 

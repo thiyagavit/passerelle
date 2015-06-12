@@ -1,20 +1,20 @@
-/*	Synchrotron Soleil
- *
- *   File          :  AttributeWriterValueIn.java
- *
- *   Project       :  passerelle-soleil
- *
- *   Description   :
- *
- *   Author        :  ABEILLE
- *
- *   Original      :  26 mai 2005
- *
- *   Revision:  					Author:
- *   Date: 							State:
- *
- *   Log: AttributeWriterValueIn.java,v
- *
+/*
+ * Synchrotron Soleil
+ * 
+ * File : AttributeWriterValueIn.java
+ * 
+ * Project : passerelle-soleil
+ * 
+ * Description :
+ * 
+ * Author : ABEILLE
+ * 
+ * Original : 26 mai 2005
+ * 
+ * Revision: Author:
+ * Date: State:
+ * 
+ * Log: AttributeWriterValueIn.java,v
  */
 package fr.soleil.passerelle.actor.tango.basic;
 
@@ -31,15 +31,15 @@ import ptolemy.kernel.CompositeEntity;
 import ptolemy.kernel.util.Attribute;
 import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
+
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
 import com.isencia.passerelle.core.PasserelleException;
+import com.isencia.passerelle.doc.generator.ParameterName;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.util.ExecutionTracerService;
-
-import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.AttrDataFormat;
 import fr.esrf.Tango.AttrWriteType;
@@ -48,14 +48,14 @@ import fr.soleil.passerelle.actor.tango.ATangoAttributeActor;
 import fr.soleil.passerelle.recording.DataRecorder;
 import fr.soleil.passerelle.tango.util.CancellableTangoTask;
 import fr.soleil.passerelle.tango.util.WaitAttributeTask;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
 /**
  * Write a Tango attribute, read back it and output the value. Option to check
  * that the read part has reached the write part.
- *
+ * 
  * @author ABEILLE
  */
 @SuppressWarnings("serial")
@@ -107,30 +107,29 @@ public class AttributeWriter extends ATangoAttributeActor {
      * @throws ptolemy.kernel.util.NameDuplicationException
      * @throws ptolemy.kernel.util.IllegalActionException
      */
-    public AttributeWriter(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
+    public AttributeWriter(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
+        super(container, name);
 
-	// inputTrigger = PortFactory.getInstance().createInputPort(this,
-	// "Value (Scalar only)", null);
-	// outputAttribute =
-	// PortFactory.getInstance().createOutputPort(this,"Attribute Written");
+        // inputTrigger = PortFactory.getInstance().createInputPort(this,
+        // "Value (Scalar only)", null);
+        // outputAttribute =
+        // PortFactory.getInstance().createOutputPort(this,"Attribute Written");
 
-	input.setName("Value (Scalar only)");
-	input.setExpectedMessageContentType(String.class);
-	output.setName("Attribute Written");
+        input.setName("Value (Scalar only)");
+        input.setExpectedMessageContentType(String.class);
+        output.setName("Attribute Written");
 
-	waitReadPartParam = new Parameter(this,
-		WAIT_READ_PART_EQUALS_WRITE_PART, new BooleanToken(false));
-	waitReadPartParam.setTypeEquals(BaseType.BOOLEAN);
+        waitReadPartParam = new Parameter(this, WAIT_READ_PART_EQUALS_WRITE_PART, new BooleanToken(false));
+        waitReadPartParam.setTypeEquals(BaseType.BOOLEAN);
 
-	toleranceParam = new StringParameter(this, TOLERANCE);
-	toleranceParam.setExpression("0.5");
-	registerConfigurableParameter(toleranceParam);
+        toleranceParam = new StringParameter(this, TOLERANCE);
+        toleranceParam.setExpression("0.5");
+        registerConfigurableParameter(toleranceParam);
 
-	timeoutParam = new StringParameter(this, TIMEOUT);
-	timeoutParam.setExpression("10");
-	registerConfigurableParameter(timeoutParam);
+        timeoutParam = new StringParameter(this, TIMEOUT);
+        timeoutParam.setExpression("10");
+        registerConfigurableParameter(timeoutParam);
 
     }
 
@@ -142,120 +141,105 @@ public class AttributeWriter extends ATangoAttributeActor {
      * )
      */
     @Override
-    public void attributeChanged(final Attribute arg0)
-	    throws IllegalActionException {
-	if (arg0 == toleranceParam) {
-	    tolerance = PasserelleUtil.getParameterDoubleValue(toleranceParam);
-	} else if (arg0 == timeoutParam) {
-	    timeout = PasserelleUtil.getParameterDoubleValue(timeoutParam);
-	} else if (arg0 == waitReadPartParam) {
-	    waitReadPart = PasserelleUtil
-		    .getParameterBooleanValue(waitReadPartParam);
-	} else {
-	    super.attributeChanged(arg0);
-	}
+    public void attributeChanged(final Attribute arg0) throws IllegalActionException {
+        if (arg0 == toleranceParam) {
+            tolerance = PasserelleUtil.getParameterDoubleValue(toleranceParam);
+        } else if (arg0 == timeoutParam) {
+            timeout = PasserelleUtil.getParameterDoubleValue(timeoutParam);
+        } else if (arg0 == waitReadPartParam) {
+            waitReadPart = PasserelleUtil.getParameterBooleanValue(waitReadPartParam);
+        } else {
+            super.attributeChanged(arg0);
+        }
     }
 
     @Override
-    protected void process(final ActorContext ctxt,
-	    final ProcessRequest request, final ProcessResponse response)
-	    throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
-	final ManagedMessage message = request.getMessage(input);
+        final ManagedMessage message = request.getMessage(input);
 
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - entry");
-	}
-	if (isMockMode()) {
-	    final String input = (String) PasserelleUtil.getInputValue(message);
-	    ExecutionTracerService.trace(this, "MOCK - writing attribute "
-		    + getAttributeName());
-	    // sendOutputMsg(output, PasserelleUtil.createContentMessage(this,
-	    // input));
-	    response.addOutputMessage(0, output, PasserelleUtil
-		    .createContentMessage(this, input));
-	} else {
-	    try {
-		final TangoAttribute attr = getTangoAttribute();
-		final AttrDataFormat dataFormat = attr.getAttributeProxy()
-			.get_info().data_format;
-		final Object obj = PasserelleUtil.getInputValue(message);
-		if (dataFormat.equals(AttrDataFormat.SPECTRUM)) {
-		    String[] table;
-		    if (obj.getClass().isArray()) {
-			table = (String[]) obj;
-		    } else {
-			table = ((String) obj).split(",");
-		    }
-		    attr.writeSpectrum(table);
-		    ExecutionTracerService.trace(this, "writing attribute "
-			    + getAttributeName() + " with value: "
-			    + Arrays.toString(table));
-		} else if (dataFormat.equals(AttrDataFormat.SCALAR)) {
-		    ExecutionTracerService.trace(this, "writing attribute "
-			    + getAttributeName() + " with value: " + obj);
-		    attr.write(obj.toString());
+        if (logger.isTraceEnabled()) {
+            logger.trace(getName() + " doFire() - entry");
+        }
+        if (isMockMode()) {
+            final String input = (String) PasserelleUtil.getInputValue(message);
+            ExecutionTracerService.trace(this, "MOCK - writing attribute " + getAttributeName());
+            // sendOutputMsg(output, PasserelleUtil.createContentMessage(this,
+            // input));
+            response.addOutputMessage(0, output, PasserelleUtil.createContentMessage(this, input));
+        } else {
+            try {
+                final TangoAttribute attr = getTangoAttribute();
+                final AttrDataFormat dataFormat = attr.getAttributeProxy().get_info().data_format;
+                final Object obj = PasserelleUtil.getInputValue(message);
+                if (dataFormat.equals(AttrDataFormat.SPECTRUM)) {
+                    Object[] table;
+                    if (obj.getClass().isArray()) {
+                        table = (String[]) obj;
+                    } else {
+                        table = ((String) obj).split(",");
+                    }
+                    attr.writeSpectrum(table);
+                    ExecutionTracerService.trace(this, "writing attribute " + getAttributeName() + " with value: "
+                            + Arrays.toString(table));
+                } else if (dataFormat.equals(AttrDataFormat.SCALAR)) {
+                    ExecutionTracerService.trace(this, "writing attribute " + getAttributeName() + " with value: "
+                            + obj);
+                    attr.write(obj.toString());
 
-		} else {
-		    // TODO: gerer �criture
-		    throw new ProcessingException(
-			    "Cannot write on image attributes",
-			    getAttributeName(), null);
-		}
+                } else {
+                    // TODO: gerer ecriture
+                    ExceptionUtil.throwProcessingException("Cannot write on image attributes", getAttributeName());
+                }
 
-		if (attr.getAttributeProxy().get_info().writable != AttrWriteType.WRITE) {
-		    if (waitReadPart) {
-			ExecutionTracerService.trace(this, "waiting attribute "
-				+ getAttributeName() + " equals " + obj + "+-"
-				+ tolerance);
-			waitTask = new WaitAttributeTask(attr, tolerance,
-				timeout, 1000, null, false);
-			waitTask.run();
-			if (waitTask.hasFailed()) {
-			    throw waitTask.getDevFailed();
-			}
-			ExecutionTracerService.trace(this, "attribute "
-				+ getAttributeName() + " has been to "
-				+ attr.readAsString(" ", ""));
-		    }
+                if (attr.getAttributeProxy().get_info().writable != AttrWriteType.WRITE) {
+                    if (waitReadPart) {
+                        ExecutionTracerService.trace(this, "waiting attribute " + getAttributeName() + " equals " + obj
+                                + "+-" + tolerance);
+                        waitTask = new WaitAttributeTask(attr, tolerance, timeout, 1000, null, false);
+                        waitTask.run();
+                        if (waitTask.hasFailed()) {
+                            throw waitTask.getDevFailed();
+                        }
+                        ExecutionTracerService.trace(this,
+                                "attribute " + getAttributeName() + " has been to " + attr.readAsString(" ", ""));
+                    }
 
-		}
+                }
 
-		// save data if necessary
-		if (isRecordData()) {
-		    DataRecorder.getInstance().saveDevice(this,
-			    attr.getDeviceName());
-		}
-		// sendOutputMsg(output,
-		// PasserelleUtil.createContentMessage(this,
-		// attr));
-		attr.update();
-		response.addOutputMessage(0, output, PasserelleUtil
-			.createContentMessage(this, attr));
+                // save data if necessary
+                if (isRecordData()) {
+                    DataRecorder.getInstance().saveDevice(this, attr.getDeviceName());
+                }
+                // sendOutputMsg(output,
+                // PasserelleUtil.createContentMessage(this,
+                // attr));
+                attr.update();
+                response.addOutputMessage(0, output, PasserelleUtil.createContentMessage(this, attr));
 
-	    } catch (final DevFailed e) {
-		throw new DevFailedProcessingException(e, this);
-	    } catch (final PasserelleException e) {
-		throw new ProcessingException(e.getMessage(),
-			getAttributeName(), e);
-	    }
-	}
-	if (logger.isTraceEnabled()) {
-	    logger.trace(getInfo() + " doFire() - exit");
-	}
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
+            } catch (final PasserelleException e) {
+                ExceptionUtil.throwProcessingException(e.getMessage(), getAttributeName(), e);
+            }
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace(getName() + " doFire() - exit");
+        }
     }
 
     @Override
     protected void doStop() {
-	if (waitTask != null) {
-	    waitTask.cancel();
-	}
-	super.doStop();
+        if (waitTask != null) {
+            waitTask.cancel();
+        }
+        super.doStop();
     }
 
     @Override
     protected String getExtendedInfo() {
-	return this.getName();
+        return this.getName();
     }
 
 }

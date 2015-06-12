@@ -1,12 +1,14 @@
 package fr.soleil.passerelle.ptolemy.data.exp;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ptolemy.data.expr.PtParser;
+
+import com.isencia.passerelle.util.StringUtils;
+
 import fr.soleil.math.Analysis;
 import fr.soleil.math.BeamCalculations;
 

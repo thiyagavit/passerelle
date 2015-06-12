@@ -9,22 +9,24 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.kernel.util.NameDuplicationException;
 
 import com.isencia.passerelle.actor.ProcessingException;
-import com.isencia.passerelle.actor.v3.Actor;
 import com.isencia.passerelle.actor.v3.ActorContext;
 import com.isencia.passerelle.actor.v3.ProcessRequest;
 import com.isencia.passerelle.actor.v3.ProcessResponse;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
 import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.util.ExecutionTracerService;
 
+import fr.soleil.passerelle.actor.ActorV3;
+import fr.soleil.passerelle.util.ExceptionUtil;
+
 @SuppressWarnings("serial")
-public class ErrorGeneratorV3 extends Actor {
+public class ErrorGeneratorV3 extends ActorV3 {
 
     public Parameter severityParam;
-    public String severity = Severity.FATAL.toString();
-
+    public String severity = ExceptionUtil.FATAL_ERROR;
+    
     public Port input;
     public Port output;
 
@@ -39,9 +41,9 @@ public class ErrorGeneratorV3 extends Actor {
 
         severityParam = new StringParameter(this, "severity");
         severityParam.setExpression(severity);
-        severityParam.addChoice(Severity.FATAL.toString());
-        severityParam.addChoice(Severity.NON_FATAL.toString());
-
+        severityParam.addChoice(ExceptionUtil.FATAL_ERROR);
+        severityParam.addChoice(ExceptionUtil.NON_FATAL_ERROR);
+        
         input = PortFactory.getInstance().createInputPort(this, "in", null);
         input.setMode(PortMode.PUSH);
         output = PortFactory.getInstance().createOutputPort(this, "out");
@@ -51,14 +53,13 @@ public class ErrorGeneratorV3 extends Actor {
     @Override
     protected void process(final ActorContext arg0, final ProcessRequest arg1,
             final ProcessResponse arg2) throws ProcessingException {
-
+        
         ExecutionTracerService.trace(this, "Error message: " + this.message);
-        Severity s = Severity.NON_FATAL;
-        if (Severity.FATAL.toString().equals(severity)) {
-            s = Severity.FATAL;
+        ErrorCode error = ErrorCode.INFO;
+        if (ExceptionUtil.FATAL_ERROR.equals(severity)) {
+            error = ErrorCode.FATAL;
+            ExceptionUtil.throwProcessingException(error, this.message,this);
         }
-        throw new ProcessingException(s, this.message, null, null);
-
     }
 
     @Override
@@ -70,12 +71,6 @@ public class ErrorGeneratorV3 extends Actor {
         } else {
             super.attributeChanged(attribute);
         }
-    }
-
-    @Override
-    protected String getExtendedInfo() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

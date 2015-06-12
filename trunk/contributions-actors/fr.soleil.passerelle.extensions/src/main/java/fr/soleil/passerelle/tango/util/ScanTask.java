@@ -3,10 +3,10 @@ package fr.soleil.passerelle.tango.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.isencia.passerelle.core.PasserelleException;
-import com.isencia.passerelle.core.PasserelleException.Severity;
+import com.isencia.passerelle.core.ErrorCode;
 
 import fr.soleil.passerelle.actor.tango.acquisition.scan.ScanUtil;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.salsa.api.SalsaAPI;
 import fr.soleil.salsa.entity.IConfig;
 import fr.soleil.salsa.entity.IScanStatus;
@@ -76,12 +76,13 @@ public class ScanTask implements Runnable {
                 if (currentSalsaApi.getScanState() == ScanState.ABORT) {
                     hasFailed = true;
                     final IScanStatus status = currentSalsaApi.getStatus();
-                    exception = new PasserelleException(Severity.FATAL, "The Scan has been interrupted with status: "
-                            + status.getStatus(), null, null);
+                    ExceptionUtil.throwPasserelleException(ErrorCode.FATAL,
+                            "The Scan has been interrupted with status: " + status.getStatus(), this);
                 }
 
             } catch (final SalsaDeviceException e) {
-                logger.error("SalsaDeviceException : Scan has been interrupted on getState, because {} ", e.getMessage());
+                logger.error("SalsaDeviceException : Scan has been interrupted on getState, because {} ",
+                        e.getMessage());
                 hasFailed = true;
                 exception = e;
 

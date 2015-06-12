@@ -34,9 +34,8 @@ import fr.soleil.passerelle.actor.tango.ATangoDeviceActorV5;
 import fr.soleil.passerelle.domain.BasicDirector;
 import fr.soleil.passerelle.tango.util.TangoAccess;
 import fr.soleil.passerelle.tango.util.TangoToPasserelleUtil;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
-import fr.soleil.passerelle.util.ProcessingExceptionWithLog;
 
 @SuppressWarnings("serial")
 public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IActorFinalizer {
@@ -54,26 +53,25 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
     public Port outputAcqStarted = null;
 
     public CCDAcquisitionPerformer(final CompositeEntity arg0, final String arg1,
-            final HashMap<String, Integer> acqModeMap) throws NameDuplicationException,
-            IllegalActionException {
+            final HashMap<String, Integer> acqModeMap) throws NameDuplicationException, IllegalActionException {
         super(arg0, arg1);
-        initActor(acqModeMap,false);
+        initActor(acqModeMap, false);
     }
-    
+
     public CCDAcquisitionPerformer(final CompositeEntity arg0, final String arg1,
             final HashMap<String, Integer> acqModeMap, final boolean withAcqStartedInfo)
-                    throws NameDuplicationException, IllegalActionException {
+            throws NameDuplicationException, IllegalActionException {
         super(arg0, arg1);
-        initActor(acqModeMap,withAcqStartedInfo);
-        
+        initActor(acqModeMap, withAcqStartedInfo);
+
     }
-    
-    private void initActor (final HashMap<String, Integer> acqModeMap, final boolean withAcqStartedInfo)
-            throws NameDuplicationException, IllegalActionException{
+
+    private void initActor(final HashMap<String, Integer> acqModeMap, final boolean withAcqStartedInfo)
+            throws NameDuplicationException, IllegalActionException {
         input.setMode(PortMode.PUSH);
-        
-        if(withAcqStartedInfo) {
-            outputAcqStarted = PortFactory.getInstance().createOutputPort(this,"AcqStarted");
+
+        if (withAcqStartedInfo) {
+            outputAcqStarted = PortFactory.getInstance().createOutputPort(this, "AcqStarted");
         }
 
         this.acqModeMap = acqModeMap;
@@ -97,21 +95,15 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
         final URL url = this.getClass().getResource("/image/camera.png");
         _attachText("_iconDescription", "<svg>\n" + "<rect x=\"-20\" y=\"-20\" width=\"40\" "
                 + "height=\"40\" style=\"fill:blue;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:white\"/>\n"
-                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" "
-                + "style=\"stroke-width:1.0;stroke:black\"/>\n"
-                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" "
-                + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
-                + " <image x=\"-11\" y=\"-11\" width =\"32\" height=\"32\" xlink:href=\"" + url
-                + "\"/>\n" + "</svg>\n"); 
-            }
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"19\" y2=\"-19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"-19\" y1=\"-19\" x2=\"-19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:white\"/>\n"
+                + "<line x1=\"20\" y1=\"-19\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"-19\" y1=\"20\" x2=\"20\" y2=\"20\" " + "style=\"stroke-width:1.0;stroke:black\"/>\n"
+                + "<line x1=\"19\" y1=\"-18\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + "<line x1=\"-18\" y1=\"19\" x2=\"19\" y2=\"19\" " + "style=\"stroke-width:1.0;stroke:grey\"/>\n"
+                + " <image x=\"-11\" y=\"-11\" width =\"32\" height=\"32\" xlink:href=\"" + url + "\"/>\n" + "</svg>\n");
+    }
+
     @Override
     protected void doInitialize() throws InitializationException {
         final Director dir = getDirector();
@@ -122,15 +114,15 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
         ccd = CCDManagerFactory.getInstance().createCCDManager(this, getDeviceName());
 
     }
-    
+
     @Override
     protected Logger getLogger() {
-      return LOGGER;
+        return LOGGER;
     }
-    
+
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
         getLogger().trace("process - entry");
         final CCDConfiguration config = ccd.getConfig();
@@ -143,20 +135,17 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
                 ExecutionTracerService.trace(this,
                         "MOCK - starting CCD acquisition with parameters: \n" + ccd.getConfig());
                 ExecutionTracerService.trace(this, "MOCK - CCD acquisition finished");
-            }
-            else {
+            } else {
                 ccd.startStandardAcquisition();
-                if(outputAcqStarted != null){
-                    getLogger().trace("process - Acquisition is started");                    
+                if (outputAcqStarted != null) {
+                    getLogger().trace("process - Acquisition is started");
                     sendOutputMsg(outputAcqStarted, PasserelleUtil.createTriggerMessage());
                 }
                 ccd.updateConfigFromDevice();
-                ExecutionTracerService.trace(this, "starting CCD acquisition with parameters: \n"
-                        + ccd.getConfig());
+                ExecutionTracerService.trace(this, "starting CCD acquisition with parameters: \n" + ccd.getConfig());
                 if (isRecordData()) {
                     ccd.waitEndAcquisitionAndStore();
-                }
-                else {
+                } else {
                     ccd.waitEndAcquisition();
                 }
                 ExecutionTracerService.trace(this, "CCD acquisition finished");
@@ -164,12 +153,10 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
             response.addOutputMessage(output, PasserelleUtil.createTriggerMessage());
 
             getLogger().trace("process - exit");
-        }
-        catch (final DevFailed e) {
-            throw new DevFailedProcessingException(e, this);
-        }
-        catch (final IllegalActionException e) {
-            throw new ProcessingExceptionWithLog(this,"Cannot record data", null, e);
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
+        } catch (final IllegalActionException e) {
+            ExceptionUtil.throwProcessingExceptionWithLog(this, "Cannot record data", this, e);
         }
     }
 
@@ -184,11 +171,9 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == acquisitionModeParam) {
             acqMode = ((StringToken) acquisitionModeParam.getToken()).stringValue();
-        }
-        else if (arg0 == recordAllSequenceParam) {
+        } else if (arg0 == recordAllSequenceParam) {
             recordAllSequence = Boolean.valueOf(recordAllSequenceParam.getExpression());
-        }
-        else {
+        } else {
             super.attributeChanged(arg0);
         }
     }
@@ -196,18 +181,16 @@ public class CCDAcquisitionPerformer extends ATangoDeviceActorV5 implements IAct
     public void doFinalAction() {
         try {
             if (!isMockMode()) {
-                // bug 22954              
-                if (TangoAccess.isCurrentStateEqualStateRequired(getDeviceName(),DevState.RUNNING)) {
+                // bug 22954
+                if (TangoAccess.isCurrentStateEqualStateRequired(getDeviceName(), DevState.RUNNING)) {
                     ccd.stopAcquisition();
                     ExecutionTracerService.trace(this, "CCD acquisition stopped");
                 }
                 ccd.cancelWaitEndAcquisition();
             }
-        }
-        catch (final DevFailed e) {
+        } catch (final DevFailed e) {
             TangoToPasserelleUtil.getDevFailedString(e, this);
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             // ignore error since it is impossible to throw it
         }

@@ -16,7 +16,7 @@ import com.isencia.passerelle.core.PasserelleException;
 import com.isencia.passerelle.doc.generator.ParameterName;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedValidationException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoCommand;
 
@@ -64,19 +64,19 @@ public abstract class ATangoCommandActor extends ATangoDeviceActor {
     protected void validateInitialization() throws ValidationException {
 
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - entry");
+            logger.trace(getName() + " validateInitialization() - entry");
         }
         if (!isMockMode()) {
             try {
                 tangoCommand = new TangoCommand(getDeviceName(), commandName);
             }
             catch (final DevFailed e) {
-                throw new DevFailedValidationException(e, this);
+                ExceptionUtil.throwValidationException(this, e);
             }
         }
         super.validateInitialization();
         if (logger.isTraceEnabled()) {
-            logger.trace(getInfo() + " validateInitialization() - exit");
+            logger.trace(getName() + " validateInitialization() - exit");
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class ATangoCommandActor extends ATangoDeviceActor {
      */
     public TangoCommand getTangoCommand() throws PasserelleException {
         if (tangoCommand == null) {
-            throw new PasserelleException("field not initialized", commandName, null);
+            ExceptionUtil.throwPasserelleException("field not initialized", commandName);
         }
         return tangoCommand;
     }

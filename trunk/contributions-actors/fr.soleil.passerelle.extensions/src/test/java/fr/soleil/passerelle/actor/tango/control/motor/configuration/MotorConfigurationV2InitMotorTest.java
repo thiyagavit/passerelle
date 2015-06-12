@@ -61,7 +61,7 @@ public class MotorConfigurationV2InitMotorTest {
 
         cbProxy.command_inout("Init");
         motorProxy.command_inout("Init");
-        config = new MotorConfigurationV2(motorProxy, MOTOR_NAME, true);
+        config = new MotorConfigurationV2(MOTOR_NAME);
     }
 
     @Test

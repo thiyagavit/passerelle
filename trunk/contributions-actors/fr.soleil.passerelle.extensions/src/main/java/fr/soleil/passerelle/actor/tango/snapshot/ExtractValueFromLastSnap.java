@@ -12,7 +12,7 @@ import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.message.ManagedMessage;
 
 import fr.esrf.Tango.DevFailed;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 
 @SuppressWarnings("serial")
@@ -28,26 +28,26 @@ public class ExtractValueFromLastSnap extends ASnapExtractor {
      * @throws IllegalActionException
      */
     public ExtractValueFromLastSnap(final CompositeEntity container, final String name)
-	    throws NameDuplicationException, IllegalActionException {
-	super(container, name);
+            throws NameDuplicationException, IllegalActionException {
+        super(container, name);
 
-	contextIDParam = new StringParameter(this, "Context ID");
-	contextIDParam.setExpression("1");
+        contextIDParam = new StringParameter(this, "Context ID");
+        contextIDParam.setExpression("1");
     }
 
     @Override
     protected void doInitialize() throws InitializationException {
-	super.doInitialize();
+        super.doInitialize();
     }
 
     @Override
     protected void doFire(final ManagedMessage arg0) throws ProcessingException {
-	try {
-	    setSnapIDFromContext(contextID);
-	    getAndSendValues();
-	} catch (final DevFailed e) {
-	    throw new DevFailedProcessingException(e, this);
-	}
+        try {
+            setSnapIDFromContext(contextID);
+            getAndSendValues();
+        } catch (final DevFailed e) {
+            ExceptionUtil.throwProcessingException(this, e);
+        }
     }
 
     @Override
@@ -55,16 +55,16 @@ public class ExtractValueFromLastSnap extends ASnapExtractor {
      * @throws IllegalActionException
      */
     public void attributeChanged(final Attribute attribute) throws IllegalActionException {
-	if (attribute == contextIDParam) {
-	    contextID = PasserelleUtil.getParameterValue(contextIDParam);
-	} else {
-	    super.attributeChanged(attribute);
-	}
+        if (attribute == contextIDParam) {
+            contextID = PasserelleUtil.getParameterValue(contextIDParam);
+        } else {
+            super.attributeChanged(attribute);
+        }
     }
 
     @Override
     protected String getExtendedInfo() {
-	return null;
+        return null;
     }
 
 }

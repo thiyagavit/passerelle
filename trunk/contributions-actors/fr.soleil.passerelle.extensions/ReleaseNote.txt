@@ -1,6 +1,15 @@
 The goal of this file is to described with are the actors modifications.
 
 ---------------------------------------------
+V 8.7.6 2015-03-30 
+---------------------------------------------
+- PASSERELLE-93 : Remove Deprecation for Exception
+- PASSERELLE-145 : MotorConfigurationV2 Get motor property through device database instead of deviceproxy
+- PASSERELLE-162 : DefinePositionV2 and InitReferencePosition modification in order to ignore offset if it is not defined
+- PASSERELLE-181 : GalilAxisV5, add "Turn on as needed" parameter in order to MotorON motor if it is OFF before moving (by default = false)
+
+
+---------------------------------------------
 V 4.5.2 2012-10-18 
 ---------------------------------------------
 - Bug 22954 : Suppression de l'appel à la méthode deviceProxy.state et .ping qui impacte beaucoup d'acteurs

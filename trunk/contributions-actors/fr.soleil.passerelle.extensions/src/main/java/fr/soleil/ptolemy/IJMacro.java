@@ -36,7 +36,6 @@ package fr.soleil.ptolemy;
 import java.io.File;
 import java.net.URL;
 
-import ptolemy.actor.gui.style.TextStyle;
 import ptolemy.actor.lib.Sink;
 import ptolemy.data.StringToken;
 import ptolemy.data.expr.FileParameter;

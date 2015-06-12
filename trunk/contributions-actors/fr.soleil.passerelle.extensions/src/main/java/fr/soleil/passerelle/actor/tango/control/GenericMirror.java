@@ -20,8 +20,7 @@ import fr.esrf.Tango.DevFailed;
 import fr.soleil.passerelle.actor.tango.control.motor.MotorMover;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.IMoveAction;
 import fr.soleil.passerelle.actor.tango.control.motor.actions.MoveNumericAttribute;
-import fr.soleil.passerelle.util.DevFailedInitializationException;
-import fr.soleil.passerelle.util.DevFailedProcessingException;
+import fr.soleil.passerelle.util.ExceptionUtil;
 import fr.soleil.passerelle.util.PasserelleUtil;
 import fr.soleil.tango.clientapi.TangoAttribute;
 
@@ -40,8 +39,8 @@ public class GenericMirror extends MotorMover {
         attributeList.add("curvature");
     }
 
-    public GenericMirror(final CompositeEntity container, final String name)
-            throws NameDuplicationException, IllegalActionException {
+    public GenericMirror(final CompositeEntity container, final String name) throws NameDuplicationException,
+            IllegalActionException {
         super(container, name, attributeList);
 
         isBenderLessParam = new Parameter(this, "is Bender Less", new BooleanToken(false));
@@ -62,24 +61,22 @@ public class GenericMirror extends MotorMover {
         if (!isMockMode()) {
             try {
                 attIsBenderLessHelper = new TangoAttribute(getDeviceName() + "/isBenderLess");
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedInitializationException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwInitializationException(this, e);
             }
         }
         super.doInitialize();
     }
 
     @Override
-    protected void process(final ActorContext ctxt, final ProcessRequest request,
-            final ProcessResponse response) throws ProcessingException {
+    protected void process(final ActorContext ctxt, final ProcessRequest request, final ProcessResponse response)
+            throws ProcessingException {
 
         if (!isMockMode()) {
             try {
                 attIsBenderLessHelper.write(isBenderLess);
-            }
-            catch (final DevFailed e) {
-                throw new DevFailedProcessingException(e, this);
+            } catch (final DevFailed e) {
+                ExceptionUtil.throwProcessingException(this, e);
             }
         }
         // sendOutputMsg(output, PasserelleUtil.createTriggerMessage());

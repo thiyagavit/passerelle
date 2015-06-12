@@ -54,6 +54,7 @@ import com.isencia.passerelle.util.ExecutionTracerService;
 
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonNature;
 import fr.soleil.passerelle.actor.flow.ComparatorHelper.ComparisonType;
+import fr.soleil.passerelle.util.ExceptionUtil;
 
 /**
  * @author ABEILLE
@@ -140,7 +141,7 @@ public class AttributeComparator extends Actor {
 		rightReceived = false;
 
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doInitialize() - entry");
+			logger.trace(getName() + " doInitialize() - entry");
 
 		// If something connected to the set port, install a handler
 		if (left.getWidth() > 0) {
@@ -224,7 +225,7 @@ public class AttributeComparator extends Actor {
 
 		}
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doInitialize() - exit");
+			logger.trace(getName() + " doInitialize() - exit");
 	}
 
 	private synchronized void performNotify() {
@@ -266,7 +267,7 @@ public class AttributeComparator extends Actor {
 	@Override
 	protected void doFire() throws ProcessingException {
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doFire() - entry");
+			logger.trace(getName() + " doFire() - entry");
 		while (!leftReceived || !rightReceived) {
 			performWait(1000);
 		}
@@ -300,13 +301,13 @@ public class AttributeComparator extends Actor {
 			try {
 				if (result) {
 					if (logger.isTraceEnabled())
-						logger.trace(getInfo()
+						logger.trace(getName()
 								+ " doFire() - comparison is true");
 					sendOutputMsg(trueOutput, MessageFactory.getInstance()
 							.createTriggerMessage());
 				} else {
 					if (logger.isTraceEnabled())
-						logger.trace(getInfo()
+						logger.trace(getName()
 								+ " doFire() - comparison is false");
 					sendOutputMsg(falseOutput, MessageFactory.getInstance()
 							.createTriggerMessage());
@@ -314,9 +315,7 @@ public class AttributeComparator extends Actor {
 			} catch (TerminateProcessException e) {
 				requestFinish();
 			} catch (NoRoomException e) {
-				e.printStackTrace();
-				throw new ProcessingException("send output message failed ",
-						this, e);
+				ExceptionUtil.throwProcessingException("send output message failed", this,e);
 			}
 			rightConst = null;
 			leftConst = null;
@@ -325,7 +324,7 @@ public class AttributeComparator extends Actor {
 
 		}
 		if (logger.isTraceEnabled())
-			logger.trace(getInfo() + " doFire() - exit");
+			logger.trace(getName() + " doFire() - exit");
 	}
 
 	private synchronized void performWait(int time) {
@@ -337,11 +336,6 @@ public class AttributeComparator extends Actor {
 		} catch (InterruptedException e) {
 		}
 
-	}
-
-	@Override
-	protected String getExtendedInfo() {
-		return this.getName();
 	}
 
 }
