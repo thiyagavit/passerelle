@@ -35,6 +35,7 @@ import com.isencia.passerelle.actor.FlowUtils;
 import com.isencia.passerelle.actor.ProcessingException;
 import com.isencia.passerelle.core.Port;
 import com.isencia.passerelle.core.PortFactory;
+import com.isencia.passerelle.core.PortMode;
 import com.isencia.passerelle.message.ManagedMessage;
 import com.isencia.passerelle.message.MessageException;
 import com.isencia.passerelle.message.MessageInputContext;
@@ -87,7 +88,7 @@ public class EventsToTaskCollector extends Actor {
 
   public EventsToTaskCollector(CompositeEntity container, String name) throws IllegalActionException, NameDuplicationException {
     super(container, name);
-    input = PortFactory.getInstance().createInputPort(this, null);
+    input = PortFactory.getInstance().createInputPort(this, PortMode.PUSH, null);
     output = PortFactory.getInstance().createOutputPort(this);
     taskTypeParam = new StringParameter(this, AttributeNames.TASK_TYPE);
     taskTypeParam.setExpression(name);
