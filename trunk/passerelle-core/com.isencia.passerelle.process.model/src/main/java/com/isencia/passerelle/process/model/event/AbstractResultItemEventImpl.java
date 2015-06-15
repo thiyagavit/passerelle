@@ -41,6 +41,7 @@ public abstract class AbstractResultItemEventImpl<V extends Serializable> extend
   protected AbstractResultItemEventImpl(String topic, V value, Date creationTS, Long duration) {
     super(topic, creationTS, duration);
     this.value = value;
+    setProperty("value", value.toString());
   }
   
   @Override
