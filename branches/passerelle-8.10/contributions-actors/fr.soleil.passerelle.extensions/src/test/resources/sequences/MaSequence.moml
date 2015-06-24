@@ -1,0 +1,49 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="MaSequence" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="4.0.1">
+    </property>
+    <property name="Recording" class="fr.soleil.passerelle.domain.RecordingDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="/usr/Local/passerelle/passerelle/conf/systemproperties.txt">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{175, 50}">
+        </property>
+    </property>
+    <entity name="StartRecording" class="fr.soleil.passerelle.actor.tango.recording.StartRecording">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[305.0, 375.0]">
+        </property>
+    </entity>
+    <entity name="SetTimeout" class="fr.soleil.passerelle.actor.tango.basic.SetTimeout">
+        <property name="Timeout" class="ptolemy.data.expr.StringParameter" value="5000">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{180, 380}">
+        </property>
+    </entity>
+    <entity name="SaveDevice" class="fr.soleil.passerelle.actor.tango.recording.SaveDevice">
+        <property name="Device Name" class="ptolemy.data.expr.StringParameter" value="titi">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[460.0, 375.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="StartRecording.output" relation="relation2"/>
+    <link port="StartRecording.trigger" relation="relation"/>
+    <link port="SetTimeout.output" relation="relation"/>
+    <link port="SaveDevice.trigger" relation="relation2"/>
+</entity>

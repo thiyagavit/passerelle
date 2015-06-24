@@ -1,0 +1,477 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="DualKeyValue" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[30.0, 35.0]">
+        </property>
+    </property>
+    <entity name="ForLoopList1" class="fr.soleil.passerelle.actor.flow.ForLoop">
+        <property name="End Value" class="ptolemy.data.expr.StringParameter" value="3">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[940.0, 200.0]">
+        </property>
+    </entity>
+    <entity name="outputList1" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="Operation" class="ptolemy.data.expr.StringParameter" value="output value">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[865.0, 325.0]">
+        </property>
+    </entity>
+    <entity name="MemorizeList1" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="Separator" class="ptolemy.data.expr.StringParameter" value=":">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[530.0, 220.0]">
+        </property>
+    </entity>
+    <entity name="gotoList1" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="Operation" class="ptolemy.data.expr.StringParameter" value="Go to position">
+        </property>
+        <property name="Position value" class="ptolemy.data.expr.Parameter" value="0">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[750.0, 210.0]">
+        </property>
+    </entity>
+    <entity name="Value Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1135.0, 370.0]">
+        </property>
+    </entity>
+    <entity name="Key Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1130.0, 285.0]">
+        </property>
+    </entity>
+    <entity name="gotoList2" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="List name" class="ptolemy.data.expr.StringParameter" value="my list name2">
+        </property>
+        <property name="Operation" class="ptolemy.data.expr.StringParameter" value="Go to position">
+        </property>
+        <property name="Position value" class="ptolemy.data.expr.Parameter" value="0">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[750.0, 520.0]">
+        </property>
+    </entity>
+    <entity name="MemorizeList2" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="List name" class="ptolemy.data.expr.StringParameter" value="my list name2">
+        </property>
+        <property name="Separator" class="ptolemy.data.expr.StringParameter" value=":">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[535.0, 530.0]">
+        </property>
+    </entity>
+    <entity name="Value Tracer_2" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1140.0, 670.0]">
+        </property>
+    </entity>
+    <entity name="ForLoopList2" class="fr.soleil.passerelle.actor.flow.ForLoop">
+        <property name="End Value" class="ptolemy.data.expr.StringParameter" value="3">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[955.0, 510.0]">
+        </property>
+    </entity>
+    <entity name="Key Tracer_2" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1140.0, 590.0]">
+        </property>
+    </entity>
+    <entity name="outputList2" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="List name" class="ptolemy.data.expr.StringParameter" value="my list name2">
+        </property>
+        <property name="Operation" class="ptolemy.data.expr.StringParameter" value="output value">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[885.0, 635.0]">
+        </property>
+    </entity>
+    <entity name="ValuesGenerator" class="fr.soleil.passerelle.actor.flow.ValuesListGenerator">
+        <property name="Values List (sep by commas)" class="ptolemy.data.expr.StringParameter" value=" ==============================================,  , Line-List1                : 7-List1, Location-List1            : P1-B-01-List1, Sample Information-List1  : ,             : 789-List1, Method Name-List1         : D:\AGILENT\METHODS\USERS\AUTOSAMPLER_SEQUENCE-List1,  , ==============================================">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[360.0, 195.0]">
+        </property>
+    </entity>
+    <entity name="ForLoopMemorize1" class="fr.soleil.passerelle.actor.flow.ForLoop">
+        <property name="End Value" class="ptolemy.data.expr.StringParameter" value="8">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[215.0, 170.0]">
+        </property>
+    </entity>
+    <entity name="Trigger" class="be.isencia.passerelle.actor.control.Trigger">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[30.0, 180.0]">
+        </property>
+    </entity>
+    <entity name="ValuesGenerator_2" class="fr.soleil.passerelle.actor.flow.ValuesListGenerator">
+        <property name="Values List (sep by commas)" class="ptolemy.data.expr.StringParameter" value="==============================================,  , Line-List2                : 7-List2, Location-List2            : P1-B-01-List2, Sample Information-List2  : ,             : 789-List2, Method Name-List2         : D:\AGILENT\METHODS\USERS\AUTOSAMPLER_SEQUENCE-List2,  , ==============================================">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[365.0, 520.0]">
+        </property>
+    </entity>
+    <entity name="Trigger_2" class="be.isencia.passerelle.actor.control.Trigger">
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[35.0, 490.0]">
+        </property>
+    </entity>
+    <entity name="ForLoopMemorize2" class="fr.soleil.passerelle.actor.flow.ForLoop">
+        <property name="End Value" class="ptolemy.data.expr.StringParameter" value="8">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[190.0, 500.0]">
+        </property>
+    </entity>
+    <entity name="Choice1" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="0">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[450.0, 320.0]">
+        </property>
+    </entity>
+    <entity name="Switch" class="fr.soleil.passerelle.actor.flow.Switch">
+        <property name="count" class="ptolemy.data.expr.Parameter" value="2">
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[640.0, 285.0]">
+        </property>
+        <port name="output 0" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+        <port name="output 1" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <entity name="ClearList1" class="fr.soleil.passerelle.actor.flow.KeyValueListMemorizer">
+        <property name="Separator" class="ptolemy.data.expr.StringParameter" value=":">
+        </property>
+        <property name="Operation" class="ptolemy.data.expr.StringParameter" value="Clear list">
+        </property>
+        <property name="Filtered keys" class="ptolemy.data.expr.StringParameter" value="">
+            <property name="style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="3">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="25">
+                </property>
+            </property>
+        </property>
+        <property name="_controllerFactory" class="com.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="com.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[740.0, 320.0]">
+        </property>
+    </entity>
+    <relation name="relation_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_4" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_6" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_7" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_8" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_10" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_11" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_12" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_13" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_14" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_15" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_16" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_17" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_18" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_19" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_20" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_9" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_21" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_22" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_23" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation_24" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="ForLoopList1.trigger (start loop)" relation="relation_4"/>
+    <link port="ForLoopList1.handled" relation="relation_6"/>
+    <link port="ForLoopList1.output value" relation="relation_6"/>
+    <link port="ForLoopList1.output value" relation="relation_5"/>
+    <link port="outputList1.input" relation="relation_5"/>
+    <link port="outputList1.input" relation="relation_21"/>
+    <link port="outputList1.key" relation="relation_7"/>
+    <link port="outputList1.value" relation="relation_2"/>
+    <link port="MemorizeList1.input" relation="relation_3"/>
+    <link port="MemorizeList1.output" relation="relation_24"/>
+    <link port="gotoList1.hasFinished" relation="relation_4"/>
+    <link port="gotoList1.input" relation="relation_23"/>
+    <link port="Value Tracer.input" relation="relation_2"/>
+    <link port="Key Tracer.input" relation="relation_7"/>
+    <link port="gotoList2.hasFinished" relation="relation_12"/>
+    <link port="gotoList2.input" relation="relation_14"/>
+    <link port="MemorizeList2.hasFinished" relation="relation_14"/>
+    <link port="MemorizeList2.input" relation="relation_9"/>
+    <link port="Value Tracer_2.input" relation="relation_11"/>
+    <link port="ForLoopList2.trigger (start loop)" relation="relation_12"/>
+    <link port="ForLoopList2.handled" relation="relation_8"/>
+    <link port="ForLoopList2.output value" relation="relation_8"/>
+    <link port="ForLoopList2.output value" relation="relation_10"/>
+    <link port="Key Tracer_2.input" relation="relation_13"/>
+    <link port="outputList2.input" relation="relation_10"/>
+    <link port="outputList2.key" relation="relation_13"/>
+    <link port="outputList2.value" relation="relation_11"/>
+    <link port="ValuesGenerator.Trigger" relation="relation_16"/>
+    <link port="ValuesGenerator.Value" relation="relation_3"/>
+    <link port="ForLoopMemorize1.trigger (start loop)" relation="relation_17"/>
+    <link port="ForLoopMemorize1.handled" relation="relation_15"/>
+    <link port="ForLoopMemorize1.output value" relation="relation_15"/>
+    <link port="ForLoopMemorize1.output value" relation="relation_16"/>
+    <link port="Trigger.output" relation="relation_17"/>
+    <link port="ValuesGenerator_2.Trigger" relation="relation_20"/>
+    <link port="ValuesGenerator_2.Value" relation="relation_9"/>
+    <link port="Trigger_2.output" relation="relation_19"/>
+    <link port="ForLoopMemorize2.trigger (start loop)" relation="relation_19"/>
+    <link port="ForLoopMemorize2.handled" relation="relation_18"/>
+    <link port="ForLoopMemorize2.output value" relation="relation_18"/>
+    <link port="ForLoopMemorize2.output value" relation="relation_20"/>
+    <link port="Choice1.output" relation="relation"/>
+    <link port="Switch.input" relation="relation_24"/>
+    <link port="Switch.select" relation="relation"/>
+    <link port="Switch.output 0" relation="relation_23"/>
+    <link port="Switch.output 1" relation="relation_22"/>
+    <link port="ClearList1.input" relation="relation_22"/>
+    <link port="ClearList1.output" relation="relation_21"/>
+</entity>

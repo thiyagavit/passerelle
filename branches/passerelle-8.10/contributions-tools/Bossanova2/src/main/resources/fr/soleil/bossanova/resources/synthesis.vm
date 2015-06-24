@@ -1,0 +1,14 @@
+List of parameters for all step in the Batch
+#foreach( $step in $steps )
+==============================================
+#if($step.enable == 'true')
+${step.name}($step.type) x$step.iterationCount, Step ENABLE
+#else
+${step.name}($step.type) x$step.iterationCount, Step DISABLE
+#end
+----------------------------------------------
+#foreach( $key in $step.parameters.keySet() )
+$key --> $step.parameters.get($key)
+#end
+==============================================
+#end

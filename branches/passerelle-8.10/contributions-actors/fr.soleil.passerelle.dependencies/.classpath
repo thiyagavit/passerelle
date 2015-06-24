@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/NumericalComputing-2.1.5-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/Pattern-2.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/Display-2.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ATKCore-4.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ATKWidget-4.0.16.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/avalon-framework-4.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/AwtUtilities-1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/BasicUtilities-1.2.6-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bsh-2.0b4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CometeAWT-2.1.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CometeDefinition-2.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CometeSwing-2.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.7.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CurrentScanDataModel-1.0.20.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/DataConnectionManagement-1.2.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/docgenerator-0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dozer-5.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ExpressionParser-2.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/fest-assert-core-2.0M10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hamcrest-core-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ij-1.45s.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ImageJUtilities-1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javassist-3.17.1-GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jcommander-1.27.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jep-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jython-2.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/logkit-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/MacroManager-0.0.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.9.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mockito-core-1.9.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/objenesis-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/PictureLibrary-5.0.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-api-mockito-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-api-support-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-core-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-module-testng-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-module-testng-common-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/powermock-reflect-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/salsa-2.7.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SalsaAPI-3.5.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SalsaEntity-3.5.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SalsaLocal-3.5.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SalsaUtils-3.5.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/servlet-api-2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-ext-1.6.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/snakeyaml-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SwingUtilities-1.2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/TangoDataSource-2.1.27.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/TangoUnit-0.3.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/testng-6.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xml-1.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

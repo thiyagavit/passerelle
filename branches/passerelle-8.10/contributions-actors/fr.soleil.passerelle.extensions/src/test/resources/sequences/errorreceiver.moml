@@ -1,0 +1,135 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="errorreceiver" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="4.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="/usr/Local/passerelle/passerelle/conf/systemproperties.txt">
+        </property>
+        <property name="Mock Mode" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="Error Control" class="ptolemy.data.expr.StringParameter" value="retry">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[70.0, 95.0]">
+        </property>
+    </property>
+    <entity name="ErrorGenerator" class="fr.soleil.passerelle.test.ErrorGenerator">
+        <property name="error type" class="ptolemy.data.expr.StringParameter" value="fire">
+        </property>
+        <property name="severity" class="ptolemy.data.expr.StringParameter" value="NON_FATAL">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[310.0, 445.0]">
+        </property>
+    </entity>
+    <entity name="Constant" class="be.isencia.passerelle.actor.general.Const">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[55.0, 465.0]">
+        </property>
+    </entity>
+    <entity name="Tracer" class="fr.soleil.passerelle.actor.tango.debug.Tracer">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[690.0, 580.0]">
+        </property>
+    </entity>
+    <entity name="BooleanSelection" class="fr.soleil.passerelle.actor.flow.BooleanSelection">
+        <property name="output true" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="icon" class="ptolemy.vergil.icon.AttributeValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="output true">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[165.0, 480.0]">
+        </property>
+    </entity>
+    <entity name="Delay" class="fr.soleil.passerelle.actor.flow.Delay">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[420.0, 510.0]">
+        </property>
+    </entity>
+    <entity name="Constant3" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="sans erreur">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{295.0, 540.0}">
+        </property>
+    </entity>
+    <entity name="ErrorReceiver" class="fr.soleil.passerelle.actor.error.ErrorReceiver">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[525.0, 480.0]">
+        </property>
+    </entity>
+    <entity name="Constant2" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="RECEIVER">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[635.0, 485.0]">
+        </property>
+    </entity>
+    <relation name="relation5" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation4" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation7" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation6" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation8" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <relation name="relation3" class="ptolemy.actor.TypedIORelation">
+    </relation>
+    <link port="ErrorGenerator.input" relation="relation4"/>
+    <link port="Constant.output" relation="relation5"/>
+    <link port="Tracer.input" relation="relation7"/>
+    <link port="Tracer.input" relation="relation2"/>
+    <link port="BooleanSelection.input" relation="relation5"/>
+    <link port="BooleanSelection.true output" relation="relation4"/>
+    <link port="BooleanSelection.false output" relation="relation6"/>
+    <link port="Delay.input" relation="relation8"/>
+    <link port="Delay.output" relation="relation7"/>
+    <link port="Delay.output" relation="relation3"/>
+    <link port="Constant3.output" relation="relation8"/>
+    <link port="Constant3.trigger" relation="relation6"/>
+    <link port="ErrorReceiver.requestFinish" relation="relation3"/>
+    <link port="ErrorReceiver.output" relation="relation"/>
+    <link port="Constant2.output" relation="relation2"/>
+    <link port="Constant2.trigger" relation="relation"/>
+</entity>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map-def SYSTEM "../../dtd/mapping_file.dtd">
+<map-def name="QUICK_EXAFS" version="1.0.0">
+    <item key="delta_theta">
+        <path>/{NXentry}/{NXdata}/DeltaTheta</path>
+    </item>
+    <item key="intensity0">
+        <path>/{NXentry}/{NXdata}/channel0*</path>
+    </item>
+    <item key="intensity1">
+        <path>/{NXentry}/{NXdata}/channel1*</path>
+    </item>
+    <item key="intensity2">
+        <path>/{NXentry}/{NXdata}/channel2*</path>
+    </item>
+    <item key="mono2_direction">
+        <path>/{NXentry}/{NXdata}/mono2Direction*</path>
+    </item>
+    <item key="mono3_direction">
+        <path>/{NXentry}/{NXdata}/mono3Direction*</path>
+    </item>
+    <item key="cristal_inter_reticular_distance">
+        <path>/{NXentry}/QuickEXAFS/cristal_inter_reticular_distance</path>
+    </item>
+    <item key="delta_theta0">
+        <path>/{NXentry}/QuickEXAFS/delta_theta_0</path>
+    </item>
+    <item key="theta">
+        <path>/{NXentry}/QuickEXAFS/theta</path>
+    </item>
+    <item key="monochromator_name">
+        <path>/{NXentry}/QuickEXAFS/monochromator_name</path>
+    </item>
+</map-def>

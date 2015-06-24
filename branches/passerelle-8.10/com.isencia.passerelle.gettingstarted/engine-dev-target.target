@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target sequenceNumber="7">
+<locations>
+<location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/ptolemy" type="Directory"/>
+<location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/rcp-deltapack" type="Directory"/>
+<location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base-sources" type="Directory"/>
+<location path="${workspace_loc}/com.isencia.passerelle.gettingstarted/passerelle-thirdparty-base" type="Directory"/>
+</locations>
+</target>

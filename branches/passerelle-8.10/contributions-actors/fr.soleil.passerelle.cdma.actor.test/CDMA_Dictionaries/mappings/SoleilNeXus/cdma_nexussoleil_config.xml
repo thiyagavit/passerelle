@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin-config SYSTEM "../../dtd/plugin_config_file.dtd">
+<plugin-config name="SOLEIL's NeXus plug-in configuration file">
+
+
+<!-- ============================================
+==  CONFIG 1: detection by file information    ==
+============================================= -->
+  <dataset-model name="fully_defined_conf">
+    <criteria>
+      <if exist="true" target="/{NXinstrument}"/>
+      <if exist="true" target="/acquisition_model"/>
+    </criteria>
+
+    <parameters> 
+      <parameter name="BEAMLINE" type="name" target="/{NXinstrument}"/>
+      <parameter name="MODEL" type="value" target="/acquisition_model"/>
+    </parameters>
+
+    <plugin>
+      <java>
+        <set name="log_debug" value="true"/>
+        <set name="N4T_buffer_size" value="300"/>
+      </java>
+    </plugin>
+  </dataset-model>
+
+<!-- ============================================
+==  CONFIG 2: all beamlines scanserver         ==
+============================================= -->
+  <dataset-model name="generic_scanserver">
+    <criteria>
+      <if exist="true" target="/{NXinstrument}"/>
+      <if exist="true" target="/scan_data{NXdata}/data_01"/>
+    </criteria>
+    
+    <parameters>
+      <parameter name="BEAMLINE" type="name" target="/{NXinstrument}"/>
+      <parameter name="MODEL" type="constant" constant="scanserver"/>
+    </parameters>
+
+    <plugin>
+      <java>
+        <set name="log_debug" value="true"/>
+        <set name="N4T_buffer_size" value="300"/>
+      </java>
+    </plugin>
+  </dataset-model>
+  
+<!-- ============================================
+==  CONFIG 3: all beamlines passerelle         ==
+============================================= -->
+  <dataset-model name="generic_passerelle">
+    <criteria>
+      <if exist="true" target="/{NXinstrument}"/>
+    </criteria>
+    
+    <parameters>
+      <parameter name="BEAMLINE" type="name" target="/{NXinstrument}"/>
+      <parameter name="MODEL" type="constant" constant="passerelle"/>
+    </parameters>
+
+    <plugin>
+      <java>
+        <set name="log_debug" value="true"/>
+        <set name="N4T_buffer_size" value="300"/>
+      </java>
+    </plugin>
+  </dataset-model>
+  
+<!-- ============================================
+==  CONFIG 4: all beamlines flyscan            ==
+============================================= -->
+  <dataset-model name="generic_flyscan">
+    <criteria>
+      <if exist="true" target="/*flyscan*{NXentry}/{NXinstrument}" />
+    </criteria>
+    
+    <parameters>
+      <parameter name="BEAMLINE" type="name" target="/{NXentry}/{NXinstrument}"/>
+      <parameter name="MODEL" type="constant" constant="flyscan"/>
+    </parameters>
+    
+    <plugin>
+      <java>
+        <set name="log_debug" value="true"/>
+        <set name="N4T_buffer_size" value="300"/>
+      </java>
+    </plugin>
+  </dataset-model>
+  
+
+<!-- ============================================
+==  CONFIG 5: SAMBA quickexafs                       ==
+============================================= -->
+  <dataset-model name="samba_quickexafs">
+    <criteria>
+      <if exist="true" target="/{NXentry}/{NXdata}/DeltaTheta"/>
+      <if exist="true" target="/{NXentry}/{NXdata}/channel0"/>
+    </criteria>
+    
+    <parameters>
+      <parameter name="BEAMLINE" type="constant" constant="samba"/>
+      <parameter name="MODEL" type="constant" constant="quickexafs"/>
+    </parameters>
+
+    <plugin>
+      <java>
+        <set name="log_debug" value="true"/>
+        <set name="N4T_buffer_size" value="300"/>
+      </java>
+    </plugin>
+  </dataset-model>
+  
+<!-- ============================================
+==  Global section                             ==
+============================================= -->
+  <global>
+    <java>
+     <set name="CDMA_DEBUG" value="true"/>
+    </java>
+  </global>
+</plugin-config>
+

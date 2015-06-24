@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map-def SYSTEM "../../dtd/mapping_file.dtd">
+<map-def name="HERMES_SCANSERVER" version="1.0.0">
+  <item key="acquisition_sequence">
+    <path></path>
+    <!-- create virtual data item having the name of the nodes listed above -->
+    <call>CreateVirtualItem</call>
+  </item>
+  <item key="images">
+    <path>/{NXdata}/data_03</path>
+    <call>HarvestEquipmentAttributes</call>
+    <attribute name="interpretation" value="image"/>
+  </item>
+  <item key="x_position">
+    <path>/{NXdata}/time_1</path>
+    <call>HarvestEquipmentAttributes</call>
+  </item>
+</map-def>

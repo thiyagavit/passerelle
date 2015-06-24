@@ -1,0 +1,28 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE plot PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="others" class="ptolemy.moml.EntityLibrary">
+  <configure>
+    <?moml
+      <group>
+<doc>Other</doc>
+<entity name="ValuesGenerator" class="fr.soleil.passerelle.ValuesGenerator">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="LoopValues" class="fr.soleil.passerelle.LoopValues">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="AttributeComparator" class="fr.soleil.passerelle.AttributeComparator">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SpectrumAverager" class="fr.soleil.passerelle.SpectrumAverager">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+      </group>
+    ?>
+  </configure>
+</entity>

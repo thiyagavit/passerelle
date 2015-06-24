@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/archiving-0.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ArchivingSoleil-0.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/Core-3.2.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/h5object-2.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hdf5lib-2.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/MamboSoleil-0.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/object-2.10.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.cdma.engine.hdf-1.0.2-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.cdma.plugin.soleil.nexus-2.0.2-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sql-0.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/utilities-1.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xml-0.0.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

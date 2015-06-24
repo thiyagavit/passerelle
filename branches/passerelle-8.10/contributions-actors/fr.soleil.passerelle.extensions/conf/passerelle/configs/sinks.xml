@@ -1,0 +1,33 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE plot PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="sinks" class="ptolemy.moml.EntityLibrary">
+  <configure>
+    <?moml
+      <group>
+<doc>Sink actors</doc>
+
+<entity name="Console" class="be.isencia.passerelle.actor.general.Console">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="FileWriter" class="be.isencia.passerelle.actor.io.FileWriter">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="Multicast Sender" class="be.isencia.passerelle.actor.net.MulticastSender">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="Socket Sender" class="be.isencia.passerelle.actor.net.SocketClientSender">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+<entity name="SMTP Sender" class="be.isencia.passerelle.actor.mail.SMTPSender">
+	<property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory" />
+	<property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory" />
+</entity>
+      </group>
+    ?>
+  </configure>
+</entity>

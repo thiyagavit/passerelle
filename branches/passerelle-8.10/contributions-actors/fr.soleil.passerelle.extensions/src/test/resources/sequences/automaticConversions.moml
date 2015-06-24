@@ -1,0 +1,325 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="test2" class="ptolemy.actor.TypedCompositeActor">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="Soleil Std" class="fr.soleil.passerelle.domain.BasicDirector">
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="/usr/Local/passerelle/passerelle/conf/systemproperties.txt">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[70.0, 45.0]">
+        </property>
+    </property>
+    <entity name="AttributeWriter" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_spectrum">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[650.0, 170.0]">
+        </property>
+    </entity>
+    <entity name="AttributeReader" class="fr.soleil.passerelle.actor.tango.basic.AttributeReader">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_spectrum">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[455.0, 215.0]">
+        </property>
+    </entity>
+    <entity name="Constant" class="be.isencia.passerelle.actor.general.Const">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[175.0, 195.0]">
+        </property>
+    </entity>
+    <entity name="Constant2" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="4553,546,5464">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[955.0, 195.0]">
+        </property>
+    </entity>
+    <entity name="AttributeWriter2" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_spectrum">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1090.0, 125.0]">
+        </property>
+    </entity>
+    <entity name="AttributeWriter3" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_spectrum">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1165.0, 250.0]">
+        </property>
+    </entity>
+    <entity name="ExtendedExpression" class="fr.soleil.passerelle.actor.ptolemy.Expression">
+        <property name="expression" class="ptolemy.data.expr.StringParameter" value="x1+10">
+        </property>
+        <property name="input types" class="ptolemy.data.expr.StringParameter" value="ARRAY">
+        </property>
+        <property name="icon3" class="ptolemy.vergil.icon.BoxedValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="expression">
+            </property>
+            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1030.0, 275.0]">
+        </property>
+        <port name="x1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+        </port>
+    </entity>
+    <entity name="AttributeWriter4" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_scalar">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1195.0, 755.0]">
+        </property>
+    </entity>
+    <entity name="ExtendedExpression2" class="fr.soleil.passerelle.actor.ptolemy.Expression">
+        <property name="expression" class="ptolemy.data.expr.StringParameter" value="x1+10">
+        </property>
+        <property name="input types" class="ptolemy.data.expr.StringParameter" value="DOUBLE">
+        </property>
+        <property name="icon3" class="ptolemy.vergil.icon.BoxedValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="expression">
+            </property>
+            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1010.0, 690.0]">
+        </property>
+        <port name="x1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+        </port>
+    </entity>
+    <entity name="AttributeWriter5" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Record data" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_scalar">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[1085.0, 515.0]">
+        </property>
+    </entity>
+    <entity name="Constant3" class="be.isencia.passerelle.actor.general.Const">
+        <property name="value" class="ptolemy.data.expr.StringParameter" value="4553">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[930.0, 505.0]">
+        </property>
+    </entity>
+    <entity name="AttributeReader2" class="fr.soleil.passerelle.actor.tango.basic.AttributeReader">
+        <property name="Record data" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_scalar">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[440.0, 475.0]">
+        </property>
+    </entity>
+    <entity name="Constant4" class="be.isencia.passerelle.actor.general.Const">
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_editorPaneFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorPaneFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[185.0, 395.0]">
+        </property>
+    </entity>
+    <entity name="AttributeWriter6" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_scalar">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[650.0, 460.0]">
+        </property>
+    </entity>
+    <entity name="AttributeWriter7" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_spectrum">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[780.0, 315.0]">
+        </property>
+    </entity>
+    <entity name="ExtendedExpression3" class="fr.soleil.passerelle.actor.ptolemy.Expression">
+        <property name="expression" class="ptolemy.data.expr.StringParameter" value="x1+10">
+        </property>
+        <property name="input types" class="ptolemy.data.expr.StringParameter" value="ARRAY">
+        </property>
+        <property name="icon3" class="ptolemy.vergil.icon.BoxedValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="expression">
+            </property>
+            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[590.0, 280.0]">
+        </property>
+        <port name="x1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+        </port>
+    </entity>
+    <entity name="ExtendedExpression4" class="fr.soleil.passerelle.actor.ptolemy.Expression">
+        <property name="expression" class="ptolemy.data.expr.StringParameter" value="x1+10">
+        </property>
+        <property name="input types" class="ptolemy.data.expr.StringParameter" value="DOUBLE">
+        </property>
+        <property name="icon3" class="ptolemy.vergil.icon.BoxedValueIcon">
+            <property name="attributeName" class="ptolemy.kernel.util.StringAttribute" value="expression">
+            </property>
+            <property name="displayWidth" class="ptolemy.data.expr.Parameter" value="60">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[560.0, 580.0]">
+        </property>
+        <port name="x1" class="be.isencia.passerelle.core.Port">
+            <property name="input"/>
+        </port>
+    </entity>
+    <entity name="AttributeWriter8" class="fr.soleil.passerelle.actor.tango.basic.AttributeWriter">
+        <property name="Attribute Name" class="ptolemy.data.expr.StringParameter" value="tango/tangotest/1/double_scalar">
+        </property>
+        <property name="_controllerFactory" class="be.isencia.passerelle.actor.gui.PasserelleActorControllerFactory">
+        </property>
+        <property name="_editorFactory" class="be.isencia.passerelle.actor.gui.PasserelleEditorFactory">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="[915.0, 765.0]">
+        </property>
+    </entity>
+    <relation name="relation" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation6" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation4" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation7" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation8" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation9" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation10" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation11" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation12" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation13" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation14" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation15" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="relation16" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="AttributeWriter.Value (Scalar only)" relation="relation"/>
+    <link port="AttributeWriter.Attribute Written" relation="relation5"/>
+    <link port="AttributeReader.Trigger" relation="relation2"/>
+    <link port="AttributeReader.Attribute" relation="relation"/>
+    <link port="AttributeReader.Attribute" relation="relation14"/>
+    <link port="Constant.output" relation="relation2"/>
+    <link port="Constant2.output" relation="relation6"/>
+    <link port="Constant2.output" relation="relation3"/>
+    <link port="Constant2.trigger" relation="relation5"/>
+    <link port="AttributeWriter2.Value (Scalar only)" relation="relation6"/>
+    <link port="AttributeWriter3.Value (Scalar only)" relation="relation4"/>
+    <link port="ExtendedExpression.result" relation="relation4"/>
+    <link port="ExtendedExpression.x1" relation="relation3"/>
+    <link port="AttributeWriter4.Value (Scalar only)" relation="relation12"/>
+    <link port="ExtendedExpression2.result" relation="relation12"/>
+    <link port="ExtendedExpression2.x1" relation="relation8"/>
+    <link port="AttributeWriter5.Value (Scalar only)" relation="relation9"/>
+    <link port="Constant3.output" relation="relation9"/>
+    <link port="Constant3.output" relation="relation8"/>
+    <link port="Constant3.trigger" relation="relation7"/>
+    <link port="AttributeReader2.Trigger" relation="relation10"/>
+    <link port="AttributeReader2.Attribute" relation="relation11"/>
+    <link port="AttributeReader2.Attribute" relation="relation16"/>
+    <link port="Constant4.output" relation="relation10"/>
+    <link port="AttributeWriter6.Value (Scalar only)" relation="relation11"/>
+    <link port="AttributeWriter6.Attribute Written" relation="relation7"/>
+    <link port="AttributeWriter7.Value (Scalar only)" relation="relation13"/>
+    <link port="ExtendedExpression3.result" relation="relation13"/>
+    <link port="ExtendedExpression3.x1" relation="relation14"/>
+    <link port="ExtendedExpression4.result" relation="relation15"/>
+    <link port="ExtendedExpression4.x1" relation="relation16"/>
+    <link port="AttributeWriter8.Value (Scalar only)" relation="relation15"/>
+</entity>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+==========================
+root element
+==========================
+-->
+<!ELEMENT synonym-def (plugin*)>
+
+<!--
+==========================
+synonyms
+==========================
+-->
+<!ELEMENT plugin (synonym*)>
+<!ATTLIST plugin
+    name CDATA #REQUIRED
+>
+
+<!-- 
+==========================
+synonym
+========================== 
+-->
+<!ELEMENT synonym EMPTY>
+<!ATTLIST synonym 
+    key CDATA #IMPLIED
+    mapping CDATA #IMPLIED
+    concept CDATA #IMPLIED
+>
