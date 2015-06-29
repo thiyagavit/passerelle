@@ -151,8 +151,8 @@ public abstract class Actor extends com.isencia.passerelle.actor.Actor implement
     // At this level we don't use such queue capacity settings anymore.
     // If queues with limited capacity are needed, our CAP domain Director must be used.
     // So we drop these parameters here.
-    receiverQueueCapacityParam.setContainer(null);
-    receiverQueueWarningSizeParam.setContainer(null);
+//    receiverQueueCapacityParam.setContainer(null);
+//    receiverQueueWarningSizeParam.setContainer(null);
   }
 
   @Override
