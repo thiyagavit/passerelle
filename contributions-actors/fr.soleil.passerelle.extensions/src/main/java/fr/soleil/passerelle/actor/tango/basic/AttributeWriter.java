@@ -64,6 +64,7 @@ public class AttributeWriter extends ATangoAttributeActor {
     private static final String TIMEOUT = "Timeout";
     private static final String TOLERANCE = "Tolerance";
     private static final String WAIT_READ_PART_EQUALS_WRITE_PART = "Wait read part equals write part";
+    private static final String SEPARATOR = "Separator";
     private final static Logger logger = LoggerFactory.getLogger(AttributeWriter.class);
 
     /**
@@ -73,6 +74,10 @@ public class AttributeWriter extends ATangoAttributeActor {
     @ParameterName(name = WAIT_READ_PART_EQUALS_WRITE_PART)
     public Parameter waitReadPartParam;
     private boolean waitReadPart;
+    
+    @ParameterName(name = SEPARATOR)
+    public Parameter separatorParam;
+    private String separator;
 
     /**
      * The absolute tolerance (only use with param
@@ -126,6 +131,9 @@ public class AttributeWriter extends ATangoAttributeActor {
         toleranceParam = new StringParameter(this, TOLERANCE);
         toleranceParam.setExpression("0.5");
         registerConfigurableParameter(toleranceParam);
+        
+        separatorParam = new StringParameter(this, SEPARATOR);
+        separatorParam.setExpression(",");
 
         timeoutParam = new StringParameter(this, TIMEOUT);
         timeoutParam.setExpression("10");
@@ -144,6 +152,9 @@ public class AttributeWriter extends ATangoAttributeActor {
     public void attributeChanged(final Attribute arg0) throws IllegalActionException {
         if (arg0 == toleranceParam) {
             tolerance = PasserelleUtil.getParameterDoubleValue(toleranceParam);
+        } 
+        if (arg0 == separatorParam) {
+            separator = PasserelleUtil.getParameterValue(separatorParam);
         } else if (arg0 == timeoutParam) {
             timeout = PasserelleUtil.getParameterDoubleValue(timeoutParam);
         } else if (arg0 == waitReadPartParam) {
@@ -178,11 +189,11 @@ public class AttributeWriter extends ATangoAttributeActor {
                     if (obj.getClass().isArray()) {
                         table = (String[]) obj;
                     } else {
-                        table = ((String) obj).split(",");
+                        table = ((String) obj).split(separator);
                     }
-                    attr.writeSpectrum(table);
                     ExecutionTracerService.trace(this, "writing attribute " + getAttributeName() + " with value: "
                             + Arrays.toString(table));
+                    attr.writeSpectrum(table);
                 } else if (dataFormat.equals(AttrDataFormat.SCALAR)) {
                     ExecutionTracerService.trace(this, "writing attribute " + getAttributeName() + " with value: "
                             + obj);
